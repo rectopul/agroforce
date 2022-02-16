@@ -6,11 +6,7 @@ import type { AppProps } from 'next/app';
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <MainHeader />
-      <div className='flex flex-row'>
-        <Aside />
-        <Component {...pageProps} />
-      </div>
+      <Component {...pageProps} />
     </>
   );
 }

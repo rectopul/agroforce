@@ -5,12 +5,15 @@ module.exports = {
   ],
   theme: {
     colors: {
-      'blue-600': '#2563eb',
+      'light': '#f8f8fc',
+
+      'blue-600': '#233D6E',
       'blue-700': '#1d4ed8',
       'blue-800': '#1e40af',
       'blue-900': '#1e3a8a',
       
       'gray-300':  '#d1d5db',
+      'gray-450':  '#595959',
       'gray-500': '#6b7280',
       'gray-600':  '#4b5563',
       'gray-700':  '#374151',
@@ -19,11 +22,17 @@ module.exports = {
       
       'white': '#FFFFFF',
       'cyan-500':  '#61dafb',
-      'yellow-500':  '#eba417'
+      'yellow-500':  '#eba417',
+
+      'e6e6f0': '#e6e6f0',
     },
     extend: {
       height: {
         'aside': 'calc(100vh - 5rem)',
+      },
+      width: {
+        // Header
+        'content-main-header': 'calc(99% - 16rem - 2.5rem)',
       }
     },
   },

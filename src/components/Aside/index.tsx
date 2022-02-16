@@ -7,7 +7,7 @@ import { BsGear } from 'react-icons/bs';
 
 export function Aside() {
   return (
-    <aside className="h-aside w-32 bg-gray-850 border-r border-r-gray-100">
+    <aside className="h-aside w-32 bg-gray-450 border-r border-r-gray-100">
       <nav className="flex flex-col gap-6 text-gray-300">
         <a href="#" id="lista" className="flex flex-col content-center items-center text-sm	 transition delay-150 hover:-translate-y-1 hover:text-blue-600 hover:scale-110 hover:bg-indigo-500 duration-300">
           <HiOutlineClipboardList size={32} />
