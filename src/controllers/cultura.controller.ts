@@ -1,4 +1,5 @@
 import {CulturaService} from '../services/cultura.service';
+import {CulturaModule} from '../model/cultura.module';
 import { Controller } from '@nestjs/common';
 
 @Controller()
@@ -12,6 +13,16 @@ export class CulturaController {
             if (!response) {
                return 'Essa cultura não existe';
             } 
+        }
+    }
+
+    async postCulture(data: object) {
+        console.log('data:' + data.name);
+        const culturaService = new CulturaService;
+        let culturaModel = new CulturaModule;
+        if (data != null && data != undefined) {
+            culturaModel = data.name;
+            return await culturaService.create(culturaModel);
         }
     }
 }

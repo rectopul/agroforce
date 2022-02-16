@@ -1,9 +1,9 @@
 import {prisma} from '../db/db';
-import {Cultura} from '../model/cultura';
+import {CulturaModule} from '../model/cultura.module';
 
 export class CulturaService {   
     async findOne(id: number) {
-        const Result = await prisma.cultura.findUnique({
+        let Result = await prisma.cultura.findUnique({
                where: {
                    id: id
                }
@@ -12,15 +12,16 @@ export class CulturaService {
     }
 
     async findAll () {
-        const Result = await prisma.cultura.findMany() .finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.cultura.findMany() .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
-    async create(Teste: Cultura) {
-    
+    async create(Cultura: CulturaModule) {
+        let Result = await prisma.cultura.createMany({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
+        return Result;
     }
 
-    update(Cultura: Cultura) {
+    update(Cultura: CulturaModule) {
 
     }
     
