@@ -21,7 +21,11 @@ module.exports = {
       'cyan-500':  '#61dafb',
       'yellow-500':  '#eba417'
     },
-    extend: {},
+    extend: {
+      height: {
+        'aside': 'calc(100vh - 5rem)',
+      }
+    },
   },
   plugins: [],
 }
