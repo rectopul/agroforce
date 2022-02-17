@@ -6,15 +6,15 @@ module.exports = {
   theme: {
     colors: {
       'light': '#f8f8fc',
-
+      
       'blue-600': '#233D6E',
       'blue-700': '#1d4ed8',
       'blue-800': '#1e40af',
       'blue-900': '#1e3a8a',
       
       'gray-300':  '#d1d5db',
+      'gray-400': '#9ca3af',
       'gray-450':  '#595959',
-      'gray-500': '#6b7280',
       'gray-600':  '#4b5563',
       'gray-700':  '#374151',
       'gray-850':  '#1f2729',

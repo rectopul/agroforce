@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-interface ITabProps {
+type ITabProps = {
   value: string | ReactNode;
   active: (() => boolean);
   title: string;
@@ -26,14 +26,18 @@ export function TabHeader({
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className={`w-14 h-14 flex justify-center items-center border ${border} rounded-md ${bg}
+    <div className="h-full
+      flex items-center gap-1
+    ">
+      <div className={`h-3/5 w-12
+        flex justify-center items-center
+        border ${border} rounded-md ${bg}
         rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full
       `}>
         <span className={`${color} text-2xl`}>{value}</span>
       </div>
 
-      <span className={`${border} text-lg`}>{title}</span>
+      <span className={`${border} text-sm`}>{title}</span>
     </div>
   );
 }

@@ -35,7 +35,12 @@ const Home: NextPage = () => {
                   />
                 </div>
 
-                <Button title='Conectar' onClick={() => {}} />
+                <Button 
+                  title='Conectar'
+                  onClick={() => {}} 
+                  bgColor="blue-600"
+                  textColor="white"
+                />
             </form>
 
             <a href="#" className='text-blue-600 mb-64
