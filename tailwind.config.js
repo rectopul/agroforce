@@ -33,6 +33,9 @@ module.exports = {
       width: {
         // Header
         'content-main-header': 'calc(99% - 16rem - 2.5rem)',
+
+        // Separar o componente Aside dos Conteúdos das outras telas
+        'container-all-main-contents': 'calc(100vw - 8rem)',
       },
     },
   },

@@ -7,7 +7,7 @@ interface IMainHeaderProps {
   children: never[] | ReactNode;
 }
 
-export function MainHeader({ children }: IMainHeaderProps): JSX.Element {
+export function MainHeader({ children }: IMainHeaderProps) {
   return (
     <header className="h-20 w-screen flex items-center  bg-gray-450">
       <div className="w-full flex justify-between items-center px-6 text-4xl">

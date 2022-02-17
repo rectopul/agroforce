@@ -3,6 +3,7 @@ import { Aside } from "../components/Aside";
 import Head from "next/head";
 import { TabHeader } from "../components/TabHeader";
 import { BsGraphUp } from "react-icons/bs";
+import { Content } from "../components/Content";
 
 export default function Dashboard() {
   return (
@@ -34,10 +35,13 @@ export default function Dashboard() {
           active={() => true}
           title="ENSIO"
         />
-
       </MainHeader>
+
       <div className='flex flex-row'>
         <Aside />
+        <Content>
+          <h1>Opa</h1>
+        </Content>
       </div>
     </>
   );
