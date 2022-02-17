@@ -23,7 +23,7 @@ const swaggerHandler = withSwagger({
         ],
         "schemes" : [ "http" ],
         "paths" : {
-            "/cultura" : {
+            "/culture" : {
                 "get" : {
                     "tags" : [ "cultura" ],
                     "summary" : "Lista todas a culturas cadastradas no banco",
@@ -53,7 +53,7 @@ const swaggerHandler = withSwagger({
                         "description" : "cultura a ser salva",
                         "required" : true,
                         "schema": {
-                            "$ref": "#/definitions/Cultura"
+                            "$ref": "#/definitions/Culture"
                         }                
                     }],
                     "responses" : {
@@ -64,7 +64,7 @@ const swaggerHandler = withSwagger({
                 },
               
             },
-            "/cultura/{id}": {
+            "/culture/{id}": {
                 "get" : {
                     "tags" : [ "cultura" ],
                     "summary" : "Lista uma unica cultura",
@@ -75,8 +75,8 @@ const swaggerHandler = withSwagger({
                         "name" : "id",
                         "in" : "path",
                         "description" : "id, da cultura a ser buscada",
-                        "required" : false,
-                        "type" : "int",
+                        "required" : true,
+                        "type" : "integer",
                     }],
                     "responses" : {
                         "200" : {
@@ -105,15 +105,15 @@ const swaggerHandler = withSwagger({
                             "description" : "",
                             "required" : true,
                             "schema" : {
-                            "$ref" : "#/definitions/Cultura"
+                            "$ref" : "#/definitions/Culture"
                             }
                         }, 
                         {
                             "name" : "id",
                             "in" : "path",
                             "description" : "id, da cultura a ser buscada",
-                            "required" : false,
-                            "type" : "int",
+                            "required" : true,
+                            "type" : "integer",
                         }
                     ],
                     "security" :{
@@ -132,9 +132,52 @@ const swaggerHandler = withSwagger({
                     }
                 }   
             },
+            "/user/{id}": {
+                "put" : {
+                    "tags" : [ "user" ],
+                    "summary" : "Edita um usuario",
+                    "description" : "",
+                    "operationId" : "id",
+                    "consumes" : [ "application/json" ],
+                    "produces" : [ "application/json" ],
+                    "parameters" : 
+                    [
+                        {
+                            "in" : "body",
+                            "name" : "body",
+                            "description" : "",
+                            "required" : true,
+                            "schema" : {
+                            "$ref" : "#/definitions/User"
+                            }
+                        }, 
+                        {
+                            "name" : "id",
+                            "in" : "path",
+                            "description" : "id, da cultura a ser buscada",
+                            "required" : true,
+                            "type" : "integer",
+                        }
+                    ],
+                    "security" :{
+                        "petstore_auth" : [ "write:users", "read:users" ]
+                    },
+                    "responses" : {
+                        "400" : {
+                            "description" : "id invalido"
+                        },
+                        "404" : {
+                            "description" : "cultura não existe"
+                        },
+                        "405" : {
+                            "description" : "Metodo não existe"
+                        }
+                    }
+                }   
+            },
         },
         "definitions": {
-            "Cultura": {
+            "Culture": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -146,7 +189,36 @@ const swaggerHandler = withSwagger({
                         "description": "Nome da cultura",
                     },
                     "status": {
-                        "type": "int",
+                        "type": "integer",
+                        "description": "1: Ativo, 0: Inativo"
+                    },
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Email do Usuario",
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome do Usuario",
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Password do usuario",
+                    },
+                    "id_profile": {
+                        "type": "string",
+                        "description": "ID relacionado ao perfil de permissão do usuario",
+                    },
+                    "status": {
+                        "type": "integer",
                         "description": "1: Ativo, 0: Inativo"
                     },
                 }
