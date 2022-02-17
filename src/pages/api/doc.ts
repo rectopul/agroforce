@@ -4,19 +4,23 @@ const swaggerHandler = withSwagger({
     definition: {
         "swagger" : "2.0",
         "info" : {
-        "description" : "Documentação para teste da API",
-        "version" : "3.0.0",
-        "title" : "Swagger TMG",
+            "description" : "Documentação para teste da API",
+            "version" : "3.0.0",
+            "title" : "Swagger TMG",
         },
         "host" : "localhost:3000",
         "basePath" : "/api",
-        "tags" : [ {
-        "name" : "user",
-        "description" : "Operations about user",
-        },  {
-            "name" : "cultura",
-            "description" : "Enpoints relacionados a cultura",
-        } ],
+        "tags" : 
+        [
+            {
+                "name" : "user",
+                "description" : "Operations about user",
+            },  
+            {
+                "name" : "cultura",
+                "description" : "Enpoints relacionados a cultura",
+            } 
+        ],
         "schemes" : [ "http" ],
         "paths" : {
             "/cultura" : {
@@ -25,15 +29,15 @@ const swaggerHandler = withSwagger({
                     "summary" : "Lista todas a culturas cadastradas no banco",
                     "produces" : [ "application/json" ],
                     "responses" : {
-                    "200" : {
-                        "description" : "successful operation",
-                    },
-                    "400" : {
-                        "description" : "Invalid status value"
-                    },
-                    "405" : {
-                        "description" : "Validation exception"
-                    }
+                        "200" : {
+                            "description" : "successful operation",
+                        },
+                        "400" : {
+                            "description" : "Invalid status value"
+                        },
+                        "405" : {
+                            "description" : "Validation exception"
+                        }
                     }
                 },
                 "post" : {
@@ -41,7 +45,7 @@ const swaggerHandler = withSwagger({
                     "summary" : "Adiciona uma nova cultura",
                     "description" : "",
                     "operationId" : "id",
-                    "consumes" : [ "application/json", "application/xml" ],
+                    "consumes" : [ "application/json" ],
                     "produces" : [ "application/xml", "application/json" ],
                     "parameters" : [{
                         "in" : "body",
@@ -58,37 +62,7 @@ const swaggerHandler = withSwagger({
                         }
                     }
                 },
-                "put" : {
-                    "tags" : [ "cultura" ],
-                    "summary" : "Edita a cultura desejada",
-                    "description" : "",
-                    "operationId" : "id",
-                    "consumes" : [ "application/json", "application/xml" ],
-                    "produces" : [ "application/xml", "application/json" ],
-                    "parameters" : [{
-                        "in" : "body",
-                        "name" : "body",
-                        "description" : "Pet object that needs to be added to the store",
-                        "required" : true,
-                        "schema" : {
-                        "$ref" : "#/definitions/Cultura"
-                        }
-                    }],
-                    "security" :{
-                        "petstore_auth" : [ "write:pets", "read:pets" ]
-                    },
-                    "responses" : {
-                        "400" : {
-                        "description" : "Invalid ID supplied"
-                        },
-                        "404" : {
-                        "description" : "Pet not found"
-                        },
-                        "405" : {
-                        "description" : "Validation exception"
-                        }
-                    }
-                }
+              
             },
             "/cultura/{id}": {
                 "get" : {
@@ -97,13 +71,13 @@ const swaggerHandler = withSwagger({
                     "description" : "Lista a cultura buscada de acordo com o id passado",
                     "operationId" : "id",
                     "produces" : ["application/json" ],
-                    "parameters" : {
+                    "parameters" : [{
                         "name" : "id",
                         "in" : "path",
                         "description" : "id, da cultura a ser buscada",
-                        "required" : true,
+                        "required" : false,
                         "type" : "int",
-                    },
+                    }],
                     "responses" : {
                         "200" : {
                             "description" : "successful operation",
@@ -115,7 +89,48 @@ const swaggerHandler = withSwagger({
                             "description" : "Validation exception"
                         }
                     }
-                }
+                },
+                "put" : {
+                    "tags" : [ "cultura" ],
+                    "summary" : "Edita a cultura desejada",
+                    "description" : "",
+                    "operationId" : "id",
+                    "consumes" : [ "application/json" ],
+                    "produces" : [ "application/json" ],
+                    "parameters" : 
+                    [
+                        {
+                            "in" : "body",
+                            "name" : "body",
+                            "description" : "",
+                            "required" : true,
+                            "schema" : {
+                            "$ref" : "#/definitions/Cultura"
+                            }
+                        }, 
+                        {
+                            "name" : "id",
+                            "in" : "path",
+                            "description" : "id, da cultura a ser buscada",
+                            "required" : false,
+                            "type" : "int",
+                        }
+                    ],
+                    "security" :{
+                        "petstore_auth" : [ "write:pets", "read:pets" ]
+                    },
+                    "responses" : {
+                        "400" : {
+                            "description" : "id invalido"
+                        },
+                        "404" : {
+                            "description" : "cultura não existe"
+                        },
+                        "405" : {
+                            "description" : "Metodo não existe"
+                        }
+                    }
+                }   
             },
         },
         "definitions": {
@@ -132,7 +147,7 @@ const swaggerHandler = withSwagger({
                     },
                     "status": {
                         "type": "int",
-                        "description": "1: Ativo, 0: Inativo",
+                        "description": "1: Ativo, 0: Inativo"
                     },
                 }
             }

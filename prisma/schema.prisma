@@ -11,10 +11,12 @@ model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
+  password String 
 }
 
 
 model Cultura {
   id    Int     @id @default(autoincrement())
   name  String?
+  status Int @default(1)
 }

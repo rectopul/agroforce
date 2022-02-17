@@ -1,28 +1,54 @@
 import {CulturaService} from '../services/cultura.service';
-import {CulturaModule} from '../model/cultura.module';
-import { Controller } from '@nestjs/common';
-
+import { Controller, Get, Post, Put } from '@nestjs/common';
 @Controller()
 export class CulturaController {
-    async getCulture(id: number) {
-        const culturaService = new CulturaService;
-        if (id === 0) {
-            return await culturaService.findAll();
-        } else {
-            const response = await culturaService.findOne(id); 
+    culturaService = new CulturaService();
+
+    @Get()
+    getAllCulture() {
+        let response =  this.culturaService.findAll();
+        return response;        
+    }
+
+    @Get()
+    async getOneCulture(id: string) {
+        let newID = parseInt(id);
+        if (id && id != '{id}') {
+            let response = await this.culturaService.findOne(newID); 
             if (!response) {
-               return 'Essa cultura não existe';
-            } 
+               return {status: 400, response:{error: 'cultura não existe'}};
+            } else {
+                return {status:200 ,response: response};
+            }
+        } else {
+            return {status:405, response:{error: 'id não informado'}};
         }
     }
 
+    @Post()
     async postCulture(data: object) {
-        console.log('data:' + data.name);
-        const culturaService = new CulturaService;
-        let culturaModel = new CulturaModule;
         if (data != null && data != undefined) {
-            culturaModel = data.name;
-            return await culturaService.create(culturaModel);
+            let response = await this.culturaService.create(data);
+            if(response.count > 0) {
+                return {status: 200, message: {message: "cultura inserida"}}
+            } else {
+                return {status: 400, message: {message: "erro"}}
+
+            }
+        }
+    }
+
+    @Put()
+    async updateCulture(id: string, data: object) {
+        let newID = parseInt(id);
+        if (data != null && data != undefined) {
+            let response = await this.culturaService.update(newID, data);
+            if(response) {
+                return {status: 200, message: {message: "cultura atualizada"}}
+            } else {
+                return {status: 400, message: {message: "erro ao tentar fazer o update"}}
+
+            }
         }
     }
 }
