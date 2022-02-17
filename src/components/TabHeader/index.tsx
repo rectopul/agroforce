@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 type ITabProps = {
-  value: string | ReactNode;
+  value: string | ReactNode | never[];
   active: (() => boolean);
   title: string;
 }

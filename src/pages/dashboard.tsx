@@ -1,9 +1,11 @@
-import { MainHeader } from "../components/MainHeader";
+import { BsGraphUp } from "react-icons/bs";
 import { Aside } from "../components/Aside";
 import Head from "next/head";
+
+import { MainHeader } from "../components/MainHeader";
 import { TabHeader } from "../components/TabHeader";
-import { BsGraphUp } from "react-icons/bs";
 import { Content } from "../components/Content";
+import { Model } from "../components/MainHeader/Model";
 
 export default function Dashboard() {
   return (
@@ -40,7 +42,7 @@ export default function Dashboard() {
       <div className='flex flex-row'>
         <Aside />
         <Content>
-          <h1>Opa</h1>
+          <h1>Conteudo</h1>
         </Content>
       </div>
     </>

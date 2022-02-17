@@ -2,13 +2,15 @@ module.exports = {
   content: [
     "./src/pages/*.{js,ts,jsx,tsx}",
     "./src/components/**/*.{js,ts,jsx,tsx}",
+    './node_modules/tw-elements/dist/js/**/*.js',
+    './node_modules/tw-elements/dist/js/*.js'
   ],
   theme: {
     colors: {
       'light': '#f8f8fc',
       
-      'blue-600': '#233D6E',
       'blue-700': '#1d4ed8',
+      'blue-600': '#233D6E',
       'blue-800': '#1e40af',
       'blue-900': '#1e3a8a',
       
@@ -19,6 +21,10 @@ module.exports = {
       'gray-700':  '#374151',
       'gray-850':  '#1f2729',
       'gray-900':  '#121214',
+
+      'red-600': '#dc2626',
+      'red-700': '#b91c1c',
+      'red-800': '#991b1b',
       
       'white': '#FFFFFF',
       'cyan-500':  '#61dafb',
@@ -39,5 +45,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tw-elements/dist/plugin')
+  ],
 }
