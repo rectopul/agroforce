@@ -12,6 +12,8 @@ model User {
   email String  @unique
   name  String?
   password String 
+  status Int
+  id_profile Int
 }
 
 
