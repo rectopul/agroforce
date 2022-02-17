@@ -33,7 +33,7 @@ module.exports = {
       width: {
         // Header
         'content-main-header': 'calc(99% - 16rem - 2.5rem)',
-      }
+      },
     },
   },
   plugins: [],

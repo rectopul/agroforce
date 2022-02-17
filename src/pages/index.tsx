@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { Button } from '../components/Button';
 
 // import SwaggerUI from 'swagger-ui-react';
 // import 'swagger-ui-react/swagger-ui.css';
@@ -38,9 +39,10 @@ const Home: NextPage = () => {
                   />
                 </div>
 
-              <button type='submit' className='h-10 w-32 rounded-full bg-blue-600 text-white'>
+                <Button title='Conectar' onClick={() => {}} />
+              {/* <button type='submit' className='h-10 w-32 rounded-full bg-blue-600 text-white'>
                 Conectar
-              </button>
+              </button> */}
             </form>
 
             <a href="#" className='text-blue-600 mb-64
