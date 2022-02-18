@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import { FaRegUser } from 'react-icons/fa';
 
 import { Select } from '../Select';
@@ -6,21 +6,16 @@ import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {
   children: never[] | ReactNode;
+  name: string;
   avatar: string | ReactNode;
 }
 
-export function MainHeader({ children, avatar }: IMainHeaderProps) {
-  const [model, setModel] = useState<boolean>(false);
-
+export function MainHeader({ children, name, avatar }: IMainHeaderProps) {
   const plantas = [ "Milho", "Algodão", "Sojá" ];
   const safras = [ "03/19", "04/20", "03/21" ];
 
-  avatar = '/images/person.jpg';
-
-  // console.log(openModel);
-
   return (
-    <header className="h-20 w-screen 
+    <header className="h-20 w-screen
       flex items-center
       border-b border-white
       bg-gray-450 
@@ -51,7 +46,7 @@ export function MainHeader({ children, avatar }: IMainHeaderProps) {
             avatar = <FaRegUser className='w-44 text-white' />
           ) : (
             <ModelHeader
-              name='Juliana Aparecia da Silva'
+              name={name}
               imagem={String(avatar)}
             />
           )
