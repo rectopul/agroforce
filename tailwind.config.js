@@ -2,8 +2,6 @@ module.exports = {
   content: [
     "./src/pages/*.{js,ts,jsx,tsx}",
     "./src/components/**/*.{js,ts,jsx,tsx}",
-    './node_modules/tw-elements/dist/js/**/*.js',
-    './node_modules/tw-elements/dist/js/*.js'
   ],
   theme: {
     colors: {
@@ -46,6 +44,6 @@ module.exports = {
     },
   },
   plugins: [
-    require('tw-elements/dist/plugin')
+    
   ],
 }
