@@ -41,9 +41,9 @@ export class UserController {
     @Post()
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
-            let response = await this.userService.create(data);
-            if(response.count > 0) {
-                return {status: 200, message: {message: "cultura inserida"}}
+            let response = await this.userService.signIn(data);
+            if(response) {
+                return response
             } else {
                 return {status: 400, message: {message: "erro"}}
 
@@ -51,13 +51,13 @@ export class UserController {
         }
     }
 
-    @Put()
+
     async updateUser(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {
             let response = await this.userService.update(newID, data);
             if(response) {
-                return {status: 200, message: {message: "cultura atualizada"}}
+                return {status: 200, message: {message: "Usuario atualizada"}}
             } else {
                 return {status: 400, message: {message: "usuario não existe"}}
 

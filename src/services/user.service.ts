@@ -17,15 +17,19 @@ export class UserService {
         return Result;
     }
 
+    async signIn (Where: object) {
+        let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
+        return Result;
+    }
+    
     async create(User: object) {
-        let Result = await prisma.user.createMany({ data: User }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.user.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async update(id: number, Data: Object) {
-        console.log("id: " + id + "," + "data: " + Data) 
         let User = await this.findOne(id);
-        if (User != null) {
+        if (User != null) { 
             let Result = await prisma.user.update({ 
                 where: {
                     id: id
@@ -37,6 +41,5 @@ export class UserService {
             return false;
         }
     }
-    
 }
 

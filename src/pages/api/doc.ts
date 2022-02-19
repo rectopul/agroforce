@@ -155,7 +155,7 @@ const swaggerHandler = withSwagger({
                             "name" : "id",
                             "in" : "path",
                             "description" : "id, da cultura a ser buscada",
-                            "required" : true,
+                            "required" : false,
                             "type" : "integer",
                         }
                     ],
@@ -214,7 +214,7 @@ const swaggerHandler = withSwagger({
                         "description": "Password do usuario",
                     },
                     "id_profile": {
-                        "type": "string",
+                        "type": "integer",
                         "description": "ID relacionado ao perfil de permissão do usuario",
                     },
                     "status": {

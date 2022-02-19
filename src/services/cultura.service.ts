@@ -9,7 +9,6 @@ export class CulturaService {
                    id: id
                }
              }) .finally(async () => { await prisma.$disconnect() })
-             console.log(typeof Result);
         return Result;
     }
 
