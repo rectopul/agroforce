@@ -1,13 +1,14 @@
+import { ReactNode } from "react";
+
 interface ISelectProps {
   items: Array<string | Date>;
 }
 
 export function Select({ items }: ISelectProps) {
   return (
-    <select className="
+    <select className="h-full w-full
       rounded
       text-sm bg-light
-
       form-select form-select-sm
       appearance-none
       block
@@ -25,10 +26,13 @@ export function Select({ items }: ISelectProps) {
       m-0
       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" aria-label=".form-select-sm example
     ">
+      <option>Escolher...</option>
       {
         items.map((value) => {
           return (
-            <option key={value.toString()}>{value}</option>
+            <option key={value.toString()}>
+              {value}
+            </option>
           )
         })
       }

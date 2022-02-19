@@ -6,7 +6,10 @@ interface IContentProps {
 
 export function Content({ children }: IContentProps) {
   return (
-    <div className="flex w-container-all-main-contents border border-gray-700
+    <div className="flex flex-col
+      w-container-all-main-contents
+      border border-gray-700
+      bg-gray-300
     ">
       { children }
     </div>

@@ -9,7 +9,6 @@ export function Aside() {
   return (
     <aside className="h-aside w-32
       bg-gray-450 
-      border-r border-r-white
     ">
       <nav className="flex flex-col gap-6
         pt-4

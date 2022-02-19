@@ -17,7 +17,6 @@ export function MainHeader({ children, name, avatar }: IMainHeaderProps) {
   return (
     <header className="h-20 w-screen
       flex items-center
-      border-b border-white
       bg-gray-450 
     ">
       <div className="w-full 
