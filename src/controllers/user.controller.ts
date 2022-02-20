@@ -33,7 +33,6 @@ export class UserController {
                 return {status: 200, message: {message: "cultura inserida"}}
             } else {
                 return {status: 400, message: {message: "erro"}}
-
             }
         }
     }
@@ -43,10 +42,9 @@ export class UserController {
         if (data != null && data != undefined) {
             let response = await this.userService.signIn(data);
             if(response) {
-                return response
+                return {status: 200, response}
             } else {
-                return {status: 400, message: {message: "erro"}}
-
+                return {status: 400, message:"Erro"}
             }
         }
     }
