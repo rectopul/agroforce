@@ -16,9 +16,9 @@ export class UserController {
         if (id && id != '{id}') {
             let response = await this.userService.findOne(newID); 
             if (!response) {
-               return {status: 400, response:{error: 'cultura não existe'}};
+               return {status: 400, message: 'cultura não existe'};
             } else {
-                return {status:200 ,response: response};
+                return {status:200 , response};
             }
         } else {
             return {status:405, response:{error: 'id não informado'}};
@@ -40,8 +40,10 @@ export class UserController {
     @Post()
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
-            let response = await this.userService.signIn(data);
+            const param = {email: data.email, password: data.password}
+            let response = await this.userService.signIn(param);
             if(response) {
+               await this.userService.update(response.id, {token: data.token});
                 return {status: 200, response}
             } else {
                 return {status: 400, message:"Erro"}
