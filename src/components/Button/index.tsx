@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { useRouter } from "next/router";
+import { ButtonHTMLAttributes, ReactNode } from "react";
 
-interface IButtonProps {
+type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   title?: string;
   onClick: (() => any);
   icon?: string | ReactNode;
@@ -8,6 +9,7 @@ interface IButtonProps {
   textColor?: string;
   hoverBgColor?: string;
   hoverTextColor?: string;
+  href?: string | any;
 }
 
 export function Button({
@@ -17,30 +19,62 @@ export function Button({
   textColor,
   bgColor,
   hoverBgColor,
-  hoverTextColor
-}: IButtonProps) {
+  hoverTextColor,
+  href
+}: ITypeButtonProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(href);
+  }
+
   return (
-    <button 
-      type="submit" 
-      onClick={onClick}
-      className={`w-full h-full
-      flex justify-center items-center gap-2
-      px-4 
-      ${bgColor}
-      text-${textColor}
-      font-medium text-xs
-      leading-tight
-      rounded-lg
-      shadow-md
-      border-2 border-${textColor}
-      transition duration-150
-      hover:${hoverBgColor}
-      hover:shadow-lg
-      hover:text-${hoverTextColor}
-      hover:shadow-lg
-    `}>
-      {icon}
-      { title }
-    </button>
+    !href ? (
+      <button
+        type="submit" 
+        onClick={onClick}
+        className={`w-full h-full
+        flex justify-center items-center gap-2
+        px-4 
+        ${bgColor}
+        text-${textColor}
+        font-medium text-xs
+        leading-tight
+        rounded-lg
+        shadow-md
+        border-2 border-${textColor}
+        transition duration-150
+        hover:${hoverBgColor}
+        hover:shadow-lg
+        hover:text-${hoverTextColor}
+        hover:shadow-lg
+      `}>
+        {icon}
+        { title }
+      </button>
+    ) : (
+      <button
+        type="submit" 
+        onClick={handleClick}
+        className={`w-full h-full
+        flex justify-center items-center gap-2
+        px-4 
+        ${bgColor}
+        text-${textColor}
+        font-medium text-xs
+        leading-tight
+        rounded-lg
+        shadow-md
+        border-2 border-${textColor}
+        transition duration-150
+        hover:${hoverBgColor}
+        hover:shadow-lg
+        hover:text-${hoverTextColor}
+        hover:shadow-lg
+      `}>
+        {icon}
+        { title }
+      </button>
+    )
   );
 }

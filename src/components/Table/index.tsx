@@ -111,6 +111,7 @@ export function Table({ data }: ITableProps) {
                           onClick={() =>{}}
                           bgColor="bg-yellow-500"
                           textColor="white"
+                          href="perfil"
                         />
                       </div>
 
@@ -122,6 +123,7 @@ export function Table({ data }: ITableProps) {
                           onClick={() =>{}}
                           bgColor="bg-blue-600"
                           textColor="white"
+                          href="atualizar-usuario"
                         />
                       </div>
 

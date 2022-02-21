@@ -18,18 +18,16 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
             </span>
             <input
               {...rest}
-              name="company-website"
-              id="company-website"
               className="h-full w-full
               px-2
-              focus:ring-blue-600
-              focus:border-blue-600
               flex-1 
               block
-              rounded-none
-              rounded-r-md
-              rounded-l-md
-              sm:text-sm 
+              caret-blue-600
+              sm:text-sm
+              rounded-lg
+              shadow-lg
+              border border-gray-300
+              hover:shadow-lg
             "
             />
           </>
@@ -57,11 +55,8 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
               block
               rounded-none
               rounded-r-md 
-              sm:text-sm 
+              sm:text-sm
               bg-gray-200
-              border-gray-300
-              focus:ring-indigo-500
-              focus:border-indigo-500
             "/>
           </>
           
