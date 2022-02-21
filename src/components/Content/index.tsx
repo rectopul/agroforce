@@ -8,7 +8,8 @@ export function Content({ children }: IContentProps) {
   return (
     <div className="flex flex-col
       w-container-all-main-contents
-      
+      h-content
+
       border border-gray-700
       bg-gray-300
     ">

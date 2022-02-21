@@ -34,6 +34,7 @@ module.exports = {
     extend: {
       height: {
         'aside': 'calc(100vh - 5rem)',
+        'content': 'calc(100vh - 5rem)',
       },
       width: {
         // Header

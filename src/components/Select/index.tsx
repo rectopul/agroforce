@@ -22,7 +22,7 @@ export function Select({ values, ...rest }: ITypeSelectProps) {
       m-0
       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" aria-label=".form-select-sm example
     ">
-      <option value="">Filtrar...</option>
+      <option value="">Selecione...</option>
      {
        values.map((value: string) => {
          return (

@@ -173,7 +173,7 @@ export default function Listagem() {
             </div>
 
 
-            <div className="w-full">
+            <div className="w-full h-full overflow-y-scroll ">
               <Table
                 data={people}
               />
