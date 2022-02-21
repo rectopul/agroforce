@@ -74,6 +74,7 @@ export default function Listagem() {
                 title={tab.title}
                 value={tab.value}
                 active={tab.active}
+                onClick={() => {}}
               />
             )
           })

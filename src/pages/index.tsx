@@ -110,7 +110,7 @@ const Home: NextPage = () => {
                 <Button 
                   title='Conectar'
                   onClick={() => {}} 
-                  bgColor="blue-600"
+                  bgColor="bg-blue-600"
                   textColor="white"
                 />
               </div>

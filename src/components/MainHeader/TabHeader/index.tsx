@@ -4,12 +4,14 @@ type ITabProps = {
   value: string | ReactNode | never[];
   active: (() => boolean);
   title: string;
+  onClick: (() => void);
 }
 
 export function TabHeader({
   value,
   active,
-  title
+  title,
+  onClick
 }: ITabProps) {
   let bg;
   let color;
@@ -26,7 +28,7 @@ export function TabHeader({
   }
 
   return (
-    <div className="h-full
+    <button className="h-full
       flex items-center gap-1
     ">
       <div className={`h-3/5 w-12
@@ -38,6 +40,6 @@ export function TabHeader({
       </div>
 
       <span className={`${border} text-sm`}>{title}</span>
-    </div>
+    </button>
   );
 }
