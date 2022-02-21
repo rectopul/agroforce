@@ -30,8 +30,8 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
               rounded-r-md
               rounded-l-md
               sm:text-sm 
-              border-blue-600
-            "/>
+            "
+            />
           </>
         ) : (
           <>

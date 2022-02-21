@@ -1,23 +1,19 @@
-import { ReactNode } from "react";
+import { SelectHTMLAttributes } from "react";
 
-interface ISelectProps {
-  items: Array<string | Date>;
+type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  values: Array<string>;
 }
 
-export function Select({ items }: ISelectProps) {
+export function Select({ values, ...rest }: ITypeSelectProps) {
   return (
-    <select className="h-full w-full
+    <select
+      { ...rest }
+      className="h-full w-full
       rounded
-      text-sm bg-light
       form-select form-select-sm
-      appearance-none
-      block
-      w-full
-      px-2
-      py-1
       text-sm
       font-normal
-      text-gray-700
+      text-gray-800
       bg-white bg-clip-padding bg-no-repeat
       border border-solid border-gray-300
       rounded
@@ -26,16 +22,14 @@ export function Select({ items }: ISelectProps) {
       m-0
       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" aria-label=".form-select-sm example
     ">
-      <option>Escolher...</option>
-      {
-        items.map((value) => {
-          return (
-            <option key={value.toString()}>
-              {value}
-            </option>
-          )
-        })
-      }
+      <option value="">Filtrar...</option>
+     {
+       values.map((value: string) => {
+         return (
+           <option key={value} value={value}>{value}</option>
+         )
+       })
+     }
     </select>
   );
 }

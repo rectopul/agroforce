@@ -28,8 +28,8 @@ export function MainHeader({ children, name, avatar }: IMainHeaderProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo-tmg.png" alt="TMG" className='w-32 h-24
           '/>
-          <Select items={plantas} />
-          <Select items={safras} />
+          <Select values={plantas} />
+          <Select values={safras}/>
         </div>
 
         <div className='h-20

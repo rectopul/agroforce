@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { BiEdit } from "react-icons/bi";
-import { BsTrash } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 
 import { Button } from "../Button";
 
-interface IUserProps {
+export interface IUserProps {
   id: number;
   name: string,
   nickname: string;
@@ -108,9 +107,9 @@ export function Table({ data }: ITableProps) {
                         h-10
                       ">
                         <Button 
-                          icon={<BsTrash size={16} />}
+                          icon={<FaRegUserCircle size={16} />}
                           onClick={() =>{}}
-                          bgColor="bg-red-600"
+                          bgColor="bg-yellow-500"
                           textColor="white"
                         />
                       </div>

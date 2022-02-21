@@ -2,7 +2,7 @@ import Head from "next/head";
 import { FiUserPlus } from "react-icons/fi";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { HiOutlineClipboardList } from "react-icons/hi";
-import { BiSearchAlt } from "react-icons/bi";
+import { BiFilterAlt, BiSearchAlt } from "react-icons/bi";
 
 import { MainHeader } from "../components/MainHeader";
 import { Aside } from "../components/Aside";
@@ -12,6 +12,10 @@ import { Select } from "../components/Select";
 import { Button } from "../components/Button";
 import { Table } from "../components/Table";
 import { Input } from "../components/Input";
+
+// teste de listagem
+import { people } from "../modules/users";
+
 
 export default function Listagem() {
   function handleTabsHeader() {
@@ -24,38 +28,6 @@ export default function Listagem() {
 
     return tabs;
   }
-
-  const users = [ "Jonatas", "Paulo", "Gabriel", "Isabelle" ];
-
-  let people = [
-    {
-      id: 1,
-      name: 'Paulo Cesar',
-      nickname: 'PAULO CESAR',
-      telefone: '(11) 1234-123',
-      email: 'paulo.jomo@agroforce.com.br',
-      image: 'https://avatars.githubusercontent.com/u/55369778?v=4',
-      status: true,
-    },
-    {
-      id: 2,
-      name: 'Jonatas Rosa Moura',
-      nickname: 'JONATAS R MOURA',
-      telefone: '(11) 1234-123',
-      email: 'jonatas.moura@agroforce.com.br',
-      image: 'https://avatars.githubusercontent.com/u/66448546?s=400&u=f9dba4fdf4ff112c31e59860f23578a994deb838&v=4',
-      status: true,
-    },
-    {
-      id: 3,
-      name: 'Fulano da Silva Sauro',
-      nickname: 'FULANO SILVA',
-      telefone: '(11) 1234-123',
-      email: 'fulano.silva@agroforce.com.br',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_eKClhijhzBYGKsSP-kDvZsXFhu8cdiJXzA&usqp=CAU',
-      status: false,
-    },
-  ];
 
   return (
     <>
@@ -90,10 +62,40 @@ export default function Listagem() {
             gap-8
             p-8
           ">
-            <div className="w-3/12 h-12">
-              <Select
-                items={users}
+            <div className="w-full
+              flex
+              flex-col
+              justify-between
+              items-center
+              gap-10
+              p-4
+              rounded-lg
+              bg-gray-50
+            ">
+            <div className="flex w-full gap-12">
+              <div className="w-full h-10">
+                <span>Inativo:</span>
+                <Select values={[]} />
+              </div>
+              <div className="w-full h-10">
+                <span>GRV a quem responde:</span>
+                <Select values={[]} />
+              </div>
+              <div className="w-full h-10">
+                <span>RDT a quem responde:</span>
+                <Select values={[]} />
+              </div>
+            </div>
+
+             <div className="h-10">
+              <Button
+                title="Filtrar"
+                onClick={() => {}}
+                bgColor="bg-blue-600"
+                textColor="white"
+                icon={<BiFilterAlt size={20} />}
               />
+             </div>
             </div>
             <div className="w-full
               flex
