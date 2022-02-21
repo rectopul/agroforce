@@ -2,13 +2,12 @@ import { createContext, useEffect, useState } from "react";
 import { setCookie, parseCookies } from 'nookies'
 import Router from 'next/router'
 
-import { recoverUserInformation, signInRequest } from "../services/auth";
-import { api } from "../services/api";
+import {  signInRequest } from "../services/auth";
 
 type User = {
   name: string;
   email: string;
-  avatar_url: string;
+  id_profile: number;
 }
 
 type SignInData = {
@@ -30,12 +29,14 @@ export function AuthProvider({ children }: any) {
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    const { 'nextauth.token': token } = parseCookies()
+    const { 'token': token } = parseCookies()
 
     if (token) {
-      recoverUserInformation().then(response => {
-        setUser(response.user)
-      })
+      // recoverUserInformation(token).then(response => {
+      //   setUser(response.user)
+      // })
+    } else {
+      Router.push('/');
     }
   }, [])
 
@@ -45,15 +46,15 @@ export function AuthProvider({ children }: any) {
       password,
     })
 
-    setCookie(undefined, 'nextauth.token', token, {
-      maxAge: 60 * 60 * 1, // 1 hour
-    })
-
-    api.defaults.headers['Authorization'] = `Bearer ${token}`;
-
-    setUser(user)
-
-    // Router.push('/listagem');
+    if (token && token != "") {
+      setCookie(undefined, 'token', token, {
+        maxAge: 60 * 60 * 1, // 1 hour
+      })
+  
+      setUser(user)
+  
+      Router.push('/listagem');
+    } 
   }
 
   return (

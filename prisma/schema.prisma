@@ -14,8 +14,8 @@ model User {
   password String 
   id_profile Int
   status Int @default(1)
+  token String?
 }
-
 
 model Cultura {
   id    Int     @id @default(autoincrement())
