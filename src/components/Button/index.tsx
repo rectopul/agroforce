@@ -10,6 +10,7 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   hoverBgColor?: string;
   hoverTextColor?: string;
   href?: string | any;
+  disabled?: boolean;
 }
 
 export function Button({
@@ -20,7 +21,8 @@ export function Button({
   bgColor,
   hoverBgColor,
   hoverTextColor,
-  href
+  href,
+  disabled
 }: ITypeButtonProps) {
   const router = useRouter();
 
@@ -55,6 +57,7 @@ export function Button({
     ) : (
       <button
         type="submit" 
+        disabled={disabled}
         onClick={handleClick}
         className={`w-full h-full
         flex justify-center items-center gap-2
