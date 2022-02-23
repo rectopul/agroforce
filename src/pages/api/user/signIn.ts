@@ -1,16 +1,39 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import {UserController} from '../../../controllers/user.controller';
+const jwt = require('jsonwebtoken');
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+import getConfig from 'next/config';
+import { apiHandler } from '../../../helpers/api';
+
+const { serverRuntimeConfig } = getConfig();
+
+export default  apiHandler(handler);
+
+function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new UserController();
     switch (req.method) {
         case 'POST':
-          let result = await Controller.signinUSer(req.body);
-          res.status(200).json(result?.response);
+          return authenticate();
           break
         default:
           res.status(405).end(`Method ${req.method} Not Allowed`)
     }
 
+    async function authenticate() {
+      const user = await Controller.signinUSer(req.body);
+      if (!user) throw 'Email ou senha é invalida!';
+
+      // create a jwt token that is valid for 7 days
+      const token = jwt.sign({ sub: user.id }, serverRuntimeConfig.secret, { expiresIn: '7d' });
+
+      // return basic user details and token
+      return res.status(200).json({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          token
+      });
+    }
 }
+

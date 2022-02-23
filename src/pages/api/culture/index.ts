@@ -1,6 +1,8 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import {CulturaController} from '../../../controllers/cultura.controller';
+import { apiHandler } from '../../../helpers/api';
+
 /**
  * @swagger
  * /api/cultura:
@@ -11,7 +13,9 @@ import {CulturaController} from '../../../controllers/cultura.controller';
  *         description: culturas
  */
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default  apiHandler(handler);
+
+ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new CulturaController();
     switch (req.method) {
         case 'GET':

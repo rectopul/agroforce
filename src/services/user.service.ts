@@ -1,46 +1,39 @@
-import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
+import { BehaviorSubject } from 'rxjs';
+import getConfig from 'next/config';
+import Router from 'next/router'
 
-@Injectable()
-export class UserService {   
-    async findOne(id: number) {
-        console.log(id)
-        let Result = await prisma.user.findUnique({
-               where: {
-                   id: id
-               }
-             }) .finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
+import { fetchWrapper } from '../helpers';
 
-    async findAll () {
-        let Result = await prisma.user.findMany() .finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
+const { publicRuntimeConfig } = getConfig();
+const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user')));
 
-    async signIn (Where: object) {
-        let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
-    
-    async create(User: object) {
-        let Result = await prisma.user.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
+export const userService = {
+    user: userSubject.asObservable(),
+    get userValue () { return userSubject.value },
+    login,
+    logout,
+    getAll
+};
 
-    async update(id: number, Data: Object) {
-        let User = await this.findOne(id);
-        if (User != null) { 
-            let Result = await prisma.user.update({ 
-                where: {
-                    id: id
-                },
-                data: Data })
-                .finally(async () => { await prisma.$disconnect() })
-            return Result;
-        } else {
-            return false;
-        }
-    }
+function login(email: any, password: any) {
+    return fetchWrapper.post(`${baseUrl}/signIn`, { email, password })
+        .then(user => {
+            // publish user to subscribers and store in local storage to stay logged in between page refreshes
+            userSubject.next(user);
+            localStorage.setItem('user', JSON.stringify(user));
+
+            return user;
+        });
 }
 
+function logout() {
+    // remove user from local storage, publish null to user subscribers and redirect to login page
+    localStorage.removeItem('user');
+    userSubject.next(null);
+    Router.push('/login');
+}
+
+function getAll() {
+    return fetchWrapper.get(baseUrl);
+}

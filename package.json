@@ -10,13 +10,16 @@
   "dependencies": {
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.5",
+    "@hookform/resolvers": "^2.8.8",
     "@nestjs/platform-express": "^8.3.0",
     "@nestjs/swagger": "^5.2.0",
     "@prisma/client": "^3.9.2",
+    "@types/yup": "^0.29.13",
     "cache-manager": "^3.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "common": "^0.2.5",
+    "express-jwt": "^6.1.1",
     "next": "^12.1.0",
     "next-swagger-doc": "^0.2.0",
     "nookies": "^2.5.2",
@@ -28,7 +31,9 @@
     "swagger-ui-express": "^4.3.0",
     "swagger-ui-react": "^4.5.0",
     "tailwindcss": "^3.0.23",
-    "uuid": "^8.3.2"
+    "util": "^0.12.4",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/cookie": "^0.4.1",

@@ -12,13 +12,17 @@ model User {
   name  String?
   email String  @unique
   password String 
-  id_profile Int
+  id_profile Int 
   status Int @default(1)
-  token String?
 }
 
 model Cultura {
   id    Int     @id @default(autoincrement())
   name  String?
   status Int @default(1)
+}
+
+model Profile {
+  id    Int     @id @default(autoincrement())
+  name  String
 }
