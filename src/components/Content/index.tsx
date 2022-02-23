@@ -8,6 +8,7 @@ interface IContentProps {
 }
 
 export function Content({ children }: IContentProps) {
+
   const tabs = [
     { title: 'NPE', value: '1', active: (() => true)  },
     // { title: 'Teste1', value: '2', active: (() => false)  },

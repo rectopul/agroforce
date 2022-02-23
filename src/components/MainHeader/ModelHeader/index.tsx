@@ -7,6 +7,9 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineExitToApp } from "react-icons/md";
 
+import { userService } from "../../../services";
+import { useState, useEffect } from 'react';
+ 
 interface IModelProps {
   name: string | undefined;
   imagem?: string;
@@ -17,6 +20,21 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
+  
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+      const subscription = userService.user.subscribe(x => setUser(x));
+      return () => subscription.unsubscribe();
+  }, []);
+
+  function logout() {
+      userService.logout();
+  }
+
+  // only show nav when logged in
+  if (!user) return null;
+  
   
   return (
     <>
@@ -106,6 +124,7 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
                       active ? 'bg-gray-100 text-red-600' : 'text-red-800',
                       'block w-full text-left px-4 py-2 text-sm'
                     )}
+                    onClick={logout}
                   >
                     Sair
                   </button>

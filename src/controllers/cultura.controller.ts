@@ -1,4 +1,4 @@
-import {CulturaService} from '../services/cultura.service';
+import {CulturaService} from '../repository/culture.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 @Controller()
 export class CulturaController {

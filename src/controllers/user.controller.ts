@@ -1,12 +1,41 @@
-import {UserService} from '../services/user.service';
+import {UserService} from '../repository/user.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
+
 @Controller()
 export class UserController {
     userService = new UserService();
 
+    /**
+     * 
+     * @returns Listagem de todos usuarios.
+     * @example Options: 
+     * {
+        "select": {"id": true, "name": true, "token": true},
+        "where": {
+            "id": 1
+        },
+        "paginate": false
+        }
+     */
     @Get()
-    getAllUser() {
-        let response =  this.userService.findAll();
+    async getAllUser(options: object) {
+        let select: any;
+        let where: any;
+        let paginate: boolean;
+
+        if (options.select) {
+            select = options.select;
+        }
+
+        if (options.where) {
+            where = options.where   ;
+        }
+
+        if (options.paginate) {
+            paginate = options.paginate;
+        }
+
+        let response = await this.userService.findAll(select, where, paginate);
         return response;        
     }
 
@@ -16,7 +45,7 @@ export class UserController {
         if (id && id != '{id}') {
             let response = await this.userService.findOne(newID); 
             if (!response) {
-               return {status: 400, message: 'cultura não existe'};
+               return {status: 400, message: 'user não existe'};
             } else {
                 return {status:200 , response};
             }
@@ -37,21 +66,21 @@ export class UserController {
         }
     }
 
+    /**
+     * @returns Função responsavel por verificar se o usuario que está tentando logar, é um usuario do sistema. 
+     * @requires Object contendo o email e a senha do usuario que está tentando fazer o login. 
+     */  
     @Post()
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
-            const param = {email: data.email, password: data.password}
-            let response = await this.userService.signIn(param);
-            if(response) {
-               await this.userService.update(response.id, {token: data.token});
-                return {status: 200, response}
-            } else {
-                return {status: 400, message:"Erro"}
-            }
+            return await this.userService.signIn(data);
         }
     }
 
-
+    /**
+    * @returns Função responsavel por fazer a atualização do usuario 
+    * @requires id do usuario a ser editado
+     */
     async updateUser(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {

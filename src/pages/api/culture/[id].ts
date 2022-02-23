@@ -1,8 +1,21 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import {CulturaController} from '../../../controllers/cultura.controller';
+import { apiHandler } from '../../../helpers/api';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+/**
+ * @swagger
+ * /api/cultura:
+ *   get:
+ *     description: Retorna todas culturas da base
+ *     responses:
+ *       200:
+ *         description: culturas
+ */
+
+ export default  apiHandler(handler);
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new CulturaController();
     const id = req.query.id.toString();
     switch (req.method) {
