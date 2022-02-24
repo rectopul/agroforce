@@ -22,8 +22,11 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
     async function authenticate() {
       const user = await Controller.signinUSer(req.body);
+
       if (!user) throw 'Email ou senha é invalida!';
 
+      // fazer a busca de permissoes 
+  
       // create a jwt token that is valid for 7 days
       const token = jwt.sign({ sub: user.id }, serverRuntimeConfig.secret, { expiresIn: '7d' });
 
@@ -32,7 +35,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           id: user.id,
           email: user.email,
           name: user.name,
-          token
+          profile_id: user.profile_id,
+          token: token
       });
     }
 }

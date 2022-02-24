@@ -2,10 +2,11 @@ import '../styles/tailwind.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { userService  } from '../services';
+import PermisssionGate from "../utils/PermissionUser";
 
 export default App;
 
-function App({ Component, pageProps }: any) {
+function App({ Component, pageProps, permissions, user }: any) {
     const router = useRouter();
     const [authorized, setAuthorized] = useState(false);
 
@@ -44,9 +45,18 @@ function App({ Component, pageProps }: any) {
 
     return (
         <>
-          {authorized &&
-              <Component {...pageProps} />
-          }
+            <PermisssionGate
+                permissions={[
+                    'canEdit',
+                    'canDelete',
+                    'canSave',
+                ]} 
+                user={{ permissions: ['canSave'] }}
+                >
+                {authorized &&
+                    <Component {...pageProps} />
+                }
+            </PermisssionGate>
         </>
     );
 }

@@ -19,7 +19,6 @@ function Login() {
     useEffect(() => {
         // redirect to home if already logged in
         if (userService.userValue) {
-          console.log(userService.userValue)
             router.push('/');
         }
     }, []);

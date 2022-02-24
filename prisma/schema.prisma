@@ -8,21 +8,25 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  name  String?
-  email String  @unique
-  password String 
-  id_profile Int 
-  status Int @default(1)
-}
-
-model Cultura {
-  id    Int     @id @default(autoincrement())
-  name  String?
-  status Int @default(1)
+  id         Int     @id @default(autoincrement())
+  name       String?
+  email      String  @unique
+  password   String
+  id_profile  Int?  
+  profile     Profile? @relation(fields: [id_profile], references: [id])
+  status     Int     @default(1)
 }
 
 model Profile {
-  id    Int     @id @default(autoincrement())
-  name  String
+  id               Int    @id @default(autoincrement())
+  name             String
+  acess_permission String
+  user User[]
 }
+
+model Cultura {
+  id     Int     @id @default(autoincrement())
+  name   String?
+  status Int     @default(1)
+}
+

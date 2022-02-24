@@ -2,7 +2,7 @@ import {prisma} from '../pages/api/db/db';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserService {   
+export class UserRepository {   
     async create(User: object) {
         let Result = await prisma.user.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
         return Result;
@@ -32,8 +32,8 @@ export class UserService {
         return Result;
     }
 
-    async findAll (select: any, where: any, paginate: any) {
-        let Result = await prisma.user.findMany({ select }, { where }) .finally(async () => { await prisma.$disconnect() })
+    async findAll (select: object, where: object, paginate: any) {
+        let Result = await prisma.user.findMany({ where , select}) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
     
@@ -41,9 +41,19 @@ export class UserService {
         let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
-    
-  
 
-  
+    async getPermissions() {
+        const user = localStorage.getItem('user')
+        let Result = await prisma.profile.findMany({
+            where: {
+                id: user.profile_id
+            }, 
+            select: {
+                acess_permission: true
+            }
+          }) .finally(async () => { await prisma.$disconnect() })
+        return Result;
+    }
+
 }
 
