@@ -6,10 +6,13 @@ import { Select } from "../components/Select";
 import { Button } from "../components/Button";
 import { Table } from "../components/Table";
 import { useGetUsers } from "src/hooks/useGetUsers";
+import { Pagination } from "src/components/Pagination";
 
 export default function Listagem() {
   const {
-    items: users
+    items: users,
+    setCurrentPage,
+    pages
   } = useGetUsers();
 
   const filters = [
@@ -57,7 +60,7 @@ export default function Listagem() {
 
             <div className="h-10">
             <Button
-              title="Filtrar"
+              value="Filtrar"
               onClick={() => {}}
               bgColor="bg-blue-600"
               textColor="white"

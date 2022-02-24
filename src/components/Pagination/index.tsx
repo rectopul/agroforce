@@ -1,13 +1,16 @@
 interface IPagination {
   setCurrentPage: ((e: number) => void);
   pages: number;
+  disabled?: boolean;
 }
 
-export function Pagination({ setCurrentPage, pages }: IPagination) {
+export function Pagination({ setCurrentPage, pages, disabled }: IPagination) {  
   return (
     <div className='w-full flex items-center gap-2 pl-5 pt-5'>
       {   
         Array.from(Array(pages), (items, index) => {
+          console.log(index % pages)
+          console.log(`pages - ${index}`)
           return (
             <button className='flex justify-center items-center
               h-5 w-12 
@@ -26,7 +29,8 @@ export function Pagination({ setCurrentPage, pages }: IPagination) {
               hover:shadow-lg
             '
               value={index}
-              onClick={(e) => setCurrentPage(index)} // e.target.value
+              onClick={() => setCurrentPage(index)} // e.target.value
+              disabled={disabled}
               key={index}
             >
               { index + 1 }

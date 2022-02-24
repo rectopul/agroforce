@@ -33,8 +33,8 @@ export function Table({ data }: ITableProps) {
     pages,
     currentItens,
     itensPerPage,
-    setCurrentPage,
     setItensPerPage,
+    setCurrentPage,
     setItems: setUsers
   } = useGetUsers();
 
@@ -76,7 +76,7 @@ export function Table({ data }: ITableProps) {
   useEffect(() => {
     setUsers(data);
     handleFilterUserByName();
-    handleListUser()
+    handleListUser();
   }, [data, search, listAll]);
 
   return (
@@ -97,6 +97,7 @@ export function Table({ data }: ITableProps) {
           <div>
             <Button 
               title="Cadastrar um usuário"
+              value="Cadastrar um usuário"
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {}}
@@ -142,6 +143,7 @@ export function Table({ data }: ITableProps) {
             {
               listAll ? (
                 <Button
+                  title="Paginar"
                   icon={<FaRegEye size={20} />}
                   onClick={() => setListAll(false)}
                   bgColor="bg-blue-600"
@@ -149,6 +151,7 @@ export function Table({ data }: ITableProps) {
                 />
               ) : (
                 <Button
+                  title="Listar todos os registros"
                   icon={<FaEyeSlash size={20} />}
                   onClick={() => setListAll(true)}
                   bgColor="bg-blue-600"
@@ -169,36 +172,36 @@ export function Table({ data }: ITableProps) {
       <div className="-my-2 overflow-x-auto">
         <div className="py-2 align-middle inline-block min-w-full">
           <div className="shadow overflow-hidden border-b border-gray-200 ">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 border-b border-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                   >
                     Nome
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                   >
                     Login
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                   >
                     E-mail
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                   >
                     Telefone
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                   >
                     Ações
                   </th>
@@ -222,11 +225,13 @@ export function Table({ data }: ITableProps) {
                       <div className="text-sm text-gray-900">{person.login}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800">
+                      <span className="px-2 inline-flex text-xs leading-5 font-medium text-gray-900">
                         { person.email }
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{person.telefone}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                      {person.telefone}
+                    </td>
                     <td className="flex gap-4 mt-4
                     ">
                       <div className="
@@ -279,12 +284,11 @@ export function Table({ data }: ITableProps) {
                 ))}
               </tbody>
             </table>
+            <div className="pb-3 bg-gray-50">
+              <Pagination setCurrentPage={setCurrentPage} pages={pages} />
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="flex justify-end gap-2 pr-20 py-5 bg-gray-50">
-        <Pagination setCurrentPage={setCurrentPage} pages={pages} />
       </div>
     </div>
   )

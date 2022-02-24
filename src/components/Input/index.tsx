@@ -13,21 +13,18 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
       {
         !icon ? (
           <>
-            <span className="bg-text">
+            <span>
               { icon }
             </span>
             <input
               {...rest}
               className="h-full w-full
+              text-gray-900
               px-2
-              flex-1 
-              block
-              caret-blue-600
-              sm:text-sm
-              rounded-lg
-              shadow-lg
-              border border-gray-300
-              hover:shadow-lg
+              bg-gray-50
+              rounded-r-md
+              focus:border-blue-600
+              focus:outline-none
             "
             />
           </>
@@ -36,27 +33,22 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
             <span className="inline-flex 
               items-center
               px-3
-              rounded-l-md 
-              border 
-              border-r-0 
-              text-sm
-              bg-gray-200
-              border-gray-200
+              rounded-l-md
+              bg-gray-200 bg-no-repeat
+              text-blue-600
+              border-solid border-gray-300
             ">
               { icon }
             </span>
             <input
               {...rest}
-              name="company-website"
-              id="company-website"
               className="h-full w-full
+              text-gray-900
               px-2
-              flex-1 
-              block
-              rounded-none
-              rounded-r-md 
-              sm:text-sm
               bg-gray-200
+              rounded-r-md
+              focus:border-blue-600
+              focus:outline-none
             "/>
           </>
           
@@ -65,23 +57,3 @@ export function Input({ icon, ...rest }: InputProps & ITypeInputProps) {
     </div>
   );
 }
-
-{/* <input 
-       className="form-control
-         block
-         w-full
-         px-3
-         py-1.5
-         text-base
-         font-normal
-         text-gray-700
-         bg-white bg-clip-padding
-         border border-solid border-gray-300
-         rounded
-         transition
-         ease-in-out
-         m-0
-         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-         id="floatingPassword" 
-       { ...rest }
-     /> */}

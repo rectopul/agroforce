@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  value?: string;
   title?: string;
   onClick: (() => any);
   icon?: string | ReactNode;
@@ -14,6 +15,7 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export function Button({
+  value,
   title,
   icon,
   onClick,
@@ -33,6 +35,7 @@ export function Button({
   return (
     !href ? (
       <button
+        title={title}
         type="submit" 
         onClick={onClick}
         className={`w-full h-full
@@ -52,10 +55,11 @@ export function Button({
         hover:shadow-lg
       `}>
         {icon}
-        { title }
+        { value }
       </button>
     ) : (
       <button
+        title={title}
         type="submit" 
         disabled={disabled}
         onClick={handleClick}
@@ -76,7 +80,7 @@ export function Button({
         hover:shadow-lg
       `}>
         {icon}
-        { title }
+        { value }
       </button>
     )
   );

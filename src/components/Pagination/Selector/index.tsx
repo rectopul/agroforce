@@ -25,6 +25,7 @@ export function SelectorPagination({ itensPerPage, setItensPerPage, listAll }: I
           bg-blue-600
           rounded-lg
           text-white
+          focus:border-blue-600 focus:outline-none
       ">
         {
           itensPerPage < 50 ? (

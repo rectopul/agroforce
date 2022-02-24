@@ -13,8 +13,8 @@ export function Select({ values, ...rest }: ITypeSelectProps) {
       form-select form-select-sm
       text-sm
       font-normal
-      text-gray-800
-      bg-white bg-clip-padding bg-no-repeat
+      text-gray-900
+      bg-white bg-no-repeat
       border border-solid border-gray-300
       rounded
       transition
