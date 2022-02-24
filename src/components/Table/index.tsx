@@ -1,49 +1,63 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BiEdit, BiSearchAlt } from "react-icons/bi";
-import { FaRegEye, FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegEye, FaEyeSlash, FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { HiOutlineClipboardList } from "react-icons/hi";
+
 import { useGetUsers } from "src/hooks/useGetUsers";
 
+import { SelectorPagination } from "../Pagination/Selector";
 import { Button } from "../Button";
 import { Input } from "../Input";
 import { Pagination } from "../Pagination";
-import { SelectorPagination } from "../Pagination/Selector";
 
-export interface IUserProps {
-  id: number;
-  avatar: string | ReactNode;
-  name: string;
-  login: string;
-  email: string;
-  telefone: string;
-  status: boolean;
+interface IUsers {
+  id: number,
+  name: string,
+  login: string,
+  telefone: string,
+  email: string,
+  avatar: string,
+  status: boolean,
 }
 
 interface ITableProps {
-  data: IUserProps[],
+  data: IUsers[],
 }
 
 export function Table({ data }: ITableProps) {  
-  const [items, setItems] = useState<IUserProps[]>(() => data);
-  
+  const [search, setSearch] = useState('');
+  const [listAll, setListAll] = useState<boolean>(false);
+
   const {
     pages,
     currentItens,
     itensPerPage,
     setCurrentPage,
     setItensPerPage,
-    items: users
+    setItems: setUsers
   } = useGetUsers();
+
+  const handleFilterUserByName = (): IUsers[] => {
+    if (!search || search === '') {
+      return currentItens;
+    } else {
+      const lowerSearch = search.toLowerCase();
   
+      const filterUserByName = data.filter((user) => user.name.toLowerCase().includes(lowerSearch));
+  
+      return filterUserByName;
+    }
+  };
+
   function handleStatusUser(id: number, status: boolean): void {
-    const index = items.findIndex((user) => user.id === id);
+    const index = data.findIndex((user) => user.id === id);
 
     if (index === -1) {
       return;
     }
 
-    setItems((oldUser) => {
+    setUsers((oldUser) => {
       const copy = [...oldUser];
 
       copy[index].status = status;
@@ -51,9 +65,19 @@ export function Table({ data }: ITableProps) {
     });
   }
 
+  const handleListUser = () => {
+    if(listAll) {
+      setItensPerPage(500);
+    } else {
+      setItensPerPage(5);
+    }
+  }
+
   useEffect(() => {
-    setItems(users)
-  }, [users])
+    setUsers(data);
+    handleFilterUserByName();
+    handleListUser()
+  }, [data, search, listAll]);
 
   return (
     /* This example requires Tailwind CSS v2.0+ */
@@ -86,6 +110,8 @@ export function Table({ data }: ITableProps) {
               type="search"
               placeholder="Pesquisar..."
               icon={<BiSearchAlt size={18} />}
+              value={search}
+              onChange={(env) => setSearch(env.target.value)}
             />
           </div>
         </div>
@@ -98,23 +124,38 @@ export function Table({ data }: ITableProps) {
           gb-gray-50
         ">
           <div className="w-24">
-            <SelectorPagination itensPerPage={itensPerPage} setItensPerPage={setItensPerPage} />
+            <SelectorPagination 
+              itensPerPage={itensPerPage}
+              setItensPerPage={setItensPerPage}
+              listAll={listAll}
+            />
           </div>
  
           <span className="flex items-center gap-1">
             Total:
             <strong className="text-blue-600">
-              {users.length} registro(s)
+              {data.length} registro(s)
             </strong>
           </span>
 
           <div className="h-full flex gap-2">
-            <Button
-              icon={<FaRegEye size={20} />}
-              onClick={() => {}}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
+            {
+              listAll ? (
+                <Button
+                  icon={<FaRegEye size={20} />}
+                  onClick={() => setListAll(false)}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                />
+              ) : (
+                <Button
+                  icon={<FaEyeSlash size={20} />}
+                  onClick={() => setListAll(true)}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                />
+              )
+            }
 
             <Button
               icon={<HiOutlineClipboardList size={20} />}
@@ -164,7 +205,7 @@ export function Table({ data }: ITableProps) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {currentItens.map((person) => (
+                {handleFilterUserByName().map((person) => (
                   <tr key={person.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">

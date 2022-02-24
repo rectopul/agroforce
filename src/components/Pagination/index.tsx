@@ -27,6 +27,7 @@ export function Pagination({ setCurrentPage, pages }: IPagination) {
             '
               value={index}
               onClick={(e) => setCurrentPage(index)} // e.target.value
+              key={index}
             >
               { index + 1 }
             </button>

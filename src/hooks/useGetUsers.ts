@@ -43,6 +43,7 @@ export function useGetUsers () {
     currentItens,
     itensPerPage,
     setCurrentPage,
-    setItensPerPage
+    setItensPerPage,
+    setItems
   }
 }

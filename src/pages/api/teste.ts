@@ -182,6 +182,15 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
       avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_eKClhijhzBYGKsSP-kDvZsXFhu8cdiJXzA&usqp=CAU',
       status: true,
     },
+    {
+      id: 21,
+      name: 'Gabriel',
+      login: 'GABRIEL',
+      telefone: '(11) 1234-123',
+      email: 'gabriel@agroforce.com.br',
+      avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_eKClhijhzBYGKsSP-kDvZsXFhu8cdiJXzA&usqp=CAU',
+      status: true,
+    },
   ];
 
  return res.json(people);
