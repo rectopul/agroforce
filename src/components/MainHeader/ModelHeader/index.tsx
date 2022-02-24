@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
-import { FaRegUserCircle } from "react-icons/fa";
+import { FaRegEdit, FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineExitToApp } from "react-icons/md";
 
@@ -73,67 +73,89 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-        <Menu.Items className="origin-top-right right-6 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="py-1">
-            <div className='flex items-center justify-start border 
-              border-b-gray-300
-              border-t-white
-              border-r-white
-              border-l-white
-            '>
+          <Menu.Items className="w-64 origin-top-right 
+            right-7 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 
+            ring-black ring-opacity-5 focus:outline-none
+          ">
+            <div className="py-1">
+              <div className='flex items-center justify-start gap-1
+                border 
+                border-b-gray-300
+                border-t-white
+                border-r-white
+                border-l-white
+                py-2
+              '>
 
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(avatar)} alt={name} className='h-12 w-12
-                rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-              '/>
-              <span className='text-xs'>{name}</span>
-            </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={String(avatar)} alt={name} className='h-14 w-14
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '/>
+                <strong className='text-xs'>{name}</strong>
+              </div>
 
-            <Menu.Item>
-              {({ active }) => (
-                <a
-                  href="#"
-                  className={classNames(
-                    active ? 'bg-gray-100 text-red-900' : 'text-gray-700',
-                    'block px-4 py-2 text-sm'
-                  )}
-                >
-                  Editar avatar
-                </a>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <a
-                  href="#"
-                  className={classNames(
-                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                    'block px-4 py-2 text-sm'
-                  )}
-                >
-                  Editar senha
-                </a>
-              )}
-            </Menu.Item>
-            <form method="POST" action="#">
               <Menu.Item>
                 {({ active }) => (
-                  <button
-                    type="submit"
-                    className={classNames(
-                      active ? 'bg-gray-100 text-red-600' : 'text-red-800',
-                      'block w-full text-left px-4 py-2 text-sm'
+                  <a
+                  href="#"
+                  className={classNames(
+                    active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                    'block px-4 py-2 text-base flex flex-row items-center gap-1'
                     )}
-                    onClick={logout}
-                  >
-                    Sair
-                  </button>
+                    >
+                    <FaRegUserCircle />
+                    <span>Perfil</span>
+                  </a>
                 )}
               </Menu.Item>
-            </form>
-          </div>
-        </Menu.Items>
-      </Transition>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    href="#"
+                    className={classNames(
+                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                      'block px-4 py-2 text-base flex items-center gap-1'
+                    )}
+                  >
+                    <FaRegEdit />
+                    Alterar dados pessoais
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    href="#"
+                    className={classNames(
+                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                      'block px-4 py-2 text-base flex items-center gap-1'
+                    )}
+                  >
+                    <RiLockPasswordLine />
+                    Editar senha
+                  </a>
+                )}
+              </Menu.Item>
+              <form method="POST" action="#" className='mt-2 border-t border-gray-300'>
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      type="submit"
+                      className={classNames(
+                        active ? 'bg-gray-100 text-red-600' : 'text-red-800',
+                        'block w-full text-left px-4 py-2 text-base flex items-center gap-1'
+                      )}
+                      onClick={logout}
+                    >
+                      <MdOutlineExitToApp />
+                      <strong>Sair</strong>
+                    </button>
+                  )}
+                </Menu.Item>
+              </form>
+            </div>
+          </Menu.Items>
+        </Transition>
       </Menu>
     </>
   )

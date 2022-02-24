@@ -5,11 +5,13 @@ import { Content } from "../components/Content";
 import { Select } from "../components/Select";
 import { Button } from "../components/Button";
 import { Table } from "../components/Table";
-
-// teste de listagem
-import { people } from "../modules/users";
+import { useGetUsers } from "src/hooks/useGetUsers";
 
 export default function Listagem() {
+  const {
+    items: users
+  } = useGetUsers();
+
   const filters = [
     'Teste1',
     'Teste2',
@@ -67,20 +69,7 @@ export default function Listagem() {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <Table data={people} />
-
-            {/* <QuickFilteringGrid /> */}
-
-
-            {/* <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              {
-                users.map((user) => (
-                  <div key={user.id}>
-                    <img style={{ maxWidth: '100%' }} src={user.url} alt={user.title} />
-                  </div>
-                ))
-              }
-            </div> */}
+            <Table data={users} />
           </div>
         </main>
       </Content>

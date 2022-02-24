@@ -1,22 +1,22 @@
-import { BaseSyntheticEvent, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { BiEdit, BiSearchAlt } from "react-icons/bi";
 import { FaRegEye, FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { HiOutlineClipboardList } from "react-icons/hi";
-
-import { usePagination } from '../../hooks/usePagination';
-import { useUsers } from "../../hooks/users";
+import { useGetUsers } from "src/hooks/useGetUsers";
 
 import { Button } from "../Button";
 import { Input } from "../Input";
+import { Pagination } from "../Pagination";
+import { SelectorPagination } from "../Pagination/Selector";
 
 export interface IUserProps {
   id: number;
-  name: string,
-  nickname: string;
-  telefone: string | number;
+  avatar: string | ReactNode;
+  name: string;
+  login: string;
   email: string;
-  image?: string;
+  telefone: string;
   status: boolean;
 }
 
@@ -24,13 +24,18 @@ interface ITableProps {
   data: IUserProps[],
 }
 
-export function Table({ data }: ITableProps) {
-  // const [users, setUsers] = useState<IUserProps[]>(() => data);
+export function Table({ data }: ITableProps) {  
   const [items, setItems] = useState<IUserProps[]>(() => data);
   
-  const { users, fetchUsers } = useUsers(10);
-  const { actualPage, setActualPage } = usePagination();
-
+  const {
+    pages,
+    currentItens,
+    itensPerPage,
+    setCurrentPage,
+    setItensPerPage,
+    items: users
+  } = useGetUsers();
+  
   function handleStatusUser(id: number, status: boolean): void {
     const index = items.findIndex((user) => user.id === id);
 
@@ -47,8 +52,8 @@ export function Table({ data }: ITableProps) {
   }
 
   useEffect(() => {
-    fetchUsers(actualPage)
-  }, [actualPage]);
+    setItems(users)
+  }, [users])
 
   return (
     /* This example requires Tailwind CSS v2.0+ */
@@ -76,16 +81,6 @@ export function Table({ data }: ITableProps) {
             />
           </div>
 
-          <div className="flex 
-            items-center 
-            p-2
-            px-4
-            rounded-lg
-            bg-blue-600
-          ">
-            <span className="text-white" >1</span>
-          </div>
-
           <div className="w-2/4">
             <Input
               type="search"
@@ -102,12 +97,15 @@ export function Table({ data }: ITableProps) {
           items-center
           gb-gray-50
         ">
-          
+          <div className="w-24">
+            <SelectorPagination itensPerPage={itensPerPage} setItensPerPage={setItensPerPage} />
+          </div>
+ 
           <span className="flex items-center gap-1">
             Total:
             <strong className="text-blue-600">
-              6 registro(s)
-              </strong>
+              {users.length} registro(s)
+            </strong>
           </span>
 
           <div className="h-full flex gap-2">
@@ -166,13 +164,13 @@ export function Table({ data }: ITableProps) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((person) => (
+                {currentItens.map((person) => (
                   <tr key={person.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img className="h-10 w-10 rounded-full" src={person.avatar} alt={person.name} />
+                          <img className="h-10 w-10 rounded-full" src={person.avatar as string} alt={person.name} />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{person.name}</div>
@@ -244,24 +242,8 @@ export function Table({ data }: ITableProps) {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 pr-2 py-5 bg-gray-50">
-        {
-          Array(5).fill('').map((_, index) => {
-            return (
-              <button key={index} onClick={() => setActualPage(index + 1)} disabled={index === actualPage - 1}
-                className="
-                z-10 bg-indigo-50 text-blue-600 relative inline-flex items-center px-4 py-2 text-sm font-medium
-                
-                rounded-lg
-                border border-1 border-blue-600
-                transition duration-700
-                hover:bg-gray-300
-              ">
-                { index + 1 }
-              </button>
-            )                
-          })
-        }
+      <div className="flex justify-end gap-2 pr-20 py-5 bg-gray-50">
+        <Pagination setCurrentPage={setCurrentPage} pages={pages} />
       </div>
     </div>
   )

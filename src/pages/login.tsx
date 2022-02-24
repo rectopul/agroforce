@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Input } from '../components/Input';
+// import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 
 import { useEffect } from 'react';
@@ -9,6 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
 import { userService } from '../services';
+// import { BiUser } from 'react-icons/bi';
 
 export default Login;
 
@@ -39,7 +40,7 @@ function Login() {
             .then(() => {
                 // get return url from query parameters or default to '/'
                 const returnUrl = router.query.returnUrl || '/';
-                router.push(returnUrl);
+                router.push(returnUrl as string);
             })
             .catch(error => {
                 setError('apiError', { message: error });
@@ -76,30 +77,33 @@ function Login() {
                   '>
                     <div className='h-10'>
                       <span className="block text-sm font-medium text-blue-600">Usuário</span>
-                        <input
-                          {...register('email')}
-                          placeholder='Usuário'
-                          type="email"
-                          name="email"
-                          required
-                          id="company-website"
-                          className="h-full w-full
-                          px-2
-                          flex-1 
-                          block
-                          rounded-none
-                          rounded-r-md 
-                          sm:text-sm 
-                          bg-gray-200
-                          border-gray-300
-                          focus:ring-indigo-500
-                          focus:border-indigo-500
-                        "/>
+                      <input
+                        {...register('email')}
+                        placeholder='Usuário'
+                        type="email"
+                        name="email"
+                        required
+                        id="company-website"
+                        className="h-full w-full
+                        px-2
+                        flex-1 
+                        block
+                        rounded-none
+                        rounded-r-md 
+                        sm:text-sm 
+                        bg-gray-200
+                        border-gray-300
+                        focus:ring-indigo-500
+                        focus:border-indigo-500
+                      "/>
                       {/* <Input 
                         placeholder='Usuário'
                         type="email"
+                        // name="email"
                         required
                         icon={<BiUser size={18} color="#1e40af" />}
+                        id="company-website"
+                        {...register('email')}
                       /> */}
                     </div>
     
@@ -125,6 +129,9 @@ function Login() {
                           focus:border-indigo-500
                         "/>
                       {/* <Input 
+                       {...register('password')}
+                        name="password"
+                        id="company-website"
                         placeholder='Senha'
                         type="password"
                         required
