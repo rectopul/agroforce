@@ -1,9 +1,9 @@
-import {UserService} from '../repository/user.repository';
+import {UserRepository} from '../repository/user.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 
 @Controller()
 export class UserController {
-    userService = new UserService();
+    userRepository = new UserRepository();
 
     /**
      * 
@@ -18,11 +18,10 @@ export class UserController {
         }
      */
     @Get()
-    async getAllUser(options: object) {
+    async getAllUser(options: any) {
         let select: any;
         let where: any;
-        let paginate: boolean;
-
+        let paginate: any;
         if (options.select) {
             select = options.select;
         }
@@ -35,7 +34,7 @@ export class UserController {
             paginate = options.paginate;
         }
 
-        let response = await this.userService.findAll(select, where, paginate);
+        let response = await this.userRepository.findAll(select, where, paginate);
         return response;        
     }
 
@@ -43,7 +42,7 @@ export class UserController {
     async getOneUser(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
-            let response = await this.userService.findOne(newID); 
+            let response = await this.userRepository.findOne(newID); 
             if (!response) {
                return {status: 400, message: 'user não existe'};
             } else {
@@ -57,7 +56,7 @@ export class UserController {
     @Post()
     async postUser(data: object) {
         if (data != null && data != undefined) {
-            let response = await this.userService.create(data);
+            let response = await this.userRepository.create(data);
             if(response.count > 0) {
                 return {status: 200, message: {message: "cultura inserida"}}
             } else {
@@ -68,23 +67,24 @@ export class UserController {
 
     /**
      * @returns Função responsavel por verificar se o usuario que está tentando logar, é um usuario do sistema. 
-     * @requires Object contendo o email e a senha do usuario que está tentando fazer o login. 
+     * @parameters Object contendo o email e a senha do usuario que está tentando fazer o login. 
      */  
     @Post()
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
-            return await this.userService.signIn(data);
+            return await this.userRepository.signIn(data);
         }
     }
 
     /**
     * @returns Função responsavel por fazer a atualização do usuario 
     * @requires id do usuario a ser editado
+    * @parameters data. objeto com as informações a serem atualizadas
      */
     async updateUser(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {
-            let response = await this.userService.update(newID, data);
+            let response = await this.userRepository.update(newID, data);
             if(response) {
                 return {status: 200, message: {message: "Usuario atualizada"}}
             } else {

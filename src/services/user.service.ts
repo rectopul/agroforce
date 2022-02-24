@@ -13,7 +13,8 @@ export const userService = {
     get userValue () { return userSubject.value },
     login,
     logout,
-    getAll
+    getAll,
+    getPermissions
 };
 
 function login(email: any, password: any) {
@@ -36,4 +37,8 @@ function logout() {
 
 function getAll() {
     return fetchWrapper.get(baseUrl);
+}
+
+function getPermissions() {
+    return fetchWrapper.get(baseUrl + '/permissions');
 }

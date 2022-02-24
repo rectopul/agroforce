@@ -1,6 +1,6 @@
 import Head from "next/head";
+import { Table } from "src/components/Table";
 import { Content } from "../components/Content";
-
 export default function Listagem() {
   const filters = [
     'Teste1',
@@ -20,6 +20,7 @@ export default function Listagem() {
           items-start
           gap-8
         ">
+         {/* <Table data={users} /> */}
 
         </main>
       </Content>
