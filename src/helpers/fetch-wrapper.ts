@@ -11,12 +11,15 @@ export const fetchWrapper = {
     delete: _delete
 };
 
-function get(url: any) {
+function get(url: any, params: any) {
+    const urlParameters = new URL(url);
+    urlParameters.search = new URLSearchParams(params).toString();
     const requestOptions = {
         method: 'GET',
-        headers: authHeader(url)
+        credentials: 'include',
+        headers:authHeader(url)
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    return fetch(urlParameters, requestOptions).then(handleResponse);
 }
 
 function post(url: any, body: any) {

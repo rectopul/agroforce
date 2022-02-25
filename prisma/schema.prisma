@@ -11,22 +11,41 @@ model User {
   id         Int     @id @default(autoincrement())
   name       String?
   email      String  @unique
+  cpf        String  @unique
+  tel        String?
   password   String
-  id_profile  Int?  
-  profile     Profile? @relation(fields: [id_profile], references: [id])
+  avatar     String?
   status     Int     @default(1)
+  created_at  DateTime 
+  created_by Int 
+  User_Permission Users_Permissions[]
 }
 
 model Profile {
   id               Int    @id @default(autoincrement())
   name             String
   acess_permission String
-  user User[]
+  created_at  DateTime 
+  created_by Int 
+  status Int?
+  User_Permission Users_Permissions[]
 }
 
-model Cultura {
+model Users_Permissions {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  profileId Int
+  profile Profile @relation(fields: [profileId], references: [id])
+  created_at  DateTime 
+  created_by Int 
+}
+
+model Culture {
   id     Int     @id @default(autoincrement())
   name   String?
+  created_at  DateTime 
+  created_by Int 
   status Int     @default(1)
 }
 

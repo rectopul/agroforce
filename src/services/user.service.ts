@@ -14,7 +14,8 @@ export const userService = {
     login,
     logout,
     getAll,
-    getPermissions
+    getPermissions,
+    createUsers
 };
 
 function login(email: any, password: any) {
@@ -28,6 +29,10 @@ function login(email: any, password: any) {
         });
 }
 
+function createUsers(data: any) {
+    return fetchWrapper.post(baseUrl, data);
+}
+
 function logout() {
     // remove user from local storage, publish null to user subscribers and redirect to login page
     localStorage.removeItem('user');
@@ -35,10 +40,10 @@ function logout() {
     Router.push('/login');
 }
 
-function getAll() {
-    return fetchWrapper.get(baseUrl);
+function getAll(parameters: object) {
+    return fetchWrapper.get(baseUrl, parameters);
 }
 
-function getPermissions() {
-    return fetchWrapper.get(baseUrl + '/permissions');
+function getPermissions(parameters: any) {
+    return fetchWrapper.get(baseUrl + '/permissions', parameters);
 }

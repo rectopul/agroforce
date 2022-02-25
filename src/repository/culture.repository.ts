@@ -18,7 +18,7 @@ export class CulturaService {
     }
 
     async create(Cultura: object) {
-        let Result = await prisma.cultura.createMany({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.cultura.create({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
