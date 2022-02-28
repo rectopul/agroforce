@@ -9,32 +9,19 @@ export class UserController {
      * 
      * @returns Listagem de todos usuarios.
      * @example Options: 
-     * {
-        "select": {"id": true, "name": true, "token": true},
-        "where": {
-            "id": 1
-        },
-        "paginate": false
-        }
+     * 
      */
     @Get()
     async getAllUser(options: any) {
-        let select: any;
-        let where: any;
-        let paginate: any;
-        if (options.select) {
-            select = options.select;
+        if (typeof(options.status) === 'string') {
+            options.status = parseInt(options.status);
         }
 
-        if (options.where) {
-            where = options.where   ;
-        }
+        let response = await this.userRepository.findAll(options);
 
-        if (options.paginate) {
-            paginate = options.paginate;
-        }
+        if (!response) 
+            throw "falha na requisição, tente novamente";
 
-        let response = await this.userRepository.findAll(select, where, paginate);
         return response;        
     }
 
@@ -58,7 +45,7 @@ export class UserController {
         if (data != null && data != undefined) {
             let response = await this.userRepository.create(data);
             if(response.count > 0) {
-                return {status: 200, message: {message: "cultura inserida"}}
+                return {status: 200, message: {message: "users inseridos"}}
             } else {
                 return {status: 400, message: {message: "erro"}}
             }

@@ -32,21 +32,22 @@ export class UserRepository {
         return Result;
     }
 
-    async findAll (select: object, where: object, paginate: any) {
-        let Result = await prisma.user.findMany({ where , select}) .finally(async () => { await prisma.$disconnect() })
+    async findAll (where: any) {
+        const select = {id: true, name: true, cpf:true, email:true, telefone:true, avatar:true, status: true};
+        let Result = await prisma.user.findMany({ where: where, select: select }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
+    
     
     async signIn (Where: object) {
         let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
-    async getPermissions() {
-        const user = localStorage.getItem('user')
+    async getPermissions(userId: any) {
         let Result = await prisma.profile.findMany({
             where: {
-                id: user.profile_id
+                id: userId
             }, 
             select: {
                 acess_permission: true

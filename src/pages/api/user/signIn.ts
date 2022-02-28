@@ -1,10 +1,14 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import {UserController} from '../../../controllers/user.controller';
+import { UserPermissionController } from 'src/controllers/user-permission.controller';
+
 const jwt = require('jsonwebtoken');
 
 import getConfig from 'next/config';
 import { apiHandler } from '../../../helpers/api';
+import { any } from 'prop-types';
+import permissions from './permissions';
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -12,6 +16,7 @@ export default  apiHandler(handler);
 
 function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new UserController();
+    const PermissionController = new UserPermissionController();
     switch (req.method) {
         case 'POST':
           return authenticate();
@@ -22,6 +27,10 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
     async function authenticate() {
       const user = await Controller.signinUSer(req.body);
+      let permisions;
+      if (user) {
+        permisions = await PermissionController.getUserPermissions(user.id); 
+      }
 
       if (!user) throw 'Email ou senha é invalida!';
 
@@ -35,8 +44,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           id: user.id,
           email: user.email,
           name: user.name,
-          profile_id: user.profile_id,
-          token: token
+          token: token,
+          permission: permisions,
       });
     }
 }

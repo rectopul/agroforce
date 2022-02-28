@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class CulturaService {   
     async findOne(id: number) {
-        let Result = await prisma.cultura.findUnique({
+        let Result = await prisma.culture.findUnique({
                where: {
                    id: id
                }
@@ -13,19 +13,19 @@ export class CulturaService {
     }
 
     async findAll () {
-        let Result = await prisma.cultura.findMany() .finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.culture.findMany() .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async create(Cultura: object) {
-        let Result = await prisma.cultura.createMany({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.culture.create({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async update(id: number, Cultura: Object) {
         let Culture = await this.findOne(id);
         if (Culture != null) {
-            let Result = await prisma.cultura.update({ 
+            let Result = await prisma.culture.update({ 
                 where: {
                     id: id
                 },
