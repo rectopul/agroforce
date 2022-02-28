@@ -27,15 +27,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
     async function authenticate() {
       const user = await Controller.signinUSer(req.body);
-      let permisions; 
-      var teste = [];
+      let permisions;
       if (user) {
-        permisions = await PermissionController.getUserPermissions(user.id);
-        for (const property in permisions) {
-          teste.push(permisions[property].profile.acess_permission);          
-        }
-        console.log(teste)
-
+        permisions = await PermissionController.getUserPermissions(user.id); 
       }
 
       if (!user) throw 'Email ou senha é invalida!';
@@ -51,7 +45,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           email: user.email,
           name: user.name,
           token: token,
-          // permission: permisions.profile.acess_permission,
+          permission: permisions,
       });
     }
 }

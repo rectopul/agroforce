@@ -18,11 +18,16 @@ export class UserPermissionController {
         }
 
         let response = await this.userPermission.getPermissionsByUser(userId);
-        console.log(response)
+        var arr2 = [];
+        var arr1 = [];
+        for (const property in response) {
+          arr1 =response[property].profile.acess_permission.split(',');
+          arr2 = arr1.concat(arr2);
+        }
         if (!response) 
             throw "falha na requisição, tente novamente";
 
-        return response;        
+        return arr2;        
     }
 
     @Get()
