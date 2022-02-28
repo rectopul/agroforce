@@ -4,16 +4,11 @@ import { BiFilterAlt } from "react-icons/bi";
 import { Content } from "../components/Content";
 import { Select } from "../components/Select";
 import { Button } from "../components/Button";
-import { Table } from "../components/Table";
 import { useGetUsers } from "src/hooks/useGetUsers";
-import { Pagination } from "src/components/Pagination";
+import { TablePagination } from "src/components/Pagination";
 
 export default function Listagem() {
-  const {
-    items: users,
-    setCurrentPage,
-    pages
-  } = useGetUsers();
+  const { items: users } = useGetUsers();
 
   const filters = [
     'Teste1',
@@ -72,7 +67,7 @@ export default function Listagem() {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <Table data={users} />
+            <TablePagination data={users}  />
           </div>
         </main>
       </Content>

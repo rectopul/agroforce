@@ -1,3 +1,4 @@
+import '../styles/App.css';
 import '../styles/tailwind.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -45,7 +46,7 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     return (
         <>
-            <PermisssionGate
+            {/* <PermisssionGate
                 permissions={[
                     'canEdit',
                     'canDelete',
@@ -56,7 +57,8 @@ function App({ Component, pageProps, permissions, user }: any) {
                 {authorized &&
                     <Component {...pageProps} />
                 }
-            </PermisssionGate>
+            </PermisssionGate> */}
+            <Component {...pageProps} />
         </>
     );
 }

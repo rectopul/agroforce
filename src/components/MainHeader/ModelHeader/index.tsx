@@ -74,7 +74,7 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="w-64 origin-top-right 
-            right-7 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 
+           mr-7 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 
             ring-black ring-opacity-5 focus:outline-none
           ">
             <div className="py-1">

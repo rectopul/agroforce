@@ -13,8 +13,8 @@ module.exports = {
 
       'yellow-500':  '#eba417',
 
-      'blue-600': '#00a5b4',
       'gray-450':  '#00567b',
+      'blue-600': '#00a5b4',
       'blue-700': '#1d4ed8',
       'blue-800': '#1e40af',
       'blue-900': '#1e3a8a',
