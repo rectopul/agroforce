@@ -12,6 +12,7 @@ export function Select({ values, ...rest }: ITypeSelectProps) {
       rounded
       form-select form-select-sm
       text-sm
+      shadow
       font-normal
       text-gray-900
       bg-white bg-no-repeat

@@ -46,7 +46,7 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     return (
         <>
-            {/* <PermisssionGate
+            <PermisssionGate
                 permissions={[
                     'canEdit',
                     'canDelete',
@@ -57,8 +57,7 @@ function App({ Component, pageProps, permissions, user }: any) {
                 {authorized &&
                     <Component {...pageProps} />
                 }
-            </PermisssionGate> */}
-            <Component {...pageProps} />
+            </PermisssionGate>
         </>
     );
 }
