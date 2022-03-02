@@ -5,15 +5,13 @@ import { Select } from '../Select';
 import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {
+  headerSelects: ReactNode;
   children: never[] | ReactNode;
   name: string;
   avatar: string | ReactNode;
 }
 
-export function MainHeader({ children, name, avatar }: IMainHeaderProps) {
-  const plantas = [ "Milho", "Algodão", "Sojá" ];
-  const safras = [ "03/19", "04/20", "03/21" ];
-
+export function MainHeader({ children, name, avatar, headerSelects }: IMainHeaderProps) {
   return (
     <header className="h-20 w-screen
       flex items-center
@@ -28,8 +26,7 @@ export function MainHeader({ children, name, avatar }: IMainHeaderProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo-tmg.png" alt="TMG" className='w-32 h-24
           '/>
-          <Select values={plantas} />
-          <Select values={safras}/>
+          { headerSelects }
         </div>
 
         <div className='h-20

@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
+
 import { Aside } from "../Aside";
 import { MainHeader } from "../MainHeader";
+import { Select } from "../Select";
 
 interface IContentProps {
   children: never[] | ReactNode;
@@ -8,14 +10,21 @@ interface IContentProps {
 }
 
 export function Content({ headerCotent, children }: IContentProps) {
+  // const plantas = [ "Milho", "Algodão", "Soja" ];
+  const safras = [ "03/19", "04/20", "03/21" ];
+
   return (
     <>
       <MainHeader
-          name="Juliana Aparecia da Silva"
-          avatar="/images/person.jpg"
-        >
-          { headerCotent }
-        </MainHeader>
+        name="Juliana Aparecia da Silva"
+        avatar="/images/person.jpg"
+
+        headerSelects={
+          <Select values={safras} />
+        }
+      >
+        { headerCotent }
+      </MainHeader>
 
       <div className='flex flex-row'>
         <Aside />
