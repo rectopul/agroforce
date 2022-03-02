@@ -1,7 +1,7 @@
 import { SelectHTMLAttributes } from "react";
 
 type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
-  values: Array<string>;
+  values: Array<string | object>;
 }
 
 export function Select({ values, ...rest }: ITypeSelectProps) {
@@ -25,9 +25,9 @@ export function Select({ values, ...rest }: ITypeSelectProps) {
     ">
       <option value="">Selecione...</option>
      {
-       values.map((value: string) => {
+       values.map((value: string | object, index) => {
          return (
-           <option key={value} value={value}>{value}</option>
+           <option key={index} value={value.toString()}>{value.toString()}</option>
          )
        })
      }

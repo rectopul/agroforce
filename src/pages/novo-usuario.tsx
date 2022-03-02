@@ -80,7 +80,7 @@ export default function NovoUsuario() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código usuário
               </label>
-              <Input value={123456} disabled />
+              <Input value={123456} disabled style={{ background: '#e5e7eb' }} />
             </div>
 
             <div className="w-full">

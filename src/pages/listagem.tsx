@@ -7,16 +7,18 @@ import { Content, TabHeader } from "../components";
 import { Select } from "../components";
 import { Button } from "../components";
 import { TablePagination } from "src/components";
+import { BsCheckLg } from "react-icons/bs";
 
 export default function Listagem() {
   const { items: users } = useGetUsers();
 
   const filters = [
-    'Teste1',
-    'Teste2',
-    'Teste3',
-    'Teste4',
+    { value: "fdasfsd", tile: 'Teste1', status: true},
   ];
+
+  const tabs = [
+    { title: 'TMG', value: <BsCheckLg />, status: true },
+  ]
 
   return (
     <>
@@ -25,11 +27,7 @@ export default function Listagem() {
       </Head>
       <Content
         headerCotent={
-          <TabHeader
-            title="Teste" 
-            value="1"
-            active={true}
-          />
+          <TabHeader data={tabs} />
         }
       >
         <main className="h-full
@@ -62,7 +60,7 @@ export default function Listagem() {
             </div>
           </div>
 
-            <div className="h-10">
+          <div className="h-10">
             <Button
               value="Filtrar"
               onClick={() => {}}

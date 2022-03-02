@@ -3,6 +3,7 @@ import {
   Button,
   Content, 
   Input, 
+  Select, 
   TabHeader 
 } from "../components";
 
@@ -15,6 +16,12 @@ export default function Cultura() {
     { title: 'NPE', value: <BsCheckLg />, status: false  },
     { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
     { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
+  ];
+
+  const culturas = [
+    { id: 1, title: 'Soja', status: true },
+    { id: 1, title: 'Algodão', status: true },
+    { id: 1, title: 'Milho', status: true },
   ];
 
   return (
@@ -62,7 +69,7 @@ export default function Cultura() {
     </div>
 
     <form className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2">
-      <h1 className="text-2xl">Novo usuário</h1>
+      <h1 className="text-2xl">Nova cultura</h1>
 
       <div className="w-full
         flex 
@@ -75,14 +82,18 @@ export default function Cultura() {
           <label className="block text-gray-900 text-sm font-bold mb-2">
             ID cultura
           </label>
-          <Input value={123456} disabled />
+          <Input value={123456} disabled style={{ background: '#e5e7eb' }} />
         </div>
 
-        <div className="w-full">
+        <div className="w-full h-10">
           <label className="block text-gray-900 text-sm font-bold mb-2">
             Nome cultura
           </label>
-          <Input type="text" max={30} placeholder="Ex: Soja" />
+          <Select 
+            values={
+              culturas.map((cultura) => cultura.title)
+            }
+          />
         </div>
       </div>
 
