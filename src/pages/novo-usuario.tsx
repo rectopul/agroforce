@@ -1,50 +1,44 @@
 import Head from "next/head";
-import { Content } from "../components/Content";
-import { Input } from "src/components/Input"; 
-import { Select } from "../components/Select";
-import { Button } from "../components/Button";
 import { BsCheckLg } from 'react-icons/bs';
-import { TabHeader } from "src/components/MainHeader/TabHeader";
+
+import { TabHeader } from "../components";
+import { Content } from "../components";
+import { Input } from "../components"; 
+import { Select } from "../components";
+import { Button } from "../components";
 
 export default function NovoUsuario() {
   const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, active: (() => true)  },
-    { title: 'ENSAIO', value: <BsCheckLg />, active: (() => false)  },
-    { title: 'LOCAL', value: <BsCheckLg />, active: (() => false)  },
-    { title: 'DELINEAMENTO', value: <BsCheckLg />, active: (() => false)  },
-    { title: 'NPE', value: <BsCheckLg />, active: (() => false)  },
-    { title: 'QUADRAS', value: <BsCheckLg />, active: (() => false)  },
-    { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, active: (() => false)  },
+    { title: 'TMG', value: <BsCheckLg />, status: true },
+    { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
+    { title: 'LOCAL', value: <BsCheckLg />, status: false  },
+    { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false  },
+    { title: 'NPE', value: <BsCheckLg />, status: false  },
+    { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
+    { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
   ];
 
   return (
-   <>
+    <>
       <Head>
         <title>Novo usuário</title>
       </Head>
 
 
       <Content headerCotent={
-        tabs.map((tab) => (
-          <TabHeader
-            key={tab.title}
-            title={tab.title}
-            value={tab.value}
-            active={tab.active}
-            onClick={() => {}}
-          />
-        ))
+        <TabHeader data={tabs} />
       }>
         
-        <div className="
-          w-full
+        <div className=" w-full
           h-20
           flex
           items-center
           gap-2
-          rounded-lg
-          bg-white
           px-5
+          rounded-lg
+          border-b border-blue-600
+          shadow
+          bg-white
         ">
           <div className="h-10 w-32">
             <Button 
@@ -72,11 +66,15 @@ export default function NovoUsuario() {
           </div>
         </div>
 
-        <form className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-10">
+        <form className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2">
+          <h1 className="text-2xl">Novo usuário</h1>
+
           <div className="w-full
             flex 
             justify-around
             gap-2
+            mt-4
+            mb-4
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -211,7 +209,7 @@ export default function NovoUsuario() {
           <div className="h-10 w-full
             flex
             justify-center
-            mt-20
+            mt-10
           ">
             <div className="w-40">
               <Button 

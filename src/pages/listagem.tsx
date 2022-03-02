@@ -1,11 +1,12 @@
 import Head from "next/head";
 import { BiFilterAlt } from "react-icons/bi";
 
-import { Content } from "../components/Content";
-import { Select } from "../components/Select";
-import { Button } from "../components/Button";
 import { useGetUsers } from "src/hooks/useGetUsers";
-import { TablePagination } from "src/components/Pagination";
+
+import { Content, TabHeader } from "../components";
+import { Select } from "../components";
+import { Button } from "../components";
+import { TablePagination } from "src/components";
 
 export default function Listagem() {
   const { items: users } = useGetUsers();
@@ -22,7 +23,15 @@ export default function Listagem() {
       <Head>
         <title>Listagem de usuários</title>
       </Head>
-      <Content>
+      <Content
+        headerCotent={
+          <TabHeader
+            title="Teste" 
+            value="1"
+            active={true}
+          />
+        }
+      >
         <main className="h-full
           flex flex-col
           items-start

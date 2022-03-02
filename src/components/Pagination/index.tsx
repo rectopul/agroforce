@@ -1,4 +1,4 @@
-import { useEffect, useState  } from 'react';
+import { useState  } from 'react';
 import MaterialTable from 'material-table';
 import { Button } from '../Button';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
@@ -23,7 +23,6 @@ export const TablePagination = ({data}: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(data);
 
   function handleStatusUser(id: number, status: boolean): void {
-    console.log(status)
     const index = tableData.findIndex((user) => user.id === id);
 
     if (index === -1) {

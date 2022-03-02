@@ -8,7 +8,9 @@ export default function Perfil() {
       <Head>
         <title>Perfil do usuário</title>
       </Head>
-      <Content>
+      <Content
+        headerCotent={""}
+      >
         
       </Content>
    </>

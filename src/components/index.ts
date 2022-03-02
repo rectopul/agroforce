@@ -1,0 +1,10 @@
+export { Aside } from './Aside';
+export { ButtonAside } from './Aside/ButtonAside';
+export { Button } from './Button';
+export { Content } from './Content';
+export { Input } from './Input';
+export { MainHeader } from './MainHeader';
+export { TablePagination } from './Pagination';
+export { Select } from './Select';
+export { ModelHeader } from './MainHeader/ModelHeader';
+export { TabHeader } from './MainHeader/TabHeader';

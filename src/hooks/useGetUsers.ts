@@ -1267,7 +1267,7 @@ export function useGetUsers () {
       setItems(result);
     }
     fetchData();
-  }, []);
+  }, [people]);
 
   return { items }
 }
