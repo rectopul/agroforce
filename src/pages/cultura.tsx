@@ -1,9 +1,12 @@
+import { useFormik } from 'formik'
 import { BsCheckLg } from "react-icons/bs";
+
+import { cultureService } from 'src/services';
+
 import { 
   Button,
   Content, 
   Input, 
-  Select, 
   TabHeader 
 } from "../components";
 
@@ -17,6 +20,23 @@ export default function Cultura() {
     { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
     { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
   ];
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      created_at: new Date(),
+      created_by: 1,
+    },
+    onSubmit: values => {
+      cultureService.createCulture({
+        name: formik.values.name,
+        created_at: formik.values.created_at,
+        created_by: formik.values.created_by,
+      });
+      
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
 
   return (
     <Content
@@ -62,7 +82,11 @@ export default function Cultura() {
       </div>
     </div>
 
-    <form className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2">
+    <form 
+      className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+
+      onSubmit={formik.handleSubmit}
+    >
       <h1 className="text-2xl">Nova cultura</h1>
 
       <div className="w-full
@@ -83,7 +107,15 @@ export default function Cultura() {
           <label className="block text-gray-900 text-sm font-bold mb-2">
             Nome cultura
           </label>
-          <Input type="text" max="50" placeholder="ex: Soja" />
+          <Input
+            id="name"
+            name="name"
+            type="text" 
+            max="50" 
+            placeholder="ex: Soja"
+            onChange={formik.handleChange}
+            value={formik.values.name}
+          />
         </div>
       </div>
 
@@ -93,7 +125,8 @@ export default function Cultura() {
         mt-10
       ">
         <div className="w-40">
-          <Button 
+          <Button
+            type="submit"
             value="Cadastrar"
             bgColor="bg-blue-600"
             textColor="white"
