@@ -18,12 +18,6 @@ export default function Cultura() {
     { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
   ];
 
-  const culturas = [
-    { id: 1, title: 'Soja', status: true },
-    { id: 1, title: 'Algodão', status: true },
-    { id: 1, title: 'Milho', status: true },
-  ];
-
   return (
     <Content
       headerCotent={
@@ -89,11 +83,7 @@ export default function Cultura() {
           <label className="block text-gray-900 text-sm font-bold mb-2">
             Nome cultura
           </label>
-          <Select 
-            values={
-              culturas.map((cultura) => cultura.title)
-            }
-          />
+          <Input type="text" max="50" placeholder="ex: Soja" />
         </div>
       </div>
 
