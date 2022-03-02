@@ -32,12 +32,11 @@ export class UserRepository {
         return Result;
     }
 
-    async findAll (where: any) {
-        const select = {id: true, name: true, cpf:true, email:true, telefone:true, avatar:true, status: true};
-        let Result = await prisma.user.findMany({ where: where, select: select }) .finally(async () => { await prisma.$disconnect() })
+    async findAll (where: any, take: any, skip: any) {
+        const select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
+        let Result = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
-    
     
     async signIn (Where: object) {
         let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })

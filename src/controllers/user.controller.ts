@@ -13,12 +13,33 @@ export class UserController {
      */
     @Get()
     async getAllUser(options: any) {
-        if (typeof(options.status) === 'string') {
-            options.status = parseInt(options.status);
+        const parameters = new Object();
+        let take; 
+        let skip; 
+        if (options.take) {
+            if (typeof(options.status) === 'string') {
+                parameters.status = parseInt(options.status);
+            } else {
+                parameters.status = options.status;
+            }
         }
 
-        let response = await this.userRepository.findAll(options);
+        if (options.take) {
+            if (typeof(options.take) === 'string') {
+                take = parseInt(options.take);
+            } else {
+                take = options.take;
+            }
+        }
 
+        if (options.skip) {
+            if (typeof(options.skip) === 'string') {
+                skip = parseInt(options.skip);
+            } else {
+                skip = options.skip;
+            }
+        }
+        let response = await this.userRepository.findAll(parameters, take , skip );
         if (!response) 
             throw "falha na requisição, tente novamente";
 
