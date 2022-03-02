@@ -1,12 +1,12 @@
-import {CulturaService} from '../repository/culture.repository';
+import {CulturaRepository} from '../repository/culture.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 @Controller()
 export class CulturaController {
-    culturaService = new CulturaService();
+    culturaRepository = new CulturaRepository();
 
     @Get()
     getAllCulture() {
-        let response =  this.culturaService.findAll();
+        let response =  this.culturaRepository.findAll();
         return response;        
     }
 
@@ -14,7 +14,7 @@ export class CulturaController {
     async getOneCulture(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
-            let response = await this.culturaService.findOne(newID); 
+            let response = await this.culturaRepository.findOne(newID); 
             if (!response) {
                return {status: 400, response:{error: 'cultura não existe'}};
             } else {
@@ -28,11 +28,11 @@ export class CulturaController {
     @Post()
     async postCulture(data: object) {
         if (data != null && data != undefined) {
-            let response = await this.culturaService.create(data);
-            if(response.count > 0) {
-                return {status: 200, message: {message: "cultura inserida"}}
+            let response = await this.culturaRepository.create(data);
+            if(response) {
+                return {status: 200, message: "cultura inserida"}
             } else {
-                return {status: 400, message: {message: "erro"}}
+                return {status: 400, message: "erro"}
 
             }
         }
@@ -42,7 +42,7 @@ export class CulturaController {
     async updateCulture(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {
-            let response = await this.culturaService.update(newID, data);
+            let response = await this.culturaRepository.update(newID, data);
             if(response) {
                 return {status: 200, message: {message: "cultura atualizada"}}
             } else {

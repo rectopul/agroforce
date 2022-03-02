@@ -11,6 +11,7 @@ import {
 } from "../components";
 
 export default function Cultura() {
+  const userLogado = JSON.parse(localStorage.getItem("user"));
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
     { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
@@ -24,17 +25,17 @@ export default function Cultura() {
   const formik = useFormik({
     initialValues: {
       name: '',
-      created_at: new Date(),
-      created_by: 1,
+      created_by: userLogado.id,
     },
     onSubmit: values => {
       cultureService.createCulture({
         name: formik.values.name,
-        created_at: formik.values.created_at,
         created_by: formik.values.created_by,
-      });
-      
-      alert(JSON.stringify(values, null, 2));
+      }).then((response) => {
+        if (response.status == 200) {
+          alert("Cultura criada com sucesso");
+        }
+      })
     },
   });
 
