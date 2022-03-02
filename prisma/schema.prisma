@@ -15,6 +15,8 @@ model User {
   tel        String?
   password   String
   avatar     String?
+  enroll     Int? 
+  jivochat   Int? @default(0)
   status     Int     @default(1)
   created_at  DateTime 
   created_by Int 
@@ -43,9 +45,14 @@ model Users_Permissions {
 
 model Culture {
   id     Int     @id @default(autoincrement())
-  name   String?
-  created_at  DateTime 
+  name   String? @unique
+  created_at  DateTime
   created_by Int 
   status Int     @default(1)
 }
 
+model Setor {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  status Int     @default(1)
+}
