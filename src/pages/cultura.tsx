@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useFormik } from 'formik'
 import { BsCheckLg } from "react-icons/bs";
 
@@ -33,108 +34,114 @@ export default function Cultura() {
         created_at: formik.values.created_at,
         created_by: formik.values.created_by,
       });
-      
-      alert(JSON.stringify(values, null, 2));
+
+      alert(JSON.stringify(values, null, 2)); // teste
     },
   });
 
   return (
-    <Content
-      headerCotent={
-        <TabHeader data={tabs} />
-      }
-    >
+    <>
+     <Head>
+        <title>Nova cultura</title>
+      </Head>
+      
+      <Content
+        headerCotent={
+          <TabHeader data={tabs} />
+        }
+      >
 
-    <div className=" w-full
-      h-20
-      flex
-      items-center
-      gap-2
-      px-5
-      rounded-lg
-      border-b border-blue-600
-      shadow
-      bg-white
-    ">
-      <div className="h-10 w-32">
-        <Button 
-          value="Usuário"
-          bgColor="bg-blue-600"
-          textColor="white"
-          onClick={() => {}}
-        />
-      </div>
-      <div className="h-10 w-32">
-        <Button 
-          value="Safra"
-          bgColor="bg-blue-600"
-          textColor="white"
-          onClick={() => {}}
-        />
-      </div>
-      <div className="h-10 w-32">
-        <Button 
-          value="Portfólio"
-          bgColor="bg-blue-600"
-          textColor="white"
-          onClick={() => {}}
-        />
-      </div>
-    </div>
-
-    <form 
-      className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
-
-      onSubmit={formik.handleSubmit}
-    >
-      <h1 className="text-2xl">Nova cultura</h1>
-
-      <div className="w-full
-        flex 
-        justify-around
+      <div className=" w-full
+        h-20
+        flex
+        items-center
         gap-2
-        mt-4
-        mb-4
+        px-5
+        rounded-lg
+        border-b border-blue-600
+        shadow
+        bg-white
       ">
-        <div className="w-full">
-          <label className="block text-gray-900 text-sm font-bold mb-2">
-            ID cultura
-          </label>
-          <Input value={123456} disabled style={{ background: '#e5e7eb' }} />
-        </div>
-
-        <div className="w-full h-10">
-          <label className="block text-gray-900 text-sm font-bold mb-2">
-            Nome cultura
-          </label>
-          <Input
-            id="name"
-            name="name"
-            type="text" 
-            max="50" 
-            placeholder="ex: Soja"
-            onChange={formik.handleChange}
-            value={formik.values.name}
+        <div className="h-10 w-32">
+          <Button 
+            value="Usuário"
+            bgColor="bg-blue-600"
+            textColor="white"
+            onClick={() => {}}
           />
         </div>
-      </div>
-
-      <div className="h-10 w-full
-        flex
-        justify-center
-        mt-10
-      ">
-        <div className="w-40">
-          <Button
-            type="submit"
-            value="Cadastrar"
+        <div className="h-10 w-32">
+          <Button 
+            value="Safra"
+            bgColor="bg-blue-600"
+            textColor="white"
+            onClick={() => {}}
+          />
+        </div>
+        <div className="h-10 w-32">
+          <Button 
+            value="Portfólio"
             bgColor="bg-blue-600"
             textColor="white"
             onClick={() => {}}
           />
         </div>
       </div>
-    </form>
-    </Content>
+
+      <form 
+        className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+
+        onSubmit={formik.handleSubmit}
+      >
+        <h1 className="text-2xl">Nova cultura</h1>
+
+        <div className="w-full
+          flex 
+          justify-around
+          gap-2
+          mt-4
+          mb-4
+        ">
+          <div className="w-full">
+            <label className="block text-gray-900 text-sm font-bold mb-2">
+              ID cultura
+            </label>
+            <Input value={123456} disabled style={{ background: '#e5e7eb' }} />
+          </div>
+
+          <div className="w-full h-10">
+            <label className="block text-gray-900 text-sm font-bold mb-2">
+              Nome cultura
+            </label>
+            <Input
+              id="name"
+              name="name"
+              type="text" 
+              max="50" 
+              placeholder="ex: Soja"
+              onChange={formik.handleChange}
+              value={formik.values.name}
+            />
+          </div>
+        </div>
+
+        <div className="h-10 w-full
+          flex
+          justify-center
+          mt-10
+        ">
+          <div className="w-40">
+            <Button
+              type="submit"
+              value="Cadastrar"
+              bgColor="bg-blue-600"
+              textColor="white"
+              onClick={() => {}}
+            />
+          </div>
+        </div>
+      </form>
+      </Content>
+    </>
   );
 }

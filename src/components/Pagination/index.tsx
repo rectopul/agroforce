@@ -20,7 +20,7 @@ interface ITable {
 }
 
 export const TablePagination = ({data}: ITable) => {
-  const [tableData, setTableData] = useState<IUsers[]>(data);
+  const [tableData, setTableData] = useState<IUsers[]>(() => data);
 
   function handleStatusUser(id: number, status: boolean): void {
     const index = tableData.findIndex((user) => user.id === id);
