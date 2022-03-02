@@ -34,7 +34,7 @@ function Login() {
     const { register, handleSubmit, setError, formState } = useForm(formOptions);
     const { errors } = formState;
 
-    function onSubmit({ email, password }: any) {
+    async function onSubmit({ email, password }: any) {
         return userService.login(email, password)
             .then(() => {
                 // get return url from query parameters or default to '/'
@@ -122,6 +122,7 @@ function Login() {
                     flex
                   '>
                     <Button 
+                      type='submit'
                       disabled={formState.isSubmitting}
                       value='Conectar'
                       onClick={() => {}} 

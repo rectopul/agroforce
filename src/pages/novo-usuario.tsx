@@ -1,11 +1,32 @@
+import { useFormik } from "formik";
 import Head from "next/head";
 import { BsCheckLg } from 'react-icons/bs';
+
+import { userService } from "src/services";
 
 import { TabHeader } from "../components";
 import { Content } from "../components";
 import { Input } from "../components"; 
 import { Select } from "../components";
 import { Button } from "../components";
+
+
+interface IUsers {
+  name: string;
+  login?: string;
+  email: string;
+  cpf: string;
+  tel: string;
+  registration?: string;
+  department: string;
+  password: string;
+  confirmPassword: string;
+  profile?: string;
+  jivochat?: number;
+  status?: number;
+  appLogin?: string;
+  created_by: any;
+}
 
 export default function NovoUsuario() {
   const tabs = [
@@ -18,6 +39,55 @@ export default function NovoUsuario() {
     { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
   ];
 
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+
+  const formik = useFormik<IUsers>({
+    initialValues: {
+      name: '',
+      login: '',
+      email: '',
+      cpf: '',
+      tel: '',
+      password: '',
+      confirmPassword: '',
+      profile: '',
+      registration: '',
+      department: '',
+      jivochat: 0,
+      status: 1,
+      appLogin: '',
+      created_by: userLogado.id,
+    },
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+      
+      if (values.password !== values.confirmPassword) {
+        alert("Erro de credenciais");
+        return
+      }
+
+      userService.createUsers({
+        name: values.name,
+        login: values.login,
+        email: values.email,
+        cpf: values.cpf,
+        tel: values.tel,
+        password: values.password,
+        profile: values.profile,
+        registration: values.registration,
+        department: values.department,
+        jivochat: values.jivochat,
+        status: values.status,
+        appLogin: values.appLogin,
+        created_by: values.created_by,
+      }).then((response) => {
+        if (response.status == 200) {
+          alert("Usuário criado com sucesso!");
+        }
+      })
+    },
+  });
+
   return (
     <>
       <Head>
@@ -29,7 +99,7 @@ export default function NovoUsuario() {
         <TabHeader data={tabs} />
       }>
         
-        <div className=" w-full
+        <div className="w-full
           h-20
           flex
           items-center
@@ -66,7 +136,11 @@ export default function NovoUsuario() {
           </div>
         </div>
 
-        <form className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2">
+        <form 
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+
+          onSubmit={formik.handleSubmit}
+        >
           <h1 className="text-2xl">Novo usuário</h1>
 
           <div className="w-full
@@ -87,14 +161,31 @@ export default function NovoUsuario() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome usuário
               </label>
-              <Input type="text" placeholder="Nome" />
+              <Input 
+                type="text" 
+                placeholder="Nome"
+                id="name"
+                name="name"
+                required
+                max="40"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Login único
               </label>
-              <Input type="text" placeholder="Login de usuário" />
+              <Input 
+                type="text" 
+                placeholder="Login de usuário" 
+                id="login"
+                name="login"
+                max="40"
+                onChange={formik.handleChange}
+                value={formik.values.login}
+              />
             </div>
           </div>
 
@@ -108,14 +199,31 @@ export default function NovoUsuario() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 CPF
               </label>
-              <Input type="text" placeholder="ex: 111.111.111-11" />
+              <Input
+                type="text"
+                placeholder="ex: 111.111.111-11"
+                maxLength={11}
+                minLength={11}
+                id="cpf"
+                name="cpf"
+                onChange={formik.handleChange}
+                value={formik.values.cpf}
+              />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Matricula
               </label>
-              <Input type="text" placeholder="Matricula do usuário" />
+              <Input 
+                type="text" 
+                placeholder="Matricula do usuário"
+                max="50"
+                id="registration"
+                name="registration"
+                onChange={formik.handleChange}
+                value={formik.values.registration}
+              />
             </div>
 
             <div className="w-full h-10">
@@ -123,7 +231,11 @@ export default function NovoUsuario() {
                 Selecione o Setor
               </label>
               <Select
-                values={[""]}
+                values={["Administração", "Gestão", "RH", "TI"]}
+                id="department"
+                name="department"
+                onChange={formik.handleChange}
+                value={formik.values.department}
               />
             </div>
           </div>
@@ -138,14 +250,28 @@ export default function NovoUsuario() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 E-mail
               </label>
-              <Input type="text" placeholder="usuario@tmg.com.br" />
+              <Input 
+                type="email" 
+                placeholder="usuario@tmg.com.br"
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                value={formik.values.email}
+              />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Telefone
               </label>
-              <Input type="tel" placeholder="(11) 99999-9999" />
+              <Input 
+                type="tel" 
+                placeholder="(11) 99999-9999"
+                id="tel"
+                name="tel"
+                onChange={formik.handleChange}
+                value={formik.values.tel}
+              />
             </div>
           </div>
           <div className="w-8/12
@@ -158,14 +284,28 @@ export default function NovoUsuario() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Senha
               </label>
-              <Input type="password" placeholder="*************" />
+              <Input 
+                type="password" 
+                placeholder="*************"
+                id="password"
+                name="password"
+                onChange={formik.handleChange}
+                value={formik.values.password}
+              />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Confirmar senha
               </label>
-              <Input type="password" placeholder="*************" />
+              <Input 
+                type="password"
+                placeholder="*************"
+                id="confirmPassword"
+                name="confirmPassword"
+                onChange={formik.handleChange}
+                value={formik.values.confirmPassword}
+              />
             </div>
           </div>
           <div className="w-8/12
@@ -180,13 +320,24 @@ export default function NovoUsuario() {
               </label>
               <Select
                 values={["Sim", "Não"]}
+                id="jivochat"
+                name="jivochat"
+                onChange={formik.handleChange}
+                value={formik.values.jivochat}
               />
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Login do App
               </label>
-              <Input type="text" placeholder="Login APP usuário" />
+              <Input 
+                type="text" 
+                placeholder="Login APP usuário" 
+                id="appLogin"
+                name="appLogin"
+                onChange={formik.handleChange}
+                value={formik.values.appLogin}
+              />
             </div>
           </div>
 
@@ -202,6 +353,10 @@ export default function NovoUsuario() {
               </label>
               <Select
                 values={["Administrator", "Funcionário", "Usuário comum"]}
+                id="profile"
+                name="profile"
+                onChange={formik.handleChange}
+                value={formik.values.profile}
               /> 
             </div>
           </div>
@@ -213,6 +368,7 @@ export default function NovoUsuario() {
           ">
             <div className="w-40">
               <Button 
+                type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"

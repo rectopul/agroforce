@@ -2,7 +2,7 @@ import {prisma} from '../pages/api/db/db';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CulturaService {   
+export class CulturaRepository {   
     async findOne(id: number) {
         let Result = await prisma.culture.findUnique({
                where: {
@@ -18,6 +18,7 @@ export class CulturaService {
     }
 
     async create(Cultura: object) {
+        Cultura.created_at = new Date();
         let Result = await prisma.culture.create({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
