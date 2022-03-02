@@ -40,7 +40,7 @@ function logout() {
     Router.push('/login');
 }
 
-function getAll(parameters: object) {
+function getAll(parameters: any) {
     return fetchWrapper.get(baseUrl, parameters);
 }
 
