@@ -1,16 +1,16 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { UserPermissionController } from 'src/controllers/user-permission.controller';
+import { DepartamentController } from 'src/controllers/departament.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default  apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const Controller =  new UserPermissionController();
+    const Controller =  new DepartamentController();
     switch (req.method) {
         case 'GET':
-            console.log(req.query.userId)
-            let response = await Controller.getAllPermissions(req.query.userId);
+            let response = await Controller.getAllDepartaments();
+            console.log(response);
             res.status(200).json(response);
             break
         default:

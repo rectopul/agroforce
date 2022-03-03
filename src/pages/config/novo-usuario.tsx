@@ -3,7 +3,7 @@ import Head from "next/head";
 import { BsCheckLg } from 'react-icons/bs';
 import { CheckBox } from "src/components/CheckBox";
 
-import { userService } from "src/services";
+import { userService, departmentService,profileService  } from "src/services";
 
 import { TabHeader } from "../../components";
 import { Content } from "../../components";
@@ -32,8 +32,10 @@ interface IUsers {
   profiles: IProfile[];
   // profiles: [{ profileId: number, created_by: number }];
 }
-
 export default function NovoUsuario() {
+//  departmentService.getAll('');
+//  profileService.getAll('');
+
   const profileUser: IProfile[] = [
     { id: 1, name: "Master " },
     { id: 2, name: "Admin" },
