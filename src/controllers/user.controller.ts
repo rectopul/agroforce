@@ -1,9 +1,11 @@
 import {UserRepository} from '../repository/user.repository';
+import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 
 @Controller()
 export class UserController {
     userRepository = new UserRepository();
+    usersPermissionRepository = new UsersPermissionsRepository();
 
     /**
      * 
@@ -15,13 +17,38 @@ export class UserController {
     async getAllUser(options: any) {
         const parameters = new Object();
         let take; 
-        let skip; 
-        if (options.take) {
+        let skip;
+
+        if (options.status) {
             if (typeof(options.status) === 'string') {
                 parameters.status = parseInt(options.status);
             } else {
                 parameters.status = options.status;
             }
+        }
+
+        if (options.name) {
+            parameters.name = options.name;
+        }
+
+        if (options.cpf) {
+            parameters.cpf = options.cpf;
+        }
+        
+        if (options.tel) {
+            parameters.tel = options.tel;
+        }
+
+        if (options.departamentId) {
+            parameters.departamentId = options.departamentId;
+        }
+
+        if (options.registration) {
+            parameters.registration = options.registration;
+        }
+
+        if (options.email) {
+            parameters.email = options.email;
         }
 
         if (options.take) {
@@ -39,7 +66,9 @@ export class UserController {
                 skip = options.skip;
             }
         }
+
         let response = await this.userRepository.findAll(parameters, take , skip );
+
         if (!response) 
             throw "falha na requisição, tente novamente";
 
@@ -63,9 +92,52 @@ export class UserController {
 
     @Post()
     async postUser(data: object) {
+        const parameters = new Object();
+        const parametersPermissions = new Object();
+
+        console.log(data);
         if (data != null && data != undefined) {
-            let response = await this.userRepository.create(data);
+            if (typeof(data.status) === 'string') {
+                parameters.status =  parseInt(data.status);
+            } else { 
+                parameters.status =  data.status;
+            }
+
+            if (!data.name) throw 'Informe o nome do usuário';
+            if (!data.email) throw 'Informe o email do usuário';
+            if (!data.cpf) throw 'Informe o cpf do usuário';
+            if (!data.tel) throw 'Informe o telefone do usuário';
+            if (!data.password) throw 'Informe a senha do usuário';
+            if (!data.departamentId) throw 'Informe o departamento do usuário';
+
+            // Validação de email existente. 
+            let validateEmail = await this.getAllUser({email:data.email});
+            if (validateEmail[0]) throw 'Email já cadastrado';
+
+            // Validação de cpf existente. 
+            let validateCPF = await this.getAllUser({cpf:data.cpf});
+            if (validateCPF[0]) throw 'CPF já cadastrado';
+
+            parameters.name = data.name;
+            parameters.email = data.email;
+            parameters.cpf = data.cpf;
+            parameters.tel = data.tel;
+            parameters.password = data.password;
+            parameters.jivochat = data.jivochat;
+            parameters.created_by = data.created_by;
+            parameters.departamentId = data.departamentId;
+
+            let response = await this.userRepository.create(parameters);
             if(response.count > 0) {
+                if (data.profiles) {
+                    Object.keys(data.profiles).forEach((item) => {
+                        parametersPermissions.userId = response.id;
+                        parametersPermissions.profileId = data.profiles[item].profileId;
+                        parametersPermissions.created_by = data.created_by;
+                        this.usersPermissionRepository.create(parametersPermissions);
+                    });
+                }
+    
                 return {status: 200, message: {message: "users inseridos"}}
             } else {
                 return {status: 400, message: {message: "erro"}}

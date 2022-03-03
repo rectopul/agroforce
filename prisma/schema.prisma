@@ -8,51 +8,56 @@ datasource db {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  name       String?
-  email      String  @unique
-  cpf        String  @unique
-  tel        String?
-  password   String
-  avatar     String?
-  enroll     Int? 
-  jivochat   Int? @default(0)
-  status     Int     @default(1)
-  created_at  DateTime 
-  created_by Int 
+  id              Int                 @id @default(autoincrement())
+  name            String?
+  email           String              @unique
+  cpf             String              @unique
+  tel             String?
+  password        String
+  avatar          String?
+  registration    Int?
+  departamentId   Int
+  departament     Departament         @relation(fields: [departamentId], references: [id])
+  jivochat        Int?                @default(0)
+  status          Int                 @default(1)
+  created_at      DateTime            @default(now())
+  created_by      Int
   User_Permission Users_Permissions[]
 }
 
 model Profile {
-  id               Int    @id @default(autoincrement())
+  id               Int                 @id @default(autoincrement())
   name             String
   acess_permission String
-  created_at  DateTime 
-  created_by Int 
-  status Int?
-  User_Permission Users_Permissions[]
+  created_at       DateTime            @default(now())
+  created_by       Int
+  status           Int?
+  User_Permission  Users_Permissions[]
 }
 
 model Users_Permissions {
-  id Int @id @default(autoincrement())
-  userId Int
-  user User @relation(fields: [userId], references: [id])
-  profileId Int
-  profile Profile @relation(fields: [profileId], references: [id])
-  created_at  DateTime 
-  created_by Int 
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  profileId  Int
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  created_at DateTime @default(now())
+  created_by Int
 }
 
 model Culture {
-  id     Int     @id @default(autoincrement())
-  name   String? @unique
-  created_at  DateTime
-  created_by Int 
-  status Int     @default(1)
+  id         Int      @id @default(autoincrement())
+  name       String?  @unique
+  created_at DateTime @default(now())
+  created_by Int
+  status     Int      @default(1)
 }
 
-model Setor {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique
-  status Int     @default(1)
+model Departament {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  status     Int      @default(1)
+  created_at DateTime @default(now())
+  created_by Int
+  User       User[]
 }

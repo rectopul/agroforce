@@ -68,17 +68,17 @@ export default function NovoUsuario() {
 
       userService.createUsers({
         name: values.name,
-        login: values.login,
+        // login: values.login,
         email: values.email,
         cpf: values.cpf,
         tel: values.tel,
         password: values.password,
-        profile: values.profile,
+        // profile: values.profile,
         registration: values.registration,
         department: values.department,
         jivochat: values.jivochat,
         status: values.status,
-        appLogin: values.appLogin,
+        // appLogin: values.appLogin,
         created_by: values.created_by,
       }).then((response) => {
         if (response.status == 200) {

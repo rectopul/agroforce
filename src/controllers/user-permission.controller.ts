@@ -5,12 +5,6 @@ import { UsersPermissionsRepository } from 'src/repository/user-permission.repos
 export class UserPermissionController {
     userPermission = new UsersPermissionsRepository();
 
-    /**
-     * 
-     * @returns Listagem de todos usuarios.
-     * @example Options: 
-     * 
-     */
     @Get()
     async getUserPermissions(userId: any) {
         if (typeof(userId) === 'string') {
@@ -31,12 +25,8 @@ export class UserPermissionController {
     }
 
     @Get()
-    async getAllPermission(userId: any) {
-        if (typeof(userId) === 'string') {
-            userId = parseInt(userId);
-        }
-
-        let response = await this.userPermission.findAll(userId);
+    async getAllPermissions() {
+        let response = await this.userPermission.findAll('');
 
         if (!response) 
             throw "falha na requisição, tente novamente";
@@ -44,9 +34,8 @@ export class UserPermissionController {
         return response;        
     }
 
-
     @Post()
-    async postUser(data: object) {
+    async postUserPermission(data: object) {
         if (data != null && data != undefined) {
             let response = await this.userPermission.create(data);
             if(response.count > 0) {
@@ -57,12 +46,7 @@ export class UserPermissionController {
         }
     }
 
-    /**
-    * @returns Função responsavel por fazer a atualização do usuario 
-    * @requires id do usuario a ser editado
-    * @parameters data. objeto com as informações a serem atualizadas
-     */
-    async updateUser(id: string, data: object) {
+    async updateUserPermision(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {
             let response = await this.userPermission.update(newID, data);

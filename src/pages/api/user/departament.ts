@@ -9,7 +9,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new UserPermissionController();
     switch (req.method) {
         case 'GET':
-            let response = await Controller.getAllPermissions();
+            console.log(req.query.userId)
+            let response = await Controller.getAllPermissions(req.query.userId);
             res.status(200).json(response);
             break
         default:
