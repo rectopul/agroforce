@@ -14,7 +14,6 @@ import { Button } from "../../components";
 interface IProfile {
   id: number;
   name?: string;
-  created_by: number;
 }
 
 interface IUsers {
@@ -36,13 +35,13 @@ interface IUsers {
 
 export default function NovoUsuario() {
   const profileUser: IProfile[] = [
-    { id: 1, name: "Master ", created_by: 1 },
-    { id: 2, name: "Admin", created_by: 1 },
-    { id: 3, name: "Dados", created_by: 1 },
-    { id: 4, name: "Coordenador", created_by: 1 },
-    { id: 5, name: "Pesquisador", created_by: 1 },
-    { id: 6, name: "Técnico", created_by: 1 },
-    { id: 7, name: "Visualizador", created_by: 1 },
+    { id: 1, name: "Master " },
+    { id: 2, name: "Admin" },
+    { id: 3, name: "Dados" },
+    { id: 4, name: "Coordenador" },
+    { id: 5, name: "Pesquisador" },
+    { id: 6, name: "Técnico" },
+    { id: 7, name: "Visualizador" },
   ];
 
   const tabs = [
@@ -65,7 +64,7 @@ export default function NovoUsuario() {
       tel: '',
       password: '',
       confirmPassword: '',
-      profiles: [{ id: 0, created_by: 0 }],
+      profiles: [],
       registration: 0,
       departmentId: 0,
       jivochat: 0,
@@ -81,13 +80,21 @@ export default function NovoUsuario() {
         return
       }
 
+      let ObjProfiles;
+      const auxObject = new Array();
+
+      Object.keys(values.profiles).forEach((item) => {
+        ObjProfiles = {profileId: values.profiles[item]}
+        auxObject.push(ObjProfiles);;
+      });
+
       userService.createUsers({
         name: values.name,
         email: values.email,
         cpf: values.cpf,
         tel: values.tel,
         password: values.password,
-        profiles: values.profiles,
+        profiles: auxObject,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,

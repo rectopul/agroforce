@@ -19,7 +19,7 @@ export function CheckBox({ data, ...rest }: IAllPropsAndDataCheckBox) {
             { ...rest }
             type="checkbox"
             className="form-checkbox text-blue-600"
-            value={[ item.id.toString(), item.created_by.toString() ]}
+            value={item.id}
           />
           <span className="ml-1 text-lx">
             { item.name }

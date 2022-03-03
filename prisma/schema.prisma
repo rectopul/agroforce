@@ -19,6 +19,7 @@ model User {
   departamentId   Int
   departament     Departament         @relation(fields: [departamentId], references: [id])
   jivochat        Int?                @default(0)
+  app_login       Int?                @default(1)
   status          Int                 @default(1)
   created_at      DateTime            @default(now())
   created_by      Int
@@ -60,4 +61,12 @@ model Departament {
   created_at DateTime @default(now())
   created_by Int
   User       User[]
+}
+
+model Safra {
+  id         Int      @id @default(autoincrement())
+  ano       String?  @unique
+  created_at DateTime @default(now())
+  created_by Int
+  status     Int      @default(1)
 }

@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersPermissionsRepository {   
-    async create(User: object) {
-        let Result = await prisma.users_Permissions.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
+    async create(Permission: object) {
+        let Result = await prisma.users_Permissions.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
