@@ -9,7 +9,7 @@ import {
   Content, 
   Input, 
   TabHeader 
-} from "../components";
+} from "../../components";
 
 export default function Cultura() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);

@@ -3,9 +3,9 @@ import { BiFilterAlt } from "react-icons/bi";
 
 import { useGetUsers } from "src/hooks/useGetUsers";
 
-import { Content, TabHeader } from "../components";
-import { Select } from "../components";
-import { Button } from "../components";
+import { Content, TabHeader } from "../../components";
+import { Select } from "../../components";
+import { Button } from "../../components";
 import { TablePagination } from "src/components";
 import { BsCheckLg } from "react-icons/bs";
 
