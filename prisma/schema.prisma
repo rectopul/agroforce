@@ -16,8 +16,8 @@ model User {
   password        String
   avatar          String?
   registration    Int?
-  departamentId   Int
-  departament     Departament         @relation(fields: [departamentId], references: [id])
+  departmentId    Int
+  departament     Department         @relation(fields: [departmentId], references: [id])
   jivochat        Int?                @default(0)
   app_login       Int?                @default(1)
   status          Int                 @default(1)
@@ -54,7 +54,7 @@ model Culture {
   status     Int      @default(1)
 }
 
-model Departament {
+model Department {
   id         Int      @id @default(autoincrement())
   name       String   @unique
   status     Int      @default(1)

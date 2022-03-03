@@ -40,8 +40,8 @@ export class UserController {
             parameters.tel = options.tel;
         }
 
-        if (options.departamentId) {
-            parameters.departamentId = options.departamentId;
+        if (options.departmentId) {
+            parameters.departmentId = options.departmentId;
         }
 
         if (options.registration) {
@@ -109,7 +109,7 @@ export class UserController {
             if (!data.cpf) throw 'Informe o cpf do usuário';
             if (!data.tel) throw 'Informe o telefone do usuário';
             if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departamentId) throw 'Informe o departamento do usuário';
+            if (!data.departmentId) throw 'Informe o departamento do usuário';
             if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
 
             // Validação de email existente. 
@@ -128,16 +128,17 @@ export class UserController {
             parameters.cpf = data.cpf;
             parameters.tel = data.tel;
             parameters.password = data.password;
-            parameters.departamentId = data.departamentId;
+            parameters.departmentId = data.departmentId;
             parameters.created_by = data.created_by;
             parameters.jivochat = data.jivochat || null;
             parameters.app_login = data.app_login || null;
 
             let response = await this.userRepository.create(parameters);
+            console.log(response);
             if(response.count > 0) {
                 if (data.profiles) {
                     Object.keys(data.profiles).forEach((item) => {
-                        parametersPermissions.userId = 29;
+                        parametersPermissions.userId = 34;
                         parametersPermissions.profileId = data.profiles[item].profileId;
                         parametersPermissions.created_by = data.created_by;
                         this.usersPermissionRepository.create(parametersPermissions);
