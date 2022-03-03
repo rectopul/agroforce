@@ -13,6 +13,7 @@ import { Button } from "../../components";
 
 interface IProfile {
   id: number;
+  name?: string;
   created_by: number;
 }
 
@@ -35,13 +36,13 @@ interface IUsers {
 
 export default function NovoUsuario() {
   const profileUser: IProfile[] = [
-    { id: 1, created_by: 1 },
-    { id: 2, created_by: 1 },
-    { id: 3, created_by: 1 },
-    { id: 4, created_by: 1 },
-    { id: 5, created_by: 1 },
-    { id: 6, created_by: 1 },
-    { id: 7, created_by: 1 },
+    { id: 1, name: "Master ", created_by: 1 },
+    { id: 2, name: "Admin", created_by: 1 },
+    { id: 3, name: "Dados", created_by: 1 },
+    { id: 4, name: "Coordenador", created_by: 1 },
+    { id: 5, name: "Pesquisador", created_by: 1 },
+    { id: 6, name: "Técnico", created_by: 1 },
+    { id: 7, name: "Visualizador", created_by: 1 },
   ];
 
   const tabs = [
@@ -61,9 +62,9 @@ export default function NovoUsuario() {
       name: '',
       email: '',
       cpf: '',
+      tel: '',
       password: '',
       confirmPassword: '',
-      tel: '',
       profiles: [{ id: 0, created_by: 0 }],
       registration: 0,
       departmentId: 0,
@@ -160,13 +161,12 @@ export default function NovoUsuario() {
                 Tipo de perfil
               </label>
               <div className="flex gap-6 border-b border-gray-300">
-                {/* <CheckBox
-                  title="Admin"
+                <CheckBox
                   id="profiles"
                   name="profiles"
                   onChange={formik.handleChange}
-                  value={profileUser}
-                /> */}
+                  data={profileUser}
+                />
               </div>
             </div>
           </div>

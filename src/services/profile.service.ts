@@ -5,14 +5,14 @@ import Router from 'next/router'
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/user/profile`;
 
-export const cultureService = {
+export const profileService = {
     getAll,
-    createCulture
+    createProfile 
 };
 
-function createCulture(data: any) {
+function createProfile(data: any) {
     return fetchWrapper.post(baseUrl, data);
 }
 

@@ -1,18 +1,17 @@
-import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
 import Router from 'next/router'
 
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/user/departament`;
 
-export const cultureService = {
+export const departamentService = {
     getAll,
-    createCulture
+    createProfile 
 };
 
-function createCulture(data: any) {
+function createProfile(data: any) {
     return fetchWrapper.post(baseUrl, data);
 }
 

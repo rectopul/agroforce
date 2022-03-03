@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class UserRepository {   
     async create(User: object) {
         let Result = await prisma.user.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
+
         return Result;
     }
 

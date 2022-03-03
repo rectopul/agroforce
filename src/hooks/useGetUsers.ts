@@ -4,10 +4,13 @@ interface IUsers {
   id: number,
   name: string,
   login: string,
-  telefone: string,
+  tel: string,
   email: string,
   avatar: string,
   status: boolean,
+  created_at: Date,
+  created_by: Number,
+  cpf: string
 }
 
 export function useGetUsers () {
@@ -21,6 +24,7 @@ export function useGetUsers () {
   const endIndex = startIndex + itensPerPage;
   const currentItens = items.slice(startIndex, endIndex);
 
+<<<<<<< HEAD
   useEffect(() => {
     const fetchData = async () => {
       const result = await fetch(`http://localhost:3000/api/testes/users`)
@@ -33,10 +37,34 @@ export function useGetUsers () {
     fetchData();
   }, []);
 
+=======
+ 
+  useEffect(() => {
+     const fetchData = async () => {
+       /*
+        Exemplo de informaçãoes para paginação 
+        take: Quantidade de itens por pagina, 
+        skip: Quantidade de itens a serem pulados, inicia com zero 
+        e depois é o valor da pagina atual x o valor de itens por pagina.
+        const skip = pageClicada - 1 * take;
+      */
+      const queryParameters = "status=1&take=1&skip=1";
+      const result =  userService.getAll(queryParameters).then((response) => {
+        setItems(response);
+      })
+    }
+    fetchData();
+  }), [false];
+
+>>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc
   useEffect(() => {
     setCurrentPage(0);
   }, [itensPerPage]);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc
   return {
     items,
     pages,
@@ -46,4 +74,8 @@ export function useGetUsers () {
     setItensPerPage,
     setItems
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc
