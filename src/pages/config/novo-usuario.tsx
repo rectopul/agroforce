@@ -1,45 +1,27 @@
-import { useState } from "react";
-import { GetServerSideProps, GetStaticProps } from "next";
-
+import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import Head from "next/head";
-import { tabs } from '../../utils/statics/tabs';
-import { profileUser } from '../../utils/statics/profiles';
-import { CheckBox } from "src/components/CheckBox";
 
 import { userService, departmentService,profileService  } from "src/services";
 
-import { TabHeader } from "../../components";
-import { Content } from "../../components";
-import { Input } from "../../components"; 
-import { Select } from "../../components";
-import { Button } from "../../components";
+import {
+  IUsers,
+  profileUser,
+  IDepartment,
+  IAllDepartments
+} from './props';
 
-interface IUsers {
-  name: string;
-  email: string;
-  cpf: string;
-  tel: string;
-  password: string;
-  registration: number;
-  jivochat: number;
-  status?: number;
-  created_by: any;
-  departmentId: number;
-  confirmPassword: string;
-  app_login: number;
-  profiles: IProfile[];
-  // profiles: [{ profileId: number, created_by: number }];
-}
+import {
+  TabHeader,
+  Content,
+  Input,
+  Select,
+  Button,
+  CheckBox
+} from "../../components";
 
-interface IDepartment {
-  id: number;
-  name: string;
-}
-
-interface IAllDepartments {
-  departments: IDepartment[];
-}
+// Teste
+import { tabs } from '../../utils/statics/tabs';
 
 export default function NovoUsuario({ departments }: IAllDepartments) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
