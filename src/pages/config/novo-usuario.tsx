@@ -1,6 +1,10 @@
+import { useState } from "react";
+import { GetServerSideProps, GetStaticProps } from "next";
+
 import { useFormik } from "formik";
 import Head from "next/head";
-import { BsCheckLg } from 'react-icons/bs';
+import { tabs } from '../../utils/statics/tabs';
+import { profileUser } from '../../utils/statics/profiles';
 import { CheckBox } from "src/components/CheckBox";
 
 import { userService, departmentService,profileService  } from "src/services";
@@ -10,11 +14,6 @@ import { Content } from "../../components";
 import { Input } from "../../components"; 
 import { Select } from "../../components";
 import { Button } from "../../components";
-
-interface IProfile {
-  id: number;
-  name?: string;
-}
 
 interface IUsers {
   name: string;
@@ -32,31 +31,38 @@ interface IUsers {
   profiles: IProfile[];
   // profiles: [{ profileId: number, created_by: number }];
 }
-export default function NovoUsuario() {
-//  departmentService.getAll('');
-//  profileService.getAll('');
 
-  const profileUser: IProfile[] = [
-    { id: 1, name: "Master " },
-    { id: 2, name: "Admin" },
-    { id: 3, name: "Dados" },
-    { id: 4, name: "Coordenador" },
-    { id: 5, name: "Pesquisador" },
-    { id: 6, name: "Técnico" },
-    { id: 7, name: "Visualizador" },
-  ];
+interface IDepartment {
+  id: number;
+  name: string;
+}
 
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-    { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
-    { title: 'LOCAL', value: <BsCheckLg />, status: false  },
-    { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false  },
-    { title: 'NPE', value: <BsCheckLg />, status: false  },
-    { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
-    { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
-  ];
+interface IAllDepartments {
+  departments: IDepartment[];
+}
 
+export default function NovoUsuario({ departments }: IAllDepartments) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+
+  function handleGetDepartment() {
+    const listDataDepartment: IDepartment[] = departments.map((data) =>  {
+      return {
+        id: data.id,
+        name: data.name
+      };
+    });
+  
+    const listDepartmentName = listDataDepartment.map(department => {
+      const getName: string = department.name;
+
+      return getName;
+    });
+
+    return {
+      listDataDepartment,
+      listDepartmentName
+    }
+  }
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -87,7 +93,7 @@ export default function NovoUsuario() {
 
       Object.keys(values.profiles).forEach((item) => {
         ObjProfiles = {profileId: values.profiles[item]}
-        auxObject.push(ObjProfiles);;
+        auxObject.push(ObjProfiles);
       });
 
       userService.createUsers({
@@ -259,7 +265,7 @@ export default function NovoUsuario() {
                 Setor
               </label>
               <Select
-                values={["Administração", "Gestão", "RH", "TI"]}
+                values={handleGetDepartment().listDepartmentName}
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -370,4 +376,18 @@ export default function NovoUsuario() {
       </Content>
     </>
   );
+}
+
+export const getServerSideProps:GetServerSideProps = async ({req}) => {
+  // Fetch data from external API
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjQwMTIxOCwiZXhwIjoxNjQ3MDA2MDE4fQ.VwgydY1n6Mm7M9yssN0p_eh35es_OoEJPuMxfW_4fdw'}
+  };
+
+  const res = await fetch('http://localhost:3000/api/user/departament', requestOptions)
+  const departments = await res.json();
+
+  return { props: { departments } }
 }
