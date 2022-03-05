@@ -2,13 +2,13 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import Head from "next/head";
 
-import { userService, departmentService,profileService  } from "src/services";
+import { userService } from "src/services";
 
 import {
   IUsers,
+  IProfile,
   profileUser,
   IDepartment,
-  IAllDepartments
 } from './props';
 
 import {
@@ -20,17 +20,22 @@ import {
   CheckBox
 } from "../../components";
 
+export interface IData {
+  profiles: IProfile[];
+  departments: IDepartment[];
+}
+
 // Teste
 import { tabs } from '../../utils/statics/tabs';
 
-export default function NovoUsuario({ departments }: IAllDepartments) {
+export default function NovoUsuario({ departments, profiles }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   function handleGetDepartment() {
     const listDataDepartment: IDepartment[] = departments.map((data) =>  {
       return {
         id: data.id,
-        name: data.name
+        name: data.name,
       };
     });
   
@@ -54,7 +59,7 @@ export default function NovoUsuario({ departments }: IAllDepartments) {
       tel: '',
       password: '',
       confirmPassword: '',
-      profiles: [],
+      profiles: [{ id: 0 }],
       registration: 0,
       departmentId: 0,
       jivochat: 0,
@@ -73,10 +78,12 @@ export default function NovoUsuario({ departments }: IAllDepartments) {
       let ObjProfiles;
       const auxObject = new Array();
 
-      Object.keys(values.profiles).forEach((item) => {
+      Object.keys(values.profiles).forEach((_, item) => {
         ObjProfiles = {profileId: values.profiles[item]}
         auxObject.push(ObjProfiles);
       });
+
+      console.log(ObjProfiles)
 
       userService.createUsers({
         name: values.name,
@@ -158,12 +165,20 @@ export default function NovoUsuario({ departments }: IAllDepartments) {
                 Tipo de perfil
               </label>
               <div className="flex gap-6 border-b border-gray-300">
-                <CheckBox
-                  id="profiles"
-                  name="profiles"
-                  onChange={formik.handleChange}
-                  data={profileUser}
-                />
+                {
+                  profiles.map((profile) => (
+                    <>
+                      <CheckBox
+                        key={profile.id}
+                        title={profile.name}
+                        id="profiles.id"
+                        name="profiles"
+                        onChange={formik.handleChange}
+                        value={profile.id}
+                      />
+                    </>
+                  ))
+                }
               </div>
             </div>
           </div>
@@ -361,15 +376,19 @@ export default function NovoUsuario({ departments }: IAllDepartments) {
 }
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
-  // Fetch data from external API
-  const requestOptions = {
+  const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
     headers: {Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjQwMTIxOCwiZXhwIjoxNjQ3MDA2MDE4fQ.VwgydY1n6Mm7M9yssN0p_eh35es_OoEJPuMxfW_4fdw'}
   };
 
-  const res = await fetch('http://localhost:3000/api/user/departament', requestOptions)
-  const departments = await res.json();
+  const apiDepartment = await fetch(`http://localhost:3000/api/user/departament`, requestOptions);
+  const apiProfile = await fetch(`http://localhost:3000/api/user/profile`, requestOptions);
 
-  return { props: { departments } }
+  const departments = await apiDepartment.json();
+  const profiles = await apiProfile.json();
+
+  console.log(profiles)
+
+  return { props: { departments, profiles } }
 }
