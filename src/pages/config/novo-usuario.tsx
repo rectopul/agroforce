@@ -7,7 +7,6 @@ import { userService } from "src/services";
 import {
   IUsers,
   IProfile,
-  profileUser,
   IDepartment,
 } from './props';
 
@@ -82,8 +81,6 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         ObjProfiles = {profileId: values.profiles[item]}
         auxObject.push(ObjProfiles);
       });
-
-      console.log(ObjProfiles)
 
       userService.createUsers({
         name: values.name,
@@ -387,8 +384,6 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();
-
-  console.log(profiles)
 
   return { props: { departments, profiles } }
 }

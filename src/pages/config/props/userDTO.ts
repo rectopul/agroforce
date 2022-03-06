@@ -1,18 +1,19 @@
 import { IProfile } from './index';
 
 export interface IUsers {
+  id?: number;
   name: string;
   email: string;
   cpf: string;
   tel: string;
   password: string;
+  avatar?: string;
   registration: number;
-  jivochat: number;
-  status?: number;
-  created_by: any;
   departmentId: number;
-  confirmPassword: string;
+  jivochat: number;
   app_login: number;
+  status?: number;
+  created_by: number | any;
+  confirmPassword: string;
   profiles: IProfile[];
-  // profiles: [{ profileId: number, created_by: number }];
 }

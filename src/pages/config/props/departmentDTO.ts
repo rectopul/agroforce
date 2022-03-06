@@ -1,6 +1,6 @@
 export interface IDepartment {
   id: number;
-  name: string;
+  name?: string;
 }
 
 export interface IAllDepartments {

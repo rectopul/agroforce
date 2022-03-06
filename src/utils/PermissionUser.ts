@@ -8,7 +8,7 @@ const PermisssionGate = ({ children, permissions, user }: any) => {
 
   if (
     permissions
-      .some(permission => {
+      .some((permission: string) => {
         return userPermissions.includes(permission)
       })
   ) {

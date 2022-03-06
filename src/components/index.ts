@@ -12,3 +12,5 @@ export { CheckBox } from './CheckBox';
 export { Radio } from './Radio';
 export { Toast } from './Toast';
 
+export { Select2 } from './Select/index2';
+
