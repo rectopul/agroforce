@@ -96,12 +96,29 @@ export class UserController {
         const parameters = new Object();
         const parametersPermissions = new Object();
 
-        console.log(data);
         if (data != null && data != undefined) {
             if (typeof(data.status) === 'string') {
                 parameters.status =  parseInt(data.status);
             } else { 
                 parameters.status =  data.status;
+            }
+
+            if (typeof(data.app_login) === 'string') {
+                parameters.app_login =  parseInt(data.app_login);
+            } else { 
+                parameters.app_login =  data.app_login;
+            }
+
+            if (typeof(data.jivochat) === 'string') {
+                parameters.jivochat =  parseInt(data.jivochat);
+            } else { 
+                parameters.jivochat =  data.jivochat;
+            }
+
+            if (typeof(data.departmentId) === 'string') {
+                parameters.departmentId =  parseInt(data.departmentId);
+            } else { 
+                parameters.departmentId =  data.departmentId;
             }
 
             if (!data.name) throw 'Informe o nome do usuário';
@@ -128,18 +145,19 @@ export class UserController {
             parameters.cpf = data.cpf;
             parameters.tel = data.tel;
             parameters.password = data.password;
-            parameters.departmentId = data.departmentId;
             parameters.created_by = data.created_by;
-            parameters.jivochat = data.jivochat || null;
-            parameters.app_login = data.app_login || null;
 
             let response = await this.userRepository.create(parameters);
-            console.log(response);
-            if(response.count > 0) {
+
+            if(response) {
                 if (data.profiles) {
                     Object.keys(data.profiles).forEach((item) => {
-                        parametersPermissions.userId = 34;
-                        parametersPermissions.profileId = data.profiles[item].profileId;
+                        if (typeof(data.profiles[item].profileId) === 'string') {
+                            parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
+                        } else { 
+                            parametersPermissions.profileId = data.profiles[item].profileId;
+                        }
+                        parametersPermissions.userId = response.id;
                         parametersPermissions.created_by = data.created_by;
                         this.usersPermissionRepository.create(parametersPermissions);
                     });
@@ -168,10 +186,59 @@ export class UserController {
     * @requires id do usuario a ser editado
     * @parameters data. objeto com as informações a serem atualizadas
      */
-    async updateUser(id: string, data: object) {
-        let newID = parseInt(id);
+    @Put()
+    async updateUser(data: object) {
         if (data != null && data != undefined) {
-            let response = await this.userRepository.update(newID, data);
+            const parameters = new Object();
+
+            console.log(data);
+            if (typeof(data.status) === 'string') {
+                parameters.status =  parseInt(data.status);
+            } else { 
+                parameters.status =  data.status;
+            }
+
+            if (typeof(data.app_login) === 'string') {
+                parameters.app_login =  parseInt(data.app_login);
+            } else { 
+                parameters.app_login =  data.app_login;
+            }
+
+            if (typeof(data.jivochat) === 'string') {
+                parameters.jivochat =  parseInt(data.jivochat);
+            } else { 
+                parameters.jivochat =  data.jivochat;
+            }
+
+            if (typeof(data.departmentId) === 'string') {
+                parameters.departmentId =  parseInt(data.departmentId);
+            } else { 
+                parameters.departmentId =  data.departmentId;
+            }
+
+            if (!data.name) throw 'Informe o nome do usuário';
+            if (!data.email) throw 'Informe o email do usuário';
+            if (!data.cpf) throw 'Informe o cpf do usuário';
+            if (!data.tel) throw 'Informe o telefone do usuário';
+            if (!data.password) throw 'Informe a senha do usuário';
+            if (!data.departmentId) throw 'Informe o departamento do usuário';
+            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
+
+
+            // Validação cpf é valido
+            // if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+
+            parameters.name = data.name;
+            parameters.email = data.email;
+            parameters.cpf = data.cpf;
+            parameters.tel = data.tel;
+            parameters.password = data.password;
+            parameters.created_by = data.created_by;
+
+            let response = await this.userRepository.update(data.id, parameters);
+
+            console.log(response);
+
             if(response) {
                 return {status: 200, message: {message: "Usuario atualizada"}}
             } else {

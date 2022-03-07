@@ -2,13 +2,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {UserController} from '../../../controllers/user.controller';
 import { UserPermissionController } from 'src/controllers/user-permission.controller';
+import nookies from 'nookies';
 
 const jwt = require('jsonwebtoken');
 
 import getConfig from 'next/config';
 import { apiHandler } from '../../../helpers/api';
-import { any } from 'prop-types';
-import permissions from './permissions';
 
 const { serverRuntimeConfig } = getConfig();
 

@@ -10,7 +10,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
         case 'GET':
             let response = await Controller.getAllProfiles();
-            console.log(response)
             res.status(200).json(response);
             break
         default:

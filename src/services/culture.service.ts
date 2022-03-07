@@ -9,7 +9,8 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
 
 export const cultureService = {
     getAll,
-    createCulture
+    createCulture,
+    updateCulture
 };
 
 function createCulture(data: any) {
@@ -18,4 +19,8 @@ function createCulture(data: any) {
 
 function getAll(parameters: any) {
     return fetchWrapper.get(baseUrl, parameters);
+}
+
+function updateCulture(data: any) {
+    return fetchWrapper.put(baseUrl, data);
 }

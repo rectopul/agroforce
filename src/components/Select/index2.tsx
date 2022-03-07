@@ -7,9 +7,10 @@ interface ISelectProps {
 
 type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   data: ISelectProps[];
+  selected: any
 }
 
-export function Select2({ data, ...rest }: ITypeSelectProps) {
+export function Select2({ selected, data, ...rest }: ITypeSelectProps) {
   return (
     <select
       { ...rest }
@@ -31,8 +32,9 @@ export function Select2({ data, ...rest }: ITypeSelectProps) {
       <option value="">Selecione opções...</option>
      {
        data.map((item, index) => {
+         let itemSelected = selected === item.id ? true : false;
          return (
-           <option key={index} value={item.id}>{item.name}</option>
+           <option selected={itemSelected} key={index}value={item.id}>{item.name}</option>
          )
        })
      }

@@ -39,15 +39,18 @@ export class CulturaController {
     }
 
     @Put()
-    async updateCulture(id: string, data: object) {
-        let newID = parseInt(id);
+    async updateCulture(data: any) {
+        const parameters = new Object();
+        console.log(data)
+        if(data.name) parameters.name = data.name;
+        if(data.status) parameters.status = data.status;
+
         if (data != null && data != undefined) {
-            let response = await this.culturaRepository.update(newID, data);
+            let response = await this.culturaRepository.update(data.id, parameters);
             if(response) {
                 return {status: 200, message: {message: "cultura atualizada"}}
             } else {
                 return {status: 400, message: {message: "erro ao tentar fazer o update"}}
-
             }
         }
     }

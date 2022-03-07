@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UserRepository {   
     async create(User: object) {
-        let Result = await prisma.user.createMany({ data: User}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.user.create({ data: User}).finally(async () => { await prisma.$disconnect() })
 
         return Result;
     }
@@ -12,7 +12,7 @@ export class UserRepository {
     async update(id: number, Data: Object) {
         let User = await this.findOne(id);
         if (User != null) { 
-            let Result = await prisma.user.update({ 
+            let Result = await prisma.user.updateMany({ 
                 where: {
                     id: id
                 },
@@ -25,7 +25,7 @@ export class UserRepository {
     }
 
     async findOne(id: number) {
-        let Result = await prisma.user.findUnique({
+        let Result = await prisma.user.findMany({
                where: {
                    id: id
                }

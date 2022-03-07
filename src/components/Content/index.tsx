@@ -11,7 +11,7 @@ interface IContentProps {
 
 export function Content({ headerCotent, children }: IContentProps) {
   // const plantas = [ "Milho", "Algodão", "Soja" ];
-  const safras = [ "03/19", "04/20", "03/21" ];
+  const safras = [{id: "03/19", name:"03/19" }, { id: "04/20", name: "03/21"}];
 
   return (
     <>

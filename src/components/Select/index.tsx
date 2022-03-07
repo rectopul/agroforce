@@ -2,9 +2,10 @@ import { SelectHTMLAttributes } from "react";
 
 type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   values: Array<string | object>;
+  selected: any
 }
 
-export function Select({ values, ...rest }: ITypeSelectProps) {
+export function Select({ selected, values, ...rest }: ITypeSelectProps) {
   return (
     <select
       { ...rest }
@@ -26,8 +27,10 @@ export function Select({ values, ...rest }: ITypeSelectProps) {
       <option value="">Selecione...</option>
      {
        values.map((value: string | object, index) => {
+        let itemSelected = selected === value.id ? true : false;
+
          return (
-           <option key={index} value={value.toString()}>{value.toString()}</option>
+           <option selected={itemSelected} key={index} value={value.id}>{value.name.toString()}</option>
          )
        })
      }

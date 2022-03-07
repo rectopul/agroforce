@@ -15,7 +15,8 @@ export const userService = {
     logout,
     getAll,
     getPermissions,
-    createUsers
+    createUsers,
+    updateUsers
 };
 
 function login(email: any, password: any) {
@@ -31,6 +32,10 @@ function login(email: any, password: any) {
 
 function createUsers(data: any) {
     return fetchWrapper.post(baseUrl, data);
+}
+
+function updateUsers(data: any) {
+    return fetchWrapper.put(baseUrl, data);
 }
 
 function logout() {

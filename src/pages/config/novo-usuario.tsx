@@ -29,26 +29,8 @@ import { tabs } from '../../utils/statics/tabs';
 
 export default function NovoUsuario({ departments, profiles }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
 
-  function handleGetDepartment() {
-    const listDataDepartment: IDepartment[] = departments.map((data) =>  {
-      return {
-        id: data.id,
-        name: data.name,
-      };
-    });
-  
-    const listDepartmentName = listDataDepartment.map(department => {
-      const getName: string = department.name;
-
-      return getName;
-    });
-
-    return {
-      listDataDepartment,
-      listDepartmentName
-    }
-  }
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -259,7 +241,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 Setor
               </label>
               <Select
-                values={handleGetDepartment().listDepartmentName}
+                values={departments}
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -328,7 +310,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 Libera jivochat
               </label>
               <Select
-                values={["Sim", "Não"]}
+                values={optionSorN}
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -341,7 +323,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <div className="h-10">
                 <Select
-                  values={["Não", "Sim"]} 
+                  values={optionSorN} 
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}
@@ -376,7 +358,7 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: {Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjQwMTIxOCwiZXhwIjoxNjQ3MDA2MDE4fQ.VwgydY1n6Mm7M9yssN0p_eh35es_OoEJPuMxfW_4fdw'}
+    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
   };
 
   const apiDepartment = await fetch(`http://localhost:3000/api/user/departament`, requestOptions);
@@ -384,6 +366,8 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();
+
+  console.log(profiles)
 
   return { props: { departments, profiles } }
 }

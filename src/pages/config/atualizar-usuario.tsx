@@ -23,11 +23,12 @@ import { userService } from "src/services";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
-  // users: IUsers;
+  userEdit: IUsers;
 }
 
-export default function AtualizarUsuario({ departments, profiles }: IData) {
+export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
 
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
@@ -35,13 +36,14 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
 
   const formik = useFormik<IUsers>({
     initialValues: {
+      id: userEdit.id,
       name: '',
       email: '',
       cpf: '',
       tel: '',
       password: '',
       confirmPassword: '',
-      profiles: [{ id: 0 }],
+      profiles: [],
       registration: 0,
       departmentId: 0,
       jivochat: 0,
@@ -65,7 +67,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
         auxObject.push(ObjProfiles);
       });
 
-      userService.createUsers({
+      userService.updateUsers({
         name: values.name,
         email: values.email,
         cpf: values.cpf,
@@ -80,7 +82,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
         created_by: values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          alert("Usuário criado com sucesso!");
+          alert("Usuário atualizado com sucesso!");
         }
       })
     },
@@ -89,7 +91,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
   return (
     <>
       <Head>
-        <title>Atualizar usuário</title>
+        <title>Atualizar Usuário</title>
       </Head>
       <Content
         headerCotent={
@@ -192,7 +194,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
-                value={formik.values.name}
+                value={userEdit.name}
               />
             </div>
 
@@ -206,7 +208,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 id="email"
                 name="email"
                 onChange={formik.handleChange}
-                value={formik.values.email}
+                value={userEdit.email}
               />
             </div>
           </div>
@@ -229,7 +231,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 id="cpf"
                 name="cpf"
                 onChange={formik.handleChange}
-                value={formik.values.cpf}
+                value={userEdit.cpf}
               />
             </div>
 
@@ -243,7 +245,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 id="tel"
                 name="tel"
                 onChange={formik.handleChange}
-                value={formik.values.tel}
+                value={userEdit.tel}
               />
             </div>
 
@@ -252,10 +254,11 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 Setor
               </label>
               <Select2
-                id="profiles.id"
-                name="profiles"
+                id="department.id"
+                name="departmentId"
                 onChange={formik.handleChange}
                 data={departments}
+                selected={userEdit.departmentId}
               />
             </div>
           </div>
@@ -276,7 +279,7 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 id="registration"
                 name="registration"
                 onChange={formik.handleChange}
-                value={formik.values.registration}
+                value={userEdit.registration}
               />
             </div>
 
@@ -320,11 +323,12 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
                 Libera jivochat
               </label>
               <Select
-                values={["Sim", "Não"]}
+                values={optionSorN}
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
                 value={formik.values.jivochat}
+                selected={userEdit.jivochat}
               />
             </div>
             <div className="w-full">
@@ -333,11 +337,12 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
               </label>
               <div className="h-10">
                 <Select
-                  values={["Não", "Sim"]} 
+                  values={optionSorN} 
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}
                   value={formik.values.app_login}
+                  selected={userEdit.app_login}
                 />
               </div>
             </div>
@@ -364,19 +369,23 @@ export default function AtualizarUsuario({ departments, profiles }: IData) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async () => {
-  const requestOptions: RequestInit | undefined = {
+export const getServerSideProps:GetServerSideProps = async ({req}) => {
+  // const  token  =  req.cookies.token;
+  // console.log("ALA" + token)
+  // Fetch data from external API
+  const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers: {Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjQwMTIxOCwiZXhwIjoxNjQ3MDA2MDE4fQ.VwgydY1n6Mm7M9yssN0p_eh35es_OoEJPuMxfW_4fdw'}
+    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
   };
+  const resD = await fetch('http://localhost:3000/api/user/departament', requestOptions)
+  const resP = await fetch('http://localhost:3000/api/user/profile', requestOptions)
+  const resU = await fetch('http://localhost:3000/api/user/' + 34, requestOptions)
+  const departments = await resD.json();
+  const profiles = await resP.json();
+  const userEdit = await resU.json();
 
-  const apiDepartment = await fetch(`http://localhost:3000/api/user/departament`, requestOptions);
-  const apiProfile = await fetch(`http://localhost:3000/api/user/profile`, requestOptions);
+  console.log(userEdit)
 
-
-  const departments = await apiDepartment.json() as IDepartment[];
-  const profiles = await apiProfile.json() as IProfile[];
-
-  return { props: { departments, profiles } }
+  return { props: { departments, profiles, userEdit } }
 }
