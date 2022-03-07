@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { BsCheckLg, BsEye } from "react-icons/bs";
@@ -28,15 +28,35 @@ interface Idata {
 }
 
 export default function Listagem({ allUsers }: Idata) {
+  const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const [ filter, setFilter ] = useState<number>(3)
+
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
   ];
 
   const filters = [
-    { id: "teste", name: 'Todos' },
-    { id: "teste", name: 'Ativos' },
-    { id: "teste", name: 'Inativos' },
+    { id: 1, name: 'Todos'},
+    { id: 2, name: 'Ativos'},
+    { id: 3, name: 'Inativos'},
   ];
+
+  const handleFilterUserbyStatus = (id: number) => {
+    // const allUsers = values.map((user) => user.name === 'Todos');
+    const selected = filters.find((select) => select.id === id);
+
+    const filterUsers = users.filter((user) => {
+      if (selected?.id === 3) {
+        return !user.status;
+      } else if (selected?.id === 2) {
+        return user.status
+      } else {
+        return user;
+      }
+    });
+
+    setUsers(filterUsers)
+  }
 
   return (
     <>
@@ -54,7 +74,7 @@ export default function Listagem({ allUsers }: Idata) {
           gap-8
         ">
 
-          <form className="w-full bg-white p-7 rounded-lg">
+          <div className="w-full bg-white p-7 rounded-lg">
             <div className='flex gap-2'>
               <div>
                 <Button
@@ -65,6 +85,7 @@ export default function Listagem({ allUsers }: Idata) {
                   // BsEyeSlash
                 />
               </div>
+
               <div>
                 <Button
                   onClick={() => {}}
@@ -74,24 +95,24 @@ export default function Listagem({ allUsers }: Idata) {
               />
               </div>
               <div className="h-10 w-44 ml-4">
-                <Select values={filters} selected={false} />
+                <Select values={filters.map(id => id)} selected={false} />
               </div>
 
               <div>
                 <Button
                   value="Filtrar"
-                  onClick={() => {}}
+                  onClick={() => handleFilterUserbyStatus(filter)}
                   bgColor="bg-blue-600"
                   textColor="white"
                   icon={<BiFilterAlt size={20} />}
                 />
               </div>
             </div>
-          </form>
+          </div>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={allUsers} />
+            <TablePagination data={users} />
           </div>
         </main>
       </Content>
@@ -109,8 +130,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const user = await fetch('http://localhost:3000/api/user', requestOptions);
 
   const allUsers = await user.json();
-
-  console.log(allUsers);
 
   return {
     props: {

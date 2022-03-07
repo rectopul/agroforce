@@ -136,6 +136,7 @@ export const TablePagination = ({ data }: ITable) => {
   
   return (
     <MaterialTable
+      style={{ background: '#f9fafb' }}
       columns={columns}
       data={tableData}
       options={{
