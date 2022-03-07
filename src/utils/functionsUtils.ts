@@ -1,8 +1,9 @@
-
+import { userService } from "src/services";
 
 
 export const functionsUtils = {
-    validationCPF
+    validationCPF,
+	getPermissions
 };
 
 function validationCPF(cpf: any) {	
@@ -40,4 +41,10 @@ function validationCPF(cpf: any) {
 	if (rev != parseInt(cpf.charAt(10)))
 		return false;		
 	return true;   
+}
+
+function getPermissions(userId: any, permissionsAtualizadas: any) {
+	let param = "userId=" + userId;
+	const permissions = userService.getPermissions(param);
+	console.log("PERMISSION" + permissions)
 }

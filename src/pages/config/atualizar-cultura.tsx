@@ -10,11 +10,13 @@ import {
   Button,
   Content, 
   Input, 
+  Select, 
   TabHeader 
 } from "../../components";
 
 export default function Cultura({cultureEdit}:any) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
@@ -30,12 +32,14 @@ export default function Cultura({cultureEdit}:any) {
     initialValues: {
       id: cultureEdit.id,
       name: cultureEdit.name,
+      status: cultureEdit.status,
       created_by: userLogado.id,
     },
     onSubmit: values => {
       cultureService.updateCulture({
         id: cultureEdit.id,
         name: formik.values.name,
+        status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
@@ -48,7 +52,7 @@ export default function Cultura({cultureEdit}:any) {
   return (
     <>
      <Head>
-        <title>Nova cultura</title>
+        <title>Atualizar cultura</title>
       </Head>
       
       <Content
@@ -129,7 +133,23 @@ export default function Cultura({cultureEdit}:any) {
               value={formik.values.name}
             />
           </div>
+
+          <div className="w-full h-10">
+            <label className="block text-gray-900 text-sm font-bold mb-2">
+              Status
+            </label>
+            <Select
+                values={optionStatus}
+                id="status"
+                name="status"
+                onChange={formik.handleChange}
+                value={formik.values.status}
+                selected={cultureEdit.status}
+              />
+        
+          </div>
         </div>
+       
 
         <div className="h-10 w-full
           flex
