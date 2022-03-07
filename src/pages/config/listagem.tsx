@@ -1,24 +1,42 @@
+import { ReactNode } from "react";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { BsCheckLg, BsEye } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
+import { HiOutlineClipboardList } from "react-icons/hi";
 
-import { useGetUsers } from "src/hooks/useGetUsers";
+import { 
+  Button, 
+  Content, 
+  Select, 
+  TabHeader,
+  TablePagination 
+} from "../../components";
 
-import { Content, TabHeader } from "../../components";
-import { Select } from "../../components";
-import { Button } from "../../components";
-import { TablePagination } from "src/components";
-import { BsCheckLg } from "react-icons/bs";
+interface IUsers {
+  id: number,
+  name: string,
+  cpf: string,
+  email: string,
+  tel: string,
+  avatar: string | ReactNode,
+  status: boolean,
+}
 
-export default function Listagem() {
-  const { items: users } = useGetUsers();
+interface Idata {
+  allUsers: IUsers[];
+}
 
-  const filters = [
-    { value: "fdasfsd", tile: 'Teste1', status: true},
-  ];
-
+export default function Listagem({ allUsers }: Idata) {
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
-  ]
+  ];
+
+  const filters = [
+    { id: "teste", name: 'Todos' },
+    { id: "teste", name: 'Ativos' },
+    { id: "teste", name: 'Inativos' },
+  ];
 
   return (
     <>
@@ -35,49 +53,68 @@ export default function Listagem() {
           items-start
           gap-8
         ">
-          <div className="w-full
-            flex
-            flex-col
-            justify-between
-            items-center
-            gap-10
-            p-4
-            rounded-lg
-            bg-gray-50
-          ">
-          <div className="flex w-full gap-12">
-            <div className="w-full h-10">
-              <span>Inativo:</span>
-              <Select values={filters} />
-            </div>
-            <div className="w-full h-10">
-              <span>GRV a quem responde:</span>
-              <Select values={filters} />
-            </div>
-            <div className="w-full h-10">
-              <span>RDT a quem responde:</span>
-              <Select values={filters} />
-            </div>
-          </div>
 
-          <div className="h-10">
-            <Button
-              value="Filtrar"
-              onClick={() => {}}
-              bgColor="bg-blue-600"
-              textColor="white"
-              icon={<BiFilterAlt size={20} />}
-            />
+          <form className="w-full bg-white p-7 rounded-lg">
+            <div className='flex gap-2'>
+              <div>
+                <Button
+                  onClick={() => {}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<BsEye size={20} />}
+                  // BsEyeSlash
+                />
+              </div>
+              <div>
+                <Button
+                  onClick={() => {}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<HiOutlineClipboardList size={20} />}
+              />
+              </div>
+              <div className="h-10 w-44 ml-4">
+                <Select values={filters} selected={false} />
+              </div>
+
+              <div>
+                <Button
+                  value="Filtrar"
+                  onClick={() => {}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<BiFilterAlt size={20} />}
+                />
+              </div>
             </div>
-          </div>
-          
+          </form>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={users}  />
+            <TablePagination data={allUsers} />
           </div>
         </main>
       </Content>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjY1MTAyMiwiZXhwIjoxNjQ3MjU1ODIyfQ.3QX-_a5O2sZK5VVjdZ1jwLLuY7wemFKTEU9OYaXMzIc` }
+  } as RequestInit | undefined;
+
+  const user = await fetch('http://localhost:3000/api/user', requestOptions);
+
+  const allUsers = await user.json();
+
+  console.log(allUsers);
+
+  return {
+    props: {
+      allUsers,
+    },
+  }
 }

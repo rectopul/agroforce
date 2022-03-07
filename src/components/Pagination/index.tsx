@@ -1,17 +1,18 @@
-import { useState  } from 'react';
+import { ReactNode, useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
-import { Button } from '../Button';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
 import { BiEdit } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
 
+import { Button } from '../index';
+
 interface IUsers {
   id: number,
   name: string,
-  login: string,
-  telefone: string,
+  cpf: string,
   email: string,
-  avatar: string,
+  tel: string,
+  avatar: string | ReactNode,
   status: boolean,
 }
 
@@ -19,8 +20,8 @@ interface ITable {
   data: IUsers[];
 }
 
-export const TablePagination = ({data}: ITable) => {
-  const [tableData, setTableData] = useState<IUsers[]>(data);
+export const TablePagination = ({ data }: ITable) => {
+  const [tableData, setTableData] = useState<IUsers[]>(() => data);
 
   function handleStatusUser(id: number, status: boolean): void {
     const index = tableData.findIndex((user) => user.id === id);
@@ -35,7 +36,7 @@ export const TablePagination = ({data}: ITable) => {
       copy[index].status = status;
       return copy;
     });
-  }
+  };
 
   const columns = [
     { 
@@ -47,20 +48,20 @@ export const TablePagination = ({data}: ITable) => {
       render: (rowData: any) => (
         !rowData.avatar ? (
           <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
-        ) : (
-          <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
+          ) : (
+          <FaRegUserCircle size={32} />
         )
       )
     },
-    { title: "Name", field: "name", filterPlaceholder: "Filter by name", exports: false },
-    { title: "Login", field: "login", filterPlaceholder: "Filter by login" },
-    { title: "E-mail", field: "email", filterPlaceholder: "Filter by email" },
-    { title: "Phone", field: "telefone", filterPlaceholder: "Filter by phone" },
+    { title: "Nome", field: "name", filterPlaceholder: "Filtrar por nome", exports: false },
+    // { title: "Login", field: "login", filterPlaceholder: "Filter by login" },
+    { title: "E-mail", field: "email", filterPlaceholder: "Filtrar por email" },
+    { title: "Telefone", field: "tel", filterPlaceholder: "Filtrar por contato" },
     {
       title: "Status",
-      field: "status", 
-      searchable: false, 
-      filterPlaceholder: "Filter by age" ,
+      field: "status",
+      searchable: false,
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: any) => (
         rowData.status ? (
           <div className='h-10 flex'>
@@ -95,9 +96,9 @@ export const TablePagination = ({data}: ITable) => {
               />
             </div>
           </div>
-          ) : (
-            <div className='h-10 flex'>
-              <div className="
+        ) : (
+          <div className='h-10 flex'>
+            <div className="
               h-10
             ">
               <Button 
@@ -119,16 +120,17 @@ export const TablePagination = ({data}: ITable) => {
                 href="atualizar-usuario"
               />
             </div>
-              <div>
-                <Button 
-                  icon={<FaRegThumbsDown size={16} />}
-                  onClick={() => handleStatusUser(rowData.id, !rowData.status)}
-                  bgColor="bg-red-800"
-                  textColor="white"
-                />
-              </div>
+            <div>
+              <Button 
+                icon={<FaRegThumbsDown size={16} />}
+                onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
             </div>
-      )),
+          </div>
+        )
+      ),
     },
   ];
   
@@ -149,7 +151,7 @@ export const TablePagination = ({data}: ITable) => {
       title={
         <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>
           <div className='h-10'>
-          <Button 
+            <Button 
               title="Cadastrar um usuário"
               value="Cadastrar um usuário"
               bgColor="bg-blue-600"
@@ -159,7 +161,8 @@ export const TablePagination = ({data}: ITable) => {
               icon={<FiUserPlus />}
             />
           </div>
-          <strong className='text-blue-600'>Total registrado: {tableData.length}</strong>
+
+          <strong className='text-blue-600'>Total registrado: { tableData.length }</strong>
         </div>
       }
     />
