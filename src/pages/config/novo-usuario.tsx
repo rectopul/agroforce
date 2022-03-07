@@ -315,6 +315,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 name="jivochat"
                 onChange={formik.handleChange}
                 value={formik.values.jivochat}
+                selected={false}
               />
             </div>
             <div className="w-full">
@@ -366,8 +367,6 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();
-
-  console.log(profiles)
 
   return { props: { departments, profiles } }
 }

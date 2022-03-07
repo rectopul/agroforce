@@ -27,6 +27,7 @@ export interface IData {
 }
 
 export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
 
@@ -36,19 +37,19 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
   const formik = useFormik<IUsers>({
     initialValues: {
-      id: userEdit.id,
-      name: '',
-      email: '',
-      cpf: '',
-      tel: '',
-      password: '',
+      id: userEdit[0].id,
+      name: userEdit[0].name,
+      email: userEdit[0].email,
+      cpf: userEdit[0].cpf,
+      tel: userEdit[0].tel,
+      password: userEdit[0].password,
       confirmPassword: '',
       profiles: [],
-      registration: 0,
-      departmentId: 0,
-      jivochat: 0,
-      status: 1,
-      app_login: 0,
+      registration: userEdit[0].registration,
+      departmentId: userEdit[0].departmentId,
+      jivochat: userEdit[0].jivochat,
+      status: userEdit[0].status,
+      app_login: userEdit[0].app_login,
       created_by: userLogado.id,
     },
     onSubmit: (values) => {
@@ -68,6 +69,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       });
 
       userService.updateUsers({
+        id: values.id,
         name: values.name,
         email: values.email,
         cpf: values.cpf,
@@ -83,6 +85,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       }).then((response) => {
         if (response.status == 200) {
           alert("Usuário atualizado com sucesso!");
+        } else {
+
         }
       })
     },
@@ -187,14 +191,14 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 Nome usuário
               </label>
               <Input 
+                id="name"
+                name="name"
                 type="text" 
                 placeholder="José Oliveira"
                 required
                 max="40"
-                id="name"
-                name="name"
                 onChange={formik.handleChange}
-                value={userEdit.name}
+                value={formik.values.name}
               />
             </div>
 
@@ -208,7 +212,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 id="email"
                 name="email"
                 onChange={formik.handleChange}
-                value={userEdit.email}
+                value={formik.values.email}
               />
             </div>
           </div>
@@ -231,7 +235,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 id="cpf"
                 name="cpf"
                 onChange={formik.handleChange}
-                value={userEdit.cpf}
+                value={formik.values.cpf}
               />
             </div>
 
@@ -245,7 +249,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 id="tel"
                 name="tel"
                 onChange={formik.handleChange}
-                value={userEdit.tel}
+                value={formik.values.tel}
               />
             </div>
 
@@ -258,7 +262,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 name="departmentId"
                 onChange={formik.handleChange}
                 data={departments}
-                selected={userEdit.departmentId}
+                selected={formik.values.departmentId}
               />
             </div>
           </div>
@@ -279,7 +283,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 id="registration"
                 name="registration"
                 onChange={formik.handleChange}
-                value={userEdit.registration}
+                value={formik.values.registration}
               />
             </div>
 
@@ -328,7 +332,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 name="jivochat"
                 onChange={formik.handleChange}
                 value={formik.values.jivochat}
-                selected={userEdit.jivochat}
+                selected={userEdit[0].jivochat}
               />
             </div>
             <div className="w-full">
@@ -342,7 +346,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                   name="app_login"
                   onChange={formik.handleChange}
                   value={formik.values.app_login}
-                  selected={userEdit.app_login}
+                  selected={userEdit[0].app_login}
                 />
               </div>
             </div>
@@ -380,12 +384,10 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   };
   const resD = await fetch('http://localhost:3000/api/user/departament', requestOptions)
   const resP = await fetch('http://localhost:3000/api/user/profile', requestOptions)
-  const resU = await fetch('http://localhost:3000/api/user/' + 34, requestOptions)
+  const resU = await fetch('http://localhost:3000/api/user/' + 1, requestOptions)
   const departments = await resD.json();
   const profiles = await resP.json();
   const userEdit = await resU.json();
-
-  console.log(userEdit)
 
   return { props: { departments, profiles, userEdit } }
 }

@@ -224,9 +224,8 @@ export class UserController {
             if (!data.departmentId) throw 'Informe o departamento do usuário';
             if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
 
-
             // Validação cpf é valido
-            // if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
 
             parameters.name = data.name;
             parameters.email = data.email;
@@ -237,9 +236,21 @@ export class UserController {
 
             let response = await this.userRepository.update(data.id, parameters);
 
-            console.log(response);
-
-            if(response) {
+            if(response.count > 0) {
+                if (data.profiles) {
+                    const parametersPermissions = new Object();
+                    functionsUtils.getPermissions(data.id, data.profiles);
+                    // Object.keys(data.profiles).forEach((item) => {
+                    //     if (typeof(data.profiles[item].profileId) === 'string') {
+                    //         parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
+                    //     } else { 
+                    //         parametersPermissions.profileId = data.profiles[item].profileId;
+                    //     }
+                    //     parametersPermissions.userId = data.id;
+                    //     parametersPermissions.created_by = data.created_by;
+                    //     this.usersPermissionRepository.create(parametersPermissions);
+                    // });
+                }
                 return {status: 200, message: {message: "Usuario atualizada"}}
             } else {
                 return {status: 400, message: {message: "usuario não existe"}}
