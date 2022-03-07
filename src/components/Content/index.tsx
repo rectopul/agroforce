@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { FaLaptopHouse } from "react-icons/fa";
 
 import { Aside } from "../Aside";
 import { MainHeader } from "../MainHeader";
@@ -20,7 +21,7 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar="/images/person.jpg"
 
         headerSelects={
-          <Select values={safras} />
+          <Select values={safras} selected={false} />
         }
       >
         { headerCotent }
