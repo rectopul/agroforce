@@ -23,7 +23,6 @@ export function useGetUsers () {
   const pages = Math.ceil(total / take);
   const skip = currentPage * take;
 
-  console.log(skip);
   // const currentItens = items.slice(startIndex, endIndex);
   // const endIndex = startIndex + itensPerPage;
 

@@ -44,6 +44,11 @@ export const TablePagination = ({ data }: ITable) => {
     });
   };
 
+  function handlePagination(index: number) {
+    console.log(index, 'DSDSDSDSDSDSDSD');
+    setCurrentPage(index);
+  }
+
   const columns = [
     { 
       title: "Avatar", 
@@ -160,7 +165,7 @@ export const TablePagination = ({ data }: ITable) => {
                 {...props}
               >
                 <Button
-                  onClick={() => setCurrentPage(index)}
+                  onClick={() => handlePagination(index)}
                   value={`${index + 1}`}
                   bgColor="bg-blue-600"
                   textColor="white"
