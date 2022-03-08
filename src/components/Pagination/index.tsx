@@ -1,4 +1,4 @@
-import { ReactNode, useState  } from 'react';
+import { ReactNode, useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
 import { BiEdit } from 'react-icons/bi';
@@ -23,16 +23,16 @@ interface ITable {
 }
 
 export const TablePagination = ({ data }: ITable) => {
-  console.log(data);
   const {
     pages,
     setCurrentPage,
     skip,
     take,
-    setItems
+    setItems,
+    items
   } = useGetUsers();
   
-  console.log(skip);
+
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
 
   function handleStatusUser(id: number, status: boolean): void {
@@ -49,19 +49,6 @@ export const TablePagination = ({ data }: ITable) => {
       return copy;
     });
   };
-
-  function handlePagination(index: number) {
-    setCurrentPage(index);
-    const response = {};
-    let parametersFilter = "skip=" + skip + "&take=" + take;
-    console.log(parametersFilter);
-    userService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setItems(response.response);
-      }
-    })
-
-  }
 
   const columns = [
     { 
@@ -158,6 +145,22 @@ export const TablePagination = ({ data }: ITable) => {
       ),
     },
   ];
+
+  function handlePagination(index: number) {
+    setCurrentPage(index);
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+    console.log(parametersFilter);
+    userService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setItems(response.response);
+      }
+    })
+  }
+
+  useEffect(() => {
+    setTableData(items);
+  }, [handlePagination]);
+
   
   return (
     <MaterialTable
@@ -166,7 +169,7 @@ export const TablePagination = ({ data }: ITable) => {
       data={tableData}
       components={{
         Pagination: props => (
-          Array(pages).fill('').map((_, index) => (
+          Array(pages - 2).fill('').map((_, index) => (
             <>
               <div key={index}
                 className="flex
@@ -209,7 +212,7 @@ export const TablePagination = ({ data }: ITable) => {
             />
           </div>
 
-          <strong className='text-blue-600'>Total registrado: { tableData.length }</strong>
+          <strong className='text-blue-600'>Total registrado: { data.length }</strong>
         </div>
       }
     />
