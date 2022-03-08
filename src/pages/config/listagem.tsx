@@ -37,13 +37,6 @@ interface IFilter{
 
 export default function Listagem({ allUsers }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
-  console.log("USERS", users)
-  const {
-    skip,
-    take,
-    setItems,
-    items
-  } = useGetUsers();
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -82,14 +75,6 @@ export default function Listagem({ allUsers }: Idata) {
       }
     })
   }
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     console.log('atualizou')
-  //     setUsers(items);  
-  //   }
-  //   fetchData();
-  // }), [items];
 
   return (
     <>
