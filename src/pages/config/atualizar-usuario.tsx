@@ -375,7 +375,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
   // const  token  =  req.cookies.token;
-  // console.log("ALA" + token)
+  // ("ALA" + token)
   // Fetch data from external API
   const requestOptions = {
     method: 'GET',

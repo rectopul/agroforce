@@ -4,6 +4,7 @@ import Head from "next/head";
 import { BsCheckLg, BsEye } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
 import { HiOutlineClipboardList } from "react-icons/hi";
+import { useFormik } from "formik";
 
 import { 
   Button, 
@@ -12,6 +13,8 @@ import {
   TabHeader,
   TablePagination 
 } from "../../components";
+import { get } from "react-hook-form";
+import { userService } from "src/services";
 
 interface IUsers {
   id: number,
@@ -27,36 +30,36 @@ interface Idata {
   allUsers: IUsers[];
 }
 
+interface IFilter{
+  status: number | undefined;
+}
+
 export default function Listagem({ allUsers }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
-  const [ filter, setFilter ] = useState<number>(3)
+
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      status: 2,
+    },
+    onSubmit: (values) => {
+      let parametersFilter = "status=" + values.status
+      userService.getAll(parametersFilter).then((response) => {
+        if (response.status == 200) {
+          setUsers(response.response);
+        }
+      })
+    },
+  });
 
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
   ];
 
   const filters = [
-    { id: 1, name: 'Todos'},
-    { id: 2, name: 'Ativos'},
-    { id: 3, name: 'Inativos'},
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
   ];
-
-  const handleFilterUserbyStatus = (id: number) => {
-    // const allUsers = values.map((user) => user.name === 'Todos');
-    const selected = filters.find((select) => select.id === id);
-
-    const filterUsers = users.filter((user) => {
-      if (selected?.id === 3) {
-        return !user.status;
-      } else if (selected?.id === 2) {
-        return user.status
-      } else {
-        return user;
-      }
-    });
-
-    setUsers(filterUsers)
-  }
 
   return (
     <>
@@ -94,19 +97,24 @@ export default function Listagem({ allUsers }: Idata) {
                   icon={<HiOutlineClipboardList size={20} />}
               />
               </div>
-              <div className="h-10 w-44 ml-4">
-                <Select values={filters.map(id => id)} selected={false} />
-              </div>
+              <form 
+                  className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 flex"
+                  onSubmit={formik.handleSubmit}
+                >
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="status" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
+                  </div>
 
-              <div>
-                <Button
-                  value="Filtrar"
-                  onClick={() => handleFilterUserbyStatus(filter)}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<BiFilterAlt size={20} />}
-                />
-              </div>
+                    <div>
+                      <Button
+                        onClick={() => {}}
+                        value="Filtrar"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiFilterAlt size={20} />}
+                      />
+                    </div>
+              </form>
             </div>
           </div>
 
@@ -128,8 +136,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   } as RequestInit | undefined;
 
   const user = await fetch('http://localhost:3000/api/user', requestOptions);
-
-  const allUsers = await user.json();
+  let allUsers = await user.json();
+  allUsers = allUsers.response;
 
   return {
     props: {

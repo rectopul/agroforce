@@ -70,10 +70,11 @@ export class UserController {
 
         let response = await this.userRepository.findAll(parameters, take , skip );
 
-        if (!response) 
+        if (!response) { 
             throw "falha na requisição, tente novamente";
-
-        return response;        
+        } else {
+            return {status: 200, response}
+        }        
     }
 
     @Get()
@@ -191,7 +192,6 @@ export class UserController {
         if (data != null && data != undefined) {
             const parameters = new Object();
 
-            console.log(data);
             if (typeof(data.status) === 'string') {
                 parameters.status =  parseInt(data.status);
             } else { 

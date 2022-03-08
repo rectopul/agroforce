@@ -2,8 +2,7 @@ import { userService } from "src/services";
 
 
 export const functionsUtils = {
-    validationCPF,
-	getPermissions
+    validationCPF
 };
 
 function validationCPF(cpf: any) {	
@@ -43,8 +42,3 @@ function validationCPF(cpf: any) {
 	return true;   
 }
 
-function getPermissions(userId: any, permissionsAtualizadas: any) {
-	let param = "userId=" + userId;
-	const permissions = userService.getPermissions(param);
-	console.log("PERMISSION" + permissions)
-}
