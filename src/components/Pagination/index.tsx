@@ -19,13 +19,15 @@ interface IUsers {
 
 interface ITable {
   data: IUsers[];
+  TotalItems: Number | any;
 }
 
-export const TablePagination = ({ data }: ITable) => {
+export const TablePagination = ({ data, TotalItems }: ITable) => {
+  console.log(TotalItems)
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [items, setItems] =useState<IUsers[]>(() => data);
   const take = 5;
-  const total = 22;
+  const total = TotalItems;
   const pages = Math.ceil(total / take);
   
   console.log('tableData', tableData);
@@ -162,7 +164,7 @@ export const TablePagination = ({ data }: ITable) => {
       data={tableData}
       components={{
         Pagination: props => (
-          Array(pages).fill('').map((_, index) => (
+          Array(pages).fill('').map((value, index) => (
             <>
               <div key={index}
                 className="flex
@@ -205,7 +207,7 @@ export const TablePagination = ({ data }: ITable) => {
             />
           </div>
 
-          <strong className='text-blue-600'>Total registrado: { 22 }</strong>
+          <strong className='text-blue-600'>Total registrado: { TotalItems }</strong>
         </div>
       }
     />
