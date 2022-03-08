@@ -135,7 +135,7 @@ export default function Listagem({ allUsers }: Idata) {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={users} />
+            <TablePagination data={allUsers} />
           </div>
         </main>
       </Content>
@@ -144,13 +144,17 @@ export default function Listagem({ allUsers }: Idata) {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  let params = "skip=0&take=5";
+  const urlParameters = new URL('http://localhost:3000/api/user');
+  urlParameters.search = new URLSearchParams(params).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjY1MTAyMiwiZXhwIjoxNjQ3MjU1ODIyfQ.3QX-_a5O2sZK5VVjdZ1jwLLuY7wemFKTEU9OYaXMzIc` }
   } as RequestInit | undefined;
   // skip = 0, take = 50;
-  const user = await fetch('http://localhost:3000/api/user', requestOptions);
+  const user = await fetch(urlParameters, requestOptions);
   let allUsers = await user.json();
   allUsers = allUsers.response;
 

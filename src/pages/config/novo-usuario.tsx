@@ -246,6 +246,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 name="departmentId"
                 onChange={formik.handleChange}
                 value={formik.values.departmentId}
+                selected={false}
               />
             </div>
 
@@ -329,6 +330,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                   name="app_login"
                   onChange={formik.handleChange}
                   value={formik.values.app_login}
+                  selected={false}
                 />
               </div>
             </div>

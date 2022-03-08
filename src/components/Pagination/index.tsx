@@ -5,7 +5,6 @@ import { BiEdit } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
 
 import { Button } from '../index';
-import { useGetUsers } from 'src/hooks/useGetUsers';
 import { userService } from "src/services";
 
 interface IUsers {
@@ -23,17 +22,13 @@ interface ITable {
 }
 
 export const TablePagination = ({ data }: ITable) => {
-  const {
-    pages,
-    setCurrentPage,
-    skip,
-    take,
-    setItems,
-    items
-  } = useGetUsers();
-  
-
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
+  const [items, setItems] =useState<IUsers[]>(() => data);
+  const take = 5;
+  const total = 22;
+  const pages = Math.ceil(total / take);
+  
+  console.log('tableData', tableData);
 
   function handleStatusUser(id: number, status: boolean): void {
     const index = tableData.findIndex((user) => user.id === id);
@@ -147,9 +142,8 @@ export const TablePagination = ({ data }: ITable) => {
   ];
 
   function handlePagination(index: number) {
-    setCurrentPage(index);
+    let skip = index * take;
     let parametersFilter = "skip=" + skip + "&take=" + take;
-    console.log(parametersFilter);
     userService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
         setItems(response.response);
@@ -161,7 +155,6 @@ export const TablePagination = ({ data }: ITable) => {
     setTableData(items);
   }, [handlePagination]);
 
-  
   return (
     <MaterialTable
       style={{ background: '#f9fafb' }}
@@ -169,7 +162,7 @@ export const TablePagination = ({ data }: ITable) => {
       data={tableData}
       components={{
         Pagination: props => (
-          Array(pages - 2).fill('').map((_, index) => (
+          Array(pages).fill('').map((_, index) => (
             <>
               <div key={index}
                 className="flex
@@ -212,7 +205,7 @@ export const TablePagination = ({ data }: ITable) => {
             />
           </div>
 
-          <strong className='text-blue-600'>Total registrado: { data.length }</strong>
+          <strong className='text-blue-600'>Total registrado: { 22 }</strong>
         </div>
       }
     />
