@@ -35,7 +35,9 @@ export class UserRepository {
 
     async findAll (where: any, take: any, skip: any) {
         const select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
+        let count = await prisma.user.count()
         let Result = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where }) .finally(async () => { await prisma.$disconnect() })
+        Result.total = count;
         return Result;
     }
     

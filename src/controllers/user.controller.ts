@@ -69,11 +69,10 @@ export class UserController {
         }
 
         let response = await this.userRepository.findAll(parameters, take , skip );
-
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
-            return {status: 200, response}
+            return {status: 200, response, total: response.total}
         }        
     }
 

@@ -13,7 +13,6 @@ import {
   TabHeader,
   TablePagination 
 } from "../../components";
-import { get } from "react-hook-form";
 import { userService } from "src/services";
 
 interface IUsers {
@@ -28,13 +27,14 @@ interface IUsers {
 
 interface Idata {
   allUsers: IUsers[];
+  TotalItems: Number;
 }
 
 interface IFilter{
   status: number | undefined;
 }
 
-export default function Listagem({ allUsers }: Idata) {
+export default function Listagem({ allUsers, TotalItems }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
 
   const formik = useFormik<IFilter>({
@@ -134,7 +134,7 @@ export default function Listagem({ allUsers }: Idata) {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={allUsers} />
+            <TablePagination data={allUsers} TotalItems={TotalItems} />
           </div>
         </main>
       </Content>
@@ -154,14 +154,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   } as RequestInit | undefined;
   // skip = 0, take = 50;
   const user = await fetch(urlParameters, requestOptions);
-  let allUsers = await user.json();
-  allUsers = allUsers.response;
-
-  
+  let Response = await user.json();
+  let allUsers = Response.response;
+  let TotalItems = Response.total;
 
   return {
     props: {
       allUsers,
+      TotalItems
     },
   }
 }
