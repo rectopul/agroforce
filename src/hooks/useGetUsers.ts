@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { userService } from "src/services";
 
 interface IUsers {
   id: number,
   name: string,
-  login: string,
   tel: string,
   email: string,
-  avatar: string,
+  avatar: string | ReactNode,
   status: boolean,
   created_at: Date,
   created_by: Number,
@@ -15,67 +15,37 @@ interface IUsers {
 
 export function useGetUsers () {
   const [items, setItems] = useState<IUsers[]>([]);
-  const [itensPerPage, setItensPerPage] = useState(6);
+  const [take, setTake] = useState(50);
   const [currentPage, setCurrentPage] = useState(0);
+  const total = 200;
 
   // Arrendondar para 1 acima (ex: 11.1 vai ser 12 pages)
-  const pages = Math.ceil(items.length / itensPerPage);
-  const startIndex = currentPage * itensPerPage;
-  const endIndex = startIndex + itensPerPage;
-  const currentItens = items.slice(startIndex, endIndex);
+  const pages = Math.ceil(total / take);
+  const skip = currentPage * take;
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetch(`http://localhost:3000/api/testes/users`)
-      .then(response => response.json())
-      .then(data => data) as IUsers[];
+  console.log(skip);
+  // const currentItens = items.slice(startIndex, endIndex);
+  // const endIndex = startIndex + itensPerPage;
 
-      setItems(result);
-    }
-
-    fetchData();
-  }, []);
-
-=======
  
   useEffect(() => {
      const fetchData = async () => {
-       /*
-        Exemplo de informaçãoes para paginação 
-        take: Quantidade de itens por pagina, 
-        skip: Quantidade de itens a serem pulados, inicia com zero 
-        e depois é o valor da pagina atual x o valor de itens por pagina.
-        const skip = pageClicada - 1 * take;
-      */
-      const queryParameters = "status=1&take=1&skip=1";
-      const result =  userService.getAll(queryParameters).then((response) => {
+      const queryParameters = `status=1&take=1&skip=1`;
+      await userService.getAll(queryParameters).then((response: IUsers[]) => {
         setItems(response);
-      })
+      });
     }
     fetchData();
-  }), [false];
+  }), [];
 
->>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [itensPerPage]);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc
   return {
     items,
     pages,
-    currentItens,
-    itensPerPage,
+    // currentItens,
+    take,
     setCurrentPage,
-    setItensPerPage,
+    setTake,
     setItems
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2abaebad8d7190991d13ffc57cdd6a6197da76fc

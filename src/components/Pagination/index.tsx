@@ -1,10 +1,11 @@
-import { ReactNode, useEffect, useState  } from 'react';
+import { ReactNode, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
 import { BiEdit } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
 
 import { Button } from '../index';
+import { useGetUsers } from 'src/hooks/useGetUsers';
 
 interface IUsers {
   id: number,
@@ -21,7 +22,11 @@ interface ITable {
 }
 
 export const TablePagination = ({ data }: ITable) => {
-  console.log(data);
+  const {
+    pages,
+    setCurrentPage,
+  } = useGetUsers();
+  
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
 
   function handleStatusUser(id: number, status: boolean): void {
@@ -140,15 +145,36 @@ export const TablePagination = ({ data }: ITable) => {
       style={{ background: '#f9fafb' }}
       columns={columns}
       data={tableData}
+      components={{
+        Pagination: props => (
+          Array(pages).fill('').map((_, index) => (
+            <>
+              <div key={index}
+                className="flex
+                  h-20 
+                  gap-2 
+                  pr-2
+                  py-5 
+                  bg-gray-50
+                " 
+                {...props}
+              >
+                <Button
+                  onClick={() => setCurrentPage(index)}
+                  value={`${index + 1}`}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                />
+              </div>
+            </>
+          ))
+        ) as any
+      }}
       options={{
-        searchAutoFocus: true, filtering: true, paging: true, 
-        pageSizeOptions:[5,10, 20, 25, 50, 100], pageSize: 5, paginationType: "stepped",
-        exportButton: true,
         headerStyle: {
           backgroundColor: '#f9fafb',
         },
-        search: true,
-        exportFileName: "List Users"
+        search: false,
       }}
       title={
         <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>

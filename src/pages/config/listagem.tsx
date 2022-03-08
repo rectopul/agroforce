@@ -61,6 +61,20 @@ export default function Listagem({ allUsers }: Idata) {
     { id: 0, name: 'Inativos'},
   ];
 
+  function handleFilterUsersByStatus() {
+    let idFilter = filters.map(filter => filter.id);
+
+    users.filter((user) => {
+      if(user.status) {
+        idFilter[2];
+      }  else if (!user.status) {
+        idFilter[3];
+      } else {
+        idFilter[1];
+      }
+    })
+  }
+
   return (
     <>
       <Head>
@@ -138,6 +152,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const user = await fetch('http://localhost:3000/api/user', requestOptions);
   let allUsers = await user.json();
   allUsers = allUsers.response;
+
+  
 
   return {
     props: {
