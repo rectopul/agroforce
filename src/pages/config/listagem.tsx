@@ -5,6 +5,7 @@ import { BsCheckLg, BsEye } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
 import { HiOutlineClipboardList } from "react-icons/hi";
 import { useFormik } from "formik";
+import { useGetUsers } from 'src/hooks/useGetUsers';
 
 import { 
   Button, 
@@ -36,6 +37,13 @@ interface IFilter{
 
 export default function Listagem({ allUsers }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  console.log("USERS", users)
+  const {
+    skip,
+    take,
+    setItems,
+    items
+  } = useGetUsers();
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -74,6 +82,14 @@ export default function Listagem({ allUsers }: Idata) {
       }
     })
   }
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     console.log('atualizou')
+  //     setUsers(items);  
+  //   }
+  //   fetchData();
+  // }), [items];
 
   return (
     <>
@@ -148,7 +164,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     credentials: 'include',
     headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjY1MTAyMiwiZXhwIjoxNjQ3MjU1ODIyfQ.3QX-_a5O2sZK5VVjdZ1jwLLuY7wemFKTEU9OYaXMzIc` }
   } as RequestInit | undefined;
-
+  // skip = 0, take = 50;
   const user = await fetch('http://localhost:3000/api/user', requestOptions);
   let allUsers = await user.json();
   allUsers = allUsers.response;

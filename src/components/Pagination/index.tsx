@@ -6,6 +6,7 @@ import { FiUserPlus } from 'react-icons/fi';
 
 import { Button } from '../index';
 import { useGetUsers } from 'src/hooks/useGetUsers';
+import { userService } from "src/services";
 
 interface IUsers {
   id: number,
@@ -22,11 +23,16 @@ interface ITable {
 }
 
 export const TablePagination = ({ data }: ITable) => {
+  console.log(data);
   const {
     pages,
     setCurrentPage,
+    skip,
+    take,
+    setItems
   } = useGetUsers();
   
+  console.log(skip);
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
 
   function handleStatusUser(id: number, status: boolean): void {
@@ -45,8 +51,16 @@ export const TablePagination = ({ data }: ITable) => {
   };
 
   function handlePagination(index: number) {
-    console.log(index, 'DSDSDSDSDSDSDSD');
     setCurrentPage(index);
+    const response = {};
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+    console.log(parametersFilter);
+    userService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setItems(response.response);
+      }
+    })
+
   }
 
   const columns = [

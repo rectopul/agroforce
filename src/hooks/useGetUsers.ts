@@ -15,9 +15,9 @@ interface IUsers {
 
 export function useGetUsers () {
   const [items, setItems] = useState<IUsers[]>([]);
-  const [take, setTake] = useState(50);
+  const [take, setTake] = useState(5);
   const [currentPage, setCurrentPage] = useState(0);
-  const total = 200;
+  const total = 22;
 
   // Arrendondar para 1 acima (ex: 11.1 vai ser 12 pages)
   const pages = Math.ceil(total / take);
@@ -27,20 +27,21 @@ export function useGetUsers () {
   // const endIndex = startIndex + itensPerPage;
 
  
-  useEffect(() => {
-     const fetchData = async () => {
-      const queryParameters = `status=1&take=1&skip=1`;
-      await userService.getAll(queryParameters).then((response: IUsers[]) => {
-        setItems(response);
-      });
-    }
-    fetchData();
-  }), [];
+  // useEffect(() => {
+  //    const fetchData = async () => {
+  //     // const queryParameters = `status=1&take=1&skip=1`;
+  //     // await userService.getAll(queryParameters).then((response: IUsers[]) => {
+  //     //   setItems(response);
+  //     // });
+  //   }
+  //   fetchData();
+  // }), [];
 
 
   return {
     items,
     pages,
+    skip,
     // currentItens,
     take,
     setCurrentPage,
