@@ -36,6 +36,7 @@ export function Button({
     !href ? (
       <button
         title={title}
+        disabled={disabled}
         type="submit" 
         onClick={onClick}
         className={`w-full h-full

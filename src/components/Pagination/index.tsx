@@ -1,11 +1,13 @@
 import { ReactNode, useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+
+import { userService } from "src/services";
 
 import { Button } from '../index';
-import { userService } from "src/services";
 
 interface IUsers {
   id: number,
@@ -25,6 +27,8 @@ interface ITable {
 export const TablePagination = ({ data, TotalItems }: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [items, setItems] =useState<IUsers[]>(() => data);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  
   const take = 5;
   const total = TotalItems;
   const pages = Math.ceil(total / take);
@@ -140,19 +144,30 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
     },
   ];
 
-  function handlePagination(index: number) {
-    let skip = index * take;
-    let parametersFilter = "skip=" + skip + "&take=" + take;
-    userService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setItems(response.response);
-      }
-    })
+  function handleTotalPages() {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
   }
 
+  async function handlePagination() {
+    let skip = currentPage * take;
+
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    await userService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setTableData(response.response);
+      }
+    });
+  }
+  
   useEffect(() => {
-    setTableData(items);
-  }, [handlePagination]);
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage, pages]);
 
   return (
     <MaterialTable
@@ -161,27 +176,61 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
       data={tableData}
       components={{
         Pagination: props => (
-          Array(pages).fill('').map((value, index) => (
-            <>
-              <div key={index}
-                className="flex
-                  h-20 
-                  gap-2 
-                  pr-2
-                  py-5 
-                  bg-gray-50
-                " 
-                {...props}
-              >
-                <Button
-                  onClick={() => handlePagination(index)}
-                  value={`${index + 1}`}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                />
-              </div>
-            </>
-          ))
+          <>
+          <div
+            className="flex
+              h-20 
+              gap-2 
+              pr-2
+              py-5 
+              bg-gray-50
+            " 
+            {...props}
+          >
+            <Button 
+              onClick={() => setCurrentPage(currentPage - 10)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<MdFirstPage size={18} />}
+              disabled={currentPage <= 10}
+            />
+            <Button 
+              onClick={() => setCurrentPage(currentPage - 1)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<BiLeftArrow size={15} />}
+              disabled={currentPage <= 0}
+            />
+            {
+              Array(1).fill('').map((value, index) => (
+                <>
+                    <Button
+                      key={index}
+                      onClick={() => setCurrentPage(index)}
+                      value={`${currentPage + 1}`}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      disabled={true}
+                    />
+                </>
+              ))
+            }
+            <Button 
+              onClick={() => setCurrentPage(currentPage + 1)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<BiRightArrow size={15} />}
+              disabled={currentPage + 1 >= pages}
+            />
+            <Button 
+              onClick={() => setCurrentPage(currentPage + 10)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<MdLastPage size={18} />}
+              disabled={currentPage + 10 > pages}
+            />
+          </div>
+          </>
         ) as any
       }}
       options={{

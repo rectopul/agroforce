@@ -159,7 +159,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch(urlParameters, requestOptions);
+  const user = await fetch(urlParameters.toString(), requestOptions);
   let Response = await user.json();
   let allUsers = Response.response;
   let TotalItems = Response.total;
