@@ -115,7 +115,6 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
                     <Input 
                       type="text" 
                       placeholder="name ou email"
-                      required
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
