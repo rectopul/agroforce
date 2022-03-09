@@ -42,7 +42,6 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
 
     setTableData((oldUser) => {
       const copy = [...oldUser];
-
       copy[index].status = status;
       return copy;
     });
@@ -72,7 +71,7 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
       field: "status",
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: any) => (
+      render: (rowData: IUsers) => (
         rowData.status ? (
           <div className='h-10 flex'>
             <div className="
@@ -133,7 +132,9 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
             <div>
               <Button 
                 icon={<FaRegThumbsDown size={16} />}
-                onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                onClick={() => handleStatusUser(
+                  rowData.id, !rowData.status
+                )}
                 bgColor="bg-red-800"
                 textColor="white"
               />
@@ -192,7 +193,7 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
               bgColor="bg-blue-600"
               textColor="white"
               icon={<MdFirstPage size={18} />}
-              disabled={currentPage <= 10}
+              disabled={currentPage <= 1}
             />
             <Button 
               onClick={() => setCurrentPage(currentPage - 1)}
@@ -227,7 +228,7 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
               bgColor="bg-blue-600"
               textColor="white"
               icon={<MdLastPage size={18} />}
-              disabled={currentPage + 10 > pages}
+              disabled={currentPage + 1>= pages}
             />
           </div>
           </>

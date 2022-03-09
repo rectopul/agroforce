@@ -11,8 +11,8 @@ import { userService } from "../../../services";
 import { useState, useEffect } from 'react';
  
 interface IModelProps {
-  name: string | undefined;
-  imagem?: string;
+  name: string;
+  imagem: string;
 }
 
 
@@ -29,7 +29,7 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
   }, []);
 
   function logout() {
-      userService.logout();
+    userService.logout();
   }
 
   // only show nav when logged in
