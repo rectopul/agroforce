@@ -1,7 +1,14 @@
 import Head from "next/head";
-import { Table } from "src/components/Table";
 import { Content } from "../components/Content";
+import { setCookie } from 'nookies';
+
 export default function Listagem() {
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+
+  setCookie(null, 'token',  userLogado.token, {
+    maxAge: 86400 * 7,
+    path: '/',
+  });
   const filters = [
     'Teste1',
     'Teste2',

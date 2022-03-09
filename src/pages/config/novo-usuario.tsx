@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import Head from "next/head";
+import getConfig from 'next/config';
 
 import { userService } from "src/services";
 
@@ -358,14 +359,17 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 }
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const  token  =  req.cookies.token;
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
+    headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiDepartment = await fetch(`http://localhost:3000/api/user/departament`, requestOptions);
-  const apiProfile = await fetch(`http://localhost:3000/api/user/profile`, requestOptions);
+  const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
+  const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();

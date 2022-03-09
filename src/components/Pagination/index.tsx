@@ -23,14 +23,11 @@ interface ITable {
 }
 
 export const TablePagination = ({ data, TotalItems }: ITable) => {
-  console.log(TotalItems)
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [items, setItems] =useState<IUsers[]>(() => data);
   const take = 5;
   const total = TotalItems;
   const pages = Math.ceil(total / take);
-  
-  console.log('tableData', tableData);
 
   function handleStatusUser(id: number, status: boolean): void {
     const index = tableData.findIndex((user) => user.id === id);

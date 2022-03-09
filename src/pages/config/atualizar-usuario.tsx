@@ -2,6 +2,7 @@ import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import { BsCheckLg } from "react-icons/bs";
+import getConfig from 'next/config';
 
 import { 
   IDepartment,
@@ -374,17 +375,19 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 }
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
-  // const  token  =  req.cookies.token;
-  // ("ALA" + token)
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const  token  =  req.cookies.token;
+  
   // Fetch data from external API
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
+    headers:  { Authorization: `Bearer ${token}` }
   };
-  const resD = await fetch('http://localhost:3000/api/user/departament', requestOptions)
-  const resP = await fetch('http://localhost:3000/api/user/profile', requestOptions)
-  const resU = await fetch('http://localhost:3000/api/user/' + 1, requestOptions)
+  const resD = await fetch(`${baseUrl}/departament`, requestOptions)
+  const resP = await fetch(`${baseUrl}/profile`, requestOptions)
+  const resU = await fetch(`${baseUrl}/` + 1, requestOptions)
   const departments = await resD.json();
   const profiles = await resP.json();
   const userEdit = await resU.json();

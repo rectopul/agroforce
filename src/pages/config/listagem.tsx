@@ -5,6 +5,7 @@ import { BsCheckLg, BsEye } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
 import { HiOutlineClipboardList } from "react-icons/hi";
 import { useFormik } from "formik";
+import getConfig from 'next/config';
 
 import { 
   Button, 
@@ -45,7 +46,9 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
       let parametersFilter = "status=" + values.status
       userService.getAll(parametersFilter).then((response) => {
         if (response.status == 200) {
-          setUsers(response.response);
+          allUsers = response.response;
+          setUsers(response.response)
+          console.log("ALL", allUsers)
         }
       })
     },
@@ -134,7 +137,7 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={allUsers} TotalItems={TotalItems} />
+            <TablePagination data={users} TotalItems={TotalItems} />
           </div>
         </main>
       </Content>
@@ -142,17 +145,20 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
+  const  token  =  req.cookies.token;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   let params = "skip=0&take=5";
-  const urlParameters = new URL('http://localhost:3000/api/user');
+  const urlParameters = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(params).toString();
 
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjY1MTAyMiwiZXhwIjoxNjQ3MjU1ODIyfQ.3QX-_a5O2sZK5VVjdZ1jwLLuY7wemFKTEU9OYaXMzIc` }
+    headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
-  // skip = 0, take = 50;
+
   const user = await fetch(urlParameters, requestOptions);
   let Response = await user.json();
   let allUsers = Response.response;
