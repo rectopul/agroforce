@@ -12,6 +12,7 @@ import {
 
 interface ISafraProps {
   harvest: string;
+  status: number | any;
   mainHarvest: string;
   beginningPlating: string;
   endPlating: string;
@@ -19,6 +20,9 @@ interface ISafraProps {
 }
 
 export default function Safra() {
+  const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
+  const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
+
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
   ];
@@ -28,6 +32,7 @@ export default function Safra() {
   const formik = useFormik<ISafraProps>({
     initialValues: {
       harvest: '',
+      status: '',
       mainHarvest: '',
       beginningPlating: '',
       endPlating: '',
@@ -144,9 +149,23 @@ export default function Safra() {
               <Select
                 id="beginningPlating"
                 name="beginningPlating"
-                values={["Não", "Sim"]}
+                values={optionsSelect}
                 onChange={formik.handleChange}
                 value={formik.values.beginningPlating}
+                selected={false}
+              />
+            </div>
+            <div className="w-2/4 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Status
+              </label>
+              <Select
+                name="status"
+                id="status"
+                values={optionsStatus}
+                onChange={formik.handleChange}
+                value={formik.values.status}
+                selected={false}
               />
             </div>
             
