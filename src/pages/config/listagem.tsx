@@ -1,9 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BsCheckLg, BsEye } from "react-icons/bs";
+import { BsCheckLg } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
-import { HiOutlineClipboardList } from "react-icons/hi";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
 
@@ -11,6 +10,7 @@ import {
   Button, 
   Content, 
   Select, 
+  Input,
   TabHeader,
   TablePagination 
 } from "../../components";
@@ -28,27 +28,34 @@ interface IUsers {
 
 interface Idata {
   allUsers: IUsers[];
-  TotalItems: Number;
+  totalItems: Number;
 }
 
 interface IFilter{
-  status: number | undefined;
+  filterStatus: object | any;
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 
-export default function Listagem({ allUsers, TotalItems }: Idata) {
+export default function Listagem({ allUsers, totalItems }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      status: 2,
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: (values) => {
-      let parametersFilter = "status=" + values.status
-      userService.getAll(parametersFilter).then((response) => {
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&orderBy=" + values.orderBy + "&typeOrder=" + values.typeOrder;
+      userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
+        console.log(response);
+
         if (response.status == 200) {
           allUsers = response.response;
-          setUsers(response.response)
-          console.log("ALL", allUsers)
+          return ( <div className="w-full h-full overflow-y-scroll"> <TablePagination data={allUsers} totalItems={response.total} filterAplication={parametersFilter} />  </div>);
         }
       })
     },
@@ -64,19 +71,15 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
     { id: 0, name: 'Inativos'},
   ];
 
-  function handleFilterUsersByStatus() {
-    let idFilter = filters.map(filter => filter.id);
+  const orderColumns = [
+    { id: 'name', name: 'Name'},
+    { id: 'email', name: 'Email'},
+  ];
 
-    users.filter((user) => {
-      if(user.status) {
-        idFilter[2];
-      }  else if (!user.status) {
-        idFilter[3];
-      } else {
-        idFilter[1];
-      }
-    })
-  }
+  const typeOrder= [
+    { id: 'asc', name: 'Crescente'},
+    { id: 'desc', name: 'Decrescente'},
+  ];
 
   return (
     <>
@@ -94,35 +97,33 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
           gap-8
         ">
 
-          <div className="w-full bg-white p-7 rounded-lg">
-            <div className='flex gap-2'>
-              <div>
-                <Button
-                  onClick={() => {}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<BsEye size={20} />}
-                  // BsEyeSlash
-                />
-              </div>
-
-              <div>
-                <Button
-                  onClick={() => {}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<HiOutlineClipboardList size={20} />}
-              />
-              </div>
+            <div className='flex gap-2' style={{ width: '100%' }}>
               <form 
                   className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 flex"
                   onSubmit={formik.handleSubmit}
                 >
                   <div className="h-10 w-44 ml-4">
-                    <Select name="status" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="orderBy" onChange={formik.handleChange} values={orderColumns.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="typeOrder" onChange={formik.handleChange} values={typeOrder.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Input 
+                      type="text" 
+                      placeholder="name ou email"
+                      required
+                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
                   </div>
 
-                    <div>
+                    <div className="h-10 w-44 ml-4">
                       <Button
                         onClick={() => {}}
                         value="Filtrar"
@@ -133,11 +134,10 @@ export default function Listagem({ allUsers, TotalItems }: Idata) {
                     </div>
               </form>
             </div>
-          </div>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={users} TotalItems={TotalItems} />
+            <TablePagination data={users} totalItems={totalItems} filterAplication={[]} />
           </div>
         </main>
       </Content>
@@ -150,7 +150,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   let params = "skip=0&take=5";
-  const urlParameters = new URL(baseUrl);
+  const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(params).toString();
 
   const requestOptions = {
@@ -162,12 +162,12 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const user = await fetch(urlParameters.toString(), requestOptions);
   let Response = await user.json();
   let allUsers = Response.response;
-  let TotalItems = Response.total;
+  let totalItems = Response.total;
 
   return {
     props: {
       allUsers,
-      TotalItems
+      totalItems
     },
   }
 }

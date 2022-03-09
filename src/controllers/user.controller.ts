@@ -19,18 +19,23 @@ export class UserController {
         const parameters: object | any = new Object();
         let take; 
         let skip;
+        let orderBy: object | any; 
 
-        if (options.status) {
+        console.log(options)
+        if (options.filterStatus) {
             if (typeof(options.status) === 'string') {
-                parameters.status = parseInt(options.status);
+                options.filterStatus = parseInt(options.filterStatus);
+                if (options.filterStatus != 2) parameters.status = options.filterStatus;
             } else {
-                parameters.status = options.status;
+                if (options.filterStatus != 2) parameters.status = options.filterStatus;
             }
         }
 
-        if (options.name) {
-            parameters.name = options.name;
+        if (options.filterSearch) {
+            parameters.name = options.filterSearch;
+            parameters.email = options.filterSearch;
         }
+
 
         if (options.cpf) {
             parameters.cpf = options.cpf;
@@ -48,9 +53,7 @@ export class UserController {
             parameters.registration = options.registration;
         }
 
-        if (options.email) {
-            parameters.email = options.email;
-        }
+
 
         if (options.take) {
             if (typeof(options.take) === 'string') {
@@ -67,8 +70,15 @@ export class UserController {
                 skip = options.skip;
             }
         }
+
+        if (options.orderBy) {
+            orderBy = '{' + options.orderBy + ':' + options.typeOrder + '}';
+            console.log(orderBy);
+        }
         
-        let response: object | any = await this.userRepository.findAll(parameters, take , skip );
+        let response: object | any = await this.userRepository.findAll(parameters, take , skip, orderBy );
+        console.log(response)
+
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {

@@ -1,6 +1,6 @@
 export { errorHandler };
 
-function errorHandler(err, res) {
+function errorHandler(err: any, res: any) {
     if (typeof (err) === 'string') {
         // custom application error
         return res.status(400).json({ message: err });
