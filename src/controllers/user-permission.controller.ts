@@ -12,8 +12,8 @@ export class UserPermissionController {
         }
 
         let response = await this.userPermission.getPermissionsByUser(userId);
-        var arr2 = [];
-        var arr1 = [];
+        var arr2: any = [];
+        var arr1: any = [];
         for (const property in response) {
           arr1 =response[property].profile.acess_permission.split(',');
           arr2 = arr1.concat(arr2);

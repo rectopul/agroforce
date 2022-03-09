@@ -40,7 +40,7 @@ export class CulturaController {
 
     @Put()
     async updateCulture(data: any) {
-        const parameters = new Object();
+        const parameters: object | any = new Object();
 
         if (typeof(data.status) === 'string') {
             parameters.status =  parseInt(data.status);

@@ -21,16 +21,17 @@ interface IUsers {
 
 interface ITable {
   data: IUsers[];
-  TotalItems: Number | any;
+  totalItems: Number | any;
+  filterAplication: object | any;
 }
 
-export const TablePagination = ({ data, TotalItems }: ITable) => {
+export const TablePagination = ({ data, totalItems, filterAplication }: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [items, setItems] =useState<IUsers[]>(() => data);
   const [currentPage, setCurrentPage] = useState<number>(0);
   
   const take = 5;
-  const total = TotalItems;
+  const total = totalItems;
   const pages = Math.ceil(total / take);
 
   function handleStatusUser(id: number, status: boolean): void {
@@ -254,7 +255,7 @@ export const TablePagination = ({ data, TotalItems }: ITable) => {
             />
           </div>
 
-          <strong className='text-blue-600'>Total registrado: { TotalItems }</strong>
+          <strong className='text-blue-600'>Total registrado: { totalItems }</strong>
         </div>
       }
     />

@@ -12,9 +12,9 @@ export const fetchWrapper = {
 };
 
 function get(url: any, params: any) {
-    const urlParameters = new URL(url);
+    const urlParameters: any = new URL(url);
     urlParameters.search = new URLSearchParams(params).toString();
-    const requestOptions = {
+    const requestOptions: any = {
         method: 'GET',
         credentials: 'include',
         headers:authHeader(url)
@@ -23,7 +23,7 @@ function get(url: any, params: any) {
 }
 
 function post(url: any, body: any) {
-    const requestOptions = {
+    const requestOptions: object | any = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeader(url) },
         credentials: 'include',
@@ -33,7 +33,7 @@ function post(url: any, body: any) {
 }
 
 function put(url: any, body: any) {
-    const requestOptions = {
+    const requestOptions: object | any = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeader(url) },
         body: JSON.stringify(body)
@@ -42,8 +42,8 @@ function put(url: any, body: any) {
 }
 
 // prefixed with underscored because delete is a reserved word in javascript
-function _delete(url) {
-    const requestOptions = {
+function _delete(url: string | any) {
+    const requestOptions: object | any = {
         method: 'DELETE',
         headers: authHeader(url)
     };
@@ -52,7 +52,7 @@ function _delete(url) {
 
 // helper functions
 
-function authHeader(url) {
+function authHeader(url: string | any) {
     // return auth header with jwt if user is logged in and request is to the api url
     const user = userService.userValue;
     const isLoggedIn = user && user.token;
@@ -64,7 +64,7 @@ function authHeader(url) {
     }
 }
 
-function handleResponse(response) {
+function handleResponse(response: string | any) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         

@@ -43,6 +43,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           id: user.id,
           email: user.email,
           name: user.name,
+          avatar: user.avatar,
           token: token,
           permission: permisions,
       });
