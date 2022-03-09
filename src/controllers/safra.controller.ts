@@ -1,21 +1,19 @@
-import {UserRepository} from '../repository/user.repository';
-import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
+import {SafraRepository} from '../repository/safra.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 import { functionsUtils } from 'src/utils/functionsUtils';
 
 @Controller()
-export class UserController {
-    userRepository = new UserRepository();
-    usersPermissionRepository = new UsersPermissionsRepository();
+export class SafraController {
+    safraRepository = new SafraRepository();
 
     /**
      * 
-     * @returns Listagem de todos usuarios.
+     * @returns Listagem de todas as safras.
      * @example Options: 
      * 
      */
     @Get()
-    async getAllUser(options: any) {
+    async getAllSafra(options: any) {
         const parameters: object | any = new Object();
         let take; 
         let skip;
@@ -68,7 +66,7 @@ export class UserController {
             }
         }
         
-        let response: object | any = await this.userRepository.findAll(parameters, take , skip );
+        let response: object | any = await this.safraRepository.findAll(parameters, take , skip );
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
@@ -77,12 +75,12 @@ export class UserController {
     }
 
     @Get()
-    async getOneUser(id: string) {
+    async getOneSafra(id: number | any) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
-            let response = await this.userRepository.findOne(newID); 
+            let response = await this.safraRepository.findOne(newID); 
             if (!response) {
-               return {status: 400, message: 'user não existe'};
+               return {status: 400, message: 'Safra não existe'};
             } else {
                 return {status:200 , response};
             }
@@ -92,7 +90,7 @@ export class UserController {
     }
 
     @Post()
-    async postUser(data: object | any) {
+    async postSafra(data: object | any) {
         const parameters: object | any = new Object();
         const parametersPermissions: object | any  = new Object();
 
@@ -130,11 +128,11 @@ export class UserController {
             if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
 
             // Validação de email existente. 
-            let validateEmail: object | any = await this.getAllUser({email:data.email});
+            let validateEmail: object | any = await this.getAllSafra({email:data.email});
             if (validateEmail[0]) throw 'Email já cadastrado';
 
             // Validação de cpf existente. 
-            let validateCPF: object | any  = await this.getAllUser({cpf:data.cpf});
+            let validateCPF: object | any  = await this.getAllSafra({cpf:data.cpf});
             if (validateCPF[0]) throw 'CPF já cadastrado';
 
             // Validação cpf é valido
@@ -147,7 +145,7 @@ export class UserController {
             parameters.password = data.password;
             parameters.created_by = data.created_by;
 
-            let response = await this.userRepository.create(parameters);
+            let response = await this.safraRepository.create(parameters);
 
             if(response) {
                 if (data.profiles) {
@@ -157,13 +155,12 @@ export class UserController {
                         } else { 
                             parametersPermissions.profileId = data.profiles[item].profileId;
                         }
-                        parametersPermissions.userId = response.id;
+                        parametersPermissions.SafraId = response.id;
                         parametersPermissions.created_by = data.created_by;
-                        this.usersPermissionRepository.create(parametersPermissions);
                     });
                 }
     
-                return {status: 200, message: {message: "users inseridos"}}
+                return {status: 200, message: {message: "Safras inseridos"}}
             } else {
                 return {status: 400, message: {message: "erro"}}
             }
@@ -171,23 +168,11 @@ export class UserController {
     }
 
     /**
-     * @returns Função responsavel por verificar se o usuario que está tentando logar, é um usuario do sistema. 
-     * @parameters Object contendo o email e a senha do usuario que está tentando fazer o login. 
-     */  
-    @Post()
-    async signinUSer(data: object) {
-        if (data != null && data != undefined) {
-            return await this.userRepository.signIn(data);
-        }
-    }
-
-    /**
-    * @returns Função responsavel por fazer a atualização do usuario 
-    * @requires id do usuario a ser editado
+    * @returns Função responsavel por fazer a atualização da safra 
     * @parameters data. objeto com as informações a serem atualizadas
      */
     @Put()
-    async updateUser(data: object| any) {
+    async updateSafra(data: object| any) {
         if (data != null && data != undefined) {
             const parameters: object | any  = new Object();
 
@@ -233,7 +218,7 @@ export class UserController {
             parameters.password = data.password;
             parameters.created_by = data.created_by;
 
-            let response: object | any  = await this.userRepository.update(data.id, parameters);
+            let response: object | any  = await this.safraRepository.update(data.id, parameters);
 
             if(response.count > 0) {
                 if (data.profiles) {
@@ -245,9 +230,9 @@ export class UserController {
                     //     } else { 
                     //         parametersPermissions.profileId = data.profiles[item].profileId;
                     //     }
-                    //     parametersPermissions.userId = data.id;
+                    //     parametersPermissions.SafraId = data.id;
                     //     parametersPermissions.created_by = data.created_by;
-                    //     this.usersPermissionRepository.create(parametersPermissions);
+                    //     this.SafrasPermissionRepository.create(parametersPermissions);
                     // });
                 }
                 return {status: 200, message: {message: "Usuario atualizada"}}
