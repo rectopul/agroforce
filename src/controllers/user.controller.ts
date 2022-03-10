@@ -223,23 +223,30 @@ export class UserController {
                 parameters.departmentId =  data.departmentId;
             }
 
-            if (!data.name) throw 'Informe o nome do usuário';
-            if (!data.email) throw 'Informe o email do usuário';
-            if (!data.cpf) throw 'Informe o cpf do usuário';
-            if (!data.tel) throw 'Informe o telefone do usuário';
-            if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departmentId) throw 'Informe o departamento do usuário';
-            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
+            if (data.name) {
+                parameters.name = data.name;
+            } 
 
-            // Validação cpf é valido
-            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+            if (data.email) {
+                parameters.email = data.email;
+            } 
 
-            parameters.name = data.name;
-            parameters.email = data.email;
-            parameters.cpf = data.cpf;
-            parameters.tel = data.tel;
-            parameters.password = data.password;
-            parameters.created_by = data.created_by;
+            if (data.cpf) {
+                if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+                parameters.cpf = data.cpf;
+            }
+
+            if (data.tel) {
+                parameters.tel = data.tel;
+            }
+
+            if (data.password) {
+                parameters.password = data.password;
+            }
+
+            if (data.created_by) {
+                parameters.created_by = data.created_by;
+            }
 
             let response: object | any  = await this.userRepository.update(data.id, parameters);
 

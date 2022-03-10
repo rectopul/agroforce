@@ -33,7 +33,18 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   const total = totalItems;
   const pages = Math.ceil(total / take);
 
-  function handleStatusUser(id: number, status: boolean): void {
+  function handleStatusUser(id: number, status: any): void {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+
+    userService.updateUsers({id: id, status: status}).then((response) => {
+        console.log('response', response)
+    });
+    console.log("id", id)
+    console.log("status", status)
     const index = tableData.findIndex((user) => user.id === id);
 
     if (index === -1) {

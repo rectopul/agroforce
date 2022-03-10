@@ -104,15 +104,27 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
                   onSubmit={formik.handleSubmit}
                 >
                   <div className="h-10 w-44 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Status
+                    </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
                   </div>
                   <div className="h-10 w-44 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Order
+                    </label>
                     <Select name="orderBy" onChange={formik.handleChange} values={orderColumns.map(id => id)} selected={false} />
                   </div>
                   <div className="h-10 w-44 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Tipo Order
+                    </label>
                     <Select name="typeOrder" onChange={formik.handleChange} values={typeOrder.map(id => id)} selected={false} />
                   </div>
                   <div className="h-10 w-44 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Pesquisar
+                    </label>
                     <Input 
                       type="text" 
                       placeholder="name ou email"
@@ -125,6 +137,7 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
 
                     <div className="h-10 w-44 ml-4">
                       <Button
+                        style={{ marginTop: '15%' }}
                         onClick={() => {}}
                         value="Filtrar"
                         bgColor="bg-blue-600"
