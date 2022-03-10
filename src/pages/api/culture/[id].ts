@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             res.status(Result.status).json(Result.response);
           break
         case 'PUT':
-          let resultPut = await Controller.updateCulture(id, req.body);  
+          let resultPut = await Controller.updateCulture(req.body);  
           res.status(200).json(resultPut);
           break
         default:

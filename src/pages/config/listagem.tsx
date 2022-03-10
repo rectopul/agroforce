@@ -40,6 +40,8 @@ interface IFilter{
 
 export default function Listagem({ allUsers, totalItems }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [filterEndpoint, setFilter] = useState<string | any>();
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -51,11 +53,10 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
     onSubmit: (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&orderBy=" + values.orderBy + "&typeOrder=" + values.typeOrder;
       userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
-        console.log(response);
-
         if (response.status == 200) {
-          allUsers = response.response;
-          return ( <div className="w-full h-full overflow-y-scroll"> <TablePagination data={allUsers} totalItems={response.total} filterAplication={parametersFilter} />  </div>);
+          setTotaItems(response.total)
+          setFilter(parametersFilter)
+          setUsers(response.response)
         }
       })
     },
@@ -72,7 +73,7 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
   ];
 
   const orderColumns = [
-    { id: 'name', name: 'Name'},
+    { id: 'name', name: 'Nome'},
     { id: 'email', name: 'Email'},
   ];
 
@@ -136,7 +137,7 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={users} totalItems={totalItems} filterAplication={[]} />
+            <TablePagination data={users} totalItems={itemsTotal} filterAplication={filterEndpoint} />
           </div>
         </main>
       </Content>
@@ -160,6 +161,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const user = await fetch(urlParameters.toString(), requestOptions);
   let Response = await user.json();
+
   let allUsers = Response.response;
   let totalItems = Response.total;
 

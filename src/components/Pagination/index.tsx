@@ -27,7 +27,6 @@ interface ITable {
 
 export const TablePagination = ({ data, totalItems, filterAplication }: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
-  const [items, setItems] =useState<IUsers[]>(() => data);
   const [currentPage, setCurrentPage] = useState<number>(0);
   
   const take = 5;
@@ -156,9 +155,11 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
 
   async function handlePagination() {
     let skip = currentPage * take;
-
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
+    if (filterAplication) {
+      parametersFilter = parametersFilter + "&" + filterAplication;
+    }
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
         setTableData(response.response);
@@ -169,7 +170,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage, pages, data]);
 
   return (
     <MaterialTable
