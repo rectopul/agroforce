@@ -19,7 +19,7 @@ function Login() {
     useEffect(() => {
         // redirect to home if already logged in
         if (userService.userValue) {
-            router.push('/');
+            router.push('/config/tmg/usuarios');
         }
     }, []);
 
@@ -38,7 +38,7 @@ function Login() {
         return userService.login(email, password)
             .then(() => {
                 // get return url from query parameters or default to '/'
-                const returnUrl = router.query.returnUrl || '/';
+                const returnUrl = router.query.returnUrl || '/config/tmg/usuarios';
                 router.push(returnUrl as string);
             })
             .catch(error => {

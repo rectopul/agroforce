@@ -8,7 +8,7 @@ import {
   IDepartment,
   IProfile, 
   IUsers
-} from "./props";
+} from "../../props";
 
 import { 
   Button,
@@ -18,7 +18,7 @@ import {
   Select,
   Select2,
   TabHeader
-} from "../../components";
+} from "../../../../components";
 import { userService } from "src/services";
 
 export interface IData {

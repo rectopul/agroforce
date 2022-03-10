@@ -12,7 +12,7 @@ import {
   Input, 
   Select, 
   TabHeader 
-} from "../../components";
+} from "../../../../components";
 
 export default function Cultura({cultureEdit}:any) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);

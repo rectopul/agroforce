@@ -8,7 +8,7 @@ import {
   Select, 
   TabHeader,
   Radio
-} from "../../components";
+} from "../../../../components";
 
 interface ISafraProps {
   harvest: string;

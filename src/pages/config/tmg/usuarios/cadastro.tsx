@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
+import { useRouter } from 'next/router';
 
 import { userService } from "src/services";
 
@@ -9,7 +10,7 @@ import {
   IUsers,
   IProfile,
   IDepartment,
-} from './props';
+} from '../../props';
 
 import {
   TabHeader,
@@ -18,7 +19,7 @@ import {
   Select,
   Button,
   CheckBox
-} from "../../components";
+} from "../../../../components";
 
 export interface IData {
   profiles: IProfile[];
@@ -26,12 +27,12 @@ export interface IData {
 }
 
 // Teste
-import { tabs } from '../../utils/statics/tabs';
+import { tabs } from '../../../../utils/statics/tabs';
 
 export default function NovoUsuario({ departments, profiles }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-
+  const router = useRouter();
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -140,27 +141,6 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         >
           <div className="w-full flex justify-between items-start">
             <h1 className="text-2xl">Novo usuário</h1>
-            <div className="flex flex-col">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de perfil
-              </label>
-              <div className="flex gap-6 border-b border-gray-300">
-                {
-                  profiles.map((profile) => (
-                    <>
-                      <CheckBox
-                        key={profile.id}
-                        title={profile.name}
-                        id="profiles.id"
-                        name="profiles"
-                        onChange={formik.handleChange}
-                        value={profile.id}
-                      />
-                    </>
-                  ))
-                }
-              </div>
-            </div>
           </div>
 
           <div className="w-full
@@ -336,6 +316,29 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </div>
             </div>
           </div>
+          <div className="w-full flex justify-between items-start">
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Tipo de perfil
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  profiles.map((profile) => (
+                    <>
+                      <CheckBox
+                        key={profile.id}
+                        title={profile.name}
+                        id="profiles.id"
+                        name="profiles"
+                        onChange={formik.handleChange}
+                        value={profile.id}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
 
           <div className="h-10 w-full
             flex
@@ -349,6 +352,15 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {}}
+              />
+            </div>
+            <div className="h-10">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                onClick={() => {router.push('/config/tmj/usuarios/')}}
               />
             </div>
           </div>

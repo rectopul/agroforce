@@ -13,7 +13,7 @@ import {
   Input,
   TabHeader,
   TablePagination 
-} from "../../components";
+} from "../../../../components";
 import { userService } from "src/services";
 
 interface IUsers {
@@ -29,6 +29,7 @@ interface IUsers {
 interface Idata {
   allUsers: IUsers[];
   totalItems: Number;
+  filter: string | any;
 }
 
 interface IFilter{
@@ -38,11 +39,11 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export default function Listagem({ allUsers, totalItems }: Idata) {
+export default function Listagem({ allUsers, totalItems, filter }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [filterEndpoint, setFilter] = useState<string | any>();
-
+  const [filterEndpoint, setFilter] = useState<string | any>(filter);
+  console.log(filterEndpoint)
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -88,7 +89,7 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
         <title>Listagem de usuários</title>
       </Head>
       <Content
-        headerCotent={
+        headerCotent={  
           <TabHeader data={tabs} />
         }
       >
@@ -175,9 +176,10 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  let params = "skip=0&take=5";
+  let param = "skip=0&take=5&filterStatus=1";
+  let filter = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(params).toString();
+  urlParameters.search = new URLSearchParams(param).toString();
 
   const requestOptions = {
     method: 'GET',
@@ -194,7 +196,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   return {
     props: {
       allUsers,
-      totalItems
+      totalItems,
+      filter
     },
   }
 }
