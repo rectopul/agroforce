@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
+import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai';
 import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -15,7 +16,7 @@ interface IUsers {
   cpf: string,
   email: string,
   tel: string,
-  avatar: string | ReactNode,
+  avatar: string | any,
   status: boolean,
 }
 
@@ -28,6 +29,10 @@ interface ITable {
 export const TablePagination = ({ data, totalItems, filterAplication }: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [orderEmail, setOrderEmail] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<any>('');
+  const [arrowEmail, setArrowEmail] = useState<any>('');
   
   const take = 5;
   const total = totalItems;
@@ -58,28 +63,79 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     });
   };
 
+  function handleOrderEmail(column: string, order: string | any): void {
+    if (orderEmail === 2) {
+      setOrderEmail(0);
+      setArrowEmail(<AiOutlineArrowDown />);
+    } else {
+      setOrderEmail(orderEmail + 1);
+      if (orderEmail === 1) {
+        setArrowEmail(<AiOutlineArrowUp />);
+      } else {
+        setArrowEmail('');
+      }
+    }
+  };
+
+  function handleOrderName(column: string, order: string | any): void {
+    if (orderName === 2) {
+      setOrderName(0);
+      setArrowName(<AiOutlineArrowUp />);
+    } else {
+      setOrderName(orderName + 1);
+      if (order === 1) {
+        setArrowName(<AiOutlineArrowDown />);
+      } else {
+        setArrowName('');
+      }
+    }
+  };
+
   const columns = [
-    { 
+    {
       title: "Avatar", 
-      field: "avatar", 
+      field: "avatar",
+      sorting: false, 
       width: 0,
-      filtering: false, 
       exports: false, //export
-      render: (rowData: any) => (
-        !rowData.avatar ? (
+      render: (rowData: IUsers) => (
+        !rowData.avatar || rowData.avatar === '' ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
           ) : (
           <FaRegUserCircle size={32} />
         )
       )
     },
-    { title: "Nome", field: "name", filterPlaceholder: "Filtrar por nome", exports: false },
-    // { title: "Login", field: "login", filterPlaceholder: "Filter by login" },
-    { title: "E-mail", field: "email", filterPlaceholder: "Filtrar por email" },
-    { title: "Telefone", field: "tel", filterPlaceholder: "Filtrar por contato" },
+    {
+      title: (
+        <div className='flex items-center'>
+          { arrowName }
+          <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
+            Nome
+          </button>
+        </div>
+      ),
+      field: "name",
+      sorting: false
+    },
+    {
+      title: (
+        <div className='flex items-center'>
+          { arrowEmail }
+          <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
+            E-mail
+          </button>
+        </div>
+      ), 
+      field: "email",
+      sorting: false
+    },
+    { title: "Telefone", field: "tel", sorting: false },
     {
       title: "Status",
       field: "status",
+      sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
       render: (rowData: IUsers) => (
@@ -252,6 +308,8 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
           backgroundColor: '#f9fafb',
         },
         search: false,
+        filtering: false
+        
       }}
       title={
         <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>
