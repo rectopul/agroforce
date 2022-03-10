@@ -98,30 +98,43 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
           gap-8
         ">
 
-            <div className='flex gap-2' style={{ width: '100%' }}>
+            <div className='flex gap-2 w-full'>
               <form 
-                  className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 flex"
-                  onSubmit={formik.handleSubmit}
-                >
-                  <div className="h-10 w-44 ml-4">
+                className="flex flex-col
+                  w-full
+                  items-center
+                  py-4
+                  pb-4
+                  shadow-md
+                  rounded 
+                  bg-white
+                "
+                onSubmit={formik.handleSubmit}
+              >
+                <div className="w-full h-full
+                  flex
+                  justify-center
+                  pb-2
+                ">
+                  <div className="h-10 w-64 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
                   </div>
-                  <div className="h-10 w-44 ml-4">
+                  <div className="h-10 w-64 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Order
                     </label>
                     <Select name="orderBy" onChange={formik.handleChange} values={orderColumns.map(id => id)} selected={false} />
                   </div>
-                  <div className="h-10 w-44 ml-4">
+                  <div className="h-10 w-64 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Tipo Order
                     </label>
                     <Select name="typeOrder" onChange={formik.handleChange} values={typeOrder.map(id => id)} selected={false} />
                   </div>
-                  <div className="h-10 w-44 ml-4">
+                  <div className="h-10 w-64 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
@@ -134,17 +147,17 @@ export default function Listagem({ allUsers, totalItems }: Idata) {
                       onChange={formik.handleChange}
                     />
                   </div>
+                </div>
 
-                    <div className="h-10 w-44 ml-4">
-                      <Button
-                        style={{ marginTop: '15%' }}
-                        onClick={() => {}}
-                        value="Filtrar"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiFilterAlt size={20} />}
-                      />
-                    </div>
+                <div className="h-16 w-32 ml-5 mt-3">
+                  <Button
+                    onClick={() => {}}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
               </form>
             </div>
 
