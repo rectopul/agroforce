@@ -44,12 +44,9 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     } else {
       status = 0;
     }
-
     userService.updateUsers({id: id, status: status}).then((response) => {
-        console.log('response', response)
+  
     });
-    console.log("id", id)
-    console.log("status", status)
     const index = tableData.findIndex((user) => user.id === id);
 
     if (index === -1) {
@@ -64,6 +61,37 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   };
 
   function handleOrderEmail(column: string, order: string | any): void {
+    let typeOrder: any; 
+    let parametersFilter: any;
+    console.log(column, "coluns")
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filterAplication && typeof(filterAplication) != undefined) {
+      console.log("APLICATION = ", filterAplication)
+      if (typeOrder != '') {
+        parametersFilter = filterAplication + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filterAplication;
+      }
+    } else {
+      if (typeOrder != ''){
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filterAplication;
+      }
+    }
+
+    userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
+      if (response.status == 200) {
+        setTableData(response.response)
+      }
+    })
     if (orderEmail === 2) {
       setOrderEmail(0);
       setArrowEmail(<AiOutlineArrowDown />);
@@ -160,7 +188,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
                 onClick={() =>{}}
                 bgColor="bg-blue-600"
                 textColor="white"
-                href="atualizar-usuario"
+                href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
               />
             </div>
             <div>
@@ -193,7 +221,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
                 onClick={() =>{}}
                 bgColor="bg-blue-600"
                 textColor="white"
-                href="atualizar-usuario"
+                href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
               />
             </div>
             <div>
@@ -320,7 +348,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {}}
-              href="novo-usuario"
+              href="usuarios/cadastro"
               icon={<FiUserPlus />}
             />
           </div>

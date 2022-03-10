@@ -360,7 +360,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                onClick={() => {router.push('/config/tmj/usuarios/')}}
+                onClick={() => {router.push('/config/tmg/usuarios/')}}
               />
             </div>
           </div>

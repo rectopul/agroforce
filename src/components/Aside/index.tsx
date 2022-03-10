@@ -63,7 +63,7 @@ export function Aside() {
         <ButtonAside 
           title='Configurações'
           icon={ <BsGear  size={32} />}
-          href='config/novo-usuario'
+          href='usuarios'
           active
         />
       </nav>

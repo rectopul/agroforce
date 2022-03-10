@@ -3,6 +3,7 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import { BsCheckLg } from "react-icons/bs";
 import getConfig from 'next/config';
+import { useRouter } from 'next/router'
 
 import { 
   IDepartment,
@@ -378,7 +379,6 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const  token  =  req.cookies.token;
-  
   // Fetch data from external API
   const requestOptions: object | any = {
     method: 'GET',

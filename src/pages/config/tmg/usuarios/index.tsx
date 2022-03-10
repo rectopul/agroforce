@@ -52,7 +52,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
       typeOrder: '',
     },
     onSubmit: (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&orderBy=" + values.orderBy + "&typeOrder=" + values.typeOrder;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
         if (response.status == 200) {
           setTotaItems(response.total)
