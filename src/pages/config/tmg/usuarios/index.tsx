@@ -12,7 +12,8 @@ import {
   Select, 
   Input,
   TabHeader,
-  TablePagination 
+  TablePagination, 
+  AccordionFilter
 } from "../../../../components";
 import { userService } from "src/services";
 
@@ -83,21 +84,18 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
           <TabHeader data={tabs} />
         }
       >
-        <main className="h-full
+        <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-
-            <div className='flex gap-2 w-full'>
-              <form 
+          <AccordionFilter title="Filtrar usuários">
+            <div className='flex w-full gap-2'>
+              <form
                 className="flex flex-col
                   w-full
                   items-center
-                  py-4
-                  pb-4
-                  shadow-md
-                  rounded 
+                  px-4
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -107,13 +105,13 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
                   justify-center
                   pb-2
                 ">
-                  <div className="h-10 w-64 ml-4">
+                  <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
                   </div>
-                  <div className="h-10 w-64 ml-4">
+                  <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
@@ -128,7 +126,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
                   </div>
                 </div>
 
-                <div className="h-16 w-32 ml-5 mt-3">
+                <div className="h-16 w-32 mt-3">
                   <Button
                     onClick={() => {}}
                     value="Filtrar"
@@ -139,6 +137,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
                 </div>
               </form>
             </div>
+          </AccordionFilter>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">

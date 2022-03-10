@@ -12,5 +12,7 @@ export { CheckBox } from './CheckBox';
 export { Radio } from './Radio';
 export { Toast } from './Toast';
 
+export { AccordionFilter } from './AccordionFilter';
+
 export { Select2 } from './Select/index2';
 
