@@ -73,16 +73,6 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
     { id: 0, name: 'Inativos'},
   ];
 
-  const orderColumns = [
-    { id: 'name', name: 'Nome'},
-    { id: 'email', name: 'Email'},
-  ];
-
-  const typeOrder= [
-    { id: 'asc', name: 'Crescente'},
-    { id: 'desc', name: 'Decrescente'},
-  ];
-
   return (
     <>
       <Head>
@@ -122,18 +112,6 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
-                  </div>
-                  <div className="h-10 w-64 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Order
-                    </label>
-                    <Select name="orderBy" onChange={formik.handleChange} values={orderColumns.map(id => id)} selected={false} />
-                  </div>
-                  <div className="h-10 w-64 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Tipo Order
-                    </label>
-                    <Select name="typeOrder" onChange={formik.handleChange} values={typeOrder.map(id => id)} selected={false} />
                   </div>
                   <div className="h-10 w-64 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
