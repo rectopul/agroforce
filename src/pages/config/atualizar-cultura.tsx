@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useFormik } from 'formik'
 import { BsCheckLg } from "react-icons/bs";
 import { GetServerSideProps } from "next";
-
+import getConfig from 'next/config';
 
 import { cultureService } from 'src/services';
 
@@ -174,19 +174,17 @@ export default function Cultura({cultureEdit}:any) {
 
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
-    // const  token  =  req.cookies.token;
-    // console.log("ALA" + token)
-    // Fetch data from external API
-    const requestOptions = {
-      method: 'GET',
-      credentials: 'include',
-      headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
-    };
-    const res = await fetch('http://localhost:3000/api/culture/' + 1, requestOptions)
-    const cultureEdit = await res.json();
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+  const  token  =  req.cookies.token;
   
-    console.log(cultureEdit)
-  
-    return { props: { cultureEdit } }
-  }
-  
+  const requestOptions: object | any = {
+    method: 'GET',
+    credentials: 'include',
+    headers:  { Authorization: `Bearer  ${token}` }
+  };
+  const res = await fetch(`${baseUrl}/` + 1, requestOptions)
+  const cultureEdit = await res.json();
+
+  return { props: { cultureEdit } }
+}

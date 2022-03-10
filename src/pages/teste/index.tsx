@@ -15,7 +15,6 @@ import {
 } from '@syncfusion/ej2-react-grids';
 
 import * as React from 'react';
-import { useGetUsers } from 'src/hooks/useGetUsers';
 
 
 interface IGridProps {
@@ -25,11 +24,6 @@ interface IGridProps {
 }
 
 export default function Teste() {
-  const {
-    items
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useGetUsers();
-
   let grid: Grid | null;
   const excelExtensio: string = (".xlsx" || ".xlsm" || ".xlsb" || ".xltx");
 
@@ -103,7 +97,7 @@ export default function Teste() {
 
   return(
    <div style={{ margin: '10%', marginTop: '5%' }}>
-      <GridComponent dataSource={items}
+      <GridComponent dataSource={[]}
         dataBound={dataBound}
         ref={g => grid = g}
         allowPaging={true}

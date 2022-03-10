@@ -17,7 +17,7 @@ export class DepartamentRepository {
         return Result;
     }
 
-    async create(Departament: object) {
+    async create(Departament: object | any) {
         let Result = await prisma.department.create({ data: Departament }).finally(async () => { await prisma.$disconnect() })
         return Result;
     }

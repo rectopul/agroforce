@@ -24,7 +24,7 @@ import { userService } from "src/services";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
-  userEdit: IUsers;
+  userEdit: IUsers | any;
 }
 
 export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
@@ -380,7 +380,7 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   const  token  =  req.cookies.token;
   
   // Fetch data from external API
-  const requestOptions = {
+  const requestOptions: object | any = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }

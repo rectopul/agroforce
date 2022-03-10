@@ -17,7 +17,7 @@ export class ProfileRepository {
         return Result;
     }
 
-    async create(Profile: object) {
+    async create(Profile: object | any) {
         let Result = await prisma.profile.create({ data: Profile }).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
