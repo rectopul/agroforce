@@ -6,7 +6,7 @@ const { serverRuntimeConfig } = getConfig();
 
 export { jwtMiddleware };
 
-function jwtMiddleware(req, res) {
+function jwtMiddleware(req: any, res:any) {
     const middleware = expressJwt({ secret: serverRuntimeConfig.secret, algorithms: ['HS256'] }).unless({
         path: [
             // public routes that don't require authentication

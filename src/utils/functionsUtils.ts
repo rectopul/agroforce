@@ -1,4 +1,4 @@
-
+import { userService } from "src/services";
 
 
 export const functionsUtils = {
@@ -41,3 +41,4 @@ function validationCPF(cpf: any) {
 		return false;		
 	return true;   
 }
+

@@ -17,7 +17,7 @@ export class CulturaRepository {
         return Result;
     }
 
-    async create(Cultura: object) {
+    async create(Cultura: object | any) {
         Cultura.created_at = new Date();
         let Result = await prisma.culture.create({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
         return Result;

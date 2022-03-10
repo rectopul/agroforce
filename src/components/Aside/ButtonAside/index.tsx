@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router'
+import Link from 'next/link';
 import { ReactNode } from "react";
 
 interface AnchorAsideProps {
   title: string;
-  link: any;
+  href: any;
   icon: string | ReactNode;
   active?: boolean;
 }
@@ -11,38 +12,35 @@ interface AnchorAsideProps {
 export function ButtonAside({
   title,
   icon,
-  link,
+  href,
   active,
 }: AnchorAsideProps) {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push(link);
-  }
-
   return (
     active ? (
-      <button 
-        id="lista"
-        onClick={() => handleClick()}
-        className="flex flex-col
-        items-center
-        text-sm
-        bg-indigo-500
-        text-blue-600
-        transition delay-150
-        -translate-y-1
-        scale-110 duration-300
-      ">
-        { icon }
-        { title }
-      </button>
+      <Link href={href}>
+        <a
+          id="lista"
+          className="flex flex-col
+          items-center
+          text-sm
+          text-center
+          bg-indigo-500
+          text-blue-600
+          transition delay-150
+          -translate-y-1
+          scale-110 duration-300
+        ">
+          { icon }
+          { title }
+        </a>
+      </Link>
    ) : (
-      <button
+      <Link href={href}>
+      <a 
         id="lista"
-        onClick={() => handleClick()}
         className="flex flex-col
         items-center
+        text-center
         text-sm
         text-gray-300
         transition delay-150
@@ -51,7 +49,8 @@ export function ButtonAside({
       ">
         { icon }
         { title }
-      </button>
+      </a>
+      </Link>
    )
   );
 }

@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useFormik } from 'formik'
 import { BsCheckLg } from "react-icons/bs";
 import { GetServerSideProps } from "next";
-
+import getConfig from 'next/config';
 
 import { cultureService } from 'src/services';
 
@@ -10,11 +10,13 @@ import {
   Button,
   Content, 
   Input, 
+  Select, 
   TabHeader 
 } from "../../components";
 
 export default function Cultura({cultureEdit}:any) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
@@ -30,12 +32,14 @@ export default function Cultura({cultureEdit}:any) {
     initialValues: {
       id: cultureEdit.id,
       name: cultureEdit.name,
+      status: cultureEdit.status,
       created_by: userLogado.id,
     },
     onSubmit: values => {
       cultureService.updateCulture({
         id: cultureEdit.id,
         name: formik.values.name,
+        status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
@@ -48,7 +52,7 @@ export default function Cultura({cultureEdit}:any) {
   return (
     <>
      <Head>
-        <title>Nova cultura</title>
+        <title>Atualizar cultura</title>
       </Head>
       
       <Content
@@ -129,7 +133,23 @@ export default function Cultura({cultureEdit}:any) {
               value={formik.values.name}
             />
           </div>
+
+          <div className="w-full h-10">
+            <label className="block text-gray-900 text-sm font-bold mb-2">
+              Status
+            </label>
+            <Select
+                values={optionStatus}
+                id="status"
+                name="status"
+                onChange={formik.handleChange}
+                value={formik.values.status}
+                selected={cultureEdit.status}
+              />
+        
+          </div>
         </div>
+       
 
         <div className="h-10 w-full
           flex
@@ -154,19 +174,17 @@ export default function Cultura({cultureEdit}:any) {
 
 
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
-    // const  token  =  req.cookies.token;
-    // console.log("ALA" + token)
-    // Fetch data from external API
-    const requestOptions = {
-      method: 'GET',
-      credentials: 'include',
-      headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM0LCJpYXQiOjE2NDY0ODkxNDksImV4cCI6MTY0NzA5Mzk0OX0.YrbCWGV0ZN0R9VD9OKOJ35afYsWXM1zeAEDzPzGXxws` }
-    };
-    const res = await fetch('http://localhost:3000/api/culture/' + 1, requestOptions)
-    const cultureEdit = await res.json();
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+  const  token  =  req.cookies.token;
   
-    console.log(cultureEdit)
-  
-    return { props: { cultureEdit } }
-  }
-  
+  const requestOptions: object | any = {
+    method: 'GET',
+    credentials: 'include',
+    headers:  { Authorization: `Bearer  ${token}` }
+  };
+  const res = await fetch(`${baseUrl}/` + 1, requestOptions)
+  const cultureEdit = await res.json();
+
+  return { props: { cultureEdit } }
+}

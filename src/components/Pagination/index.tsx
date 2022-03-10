@@ -1,14 +1,17 @@
 import { ReactNode, useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+
+import { userService } from "src/services";
 
 import { Button } from '../index';
 
 interface IUsers {
   id: number,
-  name: string,
+name: string,
   cpf: string,
   email: string,
   tel: string,
@@ -18,10 +21,17 @@ interface IUsers {
 
 interface ITable {
   data: IUsers[];
+  totalItems: Number | any;
+  filterAplication: object | any;
 }
 
-export const TablePagination = ({ data }: ITable) => {
+export const TablePagination = ({ data, totalItems, filterAplication }: ITable) => {
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  
+  const take = 5;
+  const total = totalItems;
+  const pages = Math.ceil(total / take);
 
   function handleStatusUser(id: number, status: boolean): void {
     const index = tableData.findIndex((user) => user.id === id);
@@ -32,7 +42,6 @@ export const TablePagination = ({ data }: ITable) => {
 
     setTableData((oldUser) => {
       const copy = [...oldUser];
-
       copy[index].status = status;
       return copy;
     });
@@ -62,7 +71,7 @@ export const TablePagination = ({ data }: ITable) => {
       field: "status",
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: any) => (
+      render: (rowData: IUsers) => (
         rowData.status ? (
           <div className='h-10 flex'>
             <div className="
@@ -123,7 +132,9 @@ export const TablePagination = ({ data }: ITable) => {
             <div>
               <Button 
                 icon={<FaRegThumbsDown size={16} />}
-                onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                onClick={() => handleStatusUser(
+                  rowData.id, !rowData.status
+                )}
                 bgColor="bg-red-800"
                 textColor="white"
               />
@@ -133,20 +144,103 @@ export const TablePagination = ({ data }: ITable) => {
       ),
     },
   ];
+
+  function handleTotalPages() {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  }
+
+  async function handlePagination() {
+    let skip = currentPage * take;
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    if (filterAplication) {
+      parametersFilter = parametersFilter + "&" + filterAplication;
+    }
+    await userService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setTableData(response.response);
+      }
+    });
+  }
   
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage, pages, data]);
+
   return (
     <MaterialTable
+      style={{ background: '#f9fafb' }}
       columns={columns}
       data={tableData}
+      components={{
+        Pagination: props => (
+          <>
+          <div
+            className="flex
+              h-20 
+              gap-2 
+              pr-2
+              py-5 
+              bg-gray-50
+            " 
+            {...props}
+          >
+            <Button 
+              onClick={() => setCurrentPage(currentPage - 10)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<MdFirstPage size={18} />}
+              disabled={currentPage <= 1}
+            />
+            <Button 
+              onClick={() => setCurrentPage(currentPage - 1)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<BiLeftArrow size={15} />}
+              disabled={currentPage <= 0}
+            />
+            {
+              Array(1).fill('').map((value, index) => (
+                <>
+                    <Button
+                      key={index}
+                      onClick={() => setCurrentPage(index)}
+                      value={`${currentPage + 1}`}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      disabled={true}
+                    />
+                </>
+              ))
+            }
+            <Button 
+              onClick={() => setCurrentPage(currentPage + 1)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<BiRightArrow size={15} />}
+              disabled={currentPage + 1 >= pages}
+            />
+            <Button 
+              onClick={() => setCurrentPage(currentPage + 10)}
+              bgColor="bg-blue-600"
+              textColor="white"
+              icon={<MdLastPage size={18} />}
+              disabled={currentPage + 1>= pages}
+            />
+          </div>
+          </>
+        ) as any
+      }}
       options={{
-        searchAutoFocus: true, filtering: true, paging: true, 
-        pageSizeOptions:[5,10, 20, 25, 50, 100], pageSize: 5, paginationType: "stepped",
-        exportButton: true,
         headerStyle: {
           backgroundColor: '#f9fafb',
         },
-        search: true,
-        exportFileName: "List Users"
+        search: false,
       }}
       title={
         <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>
@@ -162,7 +256,7 @@ export const TablePagination = ({ data }: ITable) => {
             />
           </div>
 
-          <strong className='text-blue-600'>Total registrado: { tableData.length }</strong>
+          <strong className='text-blue-600'>Total registrado: { totalItems }</strong>
         </div>
       }
     />

@@ -1,30 +1,30 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import {CulturaController} from '../../../controllers/cultura.controller';
+import {SafraController} from '../../../controllers/safra.controller';
 import { apiHandler } from '../../../helpers/api';
 
 /**
  * @swagger
- * /api/cultura:
+ * /api/safras/[id]:
  *   get:
- *     description: Retorna todas culturas da base
+ *     description: Retorna todas safras da base
  *     responses:
  *       200:
- *         description: culturas
+ *         description: safras
  */
 
  export default  apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const Controller =  new CulturaController();
+    const Controller =  new SafraController();
     const id = req.query.id.toString();
     switch (req.method) {
         case 'GET':
-            let Result = await Controller.getOneCulture(id);
+            let Result = await Controller.getOneSafra(id);
             res.status(Result.status).json(Result.response);
           break
         case 'PUT':
-          let resultPut = await Controller.updateCulture(req.body);  
+          let resultPut = await Controller.updateSafra(req.body);  
           res.status(200).json(resultPut);
           break
         default:

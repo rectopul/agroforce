@@ -40,10 +40,15 @@ export class CulturaController {
 
     @Put()
     async updateCulture(data: any) {
-        const parameters = new Object();
-        console.log(data)
+        const parameters: object | any = new Object();
+
+        if (typeof(data.status) === 'string') {
+            parameters.status =  parseInt(data.status);
+        } else { 
+            parameters.status =  data.status;
+        }
+
         if(data.name) parameters.name = data.name;
-        if(data.status) parameters.status = data.status;
 
         if (data != null && data != undefined) {
             let response = await this.culturaRepository.update(data.id, parameters);

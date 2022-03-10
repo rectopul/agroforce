@@ -1,17 +1,20 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BsCheckLg, BsEye } from "react-icons/bs";
+import { BsCheckLg } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
-import { HiOutlineClipboardList } from "react-icons/hi";
+import { useFormik } from "formik";
+import getConfig from 'next/config';
 
 import { 
   Button, 
   Content, 
   Select, 
+  Input,
   TabHeader,
   TablePagination 
 } from "../../components";
+import { userService } from "src/services";
 
 interface IUsers {
   id: number,
@@ -25,17 +28,58 @@ interface IUsers {
 
 interface Idata {
   allUsers: IUsers[];
+  totalItems: Number;
 }
 
-export default function Listagem({ allUsers }: Idata) {
+interface IFilter{
+  filterStatus: object | any;
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
+}
+
+export default function Listagem({ allUsers, totalItems }: Idata) {
+  const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [filterEndpoint, setFilter] = useState<string | any>();
+
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: (values) => {
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&orderBy=" + values.orderBy + "&typeOrder=" + values.typeOrder;
+      userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
+        if (response.status == 200) {
+          setTotaItems(response.total)
+          setFilter(parametersFilter)
+          setUsers(response.response)
+        }
+      })
+    },
+  });
+
   const tabs = [
     { title: 'TMG', value: <BsCheckLg />, status: true },
   ];
 
   const filters = [
-    { id: "teste", name: 'Todos' },
-    { id: "teste", name: 'Ativos' },
-    { id: "teste", name: 'Inativos' },
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
+
+  const orderColumns = [
+    { id: 'name', name: 'Nome'},
+    { id: 'email', name: 'Email'},
+  ];
+
+  const typeOrder= [
+    { id: 'asc', name: 'Crescente'},
+    { id: 'desc', name: 'Decrescente'},
   ];
 
   return (
@@ -54,44 +98,46 @@ export default function Listagem({ allUsers }: Idata) {
           gap-8
         ">
 
-          <form className="w-full bg-white p-7 rounded-lg">
-            <div className='flex gap-2'>
-              <div>
-                <Button
-                  onClick={() => {}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<BsEye size={20} />}
-                  // BsEyeSlash
-                />
-              </div>
-              <div>
-                <Button
-                  onClick={() => {}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<HiOutlineClipboardList size={20} />}
-              />
-              </div>
-              <div className="h-10 w-44 ml-4">
-                <Select values={filters} selected={false} />
-              </div>
+            <div className='flex gap-2' style={{ width: '100%' }}>
+              <form 
+                  className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 flex"
+                  onSubmit={formik.handleSubmit}
+                >
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="orderBy" onChange={formik.handleChange} values={orderColumns.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Select name="typeOrder" onChange={formik.handleChange} values={typeOrder.map(id => id)} selected={false} />
+                  </div>
+                  <div className="h-10 w-44 ml-4">
+                    <Input 
+                      type="text" 
+                      placeholder="name ou email"
+                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
-              <div>
-                <Button
-                  value="Filtrar"
-                  onClick={() => {}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<BiFilterAlt size={20} />}
-                />
-              </div>
+                    <div className="h-10 w-44 ml-4">
+                      <Button
+                        onClick={() => {}}
+                        value="Filtrar"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiFilterAlt size={20} />}
+                      />
+                    </div>
+              </form>
             </div>
-          </form>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={allUsers} />
+            <TablePagination data={users} totalItems={itemsTotal} filterAplication={filterEndpoint} />
           </div>
         </main>
       </Content>
@@ -99,22 +145,30 @@ export default function Listagem({ allUsers }: Idata) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
+  const  token  =  req.cookies.token;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  let params = "skip=0&take=5";
+  const urlParameters: any = new URL(baseUrl);
+  urlParameters.search = new URLSearchParams(params).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTY0NjY1MTAyMiwiZXhwIjoxNjQ3MjU1ODIyfQ.3QX-_a5O2sZK5VVjdZ1jwLLuY7wemFKTEU9OYaXMzIc` }
+    headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch('http://localhost:3000/api/user', requestOptions);
+  const user = await fetch(urlParameters.toString(), requestOptions);
+  let Response = await user.json();
 
-  const allUsers = await user.json();
-
-  console.log(allUsers);
+  let allUsers = Response.response;
+  let totalItems = Response.total;
 
   return {
     props: {
       allUsers,
+      totalItems
     },
   }
 }
