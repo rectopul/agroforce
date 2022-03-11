@@ -9,14 +9,15 @@ import { MdOutlineExitToApp } from "react-icons/md";
 
 import { userService } from "../../../services";
 import { useState, useEffect } from 'react';
+import { BiUser } from 'react-icons/bi';
  
 interface IModelProps {
   name: string;
-  imagem: string;
+  avatar: string;
 }
 
 
-export function ModelHeader({ name, imagem: avatar }: IModelProps) {
+export function ModelHeader({ name, avatar }: IModelProps) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
@@ -38,14 +39,12 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
   
   return (
     <>
-      <Menu as="div" className="relative inline-block text-left">
+      <Menu as="div" className="relative inline-block text-left shadow z-50">
         <div>
           <Menu.Button
             type='button'
             className='h-20 w-72
               flex items-center justify-around
-             
-              pl-2
             '
             // rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500
             id="menu-button"
@@ -53,10 +52,21 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
             aria-haspopup="true"
           >
             
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={String(avatar)} alt={name} className='h-16 w-16
-              rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-            '/>
+            {
+              !avatar || avatar === '' ? (
+                <div className='h-16 w-20
+                  flex items-center justify-center
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '>
+                  <BiUser color='#FFF' size={32} />
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={avatar} alt={name} className='h-16 w-16
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '/>
+              )
+            }
             <span className='w-full text-white text-base'>
               { name }
             </span>
@@ -85,13 +95,24 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
                 border-r-white
                 border-l-white
                 py-2
+                px-2
               '>
-
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={String(avatar)} alt={name} className='h-14 w-14
-                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-                '/>
-                <strong className='text-xs'>{name}</strong>
+                {
+                  !avatar || avatar === '' ? (
+                    <div className='
+                      flex items-center justify-center
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-gray-700
+                    '>
+                      <BiUser color='#374151' size={32} />
+                    </div>
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={avatar} alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
+                  )
+                }
+                <strong className='text-xs text-gray-700'>{name}</strong>
               </div>
 
               <Menu.Item>
