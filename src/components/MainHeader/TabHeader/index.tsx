@@ -1,16 +1,23 @@
 import { ReactNode, useState } from "react";
+import { DropDown, ToolTip } from "src/components";
 
 type ITabProps = {
   value: ReactNode;
   title: string;
-  status: boolean;
+  status?: boolean;
+}
+
+type IDropDownProps = {
+  labelDropDown: string;
+  hrefDropDown: string;
 }
 
 type IData = {
   data: ITabProps[];
+  dataDropDowns: IDropDownProps[];
 }
 
-export function TabHeader({ data }: IData) {
+export function TabHeader({ data, dataDropDowns }: IData) {
   const [tabs, setTabs] = useState<ITabProps[]>(() => data);
   
   function handleStatusButton(title: string, status: boolean): void {
@@ -37,22 +44,28 @@ export function TabHeader({ data }: IData) {
       {
         tabs.map((tab, index) => (
           tab.status ? (
-            <button
-              key={index}
-              onClick={() => handleStatusButton(tab.title, !tab.status)}
-              className="h-full
-              flex items-center gap-1
-            ">
-              <div className={`h-3/5 w-12
-                flex justify-center items-center
-                border border-white rounded-md bg-blue-600
-                rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full
-              `}>
-                <span className={`text-white text-2xl`}>{tab.value}</span>
-              </div>
-        
-              <span className={`border-white text-sm`}>{tab.title}</span>
-            </button>
+            <ToolTip contentMenu={
+              dataDropDowns.map((dropDown, index) => (
+                <DropDown key={index} label={dropDown.labelDropDown} href={dropDown.hrefDropDown} />
+              ))
+            }>
+              <button
+                key={index}
+                onClick={() => handleStatusButton(tab.title, !tab.status)}
+                className="h-full
+                flex items-center gap-1
+              ">
+                <div className={`h-3/5 w-12
+                  flex justify-center items-center
+                  border border-white rounded-md bg-blue-600
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full
+                `}>
+                  <span className={`text-white text-2xl`}>{tab.value}</span>
+                </div>
+          
+                <span className={`border-white text-sm`}>{tab.title}</span>
+              </button>
+            </ToolTip>
           ) : (
             <button
               key={index}

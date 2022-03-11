@@ -3,7 +3,8 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import { BsCheckLg } from "react-icons/bs";
 import getConfig from 'next/config';
-import { useRouter } from 'next/router'
+
+import { userService } from "src/services";
 
 import { 
   IDepartment,
@@ -20,8 +21,8 @@ import {
   Select2,
   TabHeader
 } from "../../../../components";
-import { userService } from "src/services";
 
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -32,10 +33,6 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-  ];
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -101,7 +98,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       </Head>
       <Content
         headerCotent={
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
         <div className="w-full

@@ -11,18 +11,10 @@ import {
   TabHeader 
 } from "../../../../components";
 
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+
 export default function Cultura() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-    { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
-    { title: 'LOCAL', value: <BsCheckLg />, status: false  },
-    { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false  },
-    { title: 'NPE', value: <BsCheckLg />, status: false  },
-    { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
-    { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
-  ];
 
   const formik = useFormik({
     initialValues: {
@@ -49,7 +41,7 @@ export default function Cultura() {
       
       <Content
         headerCotent={
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
 

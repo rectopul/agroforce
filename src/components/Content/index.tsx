@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 
-import { Aside } from "../Aside";
-import { MainHeader } from "../MainHeader";
-import { Select } from "../Select";
+import {
+  Aside,
+  MainHeader,
+  Select
+} from '../../components';
 
 interface IContentProps {
   children: never[] | ReactNode;

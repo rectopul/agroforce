@@ -21,13 +21,11 @@ import {
   CheckBox
 } from "../../../../components";
 
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
 }
-
-// Teste
-import { tabs } from '../../../../utils/statics/tabs';
 
 export default function NovoUsuario({ departments, profiles }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -95,46 +93,8 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
 
       <Content headerCotent={
-        <TabHeader data={tabs} />
+        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
       }>
-        
-        <div className="w-full
-          h-20
-          flex
-          items-center
-          gap-2
-          px-5
-          rounded-lg
-          border-b border-blue-600
-          shadow
-          bg-white
-        ">
-          <div className="h-10 w-32">
-            <Button 
-              value="Usuário"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Safra"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Portfólio"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-        </div>
-
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

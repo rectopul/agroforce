@@ -1,10 +1,12 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { BsCheckLg } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
+
+import { userService } from "src/services";
 
 import { 
   Button, 
@@ -15,7 +17,8 @@ import {
   TablePagination, 
   AccordionFilter
 } from "../../../../components";
-import { userService } from "src/services";
+
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 
 interface IUsers {
   id: number,
@@ -64,10 +67,6 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
     },
   });
 
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-  ];
-
   const filters = [
     { id: 2, name: 'Todos'},
     { id: 1, name: 'Ativos'},
@@ -81,7 +80,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
       </Head>
       <Content
         headerCotent={  
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
         }
       >
         <main className="h-full w-full

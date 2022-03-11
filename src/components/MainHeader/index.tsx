@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { FaRegUser } from 'react-icons/fa';
 
-import { Select } from '../Select';
 import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {

@@ -10,6 +10,8 @@ import {
   Radio
 } from "../../../../components";
 
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+
 interface ISafraProps {
   harvest: string;
   status: number | any;
@@ -22,10 +24,6 @@ interface ISafraProps {
 export default function Safra() {
   const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
-
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-  ];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
@@ -51,7 +49,7 @@ export default function Safra() {
 
       <Content
         headerCotent={
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
         <div className="w-full
