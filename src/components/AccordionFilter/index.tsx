@@ -14,13 +14,14 @@ interface IAccordionFilterProps {
 export function AccordionFilter({ title, children }: IAccordionFilterProps) {
   return (
     <div className='w-full shadow-md rounded'>
-      <Accordion>
+      <Accordion className='w-full px-7'>
         <AccordionSummary
+         className='w-full px-10'
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography>{ title }</Typography>
+          <Typography  className='w-full'>{ title }</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>

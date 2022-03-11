@@ -5,10 +5,12 @@ import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai';
 import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FiUserPlus } from 'react-icons/fi';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import * as XLSX from 'xlsx';
 
 import { userService } from "src/services";
 
 import { Button } from '../index';
+import { RiFileExcel2Line } from 'react-icons/ri';
 
 interface IUsers {
   id: number,
@@ -125,7 +127,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       field: "avatar",
       sorting: false, 
       width: 0,
-      exports: false, //export
+      exports: false,
       render: (rowData: IUsers) => (
         !rowData.avatar || rowData.avatar === '' ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -261,6 +263,29 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       }
     });
   }
+
+  const downloadExcel = () => {
+    const newData = tableData.map(row => {
+      delete row.avatar
+      return row
+    });
+    const workSheet = XLSX.utils.json_to_sheet(newData);
+    const workBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+
+    // Buffer
+    let buf = XLSX.write(workBook, {
+      bookType: "csv", //xlsx
+      type: "buffer",
+    });
+    // Binary
+    XLSX.write(workBook, {
+      bookType: "csv", //xlsx
+      type: "binary",
+    });
+    // Download
+    XLSX.writeFile(workBook, "Usuários.csv");
+  }
   
   useEffect(() => {
     handlePagination();
@@ -272,6 +297,25 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       style={{ background: '#f9fafb' }}
       columns={columns}
       data={tableData}
+      options={{
+        headerStyle: {
+          backgroundColor: '#f9fafb',
+        },
+        search: false,
+        filtering: false
+      }}
+      actions={[
+        { 
+          icon: () => (
+            <div className='flex items-center justify-center h-12'>
+              <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} />
+            </div>
+          ),
+          tooltip: "Export to Excel",
+          onClick: () => downloadExcel(),
+          isFreeAction: true
+        }
+      ]}
       components={{
         Pagination: props => (
           <>
@@ -330,14 +374,6 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
           </div>
           </>
         ) as any
-      }}
-      options={{
-        headerStyle: {
-          backgroundColor: '#f9fafb',
-        },
-        search: false,
-        filtering: false
-        
       }}
       title={
         <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>

@@ -48,6 +48,7 @@
     "tailwindcss": "^3.0.23",
     "util": "^0.12.4",
     "uuid": "^8.3.2",
+    "xlsx": "^0.18.3",
     "yup": "^0.32.11"
   },
   "devDependencies": {
