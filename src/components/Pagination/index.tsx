@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState  } from 'react';
+import { useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
 import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai';
@@ -9,8 +9,9 @@ import * as XLSX from 'xlsx';
 
 import { userService } from "src/services";
 
-import { Button } from '../index';
+import { AccordionFilter, Button } from '../index';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import { CheckBox } from '../CheckBox';
 
 interface IUsers {
   id: number,
@@ -56,8 +57,8 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
           render: (rowData: IUsers) => (
             !rowData.avatar || rowData.avatar === '' ? (
               <FaRegUserCircle size={32} />
-              // eslint-disable-next-line @next/next/no-img-element
               ) : (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
             )
           )
@@ -177,7 +178,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       }
     });
     return arrOb;
-  }
+  };
 
   function handleStatusUser(id: number, status: any): void {
     if (status) {
@@ -267,7 +268,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
     }
-  }
+  };
 
   async function handlePagination() {
     let skip = currentPage * take;
@@ -281,7 +282,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
         setTableData(response.response);
       }
     });
-  }
+  };
 
   const downloadExcel = () => {
     const newData = tableData.map(row => {
@@ -304,7 +305,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     });
     // Download
     XLSX.writeFile(workBook, "Usuários.csv");
-  }
+  };
   
   useEffect(() => {
     handlePagination();
@@ -317,25 +318,59 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       columns={columns}
       data={tableData}
       options={{
+        showTitle: false,
         headerStyle: {
-          backgroundColor: '#f9fafb',
+          zIndex: 20
         },
+        rowStyle: { background: '#f9fafb', zIndex: 20 },
         search: false,
         filtering: false
       }}
-      actions={[
-        { 
-          icon: () => (
-            <div className='flex items-center justify-center h-12'>
-              <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} />
-            </div>
-          ),
-          tooltip: "Export to Excel",
-          onClick: () => downloadExcel(),
-          isFreeAction: true
-        }
-      ]}
       components={{
+        Toolbar: () => (
+          <div
+          className='w-full max-h-96	
+            flex
+            items-center
+            justify-between
+            gap-4
+            bg-gray-50
+            py-2
+            px-5
+            border-solid border-b
+            border-gray-200
+          '>
+            <div className='h-12'>
+              <Button 
+                title="Cadastrar um usuário"
+                value="Cadastrar um usuário"
+                bgColor="bg-blue-600"
+                textColor="white"
+                onClick={() => {}}
+                href="usuarios/cadastro"
+                icon={<FiUserPlus />}
+              />
+            </div>
+
+            <strong className='text-blue-600'>Total registrado: { totalItems }</strong>
+
+            <div className='h-full flex items-center gap-2
+            '>
+              <div className="border-solid border-2 border-blue-600 rounded">
+              <AccordionFilter title='Organizar: '>
+                <CheckBox title='Nome' value={1} />
+                <CheckBox title='E-mail' value={2} />
+                <CheckBox title='Telefone' value={3} />
+                <CheckBox title='Status' value={4} />
+              </AccordionFilter>
+              </div>
+
+              <div className='h-12 flex items-center justify-center w-full' style={{ zIndex: 99999 }}>
+               <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+              </div>
+            </div>
+          </div>
+        ),
         Pagination: props => (
           <>
           <div
@@ -394,23 +429,6 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
           </>
         ) as any
       }}
-      title={
-        <div className='flex items-center w-screen h-20 gap-4 bg-gray-50'>
-          <div className='h-10'>
-            <Button 
-              title="Cadastrar um usuário"
-              value="Cadastrar um usuário"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-              href="usuarios/cadastro"
-              icon={<FiUserPlus />}
-            />
-          </div>
-
-          <strong className='text-blue-600'>Total registrado: { totalItems }</strong>
-        </div>
-      }
     />
   )
 }

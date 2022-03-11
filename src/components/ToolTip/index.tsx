@@ -4,7 +4,6 @@ import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 
 interface IToolTipProps {
   children: ReactNode;

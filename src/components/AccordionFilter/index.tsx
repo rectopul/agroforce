@@ -16,15 +16,15 @@ export function AccordionFilter({ title, children }: IAccordionFilterProps) {
     <div className='w-full shadow-md rounded'>
       <Accordion className='w-full px-7'>
         <AccordionSummary
-         className='w-full px-10'
+         className='w-full px-10 z-40'
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography  className='w-full'>{ title }</Typography>
+          <Typography>{ title }</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
+          <Typography className='flex flex-col'>
             { children }
           </Typography>
         </AccordionDetails>

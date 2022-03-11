@@ -63,7 +63,7 @@ export function TabHeader({ data, dataDropDowns }: IData) {
                   <span className={`text-white text-2xl`}>{tab.value}</span>
                 </div>
           
-                <span className={`border-white text-sm`}>{tab.title}</span>
+                <span style={{ color: '#fff' }} className={`border-white text-sm`}>{tab.title}</span>
               </button>
             </ToolTip>
           ) : (

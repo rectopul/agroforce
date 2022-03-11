@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from 'react'
+import { Fragment, ReactNode } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
@@ -13,7 +13,7 @@ import { BiUser } from 'react-icons/bi';
  
 interface IModelProps {
   name: string;
-  avatar: string;
+  avatar: string | ReactNode;
 }
 
 
@@ -35,7 +35,6 @@ export function ModelHeader({ name, avatar }: IModelProps) {
 
   // only show nav when logged in
   if (!user) return null;
-  
   
   return (
     <>
@@ -62,7 +61,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 </div>
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={avatar} alt={name} className='h-16 w-16
+                <img src={String(avatar)} alt={name} className='h-16 w-16
                   rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                 '/>
               )
@@ -107,7 +106,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     </div>
                   ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={avatar} alt={name} className='h-14 w-14
+                    <img src={String(avatar)} alt={name} className='h-14 w-14
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                     '/>
                   )

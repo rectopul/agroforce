@@ -29,7 +29,7 @@ export function Content({ headerCotent, children }: IContentProps) {
     <>
       <MainHeader
         name={userLogado.name}
-        avatar="/images/person.jpg"
+        avatar={ userLogado.avatar }
 
         headerSelects={
           <Select values={safras} selected={false}/>

@@ -36,16 +36,11 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
           { children }
         </div>
 
-        {
-          !avatar ? (
-            avatar = <FaRegUser className='w-44 text-white' />
-          ) : (
-            <ModelHeader
-              name={name}
-              imagem={String(avatar)}
-            />
-          )
-        }
+        <ModelHeader
+          name={name}
+          avatar={avatar}
+        />
+
       </div>
     </header>
   );
