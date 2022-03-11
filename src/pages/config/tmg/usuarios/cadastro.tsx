@@ -28,6 +28,7 @@ export interface IData {
 }
 
 export default function NovoUsuario({ departments, profiles }: IData) {
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const router = useRouter();
@@ -48,14 +49,9 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       app_login: 0,
       created_by: userLogado.id,
     },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      
-      if (values.password !== values.confirmPassword) {
-        alert("Erro de credenciais");
-        return
-      }
-
+    onSubmit: (values) => {      
+      validateInputs(values);
+      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { console.log('entrou'); return; }
       let ObjProfiles;
       const auxObject = new Array();
 
@@ -80,11 +76,26 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           alert("Usuário criado com sucesso!");
+        } else {
+          alert(response.message);
         }
       })
     },
   });
 
+  function validateInputs(values: any) {
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
+    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= ''; }
+    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= ''; }
+    if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
+    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
+    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
+    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
+
+    if (values.password !== values.confirmPassword) {
+      console.log('aqui');
+    }
+  }
   return (
     <>
       <Head>
@@ -117,7 +128,6 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               <Input 
                 type="text" 
                 placeholder="José Oliveira"
-                required
                 max="40"
                 id="name"
                 name="name"
@@ -288,7 +298,6 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                       <CheckBox
                         key={profile.id}
                         title={profile.name}
-                        id="profiles.id"
                         name="profiles"
                         onChange={formik.handleChange}
                         value={profile.id}
@@ -305,6 +314,15 @@ export default function NovoUsuario({ departments, profiles }: IData) {
             justify-center
             mt-10
           ">
+              <div className="h-10">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                onClick={() => {router.push('/config/tmg/usuarios/')}}
+              />
+            </div>
             <div className="w-40">
               <Button 
                 type="submit"
@@ -314,15 +332,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 onClick={() => {}}
               />
             </div>
-            <div className="h-10">
-              <Button 
-                type="submit"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                onClick={() => {router.push('/config/tmg/usuarios/')}}
-              />
-            </div>
+          
           </div>
         </form>
       </Content>
@@ -348,3 +358,5 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   return { props: { departments, profiles } }
 }
+
+

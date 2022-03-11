@@ -47,7 +47,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [filterEndpoint, setFilter] = useState<string | any>(filter);
-  console.log(filterEndpoint)
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -108,7 +108,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={false} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">

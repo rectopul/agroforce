@@ -35,10 +35,149 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   const [orderEmail, setOrderEmail] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
-  
+  const [camposGerenciados, setCamposGerenciados] = useState<any>('avatar,name,email,cpf,tel,status');
+
   const take = 5;
   const total = totalItems;
   const pages = Math.ceil(total / take);
+
+  function colums(camposGerenciados: any) {
+    let ObjetCampos: any = camposGerenciados.split(',');
+    var arrOb: any = [];
+
+    Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'avatar') {
+        arrOb.push({
+          title: "Avatar", 
+          field: "avatar",
+          sorting: false, 
+          width: 0,
+          exports: false,
+          render: (rowData: IUsers) => (
+            !rowData.avatar || rowData.avatar === '' ? (
+              <FaRegUserCircle size={32} />
+              // eslint-disable-next-line @next/next/no-img-element
+              ) : (
+              <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
+            )
+          )
+        });
+      } 
+      if (ObjetCampos[item] == 'name') {
+        arrOb.push({
+          title: (
+            <div className='flex items-center'>
+              { arrowName }
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
+                Nome
+              </button>
+            </div>
+          ),
+          field: "name",
+          sorting: false
+        },);
+      }
+      
+      if (ObjetCampos[item] == 'email') {
+        arrOb.push({
+          title: (
+            <div className='flex items-center'>
+              { arrowEmail }
+              <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
+                E-mail
+              </button>
+            </div>
+          ), 
+          field: "email",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[item] == 'tel') {
+        arrOb.push({ title: "Telefone", field: "tel", sorting: false })
+      }
+      if (ObjetCampos[item] == 'status') {
+        arrOb.push({
+          title: "Status",
+          field: "status",
+          sorting: false,
+          searchable: false,
+          filterPlaceholder: "Filtrar por status",
+          render: (rowData: IUsers) => (
+            rowData.status ? (
+              <div className='h-10 flex'>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<FaRegUserCircle size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-yellow-500"
+                    textColor="white"
+                    href="perfil"
+                  />
+                </div>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<BiEdit size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
+                  <Button 
+                    icon={<FaRegThumbsUp size={16} />}
+                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    bgColor="bg-green-600"
+                    textColor="white"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<FaRegUserCircle size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-yellow-500"
+                    textColor="white"
+                    href="perfil"
+                  />
+                </div>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<BiEdit size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
+                  <Button 
+                    icon={<FaRegThumbsDown size={16} />}
+                    onClick={() => handleStatusUser(
+                      rowData.id, !rowData.status
+                    )}
+                    bgColor="bg-red-800"
+                    textColor="white"
+                  />
+                </div>
+              </div>
+            )
+          ),
+        })
+      }
+    });
+    return arrOb;
+  }
 
   function handleStatusUser(id: number, status: any): void {
     if (status) {
@@ -75,14 +214,13 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     }
 
     if (filterAplication && typeof(filterAplication) != undefined) {
-      console.log("APLICATION = ", filterAplication)
       if (typeOrder != '') {
         parametersFilter = filterAplication + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filterAplication;
       }
     } else {
-      if (typeOrder != ''){
+      if (typeOrder != '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filterAplication;
@@ -121,126 +259,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     }
   };
 
-  const columns = [
-    {
-      title: "Avatar", 
-      field: "avatar",
-      sorting: false, 
-      width: 0,
-      exports: false,
-      render: (rowData: IUsers) => (
-        !rowData.avatar || rowData.avatar === '' ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
-          ) : (
-          <FaRegUserCircle size={32} />
-        )
-      )
-    },
-    {
-      title: (
-        <div className='flex items-center'>
-          { arrowName }
-          <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-            Nome
-          </button>
-        </div>
-      ),
-      field: "name",
-      sorting: false
-    },
-    {
-      title: (
-        <div className='flex items-center'>
-          { arrowEmail }
-          <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
-            E-mail
-          </button>
-        </div>
-      ), 
-      field: "email",
-      sorting: false
-    },
-    { title: "Telefone", field: "tel", sorting: false },
-    {
-      title: "Status",
-      field: "status",
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: "Filtrar por status",
-      render: (rowData: IUsers) => (
-        rowData.status ? (
-          <div className='h-10 flex'>
-            <div className="
-              h-10
-            ">
-              <Button 
-                icon={<FaRegUserCircle size={16} />}
-                onClick={() =>{}}
-                bgColor="bg-yellow-500"
-                textColor="white"
-                href="perfil"
-              />
-            </div>
-            <div className="
-              h-10
-            ">
-              <Button 
-                icon={<BiEdit size={16} />}
-                onClick={() =>{}}
-                bgColor="bg-blue-600"
-                textColor="white"
-                href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
-              />
-            </div>
-            <div>
-              <Button 
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={() => handleStatusUser(rowData.id, !rowData.status)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className='h-10 flex'>
-            <div className="
-              h-10
-            ">
-              <Button 
-                icon={<FaRegUserCircle size={16} />}
-                onClick={() =>{}}
-                bgColor="bg-yellow-500"
-                textColor="white"
-                href="perfil"
-              />
-            </div>
-            <div className="
-              h-10
-            ">
-              <Button 
-                icon={<BiEdit size={16} />}
-                onClick={() =>{}}
-                bgColor="bg-blue-600"
-                textColor="white"
-                href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
-              />
-            </div>
-            <div>
-              <Button 
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={() => handleStatusUser(
-                  rowData.id, !rowData.status
-                )}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        )
-      ),
-    },
-  ];
+  const columns = colums(camposGerenciados);
 
   function handleTotalPages() {
     if (currentPage < 0) {
