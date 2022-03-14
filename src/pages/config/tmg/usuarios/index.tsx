@@ -89,7 +89,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
           gap-8
         ">
           <AccordionFilter title="Filtrar usuários">
-            <div className='flex w-full gap-2'>
+            <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
                   w-full

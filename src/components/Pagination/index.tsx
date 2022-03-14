@@ -220,7 +220,6 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   function handleOrderEmail(column: string, order: string | any): void {
     let typeOrder: any; 
     let parametersFilter: any;
-    console.log(column, "coluns")
     if (order === 1) {
       typeOrder = 'asc';
     } else if (order === 2) {
@@ -300,26 +299,31 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   };
 
   const downloadExcel = () => {
-    const newData = tableData.map(row => {
-      delete row.avatar
-      return row
-    });
-    const workSheet = XLSX.utils.json_to_sheet(newData);
-    const workBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+    userService.getAll(filterAplication).then((response) => {
+      if (response.status == 200) {
+        const newData = response.response.map((row: { avatar: any; }) => {
+          delete row.avatar
+          return row
+        });
 
-    // Buffer
-    let buf = XLSX.write(workBook, {
-      bookType: "csv", //xlsx
-      type: "buffer",
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+    
+        // Buffer
+        let buf = XLSX.write(workBook, {
+          bookType: "csv", //xlsx
+          type: "buffer",
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: "csv", //xlsx
+          type: "binary",
+        });
+        // Download
+        XLSX.writeFile(workBook, "Usuários.csv");
+      }
     });
-    // Binary
-    XLSX.write(workBook, {
-      bookType: "csv", //xlsx
-      type: "binary",
-    });
-    // Download
-    XLSX.writeFile(workBook, "Usuários.csv");
   };
   
   useEffect(() => {
@@ -372,14 +376,18 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
             <div className='h-full flex items-center gap-2
             '>
               <div className="border-solid border-2 border-blue-600 rounded">
-                <AccordionFilter title='Gerenciar Campos'>
-                  <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} />
-                  <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} />
-                  <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} />
-                  <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} />
-                  <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} />
-                  <Button   value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                </AccordionFilter>
+                <div className="w-64">
+                  <AccordionFilter title='Gerenciar Campos'>
+                    <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} />
+                    <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} />
+                    <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} />
+                    <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} />
+                    <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} />
+                    <div className="h-8 mt-2">
+                    <Button   value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
+                    </div>
+                  </AccordionFilter>
+                </div>
               </div>
 
               <div className='h-12 flex items-center justify-center w-full' style={{ zIndex: 99999 }}>
