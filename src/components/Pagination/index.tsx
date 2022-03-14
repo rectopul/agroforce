@@ -185,15 +185,11 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
-        if (i !+ els.length) {
-          selecionados += els[i].value + ',';
-        } else {
-          selecionados += els[i].value;
-        }
+        selecionados += els[i].value + ',';
       }
     }                           
-    setCamposGerenciados(selecionados)
-  }
+    setCamposGerenciados(selecionados);
+  };
 
   function handleStatusUser(id: number, status: any): void {
     if (status) {
@@ -299,6 +295,12 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   };
 
   const downloadExcel = () => {
+    var totalString = camposGerenciados.length;
+    let campos = camposGerenciados.substr(0, totalString- 1)
+    if (filterAplication) {
+      filterAplication += `&paramSelect=${campos}`;
+    }
+    
     userService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
