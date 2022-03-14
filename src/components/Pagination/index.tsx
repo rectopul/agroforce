@@ -301,9 +301,16 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   const downloadExcel = () => {
     userService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; }) => {
-          delete row.avatar
-          return row
+        const newData = response.response.map((row: { avatar: any; status: any }) => {
+          delete row.avatar;
+
+          if (row.status === 0) {
+            row.status = "Inativo";
+          } else {
+            row.status = "Ativo";
+          }
+
+          return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -384,13 +391,13 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
                     <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} />
                     <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} />
                     <div className="h-8 mt-2">
-                    <Button   value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
+                    <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
                     </div>
                   </AccordionFilter>
                 </div>
               </div>
 
-              <div className='h-12 flex items-center justify-center w-full' style={{ zIndex: 99999 }}>
+              <div className='h-12 flex items-center justify-center w-full'>
                <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
               </div>
             </div>
