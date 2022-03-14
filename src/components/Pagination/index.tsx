@@ -180,6 +180,21 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
     return arrOb;
   };
 
+  function getValuesComluns() {
+    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var selecionados = '';
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].checked) {
+        if (i !+ els.length) {
+          selecionados += els[i].value + ',';
+        } else {
+          selecionados += els[i].value;
+        }
+      }
+    }                           
+    setCamposGerenciados(selecionados)
+  }
+
   function handleStatusUser(id: number, status: any): void {
     if (status) {
       status = 1;
@@ -357,12 +372,14 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
             <div className='h-full flex items-center gap-2
             '>
               <div className="border-solid border-2 border-blue-600 rounded">
-              <AccordionFilter title='Organizar: '>
-                <CheckBox title='Nome' value={1} />
-                <CheckBox title='E-mail' value={2} />
-                <CheckBox title='Telefone' value={3} />
-                <CheckBox title='Status' value={4} />
-              </AccordionFilter>
+                <AccordionFilter title='Gerenciar Campos'>
+                  <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} />
+                  <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} />
+                  <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} />
+                  <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} />
+                  <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} />
+                  <Button   value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
+                </AccordionFilter>
               </div>
 
               <div className='h-12 flex items-center justify-center w-full' style={{ zIndex: 99999 }}>
