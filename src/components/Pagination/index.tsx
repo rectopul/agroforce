@@ -28,13 +28,9 @@ interface ITable {
   data: IUsers[];
   totalItems: Number | any;
   filterAplication: object | any;
-<<<<<<< HEAD
-  itensPerPage: number | any;
 
   genarates: IGenarateProps[];
-=======
   itensPerPage: number | undefined;
->>>>>>> 342ef24a328b2cbb1a311c63f77de20581d92dec
 }
 
 interface IGenarateProps {
@@ -375,8 +371,9 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     if (!result)  return;
     
     const items = Array.from(genaratesProps);
-    const [reorderedItem] = items.slice(result.source.index, 1);
-    items.slice(result.destination?.index, Number(reorderedItem));
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
 
     setGenaratesProps(items);
   };

@@ -28,8 +28,9 @@ export default function Teste({data}: IData) {
     if (!result)  return;
     
     const items = Array.from(characters);
-    const [reorderedItem] = items.slice(result.source.index, 1);
-    items.slice(result.destination?.index, Number(reorderedItem));
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
 
     setCharacters(items);
   }
