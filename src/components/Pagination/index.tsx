@@ -7,7 +7,7 @@ import { FiUserPlus } from 'react-icons/fi';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 
-import { userService } from "src/services";
+import { userService, userPreferencesService } from "src/services";
 
 import { AccordionFilter, Button } from '../index';
 import { RiFileExcel2Line } from 'react-icons/ri';
@@ -27,18 +27,21 @@ interface ITable {
   data: IUsers[];
   totalItems: Number | any;
   filterAplication: object | any;
+  itensPerPage: number | any;
 }
 
-export const TablePagination = ({ data, totalItems, filterAplication }: ITable) => {
+export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage }: ITable) => {
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);  
+  const preferences = userLogado.preferences.usuario;
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   const [orderEmail, setOrderEmail] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
-  const [camposGerenciados, setCamposGerenciados] = useState<any>('avatar,name,email,cpf,tel,status');
-
-  const take = 5;
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  
+  const take = itensPerPage;
   const total = totalItems;
   const pages = Math.ceil(total / take);
 
@@ -187,7 +190,12 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    }                           
+    } 
+    var totalString = selecionados.length;
+    let campos = selecionados.substr(0, totalString- 1)
+    userLogado.preferences.usuario = {id: preferences.id, user_id: preferences.user_id, table_preferences: campos};
+    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    localStorage.setItem('user', JSON.stringify(userLogado));
     setCamposGerenciados(selecionados);
   };
 
@@ -238,7 +246,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
       }
     }
 
-    userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
+    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setTableData(response.response)
       }
@@ -281,6 +289,7 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
   };
 
   async function handlePagination() {
+    alert(take)
     let skip = currentPage * take;
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
@@ -387,11 +396,11 @@ export const TablePagination = ({ data, totalItems, filterAplication }: ITable) 
               <div className="border-solid border-2 border-blue-600 rounded">
                 <div className="w-64">
                   <AccordionFilter title='Gerenciar Campos'>
-                    <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} />
-                    <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} />
-                    <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} />
-                    <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} />
-                    <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} />
+                    <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} defaultChecked={camposGerenciados.includes('avatar')} />
+                    <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} defaultChecked={camposGerenciados.includes('name')} />
+                    <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} defaultChecked={camposGerenciados.includes('email')} />
+                    <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} defaultChecked={camposGerenciados.includes('tel')} />
+                    <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} defaultChecked={camposGerenciados.includes('status')} />
                     <div className="h-8 mt-2">
                     <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
                     </div>

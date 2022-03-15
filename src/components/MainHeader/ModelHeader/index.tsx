@@ -57,7 +57,9 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   flex items-center justify-center
                   rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                 '>
-                  <BiUser color='#FFF' size={32} />
+                   <img src='/images/logo-agro-branco.png' alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
                 </div>
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -102,7 +104,9 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                       flex items-center justify-center
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-gray-700
                     '>
-                      <BiUser color='#374151' size={32} />
+                      <img src='/images/logo-agro-escuro.png' alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
                     </div>
                   ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */

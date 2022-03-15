@@ -1,7 +1,6 @@
 import { ReactNode, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BsCheckLg } from "react-icons/bs";
 import { BiFilterAlt } from "react-icons/bi";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
@@ -19,6 +18,7 @@ import {
 } from "../../../../components";
 
 import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
 
 interface IUsers {
   id: number,
@@ -34,6 +34,7 @@ interface Idata {
   allUsers: IUsers[];
   totalItems: Number;
   filter: string | any;
+  itensPerPage: number | any;
 }
 
 interface IFilter{
@@ -43,7 +44,7 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export default function Listagem({ allUsers, totalItems, filter }: Idata) {
+export default function Listagem({ allUsers, totalItems, filter, itensPerPage}: Idata) {
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [filterEndpoint, setFilter] = useState<string | any>(filter);
@@ -57,7 +58,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
     },
     onSubmit: (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      userService.getAll(parametersFilter + "&skip=0&take=5").then((response) => {
+      userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           setTotaItems(response.total)
           setFilter(parametersFilter)
@@ -140,7 +141,7 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <TablePagination data={users} totalItems={itemsTotal} filterAplication={filterEndpoint} />
+            <TablePagination data={users} totalItems={itemsTotal} filterAplication={filterEndpoint} itensPerPage={itensPerPage} />
           </div>
         </main>
       </Content>
@@ -149,14 +150,16 @@ export default function Listagem({ allUsers, totalItems, filter }: Idata) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
+  const PreferencesControllers = new UserPreferenceController();
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  let param = "skip=0&take=5&filterStatus=1";
+
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filter = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -165,7 +168,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const user = await fetch(urlParameters.toString(), requestOptions);
   let Response = await user.json();
-
+  
   let allUsers = Response.response;
   let totalItems = Response.total;
 
@@ -173,6 +176,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     props: {
       allUsers,
       totalItems,
+      itensPerPage,
       filter
     },
   }
