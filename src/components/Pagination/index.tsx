@@ -28,9 +28,13 @@ interface ITable {
   data: IUsers[];
   totalItems: Number | any;
   filterAplication: object | any;
+<<<<<<< HEAD
   itensPerPage: number | any;
 
   genarates: IGenarateProps[];
+=======
+  itensPerPage: number | undefined;
+>>>>>>> 342ef24a328b2cbb1a311c63f77de20581d92dec
 }
 
 interface IGenarateProps {
@@ -58,9 +62,9 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]); // se for vim do banco(dinâmico)
   
-  const take = itensPerPage;
+  const take: number | undefined = itensPerPage;
   const total = totalItems;
-  const pages = Math.ceil(total / take);
+  const pages = Math.ceil(total / Number(take));
 
   // const genarateProps: IGenarateProps[] = [
   //   { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
@@ -222,7 +226,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
-    setCamposGerenciados(selecionados);
+    setCamposGerenciados(campos);
   };
 
   function handleStatusUser(id: number, status: any): void {
@@ -315,7 +319,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   };
 
   async function handlePagination() {
-    let skip = currentPage * take;
+    let skip = currentPage * Number(take);
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
     if (filterAplication) {
@@ -329,10 +333,8 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   };
 
   const downloadExcel = () => {
-    var totalString = camposGerenciados.length;
-    let campos = camposGerenciados.substr(0, totalString- 1)
     if (filterAplication) {
-      filterAplication += `&paramSelect=${campos}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     userService.getAll(filterAplication).then((response) => {
@@ -394,7 +396,10 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
         headerStyle: {
           zIndex: 20
         },
-        rowStyle: { background: '#f9fafb'}
+        rowStyle: { background: '#f9fafb'},
+        search: false,
+        filtering: false,
+        pageSize: itensPerPage
       }}
       components={{
         Toolbar: () => (
