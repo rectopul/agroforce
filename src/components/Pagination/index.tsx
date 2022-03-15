@@ -37,7 +37,6 @@ interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
-  defaultChecked: () => boolean | undefined;
 }
 
 export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage, genarates }: ITable) => {
@@ -56,19 +55,14 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
     { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
-  ]); // se for vim do banco(dinâmico)
+  ]);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   
   const take: number | undefined = itensPerPage;
   const total = totalItems;
   const pages = Math.ceil(total / Number(take));
 
-  // const genarateProps: IGenarateProps[] = [
-  //   { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
-  //   { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-  //   { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
-  //   { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
-  //   { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
-  // ];
+  const columns = colums(camposGerenciados);
 
   function colums(camposGerenciados: any) {
     let ObjetCampos: any = camposGerenciados.split(',');
@@ -222,6 +216,8 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
+    setStatusAccordion(false);
+
     setCamposGerenciados(campos);
   };
 
@@ -304,8 +300,6 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     }
   };
 
-  const columns = colums(camposGerenciados);
-
   function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -368,6 +362,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   };
 
   function handleOnDragEnd(result: DropResult) {
+    setStatusAccordion(true);
     if (!result)  return;
     
     const items = Array.from(genaratesProps);
@@ -430,7 +425,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
             '>
               <div className="border-solid border-2 border-blue-600 rounded">
                 <div className="w-64">
-                  <AccordionFilter title='Gerenciar Campos'>
+                  <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                     <DragDropContext onDragEnd={handleOnDragEnd}>
                       <Droppable droppableId='characters'>
                         {
@@ -445,7 +440,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
                                         name={genarate.name} 
                                         title={genarate.title?.toString()} 
                                         value={genarate.value} 
-                                        defaultChecked={genarate.defaultChecked()}
+                                        defaultChecked={camposGerenciados.includes(genarate.value)}
                                       />
                                     </li>
                                   )}
