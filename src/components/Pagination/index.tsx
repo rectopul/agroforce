@@ -1,5 +1,6 @@
 import { useEffect, useState  } from 'react';
 import MaterialTable from 'material-table';
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from 'react-icons/fa';
 import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai';
 import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
@@ -28,9 +29,18 @@ interface ITable {
   totalItems: Number | any;
   filterAplication: object | any;
   itensPerPage: number | any;
+
+  genarates: IGenarateProps[];
 }
 
-export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage }: ITable) => {
+interface IGenarateProps {
+  name: string | undefined;
+  title:  string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
+  defaultChecked: () => boolean | undefined;
+}
+
+export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage, genarates }: ITable) => {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);  
   const preferences = userLogado.preferences.usuario;
   const [tableData, setTableData] = useState<IUsers[]>(() => data);
@@ -40,10 +50,25 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
+    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
+    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
+    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
+  ]); // se for vim do banco(dinâmico)
   
   const take = itensPerPage;
   const total = totalItems;
   const pages = Math.ceil(total / take);
+
+  // const genarateProps: IGenarateProps[] = [
+  //   { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
+  //   { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+  //   { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
+  //   { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
+  //   { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
+  // ];
 
   function colums(camposGerenciados: any) {
     let ObjetCampos: any = camposGerenciados.split(',');
@@ -196,6 +221,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
     userLogado.preferences.usuario = {id: preferences.id, user_id: preferences.user_id, table_preferences: campos};
     userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
+
     setCamposGerenciados(selecionados);
   };
 
@@ -289,7 +315,6 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   };
 
   async function handlePagination() {
-    alert(take)
     let skip = currentPage * take;
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
@@ -343,6 +368,16 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
       }
     });
   };
+
+  function handleOnDragEnd(result: DropResult) {
+    if (!result)  return;
+    
+    const items = Array.from(genaratesProps);
+    const [reorderedItem] = items.slice(result.source.index, 1);
+    items.slice(result.destination?.index, Number(reorderedItem));
+
+    setGenaratesProps(items);
+  };
   
   useEffect(() => {
     handlePagination();
@@ -359,9 +394,7 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
         headerStyle: {
           zIndex: 20
         },
-        rowStyle: { background: '#f9fafb', zIndex: 20 },
-        search: false,
-        filtering: false
+        rowStyle: { background: '#f9fafb'}
       }}
       components={{
         Toolbar: () => (
@@ -396,14 +429,36 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
               <div className="border-solid border-2 border-blue-600 rounded">
                 <div className="w-64">
                   <AccordionFilter title='Gerenciar Campos'>
-                    <CheckBox name="CamposGerenciados[]" title='Avatar' value={'avatar'} defaultChecked={camposGerenciados.includes('avatar')} />
-                    <CheckBox name="CamposGerenciados[]" title='Nome' value={'name'} defaultChecked={camposGerenciados.includes('name')} />
-                    <CheckBox name="CamposGerenciados[]" title='E-mail' value={'email'} defaultChecked={camposGerenciados.includes('email')} />
-                    <CheckBox name="CamposGerenciados[]" title='Telefone' value={'tel'} defaultChecked={camposGerenciados.includes('tel')} />
-                    <CheckBox name="CamposGerenciados[]" title='Status' value={'status'} defaultChecked={camposGerenciados.includes('status')} />
-                    <div className="h-8 mt-2">
-                    <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                    </div>
+                    <DragDropContext onDragEnd={handleOnDragEnd}>
+                      <Droppable droppableId='characters'>
+                        {
+                          (provided) => (
+                            <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                              {
+                                genaratesProps.map((genarate, index) => (
+                                <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                  {(provided) => (
+                                    <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                      <CheckBox 
+                                        name={genarate.name} 
+                                        title={genarate.title?.toString()} 
+                                        value={genarate.value} 
+                                        defaultChecked={genarate.defaultChecked()}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                                ))
+                              }
+                              { provided.placeholder }
+                              <div className="h-8 mt-2">
+                                <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
+                              </div>
+                            </ul>
+                          )
+                        }
+                      </Droppable>
+                    </DragDropContext>
                   </AccordionFilter>
                 </div>
               </div>
