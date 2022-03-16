@@ -10,6 +10,7 @@ type ITabProps = {
 type IDropDownProps = {
   labelDropDown: string;
   hrefDropDown: string;
+  iconDropDown: string | ReactNode;
 }
 
 type IData = {
@@ -46,7 +47,11 @@ export function TabHeader({ data, dataDropDowns }: IData) {
           tab.status ? (
             <ToolTip contentMenu={
               dataDropDowns.map((dropDown, index) => (
-                <DropDown key={index} label={dropDown.labelDropDown} href={dropDown.hrefDropDown} />
+                <DropDown key={index}
+                 label={dropDown.labelDropDown} 
+                 href={dropDown.hrefDropDown} 
+                 icon={dropDown.iconDropDown} 
+                />
               ))
             }>
               <button

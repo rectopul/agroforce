@@ -1,4 +1,7 @@
+import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
+import { MdDateRange } from "react-icons/md";
+import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
 const tabs = [
   { title: 'TMG', value: <BsCheckLg />, status: false },
@@ -11,10 +14,10 @@ const tabs = [
 ];
 
 const tmgDropDown =  [
-  {labelDropDown: 'Usuário', hrefDropDown: 'http://localhost:3000/config/tmg/usuarios'},
-  {labelDropDown: 'Safra', hrefDropDown: 'http://localhost:3000/config/tmg/safra'},
-  {labelDropDown: 'Portfólio', hrefDropDown: 'http://localhost:3000/config/tmg/portfolio'},
-  {labelDropDown: 'Cultura', hrefDropDown: 'http://localhost:3000/config/tmg/cultura'},
+  {labelDropDown: 'Usuário', hrefDropDown: 'http://localhost:3000/config/tmg/usuarios', iconDropDown: <BiUser/> },
+  {labelDropDown: 'Safra', hrefDropDown: 'http://localhost:3000/config/tmg/safra', iconDropDown: <MdDateRange/> },
+  {labelDropDown: 'Portfólio', hrefDropDown: 'http://localhost:3000/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
+  {labelDropDown: 'Cultura', hrefDropDown: 'http://localhost:3000/config/tmg/cultura', iconDropDown: <RiSeedlingLine/> },
 ];
 
 const ensaiosDropDown =  [

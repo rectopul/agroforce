@@ -285,13 +285,43 @@ export const TablePagination = ({ data, totalItems, filterAplication, itensPerPa
   };
 
   function handleOrderName(column: string, order: string | any): void {
+    let typeOrder: any; 
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filterAplication && typeof(filterAplication) != undefined) {
+      if (typeOrder != '') {
+        parametersFilter = filterAplication + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filterAplication;
+      }
+    } else {
+      if (typeOrder != '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filterAplication;
+      }
+    }
+
+    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
+        setTableData(response.response)
+      }
+    });
+    
     if (orderName === 2) {
       setOrderName(0);
-      setArrowName(<AiOutlineArrowUp />);
+      setArrowName(<AiOutlineArrowDown />);
     } else {
       setOrderName(orderName + 1);
-      if (order === 1) {
-        setArrowName(<AiOutlineArrowDown />);
+      if (orderName === 1) {
+        setArrowName(<AiOutlineArrowUp />);
       } else {
         setArrowName('');
       }
