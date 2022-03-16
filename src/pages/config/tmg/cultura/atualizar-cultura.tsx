@@ -14,9 +14,10 @@ import {
   TabHeader 
 } from "../../../../components";
 
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../utils/dropdown';
 
 export default function Cultura({cultureEdit}:any) {
+  const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 

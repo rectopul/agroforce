@@ -10,6 +10,7 @@ import { MdOutlineExitToApp } from "react-icons/md";
 import { userService } from "../../../services";
 import { useState, useEffect } from 'react';
 import { BiUser } from 'react-icons/bi';
+import { Observer } from 'react-hook-form/dist/utils/createSubject';
  
 interface IModelProps {
   name: string;
@@ -22,7 +23,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
     return classes.filter(Boolean).join(' ')
   }
   
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState <Observer<any> | undefined>();
 
   useEffect(() => {
       const subscription = userService.user.subscribe(x => setUser(x));

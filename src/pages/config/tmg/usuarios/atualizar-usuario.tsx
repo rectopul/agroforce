@@ -6,11 +6,9 @@ import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
-import { 
-  IDepartment,
-  IProfile, 
-  IUsers
-} from "../../props";
+import  IProfile  from "../../props/profileDTO";
+import  IUsers  from "../../props/userDTO";
+import  IDepartment  from "../../props/departmentDTO";
 
 import { 
   Button,
@@ -22,8 +20,7 @@ import {
   TabHeader
 } from "../../../../components";
 
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
-import { Alert } from "@mui/material";
+import  * as ITabs from '../../../../utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -31,7 +28,7 @@ export interface IData {
 }
 
 export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
-  
+  const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
 

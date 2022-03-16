@@ -11,10 +11,11 @@ import {
   TabHeader 
 } from "../../../../components";
 
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../utils/dropdown';
 
 export default function Cultura() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const { tmgDropDown, tabs } = ITabs.default;
 
   const formik = useFormik({
     initialValues: {

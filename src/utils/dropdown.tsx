@@ -53,7 +53,7 @@ const configPlanilhasDropDown =  [
   {labelDropDown: 'Teste', hrefDropDown: '#'},
 ];
 
-export { 
+export default { 
   tabs, 
   tmgDropDown,
   ensaiosDropDown,
