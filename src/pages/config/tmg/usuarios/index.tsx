@@ -109,7 +109,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     { id: 0, name: 'Inativos'},
   ];
 
-  function colums(camposGerenciados: any) {
+  function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
 
@@ -387,7 +387,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     setGenaratesProps(items);
   };
 
-  const downloadExcel = () => {
+  const downloadExcel = (): void => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
@@ -426,7 +426,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     });
   };
 
-  function handleTotalPages() {
+  function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
@@ -434,7 +434,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     }
   };
 
-  async function handlePagination() {
+  async function handlePagination(): Promise<void> {
     let skip = currentPage * Number(take);
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
@@ -522,8 +522,6 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            {/* <TablePagination data={users} totalItems={itemsTotal} filterAplication={filterEndpoint} itensPerPage={itensPerPage} /> */}
-
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -611,7 +609,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     </div>
                   </div>
                 ),
-                Pagination: props => (
+                Pagination: (props) => (
                   <>
                   <div
                     className="flex
