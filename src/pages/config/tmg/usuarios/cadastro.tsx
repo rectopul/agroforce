@@ -7,11 +7,9 @@ import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
-import {
-  IUsers,
-  IProfile,
-  IDepartment,
-} from '../../props';
+import  IProfile  from "../../props/profileDTO";
+import  IUsers  from "../../props/userDTO";
+import  IDepartment  from "../../props/departmentDTO";
 
 import {
   TabHeader,
@@ -22,14 +20,14 @@ import {
   CheckBox
 } from "../../../../components";
 
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import * as ITabs from '../../../../utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
 }
 
 export default function NovoUsuario({ departments, profiles }: IData) {
-
+  const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const router = useRouter();

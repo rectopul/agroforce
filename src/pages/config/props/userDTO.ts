@@ -1,6 +1,6 @@
-import { IProfile } from './index';
+import IProfile from './profileDTO';
 
-export interface IUsers {
+export default interface IUsers {
   id?: number;
   name: string;
   email: string;

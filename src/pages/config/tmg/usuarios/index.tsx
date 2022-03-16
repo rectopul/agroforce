@@ -16,8 +16,7 @@ import {
   TablePagination, 
   AccordionFilter
 } from "../../../../components";
-
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 
 interface IUsers {
@@ -48,6 +47,7 @@ export default function Listagem({ allUsers, totalItems, filter, itensPerPage}: 
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [filterEndpoint, setFilter] = useState<string | any>(filter);
+  const { tmgDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {
