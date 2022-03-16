@@ -241,7 +241,7 @@ export class UserController {
             } 
 
             if (data.cpf) {
-                if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+                if(!functionsUtils.validationCPF(data.cpf)) return {message: 'CPF invalído'};
                 parameters.cpf = data.cpf;
             }
 

@@ -17,6 +17,8 @@ export class SafraController {
         const parameters: object | any = new Object();
         let take; 
         let skip;
+        let orderBy: object | any;
+        let select: any = [];
 
         if (options.status) {
             if (typeof(options.status) === 'string') {
@@ -66,7 +68,7 @@ export class SafraController {
             }
         }
         
-        let response: object | any = await this.safraRepository.findAll(parameters, take , skip );
+        let response: object | any = await this.safraRepository.findAll(parameters, select, take , skip, orderBy);
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {

@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
@@ -75,9 +76,9 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         created_by: values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          alert("Usuário criado com sucesso!");
+          Swal.fire('Usuário cadastrado com sucesso!')
         } else {
-          alert(response.message);
+          Swal.fire(response.message)
         }
       })
     },
@@ -93,7 +94,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
     if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
 
     if (values.password !== values.confirmPassword) {
-      console.log('aqui');
+        Swal.fire("erro de credenciais")         
     }
   }
   return (

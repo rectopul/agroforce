@@ -6,7 +6,12 @@ export class CulturaController {
 
     @Get()
     getAllCulture() {
-        let response =  this.culturaRepository.findAll();
+        const parameters: object | any = new Object();
+        let take; 
+        let skip;
+        let orderBy: object | any;
+        let select: any = [];
+        let response =  this.culturaRepository.findAll(parameters, select, take, skip, orderBy);
         return response;        
     }
 

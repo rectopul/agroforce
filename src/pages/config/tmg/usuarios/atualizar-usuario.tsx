@@ -1,8 +1,8 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
-import { BsCheckLg } from "react-icons/bs";
 import getConfig from 'next/config';
+import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
@@ -23,6 +23,7 @@ import {
 } from "../../../../components";
 
 import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import { Alert } from "@mui/material";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -52,10 +53,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       created_by: userLogado.id,
     },
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      
       if (values.password !== values.confirmPassword) {
-        alert("Erro de credenciais");
+        Swal.fire("erro de credenciais")     
         return
       }
 
@@ -83,9 +82,10 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
         created_by: values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          alert("Usuário atualizado com sucesso!");
-        } else {
+          Swal.fire('Usuário atualizado com sucesso!')
 
+        } else {
+          Swal.fire(response.message)
         }
       })
     },
@@ -181,7 +181,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <Input 
                 disabled
                 type="text"
-                value={userLogado.id}
+                value={userEdit[0].id}
                 style={{ background: '#e5e7eb' }}
               />
             </div>
@@ -355,11 +355,11 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             flex
             justify-center
             mt-10
-          ">
+          ">  
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {}}
@@ -372,10 +372,10 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const  token  =  req.cookies.token;
+  const  token  =  context.req.cookies.token;
   // Fetch data from external API
   const requestOptions: object | any = {
     method: 'GET',
@@ -384,7 +384,7 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   };
   const resD = await fetch(`${baseUrl}/departament`, requestOptions)
   const resP = await fetch(`${baseUrl}/profile`, requestOptions)
-  const resU = await fetch(`${baseUrl}/` + 1, requestOptions)
+  const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
   const departments = await resD.json();
   const profiles = await resP.json();
   const userEdit = await resU.json();

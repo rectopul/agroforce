@@ -68,7 +68,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 '/>
               )
             }
-            <span className='w-full text-white text-base'>
+            <span style={{textAlign:'left', marginLeft: '10px'}} className='w-full text-white text-base'>
               { name }
             </span>
           </Menu.Button>

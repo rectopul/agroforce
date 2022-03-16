@@ -28,8 +28,6 @@ interface ITable {
   data: IUsers[];
   totalItems: Number | any;
   filterAplication: object | any;
-
-  genarates: IGenarateProps[];
   itensPerPage: number | undefined;
 }
 
@@ -39,7 +37,7 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 
-export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage, genarates }: ITable) => {
+export const TablePagination = ({ data, totalItems, filterAplication, itensPerPage }: ITable) => {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);  
   const preferences = userLogado.preferences.usuario;
   const [tableData, setTableData] = useState<IUsers[]>(() => data);

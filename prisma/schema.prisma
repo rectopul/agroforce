@@ -66,7 +66,9 @@ model Department {
 
 model Safra {
   id         Int      @id @default(autoincrement())
-  ano       String?  @unique
+  name       String?  @unique
+  ano        String?  @unique
+  safra_principal Int @default(0)
   created_at DateTime @default(now())
   created_by Int
   status     Int      @default(1)
