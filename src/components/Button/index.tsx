@@ -44,7 +44,7 @@ export function Button({
         px-4 
         ${bgColor}
         text-${textColor}
-        font-medium text-xs
+        text-base
         leading-tight
         rounded-lg
         shadow-md
@@ -69,7 +69,7 @@ export function Button({
         px-4 
         ${bgColor}
         text-${textColor}
-        font-medium text-xs
+        text-base
         leading-tight
         rounded-lg
         shadow-md

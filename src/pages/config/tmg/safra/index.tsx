@@ -5,8 +5,7 @@ import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { FiUserPlus } from "react-icons/fi";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 
@@ -358,20 +357,19 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
                     '>
                       <div className='h-12'>
                         <Button 
-                          title="Cadastrar um usuário"
-                          value="Cadastrar um usuário"
+                          title="Cadastrar uma safra"
+                          value="Cadastrar uma safra"
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {}}
-                          href="usuarios/cadastro"
-                          icon={<FiUserPlus />}
+                          href="safra/cadastro"
+                          icon={<MdDateRange size={20} />}
                         />
                       </div>
 
                       <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                      <div className='h-full flex items-center gap-2
-                      '>
+                      <div className='h-full flex items-center gap-2'>
                         <div className="border-solid border-2 border-blue-600 rounded">
                           <div className="w-64">
                             <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
@@ -385,10 +383,10 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
                                           <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                             {(provided) => (
                                               <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                <CheckBox 
-                                                  name={genarate.name} 
-                                                  title={genarate.title?.toString()} 
-                                                  value={genarate.value} 
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
                                                   defaultChecked={managedFields.includes(genarate.value as string)}
                                                 />
                                               </li>
@@ -415,7 +413,7 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
                       </div>
                     </div>
                   ),
-                  Pagination: props => (
+                  Pagination: (props) => (
                     <>
                     <div
                       className="flex

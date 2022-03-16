@@ -453,8 +453,6 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     handleTotalPages();
   }, [currentPage, pages]);
 
-  console.log(filter);
-
   return (
     <>
       <Head>
@@ -558,7 +556,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                         textColor="white"
                         onClick={() => {}}
                         href="usuarios/cadastro"
-                        icon={<FiUserPlus />}
+                        icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
