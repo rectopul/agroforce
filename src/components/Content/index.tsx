@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 import { FaLaptopHouse } from "react-icons/fa";
 
-import { Aside } from "../Aside";
-import { MainHeader } from "../MainHeader";
-import { Select } from "../Select";
+import {
+  Aside,
+  MainHeader,
+  Select
+} from '../../components';
 
 interface IContentProps {
   children: never[] | ReactNode;
@@ -28,7 +30,7 @@ export function Content({ headerCotent, children }: IContentProps) {
     <>
       <MainHeader
         name={userLogado.name}
-        avatar="/images/person.jpg"
+        avatar={ userLogado.avatar }
 
         headerSelects={
           <Select values={safras} selected={false} />

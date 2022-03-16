@@ -1,11 +1,8 @@
-import { userService } from "src/services";
-
-
 export const functionsUtils = {
     validationCPF
 };
 
-function validationCPF(cpf: any) {	
+function validationCPF(cpf: any) {
 	cpf = cpf.replace(/[^\d]+/g,'');	
 	if(cpf == '') return false;	
 	// Elimina CPFs invalidos conhecidos	

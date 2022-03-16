@@ -1,134 +1,100 @@
-import { 
-  ColumnDirective,
-  ColumnsDirective, 
-  GridComponent, 
-  Page, 
-  Inject, 
-  Filter,
-  Group,
-  Grid,
-  Toolbar,
-  PdfExport,
-  ExcelExport,
-  Search,
-  SearchSettingsModel,
-} from '@syncfusion/ej2-react-grids';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import React, { useState } from 'react'
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { useDrag } from 'react-dnd';
 
-import * as React from 'react';
+import { Content, TabHeader } from 'src/components';
 
+import { tabs, dropDowns } from '../../utils/statics/tabs';
 
-interface IGridProps {
-  item: {
-    id: string;
-  }
+interface ITestesProps {
+  id: number;
+  avatar: string;
+  name: string;
+  email?: string;
+  status?: number | boolean;
+  telefone?: string;
 }
 
-export default function Teste() {
-  let grid: Grid | null;
-  const excelExtensio: string = (".xlsx" || ".xlsm" || ".xlsb" || ".xltx");
+interface IData {
+  data: ITestesProps[];
+}
 
-  const toolbarClick = async (args: IGridProps) => {
-    if (grid) {
-      if(args.item.id.includes('pdfexport')) {
-        await grid.pdfExport({
-          fileName: 'Usuarios.pdf',
-          exportType: 'CurrentPage'
-        })
-      } else if(args.item.id.includes('excelexport')) {
-        await grid.excelExport({
-          fileName: `Usuarios${excelExtensio}`,
-          exportType: 'CurrentPage',
-          header: {
-            headerRows: 1,
-            rows: [
-              {
-                cells: [{
-                  colSpan: 6,
-                  value: "TMG Usuários",
-                  style: { fontColor: "#C67878", fontSize: 20, hAlign: 'Center', bold: true,  },
-                }]
-              }
-            ]
-          },
-          footer: {
-            footerRows: 1,
-            rows: [
-              {
-                cells: [{ 
-                  colSpan: 6,
-                  value: "Thank you for your job!",
-                  style: {
-                    hAlign: 'Center', 
-                    bold: true,
-                  } 
-                }]
-              }
-            ]
-          }
-        })
-      }
-    }
-  };
+export default function Teste({data}: IData) { 
+  const [characters, setCharacters] = useState<ITestesProps[]>(() => data);
 
-  const searchOptions: SearchSettingsModel = {
-    fields: ['name', 'email', 'login', 'status'],
-    ignoreCase: true,
-    key: '',
-    operator: 'contains'
-  };
+  function handleOnDragEnd(result: DropResult) {
+    if (!result)  return;
+    
+    const items = Array.from(characters);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
 
-
-
-  let initialGridLoad: boolean = true;
-  function dataBound() {
-    if (initialGridLoad && grid) {
-      initialGridLoad = false;
-      const pager: any = document.getElementsByClassName('e-gridpager');
-      let topElement: any;
-      if (grid.allowGrouping || grid.toolbar) {
-        topElement = grid.allowGrouping ? document.getElementsByClassName('e-groupdroparea') :
-        document.getElementsByClassName('e-toolbar');
-      } else {
-        topElement = document.getElementsByClassName('e-gridheader');
-      }
-      grid.element.insertBefore(pager[0], topElement[0]);
-    }
+    setCharacters(items);
   }
 
-  return(
-   <div style={{ margin: '10%', marginTop: '5%' }}>
-      <GridComponent dataSource={[]}
-        dataBound={dataBound}
-        ref={g => grid = g}
-        allowPaging={true}
-        allowFiltering={true}
-        allowPdfExport={true}
-        allowExcelExport={true}
-        allowGrouping={true}
-        pageSettings={{pageSize: 10, pageSizes: true, enableQueryString: true }}
-        toolbar={['PdfExport', 'ExcelExport', 'Search']}
-        toolbarClick={toolbarClick}
-        searchSettings={searchOptions}
-      >
-        
-        <ColumnsDirective>
-          <ColumnDirective field='id' headerText='ID' width='12' textAlign="Left"/>
-          <ColumnDirective field='name' headerText='Nome' width='100' textAlign="Left"/>
-          <ColumnDirective field='login' headerText='Login' width='100' textAlign="Left"/>
-          <ColumnDirective field='email' headerText='E-mail' width='100' textAlign="Left"/>
-          <ColumnDirective field='telefone' headerText='Telefone' width='100' textAlign="Left"/>
-          <ColumnDirective field='status' headerText='Status' width='100' textAlign="Left"/>
-        </ColumnsDirective>
-        <Inject services={[
-          Page, 
-          Search,
-          Toolbar, 
-          Filter, 
-          Group,
-          PdfExport,
-          ExcelExport
-        ]} />
-      </GridComponent>
-   </div>
-  ) 
-};
+  return (
+    <>
+      <Content   headerCotent={  
+        <TabHeader data={tabs} dataDropDowns={dropDowns} />
+      }>
+        <>
+          <h1>Agroforce - TMG</h1>
+          <DragDropContext onDragEnd={handleOnDragEnd}>
+            <Droppable droppableId='characters'>
+              {
+                (provided) => (
+                  <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                    {
+                      characters.map(({ id, name, avatar  }, index) => (
+                        <Draggable key={id} draggableId={id.toString()} index={index}>
+                          {(provided) => (
+                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                              <div className="w-full h-full">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={avatar} alt={name} />
+                              </div>
+                              <p>{name}</p>
+                            </li>
+                          )}
+                        </Draggable>
+                      ))
+                    }
+                    { provided.placeholder }
+                  </ul>
+                )
+              }
+            </Droppable>
+          </DragDropContext>
+        </>
+      </Content>
+    </>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
+  const  token  =  req.cookies.token;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/testes`;
+
+  const urlParameters: any = new URL(baseUrl);
+
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers:  { Authorization: `Bearer ${token}` }
+  } as RequestInit | undefined;
+
+  const teste = await fetch(urlParameters.toString(), requestOptions);
+  const data = await teste.json();
+
+  console.log(data);
+
+  return {
+    props: {
+      data,
+    },
+  }
+}

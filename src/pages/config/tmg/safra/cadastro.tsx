@@ -8,7 +8,9 @@ import {
   Select, 
   TabHeader,
   Radio
-} from "../../components";
+} from "../../../../components";
+
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 
 interface ISafraProps {
   harvest: string;
@@ -22,10 +24,6 @@ interface ISafraProps {
 export default function Safra() {
   const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
-
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-  ];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
@@ -51,46 +49,9 @@ export default function Safra() {
 
       <Content
         headerCotent={
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
-        <div className="w-full
-          h-20
-          flex
-          items-center
-          gap-2
-          px-5
-          rounded-lg
-          border-b border-blue-600
-          shadow
-          bg-white
-        ">
-          <div className="h-10 w-32">
-            <Button 
-              value="Usuário"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Safra"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Portfólio"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-        </div>
-
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

@@ -27,8 +27,7 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
       <option value="">Selecione...</option>
      {
        values.map((value: string | object | any, index) => {
-        let itemSelected = selected === value.id ? true : false;
-
+         let itemSelected: any = selected == value.id ? 'selected' : '';
          return (
            <option selected={itemSelected} key={index} value={value.id}>{value.name.toString()}</option>
          )

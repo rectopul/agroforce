@@ -12,21 +12,13 @@ import {
   Input, 
   Select, 
   TabHeader 
-} from "../../components";
+} from "../../../../components";
+
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 
 export default function Cultura({cultureEdit}:any) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
-
-  const tabs = [
-    { title: 'TMG', value: <BsCheckLg />, status: true },
-    { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
-    { title: 'LOCAL', value: <BsCheckLg />, status: false  },
-    { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false  },
-    { title: 'NPE', value: <BsCheckLg />, status: false  },
-    { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
-    { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
-  ];
 
   const formik = useFormik({
     initialValues: {
@@ -57,46 +49,9 @@ export default function Cultura({cultureEdit}:any) {
       
       <Content
         headerCotent={
-          <TabHeader data={tabs} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
-
-      <div className=" w-full
-        h-20
-        flex
-        items-center
-        gap-2
-        px-5
-        rounded-lg
-        border-b border-blue-600
-        shadow
-        bg-white
-      ">
-        <div className="h-10 w-32">
-          <Button 
-            value="Usuário"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-        <div className="h-10 w-32">
-          <Button 
-            value="Safra"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-        <div className="h-10 w-32">
-          <Button 
-            value="Portfólio"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-      </div>
 
       <form 
         className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"

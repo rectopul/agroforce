@@ -12,8 +12,14 @@ export class CulturaRepository {
         return Result;
     }
 
-    async findAll () {
-        let Result = await prisma.culture.findMany() .finally(async () => { await prisma.$disconnect() })
+    async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+        let order: object | any;
+        if (orderBy){
+            order = JSON.parse(orderBy);
+        }
+        let count = await prisma.culture.count({ where: where })
+        let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        Result.total = count;
         return Result;
     }
 

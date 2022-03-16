@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from 'react'
+import { Fragment, ReactNode } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
@@ -9,14 +9,15 @@ import { MdOutlineExitToApp } from "react-icons/md";
 
 import { userService } from "../../../services";
 import { useState, useEffect } from 'react';
+import { BiUser } from 'react-icons/bi';
  
 interface IModelProps {
   name: string;
-  imagem: string;
+  avatar: string | ReactNode;
 }
 
 
-export function ModelHeader({ name, imagem: avatar }: IModelProps) {
+export function ModelHeader({ name, avatar }: IModelProps) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
@@ -35,17 +36,14 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
   // only show nav when logged in
   if (!user) return null;
   
-  
   return (
     <>
-      <Menu as="div" className="relative inline-block text-left">
+      <Menu as="div" className="relative inline-block text-left shadow z-50">
         <div>
           <Menu.Button
             type='button'
             className='h-20 w-72
               flex items-center justify-around
-             
-              pl-2
             '
             // rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500
             id="menu-button"
@@ -53,11 +51,24 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
             aria-haspopup="true"
           >
             
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={String(avatar)} alt={name} className='h-16 w-16
-              rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-            '/>
-            <span className='w-full text-white text-base'>
+            {
+              !avatar || avatar === '' ? (
+                <div className='h-16 w-20
+                  flex items-center justify-center
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '>
+                   <img src='/images/logo-agro-branco.png' alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={String(avatar)} alt={name} className='h-16 w-16
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '/>
+              )
+            }
+            <span style={{textAlign:'left', marginLeft: '10px'}} className='w-full text-white text-base'>
               { name }
             </span>
           </Menu.Button>
@@ -85,13 +96,26 @@ export function ModelHeader({ name, imagem: avatar }: IModelProps) {
                 border-r-white
                 border-l-white
                 py-2
+                px-2
               '>
-
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={String(avatar)} alt={name} className='h-14 w-14
-                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-                '/>
-                <strong className='text-xs'>{name}</strong>
+                {
+                  !avatar || avatar === '' ? (
+                    <div className='
+                      flex items-center justify-center
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-gray-700
+                    '>
+                      <img src='/images/logo-agro-escuro.png' alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
+                    </div>
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={String(avatar)} alt={name} className='h-14 w-14
+                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                    '/>
+                  )
+                }
+                <strong className='text-xs text-gray-700'>{name}</strong>
               </div>
 
               <Menu.Item>

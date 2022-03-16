@@ -2,6 +2,8 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
+import { useRouter } from 'next/router';
+import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
@@ -9,7 +11,7 @@ import {
   IUsers,
   IProfile,
   IDepartment,
-} from './props';
+} from '../../props';
 
 import {
   TabHeader,
@@ -18,20 +20,19 @@ import {
   Select,
   Button,
   CheckBox
-} from "../../components";
+} from "../../../../components";
 
+import { tabs, tmgDropDown } from '../../../../utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
 }
 
-// Teste
-import { tabs } from '../../utils/statics/tabs';
-
 export default function NovoUsuario({ departments, profiles }: IData) {
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-
+  const router = useRouter();
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -49,14 +50,9 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       app_login: 0,
       created_by: userLogado.id,
     },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      
-      if (values.password !== values.confirmPassword) {
-        alert("Erro de credenciais");
-        return
-      }
-
+    onSubmit: (values) => {      
+      validateInputs(values);
+      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { console.log('entrou'); return; }
       let ObjProfiles;
       const auxObject = new Array();
 
@@ -80,12 +76,27 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         created_by: values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          alert("Usuário criado com sucesso!");
+          Swal.fire('Usuário cadastrado com sucesso!')
+        } else {
+          Swal.fire(response.message)
         }
       })
     },
   });
 
+  function validateInputs(values: any) {
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
+    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= ''; }
+    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= ''; }
+    if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
+    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
+    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
+    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
+
+    if (values.password !== values.confirmPassword) {
+        Swal.fire("erro de credenciais")         
+    }
+  }
   return (
     <>
       <Head>
@@ -94,73 +105,14 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
 
       <Content headerCotent={
-        <TabHeader data={tabs} />
+        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
       }>
-        
-        <div className="w-full
-          h-20
-          flex
-          items-center
-          gap-2
-          px-5
-          rounded-lg
-          border-b border-blue-600
-          shadow
-          bg-white
-        ">
-          <div className="h-10 w-32">
-            <Button 
-              value="Usuário"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Safra"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-          <div className="h-10 w-32">
-            <Button 
-              value="Portfólio"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
-          </div>
-        </div>
-
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
             <h1 className="text-2xl">Novo usuário</h1>
-            <div className="flex flex-col">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de perfil
-              </label>
-              <div className="flex gap-6 border-b border-gray-300">
-                {
-                  profiles.map((profile) => (
-                    <>
-                      <CheckBox
-                        key={profile.id}
-                        title={profile.name}
-                        id="profiles.id"
-                        name="profiles"
-                        onChange={formik.handleChange}
-                        value={profile.id}
-                      />
-                    </>
-                  ))
-                }
-              </div>
-            </div>
           </div>
 
           <div className="w-full
@@ -177,7 +129,6 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               <Input 
                 type="text" 
                 placeholder="José Oliveira"
-                required
                 max="40"
                 id="name"
                 name="name"
@@ -336,12 +287,43 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </div>
             </div>
           </div>
+          <div className="w-full flex justify-between items-start">
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Tipo de perfil
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  profiles.map((profile) => (
+                    <>
+                      <CheckBox
+                        key={profile.id}
+                        title={profile.name}
+                        name="profiles"
+                        onChange={formik.handleChange}
+                        value={profile.id}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
 
           <div className="h-10 w-full
             flex
             justify-center
             mt-10
           ">
+              <div className="h-10">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                onClick={() => {router.push('/config/tmg/usuarios/')}}
+              />
+            </div>
             <div className="w-40">
               <Button 
                 type="submit"
@@ -351,6 +333,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 onClick={() => {}}
               />
             </div>
+          
           </div>
         </form>
       </Content>
@@ -376,3 +359,5 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   return { props: { departments, profiles } }
 }
+
+

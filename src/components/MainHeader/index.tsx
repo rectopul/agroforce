@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { FaRegUser } from 'react-icons/fa';
 
-import { Select } from '../Select';
 import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {
@@ -37,16 +36,11 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
           { children }
         </div>
 
-        {
-          !avatar ? (
-            avatar = <FaRegUser className='w-44 text-white' />
-          ) : (
-            <ModelHeader
-              name={name}
-              imagem={String(avatar)}
-            />
-          )
-        }
+        <ModelHeader
+          name={name}
+          avatar={avatar}
+        />
+
       </div>
     </header>
   );

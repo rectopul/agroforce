@@ -6,7 +6,7 @@ type IAllPropsAndDataCheckBox = InputHTMLAttributes<HTMLInputElement> & {
 
 export function CheckBox({ title, ...rest }: IAllPropsAndDataCheckBox) {
   return (
-      <label className="w-auto inline-flex items-center">
+      <label className="w-full inline-flex items-center">
         <input
           { ...rest }
           type="checkbox"

@@ -33,13 +33,15 @@ export class SafraRepository {
         return Result;
     }
 
-    async findAll (where: any, take: any, skip: any) {
-        const select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
-        let count = await prisma.safra.count()
-        let Result: any = await prisma.safra.findMany({ select: select, skip: skip, take: take, where: where }) .finally(async () => { await prisma.$disconnect() })
+    async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+        let order: object | any;
+        if (orderBy){
+            order = JSON.parse(orderBy);
+        }
+        let count = await prisma.user.count({ where: where })
+        let Result: object | any = await prisma.safra.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         Result.total = count;
         return Result;
     }
-
 }
 

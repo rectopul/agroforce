@@ -32,9 +32,9 @@ export function Select2({ selected, data, ...rest }: ITypeSelectProps) {
       <option value="">Selecione opções...</option>
      {
        data.map((item, index) => {
-         let itemSelected = selected === item.id ? true : false;
+         let itemSelected: any = selected === item.id ? "selected" : "";
          return (
-           <option selected={itemSelected} key={index}value={item.id}>{item.name}</option>
+           <option {...itemSelected} key={index}value={item.id}>{item.name}</option>
          )
        })
      }

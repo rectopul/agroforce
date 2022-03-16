@@ -20,6 +20,7 @@ export class UserController {
         let take; 
         let skip;
         let orderBy: object | any;
+        let select: any = [];
 
         if (options.filterStatus) {
             if (typeof(options.status) === 'string') {
@@ -36,6 +37,15 @@ export class UserController {
             parameters.email =JSON.parse(options.filterSearch);
         }
 
+        if (options.paramSelect) {
+            let objSelect = options.paramSelect.split(',');
+            Object.keys(objSelect).forEach((item) => {
+                select[objSelect[item]] = true;
+            });
+            select = Object.assign({}, select);
+        } else {
+            select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
+        }
 
         if (options.cpf) {
             parameters.cpf = options.cpf;
@@ -75,7 +85,7 @@ export class UserController {
             orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
         }
         
-        let response: object | any = await this.userRepository.findAll(parameters, take , skip, orderBy );
+        let response: object | any = await this.userRepository.findAll(parameters,select, take , skip, orderBy );
 
         if (!response) { 
             throw "falha na requisição, tente novamente";
@@ -129,24 +139,23 @@ export class UserController {
                 parameters.departmentId =  data.departmentId;
             }
 
-            if (!data.name) throw 'Informe o nome do usuário';
-            if (!data.email) throw 'Informe o email do usuário';
-            if (!data.cpf) throw 'Informe o cpf do usuário';
-            if (!data.tel) throw 'Informe o telefone do usuário';
-            if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departmentId) throw 'Informe o departamento do usuário';
-            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
+            if (!data.name) return {status: 400, message: 'Informe o nome do usuário'};
+            if (!data.email) return {status: 400, message: 'Informe o email do usuário'}; 
+            if (!data.cpf) return {status: 400, message: 'Informe o cpf do usuário'};
+            if (!data.tel) return {status: 400, message: 'Informe o telefone do usuário'};
+            if (!data.departmentId) return {status: 400, message: 'Informe o departamento do usuário'};
+            if (!data.password) return {status: 400, message: 'Informe a senha do usuário'};
 
             // Validação de email existente. 
             let validateEmail: object | any = await this.getAllUser({email:data.email});
-            if (validateEmail[0]) throw 'Email já cadastrado';
+            if (validateEmail[0])return {status: 400, message: 'Email ja cadastrado'};
 
             // Validação de cpf existente. 
             let validateCPF: object | any  = await this.getAllUser({cpf:data.cpf});
-            if (validateCPF[0]) throw 'CPF já cadastrado';
+            if (validateCPF[0]) return {status: 400, message: 'CPF já cadastrado'};
 
             // Validação cpf é valido
-            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+            if(!functionsUtils.validationCPF(data.cpf))  return {status: 400, message: 'CPF invalído'};
 
             parameters.name = data.name;
             parameters.email = data.email;
@@ -171,9 +180,9 @@ export class UserController {
                     });
                 }
     
-                return {status: 200, message: {message: "users inseridos"}}
+                return {status: 200, message: "users inseridos"}
             } else {
-                return {status: 400, message: {message: "erro"}}
+                return {status: 400, message: "houve um erro, tente novamente"}
             }
         }
     }
@@ -223,23 +232,30 @@ export class UserController {
                 parameters.departmentId =  data.departmentId;
             }
 
-            if (!data.name) throw 'Informe o nome do usuário';
-            if (!data.email) throw 'Informe o email do usuário';
-            if (!data.cpf) throw 'Informe o cpf do usuário';
-            if (!data.tel) throw 'Informe o telefone do usuário';
-            if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departmentId) throw 'Informe o departamento do usuário';
-            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
+            if (data.name) {
+                parameters.name = data.name;
+            } 
 
-            // Validação cpf é valido
-            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
+            if (data.email) {
+                parameters.email = data.email;
+            } 
 
-            parameters.name = data.name;
-            parameters.email = data.email;
-            parameters.cpf = data.cpf;
-            parameters.tel = data.tel;
-            parameters.password = data.password;
-            parameters.created_by = data.created_by;
+            if (data.cpf) {
+                if(!functionsUtils.validationCPF(data.cpf)) return {message: 'CPF invalído'};
+                parameters.cpf = data.cpf;
+            }
+
+            if (data.tel) {
+                parameters.tel = data.tel;
+            }
+
+            if (data.password) {
+                parameters.password = data.password;
+            }
+
+            if (data.created_by) {
+                parameters.created_by = data.created_by;
+            }
 
             let response: object | any  = await this.userRepository.update(data.id, parameters);
 
