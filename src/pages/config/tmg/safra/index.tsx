@@ -12,7 +12,8 @@ import * as XLSX from 'xlsx';
 import { userPreferencesService, userService } from "src/services";
 
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
-import { tabs, tmgDropDown } from "src/utils/dropdown";
+
+import ITabs from "../../../../utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -41,6 +42,8 @@ interface IData {
 }
 
 export default function Listagem({data, totalItems, itensPerPage, filterAplication}: IData) {
+  const { tabs, tmgDropDown } = ITabs;
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario;
 

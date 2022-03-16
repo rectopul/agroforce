@@ -17,8 +17,7 @@ import {
   AccordionFilter,
   CheckBox
 } from "../../../../components";
-
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
 import { FiUserPlus } from "react-icons/fi";
@@ -83,6 +82,8 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
+  
+  const { tmgDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {

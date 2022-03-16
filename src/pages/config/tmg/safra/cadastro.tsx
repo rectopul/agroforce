@@ -10,7 +10,7 @@ import {
   Radio
 } from "../../../../components";
 
-import { tabs, tmgDropDown } from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../utils/dropdown';
 
 interface ISafraProps {
   harvest: string;
@@ -22,6 +22,7 @@ interface ISafraProps {
 }
 
 export default function Safra() {
+  const { tmgDropDown, tabs } = ITabs.default;
   const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
 

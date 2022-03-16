@@ -1,8 +1,8 @@
-export interface IDepartment {
+export default interface IDepartment {
   id: number;
   name?: string;
 }
 
-export interface IAllDepartments {
+export default interface IAllDepartments {
   departments: IDepartment[];
 }
