@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  next-tmg:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: next-tmg
+    container_name: next-tmg
+    ports:
+      - "18501:3000"
+    restart: unless-stopped
+    networks:
+      - app-next-network
+
+networks:
+  app-next-network:
+    driver: bridge
