@@ -7,8 +7,9 @@ const nextConfig = {
   publicRuntimeConfig: {  
       apiUrl: process.env.NODE_ENV === 'development'
           ? 'http://localhost:3000/api' // development api
-          : 'http://localhost:3000/api' // production api
-  }
+          : 'https://server.seedsforce.com.br:18601/api' // production api
+  },
+  presets: ["next/babel"]
 }
 
 module.exports = nextConfig
