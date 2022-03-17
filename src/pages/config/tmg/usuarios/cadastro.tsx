@@ -7,9 +7,9 @@ import Swal from 'sweetalert2'
 
 import { userService } from "src/services";
 
-import  IProfile  from "../../props/profileDTO";
-import  IUsers  from "../../props/userDTO";
-import  IDepartment  from "../../props/departmentDTO";
+import  IProfile  from "../../../../components/props/profileDTO";
+import  IUsers  from "../../../../components/props/userDTO";
+import  IDepartment  from "../../../../components/props/departmentDTO";
 
 import {
   TabHeader,

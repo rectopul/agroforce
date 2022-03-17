@@ -1,11 +1,14 @@
 import Link from 'next/link';
+import { ReactNode } from 'react';
+import { RiPlantLine } from 'react-icons/ri';
 
 interface IDropDownProps {
   label: string;
   href: string;
+  icon: string | ReactNode;
 }
 
-export function DropDown({ label, href }: IDropDownProps) {
+export function DropDown({ label, href, icon }: IDropDownProps) {
   return (
     <ul className='
       h-7 w-40 
@@ -15,12 +18,16 @@ export function DropDown({ label, href }: IDropDownProps) {
       <li>
         <Link href={href}>
           <a className='
+            flex
+            items-center
+            gap-1
             text-lg 
             text-gray-900
             duration-300
             hover:text-blue-600
-          '
+            '
           >
+            {icon}
             {label}
           </a>
         </Link>

@@ -11,13 +11,13 @@ const tabs = [
 ];
 
 const dropDowns = [
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
-  {labelDropDown: 'TMG', hrefDropDown: '#'},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
+  {labelDropDown: 'TMG', hrefDropDown: '#', iconDropDown: <p>teste1</p>},
 ];
 
 const teste = [

@@ -2,7 +2,6 @@ import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import React, { useState } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useDrag } from 'react-dnd';
 
 import { Content, TabHeader } from 'src/components';
 
