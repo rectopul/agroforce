@@ -1,5 +1,4 @@
 import { SelectHTMLAttributes } from "react";
-
 interface ISelectProps {
   id: number;
   name?: string;

@@ -4,6 +4,8 @@ import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
+import { IoMdArrowBack } from "react-icons/io";
+import { FiUserPlus } from "react-icons/fi";
 
 import { userService } from "src/services";
 
@@ -308,17 +310,20 @@ export default function NovoUsuario({ departments, profiles }: IData) {
             </div>
           </div>
 
-          <div className="h-10 w-full
+          <div className="
+            h-10 w-full
             flex
+            gap-3
             justify-center
             mt-10
           ">
-              <div className="h-10">
+            <div className="w-30">
               <Button 
                 type="submit"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
+                icon={<IoMdArrowBack size={18} />}
                 onClick={() => {router.push('/config/tmg/usuarios/')}}
               />
             </div>
@@ -328,10 +333,10 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
+                icon={<FiUserPlus size={18} />}
                 onClick={() => {}}
               />
             </div>
-          
           </div>
         </form>
       </Content>

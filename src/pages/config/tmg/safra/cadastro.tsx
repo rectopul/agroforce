@@ -1,6 +1,8 @@
 import Head from "next/head";
 import { useFormik } from 'formik';
-import { BsCheckLg } from "react-icons/bs";
+import { IoMdArrowBack } from "react-icons/io";
+import { MdDateRange } from "react-icons/md";
+
 import { 
   Button,
   Content, 
@@ -31,10 +33,10 @@ export default function Safra() {
   const formik = useFormik<ISafraProps>({
     initialValues: {
       harvest: '',
-      status: '',
       mainHarvest: '',
       beginningPlating: '',
       endPlating: '',
+      status: '',
       created_by: userLogado,
     },
     onSubmit: values => {
@@ -59,14 +61,29 @@ export default function Safra() {
         >
           <h1 className="text-2xl">Nova safra</h1>
 
-          <div className="w-full flex justify-between items-start">
+          <div className="w-full flex justify-between items-start gap-5">
             <div className="w-4/12">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Safra
               </label>
               <Input
-                type="date" 
-                placeholder="ex: 20/03/2025"
+                style={{ background: '#e5e7eb' }}
+                type="text"
+                required
+                disabled
+                id="harvest"
+                name="harvest"
+                onChange={formik.handleChange}
+                value={formik.values.harvest}
+              />
+            </div>
+
+            <div className="w-4/12 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Ano
+              </label>
+              <Input
+                type="date"
                 required
                 id="harvest"
                 name="harvest"
@@ -75,10 +92,11 @@ export default function Safra() {
               />
             </div>
 
-            <div>
+            <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Tipo de safra
               </label>
+              <div className="w-full h-full flex gap-4 items-center">
               <Radio
                 title="Verão"
                 id="harvest"
@@ -94,68 +112,32 @@ export default function Safra() {
                 onChange={formik.handleChange}
                 value={formik.values.harvest}
               />
+              </div>
             </div>
           </div>
 
-          <div className="w-full
-            flex 
-            justify-around
-            gap-2
-            mt-4
-            mb-4
-          ">
+          <div className="w-full flex justify-between items-start gap-5 mt-4">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Safra principal
-              </label>
-              <Select
-                id="beginningPlating"
-                name="beginningPlating"
-                values={optionsSelect}
-                onChange={formik.handleChange}
-                value={formik.values.beginningPlating}
-                selected={false}
-              />
-            </div>
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Status
-              </label>
-              <Select
-                name="status"
-                id="status"
-                values={optionsStatus}
-                onChange={formik.handleChange}
-                value={formik.values.status}
-                selected={false}
-              />
-            </div>
-            
-            <div className="w-2/4">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login único
+                Período ideal de início de plantio
               </label>
               <Input
-                disabled
-                style={{ background: '#e5e7eb' }}
                 type="text" 
-                placeholder="Login de usuário" 
+                placeholder="Ex: 04/23"
                 id="beginningPlating"
                 name="beginningPlating"
                 onChange={formik.handleChange}
                 value={formik.values.beginningPlating.toString()}
               />
             </div>
-
+            
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login único
+                Período ideal do fim do plantio
               </label>
               <Input
-                disabled
-                style={{ background: '#e5e7eb' }}
                 type="text" 
-                placeholder="Login de usuário" 
+                placeholder="Ex: 03/24" 
                 id="beginningPlating"
                 name="beginningPlating"
                 onChange={formik.handleChange}
@@ -166,14 +148,27 @@ export default function Safra() {
 
           <div className="h-10 w-full
             flex
+            gap-3
             justify-center
             mt-10
           ">
+            <div className="w-30">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                icon={<IoMdArrowBack size={18} />}
+                href='/config/tmg/safra'
+                onClick={() => {}}
+              />
+            </div>
             <div className="w-40">
               <Button
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
+                icon={<MdDateRange size={18} />}
                 onClick={() => {}}
               />
             </div>

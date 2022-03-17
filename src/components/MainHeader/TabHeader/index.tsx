@@ -28,7 +28,7 @@ export function TabHeader({ data, dataDropDowns }: IData) {
       if (indexBtn !== index) {
         btn.status = false;
       } else {
-        btn
+        btn.status = true;
       }
     });
 
@@ -36,6 +36,9 @@ export function TabHeader({ data, dataDropDowns }: IData) {
       const copy = [...oldUser];
 
       copy[index].status = status;
+
+      if (!status) copy[index].status = true;
+
       return copy;
     });
   }

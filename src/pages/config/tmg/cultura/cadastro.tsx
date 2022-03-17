@@ -12,8 +12,10 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../utils/dropdown';
+import { RiPlantLine } from 'react-icons/ri';
+import { IoMdArrowBack } from 'react-icons/io';
 
-export default function Cultura() {
+export default function Cadastro() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -45,43 +47,6 @@ export default function Cultura() {
           <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
-
-      <div className=" w-full
-        h-20
-        flex
-        items-center
-        gap-2
-        px-5
-        rounded-lg
-        border-b border-blue-600
-        shadow
-        bg-white
-      ">
-        <div className="h-10 w-32">
-          <Button 
-            value="Usuário"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-        <div className="h-10 w-32">
-          <Button 
-            value="Safra"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-        <div className="h-10 w-32">
-          <Button 
-            value="Portfólio"
-            bgColor="bg-blue-600"
-            textColor="white"
-            onClick={() => {}}
-          />
-        </div>
-      </div>
 
       <form 
         className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
@@ -120,21 +85,35 @@ export default function Cultura() {
           </div>
         </div>
 
-        <div className="h-10 w-full
-          flex
-          justify-center
-          mt-10
-        ">
-          <div className="w-40">
-            <Button
-              type="submit"
-              value="Cadastrar"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
+        <div className="
+            h-10 w-full
+            flex
+            gap-3
+            justify-center
+            mt-10
+          ">
+            <div className="w-30">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                href="/config/tmg/cultura"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => {}}
+              />
+            </div>
+            <div className="w-40">
+              <Button
+                type="submit"
+                value="Cadastrar"
+                bgColor="bg-blue-600"
+                textColor="white"
+                icon={<RiPlantLine size={20} />}
+                onClick={() => {}}
+              />
+            </div>
           </div>
-        </div>
       </form>
       </Content>
     </>

@@ -1,15 +1,10 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 import {
   Aside,
   MainHeader,
-  Select
+  Select2
 } from '../../components';
-
-interface IContentProps {
-  children: never[] | ReactNode;
-  headerCotent: never[] | ReactNode;
-}
 
 interface IUsers {
   id: number,
@@ -19,12 +14,27 @@ interface IUsers {
   tel: string,
   avatar: string | ReactNode,
   status: boolean,
-}
+};
+interface ICulturaProps {
+  id: number;
+  name: string | undefined;
+};
+interface IContentProps {
+  // culturas: ICulturaProps[];
+  headerCotent: ReactNode;
+  children: ReactNode;
+};
 
 export function Content({ headerCotent, children }: IContentProps) {
-  // const plantas = [ "Milho", "Algodão", "Soja" ];
-  const safras = [{id: "03/19", name:"03/19" }, { id: "04/20", name: "03/21"}];
+  const [cultures, setCultures] = useState<ICulturaProps[]>(() => [
+    { id: 1, name: "Milho"},
+    { id: 2, name: "Algodão" },
+    { id: 3, name: "Soja" }
+  ]);
+
+  // const safras = [{id: "03/19", name:"03/19" }, { id: "04/20", name: "03/21"}];
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
+
   return (
     <>
       <MainHeader
@@ -32,7 +42,7 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar={ userLogado.avatar }
 
         headerSelects={
-          <Select values={safras} selected={false}/>
+          <Select2 data={cultures} selected={false}/>
         }
       >
         { headerCotent }

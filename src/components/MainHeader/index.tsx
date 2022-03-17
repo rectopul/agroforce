@@ -1,11 +1,10 @@
 import { ReactNode } from 'react';
-import { FaRegUser } from 'react-icons/fa';
 
 import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {
   headerSelects: ReactNode;
-  children: never[] | ReactNode;
+  children: ReactNode;
   name: string;
   avatar: string | ReactNode;
 }
