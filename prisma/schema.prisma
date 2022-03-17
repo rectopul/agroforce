@@ -103,14 +103,16 @@ model Users_Cultures {
 
 model Safra {
   id         Int      @id @default(autoincrement())
-  culture_id Int 
-  culture    Culture         @relation(fields: [culture_id], references: [id])
-  name       String?  @unique
-  ano        String?  @unique
-  safra_principal Int @default(0)
-  created_at DateTime @default(now())
-  created_by Int
+  id_culture Int 
+  culture    Culture         @relation(fields: [id_culture], references: [id])
+
+  year        String?  @unique
+  typeCrop String
+  plantingStartTime String
+  plantingEndTime String
   status     Int      @default(1)
+  created_by Int
+  created_at DateTime @default(now())
 }
 
 

@@ -21,7 +21,7 @@ function Login() {
         if (userService.userValue) {
             router.push('/config/tmg/usuarios');
         }
-    }, []);
+    }, [router]);
 
     // form validation rules 
     const validationSchema = Yup.object().shape({
@@ -35,15 +35,14 @@ function Login() {
     const { errors } = formState;
 
     async function onSubmit({ email, password }: any) {
-        return userService.login(email, password)
-            .then(() => {
-                // get return url from query parameters or default to '/'
-                const returnUrl = router.query.returnUrl || '/config/tmg/usuarios';
-                router.push(returnUrl as string);
-            })
-            .catch(error => {
-                setError('apiError', { message: error });
-            });
+      await userService.login(email, password).then(() => {
+        // get return url from query parameters or default to '/'
+        const returnUrl = router.query.returnUrl || '/config/tmg/usuarios';
+        router.push(returnUrl as string);
+      })
+      .catch(error => {
+          setError('apiError', { message: error });
+      });
     }
 
     return (

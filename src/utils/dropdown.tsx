@@ -14,7 +14,7 @@ const tabs = [
 ];
 
 const tmgDropDown =  [
-  {labelDropDown: 'Cultura', hrefDropDown: 'http://localhost:3000/config/tmg/cultura', iconDropDown: <RiSeedlingLine/> },
+  {labelDropDown: 'Cultura', hrefDropDown: 'http://localhost:3000/config/tmg/cultura/cadastro', iconDropDown: <RiSeedlingLine/> },
   {labelDropDown: 'Usuário', hrefDropDown: 'http://localhost:3000/config/tmg/usuarios', iconDropDown: <BiUser/> },
   {labelDropDown: 'Safra', hrefDropDown: 'http://localhost:3000/config/tmg/safra', iconDropDown: <MdDateRange/> },
   {labelDropDown: 'Portfólio', hrefDropDown: 'http://localhost:3000/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },

@@ -3,25 +3,28 @@ import { useFormik } from 'formik';
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 
+import { cultureService } from 'src/services';
+
 import { 
   Button,
   Content, 
-  Input, 
-  Select, 
+  Input,
   TabHeader,
   Radio
 } from "../../../../components";
 
 import  * as ITabs from '../../../../utils/dropdown';
+import Swal from "sweetalert2";
 
 interface ISafraProps {
-  harvest: string;
-  status: number | any;
-  mainHarvest: string;
-  beginningPlating: string;
-  endPlating: string;
+  id_culture: number;
+  year: Date | null;
+  typeCrop: '' | 'Verão' | 'Inverno';
+  plantingStartTime: string;
+  plantingEndTime: string;
+  status: boolean | number;
   created_by: any;
-}
+};
 
 export default function Safra() {
   const { tmgDropDown, tabs } = ITabs.default;
@@ -29,18 +32,37 @@ export default function Safra() {
   const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const culture = userLogado.userCulture.cultura_selecionada as string;
+
 
   const formik = useFormik<ISafraProps>({
     initialValues: {
-      harvest: '',
-      mainHarvest: '',
-      beginningPlating: '',
-      endPlating: '',
-      status: '',
+      id_culture: Number(culture),
+      year: null,
+      typeCrop: '',
+      plantingStartTime: '',
+      plantingEndTime: '',
+      status: 1,
       created_by: userLogado,
     },
     onSubmit: values => {
       alert(JSON.stringify(values, null, 2));
+
+      cultureService.createCulture({
+        id_culture: formik.values.id_culture,
+        year: formik.values.year,
+        typeCrop: formik.values.typeCrop,
+        plantingStartTime: formik.values.plantingStartTime,
+        plantingEndTime: formik.values.plantingEndTime,
+        status: formik.values.status,
+        created_by: formik.values.created_by,
+      }).then((response) => {
+        if (response.status == 200) {
+          Swal.fire('Safra cadastrada com sucesso!')
+        } else {
+          Swal.fire(response.message)
+        }
+      })
     },
   });
   
@@ -74,7 +96,7 @@ export default function Safra() {
                 id="harvest"
                 name="harvest"
                 onChange={formik.handleChange}
-                value={formik.values.harvest}
+                value={20}
               />
             </div>
 
@@ -85,10 +107,10 @@ export default function Safra() {
               <Input
                 type="date"
                 required
-                id="harvest"
-                name="harvest"
+                id="year"
+                name="year"
                 onChange={formik.handleChange}
-                value={formik.values.harvest}
+                value={String(formik.values.year)}
               />
             </div>
 
@@ -99,18 +121,18 @@ export default function Safra() {
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
                 title="Verão"
-                id="harvest"
-                name="harvest"
+                id="typeCrop"
+                name="typeCrop"
                 onChange={formik.handleChange}
-                value={formik.values.harvest}
+                value={formik.values.typeCrop = 'Verão'}
               />
 
               <Radio
                 title="Inverno"
-                id="harvest"
-                name="harvest"
+                id="typeCrop"
+                name="typeCrop"
                 onChange={formik.handleChange}
-                value={formik.values.harvest}
+                value={formik.values.typeCrop = 'Inverno'}
               />
               </div>
             </div>
@@ -124,10 +146,10 @@ export default function Safra() {
               <Input
                 type="text" 
                 placeholder="Ex: 04/23"
-                id="beginningPlating"
-                name="beginningPlating"
+                id="plantingStartTime"
+                name="plantingStartTime"
                 onChange={formik.handleChange}
-                value={formik.values.beginningPlating.toString()}
+                value={formik.values.plantingStartTime.toString()}
               />
             </div>
             
@@ -138,10 +160,10 @@ export default function Safra() {
               <Input
                 type="text" 
                 placeholder="Ex: 03/24" 
-                id="beginningPlating"
-                name="beginningPlating"
+                id="plantingEndTime"
+                name="plantingEndTime"
                 onChange={formik.handleChange}
-                value={formik.values.beginningPlating.toString()}
+                value={formik.values.plantingEndTime.toString()}
               />
             </div>
           </div>

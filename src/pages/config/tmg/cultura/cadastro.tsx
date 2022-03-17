@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useFormik } from 'formik'
-import { BsCheckLg } from "react-icons/bs";
+import Swal from 'sweetalert2';
 
 import { cultureService } from 'src/services';
 
@@ -30,7 +30,9 @@ export default function Cadastro() {
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          alert("Cultura criada com sucesso");
+          Swal.fire('Cultura cadastrada com sucesso!')
+        } else {
+          Swal.fire(response.message)
         }
       })
     },
@@ -66,7 +68,7 @@ export default function Cadastro() {
             <label className="block text-gray-900 text-sm font-bold mb-2">
               ID cultura
             </label>
-            <Input value={123456} disabled style={{ background: '#e5e7eb' }} />
+            <Input value={''} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
           <div className="w-full h-10">
