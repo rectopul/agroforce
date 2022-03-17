@@ -1,7 +1,7 @@
 import {UserRepository} from '../repository/user.repository';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
-import { functionsUtils } from 'src/utils/functionsUtils';
+import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
 @Controller()
 export class UserController {

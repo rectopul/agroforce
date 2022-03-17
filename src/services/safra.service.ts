@@ -1,19 +1,18 @@
-import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
 
 import { fetchWrapper } from '../helpers';
+import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
-export const userService = {
+export const safraService = {
     getAll,
-    createSafras,
+    create,
     updateSafras
 };
 
-function createSafras(data: any) {
+async function create(data: ISafraPropsDTO) {
     return fetchWrapper.post(baseUrl, data);
 }
 

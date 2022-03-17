@@ -17,7 +17,7 @@ import {
   AccordionFilter,
   CheckBox
 } from "../../../../components";
-import  * as ITabs from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
 import { FiUserPlus } from "react-icons/fi";

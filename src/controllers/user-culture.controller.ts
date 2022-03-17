@@ -1,6 +1,6 @@
 import {UserCultureRepository} from '../repository/user-culture.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
-import { functionsUtils } from 'src/utils/functionsUtils';
+import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
 @Controller()
 export class UserCultureController {

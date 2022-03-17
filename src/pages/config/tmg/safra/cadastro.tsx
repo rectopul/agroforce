@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 
-import { cultureService } from 'src/services';
+import { safraService } from 'src/services';
 
 import { 
   Button,
@@ -13,17 +13,19 @@ import {
   Radio
 } from "../../../../components";
 
-import  * as ITabs from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
 
 interface ISafraProps {
   id_culture: number;
-  year: Date | null;
-  typeCrop: '' | 'Verão' | 'Inverno';
+  year: Date;
+  typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
-  status: boolean | number;
-  created_by: any;
+  status: number;
+  created_by: {
+    id: number;
+  };
 };
 
 export default function Safra() {
@@ -34,11 +36,10 @@ export default function Safra() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
-
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id_culture: Number(culture),
-      year: null,
+      year: new Date(''),
       typeCrop: '',
       plantingStartTime: '',
       plantingEndTime: '',
@@ -46,9 +47,10 @@ export default function Safra() {
       created_by: userLogado,
     },
     onSubmit: values => {
+      console.log(values);
       alert(JSON.stringify(values, null, 2));
 
-      cultureService.createCulture({
+      safraService.create({
         id_culture: formik.values.id_culture,
         year: formik.values.year,
         typeCrop: formik.values.typeCrop,

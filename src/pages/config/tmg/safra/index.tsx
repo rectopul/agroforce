@@ -13,7 +13,7 @@ import { userPreferencesService, userService } from "src/services";
 
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
 
-import ITabs from "../../../../utils/dropdown";
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;

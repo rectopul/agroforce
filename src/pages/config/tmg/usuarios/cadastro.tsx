@@ -22,7 +22,7 @@ import {
   CheckBox
 } from "../../../../components";
 
-import * as ITabs from '../../../../utils/dropdown';
+import * as ITabs from '../../../../shared/utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];

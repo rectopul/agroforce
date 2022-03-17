@@ -1,6 +1,9 @@
 import {SafraRepository} from '../repository/safra.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
-import { functionsUtils } from 'src/utils/functionsUtils';
+import { functionsUtils } from 'src/shared/utils/functionsUtils';
+
+import {ISafraPropsDTO} from '../shared/dtos/ISafraPropsDTO';
+import { validationSafra } from '../shared/validations/safra/create.validation';
 
 @Controller()
 export class SafraController {
@@ -92,80 +95,23 @@ export class SafraController {
     }
 
     @Post()
-    async postSafra(data: object | any) {
-        const parameters: object | any = new Object();
-        const parametersPermissions: object | any  = new Object();
+    async postSafra(data: ISafraPropsDTO) {
+        try {
+            console.log(data);
+            const safraRepository = new SafraRepository();
 
-        if (data != null && data != undefined) {
-            if (typeof(data.status) === 'string') {
-                parameters.status =  parseInt(data.status);
-            } else { 
-                parameters.status =  data.status;
-            }
+            // Validação
+            const valid = validationSafra.isValidSync(data);
 
-            if (typeof(data.app_login) === 'string') {
-                parameters.app_login =  parseInt(data.app_login);
-            } else { 
-                parameters.app_login =  data.app_login;
-            }
+            if (!valid) throw new Error('Dados inválidos');
 
-            if (typeof(data.jivochat) === 'string') {
-                parameters.jivochat =  parseInt(data.jivochat);
-            } else { 
-                parameters.jivochat =  data.jivochat;
-            }
+            // Salvando
 
-            if (typeof(data.departmentId) === 'string') {
-                parameters.departmentId =  parseInt(data.departmentId);
-            } else { 
-                parameters.departmentId =  data.departmentId;
-            }
+            await safraRepository.create(data);
 
-            if (!data.name) throw 'Informe o nome do usuário';
-            if (!data.email) throw 'Informe o email do usuário';
-            if (!data.cpf) throw 'Informe o cpf do usuário';
-            if (!data.tel) throw 'Informe o telefone do usuário';
-            if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departmentId) throw 'Informe o departamento do usuário';
-            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
-
-            // Validação de email existente. 
-            let validateEmail: object | any = await this.getAllSafra({email:data.email});
-            if (validateEmail[0]) throw 'Email já cadastrado';
-
-            // Validação de cpf existente. 
-            let validateCPF: object | any  = await this.getAllSafra({cpf:data.cpf});
-            if (validateCPF[0]) throw 'CPF já cadastrado';
-
-            // Validação cpf é valido
-            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
-
-            parameters.name = data.name;
-            parameters.email = data.email;
-            parameters.cpf = data.cpf;
-            parameters.tel = data.tel;
-            parameters.password = data.password;
-            parameters.created_by = data.created_by;
-
-            let response = await this.safraRepository.create(parameters);
-
-            if(response) {
-                if (data.profiles) {
-                    Object.keys(data.profiles).forEach((item) => {
-                        if (typeof(data.profiles[item].profileId) === 'string') {
-                            parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                        } else { 
-                            parametersPermissions.profileId = data.profiles[item].profileId;
-                        }
-                        parametersPermissions.SafraId = response.id;
-                        parametersPermissions.created_by = data.created_by;
-                    });
-                }
-    
-                return {status: 200, message: {message: "Safras inseridos"}}
-            } else {
-                return {status: 400, message: {message: "erro"}}
-            }
+            return {status: 200, message: "Safra inserida"}
+        } catch {
+            return { status: 404, message: "Erro"}
         }
     }
 

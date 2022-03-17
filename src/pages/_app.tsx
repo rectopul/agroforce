@@ -1,9 +1,9 @@
-import '../styles/App.css';
-import '../styles/tailwind.css';
+import '../shared/styles/App.css';
+import '../shared/styles/tailwind.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { userService  } from '../services';
-import PermisssionGate from "../utils/PermissionUser";
+import PermisssionGate from "../shared/utils/PermissionUser";
 
 export default App;
 

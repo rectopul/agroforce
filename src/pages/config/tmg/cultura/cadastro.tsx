@@ -11,7 +11,7 @@ import {
   TabHeader 
 } from "../../../../components";
 
-import  * as ITabs from '../../../../utils/dropdown';
+import  * as ITabs from '../../../../shared/utils/dropdown';
 import { RiPlantLine } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
 
