@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Config_Gerais {
+  id         Int      @id @default(autoincrement())
+  itens_per_page Int? 
+  updated_at DateTime @default(now())
+  updated_by Int
+}
+
+model Modules {
+  id         Int      @id @default(autoincrement())
+  module     String   @unique
+  Users_Preferences  Users_Preferences[]
+}
+
 model User {
   id              Int                 @id @default(autoincrement())
   name            String?
@@ -25,6 +38,7 @@ model User {
   created_by      Int
   User_Permission Users_Permissions[]
   Users_Preferences  Users_Preferences[]
+  Users_Cultures Users_Cultures[]
 }
 
 model Profile {
@@ -47,12 +61,14 @@ model Users_Permissions {
   created_by Int
 }
 
-model Culture {
+model Users_Preferences {
   id         Int      @id @default(autoincrement())
-  name       String?  @unique
-  created_at DateTime @default(now())
-  created_by Int
-  status     Int      @default(1)
+  user_id    Int 
+  user       User         @relation(fields: [user_id], references: [id])
+  module_id  Int 
+  modules     Modules         @relation(fields: [module_id], references: [id])
+  table_preferences String? 
+  updated_at DateTime @default(now())
 }
 
 model Department {
@@ -64,8 +80,31 @@ model Department {
   User       User[]
 }
 
+model Culture {
+  id         Int      @id @default(autoincrement())
+  name       String?  @unique
+  created_at DateTime @default(now())
+  created_by Int
+  status     Int      @default(1)
+  Users_Cultures Users_Cultures[]
+  Safra Safra[]
+}
+
+model Users_Cultures {
+    id         Int      @id @default(autoincrement())
+    user_id    Int 
+    user       User         @relation(fields: [user_id], references: [id])
+    culture_id Int 
+    culture    Culture         @relation(fields: [culture_id], references: [id])
+    created_at DateTime @default(now())
+    created_by Int
+    status     Int      @default(1)
+}
+
 model Safra {
   id         Int      @id @default(autoincrement())
+  culture_id Int 
+  culture    Culture         @relation(fields: [culture_id], references: [id])
   name       String?  @unique
   ano        String?  @unique
   safra_principal Int @default(0)
@@ -74,25 +113,8 @@ model Safra {
   status     Int      @default(1)
 }
 
-model Modules {
-  id         Int      @id @default(autoincrement())
-  module     String   @unique
-  Users_Preferences  Users_Preferences[]
-}
 
-model Users_Preferences {
-  id         Int      @id @default(autoincrement())
-  user_id    Int 
-  user       User         @relation(fields: [user_id], references: [id])
-  module_id  Int 
-  modules     Modules         @relation(fields: [module_id], references: [id])
-  table_preferences String? 
-  updated_at DateTime @default(now())
-}
 
-model Config_Gerais {
-  id         Int      @id @default(autoincrement())
-  itens_per_page Int? 
-  updated_at DateTime @default(now())
-  updated_by Int
-}
+
+
+

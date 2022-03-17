@@ -9,12 +9,11 @@ export default function Listagem() {
     maxAge: 86400 * 7,
     path: '/',
   });
-  const filters = [
-    'Teste1',
-    'Teste2',
-    'Teste3',
-    'Teste4',
-  ];
+
+  setCookie(null, 'userId',  userLogado.id, {
+    maxAge: 86400 * 7,
+    path: '/',
+  });
 
   return (
     <>

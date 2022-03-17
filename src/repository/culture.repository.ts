@@ -43,6 +43,5 @@ export class CulturaRepository {
             return false;
         }
     }
-    
 }
 

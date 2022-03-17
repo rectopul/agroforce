@@ -2,23 +2,17 @@ import {prisma} from '../pages/api/db/db';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserRepository {   
-    async create(User: object | any) {
-        let Result = await prisma.user.create({ data: User}).finally(async () => { await prisma.$disconnect() })
-
-        return Result;
-    }
-
-    async createUserCulture(Cultures: object | any) {
+export class UserCultureRepository {   
+    async create(Cultures: object | any) {
         let Result = await prisma.users_Cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
 
         return Result;
     }
 
     async update(id: number, Data: Object) {
-        let User = await this.findOne(id);
-        if (User != null) { 
-            let Result = await prisma.user.updateMany({ 
+        let userCulture = await this.findOne(id);
+        if (userCulture != null) { 
+            let Result = await prisma.users_Cultures.updateMany({ 
                 where: {
                     id: id
                 },
@@ -31,7 +25,7 @@ export class UserRepository {
     }
 
     async findOne(id: number) {
-        let Result = await prisma.user.findMany({
+        let Result = await prisma.users_Cultures.findMany({
                where: {
                    id: id
                }
@@ -44,28 +38,28 @@ export class UserRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.user.count({ where: where })
-        let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let count = await prisma.users_Cultures.count({ where: where })
+        let Result: object | any = await prisma.users_Cultures.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         Result.total = count;
         return Result;
     }
-    
-    async signIn (Where: object) {
-        let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
 
-    async getPermissions(userId: any) {
-        let Result = await prisma.profile.findMany({
+    async findAllByUser (userId: Number | any) {
+        let Result = await prisma.users_Cultures.findMany({
             where: {
-                id: userId
+                user_id: userId,
+                status: 1,
+                culture: {
+                    status: 1
+                }
             }, 
             select: {
-                acess_permission: true
-            }
+                id: true,            
+                culture: {select: {name: true}}
+            },
           }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
-
+    
 }
 

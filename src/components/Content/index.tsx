@@ -1,9 +1,10 @@
-import { ReactNode, useState } from "react";
+
+import { useEffect, ReactNode, useState } from "react";
 
 import {
   Aside,
   MainHeader,
-  Select2
+  Select
 } from '../../components';
 
 interface IUsers {
@@ -26,14 +27,20 @@ interface IContentProps {
 };
 
 export function Content({ headerCotent, children }: IContentProps) {
-  const [cultures, setCultures] = useState<ICulturaProps[]>(() => [
-    { id: 1, name: "Milho"},
-    { id: 2, name: "Algodão" },
-    { id: 3, name: "Soja" }
-  ]);
-
-  // const safras = [{id: "03/19", name:"03/19" }, { id: "04/20", name: "03/21"}];
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
+  const cultures: object | any = [];
+  const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
+  
+  if (userLogado.userCulture.culturas[0]) {
+    userLogado.userCulture.culturas.map((value: string | object | any) => {
+      cultures.push({id: value.id, name: value.culture.name});
+    })
+  }
+
+  useEffect(() => {
+      userLogado.userCulture.cultura_selecionada =  parseInt(culturaSelecionada);
+      localStorage.setItem('user', JSON.stringify(userLogado));
+  }, [culturaSelecionada]);
 
   return (
     <>
@@ -42,7 +49,7 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar={ userLogado.avatar }
 
         headerSelects={
-          <Select2 data={cultures} selected={false}/>
+          <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={userLogado.userCulture.cultura_selecionada} />
         }
       >
         { headerCotent }

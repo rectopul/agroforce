@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {UserController} from '../../../controllers/user.controller';
 import { UserPermissionController } from 'src/controllers/user-permission.controller';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { UserCultureController } from 'src/controllers/user-culture.controller';
 
 const jwt = require('jsonwebtoken');
 
@@ -17,6 +18,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new UserController();
     const PermissionController = new UserPermissionController();
     const PreferencesControllers = new UserPreferenceController();
+    const userCultureController = new UserCultureController();
+
     switch (req.method) {
         case 'POST':
           return authenticate();
@@ -29,11 +32,15 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       const user = await Controller.signinUSer(req.body);
       let permisions;
       let preferences: object | any = new Object;
+      let userCulture: object | any = new Object;
       if (user) {
+        userCulture.culturas = await (await userCultureController.getByUserID(user.id)).response;
+        userCulture.cultura_selecionada = userCulture.culturas[0].id;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
         preferences.safra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
       }
+
 
       if (!user) throw 'Email ou senha é invalida!';
 
@@ -50,7 +57,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           avatar: user.avatar,
           token: token,
           permission: permisions,
-          preferences
+          preferences,
+          userCulture
       });
     }
 }
