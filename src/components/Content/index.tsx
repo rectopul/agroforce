@@ -49,7 +49,7 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar={ userLogado.avatar }
 
         headerSelects={
-          <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={userLogado.userCulture.cultura_selecionada} />
+          <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
         }
       >
         { headerCotent }

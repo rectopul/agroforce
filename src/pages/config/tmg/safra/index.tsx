@@ -209,7 +209,7 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, user_id: preferences.user_id, table_preferences: campos};
+    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
     userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 

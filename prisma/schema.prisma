@@ -63,8 +63,8 @@ model Users_Permissions {
 
 model Users_Preferences {
   id         Int      @id @default(autoincrement())
-  user_id    Int 
-  user       User         @relation(fields: [user_id], references: [id])
+  userId    Int 
+  user       User         @relation(fields: [userId], references: [id])
   module_id  Int 
   modules     Modules         @relation(fields: [module_id], references: [id])
   table_preferences String? 
@@ -92,10 +92,10 @@ model Culture {
 
 model Users_Cultures {
     id         Int      @id @default(autoincrement())
-    user_id    Int 
-    user       User         @relation(fields: [user_id], references: [id])
-    culture_id Int 
-    culture    Culture         @relation(fields: [culture_id], references: [id])
+    userId    Int 
+    user       User         @relation(fields: [userId], references: [id])
+    cultureId Int 
+    culture    Culture         @relation(fields: [cultureId], references: [id])
     created_at DateTime @default(now())
     created_by Int
     status     Int      @default(1)
@@ -103,16 +103,18 @@ model Users_Cultures {
 
 model Safra {
   id         Int      @id @default(autoincrement())
-  id_culture Int 
-  culture    Culture         @relation(fields: [id_culture], references: [id])
-
   year        String?  @unique
   typeCrop String
   plantingStartTime String
   plantingEndTime String
-  status     Int      @default(1)
-  created_by Int
+  cultureId Int 
+  culture    Culture         @relation(fields: [cultureId], references: [id])
+  name       String?  @unique
+  ano        String?  @unique
+  safra_principal Int @default(0)
   created_at DateTime @default(now())
+  created_by Int
+  status     Int      @default(1)
 }
 
 

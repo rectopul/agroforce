@@ -11,7 +11,7 @@ export const fetchWrapper = {
     delete: _delete
 };
 
-function get(url: any, params: any) {
+async function get(url: any, params: any) {
     const urlParameters: any = new URL(url);
     urlParameters.search = new URLSearchParams(params).toString();
     const requestOptions: any = {
@@ -19,35 +19,39 @@ function get(url: any, params: any) {
         credentials: 'include',
         headers:authHeader(url)
     };
-    return fetch(urlParameters, requestOptions).then(handleResponse);
+    const response = await fetch(urlParameters, requestOptions);
+    return handleResponse(response);
 }
 
-function post(url: any, body: any) {
+async function post(url: any, body: any) {
     const requestOptions: object | any = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeader(url) },
         credentials: 'include',
         body: JSON.stringify(body)
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    const response = await fetch(url, requestOptions);
+    return handleResponse(response);
 }
 
-function put(url: any, body: any) {
+async function put(url: any, body: any) {
     const requestOptions: object | any = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeader(url) },
         body: JSON.stringify(body)
     };
-    return fetch(url, requestOptions).then(handleResponse);    
+    const response = await fetch(url, requestOptions);
+    return handleResponse(response);    
 }
 
 // prefixed with underscored because delete is a reserved word in javascript
-function _delete(url: string | any) {
+async function _delete(url: string | any) {
     const requestOptions: object | any = {
         method: 'DELETE',
         headers: authHeader(url)
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    const response = await fetch(url, requestOptions);
+    return handleResponse(response);
 }
 
 // helper functions
