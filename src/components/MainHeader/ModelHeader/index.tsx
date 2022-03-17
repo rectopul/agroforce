@@ -23,7 +23,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
     return classes.filter(Boolean).join(' ')
   }
   
-  const [user, setUser] = useState <Observer<undefined> | undefined>();
+  const [user, setUser] = useState <any>();
 
   useEffect(() => {
       const subscription = userService.user.subscribe(x => setUser(x));
