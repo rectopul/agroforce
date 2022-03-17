@@ -20,11 +20,11 @@ export class UserPreferenceController {
             });
             select = Object.assign({}, select);
         } else {
-            select = {id: true, user_id: true, table_preferences: true};
+            select = {id: true, userId: true, table_preferences: true};
         }
 
-        if(options.user_id) {
-            parameters.user_id = parseInt(options.user_id);
+        if(options.userId) {
+            parameters.userId = parseInt(options.userId);
         }
 
         if(options.module_id) {
@@ -81,10 +81,10 @@ export class UserPreferenceController {
         const parameters: object | any = new Object();
 
         if (data != null && data != undefined) {
-            if (typeof(data.user_id) === 'string') {
-                parameters.user_id =  parseInt(data.user_id);
+            if (typeof(data.userId) === 'string') {
+                parameters.userId =  parseInt(data.userId);
             } else { 
-                parameters.user_id =  data.user_id;
+                parameters.userId =  data.userId;
             }
 
             if (typeof(data.module_id) === 'string') {
