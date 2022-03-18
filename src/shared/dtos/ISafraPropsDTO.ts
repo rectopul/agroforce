@@ -1,11 +1,12 @@
 export interface ISafraPropsDTO {
+  id?: number;
   id_culture: number;
-  year: Date;
+
+  year: string;
   typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
-  status: number;
-  created_by: {
-    id: number;
-  };
+  main_safra?: number;
+  status?: number;
+  created_by: number;
 };

@@ -1,12 +1,13 @@
 import {prisma} from '../pages/api/db/db';
 import { Injectable } from '@nestjs/common';
+import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
 
 @Injectable()
 export class SafraRepository {   
-    async create(Safra: object | any) {
-        let Result = await prisma.safra.create({ data: Safra}).finally(async () => { await prisma.$disconnect() })
+    async create(data: ISafraPropsDTO) {
+        const safra = await prisma.safra.create({data});
 
-        return Result;
+        return safra;
     }
 
     async update(id: number, Data: Object) {

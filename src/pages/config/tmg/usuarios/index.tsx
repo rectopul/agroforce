@@ -677,6 +677,8 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  console.log(itensPerPage)
+
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;

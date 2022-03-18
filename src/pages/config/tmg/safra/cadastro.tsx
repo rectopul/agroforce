@@ -18,7 +18,7 @@ import Swal from "sweetalert2";
 
 interface ISafraProps {
   id_culture: number;
-  year: Date;
+  year: string;
   typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
@@ -39,12 +39,12 @@ export default function Safra() {
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id_culture: Number(culture),
-      year: new Date(''),
+      year: '',
       typeCrop: '',
       plantingStartTime: '',
       plantingEndTime: '',
       status: 1,
-      created_by: userLogado,
+      created_by: userLogado.id,
     },
     onSubmit: values => {
       console.log(values);
@@ -57,7 +57,7 @@ export default function Safra() {
         plantingStartTime: formik.values.plantingStartTime,
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
-        created_by: formik.values.created_by,
+        created_by: formik.values.created_by.id,
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Safra cadastrada com sucesso!')
@@ -151,7 +151,7 @@ export default function Safra() {
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
-                value={formik.values.plantingStartTime.toString()}
+                value={formik.values.plantingStartTime}
               />
             </div>
             
@@ -165,7 +165,7 @@ export default function Safra() {
                 id="plantingEndTime"
                 name="plantingEndTime"
                 onChange={formik.handleChange}
-                value={formik.values.plantingEndTime.toString()}
+                value={formik.values.plantingEndTime}
               />
             </div>
           </div>

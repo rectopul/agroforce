@@ -97,7 +97,6 @@ export class SafraController {
     @Post()
     async postSafra(data: ISafraPropsDTO) {
         try {
-            console.log(data);
             const safraRepository = new SafraRepository();
 
             // Validação
@@ -110,7 +109,8 @@ export class SafraController {
             await safraRepository.create(data);
 
             return {status: 200, message: "Safra inserida"}
-        } catch {
+        } catch(err) {
+            console.log(err);
             return { status: 404, message: "Erro"}
         }
     }
