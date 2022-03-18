@@ -4,7 +4,7 @@ import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
 
 @Injectable()
 export class SafraRepository {   
-    async create(data: ISafraPropsDTO) {
+    async create(data: ISafraPropsDTO | any) {
         const safra = await prisma.safra.create({data});
         return safra;
     }
