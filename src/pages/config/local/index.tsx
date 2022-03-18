@@ -417,7 +417,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Usuários.csv");
+        XLSX.writeFile(workBook, "Locais.csv");
       }
     });
   };
