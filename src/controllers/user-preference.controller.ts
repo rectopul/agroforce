@@ -66,6 +66,15 @@ export class UserPreferenceController {
             if (data.table_preferences) {
                 parameters.table_preferences = data.table_preferences;
             }
+
+            if (data.userId) {
+                parameters.userId = data.userId;
+            }
+
+            if (data.module_id) {
+                parameters.module_id = data.module_id;
+            }
+
             let response = await this.userPreferences.update(id, parameters);
             if(response) {
                 return {status: 200, message: {message: "preferences atualizada"}}

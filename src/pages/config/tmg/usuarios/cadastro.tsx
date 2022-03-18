@@ -52,7 +52,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
     },
     onSubmit: (values) => {      
       validateInputs(values);
-      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { console.log('entrou'); return; }
+      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
       let ObjProfiles;
       const auxObject = new Array();
 

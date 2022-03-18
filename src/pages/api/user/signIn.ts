@@ -39,6 +39,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
         preferences.safra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
+        preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3})).response[0]
+        preferences.local= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 4})).response[0]
       }
 
 
