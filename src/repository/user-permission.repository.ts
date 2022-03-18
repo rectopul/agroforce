@@ -4,12 +4,12 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UsersPermissionsRepository {   
     async create(Permission: object | any) {
-        let Result = await prisma.users_Permissions.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_permissions.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async update(id: number, Data: Object) {
-        let Result = await prisma.users_Permissions.update({ 
+        let Result = await prisma.users_permissions.update({ 
             where: {
                 id: id
             },
@@ -20,12 +20,12 @@ export class UsersPermissionsRepository {
 
     async findAll (where: any) {
         const select = {id: true, name: true, cpf:true, email:true, telefone:true, avatar:true, status: true};
-        let Result = await prisma.users_Permissions.findMany({ where: where, select: select }) .finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_permissions.findMany({ where: where, select: select }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async getPermissionsByUser(userId: any) {
-        let Result = await prisma.users_Permissions.findMany({
+        let Result = await prisma.users_permissions.findMany({
             where: {
                 userId: userId
             },

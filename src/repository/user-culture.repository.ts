@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
-        let Result = await prisma.users_Cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
 
         return Result;
     }
@@ -12,7 +12,7 @@ export class UserCultureRepository {
     async update(id: number, Data: Object) {
         let userCulture = await this.findOne(id);
         if (userCulture != null) { 
-            let Result = await prisma.users_Cultures.updateMany({ 
+            let Result = await prisma.users_cultures.updateMany({ 
                 where: {
                     id: id
                 },
@@ -25,7 +25,7 @@ export class UserCultureRepository {
     }
 
     async findOne(id: number) {
-        let Result = await prisma.users_Cultures.findMany({
+        let Result = await prisma.users_cultures.findMany({
                where: {
                    id: id
                }
@@ -38,14 +38,14 @@ export class UserCultureRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.users_Cultures.count({ where: where })
-        let Result: object | any = await prisma.users_Cultures.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let count = await prisma.users_cultures.count({ where: where })
+        let Result: object | any = await prisma.users_cultures.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         Result.total = count;
         return Result;
     }
 
     async findAllByUser (userId: Number | any) {
-        let Result = await prisma.users_Cultures.findMany({
+        let Result = await prisma.users_cultures.findMany({
             where: {
                 userId: userId,
                 status: 1,

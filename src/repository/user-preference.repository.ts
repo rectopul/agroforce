@@ -4,17 +4,36 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UserPreferenceRepository {   
     async create(Permission: object | any) {
-        let Result = await prisma.users_Preferences.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_preferences.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
-    async update(id: number, Data: Object) {
-        let Result = await prisma.users_Preferences.update({ 
-            where: {
-                id: id
-            },
-            data: Data })
-            .finally(async () => { await prisma.$disconnect() })
+    async update(id: number, Data: Object | any) {
+        let preference: any = this.findAll({id: id}, {id: true},  1,  0, '');
+        let Result: undefined | any;
+        if (preference) {
+            Result = await prisma.users_preferences.update({ 
+                where: {
+                    id: id
+                },
+                data: {table_preferences: Data.table_preferences}
+                })
+                .finally(async () => { await prisma.$disconnect() })
+        } else {
+            Result = await prisma.users_preferences.upsert({ 
+                update:{
+                    table_preferences: Data.table_preferences
+                },
+                where: {
+                    id: id
+                },
+                create: {
+                    table_preferences: Data.table_preferences,
+                    userId: Data.userId,
+                    module_id: Data.module_id
+                }})
+                .finally(async () => { await prisma.$disconnect() })
+        }
         return Result;
     }
 
@@ -23,8 +42,8 @@ export class UserPreferenceRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.users_Preferences.count({ where: where })
-        let Result: object | any = await prisma.users_Preferences.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let count = await prisma.users_preferences.count({ where: where })
+        let Result: object | any = await prisma.users_preferences.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         Result.total = count;
         return Result;
     }
@@ -34,7 +53,7 @@ export class UserPreferenceRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let Result: object | any = await prisma.config_Gerais.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() });
+        let Result: object | any = await prisma.config_gerais.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() });
         return Result;
     }
 }
