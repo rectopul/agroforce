@@ -23,36 +23,54 @@ export class SafraController {
         let orderBy: object | any;
         let select: any = [];
 
-        if (options.status) {
-            if (typeof(options.status) === 'string') {
-                parameters.status = parseInt(options.status);
+        if (options.filterStatus) {
+            if (typeof(options.filterStatus) === 'string') {
+                parameters.status = parseInt(options.filterStatus);
             } else {
-                parameters.status = options.status;
+                parameters.status = options.filterStatus;
             }
         }
 
-        if (options.name) {
-            parameters.name = options.name;
+        if (options.id_culture) {
+            parameters.id_culture = options.id_culture;
         }
 
-        if (options.cpf) {
-            parameters.cpf = options.cpf;
+        if (options.year) {
+            parameters.year = options.year;
+        }
+
+        if (options.typeCrop) {
+            parameters.typeCrop = options.typeCrop;
         }
         
-        if (options.tel) {
-            parameters.tel = options.tel;
+        if (options.plantingStartTime) {
+            parameters.plantingStartTime = options.plantingStartTime;
         }
 
-        if (options.departmentId) {
-            parameters.departmentId = options.departmentId;
+        if (options.plantingEndTime) {
+            parameters.plantingEndTime = options.plantingEndTime;
         }
 
-        if (options.registration) {
-            parameters.registration = options.registration;
+        if (options.main_safra) {
+            parameters.main_safra = options.main_safra;
         }
 
-        if (options.email) {
-            parameters.email = options.email;
+        if (options.paramSelect) {
+            let objSelect = options.paramSelect.split(',');
+            Object.keys(objSelect).forEach((item) => {
+                select[objSelect[item]] = true;
+            });
+            select = Object.assign({}, select);
+        } else {
+            select = {
+                id: true, 
+                year: true, 
+                typeCrop:true, 
+                plantingStartTime:true, 
+                plantingEndTime:true, 
+                main_safra:true, 
+                status: true
+            };
         }
 
         if (options.take) {
@@ -70,13 +88,18 @@ export class SafraController {
                 skip = options.skip;
             }
         }
+
+        if (options.orderBy) {
+            orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+        }
         
         let response: object | any = await this.safraRepository.findAll(parameters, select, take , skip, orderBy);
+        console.log('Controller' + response);
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
             return {status: 200, response, total: response.total}
-        }        
+        }       
     }
 
     @Get()
@@ -120,7 +143,7 @@ export class SafraController {
     * @parameters data. objeto com as informações a serem atualizadas
      */
     @Put()
-    async updateSafra(data: object| any) {
+    async updateSafra(data: object | any) {
         if (data != null && data != undefined) {
             const parameters: object | any  = new Object();
 

@@ -6,13 +6,12 @@ import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
 export class SafraRepository {   
     async create(data: ISafraPropsDTO) {
         const safra = await prisma.safra.create({data});
-
         return safra;
     }
 
     async update(id: number, Data: Object) {
-        let User = await this.findOne(id);
-        if (User != null) { 
+        let safra = await this.findOne(id);
+        if (safra != null) {
             let Result = await prisma.safra.updateMany({ 
                 where: {
                     id: id
@@ -27,19 +26,20 @@ export class SafraRepository {
 
     async findOne(id: number) {
         let Result = await prisma.safra.findMany({
-               where: {
-                   id: id
-               }
-             }) .finally(async () => { await prisma.$disconnect() })
+            where: {
+                id: id
+            }
+                }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+        console.log(where, select, take);
         let order: object | any;
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.user.count({ where: where })
+        let count = await prisma.safra.count({ where: where })
         let Result: object | any = await prisma.safra.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         Result.total = count;
         return Result;

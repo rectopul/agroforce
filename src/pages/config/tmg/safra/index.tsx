@@ -1,3 +1,4 @@
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { useFormik } from "formik";
@@ -9,11 +10,13 @@ import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 
-import { userPreferencesService, userService } from "src/services";
+import { safraService, userPreferencesService, userService } from "src/services";
 
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
 
 import ITabs from "../../../../shared/utils/dropdown";
+import getConfig from "next/config";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
 
 interface IFilter{
   filterStatus: object | any;
@@ -24,8 +27,11 @@ interface IFilter{
 
 interface ISafra{
   id: number;
-  value: string;
-  description: string;
+  year: string;
+  typeCrop: string;
+  plantingStartTime: string;
+  plantingEndTime: string;
+  main_safra: string;
   status: boolean;
 }
 
@@ -35,30 +41,34 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
-  data: ISafra[];
+  allSafras: ISafra[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
 }
 
-export default function Listagem({data, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario;
 
-  const [safras, setSafras] = useState<ISafra[]>(() => data);
+  const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
-  const [arrowValue, setArrowValue] = useState<string>('');
+  const [arrowSafra, setArrowSafra] = useState<string>('');
   const [arrowDescription, setArrowDescription] = useState<string>('');
   const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Safra", value: "safra"},
-    { name: "CamposGerenciados[]", title: "Descrição", value: "description" },
+    { name: "CamposGerenciados[]", title: "Safra", value: "year"},
+    { name: "CamposGerenciados[]", title: "Tipo de safra", value: "typeCrop" },
+    { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
+    { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
+    { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
 
   const filtersStatusItem = [
     { id: 2, name: 'Todos'},
@@ -81,6 +91,14 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
     },
     onSubmit: (values) => {
       console.log(values);
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        if (response.status == 200) {
+          setTotaItems(response.total);
+          setFilter(parametersFilter);
+          setSafras(response.response);
+        }
+      })
     },
   });
 
@@ -117,29 +135,39 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowValue }
+              { arrowSafra }
               <button className='font-medium text-gray-900' onClick={() => {} /*handleOrderName('value', item.value)*/}>
                 Safra
               </button>
             </div>
           ),
-          field: "value",
+          field: "year",
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'description') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowDescription }
-              <button className='font-medium text-gray-900' onClick={() =>{} /*handleOrderEmail('description', item.description)*/}>
-                Descrição
-              </button>
-            </div>
-          ), 
-          field: "email",
-          sorting: false
-        },);
+      if (ObjetCampos[index] == 'typeCrop') {
+        arrOb.push({ title: "Tipo de safra", field: "typeCrop", sorting: false })
+      }
+      if (ObjetCampos[index] == 'plantingStartTime') {
+        arrOb.push({ 
+          title: "Período ideal de início de plantio", 
+          field: "plantingStartTime", 
+          sorting: false 
+        })
+      }
+      if (ObjetCampos[index] == 'plantingStartTime') {
+        arrOb.push({ 
+          title: "Período ideal do fim do plantio", 
+          field: "plantingEndTime", 
+          sorting: false 
+        })
+      }
+      if (ObjetCampos[index] == 'plantingStartTime') {
+        arrOb.push({ 
+          title: "Safra principal", 
+          field: "main_safra", 
+          sorting: false 
+        })
       }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
@@ -168,7 +196,7 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
                   href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
                 />
               </div>
-              rowData.status ? (
+              {rowData.status ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
@@ -190,7 +218,7 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
                     textColor="white"
                   />
                 </div>
-              )
+              )}
             </div>
           ),
         })
@@ -374,7 +402,7 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
 
                       <div className='h-full flex items-center gap-2'>
                         <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-64">
+                          <div className="w-72">
                             <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                               <DragDropContext onDragEnd={handleOnDragEnd}>
                                 <Droppable droppableId='characters'>
@@ -480,4 +508,40 @@ export default function Listagem({data, totalItems, itensPerPage, filterAplicati
       </Content>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
+  const PreferencesControllers = new UserPreferenceController();
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+
+  const  token  =  req.cookies.token;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
+
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
+  const urlParameters: any = new URL(baseUrl);
+  urlParameters.search = new URLSearchParams(param).toString();
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers:  { Authorization: `Bearer ${token}` }
+  } as RequestInit | undefined;
+
+  const safra = await fetch(urlParameters.toString(), requestOptions);
+  let Response = await safra.json();
+  
+  let allSafras = Response.response;
+  let totalItems = Response.total;
+
+  console.log(allSafras);
+
+  return {
+    props: {
+      allSafras,
+      totalItems,
+      itensPerPage,
+      filterAplication
+    },
+  }
 }
