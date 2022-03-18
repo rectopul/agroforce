@@ -1,9 +1,10 @@
 import {SafraRepository} from '../repository/safra.repository';
 import { Controller, Get, Post, Put } from '@nestjs/common';
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
 import {ISafraPropsDTO} from '../shared/dtos/ISafraPropsDTO';
 import { validationSafra } from '../shared/validations/safra/create.validation';
+import { validationSafraUpdate } from 'src/shared/validations/safra/update.validation';
+import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
 
 @Controller()
 export class SafraController {
@@ -103,17 +104,17 @@ export class SafraController {
     }
 
     @Get()
-    async getOneSafra(id: number | any) {
-        let newID = parseInt(id);
-        if (id && id != '{id}') {
-            let response = await this.safraRepository.findOne(newID); 
-            if (!response) {
-               return {status: 400, message: 'Safra não existe'};
-            } else {
-                return {status:200 , response};
-            }
-        } else {
-            return {status:405, response:{error: 'id não informado'}};
+    async getOneSafra(id: number) {
+        try {
+            if (!id) throw new Error("ID inválido");
+
+            const response = await this.safraRepository.findOne(id);
+    
+            if (!response) throw new Error("Dados inválidos");
+
+            return {status:200 , response};
+        } catch (e) {
+            return {status: 400, message: 'Safra não encontrada'};
         }
     }
 
@@ -133,7 +134,6 @@ export class SafraController {
 
             return {status: 200, message: "Safra inserida"}
         } catch(err) {
-            console.log(err);
             return { status: 404, message: "Erro"}
         }
     }
@@ -143,74 +143,22 @@ export class SafraController {
     * @parameters data. objeto com as informações a serem atualizadas
      */
     @Put()
-    async updateSafra(data: object | any) {
-        if (data != null && data != undefined) {
-            const parameters: object | any  = new Object();
+    async updateSafra(data: ISafraUpdateDTO) {
+        try {
+            const safraRepository = new SafraRepository();
 
-            if (typeof(data.status) === 'string') {
-                parameters.status =  parseInt(data.status);
-            } else { 
-                parameters.status =  data.status;
-            }
+            // Validação
+            const valid = validationSafraUpdate.isValidSync(data);
 
-            if (typeof(data.app_login) === 'string') {
-                parameters.app_login =  parseInt(data.app_login);
-            } else { 
-                parameters.app_login =  data.app_login;
-            }
+            if (!valid) throw new Error('Dados inválidos');
 
-            if (typeof(data.jivochat) === 'string') {
-                parameters.jivochat =  parseInt(data.jivochat);
-            } else { 
-                parameters.jivochat =  data.jivochat;
-            }
+            // Salvando
 
-            if (typeof(data.departmentId) === 'string') {
-                parameters.departmentId =  parseInt(data.departmentId);
-            } else { 
-                parameters.departmentId =  data.departmentId;
-            }
+            await safraRepository.update(data.id, data);
 
-            if (!data.name) throw 'Informe o nome do usuário';
-            if (!data.email) throw 'Informe o email do usuário';
-            if (!data.cpf) throw 'Informe o cpf do usuário';
-            if (!data.tel) throw 'Informe o telefone do usuário';
-            if (!data.password) throw 'Informe a senha do usuário';
-            if (!data.departmentId) throw 'Informe o departamento do usuário';
-            if (!data.created_by) throw 'Informe quem está tentando criar um usuário';
-
-            // Validação cpf é valido
-            if(!functionsUtils.validationCPF(data.cpf)) throw 'CPF invalído';
-
-            parameters.name = data.name;
-            parameters.email = data.email;
-            parameters.cpf = data.cpf;
-            parameters.tel = data.tel;
-            parameters.password = data.password;
-            parameters.created_by = data.created_by;
-
-            let response: object | any  = await this.safraRepository.update(data.id, parameters);
-
-            if(response.count > 0) {
-                if (data.profiles) {
-                    const parametersPermissions = new Object();
-                    // functionsUtils.getPermissions(data.id, data.profiles);
-                    // Object.keys(data.profiles).forEach((item) => {
-                    //     if (typeof(data.profiles[item].profileId) === 'string') {
-                    //         parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                    //     } else { 
-                    //         parametersPermissions.profileId = data.profiles[item].profileId;
-                    //     }
-                    //     parametersPermissions.SafraId = data.id;
-                    //     parametersPermissions.created_by = data.created_by;
-                    //     this.SafrasPermissionRepository.create(parametersPermissions);
-                    // });
-                }
-                return {status: 200, message: {message: "Usuario atualizada"}}
-            } else {
-                return {status: 400, message: {message: "usuario não existe"}}
-
-            }
+            return {status: 200, message: "Safra inserida"}
+        } catch (err) {
+            return { status: 404, message: "Erro ao atualizar" }
         }
     }
 }

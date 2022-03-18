@@ -193,7 +193,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                  href={`/config/tmg/safra/atualizar-safra?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (
@@ -533,8 +533,6 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   
   let allSafras = Response.response;
   let totalItems = Response.total;
-
-  console.log(allSafras);
 
   return {
     props: {
