@@ -7,21 +7,39 @@ export class LocalController {
 
     @Get()
     async getUFs() {
-        const parameters: object | any = new Object();
-        let take; 
-        let skip;
-        let orderBy: object | any;
-        let select: any = {nome: true, id: true, sigla: true};
-        return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
+        try {
+            const parameters: object | any = new Object();
+            let take; 
+            let skip;
+            let orderBy: object | any;
+            let select: any = {nome: true, id: true, sigla: true};
+            return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
+        } catch(e) {
+            return {status:400, message: "estado não encontrada"}
+        }
     }
 
-    async getCitys(ufId: number) {
+    @Get()
+    async getOnUFs(id: Number | any) {
+        let response = await this.localRepository.findOneUFs(id);
+        if (response) { 
+            return response;
+        }
+    }
+
+
+    async getCitys(ufId: number | any) {
         const parameters: object | any = new Object();
         let take; 
         let skip;
         let orderBy: object | any;
-        let select: any = {nome: true, id: true, sigla: true};
-        return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
+        let select: any = {nome: true, id: true, ufid: true};
+
+        if (ufId) {
+            parameters.ufid = parseInt(ufId);
+        }
+
+        return this.localRepository.findCitys(parameters, select, take, skip, orderBy);
     }
 
     @Get()
@@ -101,8 +119,12 @@ export class LocalController {
     }
 
     @Post()
-    async postLocal(data: object) {
+    async postLocal(data: object | any) {
         if (data != null && data != undefined) {
+            if (data.uf) {
+               let uf = await this.getOnUFs(parseInt(data.uf));
+               data.uf = uf?.sigla;
+            }
             let response = await this.localRepository.create(data);
             if(response) {
                 return {status: 200, message: "local inserido"}

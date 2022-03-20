@@ -53,8 +53,8 @@ export default function NovoLocal({ uf }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const ufs: object | any =  [];
-  const [culturaSelecionada, setCulturaSelecionada] = useState<any>();
-  const citys =  [{id: 'Campinas', name: "Campinas"}, {id: 'Santos', name: "Santos"}];
+  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
+
   const pais =  [{id: 'Brasil', name: "Brasil"}];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
@@ -97,11 +97,20 @@ export default function NovoLocal({ uf }: IData) {
   });
 
   uf.map((value: string | object | any) => {
-    ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
+    ufs.push({id: value.id, name: value.sigla, ufid: value.id});
   })
 
-  function showCitys() {
-
+  function showCitys(uf: any) {
+    if (uf) {
+      let param = '?ufId=' + uf; 
+      let city: object | any = [];
+      localService.getCitys(param).then((response) => {
+        response.map((value: string | object | any) => {
+          city.push({id: value.nome, name: value.nome});
+        })
+          setCitys(city)
+      });
+    }
   }
 
   function validateInputs(values: any) {
@@ -114,8 +123,7 @@ export default function NovoLocal({ uf }: IData) {
     if (!values.longitude) { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= 'red'; } else { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= ''; }
     if (!values.altitude) { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= 'red'; } else { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= ''; }
   }
-  useEffect(() => {
-}, [culturaSelecionada]);
+
   return (
     <>
       <Head>
@@ -202,7 +210,7 @@ export default function NovoLocal({ uf }: IData) {
                 id="uf"
                 name="uf"
                 onChange={formik.handleChange}
-                onBlur={e => setCulturaSelecionada(e.target.value)}
+                onBlur={e => showCitys(e.target.value)}
                 value={formik.values.uf}
                 selected={false}
               />
