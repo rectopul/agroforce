@@ -10,7 +10,7 @@ export class UserRepository {
     }
 
     async createUserCulture(Cultures: object | any) {
-        let Result = await prisma.users_Cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
 
         return Result;
     }
