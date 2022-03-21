@@ -140,7 +140,7 @@ model users_preferences {
   @@index([userId], map: "Users_Preferences_userId_fkey")
 }
 
-model Local {
+model local {
   id         Int      @id @default(autoincrement())
   name       String 
   pais       String  
@@ -153,4 +153,25 @@ model Local {
   created_at DateTime @default(now())
   created_by Int
   status     Int      @default(1)
+}
+
+model layoult_quadra {
+  id         Int      @id @default(autoincrement())
+  gerenc_quadras Int 
+  esquema String
+  OP String
+  semente_metros Int
+  disparos Int
+  divisor Int
+  largura String
+  comp_fisico String
+  comp_parcela String
+  comp_corredor String
+  t4_inicial Int
+  t4_final Int 
+  df_inicial Int 
+  df_final Int  
+  localId Int
+  name String 
+
 }
