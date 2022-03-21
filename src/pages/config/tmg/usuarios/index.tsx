@@ -57,7 +57,8 @@ interface Idata {
 
 export default function Listagem({ allUsers, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario;
+  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "avatar, name, tel, email, status"};
+  // const preferences = userLogado.preferences.usuario;
   
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [currentPage, setCurrentPage] = useState<number>(0);

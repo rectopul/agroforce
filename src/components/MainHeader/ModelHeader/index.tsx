@@ -22,7 +22,6 @@ export function ModelHeader({ name, avatar }: IModelProps) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
-  
   const [user, setUser] = useState();
 
   useEffect(() => {
