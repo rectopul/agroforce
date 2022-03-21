@@ -19,7 +19,7 @@ function Login() {
     useEffect(() => {
         // redirect to home if already logged in
         if (userService.userValue) {
-            router.push('/config/tmg/usuarios');
+            router.push('/');
         }
     }, [router]);
 
