@@ -37,7 +37,7 @@ function Login() {
     async function onSubmit({ email, password }: any) {
       await userService.login(email, password).then(() => {
         // get return url from query parameters or default to '/'
-        const returnUrl = router.query.returnUrl || '/config/tmg/usuarios';
+        const returnUrl = router.query.returnUrl || '/';
         router.push(returnUrl as string);
       })
       .catch(error => {
