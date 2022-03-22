@@ -6,11 +6,10 @@ import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle, FaSearchPlus } from "react-icons/fa";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { RiFileExcel2Line } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
-import { foco as Foco } from '@prisma/client';
 
 import { focoService } from "src/services/foco.service";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
@@ -28,7 +27,11 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-type IFocos = Omit<Foco, 'created_at' | 'created_by'>;
+export interface IFocos {
+  id: number;
+  name: string;
+  status: number;
+}
 
 interface IGenarateProps {
   name: string | undefined;

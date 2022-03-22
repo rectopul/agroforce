@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
+import MaterialTable from "material-table";
 import * as XLSX from 'xlsx';
 
 import { userPreferencesService, userService } from "src/services";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
 
 import { 
   Button, 
@@ -17,15 +18,17 @@ import {
   AccordionFilter,
   CheckBox
 } from "../../../../components";
+
 import  * as ITabs from '../../../../shared/utils/dropdown';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import MaterialTable from "material-table";
+
 import { FiUserPlus } from "react-icons/fi";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { IoReloadSharp } from "react-icons/io5";
 
 interface IUsers {
   id: number,
@@ -574,6 +577,15 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button 
+                                          value="Atualizar" 
+                                          bgColor='bg-blue-600' 
+                                          textColor='white' 
+                                          onClick={getValuesComluns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
@@ -591,9 +603,6 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                                         ))
                                       }
                                       { provided.placeholder }
-                                      <div className="h-8 mt-2">
-                                        <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                                      </div>
                                     </ul>
                                   )
                                 }
