@@ -199,3 +199,21 @@ model delineamento {
   created_by     Int
   created_at     DateTime? @default(now())
 }
+
+model type_assay {
+  id             Int       @id @default(autoincrement())
+  name           String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
+}
+
+model omg {
+  id             Int       @id @default(autoincrement())
+  name           String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
+}
+
+
