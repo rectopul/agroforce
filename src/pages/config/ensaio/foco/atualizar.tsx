@@ -1,10 +1,9 @@
 import Head from 'next/head';
 import { useFormik } from 'formik'
-import { BsCheckLg } from "react-icons/bs";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
-import { cultureService } from 'src/services';
+import { focoService } from 'src/services/foco.service';
 
 import { 
   Button,
@@ -15,37 +14,47 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
+import Swal from 'sweetalert2';
 
-export default function Cultura({cultureEdit}:any) {
+export interface IUpdateFoco {
+  id: number;
+  name: string;
+  status: number;
+  created_by: number;
+}
+
+export default function Atualizar(foco: IUpdateFoco) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
-  const formik = useFormik({
+  const formik = useFormik<IUpdateFoco>({
     initialValues: {
-      id: cultureEdit.id,
-      name: cultureEdit.name,
-      status: cultureEdit.status,
+      id: foco.id,
+      name: foco.name,
+      status: foco.status,
       created_by: userLogado.id,
     },
     onSubmit: values => {
-      cultureService.updateCulture({
-        id: cultureEdit.id,
+      focoService.update({
+        id: foco.id,
         name: formik.values.name,
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
-          alert("Cultura atualizada com sucesso");
+        if (response.status === 200) {
+          Swal.fire('Foco cadastrado com sucesso!');
+        } else {
+          Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   return (
     <>
      <Head>
-        <title>Atualizar cultura</title>
+        <title>Atualizar foco</title>
       </Head>
       
       <Content
@@ -59,7 +68,7 @@ export default function Cultura({cultureEdit}:any) {
 
         onSubmit={formik.handleSubmit}
       >
-        <h1 className="text-2xl">Nova cultura</h1>
+        <h1 className="text-2xl">Atualizar foco</h1>
 
         <div className="w-full
           flex 
@@ -70,14 +79,14 @@ export default function Cultura({cultureEdit}:any) {
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              ID cultura
+              Código
             </label>
-            <Input value={cultureEdit.id} disabled style={{ background: '#e5e7eb' }} />
+            <Input value={foco.id} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Nome cultura
+              Nome
             </label>
             <Input
               id="name"
@@ -100,7 +109,7 @@ export default function Cultura({cultureEdit}:any) {
                 name="status"
                 onChange={formik.handleChange}
                 value={formik.values.status}
-                selected={cultureEdit.status}
+                selected={formik.values.status}
               />
         
           </div>
@@ -115,7 +124,7 @@ export default function Cultura({cultureEdit}:any) {
           <div className="w-40">
             <Button
               type="submit"
-              value="Cadastrar"
+              value="Atualizar"
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {}}
@@ -129,18 +138,20 @@ export default function Cultura({cultureEdit}:any) {
 }
 
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-  const  token  =  req.cookies.token;
+  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
+  const  token  =  context.req.cookies.token;
   
-  const requestOptions: object | any = {
+  const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer  ${token}` }
+    headers:  { Authorization: `Bearer ${token}` }
   };
-  const res = await fetch(`${baseUrl}/` + 1, requestOptions)
-  const cultureEdit = await res.json();
 
-  return { props: { cultureEdit } }
+  const apiFoco = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
+
+  const foco = await apiFoco.json();
+
+  return { props: foco }
 }

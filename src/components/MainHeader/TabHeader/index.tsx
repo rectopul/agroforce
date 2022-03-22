@@ -36,6 +36,10 @@ export function TabHeader({ data, dataDropDowns }: IData) {
       }
     });
 
+    const handleClickTabHeader = () => {
+      router.push(href);
+    }
+
     setTabs((oldUser) => {
       const copy = [...oldUser];
 
@@ -43,12 +47,11 @@ export function TabHeader({ data, dataDropDowns }: IData) {
 
       if (!status) copy[index].status = true;
 
-      router.push(href);
-
       return copy;
     });
 
-  }
+    handleClickTabHeader();
+  };
 
   return (
     <>
