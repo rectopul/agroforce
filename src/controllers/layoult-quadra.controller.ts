@@ -1,45 +1,9 @@
-import {LocalRepository} from '../repository/local.repository';
-export class LocalController {
-    localRepository = new LocalRepository();
+import {LayoultQuadraRepository} from '../repository/layoult-quadra.repository';
 
-    async getUFs() {
-        try {
-            const parameters: object | any = new Object();
-            let take; 
-            let skip;
-            let orderBy: object | any;
-            let select: any = {nome: true, id: true, sigla: true};
-            return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
-        } catch(e) {
-            return {status:400, message: "estado não encontrada"}
-        }
-    }
-
+export class LayoultQuadraController {
+    Repository = new LayoultQuadraRepository();
  
-    async getOnUFs(id: Number | any) {
-        let response = await this.localRepository.findOneUFs(id);
-        if (response) { 
-            return response;
-        }
-    }
-
- 
-    async getCitys(ufId: number | any) {
-        const parameters: object | any = new Object();
-        let take; 
-        let skip;
-        let orderBy: object | any;
-        let select: any = {nome: true, id: true, ufid: true};
-
-        if (ufId) {
-            parameters.ufid = parseInt(ufId);
-        }
-
-        return this.localRepository.findCitys(parameters, select, take, skip, orderBy);
-    }
-
- 
-    async getAllLocal(options: object | any) {
+    async getAll(options: object | any) {
         const parameters: object | any = new Object();
         let take; 
         let skip;
@@ -54,19 +18,9 @@ export class LocalController {
             }
         }
 
-        if (options.filterUF) {
-            let uf = await this.getOnUFs(parseInt(options.filterUF));
-            parameters.uf = uf?.sigla;
-        }
-
-        if (options.filterCity) {
-            parameters.city =options.filterCity;
-        }
-
         if (options.filterSearch) {
             options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-            parameters.name  = JSON.parse(options.filterSearch);
-            parameters.address =JSON.parse(options.filterSearch);
+            parameters.esquema  = JSON.parse(options.filterSearch);
         }
     
         if (options.take) {
@@ -96,22 +50,21 @@ export class LocalController {
             });
             select = Object.assign({}, select);
         } else {
-            select = {id: true, name: true, pais:true, uf:true, city:true, address:true, latitude: true, longitude: true, altitude: true,  status:true};
+            select = {id: true, esquema: true, semente_metros:true, disparos:true, divisor:true, largura:true, comp_fisico: true, comp_parcela: true, comp_corredor: true,  t4_inicial:true, t4_final: true, df_inicial: true, df_final: true, local: { select :{name:true}}};
         }
 
-        let response =  await this.localRepository.findAll(parameters, select, take, skip, orderBy);
+        let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
             return {status: 200, response, total: response.total}
         }             
     }
-
  
-    async getOneLocal(id: string) {
+    async getOne(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
-            let response = await this.localRepository.findOne(newID); 
+            let response = await this.Repository.findOne(newID); 
             if (!response) {
                return {status: 400, response:{error: 'local não existe'}};
             } else {
@@ -122,23 +75,18 @@ export class LocalController {
         }
     }
 
-    async postLocal(data: object | any) {
+    async post(data: object | any) {
         if (data != null && data != undefined) {
-            if (data.uf) {
-               let uf = await this.getOnUFs(parseInt(data.uf));
-               data.uf = uf?.sigla;
-            }
-            let response = await this.localRepository.create(data);
+            let response = await this.Repository.create(data);
             if(response) {
                 return {status: 200, message: "local inserido"}
             } else {
                 return {status: 400, message: "erro"}
-
             }
         }
     }
 
-    async updateLocal(data: any) {
+    async update(data: any) {
         const parameters: object | any = new Object();
 
         if (typeof(data.status) === 'string') {
@@ -156,7 +104,8 @@ export class LocalController {
         if(data.longitude) parameters.longitude = data.longitude;
         if(data.altitude) parameters.altitude = data.altitude;
         if (data != null && data != undefined) {
-            let response = await this.localRepository.update(data.id, parameters);
+            let response = await this.Repository.update(data.id, parameters);
+            console.log(response)
             if(response) {
                 return {status: 200, message: {message: "local atualizado"}}
             } else {

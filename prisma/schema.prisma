@@ -154,13 +154,13 @@ model local {
   created_at DateTime @default(now())
   created_by Int
   status     Int      @default(1)
+  layoult_quadra layoult_quadra[]
 }
 
 model layoult_quadra {
   id         Int      @id @default(autoincrement())
-  gerenc_quadras Int 
   esquema String
-  OP String
+  op String
   semente_metros Int
   disparos Int
   divisor Int
@@ -173,7 +173,10 @@ model layoult_quadra {
   df_inicial Int 
   df_final Int  
   localId Int
-  name String 
+  status Int @default(1)
+  created_by Int
+  created_at DateTime @default(now())
+  local local  @relation(fields: [localId], references: [id])
 }
 
 model portfolio {
