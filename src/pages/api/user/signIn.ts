@@ -41,6 +41,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         preferences.safra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
         preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3})).response[0]
         preferences.local= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 4})).response[0]
+        preferences.layoult_quadra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5})).response[0]
+        preferences.delineamento= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 7})).response[0]
       }
 
 
