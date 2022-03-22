@@ -42,7 +42,7 @@ export class OGMController {
         if (options.orderBy) {
             orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
         }
-        console.log(options.paramSelect);
+
         if (options.paramSelect) {
             let objSelect = options.paramSelect.split(',');
             Object.keys(objSelect).forEach((item) => {
@@ -99,7 +99,6 @@ export class OGMController {
         if(data.status) parameters.status = data.status;
         if (data != null && data != undefined) {
             let response = await this.Repository.update(data.id, parameters);
-            console.log(response)
             if(response) {
                 return {status: 200, message: {message: "layoult atualizado"}}
             } else {
