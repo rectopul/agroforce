@@ -17,7 +17,6 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
-import { Decimal } from "@prisma/client/runtime";
 
 interface ILayoultProps {
   id: Number | any;
@@ -26,10 +25,10 @@ interface ILayoultProps {
   semente_metros: Number | any;
   disparos: Number | any;
   divisor: Number | any;
-  largura: Decimal | any;
-  comp_fisico: Decimal | any;
-  comp_parcela: Decimal | any;
-  comp_corredor: Decimal | any;
+  largura: Number | any;
+  comp_fisico: Number | any;
+  comp_parcela: Number | any;
+  comp_corredor: Number | any;
   t4_inicial: Number | any;
   t4_final: Number | any;
   df_inicial: Number | any;
