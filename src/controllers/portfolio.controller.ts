@@ -4,14 +4,7 @@ import { PortfolioRepository } from '../repository/portfolio.repository';
 
 import { ICreatePortfolioDTO } from '../shared/dtos/portfolioDTO/ICreatePortfolioDTO';
 import { validationCreatePortfolio } from '../shared/validations/potfolio/createPortfolioValidation';
-import { portfolio as Portfolio } from '@prisma/client';
-interface IListPortfolio {
-  where: Portfolio | undefined;
-  select: any; 
-  take: number;
-  skip: number;
-  orderBy: string | any;
-}
+
 export class PortfolioController {
   portfolioRepository = new PortfolioRepository();
 
@@ -46,7 +39,6 @@ export class PortfolioController {
     } else {
       select = {
         id: true, 
-        id_culture: true, 
         genealogy:true, 
         cruza:true, 
         status: true 
@@ -63,10 +55,6 @@ export class PortfolioController {
 
     if (options.cruza) {
       parameters.cruza = options.cruza;
-    }
-
-    if (options.id_culture) {
-      parameters.id_culture = options.id_culture;
     }
 
     if (options.take) {
@@ -86,17 +74,16 @@ export class PortfolioController {
     }
 
     if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+      orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
     }
     
     let response: object | any = await this.portfolioRepository.findAll(
       parameters,
-      select, 
-      take, 
-      skip, 
-      orderBy 
+      select,
+      take,
+      skip,
+      orderBy
     );
-
     if (!response) { 
       throw "falha na requisição, tente novamente";
     } else {

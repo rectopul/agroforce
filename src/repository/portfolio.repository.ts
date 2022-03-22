@@ -1,15 +1,6 @@
 import {prisma} from '../pages/api/db/db';
 import { ICreatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/ICreatePortfolioDTO';
 import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
-import { portfolio as Portfolio } from '@prisma/client';
-
-interface IListPortfolio {
-  where: Portfolio | undefined;
-  select: any; 
-  take: number;
-  skip: number;
-  orderBy: string | any;
-}
 
 export class PortfolioRepository {
   async list() {

@@ -1,7 +1,7 @@
 import getConfig from "next/config";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
@@ -19,6 +19,7 @@ import { userPreferencesService } from "src/services";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
 
 import ITabs from "../../../../shared/utils/dropdown";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
 interface IFilter{
   filterStatus: object | any;
@@ -50,9 +51,11 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
   const [portfolios, setPortfolios] = useState<IPortfolio[]>(() => allPortfolios);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number>(totalItems);
-  const [arrowGenealogy, setArrowGenealogy] = useState<string>('');
-  const [arrowCruza, setArrowCruza] = useState<string>('');
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
+  const [orderCruza, setOrderCruza] = useState<number>(0);
+  const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
+  const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
   const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -81,13 +84,13 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
+      await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        if (response.status === 200) {
           setTotaItems(response.total);
-          setFilter(parametersFilter);
           setPortfolios(response.response);
+          setFilter(parametersFilter);
         }
       })
     },
@@ -123,7 +126,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           title: (
             <div className='flex items-center'>
               { arrowGenealogy }
-              <button className='font-medium text-gray-900' onClick={() => {} /*handleOrderName('value', item.value)*/}>
+              <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
                 Genealogia
               </button>
             </div>
@@ -137,7 +140,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           title: (
             <div className='flex items-center'>
               { arrowCruza }
-              <button className='font-medium text-gray-900' onClick={() => {} /*handleOrderName('value', item.value)*/}>
+              <button className='font-medium text-gray-900' onClick={() => handleOrderCruza('cruza', orderCruza)}>
                 Cruza
               </button>
             </div>
@@ -223,6 +226,93 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     setManagedFields(campos);
   };
 
+  function handleOrderGenealogy(column: string, order: string | any): void {
+    let typeOrder: any; 
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof(filter) != undefined) {
+      if (typeOrder != '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder != '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
+        setOrderGenealogy(response.response)
+      }
+    })
+    if (orderGenealogy === 2) {
+      setOrderGenealogy(0);
+      setArrowGenealogy(<AiOutlineArrowDown />);
+    } else {
+      setOrderGenealogy(orderGenealogy + 1);
+      if (orderGenealogy === 1) {
+        setArrowGenealogy(<AiOutlineArrowUp />);
+      } else {
+        setArrowGenealogy('');
+      }
+    }
+  };
+
+  function handleOrderCruza(column: string, order: string | any): void {
+    let typeOrder: any; 
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof(filter) != undefined) {
+      if (typeOrder != '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder != '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
+        setOrderCruza(response.response)
+      }
+    });
+    
+    if (orderCruza === 2) {
+      setOrderCruza(0);
+      setArrowCruza(<AiOutlineArrowDown />);
+    } else {
+      setOrderCruza(orderCruza + 1);
+      if (orderCruza === 1) {
+        setArrowCruza(<AiOutlineArrowUp />);
+      } else {
+        setArrowCruza('');
+      }
+    }
+  };
+
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result)  return;
@@ -271,6 +361,33 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     });
   };
+
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  };
+
+  async function handlePagination(): Promise<void> {
+    let skip = currentPage * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    if (filter) {
+      parametersFilter = parametersFilter + "&" + filter;
+    }
+    await portfolioService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setPortfolios(response.response);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage, pages]);
   
   return (
     <>
@@ -507,8 +624,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const portfolios = await fetch(urlParameters.toString(), requestOptions);
   const response = await portfolios.json();
 
-  let allPortfolios = response.response;
-  let totalItems = response.total;
+  const allPortfolios = response.response;
+  const totalItems = response.total;
 
   return {
     props: {

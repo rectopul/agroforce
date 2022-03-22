@@ -93,9 +93,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           setTotaItems(response.total);
           setFilter(parametersFilter);
