@@ -1,7 +1,5 @@
 import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class LocalRepository {   
     async findOne(id: number) {
         let Result = await prisma.local.findUnique({

@@ -1,12 +1,10 @@
 import {SafraRepository} from '../repository/safra.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-
 import {ISafraPropsDTO} from '../shared/dtos/ISafraPropsDTO';
 import { validationSafra } from '../shared/validations/safra/create.validation';
 import { validationSafraUpdate } from 'src/shared/validations/safra/update.validation';
 import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
 
-@Controller()
+
 export class SafraController {
     safraRepository = new SafraRepository();
 
@@ -16,7 +14,6 @@ export class SafraController {
      * @example Options: 
      * 
      */
-    @Get()
     async getAllSafra(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -103,7 +100,6 @@ export class SafraController {
         }       
     }
 
-    @Get()
     async getOneSafra(id: number) {
         try {
             if (!id) throw new Error("ID inválido");
@@ -118,7 +114,6 @@ export class SafraController {
         }
     }
 
-    @Post()
     async postSafra(data: ISafraPropsDTO) {
         try {
             const safraRepository = new SafraRepository();
@@ -142,7 +137,7 @@ export class SafraController {
     * @returns Função responsavel por fazer a atualização da safra 
     * @parameters data. objeto com as informações a serem atualizadas
      */
-    @Put()
+
     async updateSafra(data: ISafraUpdateDTO) {
         try {
             const safraRepository = new SafraRepository();

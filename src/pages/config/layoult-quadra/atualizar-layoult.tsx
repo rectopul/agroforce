@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 import { IoMdArrowBack } from "react-icons/io";
 import { layoultQuadraService } from "src/services";
-import { useState } from "react";
 import InputMask from "react-input-mask";
 
 import {

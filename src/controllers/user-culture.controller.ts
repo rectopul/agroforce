@@ -1,12 +1,9 @@
 import {UserCultureRepository} from '../repository/user-culture.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
-@Controller()
+import { functionsUtils } from 'src/shared/utils/functionsUtils';
 export class UserCultureController {
     userCultureRepository = new UserCultureRepository();
 
-    @Get()
     async getAll(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -86,7 +83,6 @@ export class UserCultureController {
         }        
     }
 
-    @Get()
     async getOne(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -101,7 +97,6 @@ export class UserCultureController {
         }
     }
 
-    @Get() 
     async getByUserID(userId: Number | any)  {
         let newID = parseInt(userId);
         if (userId && userId != '{id}') {
@@ -116,7 +111,6 @@ export class UserCultureController {
         }
     }
 
-    @Post()
     async save(data: object | any) {
         const parameters: object | any = new Object();
         if (data != null && data != undefined) {
@@ -154,7 +148,6 @@ export class UserCultureController {
         }
     }
 
-    @Put()
     async update(data: object| any) {
         if (data != null && data != undefined) {
             const parameters: object | any  = new Object();

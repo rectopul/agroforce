@@ -1,16 +1,13 @@
 import {ProfileRepository} from '../repository/profile.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-@Controller()
+
 export class ProfileController {
     profileRepository = new ProfileRepository();
 
-    @Get()
     async getAllProfiles() {
         let response = await this.profileRepository.findAll();
         return response;        
     }
 
-    @Get()
     async getOneProfile(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -25,7 +22,6 @@ export class ProfileController {
         }
     }
 
-    @Post()
     async postProfile(data: object) {
         if (data != null && data != undefined) {
             let response = await this.profileRepository.create(data);
@@ -38,7 +34,6 @@ export class ProfileController {
         }
     }
 
-    @Put()
     async updateProfile(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {
