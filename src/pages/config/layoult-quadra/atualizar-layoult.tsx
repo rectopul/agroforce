@@ -470,7 +470,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const layoultEdit = await resU.json();
   let local = await apiLocal.json();
   local = local.response
-  console.log(layoultEdit)
   return { props: { local, layoultEdit  } }
 }
 

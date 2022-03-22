@@ -316,7 +316,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   function handleStatusUser(id: number, status: any): void {
-    console.log(status);
     if (status) {
       status = 1;
     } else {

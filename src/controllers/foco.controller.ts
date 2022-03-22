@@ -1,14 +1,15 @@
-import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
-import { validationUpdatePortfolio } from 'src/shared/validations/potfolio/updatePortfolioValidation';
-import { PortfolioRepository } from '../repository/portfolio.repository';
+import { FocoRepository } from '../repository/foco.repository';
 
-import { ICreatePortfolioDTO } from '../shared/dtos/portfolioDTO/ICreatePortfolioDTO';
-import { validationCreatePortfolio } from '../shared/validations/potfolio/createPortfolioValidation';
+import { IUpdateFocoDTO } from 'src/shared/dtos/focoDTO/IUpdateFocoDTO';
+import { ICreateFocoDTO } from '../shared/dtos/focoDTO/ICreateFocoDTO';
 
-export class PortfolioController {
-  portfolioRepository = new PortfolioRepository();
+import { validationFocoUpdate } from 'src/shared/validations/foco/update.validation';
+import { validationFocoCreate } from '../shared/validations/foco/create.validation';
 
-  async listAllPortfolios(options: any) {
+export class FocoController {
+  focoRepository = new FocoRepository();
+
+  async listAllFocos(options: any) {
     const parameters: object | any = new Object();
     let take; 
     let skip;
@@ -26,8 +27,7 @@ export class PortfolioController {
 
     if (options.filterSearch) {
       options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-      parameters.genealogy  = JSON.parse(options.filterSearch);
-      parameters.cruza = JSON.parse(options.filterSearch);
+      parameters.name  = JSON.parse(options.filterSearch);
     }
 
     if (options.paramSelect) {
@@ -38,23 +38,14 @@ export class PortfolioController {
       select = Object.assign({}, select);
     } else {
       select = {
-        id: true, 
-        genealogy:true, 
-        cruza:true, 
-        status: true 
+        id: true,
+        name:true,
+        status: true
       };
     }
 
-    if (options.genealogy) {
-      parameters.genealogy = options.genealogy;
-    }
-    
-    if (options.cruza) {
-      parameters.cruza = options.cruza;
-    }
-
-    if (options.cruza) {
-      parameters.cruza = options.cruza;
+    if (options.name) {
+      parameters.name = options.name;
     }
 
     if (options.take) {
@@ -77,7 +68,7 @@ export class PortfolioController {
       orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
     }
     
-    let response: object | any = await this.portfolioRepository.findAll(
+    let response: object | any = await this.focoRepository.findAll(
       parameters,
       select,
       take,
@@ -89,13 +80,13 @@ export class PortfolioController {
     } else {
       return {status: 200, response, total: response.total}
     }    
-  }
+  };
 
-  async getOnePortfolio(id: number) {
+  async getOneFoco(id: number) {
     try {
       if (!id) throw new Error("Dados inválidos");
 
-      const response = await this.portfolioRepository.findOne(id);
+      const response = await this.focoRepository.findOne(id);
 
       if (!response) throw new Error("Dados inválidos");
 
@@ -103,38 +94,37 @@ export class PortfolioController {
     } catch (e) {
       return {status: 400, message: 'Portfólio não encontrado'};
     }
-  }
+  };
 
-  async createPortfolio(data: ICreatePortfolioDTO) {
+  async createFoco(data: ICreateFocoDTO) {
     try {
       // Validação
-      const valid = validationCreatePortfolio.isValidSync(data);
+      const valid = validationFocoCreate.isValidSync(data);
 
       if (!valid) throw new Error('Dados inválidos');
 
       // Salvando
-      await this.portfolioRepository.create(data);
+      await this.focoRepository.create(data);
 
-      return {status: 201, message: "Portfólio cadastrado com sucesso!"}
+      return {status: 201, message: "Foco cadastrado com sucesso!"}
     } catch(err) {
       return { status: 404, message: "Erro"}
     }
-  }
+  };
 
-  async updatePortfolio(data: IUpdatePortfolioDTO) {
+  async updateFoco(data: IUpdateFocoDTO) {
     try {
       // Validação
-      const valid = validationUpdatePortfolio.isValidSync(data);
+      const valid = validationFocoUpdate.isValidSync(data);
 
       if (!valid) throw new Error('Dados inválidos');
 
       // Salvando
-      await this.portfolioRepository.update(data.id, data);
+      await this.focoRepository.update(data.id, data);
 
-      return {status: 200, message: "Portfólio atualizado!"}
+      return {status: 200, message: "Foco atualizado!"}
     } catch (err) {
-      console.log(err)
       return { status: 404, message: "Erro ao atualizar" }
     }
-  }
-}
+  };
+};

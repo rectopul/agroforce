@@ -1,7 +1,7 @@
-import {DelineamentoRepository} from '../repository/delineamento.repository';
+import {OGMRepository} from '../repository/ogm.repository';
 
-export class DelineamentoController {
-    Repository = new DelineamentoRepository();
+export class OGMController {
+    Repository = new OGMRepository();
  
     async getAll(options: object | any) {
         const parameters: object | any = new Object();
@@ -50,7 +50,7 @@ export class DelineamentoController {
             });
             select = Object.assign({}, select);
         } else {
-            select = {id: true, name: true, repeticao:true, trat_repeticao:true, status:true};
+            select = {id: true, name: true, status:true};
         }
 
         let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
@@ -79,7 +79,7 @@ export class DelineamentoController {
         if (data != null && data != undefined) {
             let response = await this.Repository.create(data);
             if(response) {
-                return {status: 200, message: "delineamento inserido"}
+                return {status: 200, message: "tipo ensaio inserido"}
             } else {
                 return {status: 400, message: "erro"}
             }
@@ -96,10 +96,7 @@ export class DelineamentoController {
         }
 
         if(data.name) parameters.name = data.name;
-        if(data.repeticao) parameters.repeticao = data.repeticao;
-        if(data.trat_repeticao) parameters.trat_repeticao = data.trat_repeticao;
         if(data.status) parameters.status = data.status;
-
         if (data != null && data != undefined) {
             let response = await this.Repository.update(data.id, parameters);
             if(response) {

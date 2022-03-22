@@ -178,7 +178,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/delineamento/atualizar-layoult?id=${rowData.id}`}
                   />
                 </div>
                 <div>

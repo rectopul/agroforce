@@ -112,7 +112,6 @@ export class LayoultQuadraController {
 
         if (data != null && data != undefined) {
             let response = await this.Repository.update(data.id, parameters);
-            console.log(response)
             if(response) {
                 return {status: 200, message: {message: "layoult atualizado"}}
             } else {

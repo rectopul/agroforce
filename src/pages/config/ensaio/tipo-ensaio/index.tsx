@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import getConfig from 'next/config';
 import * as XLSX from 'xlsx';
 
-import { userPreferencesService, userService } from "src/services";
+import { userPreferencesService, typeAssayService } from "src/services";
 
 import { 
   Button, 
@@ -17,6 +17,7 @@ import {
   AccordionFilter,
   CheckBox
 } from "../../../../components";
+
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
@@ -27,15 +28,13 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
-interface IUsers {
-  id: number,
-  name: string,
-  cpf: string,
-  email: string,
-  tel: string,
-  avatar: string,
-  status: boolean,
-}
+interface ITypeAssayProps {
+  id: Number | any;
+  name: String | any;
+  created_by: Number;
+  status: Number;
+};
+
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
@@ -48,36 +47,29 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-  allUsers: IUsers[];
+  allItems: ITypeAssayProps[];
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
 }
 
-export default function Listagem({ allUsers, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "avatar, name, tel, email, status"};
-  // const preferences = userLogado.preferences.usuario;
-  
-  const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const preferences = userLogado.preferences.type_assay || {id:0, table_preferences: "name, status"};
+
+  const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
-  const [orderEmail, setOrderEmail] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
-  const [arrowEmail, setArrowEmail] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
-    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
+    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  
   const take: number = itensPerPage;
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
@@ -93,13 +85,15 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async (values) => {
+    onSubmit: (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
-          setTotaItems(response.total);
+          if (response.total > 0) {
+            setTotaItems(response.total);
+          }
           setFilter(parametersFilter);
-          setUsers(response.response);
+          setTypeAssay(response.response);
         }
       })
     },
@@ -114,32 +108,14 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
-
     Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'avatar') {
-        arrOb.push({
-          title: "Avatar", 
-          field: "avatar",
-          sorting: false, 
-          width: 0,
-          exports: false,
-          render: (rowData: IUsers) => (
-            !rowData.avatar || rowData.avatar === '' ? (
-              <FaRegUserCircle size={32} />
-              ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
-            )
-          )
-        });
-      } 
       if (ObjetCampos[item] == 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowName }
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
+                Name
               </button>
             </div>
           ),
@@ -147,24 +123,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           sorting: false
         },);
       }
-      
-      if (ObjetCampos[item] == 'email') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowEmail }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
-                E-mail
-              </button>
-            </div>
-          ), 
-          field: "email",
-          sorting: false
-        },);
-      }
-      if (ObjetCampos[item] == 'tel') {
-        arrOb.push({ title: "Telefone", field: "tel", sorting: false })
-      }
+  
       if (ObjetCampos[item] == 'status') {
         arrOb.push({
           title: "Status",
@@ -172,20 +131,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IUsers) => (
+          render: (rowData: ITypeAssayProps) => (
             rowData.status ? (
               <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
                 <div className="
                   h-10
                 ">
@@ -194,7 +142,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                    href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -212,22 +160,11 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                   h-10
                 ">
                   <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
-                <div className="
-                  h-10
-                ">
-                  <Button 
                     icon={<BiEdit size={16} />}
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                    href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -259,8 +196,13 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    userLogado.preferences.type_assay = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+    if (preferences.id == 0) {
+      userPreferencesService.createPreferences({userId: userLogado.id, module_id: 5,  table_preferences: campos })
+    } else {
+      userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    }
+    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
@@ -274,63 +216,19 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    userService.updateUsers({id: id, status: status}).then((response) => {
-  
+    typeAssayService.update({id: id, status: status}).then((response) => {
     });
-    const index = users.findIndex((user) => user.id === id);
+    const index = typeAssay.findIndex((typeAssay) => typeAssay.id === id);
 
     if (index === -1) {
       return;
     }
 
-    setUsers((oldUser) => {
+    setTypeAssay((oldUser) => {
       const copy = [...oldUser];
       copy[index].status = status;
       return copy;
     });
-  };
-
-  function handleOrderEmail(column: string, order: string | any): void {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setUsers(response.response)
-      }
-    })
-    if (orderEmail === 2) {
-      setOrderEmail(0);
-      setArrowEmail(<AiOutlineArrowDown />);
-    } else {
-      setOrderEmail(orderEmail + 1);
-      if (orderEmail === 1) {
-        setArrowEmail(<AiOutlineArrowUp />);
-      } else {
-        setArrowEmail('');
-      }
-    }
   };
 
   function handleOrderName(column: string, order: string | any): void {
@@ -358,9 +256,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       }
     }
 
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    typeAssayService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response)
+        setTypeAssay(response.response)
       }
     });
     
@@ -394,7 +292,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    userService.getAll(filterAplication).then((response) => {
+    typeAssayService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
@@ -410,7 +308,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Tipo_Ensaio");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -423,7 +321,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Usuários.csv");
+        XLSX.writeFile(workBook, "Tipo_Ensaio.csv");
       }
     });
   };
@@ -443,9 +341,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await userService.getAll(parametersFilter).then((response) => {
+    await typeAssayService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response);
+        setTypeAssay(response.response);
       }
     });
   };
@@ -458,7 +356,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem de usuários</title>
+        <title>Listagem Tipos de Ensaio</title>
       </Head>
       <Content
         headerCotent={  
@@ -470,7 +368,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar usuários">
+          <AccordionFilter title="Filtrar">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -492,13 +390,14 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
                   </div>
+  
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="name ou email"
+                      placeholder="nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -525,7 +424,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={users}
+              data={typeAssay}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -552,12 +451,12 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar um usuário"
-                        value="Cadastrar um usuário"
+                        title="Cadastrar Tipo Ensaio"
+                        value="Cadastrar Tipo Ensaio"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="usuarios/cadastro"
+                        href="/config/ensaio/tipo-ensaio/cadastro"
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
@@ -678,13 +577,12 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
-
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -693,15 +591,13 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await user.json();
-  
-  let allUsers = Response.response;
-  let totalItems = Response.total;
-
+  const local = await fetch(urlParameters.toString(), requestOptions);
+  const Response =  await local.json();
+  const allItems = Response.response;
+  const totalItems = Response.total;
   return {
     props: {
-      allUsers,
+      allItems,
       totalItems,
       itensPerPage,
       filterAplication

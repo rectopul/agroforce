@@ -1,90 +1,78 @@
-import { useEffect, useState } from "react";
+import getConfig from "next/config";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
-import getConfig from 'next/config';
-import * as XLSX from 'xlsx';
-
-import { userPreferencesService, userService } from "src/services";
-
-import { 
-  Button, 
-  Content, 
-  Select, 
-  Input,
-  TabHeader,
-  AccordionFilter,
-  CheckBox
-} from "../../../../components";
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
-import { FiUserPlus } from "react-icons/fi";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle, FaSearchPlus } from "react-icons/fa";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import * as XLSX from 'xlsx';
+import { foco as Foco } from '@prisma/client';
+
+import { focoService } from "src/services/foco.service";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { userPreferencesService } from "src/services";
+
+import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
+
+import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
-interface IUsers {
-  id: number,
-  name: string,
-  cpf: string,
-  email: string,
-  tel: string,
-  avatar: string,
-  status: boolean,
-}
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
+
+type IFocos = Omit<Foco, 'created_at' | 'created_by'>;
+
 interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
-  allUsers: IUsers[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
+
+interface IData {
+  allFocos: IFocos[];
+  totalItems: number;
+  itensPerPage: number;
   filterAplication: object | any;
 }
 
-export default function Listagem({ allUsers, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
+  const { tabs, ensaiosDropDown } = ITabs;
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "avatar, name, tel, email, status"};
-  // const preferences = userLogado.preferences.usuario;
-  
-  const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const preferences = userLogado.preferences.usuario;
+
+  const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderEmail, setOrderEmail] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<any>('');
-  const [arrowEmail, setArrowEmail] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
-    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
-  ]);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
+  const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Name", value: "name" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" }
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
+
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
+
   const take: number = itensPerPage;
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = colums(camposGerenciados);
-  
-  const { tmgDropDown, tabs } = ITabs.default;
+  const columns = columnsOrder(managedFields);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -95,45 +83,43 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
+      await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        console.log(response)
+        if (response.status === 200) {
           setTotaItems(response.total);
+          setFocos(response.response);
           setFilter(parametersFilter);
-          setUsers(response.response);
         }
       })
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
-  ];
+  function handleStatusPortfolio(id: number, status: any): void {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+    
+    const index = focos.findIndex((foco) => foco.id === id);
 
-  function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+    if (index === -1) {
+      return;
+    }
+
+    setFocos((oldSafra) => {
+      const copy = [...oldSafra];
+      copy[index].status = status;
+      return copy;
+    });
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
 
-    Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'avatar') {
-        arrOb.push({
-          title: "Avatar", 
-          field: "avatar",
-          sorting: false, 
-          width: 0,
-          exports: false,
-          render: (rowData: IUsers) => (
-            !rowData.avatar || rowData.avatar === '' ? (
-              <FaRegUserCircle size={32} />
-              ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
-            )
-          )
-        });
-      } 
-      if (ObjetCampos[item] == 'name') {
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -147,101 +133,57 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           sorting: false
         },);
       }
-      
-      if (ObjetCampos[item] == 'email') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowEmail }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
-                E-mail
-              </button>
-            </div>
-          ), 
-          field: "email",
-          sorting: false
-        },);
-      }
-      if (ObjetCampos[item] == 'tel') {
-        arrOb.push({ title: "Telefone", field: "tel", sorting: false })
-      }
-      if (ObjetCampos[item] == 'status') {
+      if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IUsers) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
-                  />
-                </div>
-                <div>
+          render: (rowData: IFocos) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button 
+                  icon={<FaRegUserCircle size={16} />}
+                  onClick={() =>{}}
+                  bgColor="bg-yellow-500"
+                  textColor="white"
+                  href="perfil"
+                />
+              </div>
+              <div className="h-10">
+                <Button 
+                  icon={<BiEdit size={16} />}
+                  onClick={() =>{}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  href={`/config/ensaio/atualizar-foco?id=${rowData.id}`}
+                />
+              </div>
+              {rowData.status ? (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    onClick={() => handleStatusPortfolio(
+                      rowData.id, !rowData.status
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
-                  />
-                </div>
-                <div>
+              ) : (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusUser(
+                    onClick={() => handleStatusPortfolio(
                       rowData.id, !rowData.status
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              </div>
-            )
+              )}
+            </div>
           ),
         })
       }
@@ -249,7 +191,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  function getValuesComluns() {
+  function getValuesComluns(): void {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -265,32 +207,10 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 
     setStatusAccordion(false);
 
-    setCamposGerenciados(campos);
+    setManagedFields(campos);
   };
 
-  function handleStatusUser(id: number, status: any): void {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-    userService.updateUsers({id: id, status: status}).then((response) => {
-  
-    });
-    const index = users.findIndex((user) => user.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setUsers((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  };
-
-  function handleOrderEmail(column: string, order: string | any): void {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -315,55 +235,11 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       }
     }
 
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await focoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response)
+        setOrderName(response.response)
       }
     })
-    if (orderEmail === 2) {
-      setOrderEmail(0);
-      setArrowEmail(<AiOutlineArrowDown />);
-    } else {
-      setOrderEmail(orderEmail + 1);
-      if (orderEmail === 1) {
-        setArrowEmail(<AiOutlineArrowUp />);
-      } else {
-        setArrowEmail('');
-      }
-    }
-  };
-
-  function handleOrderName(column: string, order: string | any): void {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setUsers(response.response)
-      }
-    });
-    
     if (orderName === 2) {
       setOrderName(0);
       setArrowName(<AiOutlineArrowDown />);
@@ -389,16 +265,14 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => {
+  const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${managedFields}`;
     }
     
-    userService.getAll(filterAplication).then((response) => {
+    await focoService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
             row.status = "Inativo";
           } else {
@@ -410,7 +284,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "focos");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -423,7 +297,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Usuários.csv");
+        XLSX.writeFile(workBook, "Focos.csv");
       }
     });
   };
@@ -443,9 +317,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await userService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setUsers(response.response);
+    await focoService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setFocos(response.response);
       }
     });
   };
@@ -454,23 +328,20 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-
+  
   return (
     <>
-      <Head>
-        <title>Listagem de usuários</title>
-      </Head>
-      <Content
-        headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-        }
-      >
+      <Head><title>Listagem de focos</title></Head>
+
+      <Content headerCotent={
+        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown}  />
+      }>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar usuários">
+          <AccordionFilter title="Filtrar focos">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -490,7 +361,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -498,7 +369,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="name ou email"
+                      placeholder="foco"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -520,18 +391,16 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
             </div>
           </AccordionFilter>
 
-          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable
+            <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={users}
+              data={focos}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20
                 },
-                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -552,22 +421,21 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar um usuário"
-                        value="Cadastrar um usuário"
+                        title="Cadastrar um Foco"
+                        value="Cadastrar um Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="usuarios/cadastro"
-                        icon={<FiUserPlus size={20} />}
+                        href="foco/cadastro"
+                        icon={<FaSearchPlus size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
+                        <div className="w-72">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -579,11 +447,11 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                           {(provided) => (
                                             <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox 
-                                                name={genarate.name} 
-                                                title={genarate.title?.toString()} 
-                                                value={genarate.value} 
-                                                defaultChecked={camposGerenciados.includes(genarate.value)}
+                                              <CheckBox
+                                                name={genarate.name}
+                                                title={genarate.title?.toString()}
+                                                value={genarate.value}
+                                                defaultChecked={managedFields.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -681,7 +549,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = "filterStatus=1";
@@ -693,15 +561,15 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await user.json();
-  
-  let allUsers = Response.response;
-  let totalItems = Response.total;
+  const focos = await fetch(urlParameters.toString(), requestOptions);
+  const response = await focos.json();
+
+  const allFocos = response.response;
+  const totalItems = response.total;
 
   return {
     props: {
-      allUsers,
+      allFocos,
       totalItems,
       itensPerPage,
       filterAplication

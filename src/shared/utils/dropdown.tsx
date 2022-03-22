@@ -1,16 +1,17 @@
+import { AiOutlineFileSearch } from "react-icons/ai";
 import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
 const tabs = [
-  { title: 'TMG', value: <BsCheckLg />, status: true },
-  { title: 'ENSAIO', value: <BsCheckLg />, status: false  },
-  { title: 'LOCAL', value: <BsCheckLg />, status: false  },
-  { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false  },
-  { title: 'NPE', value: <BsCheckLg />, status: false  },
-  { title: 'QUADRAS', value: <BsCheckLg />, status: false  },
-  { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
+  { title: 'TMG', value: <BsCheckLg />, status: true, href: 'http://localhost:3000/config/tmg/usuarios' },
+  { title: 'ENSAIO', value: <BsCheckLg />, status: false , href: 'http://localhost:3000/config/ensaio/foco' },
+  { title: 'LOCAL', value: <BsCheckLg />, status: false , href: 'http://localhost:3000/config/local' },
+  { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false , href: 'http://localhost:3000/config/delineamento' },
+  { title: 'NPE', value: <BsCheckLg />, status: false , href: 'http://localhost:3000/config/npe' },
+  { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: 'http://localhost:3000/config/quadras' },
+  { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false, href: 'http://localhost:3000/config/conf-planilhas' },
 ];
 
 const tmgDropDown =  [
@@ -21,9 +22,9 @@ const tmgDropDown =  [
 ];
 
 const ensaiosDropDown =  [
-  {labelDropDown: 'Não definido', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
+  {labelDropDown: 'Foco', hrefDropDown: 'http://localhost:3000/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
+  {labelDropDown: 'OGM', hrefDropDown: 'http://localhost:3000/config/ensaio/ogm', iconDropDown: <BiUser/> },
+  {labelDropDown: 'Tipo de ensaio', hrefDropDown: 'http://localhost:3000/config/ensaio/tipo-de-ensaio', iconDropDown: <MdDateRange/> },
 ];
 
 const localsDropDown =  [
@@ -56,7 +57,8 @@ const configPlanilhasDropDown =  [
   {labelDropDown: 'Teste', hrefDropDown: '#'},
 ];
 
-export default { 
+// eslint-disable-next-line import/no-anonymous-default-export
+export default {
   tabs, 
   tmgDropDown,
   ensaiosDropDown,

@@ -1,22 +1,8 @@
 import {prisma} from '../pages/api/db/db';
 import { ICreatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/ICreatePortfolioDTO';
 import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
-import { portfolio as Portfolio } from '@prisma/client';
-
-interface IListPortfolio {
-  where: Portfolio | undefined;
-  select: any; 
-  take: number;
-  skip: number;
-  orderBy: string | any;
-}
 
 export class PortfolioRepository {
-  async list() {
-    const portfolios = await prisma.portfolio.findMany();
-    return portfolios;
-  }
-
   async create(data: ICreatePortfolioDTO) {
     const portfolio = await prisma.portfolio.create({ data });
     return portfolio;
@@ -50,7 +36,8 @@ export class PortfolioRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.portfolio.count({ where: where })
+    const count = await prisma.portfolio.count({ where: where });
+
     const result: object | any = await prisma.portfolio.findMany({
       select: select, 
       skip: skip, 
