@@ -1,6 +1,6 @@
 import {prisma} from '../pages/api/db/db';
-import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
-import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
+import { ISafraPropsDTO } from 'src/shared/dtos/safraDTO/ISafraPropsDTO';
+import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
 
 export class SafraRepository {   
     async create(data: ISafraPropsDTO | any) {

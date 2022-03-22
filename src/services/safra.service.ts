@@ -1,8 +1,8 @@
 import getConfig from 'next/config';
 
 import { fetchWrapper } from '../helpers';
-import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
-import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
+import { ISafraPropsDTO } from 'src/shared/dtos/safraDTO/ISafraPropsDTO';
+import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
