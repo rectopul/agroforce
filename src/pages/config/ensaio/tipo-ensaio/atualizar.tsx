@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 import { IoMdArrowBack } from "react-icons/io";
-import { delineamentoService } from "src/services";
+import { typeAssayService } from "src/services";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
@@ -12,51 +12,46 @@ import {
   Content,
   Input,
   Button,
-} from "../../../components";
+} from "../../../../components";
 
-import * as ITabs from '../../../shared/utils/dropdown';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface IDelineamentoProps {
+interface ITypeAssayProps {
   id: Number | any;
   name: String | any;
-  repeticao: Number;
-  trat_repeticao: Number;
   created_by: Number;
   status: Number;
 };
 
-export interface IData {
-  delineamentoEdit: object | any;
+interface IData {
+  typeAssayEdit: ITypeAssayProps;
 }
 
-export default function NovoLocal({delineamentoEdit}: IData) {
+
+export default function NovoLocal({typeAssayEdit}: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
-  const formik = useFormik<IDelineamentoProps>({
+  const formik = useFormik<ITypeAssayProps>({
     initialValues: {
-      id: delineamentoEdit.id,
-      name: delineamentoEdit.name,
-      repeticao: delineamentoEdit.repeticao,
-      trat_repeticao: delineamentoEdit.trat_repeticao,
+      id: typeAssayEdit.id,
+      name: typeAssayEdit.name,
       created_by: userLogado.id,
       status: 1
     },
     onSubmit: (values) => {      
       validateInputs(values);
-      if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
+      if (!values.name)  { return; } 
 
-      delineamentoService.update({
+      typeAssayService.update({
         id: values.id,
         name:values.name,
-        repeticao: Number(values.repeticao),
-        trat_repeticao: Number(values.trat_repeticao),
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Delineamento cadastrado com sucesso!')
-          router.push('/config/delineamento');
+          Swal.fire('Tipo de Ensaio atualizado com sucesso!')
+          router.push('/config/ensaio/tipo-ensaio');
         } else {
           Swal.fire(response.message)
         }
@@ -66,14 +61,12 @@ export default function NovoLocal({delineamentoEdit}: IData) {
 
   function validateInputs(values: any) {
     if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
-    if (!values.repeticao) { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor= 'red'; } else { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor= ''; }
-    if (!values.trat_repeticao) { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor= 'red'; } else { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor= ''; }
   }
 
-  return (
+    return (
     <>
       <Head>
-        <title>Atualizar Delineamento</title>
+        <title>Atualizar Tipo Ensaio</title>
       </Head>
 
       <Content headerCotent={
@@ -84,7 +77,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Delineamento</h1>
+            <h1 className="text-2xl">Atualizar Tipo Ensaio</h1>
           </div>
 
           <div className="w-full
@@ -96,43 +89,30 @@ export default function NovoLocal({delineamentoEdit}: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome Delineamento
+                Código Tipo Ensaio
               </label>
               <Input 
                 type="text" 
-                placeholder="Nome Delineamento" 
+                placeholder="Nome" 
+                id="id"
+                name="id"
+                onChange={formik.handleChange}
+                value={formik.values.id}
+              />
+            </div>  
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Nome
+              </label>
+              <Input 
+                type="text" 
+                placeholder="Nome" 
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Repetição
-              </label>
-              <Input 
-                type="text" 
-                placeholder="4" 
-                id="repeticao"
-                name="repeticao"
-                onChange={formik.handleChange}
-                value={Number(formik.values.repeticao)}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Trat. Repetição
-              </label>
-              <Input 
-                type="text" 
-                placeholder="14x08(p4)-PY" 
-                id="trat_repeticao"
-                name="trat_repeticao"
-                onChange={formik.handleChange}
-                value={Number(formik.values.trat_repeticao)}
-              />
-            </div>        
+            </div>       
           </div>
 
           <div className="
@@ -149,7 +129,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
+                onClick={() => {router.push('/config/ensaio/tipo-ensaio/')}}
               />
             </div>
             <div className="w-40">
@@ -168,9 +148,10 @@ export default function NovoLocal({delineamentoEdit}: IData) {
   );
 }
 
+
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
   const  token  =  context.req.cookies.token;
   
   const requestOptions: RequestInit | undefined = {
@@ -181,7 +162,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
 
-  const delineamentoEdit = await resU.json();
+  const typeAssayEdit = await resU.json();
 
-  return { props: { delineamentoEdit  } }
+  return { props: { typeAssayEdit  } }
 }

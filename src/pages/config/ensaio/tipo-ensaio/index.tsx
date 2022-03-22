@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import getConfig from 'next/config';
 import * as XLSX from 'xlsx';
 
-import { userPreferencesService, delineamentoService } from "src/services";
+import { userPreferencesService, typeAssayService } from "src/services";
 
 import { 
   Button, 
@@ -16,8 +16,9 @@ import {
   TabHeader,
   AccordionFilter,
   CheckBox
-} from "../../../components";
-import  * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../../components";
+
+import  * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
 import { FiUserPlus } from "react-icons/fi";
@@ -27,11 +28,9 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
-interface IDelineamentoProps {
+interface ITypeAssayProps {
   id: Number | any;
   name: String | any;
-  repeticao: Number;
-  trat_repeticao: Number;
   created_by: Number;
   status: Number;
 };
@@ -48,7 +47,7 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-  allItems: IDelineamentoProps[];
+  allItems: ITypeAssayProps[];
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
@@ -57,21 +56,17 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.delineamento || {id:0, table_preferences: "name, repeticao, trat_repeticao, status"};
+  const preferences = userLogado.preferences.type_assay || {id:0, table_preferences: "name, status"};
 
-  const [delineamento, setDelineamento] = useState<IDelineamentoProps[]>(() => allItems);
+  const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
-  const [orderAddress, setOrderAddress] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
-  const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Repetiçao ", value: "repeticao", defaultChecked: () => camposGerenciados.includes('repeticao') },
-    { name: "CamposGerenciados[]", title: "Trat. Repetição", value: "trat_repeticao", defaultChecked: () => camposGerenciados.includes('trat_repeticao') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -92,13 +87,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
             setTotaItems(response.total);
           }
           setFilter(parametersFilter);
-          setDelineamento(response.response);
+          setTypeAssay(response.response);
         }
       })
     },
@@ -129,15 +124,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         },);
       }
   
-      if (ObjetCampos[item] == 'repeticao') {
-        arrOb.push({ title: "Repetição", field: "repeticao", sorting: false })
-      }
-      
-      if (ObjetCampos[item] == 'trat_repeticao') {
-        arrOb.push({ title: "Trat. Repetição", field: "trat_repeticao", sorting: false })
-      }
-
-
       if (ObjetCampos[item] == 'status') {
         arrOb.push({
           title: "Status",
@@ -145,7 +131,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IDelineamentoProps) => (
+          render: (rowData: ITypeAssayProps) => (
             rowData.status ? (
               <div className='h-10 flex'>
                 <div className="
@@ -156,7 +142,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/delineamento/atualizar?id=${rowData.id}`}
+                    href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -178,7 +164,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/delineamento/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -210,7 +196,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.layoult_quadra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+    userLogado.preferences.type_assay = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
     if (preferences.id == 0) {
       userPreferencesService.createPreferences({userId: userLogado.id, module_id: 5,  table_preferences: campos })
     } else {
@@ -230,62 +216,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    delineamentoService.update({id: id, status: status}).then((response) => {
+    typeAssayService.update({id: id, status: status}).then((response) => {
     });
-    const index = delineamento.findIndex((delineamento) => delineamento.id === id);
+    const index = typeAssay.findIndex((typeAssay) => typeAssay.id === id);
 
     if (index === -1) {
       return;
     }
 
-    setDelineamento((oldUser) => {
+    setTypeAssay((oldUser) => {
       const copy = [...oldUser];
       copy[index].status = status;
       return copy;
     });
-  };
-
-  function handleOrderAddress(column: string, order: string | any): void {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    delineamentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setDelineamento(response.response)
-      }
-    })
-    if (orderAddress === 2) {
-      setOrderAddress(0);
-      setArrowAddress(<AiOutlineArrowDown />);
-    } else {
-      setOrderAddress(orderAddress + 1);
-      if (orderAddress === 1) {
-        setArrowAddress(<AiOutlineArrowUp />);
-      } else {
-        setArrowAddress('');
-      }
-    }
   };
 
   function handleOrderName(column: string, order: string | any): void {
@@ -313,9 +256,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    delineamentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    typeAssayService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setDelineamento(response.response)
+        setTypeAssay(response.response)
       }
     });
     
@@ -349,7 +292,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    delineamentoService.getAll(filterAplication).then((response) => {
+    typeAssayService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
@@ -365,7 +308,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "delineamento");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Tipo_Ensaio");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -378,7 +321,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Delineamento.csv");
+        XLSX.writeFile(workBook, "Tipo_Ensaio.csv");
       }
     });
   };
@@ -398,9 +341,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await delineamentoService.getAll(parametersFilter).then((response) => {
+    await typeAssayService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setDelineamento(response.response);
+        setTypeAssay(response.response);
       }
     });
   };
@@ -413,7 +356,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem dos Layoults</title>
+        <title>Listagem Tipos de Ensaio</title>
       </Head>
       <Content
         headerCotent={  
@@ -481,7 +424,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={delineamento}
+              data={typeAssay}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -508,12 +451,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar Delineamento"
-                        value="Cadastrar Delineamento"
+                        title="Cadastrar Tipo Ensaio"
+                        value="Cadastrar Tipo Ensaio"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="delineamento/cadastro"
+                        href="/config/ensaio/tipo-ensaio/cadastro"
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
@@ -636,7 +579,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterAplication = "filterStatus=1";
