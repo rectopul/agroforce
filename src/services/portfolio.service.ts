@@ -9,7 +9,6 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
 
 export const portfolioService = {
   update,
-  show,
   getAll,
   create,
 };
@@ -19,13 +18,7 @@ async function create(data: ICreatePortfolioDTO) {
   return portfolio;
 }
 
-async function show(data: any) {
-  const portfolio = await fetchWrapper.put(baseUrl, data);
-  return portfolio;
-}
-
 async function update(data: IUpdatePortfolioDTO) {
-  console.log(data);
   const portfolio = await fetchWrapper.put(baseUrl, data);
   return portfolio;
 }
