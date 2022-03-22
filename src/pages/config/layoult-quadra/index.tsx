@@ -17,6 +17,7 @@ import {
   AccordionFilter,
   CheckBox
 } from "../../../components";
+
 import  * as ITabs from '../../../shared/utils/dropdown';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
@@ -24,9 +25,8 @@ import { FiUserPlus } from "react-icons/fi";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { Decimal } from "@prisma/client/runtime";
 
 interface ILayoultProps {
   id: Number | any;
@@ -34,10 +34,10 @@ interface ILayoultProps {
   semente_metros: Number | any;
   disparos: Number | any;
   divisor: Number | any;
-  largura: Decimal | any;
-  comp_fisico: Decimal | any;
-  comp_parcela: Decimal | any;
-  comp_corredor: Decimal | any;
+  largura: Number | any;
+  comp_fisico: Number | any;
+  comp_parcela: Number | any;
+  comp_corredor: Number | any;
   t4_inicial: Number | any;
   t4_final: Number | any;
   df_inicial: Number | any;

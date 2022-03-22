@@ -10,7 +10,6 @@ import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
-import { portfolio as Portfolio } from '@prisma/client';
 
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { portfolioService } from "src/services/portfolio.service";
@@ -28,7 +27,12 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-type IPortfolio = Omit<Portfolio, 'created_at' | 'created_by'>;
+export interface IPortfolio {
+  id: number;
+  genealogy: string;
+  cruza: string;
+  status: number;
+}
 
 interface IGenarateProps {
   name: string | undefined;
