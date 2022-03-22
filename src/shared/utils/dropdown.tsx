@@ -28,9 +28,7 @@ const ensaiosDropDown =  [
 ];
 
 const localsDropDown =  [
-  {labelDropDown: 'Não definido', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
+  {labelDropDown: 'Local', hrefDropDown: 'http://localhost:3000/config/local', iconDropDown: <AiOutlineFileSearch/> },
 ];
 
 const DelineamentosDropDown =  [

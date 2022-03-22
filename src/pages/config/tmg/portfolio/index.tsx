@@ -19,6 +19,7 @@ import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } 
 
 import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { IoReloadSharp } from "react-icons/io5";
 
 interface IFilter{
   filterStatus: object | any;
@@ -507,6 +508,15 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button 
+                                          value="Atualizar" 
+                                          bgColor='bg-blue-600' 
+                                          textColor='white' 
+                                          onClick={getValuesComluns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
@@ -524,9 +534,6 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                                         ))
                                       }
                                       { provided.placeholder }
-                                      <div className="h-8 mt-2">
-                                        <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                                      </div>
                                     </ul>
                                   )
                                 }
