@@ -3,11 +3,6 @@ import { ICreatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/ICreatePortfol
 import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
 
 export class PortfolioRepository {
-  async list() {
-    const portfolios = await prisma.portfolio.findMany();
-    return portfolios;
-  }
-
   async create(data: ICreatePortfolioDTO) {
     const portfolio = await prisma.portfolio.create({ data });
     return portfolio;

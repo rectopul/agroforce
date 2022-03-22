@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { DropDown, ToolTip } from "src/components";
 
 type ITabProps = {
   value: ReactNode;
   title: string;
+  href: string;
   status?: boolean;
 }
 
@@ -20,8 +22,10 @@ type IData = {
 
 export function TabHeader({ data, dataDropDowns }: IData) {
   const [tabs, setTabs] = useState<ITabProps[]>(() => data);
+
+  const router = useRouter();
   
-  function handleStatusButton(title: string, status: boolean): void {
+  function handleStatusButton(title: string, status: boolean, href: string): void {
     const index = tabs.findIndex((tab) => tab.title === title);
 
     tabs.filter((btn, indexBtn) => {
@@ -39,8 +43,11 @@ export function TabHeader({ data, dataDropDowns }: IData) {
 
       if (!status) copy[index].status = true;
 
+      router.push(href);
+
       return copy;
     });
+
   }
 
   return (
@@ -52,14 +59,14 @@ export function TabHeader({ data, dataDropDowns }: IData) {
               dataDropDowns.map((dropDown, index) => (
                 <DropDown key={index}
                  label={dropDown.labelDropDown} 
-                 href={dropDown.hrefDropDown} 
+                 href={dropDown.hrefDropDown}
                  icon={dropDown.iconDropDown} 
                 />
               ))
             }>
               <button
                 key={index}
-                onClick={() => handleStatusButton(tab.title, !tab.status)}
+                onClick={() => handleStatusButton(tab.title, !tab.status, tab.href)}
                 className="h-full
                 flex items-center gap-1
               ">
@@ -77,7 +84,7 @@ export function TabHeader({ data, dataDropDowns }: IData) {
           ) : (
             <button
               key={index}
-              onClick={() => handleStatusButton(tab.title, !tab.status)}
+              onClick={() => handleStatusButton(tab.title, !tab.status, tab.href)}
               className="h-full
               flex items-center gap-1
             ">

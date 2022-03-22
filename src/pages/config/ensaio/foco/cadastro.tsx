@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useFormik } from 'formik'
 import Swal from 'sweetalert2';
 
-import { cultureService } from 'src/services';
+import { focoService } from 'src/services/foco.service';
 
 import { 
   Button,
@@ -12,41 +12,49 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
+
 import { RiPlantLine } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
 
+interface ICreateFoco {
+  name: string;
+  created_by: number;
+}
+
 export default function Cadastro() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
 
-  const formik = useFormik({
+  const formik = useFormik<ICreateFoco>({
     initialValues: {
       name: '',
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
-      await cultureService.createCulture({
+      await focoService.create({
         name: formik.values.name,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
-          Swal.fire('Cultura cadastrada com sucesso!');
+        if (response.status === 200) {
+          Swal.fire('Foco cadastrado com sucesso!');
         } else {
           Swal.fire(response.message)
         }
-      })
+      }).finally(() => {
+        formik.values.name = '';
+      });
     },
   });
 
   return (
     <>
      <Head>
-        <title>Nova cultura</title>
+        <title>Novo foco</title>
       </Head>
       
       <Content
         headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
         }
       >
 
@@ -64,14 +72,14 @@ export default function Cadastro() {
         ">
           <div className="w-2/4 h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Nome cultura
+              Nome foco
             </label>
             <Input
               id="name"
               name="name"
               type="text" 
               max="50" 
-              placeholder="ex: Soja"
+              placeholder="ex: Foco 321"
               onChange={formik.handleChange}
               value={formik.values.name}
             />
@@ -91,7 +99,7 @@ export default function Cadastro() {
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/tmg/cultura"
+                href="/config/ensaio"
                 icon={<IoMdArrowBack size={18} />}
                 onClick={() => {}}
               />
