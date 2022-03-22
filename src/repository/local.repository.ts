@@ -1,7 +1,5 @@
 import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class LocalRepository {   
     async findOne(id: number) {
         let Result = await prisma.local.findUnique({
@@ -32,12 +30,21 @@ export class LocalRepository {
         return Result;
     }
 
+    async findOneUFs(id: number) {
+        let Result = await prisma.uf.findUnique({
+               where: {
+                   id: id
+               }
+             }) .finally(async () => { await prisma.$disconnect() })
+        return Result;
+    }
+
     async findCitys (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let Result: object | any = await prisma.uf.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.city.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 

@@ -1,11 +1,8 @@
-import { Controller, Get, Post, Put } from '@nestjs/common';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 
-@Controller()
 export class UserPermissionController {
     userPermission = new UsersPermissionsRepository();
 
-    @Get()
     async getUserPermissions(userId: any) {
         if (typeof(userId) === 'string') {
             userId = parseInt(userId);
@@ -24,7 +21,6 @@ export class UserPermissionController {
         return arr2;        
     }
 
-    @Get()
     async getAllPermissions() {
         let response = await this.userPermission.findAll('');
 
@@ -34,7 +30,6 @@ export class UserPermissionController {
         return response;        
     }
 
-    @Post()
     async postUserPermission(data: object) {
         if (data != null && data != undefined) {
             let response = await this.userPermission.create(data);

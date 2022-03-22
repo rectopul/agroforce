@@ -1,7 +1,5 @@
 import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
         let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })

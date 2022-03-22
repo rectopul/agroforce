@@ -1,37 +1,50 @@
 import {LocalRepository} from '../repository/local.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-
-@Controller()
 export class LocalController {
     localRepository = new LocalRepository();
 
-    @Get()
     async getUFs() {
+        try {
+            const parameters: object | any = new Object();
+            let take; 
+            let skip;
+            let orderBy: object | any;
+            let select: any = {nome: true, id: true, sigla: true};
+            return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
+        } catch(e) {
+            return {status:400, message: "estado não encontrada"}
+        }
+    }
+
+ 
+    async getOnUFs(id: Number | any) {
+        let response = await this.localRepository.findOneUFs(id);
+        if (response) { 
+            return response;
+        }
+    }
+
+ 
+    async getCitys(ufId: number | any) {
         const parameters: object | any = new Object();
         let take; 
         let skip;
         let orderBy: object | any;
-        let select: any = {nome: true, id: true, sigla: true};
-        return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
+        let select: any = {nome: true, id: true, ufid: true};
+
+        if (ufId) {
+            parameters.ufid = parseInt(ufId);
+        }
+
+        return this.localRepository.findCitys(parameters, select, take, skip, orderBy);
     }
 
-    async getCitys(ufId: number) {
-        const parameters: object | any = new Object();
-        let take; 
-        let skip;
-        let orderBy: object | any;
-        let select: any = {nome: true, id: true, sigla: true};
-        return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
-    }
-
-    @Get()
+ 
     async getAllLocal(options: object | any) {
         const parameters: object | any = new Object();
         let take; 
         let skip;
         let orderBy: object | any;
         let select: any = [];
-
         if (options.filterStatus) {
             if (typeof(options.status) === 'string') {
                 options.filterStatus = parseInt(options.filterStatus);
@@ -39,6 +52,15 @@ export class LocalController {
             } else {
                 if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
             }
+        }
+
+        if (options.filterUF) {
+            let uf = await this.getOnUFs(parseInt(options.filterUF));
+            parameters.uf = uf?.sigla;
+        }
+
+        if (options.filterCity) {
+            parameters.city =options.filterCity;
         }
 
         if (options.filterSearch) {
@@ -85,7 +107,7 @@ export class LocalController {
         }             
     }
 
-    @Get()
+ 
     async getOneLocal(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -100,9 +122,12 @@ export class LocalController {
         }
     }
 
-    @Post()
-    async postLocal(data: object) {
+    async postLocal(data: object | any) {
         if (data != null && data != undefined) {
+            if (data.uf) {
+               let uf = await this.getOnUFs(parseInt(data.uf));
+               data.uf = uf?.sigla;
+            }
             let response = await this.localRepository.create(data);
             if(response) {
                 return {status: 200, message: "local inserido"}
@@ -113,7 +138,6 @@ export class LocalController {
         }
     }
 
-    @Put()
     async updateLocal(data: any) {
         const parameters: object | any = new Object();
 
@@ -124,11 +148,17 @@ export class LocalController {
         }
 
         if(data.name) parameters.name = data.name;
-
+        if(data.uf) parameters.uf = data.uf;
+        if(data.address) parameters.address = data.address;
+        if(data.city) parameters.city = data.city;
+        if(data.pais) parameters.pais = data.pais;
+        if(data.latitude) parameters.latitude = data.latitude;
+        if(data.longitude) parameters.longitude = data.longitude;
+        if(data.altitude) parameters.altitude = data.altitude;
         if (data != null && data != undefined) {
             let response = await this.localRepository.update(data.id, parameters);
             if(response) {
-                return {status: 200, message: {message: "cultura atualizada"}}
+                return {status: 200, message: {message: "local atualizado"}}
             } else {
                 return {status: 400, message: {message: "erro ao tentar fazer o update"}}
             }

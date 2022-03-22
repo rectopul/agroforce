@@ -1,10 +1,9 @@
 import {CulturaRepository} from '../repository/culture.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-@Controller()
+
+
 export class CulturaController {
     culturaRepository = new CulturaRepository();
 
-    @Get()
     getAllCulture() {
         const parameters: object | any = new Object();
         let take; 
@@ -15,7 +14,6 @@ export class CulturaController {
         return response;        
     }
 
-    @Get()
     async getOneCulture(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -30,7 +28,6 @@ export class CulturaController {
         }
     }
 
-    @Post()
     async postCulture(data: object) {
         if (data != null && data != undefined) {
             let response = await this.culturaRepository.create(data);
@@ -43,7 +40,6 @@ export class CulturaController {
         }
     }
 
-    @Put()
     async updateCulture(data: any) {
         const parameters: object | any = new Object();
 

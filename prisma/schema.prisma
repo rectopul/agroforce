@@ -30,6 +30,7 @@ model culture {
   status         Int              @default(1)
   safra          safra[]
   users_cultures users_cultures[]
+  portfolio      portfolio[]
 }
 
 model department {
@@ -58,17 +59,17 @@ model profile {
 }
 
 model safra {
-  id         Int      @id @default(autoincrement())
-  id_culture Int
-  culture    culture         @relation(fields: [id_culture], references: [id])
-  year        String  @unique
-  typeCrop String
+  id                Int       @id @default(autoincrement())
+  id_culture        Int
+  culture           culture   @relation(fields: [id_culture], references: [id])
+  year              String    @unique
+  typeCrop          String
   plantingStartTime String
-  plantingEndTime String
-  main_safra Int? @default(0)
-  status     Int?      @default(1)
-  created_by Int
-  created_at DateTime? @default(now())
+  plantingEndTime   String
+  main_safra        Int?      @default(0)
+  status            Int?      @default(1)
+  created_by        Int
+  created_at        DateTime? @default(now())
 }
 
 model uf {
@@ -140,17 +141,61 @@ model users_preferences {
   @@index([userId], map: "Users_Preferences_userId_fkey")
 }
 
-model Local {
-  id         Int      @id @default(autoincrement())
-  name       String 
-  pais       String  
-  uf         String
-  city       String
-  address    String
-  latitude   String
-  longitude  String
-  altitude   String
-  created_at DateTime @default(now())
+model local {
+  id             Int              @id @default(autoincrement())
+  name           String
+  pais           String
+  uf             String
+  city           String
+  address        String
+  latitude       String
+  longitude      String
+  altitude       String
+  created_at     DateTime         @default(now())
+  created_by     Int
+  status         Int              @default(1)
+  layoult_quadra layoult_quadra[]
+}
+
+model layoult_quadra {
+  id             Int      @id @default(autoincrement())
+  esquema        String
+  op             String
+  semente_metros Int
+  disparos       Int
+  divisor        Int
+  largura        String
+  comp_fisico    String
+  comp_parcela   String
+  comp_corredor  String
+  t4_inicial     Int
+  t4_final       Int
+  df_inicial     Int
+  df_final       Int
+  localId        Int
+  status         Int      @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
+  local          local    @relation(fields: [localId], references: [id])
+}
+
+model portfolio {
+  id         Int       @id @default(autoincrement())
+  id_culture Int
+  genealogy  String
+  cruza      String
+  status     Int       @default(1)
   created_by Int
-  status     Int      @default(1)
+  created_at DateTime? @default(now())
+  culture    culture   @relation(fields: [id_culture], references: [id])
+}
+
+model delineamento {
+  id             Int       @id @default(autoincrement())
+  name           String
+  repeticao      Int
+  trat_repeticao Int
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
 }

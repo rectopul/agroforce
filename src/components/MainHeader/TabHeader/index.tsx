@@ -48,7 +48,7 @@ export function TabHeader({ data, dataDropDowns }: IData) {
       {
         tabs.map((tab, index) => (
           tab.status ? (
-            <ToolTip contentMenu={
+            <ToolTip key={index} contentMenu={
               dataDropDowns.map((dropDown, index) => (
                 <DropDown key={index}
                  label={dropDown.labelDropDown} 

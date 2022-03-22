@@ -1,11 +1,8 @@
-import { Controller, Get, Post, Put } from '@nestjs/common';
 import { UserPreferenceRepository } from 'src/repository/user-preference.repository';
 
-@Controller()
 export class UserPreferenceController {
     userPreferences = new UserPreferenceRepository();
 
-    @Get()
     async getAllPreferences(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -40,7 +37,6 @@ export class UserPreferenceController {
         }    
     }
 
-    @Get()
     async getConfigGerais(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -57,7 +53,6 @@ export class UserPreferenceController {
         }    
     }
 
-    @Put()
     async updateUserPreferences(data: object | any) {
         let id = data.id;
         const parameters: object | any = new Object();
@@ -85,7 +80,6 @@ export class UserPreferenceController {
         }
     }
 
-    @Post()
     async postUser(data: object | any) {
         const parameters: object | any = new Object();
 

@@ -1,7 +1,5 @@
 import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class CulturaRepository {   
     async findOne(id: number) {
         let Result = await prisma.culture.findUnique({

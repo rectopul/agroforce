@@ -1,9 +1,7 @@
 import {UserRepository} from '../repository/user.repository';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
-@Controller()
 export class UserController {
     userRepository = new UserRepository();
     usersPermissionRepository = new UsersPermissionsRepository();
@@ -14,7 +12,7 @@ export class UserController {
      * @example Options: 
      * 
      */
-    @Get()
+
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -94,7 +92,6 @@ export class UserController {
         }        
     }
 
-    @Get()
     async getOneUser(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -109,7 +106,6 @@ export class UserController {
         }
     }
 
-    @Post()
     async postUser(data: object | any) {
         const parameters: object | any = new Object();
         const parametersPermissions: object | any  = new Object();
@@ -191,7 +187,7 @@ export class UserController {
      * @returns Função responsavel por verificar se o usuario que está tentando logar, é um usuario do sistema. 
      * @parameters Object contendo o email e a senha do usuario que está tentando fazer o login. 
      */  
-    @Post()
+
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
             return await this.userRepository.signIn(data);
@@ -203,7 +199,7 @@ export class UserController {
     * @requires id do usuario a ser editado
     * @parameters data. objeto com as informações a serem atualizadas
      */
-    @Put()
+
     async updateUser(data: object| any) {
         if (data != null && data != undefined) {
             const parameters: object | any  = new Object();

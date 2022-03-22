@@ -8,7 +8,8 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
 export const localService = {
     getAll,
     create,
-    update
+    update,
+    getCitys
 };
 
 function create(data: any) {
@@ -21,4 +22,8 @@ function update(data: any) {
 
 function getAll(parameters: any) {
     return fetchWrapper.get(baseUrl, parameters);
+}
+
+function getCitys(parameters: any) {
+    return fetchWrapper.get(`${baseUrl}/city`, parameters);
 }

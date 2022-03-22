@@ -43,6 +43,8 @@ interface ILocalProps {
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
+  filterUF: string | any;
+  filterCity: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -57,12 +59,14 @@ interface Idata {
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
+  uf: object | any;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local ||{id:0, table_preferences: "name, pais, uf, city, address, latitude, longitude, altitude, status"};
-
+  const preferences = userLogado.preferences.local || {id:0, table_preferences: "name, pais, uf, city, address, latitude, longitude, altitude, status"};
+  const ufs: object | any =  [];
+  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
@@ -93,21 +97,25 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   
   const { tmgDropDown, tabs } = ITabs.default;
 
+  uf.map((value: string | object | any) => {
+    ufs.push({id: value.id, name: value.sigla, ufid: value.id});
+  })
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
+      filterUF: '',
+      filterCity: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
       localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
             setTotaItems(response.total);
-          } else {
-            setTotaItems(0);
           }
           setFilter(parametersFilter);
           setLocal(response.response);
@@ -444,6 +452,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     });
   };
 
+  function showCitys(uf: any) {
+    if (uf) {
+      let param = '?ufId=' + uf; 
+      let city: object | any = [];
+      localService.getCitys(param).then((response) => {
+        response.map((value: string | object | any) => {
+          city.push({id: value.nome, name: value.nome});
+        })
+          setCitys(city)
+      });
+    }
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -485,6 +506,31 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      UF
+                    </label>
+                    <Select
+                      values={ufs}
+                      id="filterUF"
+                      name="filterUF"
+                      onChange={formik.handleChange}
+                      onBlur={e => showCitys(e.target.value)}
+                      selected={false}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Município
+                    </label>
+                    <Select
+                      values={citys}
+                      id="filterCity"
+                      name="filterCity"
+                      onChange={formik.handleChange}
+                      selected={false}
+                    />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -676,10 +722,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
+  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -687,16 +734,19 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const local = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await local.json();
-  let allItems = Response.response;
-  let totalItems = Response.total;
+  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
+  const uf = await apiUF.json();
+  const Response =  await local.json();
+  const allItems = Response.response;
+  const totalItems = Response.total;
 
   return {
     props: {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      uf
     },
   }
 }

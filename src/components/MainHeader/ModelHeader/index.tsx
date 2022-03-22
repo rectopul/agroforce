@@ -22,8 +22,12 @@ export function ModelHeader({ name, avatar }: IModelProps) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
-  
-  const [user, setUser] = useState(userService.user.subscribe((x: any | undefined) => setUser(x)));
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+      const subscription = userService.user.subscribe((x: any | undefined) => setUser(x));
+      return () => subscription.unsubscribe();
+  }, []);
 
   function logout() {
     userService.logout();

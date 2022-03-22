@@ -1,23 +1,20 @@
 import {prisma} from '../pages/api/db/db';
-import { Injectable } from '@nestjs/common';
 import { ISafraPropsDTO } from 'src/shared/dtos/ISafraPropsDTO';
+import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
 
-@Injectable()
 export class SafraRepository {   
     async create(data: ISafraPropsDTO | any) {
         const safra = await prisma.safra.create({data});
         return safra;
     }
 
-    async update(id: number, Data: Object) {
+    async update(id: number, data: ISafraUpdateDTO) {
         let safra = await this.findOne(id);
         if (safra != null) {
-            let Result = await prisma.safra.updateMany({ 
-                where: {
-                    id: id
-                },
-                data: Data })
-                .finally(async () => { await prisma.$disconnect() })
+            let Result = await prisma.safra.update({ 
+                where: { id },
+                data
+            })
             return Result;
         } else {
             return false;
@@ -25,12 +22,10 @@ export class SafraRepository {
     }
 
     async findOne(id: number) {
-        let Result = await prisma.safra.findMany({
-            where: {
-                id: id
-            }
-                }) .finally(async () => { await prisma.$disconnect() })
-        return Result;
+        const safra = await prisma.safra.findUnique({
+            where: { id }
+        });
+        return safra;
     }
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {

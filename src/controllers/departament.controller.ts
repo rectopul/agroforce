@@ -1,16 +1,13 @@
 import {DepartamentRepository} from '../repository/departament.repository';
-import { Controller, Get, Post, Put } from '@nestjs/common';
-@Controller()
+
 export class DepartamentController {
     departamentRepository = new DepartamentRepository();
 
-    @Get()
     async getAllDepartaments() {
         let response = await this.departamentRepository.findAll();
         return response;        
     }
 
-    @Get()
     async getOneDepartament(id: string) {
         let newID = parseInt(id);
         if (id && id != '{id}') {
@@ -25,7 +22,6 @@ export class DepartamentController {
         }
     }
 
-    @Post()
     async postDepartament(data: object) {
         if (data != null && data != undefined) {
             let response = await this.departamentRepository.create(data);
@@ -38,7 +34,6 @@ export class DepartamentController {
         }
     }
 
-    @Put()
     async updateDepartament(id: string, data: object) {
         let newID = parseInt(id);
         if (data != null && data != undefined) {

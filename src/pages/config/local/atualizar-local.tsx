@@ -6,7 +6,8 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 import { IoMdArrowBack } from "react-icons/io";
 import { localService } from "src/services";
-import { useEffect, ReactNode, useState } from "react";
+import { useState } from "react";
+import InputMask from "react-input-mask";
 
 import {
   TabHeader,
@@ -53,9 +54,9 @@ export interface IData {
 export default function AtualizarLocal({ uf,localEdit }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const ufs: object | any =  [];
-  const [culturaSelecionada, setCulturaSelecionada] = useState<any>();
-  const citys =  [{id: 'Campinas', name: "Campinas"}, {id: 'Santos', name: "Santos"}];
+  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
+
+  const ufs: object | any =  [];;
   const pais =  [{id: 'Brasil', name: "Brasil"}];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
@@ -72,7 +73,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: (values) => {   
       validateInputs(values);
       if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
 
@@ -102,8 +103,17 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
   })
 
-  function showCitys() {
-
+  function showCitys(uf: any) {
+    if (uf) {
+      let param = '?ufId=' + uf; 
+      let city: object | any = [];
+      localService.getCitys(param).then((response) => {
+        response.map((value: string | object | any) => {
+          city.push({id: value.nome, name: value.nome});
+        })
+          setCitys(city)
+      });
+    }
   }
 
   function validateInputs(values: any) {
@@ -116,8 +126,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     if (!values.longitude) { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= 'red'; } else { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= ''; }
     if (!values.altitude) { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= 'red'; } else { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= ''; }
   }
-  useEffect(() => {
-}, [culturaSelecionada]);
+
   return (
     <>
       <Head>
@@ -133,7 +142,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo usuário</h1>
+            <h1 className="text-2xl">Atualizar Local</h1>
           </div>
 
           <div className="w-full
@@ -204,7 +213,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                 id="uf"
                 name="uf"
                 onChange={formik.handleChange}
-                onBlur={e => setCulturaSelecionada(e.target.value)}
+                onBlur={e => showCitys(e.target.value)}
                 value={formik.values.uf}
                 selected={false}
               />
@@ -247,7 +256,19 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Latitude
               </label>
-              <Input 
+              <InputMask 
+                 className="shadow
+                 appearance-none
+                 bg-white bg-no-repeat
+                 border border-solid border-gray-300
+                 rounded
+                 w-full
+                 py-2 px-3
+                 text-gray-900
+                 leading-tight
+                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+               "
+                mask="99.99" 
                 type="text" 
                 placeholder="20 10 15"
                 id="latitude"
@@ -261,9 +282,21 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Longitude
               </label>
-              <Input 
+              <InputMask
+                className="shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                "
+                mask="99.99" 
                 type="text" 
-                placeholder="20 10 30"
+                placeholder="20.25"
                 id="longitude"
                 name="longitude"
                 onChange={formik.handleChange}
@@ -277,7 +310,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               </label>
               <Input 
                 type="text" 
-                placeholder="10 15 25"
+                placeholder="200"
                 id="altitude"
                 name="altitude"
                 onChange={formik.handleChange}

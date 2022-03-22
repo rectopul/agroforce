@@ -30,8 +30,8 @@ interface ISafraProps {
 
 export default function Safra() {
   const { tmgDropDown, tabs } = ITabs.default;
-  const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-  const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
+  // const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
+  // const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -47,9 +47,6 @@ export default function Safra() {
       created_by: userLogado.id,
     },
     onSubmit: values => {
-      console.log(values);
-      alert(JSON.stringify(values, null, 2));
-
       safraService.create({
         id_culture: formik.values.id_culture,
         year: formik.values.year,

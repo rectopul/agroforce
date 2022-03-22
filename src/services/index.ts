@@ -5,3 +5,5 @@ export * from './department.service';
 export * from './profile.service';
 export * from './user-preferences.service';
 export * from './safra.service';
+export * from './layoult-quadra.service';
+export * from './delineamento.service';
