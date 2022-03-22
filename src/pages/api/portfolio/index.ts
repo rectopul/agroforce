@@ -9,10 +9,10 @@ export default  apiHandler(handler);
   const portfolioController =  new PortfolioController();
 
   switch (req.method) {
-    // case 'GET':
-    //   const result = await portfolioController.getAllPortfolio(req.query);
-    //   res.status(200).json(result);
-    //   break
+    case 'GET':
+      const result = await portfolioController.listAllPortfolios(req.query);
+      res.status(200).json(result);
+      break
     case 'POST':
       const resultPost = await portfolioController.createPortfolio(req.body);
       res.status(201).json(resultPost);

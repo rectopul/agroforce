@@ -19,7 +19,6 @@ import {
 
 import * as ITabs from '../../../shared/utils/dropdown';
 import { Decimal } from "@prisma/client/runtime";
-import { MapContainer } from "src/components/Maps";
 
 interface ILayoultProps {
   id: Number | any;
@@ -400,7 +399,6 @@ export default function NovoLocal({ local }: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.df_final}
               />
-            <MapContainer></MapContainer>
 
             </div>
           </div>
