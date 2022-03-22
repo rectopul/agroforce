@@ -5,7 +5,7 @@ import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 import { IoMdArrowBack } from "react-icons/io";
-import { localService } from "src/services";
+import { layoultQuadraService } from "src/services";
 import { useState } from "react";
 import InputMask from "react-input-mask";
 
@@ -18,80 +18,86 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { Decimal } from "@prisma/client/runtime";
+import { MapContainer } from "src/components/Maps";
 
-interface ILocalProps {
+interface ILayoultProps {
   id: Number | any;
-  name: String | any;
-  pais: String | any;
-  uf: String | any;
-  city: String | any;
-  address: String | any;
-  latitude: String | any;
-  longitude: String | any;
-  altitude: String | any;
-  created_by: Number;
+  esquema: String | any;
+  op: String | any;
+  semente_metros: Number | any;
+  disparos: Number | any;
+  divisor: Number | any;
+  largura: Decimal | any;
+  comp_fisico: Decimal | any;
+  comp_parcela: Decimal | any;
+  comp_corredor: Decimal | any;
+  t4_inicial: Number | any;
+  t4_final: Number | any;
+  df_inicial: Number | any;
+  df_final: Number | any;
+  localId: Number | any;
+  created_by: number | any;
   status: Number;
 };
 
-interface IUf {
-  id: Number;
-  npme: String;
-  sigla: String;
-}
-
-interface ICity {
-  id: Number;
-  name: String;
-  ufid: Number;
-}
 
 export interface IData {
-  uf: Object | any;
-  city: ICity;
-  localEdit: ILocalProps
+  local: object | any;
+  layoultEdit: ILayoultProps;
 }
 
-export default function AtualizarLocal({ uf,localEdit }: IData) {
+export default function NovoLocal({ local, layoultEdit }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
-
-  const ufs: object | any =  [];;
-  const pais =  [{id: 'Brasil', name: "Brasil"}];
+  const locais: object | any =  [];
   const router = useRouter();
-  const formik = useFormik<ILocalProps>({
+  const formik = useFormik<ILayoultProps>({
     initialValues: {
-      id: localEdit.id,
-      name: localEdit.name,
-      pais: localEdit.pais,
-      uf: localEdit.uf,
-      city: localEdit.city,
-      address: localEdit.address,
-      latitude: localEdit.latitude,
-      longitude: localEdit.longitude,
-      altitude: localEdit.altitude,
+      id: layoultEdit.id,
+      esquema: layoultEdit.esquema,
+      op: layoultEdit.op,
+      semente_metros: layoultEdit.semente_metros,
+      disparos: layoultEdit.disparos,
+      divisor: layoultEdit.divisor,
+      largura: layoultEdit.largura,
+      comp_fisico: layoultEdit.comp_fisico,
+      comp_parcela: layoultEdit.comp_parcela,
+      comp_corredor: layoultEdit.comp_corredor,
+      t4_inicial: layoultEdit.t4_inicial,
+      t4_final: layoultEdit.t4_final,
+      df_inicial: layoultEdit.df_inicial,
+      df_final: layoultEdit.df_final,
+      localId: layoultEdit.localId,
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {   
+    onSubmit: (values) => {      
       validateInputs(values);
-      if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
+      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
 
-      localService.update({
+      layoultQuadraService.update({
         id: values.id,
-        name: values.name,
-        pais: values.pais,
-        uf: values.uf,
-        city: values.city,
-        address: values.address,
-        latitude: values.latitude,
-        longitude: values.longitude,
-        altitude: values.altitude,
-        created_by: values.created_by,
+        esquema:values.esquema,
+        op:values.op,
+        semente_metros: Number(values.semente_metros),
+        disparos: Number(values.disparos),
+        divisor: Number(values.divisor),
+        largura:values.largura,
+        comp_fisico:values.comp_fisico,
+        comp_parcela:values.comp_parcela,
+        comp_corredor:values.comp_corredor,
+        t4_inicial: Number(values.t4_inicial),
+        t4_final: Number(values.t4_final),
+        df_inicial: Number(values.df_inicial),
+        df_final: Number (values.df_final),
+        localId: Number(values.localId),
+        created_by: Number(userLogado.id),
+        status: 1
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local atualizado com sucesso!')
-          router.push('/config/local')
+          router.push('/config/layoult-quadra');
         } else {
           Swal.fire(response.message)
         }
@@ -99,40 +105,31 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     },
   });
 
-  uf.map((value: string | object | any) => {
-    ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
+  local.map((value: string | object | any) => {
+    locais.push({id: value.id, name: value.name});
   })
-
-  function showCitys(uf: any) {
-    if (uf) {
-      let param = '?ufId=' + uf; 
-      let city: object | any = [];
-      localService.getCitys(param).then((response) => {
-        response.map((value: string | object | any) => {
-          city.push({id: value.nome, name: value.nome});
-        })
-          setCitys(city)
-      });
-    }
-  }
-
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
-    if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= ''; }
-    if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= ''; }
-    if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= ''; }
-    if (!values.address) { let inputAddress: any = document.getElementById("address"); inputAddress.style.borderColor= 'red'; } else { let inputAddress: any = document.getElementById("address"); inputAddress.style.borderColor= ''; }
-    if (!values.latitude) { let inputLatitude: any = document.getElementById("latitude"); inputLatitude.style.borderColor= 'red'; } else { let inputLatitude: any = document.getElementById("latitude"); inputLatitude.style.borderColor= ''; }
-    if (!values.longitude) { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= 'red'; } else { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= ''; }
-    if (!values.altitude) { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= 'red'; } else { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= ''; }
+    if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= ''; }
+    if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor= 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor= ''; }
+    if (!values.localId) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= ''; }
+    if (!values.semente_metros) { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor= 'red'; } else { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor= ''; }
+    if (!values.disparos) { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor= 'red'; } else { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor= ''; }
+    if (!values.divisor) { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor= 'red'; } else { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor= ''; }
+    if (!values.largura) { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor= 'red'; } else { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor= ''; }
+    if (!values.comp_fisico) { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor= 'red'; } else { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor= ''; }
+    if (!values.comp_parcela) { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor= 'red'; } else { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor= ''; }
+    if (!values.comp_corredor) { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor= 'red'; } else { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor= ''; }
+    if (!values.t4_inicial) { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor= 'red'; } else { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor= ''; }
+    if (!values.t4_final) { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor= 'red'; } else { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor= ''; }
+    if (!values.df_inicial) { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor= 'red'; } else { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor= ''; }
+    if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= ''; }
   }
 
   return (
     <>
       <Head>
-        <title>Novo Local</title>
+        <title>Atualizar Layoult Quadra</title>
       </Head>
-
 
       <Content headerCotent={
         <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
@@ -142,7 +139,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Local</h1>
+            <h1 className="text-2xl">Novo Layoult</h1>
           </div>
 
           <div className="w-full
@@ -158,44 +155,53 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               </label>
               <Input 
                 type="text" 
-                placeholder="11111"
-                max="40"
+                placeholder="14x08(p4)-PY" 
                 id="id"
                 name="id"
                 disabled
-                readOnly
                 onChange={formik.handleChange}
                 value={formik.values.id}
               />
             </div>
-
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome do Local
+                Esquema
               </label>
               <Input 
-                type="name" 
-                placeholder="TMG-Agroforce" 
-                id="name"
-                name="name"
+                type="text" 
+                placeholder="14x08(p4)-PY" 
+                id="esquema"
+                name="esquema"
                 onChange={formik.handleChange}
-                value={formik.values.name}
+                value={formik.values.esquema}
               />
             </div>
-
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                OP
+              </label>
+              <Input 
+                type="text" 
+                placeholder="QMCG-01" 
+                id="op"
+                name="op"
+                onChange={formik.handleChange}
+                value={formik.values.op}
+              />
+            </div>  
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Pais
+                Local
               </label>
               <Select
-                values={pais}
-                id="pais"
-                name="pais"
+                values={locais}
+                id="localId"
+                name="localId"
                 onChange={formik.handleChange}
-                value={formik.values.pais}
-                selected={localEdit.pais}
+                value={formik.values.localId}
+                selected={false}
               />
-            </div>
+            </div>  
           </div>
 
           <div className="w-full
@@ -204,44 +210,43 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             gap-6
             mb-4
           ">
-            <div className="w-full h-10">
+            <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Estado
+                Sementes por Metros
               </label>
-              <Select
-                values={ufs}
-                id="uf"
-                name="uf"
+              <Input 
+                type="number" 
+                placeholder="10"
+                id="semente_metros"
+                name="semente_metros"
                 onChange={formik.handleChange}
-                onBlur={e => showCitys(e.target.value)}
-                value={formik.values.uf}
-                selected={false}
-              />
-            </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Município
-              </label>
-              <Select
-                values={citys}
-                id="city"
-                name="city"
-                onChange={formik.handleChange}
-                value={formik.values.city}
-                selected={false}
+                value={formik.values.semente_metros}
               />
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Endereço
+                Disparos
               </label>
               <Input 
                 type="text" 
-                placeholder="R: São Paulo"
-                id="address"
-                name="address"
+                placeholder="1"
+                id="disparos"
+                name="disparos"
                 onChange={formik.handleChange}
-                value={formik.values.address}
+                value={formik.values.disparos}
+              />
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Divisor
+              </label>
+              <Input 
+                type="text" 
+                placeholder="1"
+                id="divisor"
+                name="divisor"
+                onChange={formik.handleChange}
+                value={formik.values.divisor}
               />
             </div>
           </div>
@@ -254,7 +259,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Latitude
+                Largura
               </label>
               <InputMask 
                  className="shadow
@@ -270,55 +275,150 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                "
                 mask="99.99" 
                 type="text" 
-                placeholder="20 10 15"
-                id="latitude"
-                name="latitude"
+                placeholder="25.2"
+                id="largura"
+                name="largura"
                 onChange={formik.handleChange}
-                value={formik.values.latitude}
+                value={formik.values.largura}
               />
-            </div>
-
+            </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Longitude
+                Comp. Físico
               </label>
-              <InputMask
-                className="shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                "
+              <InputMask 
+                 className="shadow
+                 appearance-none
+                 bg-white bg-no-repeat
+                 border border-solid border-gray-300
+                 rounded
+                 w-full
+                 py-2 px-3
+                 text-gray-900
+                 leading-tight
+                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+               "
                 mask="99.99" 
                 type="text" 
-                placeholder="20.25"
-                id="longitude"
-                name="longitude"
+                placeholder="25.2"
+                id="comp_fisico"
+                name="comp_fisico"
                 onChange={formik.handleChange}
-                value={formik.values.longitude}
+                value={formik.values.comp_fisico}
               />
-            </div>
-
+            </div>   
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Altitude
+                Comp. da Parcela
+              </label>
+              <InputMask 
+                 className="shadow
+                 appearance-none
+                 bg-white bg-no-repeat
+                 border border-solid border-gray-300
+                 rounded
+                 w-full
+                 py-2 px-3
+                 text-gray-900
+                 leading-tight
+                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+               "
+                mask="99.99" 
+                type="text" 
+                placeholder="25.2"
+                id="comp_parcela"
+                name="comp_parcela"
+                onChange={formik.handleChange}
+                value={formik.values.comp_parcela}
+              />
+            </div>    
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Comp. Corredor
+              </label>
+              <InputMask 
+                 className="shadow
+                 appearance-none
+                 bg-white bg-no-repeat
+                 border border-solid border-gray-300
+                 rounded
+                 w-full
+                 py-2 px-3
+                 text-gray-900
+                 leading-tight
+                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+               "
+                mask="99.99" 
+                type="text" 
+                placeholder="25.2"
+                id="comp_corredor"
+                name="comp_corredor"
+                onChange={formik.handleChange}
+                value={formik.values.comp_corredor}
+              />
+            </div>       
+          </div>
+
+          <div className="w-full
+            flex 
+            justify-around
+            gap-6
+            mb-4
+          ">
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                T4 Inicial
+              </label>
+              <Input 
+                type="number" 
+                placeholder="10"
+                id="t4_inicial"
+                name="t4_inicial"
+                onChange={formik.handleChange}
+                value={formik.values.t4_inicial}
+              />
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                T4 Final
               </label>
               <Input 
                 type="text" 
-                placeholder="200"
-                id="altitude"
-                name="altitude"
+                placeholder="1"
+                id="t4_final"
+                name="t4_final"
                 onChange={formik.handleChange}
-                value={formik.values.altitude}
+                value={formik.values.t4_final}
               />
             </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                DF Inicial
+              </label>
+              <Input 
+                type="text" 
+                placeholder="1"
+                id="df_inicial"
+                name="df_inicial"
+                onChange={formik.handleChange}
+                value={formik.values.df_inicial}
+              />
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                DF Final
+              </label>
+              <Input 
+                type="text" 
+                placeholder="1"
+                id="df_final"
+                name="df_final"
+                onChange={formik.handleChange}
+                value={formik.values.df_final}
+              />
+            <MapContainer></MapContainer>
 
-         
+            </div>
           </div>
 
           <div className="
@@ -335,7 +435,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/local/')}}
+                onClick={() => {router.push('/config/layoult-quadra/')}}
               />
             </div>
             <div className="w-40">
@@ -356,20 +456,25 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
+  const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
+  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
+
   const  token  =  context.req.cookies.token;
-  // Fetch data from external API
-  const requestOptions: object | any = {
+  
+  const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
-  const uf = await apiUF.json();
+  const apiLocal = await fetch(baseUrlLocal, requestOptions);
+  const resU = await fetch(`${baseUrlLayoult}/` + context.query.id, requestOptions)
 
-  const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
-  const localEdit = await resU.json();
-
-  return { props: { localEdit, uf } }
+  const layoultEdit = await resU.json();
+  let local = await apiLocal.json();
+  local = local.response
+  console.log(layoultEdit)
+  return { props: { local, layoultEdit  } }
 }
+
+

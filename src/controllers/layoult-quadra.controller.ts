@@ -95,19 +95,26 @@ export class LayoultQuadraController {
             parameters.status =  data.status;
         }
 
-        if(data.name) parameters.name = data.name;
-        if(data.uf) parameters.uf = data.uf;
-        if(data.address) parameters.address = data.address;
-        if(data.city) parameters.city = data.city;
-        if(data.pais) parameters.pais = data.pais;
-        if(data.latitude) parameters.latitude = data.latitude;
-        if(data.longitude) parameters.longitude = data.longitude;
-        if(data.altitude) parameters.altitude = data.altitude;
+        if(data.esquema) parameters.esquema = data.esquema;
+        if(data.semente_metros) parameters.semente_metros = data.semente_metros;
+        if(data.op) parameters.op = data.op;
+        if(data.disparos) parameters.disparos = data.disparos;
+        if(data.divisor) parameters.divisor = data.divisor;
+        if(data.largura) parameters.largura = data.largura;
+        if(data.comp_fisico) parameters.comp_fisico = data.comp_fisico;
+        if(data.comp_parcela) parameters.comp_parcela = data.comp_parcela;
+        if(data.comp_corredor) parameters.comp_corredor = data.comp_corredor;
+        if(data.t4_inicial) parameters.t4_inicial = data.t4_inicial;
+        if(data.t4_final) parameters.t4_final = data.t4_final;
+        if(data.df_inicial) parameters.df_inicial = data.df_inicial;
+        if(data.df_final) parameters.df_final = data.df_final;
+        if(data.localId) parameters.localId = data.localId;
+
         if (data != null && data != undefined) {
             let response = await this.Repository.update(data.id, parameters);
             console.log(response)
             if(response) {
-                return {status: 200, message: {message: "local atualizado"}}
+                return {status: 200, message: {message: "layoult atualizado"}}
             } else {
                 return {status: 400, message: {message: "erro ao tentar fazer o update"}}
             }
