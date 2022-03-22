@@ -87,6 +87,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        console.log(response)
         if (response.status === 200) {
           setTotaItems(response.total);
           setPortfolios(response.response);

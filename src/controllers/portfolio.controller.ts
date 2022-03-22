@@ -27,7 +27,7 @@ export class PortfolioController {
     if (options.filterSearch) {
       options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
       parameters.genealogy  = JSON.parse(options.filterSearch);
-      parameters.cruza =JSON.parse(options.filterSearch);
+      parameters.cruza = JSON.parse(options.filterSearch);
     }
 
     if (options.paramSelect) {
@@ -84,7 +84,7 @@ export class PortfolioController {
       skip,
       orderBy
     );
-    if (!response) { 
+    if (!response && response.total) { 
       throw "falha na requisição, tente novamente";
     } else {
       return {status: 200, response, total: response.total}

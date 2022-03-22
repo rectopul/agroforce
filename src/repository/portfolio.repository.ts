@@ -41,7 +41,8 @@ export class PortfolioRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.portfolio.count({ where: where })
+    const count = await prisma.portfolio.count({ where: where });
+
     const result: object | any = await prisma.portfolio.findMany({
       select: select, 
       skip: skip, 
