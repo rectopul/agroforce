@@ -103,7 +103,7 @@ export class LocalController {
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
-            return {status: 200, response, total: response.total}
+            return {status: 200, response, total: response.total};
         }             
     }
 
