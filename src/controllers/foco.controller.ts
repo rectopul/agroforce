@@ -27,8 +27,7 @@ export class FocoController {
 
     if (options.filterSearch) {
       options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-      parameters.genealogy  = JSON.parse(options.filterSearch);
-      parameters.cruza = JSON.parse(options.filterSearch);
+      parameters.name  = JSON.parse(options.filterSearch);
     }
 
     if (options.paramSelect) {
@@ -39,23 +38,14 @@ export class FocoController {
       select = Object.assign({}, select);
     } else {
       select = {
-        id: true, 
-        genealogy:true, 
-        cruza:true, 
-        status: true 
+        id: true,
+        name:true,
+        status: true
       };
     }
 
-    if (options.genealogy) {
-      parameters.genealogy = options.genealogy;
-    }
-    
-    if (options.cruza) {
-      parameters.cruza = options.cruza;
-    }
-
-    if (options.cruza) {
-      parameters.cruza = options.cruza;
+    if (options.name) {
+      parameters.name = options.name;
     }
 
     if (options.take) {

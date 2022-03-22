@@ -24,7 +24,7 @@ export interface IUpdateFoco {
 }
 
 export default function Atualizar(foco: IUpdateFoco) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
@@ -59,7 +59,7 @@ export default function Atualizar(foco: IUpdateFoco) {
       
       <Content
         headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
         }
       >
 

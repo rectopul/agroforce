@@ -1,3 +1,4 @@
+import { AiOutlineFileSearch } from "react-icons/ai";
 import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { MdDateRange } from "react-icons/md";
@@ -21,7 +22,7 @@ const tmgDropDown =  [
 ];
 
 const ensaiosDropDown =  [
-  {labelDropDown: 'Foco', hrefDropDown: 'http://localhost:3000/config/ensaio/foco', iconDropDown: <RiSeedlingLine/> },
+  {labelDropDown: 'Foco', hrefDropDown: 'http://localhost:3000/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
   {labelDropDown: 'OGM', hrefDropDown: 'http://localhost:3000/config/ensaio/ogm', iconDropDown: <BiUser/> },
   {labelDropDown: 'Tipo de ensaio', hrefDropDown: 'http://localhost:3000/config/ensaio/tipo-de-ensaio', iconDropDown: <MdDateRange/> },
 ];

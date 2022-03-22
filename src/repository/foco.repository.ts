@@ -36,7 +36,7 @@ export class FocoRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.portfolio.count({ where: where });
+    const count = await prisma.foco.count({ where: where });
 
     const result: object | any = await prisma.foco.findMany({
       select: select, 
