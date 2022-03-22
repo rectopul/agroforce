@@ -1,6 +1,6 @@
 import { SchemaOf, object, string, number } from 'yup';
 
-import { ISafraUpdateDTO } from '../../dtos/ISafraUpdateDTO';
+import { ISafraUpdateDTO } from '../../dtos/safraDTO/ISafraUpdateDTO';
 
 export const validationSafraUpdate: SchemaOf<ISafraUpdateDTO> = object({
   id: number().integer().required(),

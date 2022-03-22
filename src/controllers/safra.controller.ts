@@ -1,8 +1,8 @@
 import {SafraRepository} from '../repository/safra.repository';
-import {ISafraPropsDTO} from '../shared/dtos/ISafraPropsDTO';
+import {ISafraPropsDTO} from '../shared/dtos/safraDTO/ISafraPropsDTO';
 import { validationSafra } from '../shared/validations/safra/create.validation';
 import { validationSafraUpdate } from 'src/shared/validations/safra/update.validation';
-import { ISafraUpdateDTO } from 'src/shared/dtos/ISafraUpdateDTO';
+import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
 
 
 export class SafraController {
