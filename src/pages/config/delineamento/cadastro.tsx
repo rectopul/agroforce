@@ -110,7 +110,7 @@ export default function NovoLocal() {
                 id="repeticao"
                 name="repeticao"
                 onChange={formik.handleChange}
-                value={formik.values.repeticao}
+                value={Number(formik.values.repeticao)}
               />
             </div>
             <div className="w-full">
@@ -123,7 +123,7 @@ export default function NovoLocal() {
                 id="trat_repeticao"
                 name="trat_repeticao"
                 onChange={formik.handleChange}
-                value={formik.values.trat_repeticao}
+                value={Number(formik.values.trat_repeticao)}
               />
             </div>        
           </div>
