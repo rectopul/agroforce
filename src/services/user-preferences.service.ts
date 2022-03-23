@@ -7,11 +7,11 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/user/preferences`;
 
 export const userPreferencesService = {
     getAll,
-    createPreferences,
+    create,
     update
 };
 
-function createPreferences(data: any) {
+function create(data: any) {
     return fetchWrapper.post(baseUrl, data);
 }
 

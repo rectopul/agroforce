@@ -2,7 +2,7 @@ import {prisma} from '../pages/api/db/db';
 
 export class UserPreferenceRepository {   
     async create(Permission: object | any) {
-        let Result = await prisma.users_preferences.createMany({ data: Permission}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_preferences.create({ data: Permission, select:{id: true}}).finally(async () => { await prisma.$disconnect() })
         return Result;
     }
 

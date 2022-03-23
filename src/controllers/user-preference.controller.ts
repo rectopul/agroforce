@@ -99,9 +99,8 @@ export class UserPreferenceController {
             parameters.table_preferences = data.table_preferences;
 
             let response = await this.userPreferences.create(parameters);
-
             if(response) {    
-                return {status: 200, message: "users inseridos"}
+                return {status: 200, response}
             } else {
                 return {status: 400, message: "houve um erro, tente novamente"}
             }
