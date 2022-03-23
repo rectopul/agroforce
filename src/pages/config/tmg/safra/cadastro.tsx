@@ -22,10 +22,9 @@ interface ISafraProps {
   typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
+  main_safra: number;
   status: number;
-  created_by: {
-    id: number;
-  };
+  created_by: number;
 };
 
 export default function Safra() {
@@ -41,8 +40,9 @@ export default function Safra() {
       typeCrop: '',
       plantingStartTime: '',
       plantingEndTime: '',
+      main_safra: 0,
       status: 1,
-      created_by: userLogado.id,
+      created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       await safraService.create({
@@ -52,7 +52,7 @@ export default function Safra() {
         plantingStartTime: formik.values.plantingStartTime,
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
-        created_by: formik.values.created_by.id,
+        created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Safra cadastrada com sucesso!')
@@ -96,7 +96,7 @@ export default function Safra() {
                 id="year"
                 name="year"
                 onChange={formik.handleChange}
-                value={String(formik.values.year)}
+                value={formik.values.year}
               />
             </div>
 
