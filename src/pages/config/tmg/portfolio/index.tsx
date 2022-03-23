@@ -180,7 +180,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/safra/atualizar-safra?id=${rowData.id}`}
+                  href={`/config/tmg/portfolio/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (

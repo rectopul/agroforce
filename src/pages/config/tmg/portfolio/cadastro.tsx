@@ -10,6 +10,7 @@ import  * as ITabs from '../../../../shared/utils/dropdown';
 
 import { IoMdArrowBack } from "react-icons/io";
 import { SiMicrogenetics } from "react-icons/si";
+import { useRouter } from "next/router";
 
 export interface ICreatePortfolio {
   id_culture: number;
@@ -20,6 +21,8 @@ export interface ICreatePortfolio {
 }
 
 export default function  Portfolio() {
+  const router = useRouter();
+  
   const { tmgDropDown, tabs } = ITabs.default;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -45,6 +48,7 @@ export default function  Portfolio() {
           Swal.fire('Portfólio cadastrado com sucesso!');
         } else {
           Swal.fire(response.message);
+          router.back();
         }
       }).finally(() => {
         formik.values.genealogy = '';
@@ -107,13 +111,12 @@ export default function  Portfolio() {
         ">
           <div className="w-30">
             <Button
-              type="submit"
+              type="button"
               value="Voltar"
               bgColor="bg-red-600"
               textColor="white"
               icon={<IoMdArrowBack size={18} />}
-              href='/config/tmg/portfolio'
-              onClick={() => {}}
+              onClick={() => router.back()}
             />
           </div>
           <div className="w-40">

@@ -18,6 +18,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { SiMicrogenetics } from "react-icons/si";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { useRouter } from "next/router";
 
 export interface IUpdatePortfolio {
   id: number;
@@ -29,6 +30,8 @@ export interface IUpdatePortfolio {
 }
 
 export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
+  const router = useRouter();
+
   const { tmgDropDown, tabs } = ITabs.default;
 
   const select = [
@@ -61,6 +64,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Portfólio atualizado com sucesso!');
+          router.back();
         } else {
           Swal.fire(response.message);
         }
@@ -119,13 +123,12 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/portfolio'
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

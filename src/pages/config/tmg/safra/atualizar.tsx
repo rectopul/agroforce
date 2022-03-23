@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
@@ -29,6 +30,8 @@ interface ISafraProps {
 };
 
 export default function AtualizarSafra(safra: ISafraProps) {
+  const router = useRouter();
+
   const { tmgDropDown, tabs } = ITabs.default;
 
   const [checkeBox, setCheckeBox] = useState<boolean>();
@@ -60,12 +63,19 @@ export default function AtualizarSafra(safra: ISafraProps) {
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Safra atualizada com sucesso!');
+          router.back();
         } else {
           Swal.fire(response.message);
         }
-      })
+      }).finally(() => {
+        formik.values.id_culture = safra.id_culture;
+        formik.values.year = safra.year;
+        formik.values.typeCrop = safra.typeCrop;
+        formik.values.plantingStartTime = safra.plantingStartTime;
+        formik.values.plantingEndTime = safra.plantingEndTime;
+      });
     },
   });
 
@@ -199,13 +209,12 @@ export default function AtualizarSafra(safra: ISafraProps) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/safra'
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

@@ -1,7 +1,8 @@
 import Head from 'next/head';
-import { useFormik } from 'formik'
 import { GetServerSideProps } from "next";
+import { useRouter } from 'next/router';
 import getConfig from 'next/config';
+import { useFormik } from 'formik'
 
 import { cultureService } from 'src/services';
 
@@ -25,6 +26,8 @@ export interface IUpdateCulture {
 };
 
 export default function Cultura(culture: IUpdateCulture) {
+  const router = useRouter();
+
   const { tmgDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IUpdateCulture>({
@@ -43,6 +46,7 @@ export default function Cultura(culture: IUpdateCulture) {
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Cultura atualizada com sucesso');
+          router.back();
         } else {
           Swal.fire(response.message);
         }
@@ -110,13 +114,12 @@ export default function Cultura(culture: IUpdateCulture) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/tmg/cultura"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

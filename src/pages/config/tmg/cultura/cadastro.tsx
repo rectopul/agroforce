@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { useFormik } from 'formik'
 import Swal from 'sweetalert2';
 
@@ -43,6 +42,7 @@ export default function Cadastro() {
       }).then((response) => {
         if (response.status === 201) {
           Swal.fire('Cultura cadastrada com sucesso!');
+          router.back();
         } else {
           Swal.fire(response.message);
         }

@@ -15,6 +15,7 @@ import {
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 
 interface ISafraProps {
   id_culture: number;
@@ -28,6 +29,8 @@ interface ISafraProps {
 };
 
 export default function Safra() {
+  const router = useRouter();
+
   const { tmgDropDown, tabs } = ITabs.default;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -55,7 +58,8 @@ export default function Safra() {
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Safra cadastrada com sucesso!')
+          Swal.fire('Safra cadastrada com sucesso!');
+          router.back();
         } else {
           Swal.fire(response.message)
         }
@@ -162,13 +166,12 @@ export default function Safra() {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/safra'
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">
