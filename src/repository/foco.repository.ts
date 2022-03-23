@@ -1,9 +1,7 @@
 import {prisma} from '../pages/api/db/db';
-import { ICreateFocoDTO } from 'src/shared/dtos/focoDTO/ICreateFocoDTO';
-import { IUpdateFocoDTO } from 'src/shared/dtos/focoDTO/IUpdateFocoDTO';
 
 export class FocoRepository {
-  async create(data: ICreateFocoDTO) {
+  async create(data: any) {
     const foco = await prisma.foco.create({ data });
     return foco;
   }
@@ -15,7 +13,7 @@ export class FocoRepository {
     return foco;
   }
 
-  async update(id: number, data: IUpdateFocoDTO) {
+  async update(id: number, data: any) {
     const foco = await this.findOne(id);
 
     if (foco !== null) {

@@ -35,7 +35,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
   const select = [
     { id: 1, name: "Ativo" },
     { id: 2, name: "Inativo" },
-  ]
+  ];
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -50,8 +50,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
       plantingEndTime: safra.plantingEndTime,
       status: safra.status,
     },
-    onSubmit: (values) => {
-      safraService.updateSafras({
+    onSubmit: async (values) => {
+      await safraService.updateSafras({
         id: safra.id,
         id_culture: formik.values.id_culture,
         year: formik.values.year,
@@ -92,7 +92,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           <div className="w-full flex justify-between items-start gap-5 mt-4">
             <div className="w-4/12">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                ID Safra
+                Código
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}

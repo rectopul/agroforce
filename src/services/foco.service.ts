@@ -1,8 +1,5 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
-import { ICreateFocoDTO } from 'src/shared/dtos/focoDTO/ICreateFocoDTO';
-import { IUpdateFocoDTO } from 'src/shared/dtos/focoDTO/IUpdateFocoDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
@@ -13,12 +10,12 @@ export const focoService = {
   create,
 };
 
-async function create(data: ICreateFocoDTO) {
+async function create(data: any) {
   const foco = await fetchWrapper.post(baseUrl, data);
   return foco;
 }
 
-async function update(data: IUpdateFocoDTO) {
+async function update(data: any) {
   const foco = await fetchWrapper.put(baseUrl, data);
   return foco;
 }

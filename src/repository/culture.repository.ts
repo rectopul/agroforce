@@ -1,5 +1,3 @@
-import { ICreateCultureDTO } from 'src/shared/dtos/culturaDTO/ICreateCultureDTO';
-import { IUpdateCultureDTO } from 'src/shared/dtos/culturaDTO/IUpdateCultureDTO';
 import {prisma} from '../pages/api/db/db';
 
 export class CulturaRepository {   
@@ -31,12 +29,12 @@ export class CulturaRepository {
         return result;
       }
 
-    async create(data: ICreateCultureDTO) {
+    async create(data: any) {
         const culture = await prisma.culture.create({ data });
         return culture;
     }
 
-    async update(id: number, data: IUpdateCultureDTO) {
+    async update(id: number, data: any) {
         const culture = await this.findOne(id);
 
         if (culture !== null) {

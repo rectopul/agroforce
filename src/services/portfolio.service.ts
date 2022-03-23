@@ -1,8 +1,5 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
-import { ICreatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/ICreatePortfolioDTO';
-import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
@@ -13,12 +10,12 @@ export const portfolioService = {
   create,
 };
 
-async function create(data: ICreatePortfolioDTO) {
+async function create(data: any) {
   const portfolio = await fetchWrapper.post(baseUrl, data);
   return portfolio;
 }
 
-async function update(data: IUpdatePortfolioDTO) {
+async function update(data: any) {
   const portfolio = await fetchWrapper.put(baseUrl, data);
   return portfolio;
 }

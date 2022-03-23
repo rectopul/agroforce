@@ -1,8 +1,6 @@
 import getConfig from 'next/config';
 
 import { fetchWrapper } from '../helpers';
-import { ICreateCultureDTO } from 'src/shared/dtos/culturaDTO/ICreateCultureDTO';
-import { IUpdateCultureDTO } from 'src/shared/dtos/culturaDTO/IUpdateCultureDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -13,7 +11,7 @@ export const cultureService = {
     updateCulture
 };
 
-async function createCulture(data: ICreateCultureDTO) {
+async function createCulture(data: any) {
     const culture = await fetchWrapper.post(baseUrl, data);
     return culture;
 }
@@ -23,7 +21,7 @@ async function getAll(parameters: any) {
     return culture;
 }
 
-async function updateCulture(data: IUpdateCultureDTO) {
+async function updateCulture(data: any) {
     const culture = await fetchWrapper.put(baseUrl, data);
     return culture;
 }

@@ -1,10 +1,4 @@
-import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
-import { validationUpdatePortfolio } from 'src/shared/validations/potfolio/updatePortfolioValidation';
-import { PortfolioRepository } from '../repository/portfolio.repository';
-
-import { ICreatePortfolioDTO } from '../shared/dtos/portfolioDTO/ICreatePortfolioDTO';
-import { validationCreatePortfolio } from '../shared/validations/potfolio/createPortfolioValidation';
-
+import { PortfolioRepository } from "src/repository/portfolio.repository";
 export class PortfolioController {
   portfolioRepository = new PortfolioRepository();
 
@@ -97,44 +91,31 @@ export class PortfolioController {
 
       const response = await this.portfolioRepository.findOne(id);
 
-      if (!response) throw new Error("Dados inválidos");
+      if (!response) throw new Error("Item não encontrado");
 
       return {status: 200 , response};
     } catch (e) {
-      return {status: 400, message: 'Portfólio não encontrado'};
+      return {status: 400, message: 'Item não encontrado'};
     }
   }
 
-  async createPortfolio(data: ICreatePortfolioDTO) {
+  async createPortfolio(data: any) {
     try {
-      // Validação
-      const valid = validationCreatePortfolio.isValidSync(data);
-
-      if (!valid) throw new Error('Dados inválidos');
-
-      // Salvando
       await this.portfolioRepository.create(data);
 
-      return {status: 201, message: "Portfólio cadastrado com sucesso!"}
+      return {status: 201, message: "Item cadastrado"}
     } catch(err) {
-      return { status: 404, message: "Erro"}
+      return { status: 404, message: "Item não cadastrado"}
     }
   }
 
-  async updatePortfolio(data: IUpdatePortfolioDTO) {
+  async updatePortfolio(data: any) {
     try {
-      // Validação
-      const valid = validationUpdatePortfolio.isValidSync(data);
-
-      if (!valid) throw new Error('Dados inválidos');
-
-      // Salvando
       await this.portfolioRepository.update(data.id, data);
 
-      return {status: 200, message: "Portfólio atualizado!"}
+      return {status: 200, message: "Item atualizado!"}
     } catch (err) {
-      console.log(err)
-      return { status: 404, message: "Erro ao atualizar" }
+      return { status: 404, message: "Item não encontrado" }
     }
   }
 }

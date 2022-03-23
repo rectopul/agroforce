@@ -1,11 +1,5 @@
 import { FocoRepository } from '../repository/foco.repository';
 
-import { IUpdateFocoDTO } from 'src/shared/dtos/focoDTO/IUpdateFocoDTO';
-import { ICreateFocoDTO } from '../shared/dtos/focoDTO/ICreateFocoDTO';
-
-import { validationFocoUpdate } from 'src/shared/validations/foco/update.validation';
-import { validationFocoCreate } from '../shared/validations/foco/create.validation';
-
 export class FocoController {
   focoRepository = new FocoRepository();
 
@@ -88,43 +82,31 @@ export class FocoController {
 
       const response = await this.focoRepository.findOne(id);
 
-      if (!response) throw new Error("Dados inválidos");
+      if (!response) throw new Error("Item não encontrado");
 
       return {status: 200 , response};
     } catch (e) {
-      return {status: 400, message: 'Portfólio não encontrado'};
+      return {status: 400, message: 'Item não encontrado'};
     }
   };
 
-  async createFoco(data: ICreateFocoDTO) {
+  async createFoco(data: any) {
     try {
-      // Validação
-      const valid = validationFocoCreate.isValidSync(data);
-
-      if (!valid) throw new Error('Dados inválidos');
-
-      // Salvando
       await this.focoRepository.create(data);
 
-      return {status: 201, message: "Foco cadastrado com sucesso!"}
+      return {status: 201, message: "Item cadastrado"}
     } catch(err) {
-      return { status: 404, message: "Erro"}
+      return { status: 404, message: "Item não cadastrado"}
     }
   };
 
-  async updateFoco(data: IUpdateFocoDTO) {
+  async updateFoco(data: any) {
     try {
-      // Validação
-      const valid = validationFocoUpdate.isValidSync(data);
-
-      if (!valid) throw new Error('Dados inválidos');
-
-      // Salvando
       await this.focoRepository.update(data.id, data);
 
-      return {status: 200, message: "Foco atualizado!"}
+      return {status: 200, message: "Item atualizado"}
     } catch (err) {
-      return { status: 404, message: "Erro ao atualizar" }
+      return { status: 404, message: "Item não encontrado" }
     }
   };
 };

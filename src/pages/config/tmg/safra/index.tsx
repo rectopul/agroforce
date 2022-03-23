@@ -19,6 +19,8 @@ import getConfig from "next/config";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { IoReloadSharp } from "react-icons/io5";
 
+import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO'
+
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
@@ -26,15 +28,15 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-interface ISafra{
-  id: number;
-  year: string;
-  typeCrop: string;
-  plantingStartTime: string;
-  plantingEndTime: string;
-  main_safra: string;
-  status: boolean;
-}
+// interface ISafra{
+//   id: number;
+//   year: string;
+//   typeCrop: string;
+//   plantingStartTime: string;
+//   plantingEndTime: string;
+//   main_safra: string;
+//   status: boolean;
+// }
 
 interface IGenarateProps {
   name: string | undefined;
@@ -42,7 +44,7 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
-  allSafras: ISafra[];
+  allSafras: ISafraUpdateDTO[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
@@ -54,7 +56,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario;
 
-  const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
+  const [safras, setSafras] = useState<ISafraUpdateDTO[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
@@ -90,11 +92,10 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
+      await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        if (response.status === 200) {
           setTotaItems(response.total);
           setFilter(parametersFilter);
           setSafras(response.response);
@@ -103,23 +104,19 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     },
   });
 
-  async function handleStatusSafra(id: number, status: any, data?: any): Promise<void> {
+  async function handleStatusSafra(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
       status = 0;
     }
 
-    // Arrumar aqui !!!
-    await safraService.updateSafras({id: id, status: status, ...data}).then((response) => {
-      
-    });
     const index = safras.findIndex((safra) => safra.id === id);
 
     if (index === -1) {
       return;
     }
-
+    
     setSafras((oldSafra) => {
       const copy = [...oldSafra];
       copy[index].status = status;
@@ -177,7 +174,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: ISafra) => (
+          render: (rowData: ISafraUpdateDTO) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 

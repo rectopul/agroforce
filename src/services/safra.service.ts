@@ -1,8 +1,5 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
-import { ISafraPropsDTO } from 'src/shared/dtos/safraDTO/ISafraPropsDTO';
-import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
@@ -13,11 +10,11 @@ export const safraService = {
     updateSafras
 };
 
-async function create(data: ISafraPropsDTO) {
+async function create(data: any) {
     return fetchWrapper.post(baseUrl, data);
 }
 
-function updateSafras(data: ISafraUpdateDTO) {
+function updateSafras(data: any) {
     return fetchWrapper.put(baseUrl, data);
 }
 
