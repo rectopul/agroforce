@@ -11,8 +11,7 @@ import {
   Button, 
   Content, 
   Input, 
-  Radio, 
-  Select, 
+  Radio,
   TabHeader 
 } from "src/components";
 import { safraService } from "src/services";
@@ -31,6 +30,7 @@ interface ISafraProps {
 
 export default function AtualizarSafra(safra: ISafraProps) {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -69,6 +69,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           Swal.fire('Safra atualizada com sucesso!');
           router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -118,7 +119,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Ano
+                <strong className={checkInput}>*</strong>
+                Ano
               </label>
               <Input
                 type="text"
@@ -133,7 +135,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Tipo de safra
+                <strong className={checkInput}>*</strong>
+                Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
                 <Radio
@@ -160,7 +163,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
           <div className="w-8/12 flex justify-between items-start gap-5 mt-4">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Período ideal de início de plantio
+                <strong className={checkInput}>*</strong>
+                Período ideal de início de plantio
               </label>
               <Input
                 type="text" 
@@ -175,7 +179,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
             
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Período ideal do fim do plantio
+                <strong className={checkInput}>*</strong>
+                Período ideal do fim do plantio
               </label>
               <Input
                 type="text" 

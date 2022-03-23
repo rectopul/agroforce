@@ -19,6 +19,7 @@ import { SiMicrogenetics } from "react-icons/si";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 export interface IUpdatePortfolio {
   id: number;
@@ -31,6 +32,7 @@ export interface IUpdatePortfolio {
 
 export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -52,8 +54,6 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
-      alert(JSON.stringify(values, null, 2));
-
       await portfolioService.update({
         id: portfolio.id,
         id_culture: formik.values.id_culture,
@@ -66,6 +66,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           Swal.fire('Portfólio atualizado com sucesso!');
           router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -90,7 +91,8 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Código
+              <strong className={checkInput}>*</strong>
+              Código
             </label>
             <Input
               style={{ background: '#e5e7eb'}}
@@ -101,7 +103,8 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           </div>
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Genealogia
+              <strong className={checkInput}>*</strong>
+              Genealogia
             </label>
             <Input
               required
@@ -114,7 +117,8 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           </div>
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Cruza
+              <strong className={checkInput}>*</strong>
+              Cruza
             </label>
             <Input
               required

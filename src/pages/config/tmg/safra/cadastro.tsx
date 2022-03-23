@@ -16,6 +16,7 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 interface ISafraProps {
   id_culture: number;
@@ -30,6 +31,7 @@ interface ISafraProps {
 
 export default function Safra() {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -61,7 +63,8 @@ export default function Safra() {
           Swal.fire('Safra cadastrada com sucesso!');
           router.back();
         } else {
-          Swal.fire(response.message)
+          setCheckInput("text-red-600");
+          Swal.fire(response.message);
         }
       }).finally(() => {
         formik.values.year = '';
@@ -92,7 +95,8 @@ export default function Safra() {
           <div className="w-full flex justify-between items-start gap-5">
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Ano
+                <strong className={checkInput}>*</strong>
+                Ano
               </label>
               <Input
                 type="date"
@@ -106,7 +110,8 @@ export default function Safra() {
 
             <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Tipo de safra
+                <strong className={checkInput}>*</strong>
+                Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
@@ -131,7 +136,8 @@ export default function Safra() {
           <div className="w-full flex justify-between items-start gap-5 mt-10">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Período ideal de início de plantio
+                <strong className={checkInput}>*</strong>
+                Período ideal de início de plantio
               </label>
               <Input
                 type="text" 
@@ -146,7 +152,8 @@ export default function Safra() {
             
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Período ideal do fim do plantio
+                <strong className={checkInput}>*</strong>
+                Período ideal do fim do plantio
               </label>
               <Input
                 type="text"

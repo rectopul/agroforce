@@ -17,6 +17,7 @@ import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from 'sweetalert2';
 import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
+import { useState } from 'react';
 
 export interface IUpdateCulture {
   id: number;
@@ -27,6 +28,7 @@ export interface IUpdateCulture {
 
 export default function Cultura(culture: IUpdateCulture) {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -48,6 +50,7 @@ export default function Cultura(culture: IUpdateCulture) {
           Swal.fire('Cultura atualizada com sucesso');
           router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -91,7 +94,8 @@ export default function Cultura(culture: IUpdateCulture) {
 
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Nome
+              <strong className={checkInput}>*</strong>
+              Nome
             </label>
             <Input
               id="name"

@@ -11,6 +11,7 @@ import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { SiMicrogenetics } from "react-icons/si";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 export interface ICreatePortfolio {
   id_culture: number;
@@ -22,6 +23,7 @@ export interface ICreatePortfolio {
 
 export default function  Portfolio() {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
   
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -46,9 +48,10 @@ export default function  Portfolio() {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Portfólio cadastrado com sucesso!');
-        } else {
-          Swal.fire(response.message);
           router.back();
+        } else {
+          setCheckInput("text-red-600");
+          Swal.fire(response.message);
         }
       }).finally(() => {
         formik.values.genealogy = '';
@@ -77,7 +80,8 @@ export default function  Portfolio() {
         <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Genealogia
+              <strong className={checkInput}>*</strong>
+              Genealogia
             </label>
             <Input
               required
@@ -90,7 +94,8 @@ export default function  Portfolio() {
           </div>
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Cruza
+              <strong className={checkInput}>*</strong>
+              Cruza
             </label>
             <Input
               required

@@ -16,6 +16,8 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from 'react-icons/io';
 import { AiOutlineFileSearch } from 'react-icons/ai';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 export interface IUpdateFoco {
   id: number;
@@ -25,6 +27,9 @@ export interface IUpdateFoco {
 }
 
 export default function Atualizar(foco: IUpdateFoco) {
+  const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
+  
   const { ensaiosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
@@ -45,7 +50,9 @@ export default function Atualizar(foco: IUpdateFoco) {
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Foco cadastrado com sucesso!');
+          router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       });
@@ -80,6 +87,7 @@ export default function Atualizar(foco: IUpdateFoco) {
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
+              <strong className={checkInput}>*</strong>
               Código
             </label>
             <Input value={foco.id} disabled style={{ background: '#e5e7eb' }} />
@@ -87,6 +95,7 @@ export default function Atualizar(foco: IUpdateFoco) {
 
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
+              <strong className={checkInput}>*</strong>
               Nome
             </label>
             <Input
@@ -110,13 +119,12 @@ export default function Atualizar(foco: IUpdateFoco) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/ensaio/foco"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

@@ -15,6 +15,7 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { RiPlantLine } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
+import { useState } from 'react';
 
 interface ICreateCulture {
   name: string;
@@ -24,9 +25,11 @@ interface ICreateCulture {
 
 export default function Cadastro() {
   const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const { tmgDropDown, tabs } = ITabs.default;
+
 
   const formik = useFormik<ICreateCulture>({
     initialValues: {
@@ -44,6 +47,7 @@ export default function Cadastro() {
           Swal.fire('Cultura cadastrada com sucesso!');
           router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -79,7 +83,8 @@ export default function Cadastro() {
           ">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Nome
+                <strong className={checkInput}>*</strong>
+                Nome
               </label>
               <Input
                 id="name"

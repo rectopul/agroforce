@@ -1,6 +1,8 @@
 import Head from 'next/head';
 import { useFormik } from 'formik'
 import Swal from 'sweetalert2';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import { focoService } from 'src/services/foco.service';
 
@@ -8,13 +10,13 @@ import {
   Button,
   Content, 
   Input, 
-  TabHeader 
+  TabHeader
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 
-import { RiPlantLine } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
+import { AiOutlineFileSearch } from 'react-icons/ai';
 
 interface ICreateFoco {
   name: string;
@@ -22,6 +24,9 @@ interface ICreateFoco {
 }
 
 export default function Cadastro() {
+  const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const { ensaiosDropDown, tabs } = ITabs.default;
 
@@ -37,7 +42,9 @@ export default function Cadastro() {
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Foco cadastrado com sucesso!');
+          router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message)
         }
       }).finally(() => {
@@ -72,6 +79,7 @@ export default function Cadastro() {
         ">
           <div className="w-2/4 h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
+              <strong className={checkInput}>*</strong>
               Nome foco
             </label>
             <Input
@@ -95,13 +103,12 @@ export default function Cadastro() {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/ensaio"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">
@@ -110,7 +117,7 @@ export default function Cadastro() {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<RiPlantLine size={20} />}
+                icon={<AiOutlineFileSearch size={20} />}
                 onClick={() => {}}
               />
             </div>
