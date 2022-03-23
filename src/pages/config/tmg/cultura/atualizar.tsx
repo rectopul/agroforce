@@ -84,14 +84,14 @@ export default function Cultura(culture: IUpdateCulture) {
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Código
+              *Código
             </label>
             <Input value={culture.id} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Nome cultura
+              *Nome
             </label>
             <Input
               id="name"

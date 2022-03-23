@@ -77,7 +77,7 @@ export default function  Portfolio() {
         <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Genealogia
+              *Genealogia
             </label>
             <Input
               required
@@ -90,7 +90,7 @@ export default function  Portfolio() {
           </div>
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Cruza
+              *Cruza
             </label>
             <Input
               required

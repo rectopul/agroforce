@@ -90,7 +90,18 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Genealogia
+              *Código
+            </label>
+            <Input
+              style={{ background: '#e5e7eb'}}
+              required
+              disabled
+              value={portfolio.id}
+            />
+          </div>
+          <div className="w-full h-10">
+            <label className="block text-gray-900 text-sm font-bold mb-2">
+              *Genealogia
             </label>
             <Input
               required
@@ -103,7 +114,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           </div>
           <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              Cruza
+              *Cruza
             </label>
             <Input
               required

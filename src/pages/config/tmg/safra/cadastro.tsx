@@ -92,7 +92,7 @@ export default function Safra() {
           <div className="w-full flex justify-between items-start gap-5">
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Ano
+                *Ano
               </label>
               <Input
                 type="date"
@@ -106,7 +106,7 @@ export default function Safra() {
 
             <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de safra
+                *Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
@@ -131,13 +131,14 @@ export default function Safra() {
           <div className="w-full flex justify-between items-start gap-5 mt-10">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Período ideal de início de plantio
+                *Período ideal de início de plantio
               </label>
               <Input
                 type="text" 
                 placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
+                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
@@ -145,13 +146,14 @@ export default function Safra() {
             
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Período ideal do fim do plantio
+                *Período ideal do fim do plantio
               </label>
               <Input
-                type="text" 
+                type="text"
                 placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"
+                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}
               />

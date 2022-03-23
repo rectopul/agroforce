@@ -54,6 +54,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
       status: safra.status,
     },
     onSubmit: async (values) => {
+      if (values.id !== safra.id) throw new Error("Dados inválidos");
+
       await safraService.updateSafras({
         id: safra.id,
         id_culture: formik.values.id_culture,
@@ -102,7 +104,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           <div className="w-full flex justify-between items-start gap-5 mt-4">
             <div className="w-4/12">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
+                *Código
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}
@@ -116,7 +118,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Ano
+                *Ano
               </label>
               <Input
                 type="text"
@@ -131,7 +133,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de safra
+                *Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
                 <Radio
@@ -155,10 +157,10 @@ export default function AtualizarSafra(safra: ISafraProps) {
             </div>
           </div>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-4">
-            <div className="w-2/4 h-10">
+          <div className="w-8/12 flex justify-between items-start gap-5 mt-4">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Período ideal de início de plantio
+                *Período ideal de início de plantio
               </label>
               <Input
                 type="text" 
@@ -171,9 +173,9 @@ export default function AtualizarSafra(safra: ISafraProps) {
               />
             </div>
             
-            <div className="w-2/4">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Período ideal do fim do plantio
+                *Período ideal do fim do plantio
               </label>
               <Input
                 type="text" 
@@ -185,27 +187,13 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 value={formik.values.plantingEndTime}
               />
             </div>
-
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Status
-              </label>
-              <Select
-                id="plantingEndTime"
-                name="plantingEndTime"
-                onChange={formik.handleChange}
-                selected={formik.values.status}
-                value={formik.values.status}
-                values={select}
-              />
-            </div>
           </div>
 
           <div className="h-10 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-12
           ">
             <div className="w-30">
               <Button 
