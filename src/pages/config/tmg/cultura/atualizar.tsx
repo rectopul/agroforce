@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import { useFormik } from 'formik'
-import { BsCheckLg } from "react-icons/bs";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
@@ -9,36 +8,45 @@ import { cultureService } from 'src/services';
 import { 
   Button,
   Content, 
-  Input, 
-  Select, 
+  Input,
   TabHeader 
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
+import Swal from 'sweetalert2';
 
-export default function Cultura({cultureEdit}:any) {
+export interface IUpdateCulture {
+  id: number;
+  name: string;
+  status: number;
+  created_by: number;
+};
+
+export default function Cultura(culture: IUpdateCulture) {
   const { tmgDropDown, tabs } = ITabs.default;
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
-  const formik = useFormik({
+  const formik = useFormik<IUpdateCulture>({
     initialValues: {
-      id: cultureEdit.id,
-      name: cultureEdit.name,
-      status: cultureEdit.status,
-      created_by: userLogado.id,
+      id: culture.id,
+      name: culture.name,
+      status: culture.status,
+      created_by: culture.created_by
     },
-    onSubmit: values => {
-      cultureService.updateCulture({
-        id: cultureEdit.id,
+    onSubmit: async (values) => {
+      await cultureService.updateCulture({
+        id: culture.id,
         name: formik.values.name,
         status: formik.values.status,
-        created_by: formik.values.created_by,
+        created_by: formik.values.created_by
       }).then((response) => {
-        if (response.status == 200) {
-          alert("Cultura atualizada com sucesso");
+        if (response.status === 200) {
+          Swal.fire('Cultura atualizada com sucesso');
+        } else {
+          Swal.fire(response.message);
         }
-      })
+      }).finally(() => {
+        formik.values.name = culture.name;
+      });
     },
   });
 
@@ -62,7 +70,7 @@ export default function Cultura({cultureEdit}:any) {
         <h1 className="text-2xl">Nova cultura</h1>
 
         <div className="w-full
-          flex 
+          flex
           justify-around
           gap-2
           mt-4
@@ -70,9 +78,9 @@ export default function Cultura({cultureEdit}:any) {
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              ID cultura
+              Código
             </label>
-            <Input value={cultureEdit.id} disabled style={{ background: '#e5e7eb' }} />
+            <Input value={culture.id} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
           <div className="w-full h-10">
@@ -89,24 +97,8 @@ export default function Cultura({cultureEdit}:any) {
               value={formik.values.name}
             />
           </div>
-
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              Status
-            </label>
-            <Select
-                values={optionStatus}
-                id="status"
-                name="status"
-                onChange={formik.handleChange}
-                value={formik.values.status}
-                selected={cultureEdit.status}
-              />
-        
-          </div>
         </div>
        
-
         <div className="h-10 w-full
           flex
           justify-center
@@ -128,19 +120,20 @@ export default function Cultura({cultureEdit}:any) {
   );
 }
 
-
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-  const  token  =  req.cookies.token;
+  const  token  =  context.req.cookies.token;
   
-  const requestOptions: object | any = {
+  const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer  ${token}` }
+    headers:  { Authorization: `Bearer ${token}` }
   };
-  const res = await fetch(`${baseUrl}/` + 1, requestOptions)
-  const cultureEdit = await res.json();
 
-  return { props: { cultureEdit } }
+  const apiCulture = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+
+  const culture = await apiCulture.json();
+
+  return { props: culture }
 }

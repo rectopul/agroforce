@@ -59,7 +59,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
         status: portfolio.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Portfólio atualizado com sucesso!');
         } else {
           Swal.fire(response.message);
@@ -146,7 +146,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlList = `${publicRuntimeConfig.apiUrl}/portfolio`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
   const  token  =  context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
@@ -155,7 +155,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiPortfolio = await fetch(`${baseUrlList}/` + context.query.id, requestOptions);
+  const apiPortfolio = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
 
   const portfolio = await apiPortfolio.json();
 

@@ -1,5 +1,8 @@
 import {CulturaRepository} from '../repository/culture.repository';
-
+import { ICreateCultureDTO } from 'src/shared/dtos/culturaDTO/ICreateCultureDTO';
+import { IUpdateCultureDTO } from 'src/shared/dtos/culturaDTO/IUpdateCultureDTO';
+import { validationCreateCulture } from 'src/shared/validations/cultura/createValidation';
+import { validationUpdateCulture } from 'src/shared/validations/cultura/updateValidation';
 
 export class CulturaController {
     culturaRepository = new CulturaRepository();
@@ -14,50 +17,49 @@ export class CulturaController {
         return response;        
     }
 
-    async getOneCulture(id: string) {
-        let newID = parseInt(id);
-        if (id && id != '{id}') {
-            let response = await this.culturaRepository.findOne(newID); 
-            if (!response) {
-               return {status: 400, response:{error: 'cultura não existe'}};
-            } else {
-                return {status:200 ,response: response};
-            }
-        } else {
-            return {status:405, response:{error: 'id não informado'}};
+    async getOneCulture(id: number) {
+        try {
+            if (!id) throw new Error("Dados inválidos");
+      
+            const response = await this.culturaRepository.findOne(id);
+      
+            if (!response) throw new Error("Dados inválidos");
+      
+            return {status: 200 , response};
+        } catch (e) {
+        return {status: 400, message: 'Cultura não encontrada'};
         }
     }
 
-    async postCulture(data: object) {
-        if (data != null && data != undefined) {
-            let response = await this.culturaRepository.create(data);
-            if(response) {
-                return {status: 200, message: "cultura inserida"}
-            } else {
-                return {status: 400, message: "erro"}
-
-            }
+    async postCulture(data: ICreateCultureDTO) {
+        try {
+            // Validação
+            const valid = validationCreateCulture.isValidSync(data);
+        
+            if (!valid) throw new Error('Dados inválidos');
+        
+            // Salvando
+            await this.culturaRepository.create(data);
+        
+            return {status: 201, message: "Cultura cadastrada com sucesso!"}
+        } catch(err) {
+            return { status: 404, message: "Erro"}
         }
     }
 
-    async updateCulture(data: any) {
-        const parameters: object | any = new Object();
-
-        if (typeof(data.status) === 'string') {
-            parameters.status =  parseInt(data.status);
-        } else { 
-            parameters.status =  data.status;
-        }
-
-        if(data.name) parameters.name = data.name;
-
-        if (data != null && data != undefined) {
-            let response = await this.culturaRepository.update(data.id, parameters);
-            if(response) {
-                return {status: 200, message: {message: "cultura atualizada"}}
-            } else {
-                return {status: 400, message: {message: "erro ao tentar fazer o update"}}
-            }
+    async updateCulture(data: IUpdateCultureDTO) {
+        try {
+            // Validação
+            const valid = validationUpdateCulture.isValidSync(data);
+      
+            if (!valid) throw new Error('Dados inválidos');
+      
+            // Salvando
+            await this.culturaRepository.update(data.id, data);
+      
+            return { status: 200, message: "Cultura atualizada" }
+        } catch (err) {
+            return { status: 404, message: "Erro ao atualizar" }
         }
     }
 }
