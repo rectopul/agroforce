@@ -30,8 +30,6 @@ interface ISafraProps {
 
 export default function Safra() {
   const { tmgDropDown, tabs } = ITabs.default;
-  // const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-  // const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -46,8 +44,8 @@ export default function Safra() {
       status: 1,
       created_by: userLogado.id,
     },
-    onSubmit: values => {
-      safraService.create({
+    onSubmit: async (values) => {
+      await safraService.create({
         id_culture: formik.values.id_culture,
         year: formik.values.year,
         typeCrop: formik.values.typeCrop,
@@ -61,7 +59,12 @@ export default function Safra() {
         } else {
           Swal.fire(response.message)
         }
-      })
+      }).finally(() => {
+        formik.values.year = '';
+        formik.values.typeCrop = '';
+        formik.values.plantingStartTime = '';
+        formik.values.plantingEndTime = '';
+      });
     },
   });
   
@@ -77,29 +80,13 @@ export default function Safra() {
         }
       >
         <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5">
-            <div className="w-4/12">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Safra
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                type="text"
-                required
-                disabled
-                id="harvest"
-                name="harvest"
-                onChange={formik.handleChange}
-                value={20}
-              />
-            </div>
-
-            <div className="w-4/12 h-10">
+            <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Ano
               </label>
@@ -113,7 +100,7 @@ export default function Safra() {
               />
             </div>
 
-            <div className="w-4/12 h-10 justify-start">
+            <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Tipo de safra
               </label>
@@ -137,7 +124,7 @@ export default function Safra() {
             </div>
           </div>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-4">
+          <div className="w-full flex justify-between items-start gap-5 mt-10">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Período ideal de início de plantio
