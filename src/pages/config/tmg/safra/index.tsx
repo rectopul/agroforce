@@ -182,7 +182,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/safra/atualizar-safra?id=${rowData.id}`}
+                  href={`/config/tmg/safra/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (

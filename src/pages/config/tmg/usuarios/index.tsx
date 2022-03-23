@@ -201,7 +201,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
+                    href={`/config/tmg/usuarios/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
