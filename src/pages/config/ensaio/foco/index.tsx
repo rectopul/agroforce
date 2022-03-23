@@ -89,7 +89,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        console.log(response)
         if (response.status === 200) {
           setTotaItems(response.total);
           setFocos(response.response);
@@ -99,7 +98,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     },
   });
 
-  function handleStatusPortfolio(id: number, status: any): void {
+  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
@@ -111,6 +110,8 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     if (index === -1) {
       return;
     }
+
+    await focoService.update({id: id, status: status});
 
     setFocos((oldSafra) => {
       const copy = [...oldSafra];
