@@ -20,7 +20,7 @@ export default  apiHandler(handler);
 
     switch (req.method) {
       case 'GET':
-        const result = await Controller.getAllCulture();
+        const result = await Controller.getAllCulture(req.query);
         res.status(200).json(result);
         break
       case 'POST':

@@ -61,6 +61,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Name", value: "name" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
@@ -123,6 +124,13 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código", 
+          field: "id",
+          sorting: false,
+        });
+      } 
       if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
@@ -161,7 +169,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/ensaio/atualizar-foco?id=${rowData.id}`}
+                  href={`/config/ensaio/foco/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (

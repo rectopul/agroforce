@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useFormik } from 'formik'
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
+import Swal from 'sweetalert2';
 
 import { focoService } from 'src/services/foco.service';
 
@@ -14,7 +15,6 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
-import Swal from 'sweetalert2';
 
 export interface IUpdateFoco {
   id: number;

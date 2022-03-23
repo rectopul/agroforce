@@ -12,14 +12,24 @@ export class CulturaRepository {
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
+    
         if (orderBy){
-            order = JSON.parse(orderBy);
+          order = JSON.parse(orderBy);
         }
-        let count = await prisma.culture.count({ where: where })
-        let Result: object | any = await prisma.culture.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
-        Result.total = count;
-        return Result;
-    }
+    
+        const count = await prisma.culture.count({ where: where });
+    
+        const result: object | any = await prisma.culture.findMany({
+          select: select, 
+          skip: skip, 
+          take: take, 
+          where: where,
+          orderBy: order
+        });
+        
+        result.total = count;
+        return result;
+      }
 
     async create(data: ICreateCultureDTO) {
         const culture = await prisma.culture.create({ data });
