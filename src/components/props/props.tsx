@@ -11,10 +11,10 @@ const tabs = [
 ];
 
 const tmgDropDown =  [
-  {labelDropDown: 'Usuário', hrefDropDown: 'http://localhost:3000/config/tmg/usuarios'},
-  {labelDropDown: 'Safra', hrefDropDown: 'http://localhost:3000/config/tmg/safra'},
-  {labelDropDown: 'Portfólio', hrefDropDown: 'http://localhost:3000/config/tmg/portfolio'},
-  {labelDropDown: 'Cultura', hrefDropDown: 'http://localhost:3000/config/tmg/cultura'},
+  {labelDropDown: 'Usuário', hrefDropDown: '/config/tmg/usuarios'},
+  {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra'},
+  {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio'},
+  {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura'},
 ];
 
 const ensaiosDropDown =  [
