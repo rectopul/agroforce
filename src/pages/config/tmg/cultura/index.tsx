@@ -100,7 +100,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     },
   });
 
-  function handleStatusCulture(id: number, status: any): void {
+  async function handleStatusCulture(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
@@ -112,6 +112,8 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     if (index === -1) {
       return;
     }
+
+    await cultureService.updateCulture({id: id, status: status});
 
     setCultures((oldCulture) => {
       const copy = [...oldCulture];
@@ -195,7 +197,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     return arrOb;
   };
 
-  function getValuesComluns(): void {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -206,7 +208,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    await userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
@@ -258,7 +260,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     }
   };
 
-  function handleOnDragEnd(result: DropResult) {
+  function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result)  return;
     

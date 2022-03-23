@@ -103,7 +103,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     },
   });
 
-  function handleStatusPortfolio(id: number, status: any): void {
+  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
@@ -115,6 +115,8 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     if (index === -1) {
       return;
     }
+
+    await portfolioService.update({id: id, status: status});
 
     setPortfolios((oldSafra) => {
       const copy = [...oldSafra];
@@ -212,7 +214,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     return arrOb;
   };
 
-  function getValuesComluns(): void {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -221,9 +223,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     } 
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString- 1);
     userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    await userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
@@ -231,7 +233,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     setManagedFields(campos);
   };
 
-  function handleOrderGenealogy(column: string, order: string | any): void {
+  async function handleOrderGenealogy(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -256,8 +258,8 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     }
 
-    portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+    await portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
         setOrderGenealogy(response.response)
       }
     })
@@ -274,7 +276,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     }
   };
 
-  function handleOrderCruza(column: string, order: string | any): void {
+  async function handleOrderCruza(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -299,7 +301,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     }
 
-    portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setOrderCruza(response.response)
       }
@@ -318,7 +320,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     }
   };
 
-  function handleOnDragEnd(result: DropResult) {
+  function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result)  return;
     
@@ -330,12 +332,12 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => {
+  const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${managedFields}`;
     }
     
-    portfolioService.getAll(filterAplication).then((response) => {
+    await portfolioService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {

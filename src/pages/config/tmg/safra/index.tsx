@@ -19,8 +19,6 @@ import getConfig from "next/config";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { IoReloadSharp } from "react-icons/io5";
 
-import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO'
-
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
@@ -28,15 +26,15 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-// interface ISafra{
-//   id: number;
-//   year: string;
-//   typeCrop: string;
-//   plantingStartTime: string;
-//   plantingEndTime: string;
-//   main_safra: string;
-//   status: boolean;
-// }
+interface ISafra {
+  id: number;
+  year: string;
+  typeCrop: string;
+  plantingStartTime: string;
+  plantingEndTime: string;
+  main_safra: string;
+  status: boolean;
+}
 
 interface IGenarateProps {
   name: string | undefined;
@@ -44,7 +42,7 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
-  allSafras: ISafraUpdateDTO[];
+  allSafras: ISafra[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
@@ -56,7 +54,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario;
 
-  const [safras, setSafras] = useState<ISafraUpdateDTO[]>(() => allSafras);
+  const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
@@ -116,6 +114,8 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     if (index === -1) {
       return;
     }
+
+    await safraService.updateSafras({id: id, status: status});
     
     setSafras((oldSafra) => {
       const copy = [...oldSafra];
@@ -174,7 +174,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: ISafraUpdateDTO) => (
+          render: (rowData: ISafra) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
