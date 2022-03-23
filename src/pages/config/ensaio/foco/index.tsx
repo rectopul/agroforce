@@ -156,15 +156,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
-                  icon={<FaRegUserCircle size={16} />}
-                  onClick={() =>{}}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  href="perfil"
-                />
-              </div>
-              <div className="h-10">
-                <Button 
                   icon={<BiEdit size={16} />}
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
@@ -203,7 +194,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     return arrOb;
   };
 
-  function getValuesComluns(): void {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -212,9 +203,9 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
       }
     } 
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString- 1);
     userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    await userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
