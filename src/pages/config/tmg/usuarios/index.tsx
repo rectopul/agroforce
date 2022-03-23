@@ -73,6 +73,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id", defaultChecked: () => camposGerenciados.includes('id')},
     { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
@@ -119,6 +120,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
+      }
       if (ObjetCampos[item] == 'avatar') {
         arrOb.push({
           title: "Avatar", 

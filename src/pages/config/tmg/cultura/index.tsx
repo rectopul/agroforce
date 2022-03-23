@@ -157,15 +157,6 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
-                  icon={<FaRegUserCircle size={16} />}
-                  onClick={() =>{}}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  href="perfil"
-                />
-              </div>
-              <div className="h-10">
-                <Button 
                   icon={<BiEdit size={16} />}
                   onClick={() =>{}}
                   bgColor="bg-blue-600"

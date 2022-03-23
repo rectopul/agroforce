@@ -124,7 +124,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/safra'
+                href='/config/tmg/portfolio'
                 onClick={() => {}}
               />
             </div>

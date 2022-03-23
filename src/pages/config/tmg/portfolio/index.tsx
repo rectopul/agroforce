@@ -64,6 +64,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
@@ -127,6 +128,13 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
+        },);
+      }
       if (ObjetCampos[index] == 'genealogy') {
         arrOb.push({
           title: (
@@ -164,15 +172,6 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           filterPlaceholder: "Filtrar por status",
           render: (rowData: IPortfolio) => (
             <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<FaRegUserCircle size={16} />}
-                  onClick={() =>{}}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  href="perfil"
-                />
-              </div>
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}

@@ -14,6 +14,8 @@ import {
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from 'sweetalert2';
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiPlantLine } from 'react-icons/ri';
 
 export interface IUpdateCulture {
   id: number;
@@ -99,21 +101,35 @@ export default function Cultura(culture: IUpdateCulture) {
           </div>
         </div>
        
-        <div className="h-10 w-full
-          flex
-          justify-center
-          mt-10
-        ">
-          <div className="w-40">
-            <Button
-              type="submit"
-              value="Cadastrar"
-              bgColor="bg-blue-600"
-              textColor="white"
-              onClick={() => {}}
-            />
+        <div className="
+            h-10 w-full
+            flex
+            gap-3
+            justify-center
+            mt-10
+          ">
+            <div className="w-30">
+              <Button 
+                type="submit"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                href="/config/tmg/cultura"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => {}}
+              />
+            </div>
+            <div className="w-40">
+              <Button
+                type="submit"
+                value="Cadastrar"
+                bgColor="bg-blue-600"
+                textColor="white"
+                icon={<RiPlantLine size={20} />}
+                onClick={() => {}}
+              />
+            </div>
           </div>
-        </div>
       </form>
       </Content>
     </>

@@ -10,7 +10,7 @@ import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 
-import { safraService, userPreferencesService, userService } from "src/services";
+import { safraService, userPreferencesService } from "src/services";
 
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
 
@@ -103,7 +103,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     },
   });
 
-  function handleStatusSafra(id: number, status: any): void {
+  async function handleStatusSafra(id: number, status: any, data?: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
@@ -111,9 +111,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     }
 
     // Arrumar aqui !!!
-    // userService.updateUsers({id: id, status: status}).then((response) => {
-  
-    // });
+    await safraService.updateSafras({id: id, status: status, ...data}).then((response) => {
+      
+    });
     const index = safras.findIndex((safra) => safra.id === id);
 
     if (index === -1) {
@@ -179,15 +179,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           filterPlaceholder: "Filtrar por status",
           render: (rowData: ISafra) => (
             <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<FaRegUserCircle size={16} />}
-                  onClick={() =>{}}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  href="perfil"
-                />
-              </div>
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
@@ -259,12 +250,12 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => {
+  const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${managedFields}`;
     }
     
-    userService.getAll(filterAplication).then((response) => {
+    await safraService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
