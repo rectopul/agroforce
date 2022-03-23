@@ -43,11 +43,11 @@ export default function NovoLocal({delineamentoEdit}: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
 
-      delineamentoService.update({
+      await delineamentoService.update({
         id: values.id,
         name:values.name,
         repeticao: Number(values.repeticao),
@@ -111,7 +111,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
             </div> 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome
+                *Nome
               </label>
               <Input 
                 type="text" 
@@ -124,7 +124,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Repetição
+                *Repetição
               </label>
               <Input 
                 type="text" 
@@ -137,7 +137,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Trat. Repetição
+                *Trat. Repetição
               </label>
               <Input 
                 type="text" 

@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 import { IoMdArrowBack } from "react-icons/io";
 import { layoultQuadraService } from "src/services";
-import { useState } from "react";
 import InputMask from "react-input-mask";
 
 import {
@@ -18,7 +17,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
-import { FiUserPlus } from "react-icons/fi";
+import { MdDateRange } from "react-icons/md";
 
 interface ILayoultProps {
   id: Number | any;
@@ -43,38 +42,40 @@ interface ILayoultProps {
 
 export interface IData {
   local: object | any;
+  layoultEdit: ILayoultProps;
 }
 
-export default function NovoLocal({ local }: IData) {
+export default function NovoLocal({ local, layoultEdit }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
   const router = useRouter();
   const formik = useFormik<ILayoultProps>({
     initialValues: {
-      id: 1,
-      esquema: '',
-      op: '',
-      semente_metros: '',
-      disparos: '',
-      divisor: '',
-      largura: '',
-      comp_fisico: '',
-      comp_parcela: '',
-      comp_corredor: '',
-      t4_inicial: '',
-      t4_final: '',
-      df_inicial: '',
-      df_final: '',
-      localId: '',
+      id: layoultEdit.id,
+      esquema: layoultEdit.esquema,
+      op: layoultEdit.op,
+      semente_metros: layoultEdit.semente_metros,
+      disparos: layoultEdit.disparos,
+      divisor: layoultEdit.divisor,
+      largura: layoultEdit.largura,
+      comp_fisico: layoultEdit.comp_fisico,
+      comp_parcela: layoultEdit.comp_parcela,
+      comp_corredor: layoultEdit.comp_corredor,
+      t4_inicial: layoultEdit.t4_inicial,
+      t4_final: layoultEdit.t4_final,
+      df_inicial: layoultEdit.df_inicial,
+      df_final: layoultEdit.df_final,
+      localId: layoultEdit.localId,
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
 
-      layoultQuadraService.create({
+      await layoultQuadraService.update({
+        id: values.id,
         esquema:values.esquema,
         op:values.op,
         semente_metros: Number(values.semente_metros),
@@ -93,10 +94,10 @@ export default function NovoLocal({ local }: IData) {
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Local cadastrado com sucesso!')
+          Swal.fire('Local atualizado com sucesso!');
           router.back()
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
       })
     },
@@ -125,7 +126,7 @@ export default function NovoLocal({ local }: IData) {
   return (
     <>
       <Head>
-        <title>Novo Layoult</title>
+        <title>Atualizar Layoult Quadra</title>
       </Head>
 
       <Content headerCotent={
@@ -148,7 +149,22 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Esquema
+                Código
+              </label>
+              <Input 
+                type="text" 
+                placeholder="14x08(p4)-PY" 
+                id="id"
+                style={{ background: '#e5e7eb' }}
+                name="id"
+                disabled
+                onChange={formik.handleChange}
+                value={formik.values.id}
+              />
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Esquema
               </label>
               <Input 
                 type="text" 
@@ -161,7 +177,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                OP
+                *OP
               </label>
               <Input 
                 type="text" 
@@ -174,7 +190,7 @@ export default function NovoLocal({ local }: IData) {
             </div>  
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Local
+                *Local
               </label>
               <Select
                 values={locais}
@@ -195,7 +211,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Sementes por Metros
+                *Sementes por Metros
               </label>
               <Input 
                 type="number" 
@@ -208,7 +224,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Disparos
+                *Disparos
               </label>
               <Input 
                 type="text" 
@@ -221,7 +237,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Divisor
+                *Divisor
               </label>
               <Input 
                 type="text" 
@@ -242,7 +258,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Largura
+                *Largura
               </label>
               <InputMask 
                  className="shadow
@@ -267,7 +283,7 @@ export default function NovoLocal({ local }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Físico
+                *Comp. Físico
               </label>
               <InputMask 
                  className="shadow
@@ -292,7 +308,7 @@ export default function NovoLocal({ local }: IData) {
             </div>   
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. da Parcela
+                *Comp. da Parcela
               </label>
               <InputMask 
                  className="shadow
@@ -317,7 +333,7 @@ export default function NovoLocal({ local }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Corredor
+                *Comp. Corredor
               </label>
               <InputMask 
                  className="shadow
@@ -350,7 +366,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Inicial
+                *T4 Inicial
               </label>
               <Input 
                 type="number" 
@@ -363,7 +379,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Final
+                *T4 Final
               </label>
               <Input 
                 type="text" 
@@ -376,7 +392,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Inicial
+                *DF Inicial
               </label>
               <Input 
                 type="text" 
@@ -389,7 +405,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Final
+                *DF Final
               </label>
               <Input 
                 type="text" 
@@ -416,16 +432,16 @@ export default function NovoLocal({ local }: IData) {
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                onClick={() => {router.back();}}
                 icon={<IoMdArrowBack size={18} />}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
-                value="Cadastrar"
-                icon={<FiUserPlus size={18} />}
+                value="Atualizar"
                 bgColor="bg-blue-600"
+                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />
@@ -437,14 +453,12 @@ export default function NovoLocal({ local }: IData) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
-  const  token  =  req.cookies.token;
+  const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
+  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
-  const param = `filterStatus=1`;
-  const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(param).toString();
+  const  token  =  context.req.cookies.token;
   
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
@@ -452,11 +466,13 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiLocal = await fetch(urlParameters.toString(), requestOptions);
+  const apiLocal = await fetch(baseUrlLocal, requestOptions);
+  const resU = await fetch(`${baseUrlLayoult}/` + context.query.id, requestOptions)
 
+  const layoultEdit = await resU.json();
   let local = await apiLocal.json();
   local = local.response
-  return { props: { local } }
+  return { props: { local, layoultEdit  } }
 }
 
 

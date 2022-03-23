@@ -37,11 +37,11 @@ export default function NovoLocal() {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
 
-      delineamentoService.create({
+      await delineamentoService.create({
         name:values.name,
         repeticao: Number(values.repeticao),
         trat_repeticao: Number(values.trat_repeticao),
@@ -90,7 +90,7 @@ export default function NovoLocal() {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome Delineamento
+                *Nome Delineamento
               </label>
               <Input 
                 type="text" 
@@ -103,7 +103,7 @@ export default function NovoLocal() {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Repetição
+                *Repetição
               </label>
               <Input 
                 type="text" 
@@ -116,7 +116,7 @@ export default function NovoLocal() {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Trat. Repetição
+                *Trat. Repetição
               </label>
               <Input 
                 type="text" 

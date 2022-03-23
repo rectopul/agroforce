@@ -57,7 +57,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
 
-  const ufs: object | any =  [];;
+  const ufs: object | any =  [];
   const pais =  [{id: 'Brasil', name: "Brasil"}];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
@@ -74,11 +74,11 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {   
+    onSubmit: async (values) => {   
       validateInputs(values);
       if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
 
-      localService.update({
+      await localService.update({
         id: values.id,
         name: values.name,
         pais: values.pais,
@@ -104,15 +104,15 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
   })
 
-  function showCitys(uf: any) {
+  async function showCitys(uf: any) {
     if (uf) {
       let param = '?ufId=' + uf; 
       let city: object | any = [];
-      localService.getCitys(param).then((response) => {
+      await localService.getCitys(param).then((response) => {
         response.map((value: string | object | any) => {
           city.push({id: value.nome, name: value.nome});
         })
-          setCitys(city)
+        setCitys(city)
       });
     }
   }
@@ -173,7 +173,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome do Local
+                *Nome do Local
               </label>
               <Input 
                 type="name" 
@@ -187,7 +187,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Pais
+                *Pais
               </label>
               <Select
                 values={pais}
@@ -208,7 +208,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Estado
+                *Estado
               </label>
               <Select
                 values={ufs}
@@ -222,7 +222,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Município
+                *Município
               </label>
               <Select
                 values={citys}
@@ -235,7 +235,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Endereço
+                *Endereço
               </label>
               <Input 
                 type="text" 
@@ -256,7 +256,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Latitude
+                *Latitude
               </label>
               <InputMask 
                  className="shadow
@@ -282,7 +282,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Longitude
+                *Longitude
               </label>
               <InputMask
                 className="shadow
@@ -308,7 +308,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Altitude
+                *Altitude
               </label>
               <Input 
                 type="text" 
