@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useFormik } from 'formik'
 import Swal from 'sweetalert2';
 
@@ -22,6 +24,8 @@ interface ICreateCulture {
 }
 
 export default function Cadastro() {
+  const router = useRouter();
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const { tmgDropDown, tabs } = ITabs.default;
 
@@ -37,7 +41,6 @@ export default function Cadastro() {
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        console.log(response);
         if (response.status === 201) {
           Swal.fire('Cultura cadastrada com sucesso!');
         } else {
@@ -98,14 +101,13 @@ export default function Cadastro() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
-                type="submit"
+              <Button
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/tmg/cultura"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

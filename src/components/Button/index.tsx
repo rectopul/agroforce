@@ -4,6 +4,7 @@ import { ButtonHTMLAttributes, ReactNode } from "react";
 type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   value?: string;
   title?: string;
+  type?: string;
   onClick: (() => any);
   icon?: string | ReactNode;
   bgColor?: string;
@@ -17,6 +18,7 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 export function Button({
   value,
   title,
+  type,
   icon,
   onClick,
   textColor,
@@ -37,7 +39,7 @@ export function Button({
       <button
         title={title}
         disabled={disabled}
-        type="submit" 
+        type={type}
         onClick={onClick}
         className={`w-full h-full
         flex justify-center items-center gap-2
@@ -61,7 +63,7 @@ export function Button({
     ) : (
       <button
         title={title}
-        type="submit" 
+        type={type}
         disabled={disabled}
         onClick={handleClick}
         className={`w-full h-full
