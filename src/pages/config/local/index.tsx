@@ -65,7 +65,7 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local || {id:0, table_preferences: "name, pais, uf, city, address, latitude, longitude, altitude, status"};
+  const preferences = userLogado.preferences.local || {id:0, table_preferences: "id, pais, uf, city, address, latitude, longitude, altitude, status"};
   const ufs: object | any =  [];
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
@@ -78,6 +78,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Pais", value: "pais", defaultChecked: () => camposGerenciados.includes('pais') },
     { name: "CamposGerenciados[]", title: "Estado", value: "uf", defaultChecked: () => camposGerenciados.includes('uf') },
@@ -135,6 +136,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
+      }
+
       if (ObjetCampos[item] == 'name') {
         arrOb.push({
           title: (
@@ -208,13 +213,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/local/atualizar-local?id=${rowData.id}`}
+                    href={`/config/local/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -230,13 +235,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/localatualizar-local?id=${rowData.id}`}
+                    href={`/config/localatualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusUser(
+                    onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
                     bgColor="bg-red-800"
@@ -263,7 +268,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     userLogado.preferences.local = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
+    userPreferencesService.update({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
@@ -271,7 +276,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setCamposGerenciados(campos);
   };
 
-  function handleStatusUser(id: number, status: any): void {
+  function handleStatus(id: number, status: any): void {
     if (status) {
       status = 1;
     } else {

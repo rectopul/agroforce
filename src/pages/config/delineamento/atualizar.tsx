@@ -15,6 +15,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface IDelineamentoProps {
   id: Number | any;
@@ -56,7 +57,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Delineamento cadastrado com sucesso!')
-          router.push('/config/delineamento');
+          router.back();
         } else {
           Swal.fire(response.message)
         }
@@ -96,7 +97,21 @@ export default function NovoLocal({delineamentoEdit}: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome Delineamento
+                Código
+              </label>
+              <Input 
+                type="text" 
+                id="id"
+                style={{ background: '#e5e7eb' }}
+                name="id"
+                disabled
+                onChange={formik.handleChange}
+                value={formik.values.id}
+              />
+            </div> 
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Nome
               </label>
               <Input 
                 type="text" 
@@ -144,19 +159,20 @@ export default function NovoLocal({delineamentoEdit}: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
+                onClick={() => {router.back();}}
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
               />
             </div>
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
+                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

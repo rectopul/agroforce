@@ -15,11 +15,11 @@ export const userService = {
     logout,
     getAll,
     getPermissions,
-    createUsers,
-    updateUsers
+    create,
+    update
 };
 
-function login(email: any, password: any) {
+async function login(email: any, password: any) {
     return fetchWrapper.post(`${baseUrl}/signIn`, { email, password })
         .then(user => {
             // publish user to subscribers and store in local storage to stay logged in between page refreshes
@@ -30,11 +30,11 @@ function login(email: any, password: any) {
         });
 }
 
-function createUsers(data: any) {
+function create(data: any) {
     return fetchWrapper.post(baseUrl, data);
 }
 
-function updateUsers(data: any) {
+function update(data: any) {
     return fetchWrapper.put(baseUrl, data);
 }
 

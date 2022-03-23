@@ -57,7 +57,7 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.type_assay || {id:0, table_preferences: "name, status"};
+  const preferences = userLogado.preferences.type_assay || {id:0, table_preferences: "id, name, status"};
 
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -67,6 +67,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
@@ -110,6 +111,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
+      }
       if (ObjetCampos[item] == 'name') {
         arrOb.push({
           title: (
@@ -149,7 +153,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -171,7 +175,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusUser(
+                    onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
                     bgColor="bg-red-800"
@@ -201,9 +205,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (preferences.id == 0) {
       userPreferencesService.createPreferences({userId: userLogado.id, module_id: 5,  table_preferences: campos })
     } else {
-      userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+      userPreferencesService.update({table_preferences: campos, id: preferences.id });
     }
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
+    userPreferencesService.update({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
@@ -211,7 +215,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setCamposGerenciados(campos);
   };
 
-  function handleStatusUser(id: number, status: any): void {
+  function handleStatus(id: number, status: any): void {
     if (status) {
       status = 1;
     } else {

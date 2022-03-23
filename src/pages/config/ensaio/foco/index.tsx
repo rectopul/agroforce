@@ -206,7 +206,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1);
     userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    await userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    await userPreferencesService.update({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);

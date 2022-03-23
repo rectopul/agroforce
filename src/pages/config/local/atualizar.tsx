@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface ILocalProps {
   id: Number | any;
@@ -91,7 +92,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local atualizado com sucesso!')
-          router.push('/config/local')
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -159,6 +160,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <Input 
                 type="text" 
                 placeholder="11111"
+                style={{ background: '#e5e7eb' }}
                 max="40"
                 id="id"
                 name="id"
@@ -330,18 +332,19 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/local/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
+                icon={<MdDateRange size={18} />}
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {}}

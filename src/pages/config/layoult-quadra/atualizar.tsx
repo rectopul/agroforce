@@ -17,6 +17,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface ILayoultProps {
   id: Number | any;
@@ -93,8 +94,8 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Local atualizado com sucesso!')
-          router.push('/config/layoult-quadra');
+          Swal.fire('Local atualizado com sucesso!');
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -154,6 +155,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 type="text" 
                 placeholder="14x08(p4)-PY" 
                 id="id"
+                style={{ background: '#e5e7eb' }}
                 name="id"
                 disabled
                 onChange={formik.handleChange}
@@ -426,19 +428,20 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
+                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

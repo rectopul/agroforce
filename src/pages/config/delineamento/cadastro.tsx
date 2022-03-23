@@ -13,6 +13,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { FiUserPlus } from "react-icons/fi";
 
 interface IDelineamentoProps {
   id: Number | any;
@@ -49,7 +50,7 @@ export default function NovoLocal() {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Delineamento cadastrado com sucesso!')
-          router.push('/config/delineamento');
+          router.back();
         } else {
           Swal.fire(response.message)
         }
@@ -137,12 +138,12 @@ export default function NovoLocal() {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
+                onClick={() => {router.back();}}
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
               />
             </div>
             <div className="w-40">
@@ -150,6 +151,7 @@ export default function NovoLocal() {
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
+                icon={<FiUserPlus size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

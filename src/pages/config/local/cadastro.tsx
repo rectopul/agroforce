@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { FiUserPlus } from "react-icons/fi";
 
 interface ILocalProps {
   id: Number | any;
@@ -89,7 +90,7 @@ export default function NovoLocal({ uf }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local cadastrado com sucesso!')
-          router.push('/config/local');
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -311,12 +312,12 @@ export default function NovoLocal({ uf }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/local/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
@@ -324,6 +325,7 @@ export default function NovoLocal({ uf }: IData) {
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
+                icon={<FiUserPlus size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

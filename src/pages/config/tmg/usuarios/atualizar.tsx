@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
 import Swal from 'sweetalert2'
-
+import { useRouter } from 'next/router'
 import { userService } from "src/services";
 
 import  IProfile  from "../../../../components/props/profileDTO";
@@ -21,6 +21,8 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
+import { IoMdArrowBack } from "react-icons/io";
+import { MdDateRange } from "react-icons/md";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -31,6 +33,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
   const { tmgDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
+  const router = useRouter();
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -63,7 +66,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
         auxObject.push(ObjProfiles);
       });
 
-      userService.updateUsers({
+      userService.update({
         id: values.id,
         name: values.name,
         email: values.email,
@@ -80,6 +83,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Usuário atualizado com sucesso!')
+          router.back();
 
         } else {
           Swal.fire(response.message)
@@ -103,7 +107,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo usuário</h1>
+            <h1 className="text-2xl">Atualizar usuário</h1>
             <div className="flex flex-col">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Tipo de perfil
@@ -316,11 +320,22 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             justify-center
             mt-10
           ">  
+            <div className="w-30">
+              <Button 
+                type="button"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => router.back()}
+              />
+            </div>
             <div className="w-40">
               <Button 
                 type="submit"
                 value="Atualizar"
                 bgColor="bg-blue-600"
+                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

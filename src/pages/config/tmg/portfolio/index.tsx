@@ -10,13 +10,9 @@ import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
-
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { portfolioService } from "src/services/portfolio.service";
-import { userPreferencesService } from "src/services";
-
+import { userPreferencesService, portfolioService } from "src/services";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
-
 import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
@@ -225,7 +221,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1);
     userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    await userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+    await userPreferencesService.update({table_preferences: campos, id: preferences.id });
     localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);

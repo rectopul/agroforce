@@ -50,7 +50,7 @@ export class LayoultQuadraController {
             });
             select = Object.assign({}, select);
         } else {
-            select = {id: true, esquema: true, semente_metros:true, disparos:true, divisor:true, largura:true, comp_fisico: true, comp_parcela: true, comp_corredor: true,  t4_inicial:true, t4_final: true, df_inicial: true, df_final: true, local: { select :{name:true}}};
+            select = {id: true, esquema: true, semente_metros:true, disparos:true, divisor:true, largura:true, comp_fisico: true, comp_parcela: true, comp_corredor: true,  t4_inicial:true, t4_final: true, df_inicial: true, df_final: true, status: true, local: { select :{name:true}}};
         }
 
         let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
