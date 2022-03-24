@@ -123,7 +123,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] == 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false, width: 0 })
+        arrOb.push({ title: "Código", field: "id", sorting: false })
       }
       if (ObjetCampos[item] == 'avatar') {
         arrOb.push({
