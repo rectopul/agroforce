@@ -34,18 +34,25 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       let preferences: object | any = new Object;
       let userCulture: object | any = new Object;
       if (user) {
+        const validateLogin = await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id});
+        if (validateLogin.total <= 0) throw 'Você não tem acesso a essa pagina!';
+    
         userCulture.culturas = await (await userCultureController.getByUserID(user.id)).response;
         if (!userCulture.culturas) throw 'Você está sem acesso as culturas, contate o seu lider!';
+    
         userCulture.cultura_selecionada = userCulture.culturas[0].id;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
-        preferences.safra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
-        preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3})).response[0]
+        preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
+        preferences.safra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3})).response[0]
         preferences.local= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 4})).response[0]
-        preferences.layoult_quadra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5})).response[0]
+        preferences.layout_quadra= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5})).response[0]
+        preferences.foco= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 6})).response[0]
         preferences.delineamento= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 7})).response[0]
+        preferences.ogm= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8})).response[0]
+        preferences.tipo_ensaio= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9})).response[0]
+        preferences.portfolio= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10})).response[0]
       }
-
 
       if (!user) throw 'Email ou senha é invalida!';
 

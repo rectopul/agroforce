@@ -19,7 +19,7 @@ export default  apiHandler(handler);
       res.status(201).json(resultPost);
       break
     case 'PUT':
-      let resultPut = await focoController.updateFoco(req.body);  
+      const resultPut = await focoController.updateFoco(req.body);  
       res.status(200).json(resultPut);
       break
     default:

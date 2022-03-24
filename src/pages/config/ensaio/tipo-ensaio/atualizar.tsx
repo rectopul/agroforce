@@ -15,6 +15,7 @@ import {
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface ITypeAssayProps {
   id: Number | any;
@@ -89,11 +90,13 @@ export default function NovoLocal({typeAssayEdit}: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código Tipo Ensaio
+                Código
               </label>
               <Input 
+                disabled
                 type="text" 
                 placeholder="Nome" 
+                style={{ background: '#e5e7eb' }}
                 id="id"
                 name="id"
                 onChange={formik.handleChange}
@@ -124,12 +127,12 @@ export default function NovoLocal({typeAssayEdit}: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/ensaio/tipo-ensaio/')}}
+                icon={<IoMdArrowBack size={18} />} 
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
@@ -138,6 +141,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
+                icon={<MdDateRange size={18} />}
                 onClick={() => {}}
               />
             </div>

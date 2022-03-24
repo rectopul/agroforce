@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface ILocalProps {
   id: Number | any;
@@ -56,7 +57,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
 
-  const ufs: object | any =  [];;
+  const ufs: object | any =  [];
   const pais =  [{id: 'Brasil', name: "Brasil"}];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
@@ -73,11 +74,11 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {   
+    onSubmit: async (values) => {   
       validateInputs(values);
       if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
 
-      localService.update({
+      await localService.update({
         id: values.id,
         name: values.name,
         pais: values.pais,
@@ -91,7 +92,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local atualizado com sucesso!')
-          router.push('/config/local')
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -103,15 +104,15 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
   })
 
-  function showCitys(uf: any) {
+  async function showCitys(uf: any) {
     if (uf) {
       let param = '?ufId=' + uf; 
       let city: object | any = [];
-      localService.getCitys(param).then((response) => {
+      await localService.getCitys(param).then((response) => {
         response.map((value: string | object | any) => {
           city.push({id: value.nome, name: value.nome});
         })
-          setCitys(city)
+        setCitys(city)
       });
     }
   }
@@ -159,6 +160,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <Input 
                 type="text" 
                 placeholder="11111"
+                style={{ background: '#e5e7eb' }}
                 max="40"
                 id="id"
                 name="id"
@@ -171,7 +173,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome do Local
+                *Nome do Local
               </label>
               <Input 
                 type="name" 
@@ -185,7 +187,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Pais
+                *Pais
               </label>
               <Select
                 values={pais}
@@ -206,7 +208,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Estado
+                *Estado
               </label>
               <Select
                 values={ufs}
@@ -220,7 +222,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Município
+                *Município
               </label>
               <Select
                 values={citys}
@@ -233,7 +235,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Endereço
+                *Endereço
               </label>
               <Input 
                 type="text" 
@@ -254,7 +256,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Latitude
+                *Latitude
               </label>
               <InputMask 
                  className="shadow
@@ -280,7 +282,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Longitude
+                *Longitude
               </label>
               <InputMask
                 className="shadow
@@ -306,7 +308,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Altitude
+                *Altitude
               </label>
               <Input 
                 type="text" 
@@ -330,18 +332,19 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/local/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
+                icon={<MdDateRange size={18} />}
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {}}

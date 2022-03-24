@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ReactNode } from "react";
+import { useRouter } from 'next/router'
 
 interface AnchorAsideProps {
   title: string;
@@ -14,10 +15,12 @@ export function ButtonAside({
   href,
   active,
 }: AnchorAsideProps) {
+  const router = useRouter()
   return (
     active ? (
-      <Link href={href}>
+      <Link href={''}>
         <a
+          onClick={() => router.push(href)}
           id="lista"
           className="flex flex-col
           items-center
@@ -30,12 +33,14 @@ export function ButtonAside({
           scale-110 duration-300
         ">
           { icon }
+          
           { title }
         </a>
       </Link>
    ) : (
-      <Link href={href}>
+      <Link href={''}>
       <a 
+        onClick={() => router.push(href)}
         id="lista"
         className="flex flex-col
         items-center

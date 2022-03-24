@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { userService  } from '../services';
 import PermisssionGate from "../shared/utils/PermissionUser";
+import NProgress from 'nprogress'
+import '../../public/nprogress.css'
+
 
 export default App;
 
@@ -28,6 +31,26 @@ function App({ Component, pageProps, permissions, user }: any) {
             router.events.off('routeChangeComplete', authCheck);
         }
     }, []);
+
+    useEffect(() => {
+        const handleStart = (url: any) => {
+          console.log(`Loading: ${url}`)
+          NProgress.start()
+        }
+        const handleStop = () => {
+          NProgress.done()
+        }
+    
+        router.events.on('routeChangeStart', handleStart)
+        router.events.on('routeChangeComplete', handleStop)
+        router.events.on('routeChangeError', handleStop)
+    
+        return () => {
+          router.events.off('routeChangeStart', handleStart)
+          router.events.off('routeChangeComplete', handleStop)
+          router.events.off('routeChangeError', handleStop)
+        }
+      }, [router])
 
     function authCheck(url: any) {
         // redirect to login page if accessing a private page and not logged in 
@@ -55,7 +78,8 @@ function App({ Component, pageProps, permissions, user }: any) {
                 user={{ permissions: ['canSave'] }}
                 >
                 {authorized &&
-                    <Component {...pageProps} />
+                    <Component {...pageProps}  />
+                    
                 }
             </PermisssionGate>
         </>

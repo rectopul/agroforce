@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
@@ -10,8 +11,7 @@ import {
   Button, 
   Content, 
   Input, 
-  Radio, 
-  Select, 
+  Radio,
   TabHeader 
 } from "src/components";
 import { safraService } from "src/services";
@@ -29,13 +29,16 @@ interface ISafraProps {
 };
 
 export default function AtualizarSafra(safra: ISafraProps) {
+  const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
+
   const { tmgDropDown, tabs } = ITabs.default;
 
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const select = [
     { id: 1, name: "Ativo" },
     { id: 2, name: "Inativo" },
-  ]
+  ];
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -50,8 +53,10 @@ export default function AtualizarSafra(safra: ISafraProps) {
       plantingEndTime: safra.plantingEndTime,
       status: safra.status,
     },
-    onSubmit: (values) => {
-      safraService.updateSafras({
+    onSubmit: async (values) => {
+      if (values.id !== safra.id) throw new Error("Dados inválidos");
+
+      await safraService.updateSafras({
         id: safra.id,
         id_culture: formik.values.id_culture,
         year: formik.values.year,
@@ -60,12 +65,20 @@ export default function AtualizarSafra(safra: ISafraProps) {
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Safra atualizada com sucesso!');
+          router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
-      })
+      }).finally(() => {
+        formik.values.id_culture = safra.id_culture;
+        formik.values.year = safra.year;
+        formik.values.typeCrop = safra.typeCrop;
+        formik.values.plantingStartTime = safra.plantingStartTime;
+        formik.values.plantingEndTime = safra.plantingEndTime;
+      });
     },
   });
 
@@ -92,7 +105,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           <div className="w-full flex justify-between items-start gap-5 mt-4">
             <div className="w-4/12">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                ID Safra
+                *Código
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}
@@ -106,6 +119,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Ano
               </label>
               <Input
@@ -121,6 +135,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
@@ -145,9 +160,10 @@ export default function AtualizarSafra(safra: ISafraProps) {
             </div>
           </div>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-4">
-            <div className="w-2/4 h-10">
+          <div className="w-8/12 flex justify-between items-start gap-5 mt-4">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Período ideal de início de plantio
               </label>
               <Input
@@ -161,8 +177,9 @@ export default function AtualizarSafra(safra: ISafraProps) {
               />
             </div>
             
-            <div className="w-2/4">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Período ideal do fim do plantio
               </label>
               <Input
@@ -175,37 +192,22 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 value={formik.values.plantingEndTime}
               />
             </div>
-
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Status
-              </label>
-              <Select
-                id="plantingEndTime"
-                name="plantingEndTime"
-                onChange={formik.handleChange}
-                selected={formik.values.status}
-                value={formik.values.status}
-                values={select}
-              />
-            </div>
           </div>
 
           <div className="h-10 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-12
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/safra'
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

@@ -15,6 +15,8 @@ import {
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 interface ISafraProps {
   id_culture: number;
@@ -22,16 +24,16 @@ interface ISafraProps {
   typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
+  main_safra: number;
   status: number;
-  created_by: {
-    id: number;
-  };
+  created_by: number;
 };
 
 export default function Safra() {
+  const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
+
   const { tmgDropDown, tabs } = ITabs.default;
-  // const optionsSelect =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
-  // const optionsStatus =  [{id: 1, name: "Ativa"}, {id: 0, name: "Inativa"}];
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -43,25 +45,33 @@ export default function Safra() {
       typeCrop: '',
       plantingStartTime: '',
       plantingEndTime: '',
+      main_safra: 0,
       status: 1,
-      created_by: userLogado.id,
+      created_by: Number(userLogado.id),
     },
-    onSubmit: values => {
-      safraService.create({
+    onSubmit: async (values) => {
+      await safraService.create({
         id_culture: formik.values.id_culture,
         year: formik.values.year,
         typeCrop: formik.values.typeCrop,
         plantingStartTime: formik.values.plantingStartTime,
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
-        created_by: formik.values.created_by.id,
+        created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Safra cadastrada com sucesso!')
+          Swal.fire('Safra cadastrada com sucesso!');
+          router.back();
         } else {
-          Swal.fire(response.message)
+          setCheckInput("text-red-600");
+          Swal.fire(response.message);
         }
-      })
+      }).finally(() => {
+        formik.values.year = '';
+        formik.values.typeCrop = '';
+        formik.values.plantingStartTime = '';
+        formik.values.plantingEndTime = '';
+      });
     },
   });
   
@@ -77,30 +87,15 @@ export default function Safra() {
         }
       >
         <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5">
-            <div className="w-4/12">
+            <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Safra
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                type="text"
-                required
-                disabled
-                id="harvest"
-                name="harvest"
-                onChange={formik.handleChange}
-                value={20}
-              />
-            </div>
-
-            <div className="w-4/12 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Ano
               </label>
               <Input
@@ -109,12 +104,13 @@ export default function Safra() {
                 id="year"
                 name="year"
                 onChange={formik.handleChange}
-                value={String(formik.values.year)}
+                value={formik.values.year}
               />
             </div>
 
-            <div className="w-4/12 h-10 justify-start">
+            <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
@@ -137,9 +133,10 @@ export default function Safra() {
             </div>
           </div>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-4">
+          <div className="w-full flex justify-between items-start gap-5 mt-10">
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Período ideal de início de plantio
               </label>
               <Input
@@ -147,6 +144,7 @@ export default function Safra() {
                 placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
+                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
@@ -154,13 +152,15 @@ export default function Safra() {
             
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Período ideal do fim do plantio
               </label>
               <Input
-                type="text" 
+                type="text"
                 placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"
+                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}
               />
@@ -175,13 +175,12 @@ export default function Safra() {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                href='/config/tmg/safra'
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

@@ -1,9 +1,7 @@
 import {prisma} from '../pages/api/db/db';
-import { ICreatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/ICreatePortfolioDTO';
-import { IUpdatePortfolioDTO } from 'src/shared/dtos/portfolioDTO/IUpdatePortfolioDTO';
 
 export class PortfolioRepository {
-  async create(data: ICreatePortfolioDTO) {
+  async create(data: any) {
     const portfolio = await prisma.portfolio.create({ data });
     return portfolio;
   }
@@ -15,7 +13,7 @@ export class PortfolioRepository {
     return portfolio;
   }
 
-  async update(id: number, data: IUpdatePortfolioDTO) {
+  async update(id: number, data: any) {
     const portfolio = await this.findOne(id);
 
     if (portfolio !== null) {

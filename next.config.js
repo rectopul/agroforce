@@ -4,7 +4,10 @@ const nextConfig = {
   serverRuntimeConfig: {
     secret: 'THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLACE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING'
   },
-  publicRuntimeConfig: {  
+  publicRuntimeConfig: {
+      url: process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000/' // development
+      : 'https://server.seedsforce.com.br:18601/', // production
       apiUrl: process.env.NODE_ENV === 'development'
           ? 'http://localhost:3000/api' // development api
           : 'https://server.seedsforce.com.br:18601/api' // production api

@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { FiUserPlus } from "react-icons/fi";
 
 interface ILayoultProps {
   id: Number | any;
@@ -69,11 +70,11 @@ export default function NovoLocal({ local }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
 
-      layoultQuadraService.create({
+      await layoultQuadraService.create({
         esquema:values.esquema,
         op:values.op,
         semente_metros: Number(values.semente_metros),
@@ -93,7 +94,7 @@ export default function NovoLocal({ local }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local cadastrado com sucesso!')
-          router.push('/config/layoult-quadra');
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -147,7 +148,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Esquema
+                *Esquema
               </label>
               <Input 
                 type="text" 
@@ -160,7 +161,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                OP
+                *OP
               </label>
               <Input 
                 type="text" 
@@ -173,7 +174,7 @@ export default function NovoLocal({ local }: IData) {
             </div>  
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Local
+                *Local
               </label>
               <Select
                 values={locais}
@@ -194,7 +195,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Sementes por Metros
+                *Sementes por Metros
               </label>
               <Input 
                 type="number" 
@@ -207,7 +208,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Disparos
+                *Disparos
               </label>
               <Input 
                 type="text" 
@@ -220,7 +221,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Divisor
+                *Divisor
               </label>
               <Input 
                 type="text" 
@@ -241,7 +242,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Largura
+                *Largura
               </label>
               <InputMask 
                  className="shadow
@@ -266,7 +267,7 @@ export default function NovoLocal({ local }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Físico
+                *Comp. Físico
               </label>
               <InputMask 
                  className="shadow
@@ -291,7 +292,7 @@ export default function NovoLocal({ local }: IData) {
             </div>   
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. da Parcela
+                *Comp. da Parcela
               </label>
               <InputMask 
                  className="shadow
@@ -316,7 +317,7 @@ export default function NovoLocal({ local }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Corredor
+                *Comp. Corredor
               </label>
               <InputMask 
                  className="shadow
@@ -349,7 +350,7 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Inicial
+                *T4 Inicial
               </label>
               <Input 
                 type="number" 
@@ -362,7 +363,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Final
+                *T4 Final
               </label>
               <Input 
                 type="text" 
@@ -375,7 +376,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Inicial
+                *DF Inicial
               </label>
               <Input 
                 type="text" 
@@ -388,7 +389,7 @@ export default function NovoLocal({ local }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Final
+                *DF Final
               </label>
               <Input 
                 type="text" 
@@ -411,18 +412,19 @@ export default function NovoLocal({ local }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
+                onClick={() => {router.back();}}
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
               />
             </div>
             <div className="w-40">
               <Button 
                 type="submit"
                 value="Cadastrar"
+                icon={<FiUserPlus size={18} />}
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {}}

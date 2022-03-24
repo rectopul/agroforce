@@ -9,3 +9,4 @@ export * from './layoult-quadra.service';
 export * from './delineamento.service';
 export * from './tipo-ensaio.service';
 export * from './ogm.service';
+export * from './portfolio.service';

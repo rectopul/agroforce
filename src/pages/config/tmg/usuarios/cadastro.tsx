@@ -61,7 +61,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         auxObject.push(ObjProfiles);
       });
 
-      userService.createUsers({
+      userService.create({
         name: values.name,
         email: values.email,
         cpf: values.cpf,
@@ -77,6 +77,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Usuário cadastrado com sucesso!')
+          router.back();
         } else {
           Swal.fire(response.message)
         }
@@ -319,12 +320,12 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/tmg/usuarios/')}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">

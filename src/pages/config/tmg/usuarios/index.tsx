@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import getConfig from 'next/config';
 import MaterialTable from "material-table";
 import * as XLSX from 'xlsx';
+import { useRouter } from "next/router";
 
 import { userPreferencesService, userService } from "src/services";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
@@ -51,28 +52,28 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-  allUsers: IUsers[];
+  alItems: IUsers[];
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
 }
 
-export default function Listagem({ allUsers, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "avatar, name, tel, email, status"};
-  // const preferences = userLogado.preferences.usuario;
-  
-  const [users, setUsers] = useState<IUsers[]>(() => allUsers);
+  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "id,avatar,name,tel,email,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const router = useRouter();
+  const [users, setData] = useState<IUsers[]>(() => alItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   const [orderEmail, setOrderEmail] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id", defaultChecked: () => camposGerenciados.includes('id')},
     { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
@@ -100,9 +101,11 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
-          setTotaItems(response.total);
+          if (response.total > 0) {
+            setTotaItems(response.total);
+          }
           setFilter(parametersFilter);
-          setUsers(response.response);
+          setData(response.response);
         }
       })
     },
@@ -119,6 +122,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
+      }
       if (ObjetCampos[item] == 'avatar') {
         arrOb.push({
           title: "Avatar", 
@@ -194,16 +200,15 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -227,16 +232,15 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar-usuario?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusUser(
+                    onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
                     bgColor="bg-red-800"
@@ -252,7 +256,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  function getValuesComluns() {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -262,38 +266,44 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 1 }).then((response) => {
+        userLogado.preferences.usuario = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
     setCamposGerenciados(campos);
   };
 
-  function handleStatusUser(id: number, status: any): void {
+  async function handleStatus(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
       status = 0;
     }
-    userService.updateUsers({id: id, status: status}).then((response) => {
-  
-    });
+
+    await userService.update({id: id, status: status});
     const index = users.findIndex((user) => user.id === id);
 
     if (index === -1) {
       return;
     }
 
-    setUsers((oldUser) => {
+    setData((oldUser) => {
       const copy = [...oldUser];
       copy[index].status = status;
       return copy;
     });
   };
 
-  function handleOrderEmail(column: string, order: string | any): void {
+  async function handleOrderEmail(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -318,9 +328,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       }
     }
 
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response)
+        setData(response.response)
       }
     })
     if (orderEmail === 2) {
@@ -336,7 +346,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     }
   };
 
-  function handleOrderName(column: string, order: string | any): void {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -361,9 +371,9 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
       }
     }
 
-    userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response)
+        setData(response.response)
       }
     });
     
@@ -380,7 +390,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     }
   };
 
-  function handleOnDragEnd(result: DropResult) {
+  function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result)  return;
     
@@ -392,12 +402,12 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => {
+  const downloadExcel = async(): Promise<void> => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    userService.getAll(filterAplication).then((response) => {
+    await userService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
@@ -448,7 +458,7 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
     }
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setUsers(response.response);
+        setData(response.response);
       }
     });
   };
@@ -555,12 +565,11 @@ export default function Listagem({ allUsers, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar um usuário"
-                        value="Cadastrar um usuário"
+                        title="Cadastrar usuário"
+                        value="Cadastrar usuário"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
-                        href="usuarios/cadastro"
+                        onClick={() => {router.push('usuarios/cadastro')}}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
@@ -705,12 +714,12 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const user = await fetch(urlParameters.toString(), requestOptions);
   let Response = await user.json();
   
-  let allUsers = Response.response;
+  let alItems = Response.response;
   let totalItems = Response.total;
 
   return {
     props: {
-      allUsers,
+      alItems,
       totalItems,
       itensPerPage,
       filterAplication

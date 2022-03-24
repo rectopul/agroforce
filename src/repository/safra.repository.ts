@@ -1,14 +1,12 @@
 import {prisma} from '../pages/api/db/db';
-import { ISafraPropsDTO } from 'src/shared/dtos/safraDTO/ISafraPropsDTO';
-import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
 
 export class SafraRepository {   
-    async create(data: ISafraPropsDTO | any) {
+    async create(data: any) {
         const safra = await prisma.safra.create({data});
         return safra;
     }
 
-    async update(id: number, data: ISafraUpdateDTO) {
+    async update(id: number, data: any) {
         let safra = await this.findOne(id);
         if (safra != null) {
             let Result = await prisma.safra.update({ 
@@ -29,7 +27,6 @@ export class SafraRepository {
     }
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
-        console.log(where, select, take);
         let order: object | any;
         if (orderBy){
             order = JSON.parse(orderBy);
@@ -40,4 +37,3 @@ export class SafraRepository {
         return Result;
     }
 }
-

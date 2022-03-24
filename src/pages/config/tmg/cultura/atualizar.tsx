@@ -1,10 +1,10 @@
 import Head from 'next/head';
-import { useFormik } from 'formik'
 import { GetServerSideProps } from "next";
+import { useRouter } from 'next/router';
 import getConfig from 'next/config';
-import Swal from 'sweetalert2';
+import { useFormik } from 'formik'
 
-import { focoService } from 'src/services/foco.service';
+import { cultureService } from 'src/services';
 
 import { 
   Button,
@@ -14,47 +14,47 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
+import Swal from 'sweetalert2';
 import { IoMdArrowBack } from 'react-icons/io';
-import { AiOutlineFileSearch } from 'react-icons/ai';
-import { useRouter } from 'next/router';
+import { RiPlantLine } from 'react-icons/ri';
 import { useState } from 'react';
 
-export interface IUpdateFoco {
+export interface IUpdateCulture {
   id: number;
   name: string;
   status: number;
   created_by: number;
-}
+};
 
-export default function Atualizar(foco: IUpdateFoco) {
+export default function Cultura(culture: IUpdateCulture) {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
-  
-  const { ensaiosDropDown, tabs } = ITabs.default;
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
-  const formik = useFormik<IUpdateFoco>({
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  const formik = useFormik<IUpdateCulture>({
     initialValues: {
-      id: foco.id,
-      name: foco.name,
-      status: foco.status,
-      created_by: userLogado.id,
+      id: culture.id,
+      name: culture.name,
+      status: culture.status,
+      created_by: culture.created_by
     },
     onSubmit: async (values) => {
-      await focoService.update({
-        id: foco.id,
+      await cultureService.updateCulture({
+        id: culture.id,
         name: formik.values.name,
-        status: foco.status,
-        created_by: foco.created_by,
+        status: formik.values.status,
+        created_by: formik.values.created_by
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Foco cadastrado com sucesso!');
+          Swal.fire('Cultura atualizada com sucesso');
           router.back();
         } else {
           setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
+      }).finally(() => {
+        formik.values.name = culture.name;
       });
     },
   });
@@ -62,12 +62,12 @@ export default function Atualizar(foco: IUpdateFoco) {
   return (
     <>
      <Head>
-        <title>Atualizar foco</title>
+        <title>Atualizar cultura</title>
       </Head>
       
       <Content
         headerCotent={
-          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
+          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
         }
       >
 
@@ -76,10 +76,10 @@ export default function Atualizar(foco: IUpdateFoco) {
 
         onSubmit={formik.handleSubmit}
       >
-        <h1 className="text-2xl">Atualizar foco</h1>
+        <h1 className="text-2xl">Nova cultura</h1>
 
         <div className="w-full
-          flex 
+          flex
           justify-around
           gap-2
           mt-4
@@ -87,10 +87,9 @@ export default function Atualizar(foco: IUpdateFoco) {
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Código
+              *Código
             </label>
-            <Input value={foco.id} disabled style={{ background: '#e5e7eb' }} />
+            <Input value={culture.id} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
           <div className="w-full h-10">
@@ -133,7 +132,7 @@ export default function Atualizar(foco: IUpdateFoco) {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<AiOutlineFileSearch size={20} />}
+                icon={<RiPlantLine size={20} />}
                 onClick={() => {}}
               />
             </div>
@@ -146,7 +145,7 @@ export default function Atualizar(foco: IUpdateFoco) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
   const  token  =  context.req.cookies.token;
   
   const requestOptions: RequestInit | undefined = {
@@ -155,9 +154,9 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiFoco = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
+  const apiCulture = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
 
-  const foco = await apiFoco.json();
+  const culture = await apiCulture.json();
 
-  return { props: foco }
+  return { props: culture }
 }

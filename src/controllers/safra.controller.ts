@@ -1,19 +1,8 @@
 import {SafraRepository} from '../repository/safra.repository';
-import {ISafraPropsDTO} from '../shared/dtos/safraDTO/ISafraPropsDTO';
-import { validationSafra } from '../shared/validations/safra/create.validation';
-import { validationSafraUpdate } from 'src/shared/validations/safra/update.validation';
-import { ISafraUpdateDTO } from 'src/shared/dtos/safraDTO/ISafraUpdateDTO';
-
 
 export class SafraController {
     safraRepository = new SafraRepository();
 
-    /**
-     * 
-     * @returns Listagem de todas as safras.
-     * @example Options: 
-     * 
-     */
     async getAllSafra(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -92,7 +81,7 @@ export class SafraController {
         }
         
         let response: object | any = await this.safraRepository.findAll(parameters, select, take , skip, orderBy);
-        console.log('Controller' + response);
+
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {
@@ -110,48 +99,27 @@ export class SafraController {
 
             return {status:200 , response};
         } catch (e) {
-            return {status: 400, message: 'Safra não encontrada'};
+            return {status: 400, message: 'Item não encontrada'};
         }
     }
 
-    async postSafra(data: ISafraPropsDTO) {
+    async postSafra(data: any) {
         try {
             const safraRepository = new SafraRepository();
-
-            // Validação
-            const valid = validationSafra.isValidSync(data);
-
-            if (!valid) throw new Error('Dados inválidos');
-
-            // Salvando
-
             await safraRepository.create(data);
 
-            return {status: 200, message: "Safra inserida"}
+            return {status: 200, message: "Item inserido"}
         } catch(err) {
             return { status: 404, message: "Erro"}
         }
     }
 
-    /**
-    * @returns Função responsavel por fazer a atualização da safra 
-    * @parameters data. objeto com as informações a serem atualizadas
-     */
-
-    async updateSafra(data: ISafraUpdateDTO) {
+    async updateSafra(data: any) {
         try {
             const safraRepository = new SafraRepository();
-
-            // Validação
-            const valid = validationSafraUpdate.isValidSync(data);
-
-            if (!valid) throw new Error('Dados inválidos');
-
-            // Salvando
-
             await safraRepository.update(data.id, data);
 
-            return {status: 200, message: "Safra inserida"}
+            return {status: 200, message: "Item atualizado"}
         } catch (err) {
             return { status: 404, message: "Erro ao atualizar" }
         }

@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { FiUserPlus } from "react-icons/fi";
 
 interface ILocalProps {
   id: Number | any;
@@ -72,11 +73,11 @@ export default function NovoLocal({ uf }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
   
-      localService.create({
+      await localService.create({
         name: values.name,
         pais: values.pais,
         uf: values.uf,
@@ -89,7 +90,7 @@ export default function NovoLocal({ uf }: IData) {
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Local cadastrado com sucesso!')
-          router.push('/config/local');
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -101,15 +102,15 @@ export default function NovoLocal({ uf }: IData) {
     ufs.push({id: value.id, name: value.sigla, ufid: value.id});
   })
 
-  function showCitys(uf: any) {
+  async function showCitys(uf: any) {
     if (uf) {
       let param = '?ufId=' + uf; 
       let city: object | any = [];
-      localService.getCitys(param).then((response) => {
+      await localService.getCitys(param).then((response) => {
         response.map((value: string | object | any) => {
           city.push({id: value.nome, name: value.nome});
         })
-          setCitys(city)
+        setCitys(city)
       });
     }
   }
@@ -152,7 +153,7 @@ export default function NovoLocal({ uf }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome do Local
+                *Nome do Local
               </label>
               <Input 
                 type="name" 
@@ -166,7 +167,7 @@ export default function NovoLocal({ uf }: IData) {
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Pais
+                *Pais
               </label>
               <Select
                 values={pais}
@@ -187,7 +188,7 @@ export default function NovoLocal({ uf }: IData) {
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Estado
+                *Estado
               </label>
               <Select
                 values={ufs}
@@ -201,7 +202,7 @@ export default function NovoLocal({ uf }: IData) {
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Município
+               *Município
               </label>
               <Select
                 values={citys}
@@ -214,7 +215,7 @@ export default function NovoLocal({ uf }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Endereço
+                *Endereço
               </label>
               <Input 
                 type="text" 
@@ -235,7 +236,7 @@ export default function NovoLocal({ uf }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Latitude
+                *Latitude
               </label>
               <InputMask 
                  className="shadow
@@ -261,7 +262,7 @@ export default function NovoLocal({ uf }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Longitude
+                *Longitude
               </label>
               <InputMask
                 className="shadow
@@ -287,7 +288,7 @@ export default function NovoLocal({ uf }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Altitude
+                *Altitude
               </label>
               <Input 
                 type="text" 
@@ -311,12 +312,12 @@ export default function NovoLocal({ uf }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/local/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
@@ -324,6 +325,7 @@ export default function NovoLocal({ uf }: IData) {
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
+                icon={<FiUserPlus size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

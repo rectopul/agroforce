@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useFormik } from 'formik'
 import Swal from 'sweetalert2';
 
@@ -14,27 +15,44 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { RiPlantLine } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
+import { useState } from 'react';
+
+interface ICreateCulture {
+  name: string;
+  status: number;
+  created_by: number;
+}
 
 export default function Cadastro() {
+  const router = useRouter();
+  const [checkInput, setCheckInput] = useState('text-black');
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const { tmgDropDown, tabs } = ITabs.default;
 
-  const formik = useFormik({
+
+  const formik = useFormik<ICreateCulture>({
     initialValues: {
       name: '',
-      created_by: userLogado.id,
+      status: 1,
+      created_by: Number(userLogado.id),
     },
-    onSubmit: values => {
-      cultureService.createCulture({
+    onSubmit: async (values) => {
+      await cultureService.createCulture({
         name: formik.values.name,
+        status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
-          Swal.fire('Cultura cadastrada com sucesso!')
+        if (response.status === 201) {
+          Swal.fire('Cultura cadastrada com sucesso!');
+          router.back();
         } else {
-          Swal.fire(response.message)
+          setCheckInput("text-red-600");
+          Swal.fire(response.message);
         }
-      })
+      }).finally(() => {
+        formik.values.name = '';
+      });
     },
   });
 
@@ -50,44 +68,37 @@ export default function Cadastro() {
         }
       >
 
-      <form 
-        className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+        <form 
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
-        onSubmit={formik.handleSubmit}
-      >
-        <h1 className="text-2xl">Nova cultura</h1>
+          onSubmit={formik.handleSubmit}
+        >
+          <h1 className="text-2xl">Nova cultura</h1>
 
-        <div className="w-full
-          flex 
-          justify-around
-          gap-2
-          mt-4
-          mb-4
-        ">
-          <div className="w-full">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              ID cultura
-            </label>
-            <Input value={''} disabled style={{ background: '#e5e7eb' }} />
+          <div className="w-full
+            flex
+            gap-2
+            mt-4
+            mb-4
+          ">
+            <div className="w-2/4 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                id="name"
+                name="name"
+                type="text" 
+                max="50"
+                placeholder="ex: Soja"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
           </div>
 
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              Nome cultura
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text" 
-              max="50" 
-              placeholder="ex: Soja"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
-          </div>
-        </div>
-
-        <div className="
+          <div className="
             h-10 w-full
             flex
             gap-3
@@ -95,14 +106,13 @@ export default function Cadastro() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
-                type="submit"
+              <Button
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                href="/config/tmg/cultura"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {}}
+                onClick={() => router.back()}
               />
             </div>
             <div className="w-40">
@@ -116,7 +126,7 @@ export default function Cadastro() {
               />
             </div>
           </div>
-      </form>
+        </form>
       </Content>
     </>
   );

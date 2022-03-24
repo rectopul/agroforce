@@ -2,44 +2,49 @@ import {prisma} from '../pages/api/db/db';
 
 export class CulturaRepository {   
     async findOne(id: number) {
-        let Result = await prisma.culture.findUnique({
-               where: {
-                   id: id
-               }
-             }) .finally(async () => { await prisma.$disconnect() })
-        return Result;
+        const foco = await prisma.culture.findUnique({
+            where: { id }
+        });
+        return foco;
     }
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
+    
         if (orderBy){
-            order = JSON.parse(orderBy);
+          order = JSON.parse(orderBy);
         }
-        let count = await prisma.culture.count({ where: where })
-        let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
-        Result.total = count;
-        return Result;
+    
+        const count = await prisma.culture.count({ where: where });
+    
+        const result: object | any = await prisma.culture.findMany({
+          select: select, 
+          skip: skip, 
+          take: take, 
+          where: where,
+          orderBy: order
+        });
+        
+        result.total = count;
+        return result;
+      }
+
+    async create(data: any) {
+        const culture = await prisma.culture.create({ data });
+        return culture;
     }
 
-    async create(Cultura: object | any) {
-        Cultura.created_at = new Date();
-        let Result = await prisma.culture.create({ data: Cultura }).finally(async () => { await prisma.$disconnect() })
-        return Result;
-    }
+    async update(id: number, data: any) {
+        const culture = await this.findOne(id);
 
-    async update(id: number, Cultura: Object) {
-        let Culture = await this.findOne(id);
-        if (Culture != null) {
-            let Result = await prisma.culture.update({ 
-                where: {
-                    id: id
-                },
-                data: Cultura })
-                .finally(async () => { await prisma.$disconnect() })
-            return Result;
+        if (culture !== null) {
+            const result = await prisma.culture.update({
+                where: { id },
+                data
+            });
+            return result;
         } else {
             return false;
         }
     }
 }
-

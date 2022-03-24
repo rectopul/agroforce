@@ -17,6 +17,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { MdDateRange } from "react-icons/md";
 
 interface ILayoultProps {
   id: Number | any;
@@ -69,11 +70,11 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
 
-      layoultQuadraService.update({
+      await layoultQuadraService.update({
         id: values.id,
         esquema:values.esquema,
         op:values.op,
@@ -93,10 +94,10 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Local atualizado com sucesso!')
-          router.push('/config/layoult-quadra');
+          Swal.fire('Local atualizado com sucesso!');
+          router.back()
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
       })
     },
@@ -154,6 +155,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 type="text" 
                 placeholder="14x08(p4)-PY" 
                 id="id"
+                style={{ background: '#e5e7eb' }}
                 name="id"
                 disabled
                 onChange={formik.handleChange}
@@ -162,7 +164,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Esquema
+                *Esquema
               </label>
               <Input 
                 type="text" 
@@ -175,7 +177,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                OP
+                *OP
               </label>
               <Input 
                 type="text" 
@@ -188,7 +190,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>  
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Local
+                *Local
               </label>
               <Select
                 values={locais}
@@ -209,7 +211,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Sementes por Metros
+                *Sementes por Metros
               </label>
               <Input 
                 type="number" 
@@ -222,7 +224,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Disparos
+                *Disparos
               </label>
               <Input 
                 type="text" 
@@ -235,7 +237,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Divisor
+                *Divisor
               </label>
               <Input 
                 type="text" 
@@ -256,7 +258,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Largura
+                *Largura
               </label>
               <InputMask 
                  className="shadow
@@ -281,7 +283,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Físico
+                *Comp. Físico
               </label>
               <InputMask 
                  className="shadow
@@ -306,7 +308,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>   
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. da Parcela
+                *Comp. da Parcela
               </label>
               <InputMask 
                  className="shadow
@@ -331,7 +333,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>    
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Comp. Corredor
+                *Comp. Corredor
               </label>
               <InputMask 
                  className="shadow
@@ -364,7 +366,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Inicial
+                *T4 Inicial
               </label>
               <Input 
                 type="number" 
@@ -377,7 +379,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                T4 Final
+                *T4 Final
               </label>
               <Input 
                 type="text" 
@@ -390,7 +392,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Inicial
+                *DF Inicial
               </label>
               <Input 
                 type="text" 
@@ -403,7 +405,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                DF Final
+                *DF Final
               </label>
               <Input 
                 type="text" 
@@ -426,19 +428,20 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.push('/config/layoult-quadra/')}}
+                onClick={() => {router.back();}}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
+                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

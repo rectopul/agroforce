@@ -27,6 +27,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { IoReloadSharp } from "react-icons/io5";
 
 interface ILayoultProps {
   id: Number | any;
@@ -71,7 +72,8 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.layoult_quadra || {id:0, table_preferences: "esquema, local, semente_metros, divisor, , disparos, divisor, largura, comp_fisico, comp_parcela, comp_corretor, t4_inicial, t4_final, df_inicial, df_final "};
+  const preferences = userLogado.preferences.layout_quadra ||{id:0, table_preferences: "id,esquema,local,semente_metros,semente_metros,disparos,divisor,largura,comp_fisico,comp_parcela,comp_corredor,t4_inicial,t4_final,df_inicial,df_final,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -80,9 +82,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Esquema ", value: "esquema", defaultChecked: () => camposGerenciados.includes('esquema') },
     { name: "CamposGerenciados[]", title: "Local ", value: "local", defaultChecked: () => camposGerenciados.includes('local') },
     { name: "CamposGerenciados[]", title: "Sementer por Metros", value: "semente_metros", defaultChecked: () => camposGerenciados.includes('semente_metros') },
@@ -140,6 +143,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
+      }
       if (ObjetCampos[item] == 'esquema') {
         arrOb.push({
           title: (
@@ -247,13 +253,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusUser(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -269,13 +275,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusUser(
+                    onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
                     bgColor="bg-red-800"
@@ -291,7 +297,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  function getValuesComluns() {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -301,28 +307,29 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.layoult_quadra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    if (preferences.id == 0) {
-      userPreferencesService.createPreferences({userId: userLogado.id, module_id: 5,  table_preferences: campos })
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 5 }).then((response) => {
+        userLogado.preferences.layout_quadra = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
+      userLogado.preferences.layout_quadra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
-    localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
-
     setCamposGerenciados(campos);
   };
 
-  function handleStatusUser(id: number, status: any): void {
+  async function handleStatus(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
       status = 0;
     }
-    layoultQuadraService.update({id: id, status: status}).then((response) => {
-    });
+    await layoultQuadraService.update({id: id, status: status});
     const index = quadras.findIndex((quadras) => quadras.id === id);
 
     if (index === -1) {
@@ -621,6 +628,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button 
+                                          value="Atualizar" 
+                                          bgColor='bg-blue-600' 
+                                          textColor='white' 
+                                          onClick={getValuesComluns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
@@ -638,9 +654,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                         ))
                                       }
                                       { provided.placeholder }
-                                      <div className="h-8 mt-2">
-                                        <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                                      </div>
                                     </ul>
                                   )
                                 }

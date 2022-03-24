@@ -19,6 +19,7 @@ import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } 
 
 import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { IoReloadSharp } from "react-icons/io5";
 
 interface IFilter{
   filterStatus: object | any;
@@ -48,18 +49,18 @@ interface IData {
 
 export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, ensaiosDropDown } = ITabs;
-
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario;
+  const preferences = userLogado.preferences.foco ||{id:0, table_preferences: "id,name,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
-  const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Name", value: "name" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
@@ -75,7 +76,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(managedFields);
+  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -87,7 +88,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        console.log(response)
         if (response.status === 200) {
           setTotaItems(response.total);
           setFocos(response.response);
@@ -97,7 +97,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     },
   });
 
-  function handleStatusPortfolio(id: number, status: any): void {
+  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
@@ -109,6 +109,8 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     if (index === -1) {
       return;
     }
+
+    await focoService.update({id: id, status: status});
 
     setFocos((oldSafra) => {
       const copy = [...oldSafra];
@@ -122,6 +124,13 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código", 
+          field: "id",
+          sorting: false,
+        });
+      } 
       if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
@@ -147,20 +156,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
-                  icon={<FaRegUserCircle size={16} />}
-                  onClick={() =>{}}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  href="perfil"
-                />
-              </div>
-              <div className="h-10">
-                <Button 
                   icon={<BiEdit size={16} />}
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/ensaio/atualizar-foco?id=${rowData.id}`}
+                  href={`/config/ensaio/foco/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (
@@ -194,7 +194,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     return arrOb;
   };
 
-  function getValuesComluns(): void {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -204,13 +204,20 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.updateUsersPreferences({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 6 }).then((response) => {
+        userLogado.preferences.foco = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.foco = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
-    setManagedFields(campos);
+    setCamposGerenciados(campos);
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -270,7 +277,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${managedFields}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     await focoService.getAll(filterAplication).then((response) => {
@@ -445,6 +452,15 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button 
+                                          value="Atualizar" 
+                                          bgColor='bg-blue-600' 
+                                          textColor='white' 
+                                          onClick={getValuesComluns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
@@ -454,7 +470,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                                                 name={genarate.name}
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
-                                                defaultChecked={managedFields.includes(genarate.value as string)}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -462,9 +478,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                                         ))
                                       }
                                       { provided.placeholder }
-                                      <div className="h-8 mt-2">
-                                        <Button value="Atualizar" bgColor='bg-blue-600' textColor='white' onClick={getValuesComluns} />
-                                      </div>
                                     </ul>
                                   )
                                 }
