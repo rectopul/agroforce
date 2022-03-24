@@ -81,7 +81,7 @@ export class SafraController {
         }
         
         let response: object | any = await this.safraRepository.findAll(parameters, select, take , skip, orderBy);
-        console.log('Controller' + response);
+
         if (!response) { 
             throw "falha na requisição, tente novamente";
         } else {

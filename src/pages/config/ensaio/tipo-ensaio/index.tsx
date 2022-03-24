@@ -57,14 +57,15 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.type_assay || {id:0, table_preferences: "id, name, status"};
+  const preferences = userLogado.preferences.tipo_ensaio ||{id:0, table_preferences: "id,name,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
 
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
@@ -191,7 +192,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  function getValuesComluns() {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -201,17 +202,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.type_assay = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    if (preferences.id == 0) {
-      userPreferencesService.createPreferences({userId: userLogado.id, module_id: 5,  table_preferences: campos })
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 9 }).then((response) => {
+        userLogado.preferences.tipo_ensaio = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userPreferencesService.update({table_preferences: campos, id: preferences.id });
+      userLogado.preferences.tipo_ensaio = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
-    userPreferencesService.update({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
-    localStorage.setItem('user', JSON.stringify(userLogado));
 
     setStatusAccordion(false);
-
     setCamposGerenciados(campos);
   };
 

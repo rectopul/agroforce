@@ -10,6 +10,7 @@ import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
+import { useRouter } from "next/router";
 
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { cultureService, userPreferencesService } from "src/services";
@@ -49,9 +50,10 @@ interface IData {
 
 export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
-
+  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario;
+  const preferences = userLogado.preferences.culture ||{id:0, table_preferences: "id,name,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -60,7 +62,6 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   const [orderName, setOrderName] = useState<number>(0);
   // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowName, setArrowName] = useState<ReactNode>('');
-  const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
@@ -79,7 +80,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(managedFields);
+  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -207,13 +208,20 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    await userPreferencesService.update({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 2 }).then((response) => {
+        userLogado.preferences.culture = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.culture = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
-    setManagedFields(campos);
+    setCamposGerenciados(campos);
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -274,7 +282,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${managedFields}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     await cultureService.getAll(filterAplication).then((response) => {
@@ -428,11 +436,11 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar uma cultura"
-                        value="Cadastrar uma cultura"
+                        title="Cadastrar cultura"
+                        value="Cadastrar cultura"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => {router.push('cultura/cadastro')}}
                         href="cultura/cadastro"
                         icon={<RiPlantLine size={20} />}
                       />
@@ -467,7 +475,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                                                 name={genarate.name}
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
-                                                defaultChecked={managedFields.includes(genarate.value as string)}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}

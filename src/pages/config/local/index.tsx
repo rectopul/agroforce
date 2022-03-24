@@ -65,7 +65,9 @@ interface Idata {
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local || {id:0, table_preferences: "id, pais, uf, city, address, latitude, longitude, altitude, status"};
+  const preferences = userLogado.preferences.local ||{id:0, table_preferences: "id,name,pais,uf,city,address,latitude,longitude,altitude,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
   const ufs: object | any =  [];
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
@@ -75,7 +77,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
@@ -257,7 +258,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  function getValuesComluns() {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -267,14 +268,22 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.local = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.update({table_preferences: campos, id: preferences.id, userId: userLogado.id, module_id: 4 });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 4 }).then((response) => {
+        userLogado.preferences.local = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.local = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
     setCamposGerenciados(campos);
   };
+
 
   function handleStatus(id: number, status: any): void {
     if (status) {
