@@ -121,7 +121,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] == 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
+        arrOb.push({ title: "Código", field: "id", sorting: false, width: 0 })
       }
       if (ObjetCampos[item] == 'avatar') {
         arrOb.push({
@@ -135,7 +135,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
               <FaRegUserCircle size={32} />
               ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={rowData.avatar} alt={rowData.name} style={{ width: 50, height: 50, borderRadius: 99999 }} />
+              <img src={rowData.avatar} alt={rowData.name} style={{ width: 45, height: 43, borderRadius: 99999 }} />
             )
           )
         });

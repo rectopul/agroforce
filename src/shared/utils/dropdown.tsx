@@ -19,6 +19,7 @@ const tmgDropDown =  [
   {labelDropDown: 'Usuário', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
   {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
   {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
+  {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <RiPlantLine/> },
 ];
 
 const ensaiosDropDown =  [
