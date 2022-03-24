@@ -212,6 +212,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             </div>
             <div className="w-40">
               <Button
+                type="submit"
                 value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"

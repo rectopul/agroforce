@@ -59,18 +59,13 @@ export default function Safra() {
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 201) {
           Swal.fire('Safra cadastrada com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
-      }).finally(() => {
-        formik.values.year = '';
-        formik.values.typeCrop = '';
-        formik.values.plantingStartTime = '';
-        formik.values.plantingEndTime = '';
       });
     },
   });
@@ -185,6 +180,7 @@ export default function Safra() {
             </div>
             <div className="w-40">
               <Button
+                type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
