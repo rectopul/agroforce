@@ -9,6 +9,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
+import { useRouter } from "next/router";
 
 import { safraService, userPreferencesService } from "src/services";
 
@@ -50,18 +51,19 @@ interface IData {
 
 export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
-
+  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario;
+  const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,typeCrop,plantingStartTime,plantingEndTime,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
   const [arrowDescription, setArrowDescription] = useState<string>('');
-  const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id"},
     { name: "CamposGerenciados[]", title: "Safra", value: "year"},
     { name: "CamposGerenciados[]", title: "Tipo de safra", value: "typeCrop" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
@@ -81,7 +83,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(managedFields);
+  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -129,6 +131,13 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({ 
+          title: "Código", 
+          field: "id", 
+          sorting: false 
+        })
+      }
       if (ObjetCampos[index] == 'safra') {
         arrOb.push({
           title: (
@@ -179,10 +188,10 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
-                  onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/safra/atualizar?id=${rowData.id}`}
+                  onClick={() =>{router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)}}
+
                 />
               </div>
               {rowData.status ? (
@@ -216,7 +225,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     return arrOb;
   };
 
-  function getValuesComluns(): void {
+  async function getValuesComluns(): Promise<void> {
     var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
@@ -226,13 +235,20 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    userPreferencesService.update({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 3 }).then((response) => {
+        userLogado.preferences.safra = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.safra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
-    setManagedFields(campos);
+    setCamposGerenciados(campos);
   };
 
   function handleOnDragEnd(result: DropResult) {
@@ -249,7 +265,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${managedFields}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     await safraService.getAll(filterAplication).then((response) => {
@@ -376,12 +392,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                     '>
                       <div className='h-12'>
                         <Button 
-                          title="Cadastrar uma safra"
-                          value="Cadastrar uma safra"
+                          title="Cadastrar safra"
+                          value="Cadastrar safra"
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
-                          href="safra/cadastro"
+                          onClick={() => {router.push('safra/cadastro')}}
                           icon={<MdDateRange size={20} />}
                         />
                       </div>
@@ -415,7 +430,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                                                   name={genarate.name}
                                                   title={genarate.title?.toString()}
                                                   value={genarate.value}
-                                                  defaultChecked={managedFields.includes(genarate.value as string)}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                                 />
                                               </li>
                                             )}

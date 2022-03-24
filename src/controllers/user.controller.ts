@@ -6,13 +6,6 @@ export class UserController {
     userRepository = new UserRepository();
     usersPermissionRepository = new UsersPermissionsRepository();
 
-    /**
-     * 
-     * @returns Listagem de todos usuarios.
-     * @example Options: 
-     * 
-     */
-
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
         let take; 
@@ -53,6 +46,13 @@ export class UserController {
             parameters.tel = options.tel;
         }
 
+        if (options.id) {
+            parameters.id = options.id;
+        }
+
+        if (options.app_login) {
+            parameters.app_login = options.app_login;
+        }
         if (options.departmentId) {
             parameters.departmentId = options.departmentId;
         }
@@ -183,22 +183,11 @@ export class UserController {
         }
     }
 
-    /**
-     * @returns Função responsavel por verificar se o usuario que está tentando logar, é um usuario do sistema. 
-     * @parameters Object contendo o email e a senha do usuario que está tentando fazer o login. 
-     */  
-
     async signinUSer(data: object) {
         if (data != null && data != undefined) {
             return await this.userRepository.signIn(data);
         }
     }
-
-    /**
-    * @returns Função responsavel por fazer a atualização do usuario 
-    * @requires id do usuario a ser editado
-    * @parameters data. objeto com as informações a serem atualizadas
-     */
 
     async updateUser(data: object| any) {
         if (data != null && data != undefined) {

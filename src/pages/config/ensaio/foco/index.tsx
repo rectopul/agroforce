@@ -49,16 +49,15 @@ interface IData {
 
 export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, ensaiosDropDown } = ITabs;
-
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario;
+  const preferences = userLogado.preferences.foco ||{id:0, table_preferences: "id,name,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
-  const [managedFields, setManagedFields] = useState<string>(preferences.table_preferences);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
@@ -77,7 +76,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   const total: number = itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(managedFields);
+  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -204,14 +203,21 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
       }
     } 
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1);
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    await userPreferencesService.update({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    let campos = selecionados.substr(0, totalString- 1)
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 6 }).then((response) => {
+        userLogado.preferences.foco = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.foco = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
-    setManagedFields(campos);
+    setCamposGerenciados(campos);
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -271,7 +277,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${managedFields}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     await focoService.getAll(filterAplication).then((response) => {
@@ -464,7 +470,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                                                 name={genarate.name}
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
-                                                defaultChecked={managedFields.includes(genarate.value as string)}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}

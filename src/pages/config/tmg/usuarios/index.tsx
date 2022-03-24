@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import getConfig from 'next/config';
 import MaterialTable from "material-table";
 import * as XLSX from 'xlsx';
+import { useRouter } from "next/router";
 
 import { userPreferencesService, userService } from "src/services";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
@@ -60,7 +61,9 @@ interface Idata {
 
 export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: Idata) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "id, avatar, name, tel, email, status"};
+  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "id,avatar,name,tel,email,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const router = useRouter();
   const [users, setData] = useState<IUsers[]>(() => alItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
@@ -68,7 +71,6 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id", defaultChecked: () => camposGerenciados.includes('id')},
@@ -198,10 +200,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -231,10 +232,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/tmg/usuarios/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -266,12 +266,19 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     } 
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
-    userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-    await userPreferencesService.update({table_preferences: campos, id: preferences.id });
-    localStorage.setItem('user', JSON.stringify(userLogado));
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 1 }).then((response) => {
+        userLogado.preferences.usuario = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
     setStatusAccordion(false);
-
     setCamposGerenciados(campos);
   };
 
@@ -562,8 +569,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                         value="Cadastrar usuário"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
-                        href="usuarios/cadastro"
+                        onClick={() => {router.push('usuarios/cadastro')}}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
