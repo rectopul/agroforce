@@ -46,7 +46,7 @@ export interface IData {
 }
 
 export default function NovoLocal({ local }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { layoutQuadrasDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
   const router = useRouter();
@@ -129,7 +129,7 @@ export default function NovoLocal({ local }: IData) {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={layoutQuadrasDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"

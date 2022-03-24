@@ -52,7 +52,7 @@ export interface IData {
 }
 
 export default function NovoLocal({ uf }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { localsDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const ufs: object | any =  [];
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
@@ -134,7 +134,7 @@ export default function NovoLocal({ uf }: IData) {
 
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={localsDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"

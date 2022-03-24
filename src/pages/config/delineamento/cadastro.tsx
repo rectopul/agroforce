@@ -25,7 +25,7 @@ interface IDelineamentoProps {
 };
 
 export default function NovoLocal() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { delineamentosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<IDelineamentoProps>({
@@ -71,7 +71,7 @@ export default function NovoLocal() {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={delineamentosDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"

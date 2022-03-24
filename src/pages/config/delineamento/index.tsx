@@ -83,7 +83,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const columns = colums(camposGerenciados);
   
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { delineamentosDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -92,9 +92,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
             setTotaItems(response.total);
@@ -423,7 +423,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       </Head>
       <Content
         headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
+          <TabHeader data={tabs} dataDropDowns={delineamentosDropDown}  />
         }
       >
         <main className="h-full w-full

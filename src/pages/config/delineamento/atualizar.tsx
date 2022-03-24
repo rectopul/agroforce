@@ -31,7 +31,7 @@ export interface IData {
 }
 
 export default function NovoLocal({delineamentoEdit}: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { delineamentosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<IDelineamentoProps>({
@@ -45,7 +45,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
     },
     onSubmit: async (values) => {      
       validateInputs(values);
-      if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
+      if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; }
 
       await delineamentoService.update({
         id: values.id,
@@ -78,7 +78,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={delineamentosDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
