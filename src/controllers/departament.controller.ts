@@ -97,6 +97,8 @@ export class DepartamentController {
 
   async postDepartament(data: any) {
     try {
+      console.log('controller' + data)
+
       await this.departamentRepository.create(data);
 
       return {status: 201, message: "Item cadastrado"}
