@@ -1,20 +1,29 @@
 import getConfig from 'next/config';
-import Router from 'next/router'
 
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/user/departament`;
+
+const apiDepartment = 'user/departament' || 'department';
+const baseUrl = `${publicRuntimeConfig.apiUrl}/${apiDepartment}`;
 
 export const departmentService = {
     getAll,
-    createProfile 
+    createProfile,
+    update
 };
 
-function createProfile(data: any) {
-    return fetchWrapper.post(baseUrl, data);
+async function createProfile(data: any) {
+    const result = await fetchWrapper.post(baseUrl, data);
+    return result;
 }
 
-function getAll(parameters: any) {
-    return fetchWrapper.get(baseUrl, parameters);
+async function getAll(parameters: any) {
+    const result = await fetchWrapper.get(baseUrl, parameters);
+    return result;
+}
+
+async function update(parameters: any) {
+    const result = await fetchWrapper.put(baseUrl, parameters);
+    return result;
 }

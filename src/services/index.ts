@@ -10,3 +10,4 @@ export * from './delineamento.service';
 export * from './tipo-ensaio.service';
 export * from './ogm.service';
 export * from './portfolio.service';
+export * from './department.service';
