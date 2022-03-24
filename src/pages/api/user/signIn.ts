@@ -37,10 +37,10 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         const validateLogin = await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id});
         if (validateLogin.total <= 0) throw 'Você não tem acesso a essa pagina!';
     
-        userCulture.culturas = await (await userCultureController.getByUserID(user.id)).response;
+        userCulture.culturas = (await userCultureController.getByUserID(user.id)).response;
         if (!userCulture.culturas) throw 'Você está sem acesso as culturas, contate o seu lider!';
     
-        // userCulture.cultura_selecionada = userCulture.culturas[0].id;
+        userCulture.cultura_selecionada = userCulture.culturas[0].id;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
         preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
