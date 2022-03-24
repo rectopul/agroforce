@@ -108,7 +108,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const columns = colums(camposGerenciados);
   
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { layoutQuadrasDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -515,7 +515,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       </Head>
       <Content
         headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
+          <TabHeader data={tabs} dataDropDowns={layoutQuadrasDropDown}  />
         }
       >
         <main className="h-full w-full

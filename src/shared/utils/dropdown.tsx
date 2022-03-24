@@ -1,6 +1,7 @@
 import { AiOutlineFileSearch } from "react-icons/ai";
 import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
@@ -19,6 +20,7 @@ const tmgDropDown =  [
   {labelDropDown: 'Usuário', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
   {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
   {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
+  {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
 ];
 
 const ensaiosDropDown =  [
@@ -31,19 +33,15 @@ const localsDropDown =  [
   {labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <AiOutlineFileSearch/> },
 ];
 
-const DelineamentosDropDown =  [
-  {labelDropDown: 'Não definido', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
+const layoutQuadrasDropDown =  [
+  {labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <AiOutlineFileSearch/> },
+];
+
+const delineamentosDropDown =  [
+  {labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
 ];
 
 const npeDropDown =  [
-  {labelDropDown: 'Não definido', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
-  {labelDropDown: 'Teste', hrefDropDown: '#'},
-];
-
-const quadrasDropDown =  [
   {labelDropDown: 'Não definido', hrefDropDown: '#'},
   {labelDropDown: 'Teste', hrefDropDown: '#'},
   {labelDropDown: 'Teste', hrefDropDown: '#'},
@@ -61,8 +59,8 @@ export default {
   tmgDropDown,
   ensaiosDropDown,
   localsDropDown,
-  DelineamentosDropDown,
+  delineamentosDropDown,
   npeDropDown,
-  quadrasDropDown,
+  layoutQuadrasDropDown,
   configPlanilhasDropDown,
 };

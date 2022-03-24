@@ -2,38 +2,55 @@ import {prisma} from '../pages/api/db/db';
 
 export class DepartamentRepository {   
     async findOne(id: number) {
-        let Result = await prisma.department.findUnique({
-               where: {
-                   id: id
-               }
-             }) .finally(async () => { await prisma.$disconnect() })
-        return Result;
+        const result = await prisma.department.findUnique({
+            where: { id }
+        });
+        return result;
     }
 
     async findAll () {
-        let Result = await prisma.department.findMany() .finally(async () => { await prisma.$disconnect() })
-        return Result;
+        const result = await prisma.department.findMany();
+        return result;
     }
 
-    async create(Departament: object | any) {
-        let Result = await prisma.department.create({ data: Departament }).finally(async () => { await prisma.$disconnect() })
-        return Result;
+    async create(data: any) {
+        console.log('repo' + data)
+        const result = await prisma.department.create({ data });
+        return result;
     }
 
-    async update(id: number, Departament: Object) {
-        let departament = await this.findOne(id);
+    async update(id: number, data: Object) {
+        const departament = await this.findOne(id);
+
         if (departament != null) {
-            let Result = await prisma.department.update({ 
-                where: {
-                    id: id
-                },
-                data: Departament })
-                .finally(async () => { await prisma.$disconnect() })
-            return Result;
+            const result = await prisma.department.update({
+                where: { id },
+                data 
+            });
+            return result;
         } else {
             return false;
         }
     }
-    
-}
 
+    async listAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+        let order: object | any;
+    
+        if (orderBy){
+          order = JSON.parse(orderBy);
+        }
+    
+        const count = await prisma.department.count({ where: where });
+    
+        const result: object | any = await prisma.department.findMany({
+          select: select, 
+          skip: skip, 
+          take: take, 
+          where: where,
+          orderBy: order
+        });
+        
+        result.total = count;
+        return result;
+    }
+}

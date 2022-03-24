@@ -108,7 +108,7 @@ export class SafraController {
             const safraRepository = new SafraRepository();
             await safraRepository.create(data);
 
-            return {status: 200, message: "Item inserido"}
+            return {status: 201, message: "Item inserido"}
         } catch(err) {
             return { status: 404, message: "Erro"}
         }

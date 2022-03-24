@@ -101,7 +101,7 @@ export class UserCultureController {
         let newID = parseInt(userId);
         if (userId && userId != '{id}') {
             let response = await this.userCultureRepository.findAllByUser(newID); 
-            if (!response) {
+            if (!response || response.length == 0) {
                return {status: 400, message: 'usuario não tem cultura'};
             } else {
                 return {status:200 , response};

@@ -37,9 +37,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         const validateLogin = await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id});
         if (validateLogin.total <= 0) throw 'Você não tem acesso a essa pagina!';
     
-        userCulture.culturas = await (await userCultureController.getByUserID(user.id)).response;
+        userCulture.culturas = (await userCultureController.getByUserID(user.id)).response;
         if (!userCulture.culturas) throw 'Você está sem acesso as culturas, contate o seu lider!';
-    
+
         userCulture.cultura_selecionada = userCulture.culturas[0].id;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
@@ -52,6 +52,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         preferences.ogm= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8})).response[0]
         preferences.tipo_ensaio= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9})).response[0]
         preferences.portfolio= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10})).response[0]
+        preferences.department= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11})).response[0]
       }
 
       if (!user) throw 'Email ou senha é invalida!';

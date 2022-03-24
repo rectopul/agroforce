@@ -24,7 +24,7 @@ export default  apiHandler(handler);
         break
       case 'POST':
         let resultPost = await Controller.postSafra(req.body);  
-        res.status(200).json(resultPost);
+        res.status(201).json(resultPost);
         break
       case 'PUT':
         let resultPut = await Controller.updateSafra(req.body);  
