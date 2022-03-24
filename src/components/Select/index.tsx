@@ -10,11 +10,9 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
     <select
       { ...rest }
       className="h-full w-full
-      rounded
       form-select form-select-sm
-      text-sm
       shadow
-      font-normal
+      text-base
       text-gray-900
       bg-white bg-no-repeat
       border border-solid border-gray-300

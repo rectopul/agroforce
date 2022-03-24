@@ -49,7 +49,10 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar={ userLogado.avatar }
 
         headerSelects={
-          <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+          <div className="h-10 flex gap-2">
+            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+          </div>
         }
       >
         { headerCotent }
