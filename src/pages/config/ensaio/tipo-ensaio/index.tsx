@@ -56,6 +56,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.tipo_ensaio ||{id:0, table_preferences: "id,name,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -79,8 +87,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const columns = colums(camposGerenciados);
   
-  const { tmgDropDown, tabs } = ITabs.default;
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',

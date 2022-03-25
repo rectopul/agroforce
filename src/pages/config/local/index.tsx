@@ -64,6 +64,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
+  const { localsDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'LOCAL'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.local ||{id:0, table_preferences: "id,name,pais,uf,city,address,latitude,longitude,altitude,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -98,8 +106,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const columns = colums(camposGerenciados);
   
-  const { localsDropDown, tabs } = ITabs.default;
-
   uf.map((value: string | object | any) => {
     ufs.push({id: value.id, name: value.sigla, ufid: value.id});
   })

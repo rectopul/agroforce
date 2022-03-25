@@ -27,10 +27,17 @@ export interface IUpdateFoco {
 }
 
 export default function Atualizar(foco: IUpdateFoco) {
+  const { ensaiosDropDown, tabs } = ITabs.default;
+  
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   
-  const { ensaiosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 

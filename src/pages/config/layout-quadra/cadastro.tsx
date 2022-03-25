@@ -47,6 +47,13 @@ export interface IData {
 
 export default function NovoLocal({ local }: IData) {
   const { layoutQuadrasDropDown, tabs } = ITabs.default;
+  
+  tabs.map((tab) => (
+    tab.title === 'QUADRAS'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
   const router = useRouter();

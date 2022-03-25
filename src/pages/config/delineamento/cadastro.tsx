@@ -26,6 +26,13 @@ interface IDelineamentoProps {
 
 export default function NovoLocal() {
   const { delineamentosDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'DELINEAMENTO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<IDelineamentoProps>({

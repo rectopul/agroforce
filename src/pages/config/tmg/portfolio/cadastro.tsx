@@ -22,10 +22,17 @@ export interface ICreatePortfolio {
 }
 
 export default function  Portfolio() {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   
-  const { tmgDropDown, tabs } = ITabs.default;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;

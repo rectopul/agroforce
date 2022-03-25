@@ -31,6 +31,13 @@ export interface IData {
 
 export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
   const router = useRouter();

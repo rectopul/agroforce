@@ -49,6 +49,13 @@ interface IData {
 
 export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, ensaiosDropDown } = ITabs;
+
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.foco ||{id:0, table_preferences: "id,name,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);

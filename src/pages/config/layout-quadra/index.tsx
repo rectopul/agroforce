@@ -71,6 +71,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
+  const { layoutQuadrasDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'QUADRAS'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.layout_quadra ||{id:0, table_preferences: "id,esquema,local,semente_metros,semente_metros,disparos,divisor,largura,comp_fisico,comp_parcela,comp_corredor,t4_inicial,t4_final,df_inicial,df_final,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -107,8 +115,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
-  
-  const { layoutQuadrasDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {

@@ -47,6 +47,13 @@ interface IData {
 
 export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);

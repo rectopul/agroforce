@@ -57,6 +57,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   flex items-center justify-center
                   rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                 '>
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
                    <img src='/images/logo-agro-branco.png' alt={name} className='h-14 w-14
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                     '/>
@@ -85,7 +86,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="w-64 origin-top-right 
-           mr-7 absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 
+           mr-7 absolute right-0 mt-2 rounded-md shadow-lg bg-white ring-1 
             ring-black ring-opacity-5 focus:outline-none
           ">
             <div className="py-1">
@@ -104,6 +105,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                       flex items-center justify-center
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-gray-700
                     '>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src='/images/logo-agro-escuro.png' alt={name} className='h-14 w-14
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                     '/>
@@ -124,7 +126,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   href="#"
                   className={classNames(
                     active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                    'block px-4 py-2 text-base flex flex-row items-center gap-1'
+                    'px-4 py-2 text-base flex flex-row items-center gap-1'
                     )}
                     >
                     <FaRegUserCircle />
@@ -138,7 +140,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     href="#"
                     className={classNames(
                       active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                      'block px-4 py-2 text-base flex items-center gap-1'
+                      'px-4 py-2 text-base flex items-center gap-1'
                     )}
                   >
                     <FaRegEdit />
@@ -152,7 +154,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     href="#"
                     className={classNames(
                       active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                      'block px-4 py-2 text-base flex items-center gap-1'
+                      'px-4 py-2 text-base flex items-center gap-1'
                     )}
                   >
                     <RiLockPasswordLine />
@@ -167,7 +169,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                       type="submit"
                       className={classNames(
                         active ? 'bg-gray-100 text-red-600' : 'text-red-800',
-                        'block w-full text-left px-4 py-2 text-base flex items-center gap-1'
+                        'w-full text-left px-4 py-2 text-base flex items-center gap-1'
                       )}
                       onClick={logout}
                     >
