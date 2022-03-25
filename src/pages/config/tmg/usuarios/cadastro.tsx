@@ -139,7 +139,8 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 *Nome usuário
               </label>
               <Input 
-                type="text" 
+                type="text"
+                required
                 placeholder="José Oliveira"
                 max="40"
                 id="name"
@@ -155,6 +156,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="email" 
+                required
                 placeholder="usuario@tmg.agr.br" 
                 id="email"
                 name="email"
@@ -201,6 +203,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 *Matricula
               </label>
               <Input 
+                required
                 type="number" 
                 placeholder="Campo númerico"
                 id="registration"
@@ -216,6 +219,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Select
                 values={departments}
+                required
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -264,6 +268,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="password" 
+                required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -278,6 +283,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="password"
+                required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -299,6 +305,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Select
                 values={optionSorN}
+                required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -313,6 +320,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               <div className="h-10">
                 <Select
                   values={optionSorN} 
+                  required
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}

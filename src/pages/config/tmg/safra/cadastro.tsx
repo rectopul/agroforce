@@ -42,6 +42,9 @@ export default function Safra() {
   
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
+  const [checkeBox, setCheckeBox] = useState<boolean>();
+  const [checkeBox2, setCheckeBox2] = useState<boolean>();
+  const [typeCrop, setTypeCrop] = useState<string>('');
 
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -51,7 +54,7 @@ export default function Safra() {
     initialValues: {
       id_culture: Number(culture),
       year: '',
-      typeCrop: '',
+      typeCrop,
       plantingStartTime: '',
       plantingEndTime: '',
       main_safra: 0,
@@ -59,10 +62,18 @@ export default function Safra() {
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
+      formik.values.typeCrop = typeCrop;
+      const { main_safra, ...data } = values;
+
+      if (typeCrop === '' || !typeCrop || !data) {
+        Swal.fire('Dados Inválidos!');
+        throw new Error("Dados Inválidos");
+      };
+      
       await safraService.create({
         id_culture: formik.values.id_culture,
         year: formik.values.year,
-        typeCrop: formik.values.typeCrop,
+        typeCrop,
         plantingStartTime: formik.values.plantingStartTime,
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
@@ -100,7 +111,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Ano
+                Ano
               </label>
 
               <InputMask
@@ -131,23 +142,25 @@ export default function Safra() {
             <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Tipo de safra
+                Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
                 title="Verão"
                 id="typeCrop"
                 name="typeCrop"
-                onChange={formik.handleChange}
-                value={formik.values.typeCrop = 'Verão'}
+                checked={checkeBox}
+                onChange={event => setTypeCrop(event.target.value)}
+                value='Verão'
               />
 
               <Radio
                 title="Inverno"
                 id="typeCrop"
                 name="typeCrop"
-                onChange={formik.handleChange}
-                value={formik.values.typeCrop = 'Inverno'}
+                checked={checkeBox2}
+                onChange={event => setTypeCrop(event.target.value)}
+                value='Inverno'
               />
               </div>
             </div>
@@ -157,10 +170,11 @@ export default function Safra() {
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal de início de plantio
+                Período ideal de início de plantio
               </label>
               <Input
                 type="date" 
+                required
                 placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
@@ -172,10 +186,11 @@ export default function Safra() {
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal do fim do plantio
+                Período ideal do fim do plantio
               </label>
               <Input
                 type="date"
+                required
                 placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"

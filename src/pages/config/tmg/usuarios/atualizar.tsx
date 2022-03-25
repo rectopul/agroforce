@@ -160,7 +160,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 *Login
               </label>
               <Input 
-                type="email" 
+                type="email"
+                required 
                 placeholder="usuario@tmg.agr.br" 
                 id="email"
                 name="email"
@@ -238,6 +239,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Select2
                 id="department.id"
+                required
                 name="departmentId"
                 onChange={formik.handleChange}
                 data={departments}
@@ -258,6 +260,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="number" 
+                required
                 placeholder="Campo númerico"
                 id="registration"
                 name="registration"
@@ -272,6 +275,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="password" 
+                required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -286,6 +290,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="password"
+                required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -307,6 +312,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Select
                 values={optionSorN}
+                required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -321,6 +327,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <div className="h-10">
                 <Select
                   values={optionSorN} 
+                  required
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}

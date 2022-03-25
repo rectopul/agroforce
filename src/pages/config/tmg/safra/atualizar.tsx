@@ -67,6 +67,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
     },
     onSubmit: async (values) => {
       if (values.id !== safra.id) throw new Error("Dados inválidos");
+      if (values.typeCrop === '' || !values.typeCrop) throw new Error("Dados inválidos");
 
       await safraService.updateSafras({
         id: safra.id,
@@ -128,7 +129,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Ano
+                Ano
               </label>
               <InputMask 
                 mask="99/99"
@@ -158,7 +159,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Tipo de safra
+                Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
                 <Radio
@@ -186,10 +187,11 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal de início de plantio
+                Período ideal de início de plantio
               </label>
               <Input
                 type="date"
+                required
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
@@ -200,10 +202,11 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal do fim do plantio
+                Período ideal do fim do plantio
               </label>
               <Input
                 type="date"
+                required
                 id="plantingEndTime"
                 name="plantingEndTime"
                 onChange={formik.handleChange}
