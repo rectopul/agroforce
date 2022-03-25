@@ -1,9 +1,11 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
-import { useFormik } from "formik";
-import getConfig from 'next/config';
-import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
+import getConfig from 'next/config';
+import { useFormik } from "formik";
+import Swal from 'sweetalert2'
+import InputMask from 'react-input-mask';
+
 import { userService } from "src/services";
 
 import  IProfile  from "../../../../components/props/profileDTO";
@@ -22,7 +24,8 @@ import {
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
+import { RiUserSettingsLine } from "react-icons/ri";
+import { useEffect, useState } from "react";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -39,7 +42,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
+  const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
   const router = useRouter();
 
   const formik = useFormik<IUsers>({
@@ -59,7 +62,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       app_login: userEdit[0].app_login,
       created_by: userLogado.id,
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
@@ -73,7 +76,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
         auxObject.push(ObjProfiles);
       });
 
-      userService.update({
+      await userService.update({
         id: values.id,
         name: values.name,
         email: values.email,
@@ -93,7 +96,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           router.back();
 
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
       })
     },
@@ -113,30 +116,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar usuário</h1>
-            <div className="flex flex-col">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de perfil
-              </label>
-              <div className="flex gap-6 border-b border-gray-300">
-                {
-                  profiles.map((profile) => (
-                    <>
-                      <CheckBox
-                        key={profile.id}
-                        title={profile.name}
-                        id={`profiles.${profile.id}`}
-                        name="profiles"
-                        onChange={formik.handleChange}
-                        value={profile.id}
-                      />
-                    </>
-                  ))
-                }
-              </div>
-            </div>
-          </div>
+          <h1 className="text-2xl">Atualizar usuário</h1>
 
           <div className="w-full
             flex 
@@ -158,7 +138,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome usuário
+                Nome
               </label>
               <Input 
                 id="name"
@@ -197,7 +177,10 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 CPF
               </label>
-              <Input
+              <InputMask
+                mask="999.999.999-99"
+                required
+                style={{ background: '#e5e7eb' }}
                 type="text"
                 placeholder="111.111.111-11"
                 maxLength={11}
@@ -206,6 +189,17 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 name="cpf"
                 onChange={formik.handleChange}
                 value={formik.values.cpf}
+                className="shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                "
               />
             </div>
 
@@ -322,6 +316,30 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             </div>
           </div>
 
+          <div className="w-full flex justify-between items-start">
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Tipo de perfil
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  profiles.map((profile) => (
+                    <>
+                      <CheckBox
+                        key={profile.id}
+                        title={profile.name}
+                        id={`profiles.${profile.id}`}
+                        name="profiles"
+                        onChange={formik.handleChange}
+                        value={formik.values.id}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+
           <div className="h-10 w-full
             flex
             justify-center
@@ -342,7 +360,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 type="submit"
                 value="Atualizar"
                 bgColor="bg-blue-600"
-                icon={<MdDateRange size={18} />}
+                icon={<RiUserSettingsLine size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />
