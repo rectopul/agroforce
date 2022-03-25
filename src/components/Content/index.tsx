@@ -33,7 +33,7 @@ export function Content({ headerCotent, children }: IContentProps) {
   
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
-      cultures.push({id: value.id, name: value.culture.name});
+      cultures.push({id: value.cultureId, name: value.culture.name});
     })
   }
 
@@ -49,7 +49,10 @@ export function Content({ headerCotent, children }: IContentProps) {
         avatar={ userLogado.avatar }
 
         headerSelects={
-          <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+          <div className="h-10 flex gap-2">
+            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+          </div>
         }
       >
         { headerCotent }

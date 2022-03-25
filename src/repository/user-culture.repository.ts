@@ -52,7 +52,8 @@ export class UserCultureRepository {
                 }
             }, 
             select: {
-                id: true,            
+                id: true,    
+                cultureId: true,        
                 culture: {select: {name: true}}
             },
           }) .finally(async () => { await prisma.$disconnect() })

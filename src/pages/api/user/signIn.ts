@@ -39,8 +39,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     
         userCulture.culturas = (await userCultureController.getByUserID(user.id)).response;
         if (!userCulture.culturas) throw 'Você está sem acesso as culturas, contate o seu lider!';
-
-        userCulture.cultura_selecionada = userCulture.culturas[0].id;
+    
+        userCulture.cultura_selecionada = userCulture.culturas[0].cultureId;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario = await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
         preferences.culture= await (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
