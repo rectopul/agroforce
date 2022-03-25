@@ -30,6 +30,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
+import { handleFormatTel } from "src/shared/utils/tel";
 
 interface IUsers {
   id: number,
@@ -178,7 +179,14 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         },);
       }
       if (ObjetCampos[item] == 'tel') {
-        arrOb.push({ title: "Telefone", field: "tel", sorting: false })
+        arrOb.push({ 
+          title: "Telefone", 
+          field: "tel", 
+          sorting: false,
+          render: (rowData: IUsers) => (
+            handleFormatTel(rowData.tel)
+          )
+        })
       }
       if (ObjetCampos[item] == 'status') {
         arrOb.push({

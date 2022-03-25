@@ -40,10 +40,13 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
     ? tab.status = true
     : tab.status = false
   ));
+
+  const router = useRouter();
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
-  const router = useRouter();
+
+  const maskTel = '(99)99999-9999' || '(99)9999-9999';
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -53,7 +56,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       cpf: userEdit[0].cpf,
       tel: userEdit[0].tel,
       password: userEdit[0].password,
-      confirmPassword: '',
+      confirmPassword: userEdit[0].password,
       profiles: [],
       registration: userEdit[0].registration,
       departmentId: userEdit[0].departmentId,
@@ -180,6 +183,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <InputMask
                 mask="999.999.999-99"
                 required
+                disabled
                 style={{ background: '#e5e7eb' }}
                 type="text"
                 placeholder="111.111.111-11"
@@ -207,13 +211,28 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Telefone
               </label>
-              <Input 
-                type="tel" 
+              <InputMask
+                mask={maskTel}
+                required
+                type="tel"
                 placeholder="(11) 99999-9999"
+                maxLength={11}
+                minLength={11}
                 id="tel"
                 name="tel"
                 onChange={formik.handleChange}
                 value={formik.values.tel}
+                className="shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                "
               />
             </div>
 
@@ -332,6 +351,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                         name="profiles"
                         onChange={formik.handleChange}
                         value={formik.values.id}
+                        defaultChecked={profiles.includes(profile)}
                       />
                     </>
                   ))
