@@ -1,5 +1,7 @@
 import Head from "next/head";
 import { useFormik } from 'formik';
+import InputMask from 'react-input-mask';
+
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 
@@ -93,13 +95,29 @@ export default function Safra() {
                 <strong className={checkInput}>*</strong>
                 Ano
               </label>
-              <Input
-                type="date"
+
+              <InputMask
+                mask="99/99"
                 required
                 id="year"
                 name="year"
                 onChange={formik.handleChange}
                 value={formik.values.year}
+                className="
+                  shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 
+                  focus:bg-white 
+                  focus:border-blue-600 
+                  focus:outline-none
+                "
               />
             </div>
 
@@ -135,11 +153,10 @@ export default function Safra() {
                 Período ideal de início de plantio
               </label>
               <Input
-                type="text" 
+                type="date" 
                 placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
-                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
@@ -151,11 +168,10 @@ export default function Safra() {
                 Período ideal do fim do plantio
               </label>
               <Input
-                type="text"
+                type="date"
                 placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"
-                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}
               />
