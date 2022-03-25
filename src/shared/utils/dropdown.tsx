@@ -24,9 +24,9 @@ const tmgDropDown =  [
 ];
 
 const ensaiosDropDown =  [
+  {labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
   {labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
   {labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser/> },
-  {labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
 ];
 
 const localsDropDown =  [
