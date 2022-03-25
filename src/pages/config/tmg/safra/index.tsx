@@ -159,17 +159,27 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
         arrOb.push({ 
           title: "Período ideal de início de plantio", 
           field: "plantingStartTime", 
-          sorting: false 
+          sorting: false,
+          render: (rowData: ISafra) => (
+            new Intl.DateTimeFormat('pt-BR').format(
+              new Date(rowData.plantingStartTime)
+            )
+          )
         })
       }
-      if (ObjetCampos[index] == 'plantingStartTime') {
+      if (ObjetCampos[index] == 'plantingEndTime') {
         arrOb.push({ 
           title: "Período ideal do fim do plantio", 
           field: "plantingEndTime", 
-          sorting: false 
+          sorting: false,
+          render: (rowData: ISafra) => (
+            new Intl.DateTimeFormat('pt-BR').format(
+              new Date(rowData.plantingEndTime)
+            )
+          )
         })
       }
-      if (ObjetCampos[index] == 'plantingStartTime') {
+      if (ObjetCampos[index] == 'main_safra') {
         arrOb.push({ 
           title: "Safra principal", 
           field: "main_safra", 
