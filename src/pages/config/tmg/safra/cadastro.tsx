@@ -100,7 +100,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Ano
+                *Ano
               </label>
 
               <InputMask
@@ -131,7 +131,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Tipo de safra
+                *Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
@@ -157,7 +157,7 @@ export default function Safra() {
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Período ideal de início de plantio
+                *Período ideal de início de plantio
               </label>
               <Input
                 type="date" 
@@ -172,7 +172,7 @@ export default function Safra() {
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Período ideal do fim do plantio
+                *Período ideal do fim do plantio
               </label>
               <Input
                 type="date"

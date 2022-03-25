@@ -3,7 +3,9 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2'
+
 import { IoMdArrowBack } from "react-icons/io";
 import { FiUserPlus } from "react-icons/fi";
 
@@ -36,10 +38,12 @@ export default function NovoUsuario({ departments, profiles }: IData) {
     ? tab.status = true
     : tab.status = false
   ));
+
+  const router = useRouter();
   
+  const maskTel = '(99)99999-9999' || '(99)9999-9999';
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
-  const router = useRouter();
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -132,7 +136,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome usuário
+                *Nome usuário
               </label>
               <Input 
                 type="text" 
@@ -147,7 +151,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login
+                *Login
               </label>
               <Input 
                 type="email" 
@@ -161,17 +165,27 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                CPF
+                *CPF
               </label>
-              <Input
-                type="text"
+              <InputMask
+                mask="999.999.999-99"
+                required
                 placeholder="111.111.111-11"
-                maxLength={11}
-                minLength={11}
                 id="cpf"
                 name="cpf"
                 onChange={formik.handleChange}
                 value={formik.values.cpf}
+                className="shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                "
               />
             </div>
           </div>
@@ -184,7 +198,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Matricula
+                *Matricula
               </label>
               <Input 
                 type="number" 
@@ -198,7 +212,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Setor
+                *Setor
               </label>
               <Select
                 values={departments}
@@ -212,15 +226,28 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Telefone
+                *Telefone
               </label>
-              <Input 
-                type="tel" 
+              <InputMask
+                mask={maskTel}
+                required
+                type="tel"
                 placeholder="(11) 99999-9999"
                 id="tel"
                 name="tel"
                 onChange={formik.handleChange}
                 value={formik.values.tel}
+                className="shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                "
               />
             </div>
           </div>
@@ -233,7 +260,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Senha
+                *Senha
               </label>
               <Input 
                 type="password" 
@@ -247,7 +274,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Confirmar senha
+                *Confirmar senha
               </label>
               <Input 
                 type="password"
@@ -268,7 +295,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Libera jivochat
+                *Libera jivochat
               </label>
               <Select
                 values={optionSorN}
@@ -281,7 +308,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login do App
+                *Login do App
               </label>
               <div className="h-10">
                 <Select
@@ -298,7 +325,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
           <div className="w-full flex justify-between items-start">
             <div className="flex flex-col">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de perfil
+                *Tipo de perfil
               </label>
               <div className="flex gap-6 border-b border-gray-300">
                 {

@@ -97,7 +97,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Nome
+                *Nome
               </label>
               <Input
                 type="text"

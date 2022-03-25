@@ -259,7 +259,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -281,7 +281,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -617,7 +617,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="layoult-quadra/cadastro"
+                        href="layout-quadra/cadastro"
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>

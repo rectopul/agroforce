@@ -75,7 +75,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     { name: "CamposGerenciados[]", title: "Tipo de safra", value: "typeCrop" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
     { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
-    { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
+    // { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -145,7 +145,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           sorting: false 
         })
       }
-      if (ObjetCampos[index] == 'safra') {
+      if (ObjetCampos[index] == 'year') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -186,13 +186,13 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           )
         })
       }
-      if (ObjetCampos[index] == 'main_safra') {
-        arrOb.push({ 
-          title: "Safra principal", 
-          field: "main_safra", 
-          sorting: false 
-        })
-      }
+      // if (ObjetCampos[index] == 'main_safra') {
+      //   arrOb.push({ 
+      //     title: "Safra principal", 
+      //     field: "main_safra", 
+      //     sorting: false 
+      //   })
+      // }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",

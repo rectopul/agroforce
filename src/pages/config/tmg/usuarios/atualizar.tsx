@@ -130,7 +130,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código do usuário
+                Código
               </label>
               <Input 
                 disabled
@@ -141,7 +141,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Nome
+                *Nome
               </label>
               <Input 
                 id="name"
@@ -157,7 +157,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login
+                *Login
               </label>
               <Input 
                 type="email" 
@@ -178,14 +178,13 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                CPF
+                *CPF
               </label>
               <InputMask
                 mask="999.999.999-99"
                 required
                 disabled
                 style={{ background: '#e5e7eb' }}
-                type="text"
                 placeholder="111.111.111-11"
                 maxLength={11}
                 minLength={11}
@@ -209,15 +208,12 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Telefone
+                *Telefone
               </label>
               <InputMask
                 mask={maskTel}
                 required
-                type="tel"
                 placeholder="(11) 99999-9999"
-                maxLength={11}
-                minLength={11}
                 id="tel"
                 name="tel"
                 onChange={formik.handleChange}
@@ -238,7 +234,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Setor
+                *Setor
               </label>
               <Select2
                 id="department.id"
@@ -258,7 +254,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Matricula
+                *Matricula
               </label>
               <Input 
                 type="number" 
@@ -272,7 +268,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Senha
+                *Senha
               </label>
               <Input 
                 type="password" 
@@ -286,7 +282,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Confirmar senha
+                *Confirmar senha
               </label>
               <Input 
                 type="password"
@@ -307,7 +303,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Libera jivochat
+                *Libera jivochat
               </label>
               <Select
                 values={optionSorN}
@@ -320,7 +316,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login do App
+                *Login do App
               </label>
               <div className="h-10">
                 <Select
@@ -338,7 +334,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
           <div className="w-full flex justify-between items-start">
             <div className="flex flex-col">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tipo de perfil
+                *Tipo de perfil
               </label>
               <div className="flex gap-6 border-b border-gray-300">
                 {
@@ -360,8 +356,10 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
             </div>
           </div>
 
-          <div className="h-10 w-full
+          <div className="
+            h-10 w-full
             flex
+            gap-3
             justify-center
             mt-10
           ">  
