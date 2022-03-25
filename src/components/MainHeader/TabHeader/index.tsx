@@ -6,7 +6,7 @@ type ITabProps = {
   value: ReactNode;
   title: string;
   href: string;
-  status?: boolean;
+  status: boolean;
 }
 
 type IDropDownProps = {

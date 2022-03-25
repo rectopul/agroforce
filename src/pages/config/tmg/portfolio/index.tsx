@@ -47,6 +47,13 @@ interface IData {
 
 export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -74,7 +81,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -89,13 +96,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          if (response.total > 0) {
-            setTotaItems(response.total);
-          }
+          setTotaItems(response.total);
           setPortfolios(response.response);
           setFilter(parametersFilter);
-        }
       })
     },
   });
@@ -360,16 +363,16 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Portfólios.csv");
+        XLSX.writeFile(workBook, "Portfólios.xlsx");
       }
     });
   };
@@ -622,7 +625,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
@@ -639,10 +642,10 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const portfolios = await fetch(urlParameters.toString(), requestOptions);
-  const response = await portfolios.json();
+  let response = await portfolios.json();
 
-  const allPortfolios = response.response;
-  const totalItems = response.total;
+  let allPortfolios = response.response;
+  let totalItems = response.total;
 
   return {
     props: {

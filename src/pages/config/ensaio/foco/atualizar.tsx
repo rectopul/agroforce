@@ -27,10 +27,17 @@ export interface IUpdateFoco {
 }
 
 export default function Atualizar(foco: IUpdateFoco) {
+  const { ensaiosDropDown, tabs } = ITabs.default;
+  
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   
-  const { ensaiosDropDown, tabs } = ITabs.default;
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionStatus =  [{id: 1, name: "Ativo"}, {id: 0, name: "Inativo"}];
 
@@ -49,7 +56,7 @@ export default function Atualizar(foco: IUpdateFoco) {
         created_by: foco.created_by,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Foco cadastrado com sucesso!');
+          Swal.fire('Foco atualizado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");

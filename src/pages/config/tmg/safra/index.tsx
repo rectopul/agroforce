@@ -51,6 +51,13 @@ interface IData {
 
 export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
+  
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,typeCrop,plantingStartTime,plantingEndTime,status"};
@@ -68,7 +75,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     { name: "CamposGerenciados[]", title: "Tipo de safra", value: "typeCrop" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
     { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
-    { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
+    // { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -80,7 +87,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -95,11 +102,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setSafras(response.response);
-        }
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setSafras(response.response);
       })
     },
   });
@@ -138,7 +143,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           sorting: false 
         })
       }
-      if (ObjetCampos[index] == 'safra') {
+      if (ObjetCampos[index] == 'year') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -159,23 +164,33 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
         arrOb.push({ 
           title: "Período ideal de início de plantio", 
           field: "plantingStartTime", 
-          sorting: false 
+          sorting: false,
+          render: (rowData: ISafra) => (
+            new Intl.DateTimeFormat('pt-BR').format(
+              new Date(rowData.plantingStartTime)
+            )
+          )
         })
       }
-      if (ObjetCampos[index] == 'plantingStartTime') {
+      if (ObjetCampos[index] == 'plantingEndTime') {
         arrOb.push({ 
           title: "Período ideal do fim do plantio", 
           field: "plantingEndTime", 
-          sorting: false 
+          sorting: false,
+          render: (rowData: ISafra) => (
+            new Intl.DateTimeFormat('pt-BR').format(
+              new Date(rowData.plantingEndTime)
+            )
+          )
         })
       }
-      if (ObjetCampos[index] == 'plantingStartTime') {
-        arrOb.push({ 
-          title: "Safra principal", 
-          field: "main_safra", 
-          sorting: false 
-        })
-      }
+      // if (ObjetCampos[index] == 'main_safra') {
+      //   arrOb.push({ 
+      //     title: "Safra principal", 
+      //     field: "main_safra", 
+      //     sorting: false 
+      //   })
+      // }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
@@ -286,16 +301,16 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Safras.csv");
+        XLSX.writeFile(workBook, "Safras.xlsx");
       }
     });
   };
@@ -521,7 +536,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

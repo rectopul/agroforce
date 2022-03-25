@@ -27,10 +27,16 @@ export interface IUpdateCulture {
 };
 
 export default function Cultura(culture: IUpdateCulture) {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
-
-  const { tmgDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IUpdateCulture>({
     initialValues: {

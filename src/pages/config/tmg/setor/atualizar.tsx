@@ -25,18 +25,24 @@ interface IDepartmentProps {
 };
 
 export default function AtualizarSafra(item: IDepartmentProps) {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-  const { tmgDropDown, tabs } = ITabs.default;
-
-  const [checkeBox, setCheckeBox] = useState<boolean>();
-  const select = [
-    { id: 1, name: "Ativo" },
-    { id: 2, name: "Inativo" },
-  ];
+  // const [checkeBox, setCheckeBox] = useState<boolean>();
+  // const select = [
+  //   { id: 1, name: "Ativo" },
+  //   { id: 2, name: "Inativo" },
+  // ];
   
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  // const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
@@ -50,8 +56,8 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         id: item.id,
         name: formik.values.name,
       }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Safra atualizada com sucesso!');
+        if (response.status === 201) {
+          Swal.fire('Setor atualizado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
@@ -91,7 +97,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Nome
+                *Nome
               </label>
               <Input
                 type="text"

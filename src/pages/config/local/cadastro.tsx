@@ -53,6 +53,13 @@ export interface IData {
 
 export default function NovoLocal({ uf }: IData) {
   const { localsDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'LOCAL'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const ufs: object | any =  [];
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
@@ -252,7 +259,7 @@ export default function NovoLocal({ uf }: IData) {
                "
                 mask="99.99" 
                 type="text" 
-                placeholder="20 10 15"
+                placeholder="20.10"
                 id="latitude"
                 name="latitude"
                 onChange={formik.handleChange}
@@ -278,7 +285,7 @@ export default function NovoLocal({ uf }: IData) {
                 "
                 mask="99.99" 
                 type="text" 
-                placeholder="20.25874"
+                placeholder="20.25"
                 id="longitude"
                 name="longitude"
                 onChange={formik.handleChange}

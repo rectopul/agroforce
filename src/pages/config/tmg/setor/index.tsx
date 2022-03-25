@@ -48,6 +48,13 @@ interface IData {
 
 export default function Listagem({allDepartments, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.department ||{id:0, table_preferences: "id,name,status"};
@@ -73,7 +80,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -88,11 +95,9 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setItems(response.response);
-        }
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setItems(response.response);
       })
     },
   });
@@ -299,16 +304,16 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Setores.csv");
+        XLSX.writeFile(workBook, "Setores.xlsx");
       }
     });
   };
@@ -534,7 +539,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

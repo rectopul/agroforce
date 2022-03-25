@@ -1,5 +1,7 @@
 import Head from "next/head";
 import { useFormik } from 'formik';
+import InputMask from 'react-input-mask';
+
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 
@@ -30,10 +32,17 @@ interface ISafraProps {
 };
 
 export default function Safra() {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-  const { tmgDropDown, tabs } = ITabs.default;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -91,22 +100,38 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Ano
+                *Ano
               </label>
-              <Input
-                type="date"
+
+              <InputMask
+                mask="99/99"
                 required
                 id="year"
                 name="year"
                 onChange={formik.handleChange}
                 value={formik.values.year}
+                className="
+                  shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 
+                  focus:bg-white 
+                  focus:border-blue-600 
+                  focus:outline-none
+                "
               />
             </div>
 
             <div className="w-2/4 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Tipo de safra
+                *Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
               <Radio
@@ -132,14 +157,13 @@ export default function Safra() {
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Período ideal de início de plantio
+                *Período ideal de início de plantio
               </label>
               <Input
-                type="text" 
+                type="date" 
                 placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
-                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
@@ -148,14 +172,13 @@ export default function Safra() {
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Período ideal do fim do plantio
+                *Período ideal do fim do plantio
               </label>
               <Input
-                type="text"
+                type="date"
                 placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"
-                maxLength={5}
                 onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}
               />

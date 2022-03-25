@@ -71,6 +71,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
+  const { layoutQuadrasDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'QUADRAS'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.layout_quadra ||{id:0, table_preferences: "id,esquema,local,semente_metros,semente_metros,disparos,divisor,largura,comp_fisico,comp_parcela,comp_corredor,t4_inicial,t4_final,df_inicial,df_final,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -103,12 +111,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
-  
-  const { layoutQuadrasDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -253,7 +259,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -275,7 +281,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layoult-quadra/atualizar?id=${rowData.id}`}
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -467,16 +473,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Layoult_Quadra.csv");
+        XLSX.writeFile(workBook, "Layoult_Quadra.xlsx");
       }
     });
   };
@@ -593,7 +599,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                  className='w-full max-h-max		
                     flex
                     items-center
                     justify-between
@@ -611,7 +617,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="layoult-quadra/cadastro"
+                        href="layout-quadra/cadastro"
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
@@ -737,7 +743,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;

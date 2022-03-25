@@ -54,6 +54,13 @@ export interface IData {
 
 export default function AtualizarLocal({ uf,localEdit }: IData) {
   const { localsDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'LOCAL'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
 
@@ -272,7 +279,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                "
                 mask="99.99" 
                 type="text" 
-                placeholder="20 10 15"
+                placeholder="20.10"
                 id="latitude"
                 name="latitude"
                 onChange={formik.handleChange}

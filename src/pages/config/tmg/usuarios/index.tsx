@@ -30,6 +30,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
+import { handleFormatTel } from "src/shared/utils/tel";
 
 interface IUsers {
   id: number,
@@ -60,6 +61,14 @@ interface Idata {
 }
 
 export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: Idata) {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "id,avatar,name,tel,email,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -83,13 +92,11 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
   
-  const { tmgDropDown, tabs } = ITabs.default;
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -100,13 +107,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
-          if (response.total > 0) {
-            setTotaItems(response.total);
-          }
+          setTotaItems(response.total);
           setFilter(parametersFilter);
           setData(response.response);
-        }
       })
     },
   });
@@ -172,7 +175,14 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         },);
       }
       if (ObjetCampos[item] == 'tel') {
-        arrOb.push({ title: "Telefone", field: "tel", sorting: false })
+        arrOb.push({ 
+          title: "Telefone", 
+          field: "tel", 
+          sorting: false,
+          render: (rowData: IUsers) => (
+            handleFormatTel(rowData.tel)
+          )
+        })
       }
       if (ObjetCampos[item] == 'status') {
         arrOb.push({
@@ -427,16 +437,16 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx || csv
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx || csv
           type: "binary",
         });
-        // Download
-        XLSX.writeFile(workBook, "Usuários.csv");
+        // Download xlsx || csv
+        XLSX.writeFile(workBook, "Usuários.xlsx");
       }
     });
   };
@@ -695,7 +705,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

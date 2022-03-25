@@ -24,11 +24,18 @@ interface ICreateFoco {
 }
 
 export default function Cadastro() {
+  const { ensaiosDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const { ensaiosDropDown, tabs } = ITabs.default;
 
   const formik = useFormik<ICreateFoco>({
     initialValues: {
@@ -40,7 +47,7 @@ export default function Cadastro() {
         name: formik.values.name,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 200) {
+        if (response.status === 201) {
           Swal.fire('Foco cadastrado com sucesso!');
           router.back();
         } else {
@@ -80,7 +87,7 @@ export default function Cadastro() {
           <div className="w-2/4 h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
               <strong className={checkInput}>*</strong>
-              Nome foco
+              Nome
             </label>
             <Input
               id="name"

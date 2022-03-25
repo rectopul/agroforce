@@ -50,6 +50,13 @@ interface IData {
 
 export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication}: IData) {
   const { tabs, tmgDropDown } = ITabs;
+  
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.culture ||{id:0, table_preferences: "id,name,status"};
@@ -77,7 +84,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -92,11 +99,9 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
           setTotaItems(response.total);
           setCultures(response.response);
           setFilter(parametersFilter);
-        }
       })
     },
   });
@@ -303,16 +308,16 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Culturas.csv");
+        XLSX.writeFile(workBook, "Culturas.xlsx");
       }
     });
   };
@@ -566,7 +571,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

@@ -25,6 +25,13 @@ interface ITypeAssayProps {
 
 export default function NovoLocal() {
   const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<ITypeAssayProps>({

@@ -24,11 +24,18 @@ interface ICreateCulture {
 }
 
 export default function Cadastro() {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const { tmgDropDown, tabs } = ITabs.default;
 
 
   const formik = useFormik<ICreateCulture>({

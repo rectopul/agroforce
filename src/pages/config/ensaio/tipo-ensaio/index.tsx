@@ -56,6 +56,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'ENSAIO'
+    ? tab.status = true
+    : tab.status = false
+  ));
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.tipo_ensaio ||{id:0, table_preferences: "id,name,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
@@ -74,13 +82,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
   
-  const { tmgDropDown, tabs } = ITabs.default;
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -91,13 +97,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     onSubmit: (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
-          if (response.total > 0) {
-            setTotaItems(response.total);
-          }
+          setTotaItems(response.total);
           setFilter(parametersFilter);
           setTypeAssay(response.response);
-        }
       })
     },
   });
@@ -320,16 +322,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Tipo_Ensaio.csv");
+        XLSX.writeFile(workBook, "Tipo_Ensaio.xlsx");
       }
     });
   };
@@ -590,7 +592,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais('')).response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;

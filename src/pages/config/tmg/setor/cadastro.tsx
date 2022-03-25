@@ -24,10 +24,17 @@ interface IDepartmentProps {
 };
 
 export default function Safra() {
+  const { tmgDropDown, tabs } = ITabs.default;
+
+  tabs.map((tab) => (
+    tab.title === 'TMG'
+    ? tab.status = true
+    : tab.status = false
+  ));
+  
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-  const { tmgDropDown, tabs } = ITabs.default;
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
@@ -44,7 +51,7 @@ export default function Safra() {
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
-          Swal.fire('Safra cadastrada com sucesso!');
+          Swal.fire('Setor cadastrado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
@@ -75,7 +82,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Nome
+                *Nome
               </label>
               <Input
                 type="text"

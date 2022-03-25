@@ -9,101 +9,116 @@ export class OGMController {
         let skip;
         let orderBy: object | any;
         let select: any = [];
-        if (options.filterStatus) {
-            if (typeof(options.status) === 'string') {
-                options.filterStatus = parseInt(options.filterStatus);
-                if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-            } else {
-                if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+        try {
+            if (options.filterStatus) {
+                if (typeof(options.status) === 'string') {
+                    options.filterStatus = parseInt(options.filterStatus);
+                    if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+                } else {
+                    if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+                }
             }
-        }
 
-        if (options.filterSearch) {
-            options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-            parameters.name  = JSON.parse(options.filterSearch);
-        }
-    
-        if (options.take) {
-            if (typeof(options.take) === 'string') {
-                take = parseInt(options.take);
-            } else {
-                take = options.take;
+            if (options.filterSearch) {
+                options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
+                parameters.name  = JSON.parse(options.filterSearch);
             }
-        }
-
-        if (options.skip) {
-            if (typeof(options.skip) === 'string') {
-                skip = parseInt(options.skip);
-            } else {
-                skip = options.skip;
+        
+            if (options.take) {
+                if (typeof(options.take) === 'string') {
+                    take = parseInt(options.take);
+                } else {
+                    take = options.take;
+                }
             }
-        }
 
-        if (options.orderBy) {
-            orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
-        }
+            if (options.skip) {
+                if (typeof(options.skip) === 'string') {
+                    skip = parseInt(options.skip);
+                } else {
+                    skip = options.skip;
+                }
+            }
 
-        if (options.paramSelect) {
-            let objSelect = options.paramSelect.split(',');
-            Object.keys(objSelect).forEach((item) => {
-                select[objSelect[item]] = true;
-            });
-            select = Object.assign({}, select);
-        } else {
-            select = {id: true, name: true, status:true};
-        }
+            if (options.orderBy) {
+                orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+            }
 
-        let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
-        if (!response) { 
-            throw "falha na requisição, tente novamente";
-        } else {
-            return {status: 200, response, total: response.total}
-        }             
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {id: true, name: true, status:true};
+            }
+
+            let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+            if (!response || response.total <=0) { 
+                return {status: 400, response: [], total: 0}
+            } else {
+                return {status: 200, response, total: response.total}
+            }             
+        } catch (err) {
+            console.log(err);
+        }
     }
  
     async getOne(id: string) {
         let newID = parseInt(id);
-        if (id && id != '{id}') {
-            let response = await this.Repository.findOne(newID); 
-            if (!response) {
-               return {status: 400, response:{error: 'local não existe'}};
+        try {
+            if (id && id != '{id}') {
+                let response = await this.Repository.findOne(newID); 
+                if (!response) {
+                return {status: 400, response:{error: 'local não existe'}};
+                } else {
+                    return {status:200 ,response: response};
+                }
             } else {
-                return {status:200 ,response: response};
+                return {status:405, response:{error: 'id não informado'}};
             }
-        } else {
-            return {status:405, response:{error: 'id não informado'}};
+        } catch (err) {
+            console.log(err);
         }
     }
 
     async post(data: object | any) {
-        if (data != null && data != undefined) {
-            let response = await this.Repository.create(data);
-            if(response) {
-                return {status: 200, message: "tipo ensaio inserido"}
-            } else {
-                return {status: 400, message: "erro"}
+        try {
+            if (data != null && data != undefined) {
+                let response = await this.Repository.create(data);
+                if(response) {
+                    return {status: 200, message: "tipo ensaio inserido"}
+                } else {
+                    return {status: 400, message: "erro"}
+                }
             }
+        } catch (err) {
+            console.log(err);
         }
     }
 
     async update(data: any) {
         const parameters: object | any = new Object();
-
-        if (typeof(data.status) === 'string') {
-            parameters.status =  parseInt(data.status);
-        } else { 
-            parameters.status =  data.status;
-        }
-
-        if(data.name) parameters.name = data.name;
-        if(data.status) parameters.status = data.status;
-        if (data != null && data != undefined) {
-            let response = await this.Repository.update(data.id, parameters);
-            if(response) {
-                return {status: 200, message: {message: "layoult atualizado"}}
-            } else {
-                return {status: 400, message: {message: "erro ao tentar fazer o update"}}
+        try {
+            if (typeof(data.status) === 'string') {
+                parameters.status =  parseInt(data.status);
+            } else { 
+                parameters.status =  data.status;
             }
+
+            if(data.name) parameters.name = data.name;
+            if(data.status) parameters.status = data.status;
+            if (data != null && data != undefined) {
+                let response = await this.Repository.update(data.id, parameters);
+                if(response) {
+                    return {status: 200, message: {message: "layoult atualizado"}}
+                } else {
+                    return {status: 400, message: {message: "erro ao tentar fazer o update"}}
+                }
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 }
