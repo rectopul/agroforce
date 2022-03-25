@@ -599,7 +599,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                  className='w-full max-h-max		
                     flex
                     items-center
                     justify-between
