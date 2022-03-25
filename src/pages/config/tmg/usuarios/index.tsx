@@ -441,16 +441,16 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx || csv
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "csv", //xlsx
+          bookType: "xlsx", //xlsx || csv
           type: "binary",
         });
-        // Download
-        XLSX.writeFile(workBook, "Usuários.csv");
+        // Download xlsx || csv
+        XLSX.writeFile(workBook, "Usuários.xlsx");
       }
     });
   };

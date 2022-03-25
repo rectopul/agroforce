@@ -38,7 +38,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const optionSorN =  [{id: 1, name: "sim"}, {id: 0, name: "Não"}];
+  const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
   const router = useRouter();
 
   const formik = useFormik<IUsers>({
