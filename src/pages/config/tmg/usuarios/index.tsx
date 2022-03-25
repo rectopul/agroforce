@@ -92,7 +92,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
@@ -107,13 +107,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status == 200) {
-          if (response.total > 0) {
-            setTotaItems(response.total);
-          }
+          setTotaItems(response.total);
           setFilter(parametersFilter);
           setData(response.response);
-        }
       })
     },
   });

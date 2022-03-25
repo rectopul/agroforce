@@ -84,7 +84,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -99,11 +99,9 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
           setTotaItems(response.total);
           setCultures(response.response);
           setFilter(parametersFilter);
-        }
       })
     },
   });

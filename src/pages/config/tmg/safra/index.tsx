@@ -87,7 +87,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -102,11 +102,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setSafras(response.response);
-        }
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setSafras(response.response);
       })
     },
   });

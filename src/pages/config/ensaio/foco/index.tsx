@@ -80,7 +80,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -95,11 +95,9 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
           setTotaItems(response.total);
           setFocos(response.response);
           setFilter(parametersFilter);
-        }
       })
     },
   });

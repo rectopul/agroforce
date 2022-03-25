@@ -80,7 +80,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -95,11 +95,9 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setItems(response.response);
-        }
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setItems(response.response);
       })
     },
   });

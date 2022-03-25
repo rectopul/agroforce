@@ -111,7 +111,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);

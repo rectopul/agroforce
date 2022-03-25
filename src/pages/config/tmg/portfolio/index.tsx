@@ -81,7 +81,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   ];
 
   const take: number = itensPerPage;
-  const total: number = itemsTotal;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = columnsOrder(camposGerenciados);
@@ -96,13 +96,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        if (response.status === 200) {
-          if (response.total > 0) {
-            setTotaItems(response.total);
-          }
+          setTotaItems(response.total);
           setPortfolios(response.response);
           setFilter(parametersFilter);
-        }
       })
     },
   });
@@ -646,10 +642,10 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const portfolios = await fetch(urlParameters.toString(), requestOptions);
-  const response = await portfolios.json();
+  let response = await portfolios.json();
 
-  const allPortfolios = response.response;
-  const totalItems = response.total;
+  let allPortfolios = response.response;
+  let totalItems = response.total;
 
   return {
     props: {
