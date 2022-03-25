@@ -51,7 +51,7 @@ export default function Safra() {
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
-          Swal.fire('Safra cadastrada com sucesso!');
+          Swal.fire('Setor cadastrado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");

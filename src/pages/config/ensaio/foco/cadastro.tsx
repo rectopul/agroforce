@@ -47,7 +47,7 @@ export default function Cadastro() {
         name: formik.values.name,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 200) {
+        if (response.status === 201) {
           Swal.fire('Foco cadastrado com sucesso!');
           router.back();
         } else {

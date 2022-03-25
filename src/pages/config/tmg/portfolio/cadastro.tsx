@@ -53,7 +53,7 @@ export default function  Portfolio() {
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 201) {
           Swal.fire('Portfólio cadastrado com sucesso!');
           router.back();
         } else {

@@ -56,7 +56,7 @@ export default function Atualizar(foco: IUpdateFoco) {
         created_by: foco.created_by,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Foco cadastrado com sucesso!');
+          Swal.fire('Foco atualizado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");

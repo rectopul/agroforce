@@ -56,8 +56,8 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         id: item.id,
         name: formik.values.name,
       }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Safra atualizada com sucesso!');
+        if (response.status === 201) {
+          Swal.fire('Setor atualizado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
