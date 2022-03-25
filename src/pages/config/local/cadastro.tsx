@@ -259,7 +259,7 @@ export default function NovoLocal({ uf }: IData) {
                "
                 mask="99.99" 
                 type="text" 
-                placeholder="20 10 15"
+                placeholder="20.10"
                 id="latitude"
                 name="latitude"
                 onChange={formik.handleChange}
@@ -285,7 +285,7 @@ export default function NovoLocal({ uf }: IData) {
                 "
                 mask="99.99" 
                 type="text" 
-                placeholder="20.25874"
+                placeholder="20.25"
                 id="longitude"
                 name="longitude"
                 onChange={formik.handleChange}
