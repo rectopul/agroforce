@@ -279,7 +279,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                "
                 mask="99.99" 
                 type="text" 
-                placeholder="20 10 15"
+                placeholder="20.10"
                 id="latitude"
                 name="latitude"
                 onChange={formik.handleChange}
