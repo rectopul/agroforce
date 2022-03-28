@@ -352,7 +352,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 }
               </div>
             </div>
-            <div className="flex flex-col">
+            <div className="w-4/12 flex flex-col">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Culturas
               </label>

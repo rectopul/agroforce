@@ -4,9 +4,9 @@ import { ReactNode, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 import { useRouter } from "next/router";
@@ -20,6 +20,7 @@ import getConfig from "next/config";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { IoReloadSharp } from "react-icons/io5";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IFilter{
   filterStatus: object | any;
@@ -415,7 +416,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {router.push('setor/cadastro')}}
-                          icon={<MdDateRange size={20} />}
+                          icon={<HiOutlineOfficeBuilding size={20} />}
                         />
                       </div>
 

@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { useFormik } from 'formik';
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
 
 import { departmentService } from 'src/services';
 
@@ -9,14 +8,14 @@ import {
   Button,
   Content, 
   Input,
-  TabHeader,
-  Radio
+  TabHeader
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IDepartmentProps {
   name: string;
@@ -82,7 +81,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Nome
+                Nome
               </label>
               <Input
                 type="text"
@@ -118,7 +117,7 @@ export default function Safra() {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<MdDateRange size={18} />}
+                icon={<HiOutlineOfficeBuilding size={18} />}
                 onClick={() => {}}
               />
             </div>

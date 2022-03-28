@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
 import { typeAssayService } from "src/services";
 
 import {
@@ -13,7 +12,8 @@ import {
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { FiUserPlus } from "react-icons/fi";
+import { IoMdArrowBack } from "react-icons/io";
+import { RiOrganizationChart } from "react-icons/ri";
 
 interface ITypeAssayProps {
   id: Number | any;
@@ -24,7 +24,7 @@ interface ITypeAssayProps {
 
 
 export default function NovoLocal() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
 
   tabs.map((tab) => (
     tab.title === 'ENSAIO'
@@ -71,7 +71,7 @@ export default function NovoLocal() {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
@@ -81,14 +81,13 @@ export default function NovoLocal() {
             <h1 className="text-2xl">Novo Tipo Ensaio</h1>
           </div>
 
-          <div className="w-full
-            flex 
-            justify-around
+          <div className="
+            w-full
             gap-6
             mt-4
             mb-4
           ">
-            <div className="w-full">
+            <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
@@ -125,7 +124,7 @@ export default function NovoLocal() {
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
-                icon={<FiUserPlus size={18} />}
+                icon={<RiOrganizationChart size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />

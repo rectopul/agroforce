@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import MaterialTable from "material-table";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
 import * as XLSX from 'xlsx';
 
 import { userPreferencesService, typeAssayService } from "src/services";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
 
 import { 
   Button, 
@@ -19,13 +20,11 @@ import {
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import MaterialTable from "material-table";
-import { FiUserPlus } from "react-icons/fi";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiOrganizationChart } from "react-icons/ri";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
 
@@ -56,7 +55,7 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
 
   tabs.map((tab) => (
     tab.title === 'ENSAIO'
@@ -370,7 +369,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       </Head>
       <Content
         headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
+          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
         }
       >
         <main className="h-full w-full
@@ -467,7 +466,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         textColor="white"
                         onClick={() => {}}
                         href="/config/ensaio/tipo-ensaio/cadastro"
-                        icon={<FiUserPlus size={20} />}
+                        icon={<RiOrganizationChart size={20} />}
                       />
                     </div>
 

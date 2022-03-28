@@ -24,7 +24,7 @@ interface IOGMProps {
 
 
 export default function NovoLocal() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
   
   tabs.map((tab) => (
     tab.title === 'ENSAIO'
@@ -71,7 +71,7 @@ export default function NovoLocal() {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"

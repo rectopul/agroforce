@@ -3,9 +3,8 @@ import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
 
 import { departmentService } from "src/services";
 
@@ -18,6 +17,7 @@ import {
 } from "src/components";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IDepartmentProps {
   id: number;
@@ -56,7 +56,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         id: item.id,
         name: formik.values.name,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Setor atualizado com sucesso!');
           router.back();
         } else {
@@ -132,7 +132,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
                 value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<MdDateRange size={18} />}
+                icon={<HiOutlineOfficeBuilding size={18} />}
                 onClick={() => {}}
               />
             </div>

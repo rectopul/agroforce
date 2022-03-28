@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
 import { typeAssayService } from "src/services";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
@@ -15,7 +14,8 @@ import {
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { MdDateRange } from "react-icons/md";
+import { IoMdArrowBack } from "react-icons/io";
+import { RiOrganizationChart } from "react-icons/ri";
 
 interface ITypeAssayProps {
   id: Number | any;
@@ -30,7 +30,7 @@ interface IData {
 
 
 export default function NovoLocal({typeAssayEdit}: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { ensaiosDropDown, tabs } = ITabs.default;
 
   tabs.map((tab) => (
     tab.title === 'ENSAIO'
@@ -78,7 +78,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
       </Head>
 
       <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
+        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
       }>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
@@ -148,7 +148,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<MdDateRange size={18} />}
+                icon={<RiOrganizationChart size={18} />}
                 onClick={() => {}}
               />
             </div>
