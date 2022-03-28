@@ -34,26 +34,16 @@ export class UserCultureController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
+                select = {id: true, userId: true, cultureId: true};
             }
 
-            if (options.cpf) {
-                parameters.cpf = options.cpf;
-            }
-            
-            if (options.tel) {
-                parameters.tel = options.tel;
+            if (options.userId) {
+                parameters.userId = parseInt(options.userId);
             }
 
-            if (options.departmentId) {
-                parameters.departmentId = options.departmentId;
+            if (options.cultureId) {
+                parameters.cultureId = parseInt(options.cultureId);
             }
-
-            if (options.registration) {
-                parameters.registration = options.registration;
-            }
-
-
 
             if (options.take) {
                 if (typeof(options.take) === 'string') {
@@ -124,45 +114,39 @@ export class UserCultureController {
     }
 
     async save(data: object | any) {
-        const parameters: object | any = new Object();
         try {
+     
             if (data != null && data != undefined) {
-                if (typeof(data.status) === 'string') {
-                    parameters.status =  parseInt(data.status);
-                } else { 
-                    parameters.status =  data.status;
-                }
+                const create: object | any  = new Object();
+                let result: object | any= await this.getAll({userId: data.userId, cultureId: data.cultureId});
 
-                if (!data.name) return {status: 400, message: 'Informe o nome do usuário'};
-                if (!data.email) return {status: 400, message: 'Informe o email do usuário'}; 
-                if (!data.cpf) return {status: 400, message: 'Informe o cpf do usuário'};
-                if (!data.tel) return {status: 400, message: 'Informe o telefone do usuário'};
-                if (!data.departmentId) return {status: 400, message: 'Informe o departamento do usuário'};
-                if (!data.password) return {status: 400, message: 'Informe a senha do usuário'};
-
-
-                parameters.name = data.name;
-                parameters.email = data.email;
-                parameters.cpf = data.cpf;
-                parameters.tel = data.tel;
-                parameters.password = data.password;
-                parameters.created_by = data.created_by;
-
-                let response = await this.userCultureRepository.create(parameters);
-
-                if(response) {
-                    if (data.cultures) {
-                        
+                if (result.total <= 0) {
+                    if (typeof(data.cultureId) === 'string') {
+                        create.cultureId =  parseInt(data.cultureId);
+                    } else { 
+                        create.cultureId =  data.cultureId;
                     }
-                    return {status: 200, message: "users inseridos"}
-                } else {
-                    return {status: 400, message: "houve um erro, tente novamente"}
+
+                    if (typeof(data.userId) === 'string') {
+                        create.userId =  parseInt(data.userId);
+                    } else { 
+                        create.userId =  data.userId;
+                    }
+
+                    create.created_by = data.created_by;
+
+                    let response: object | any  = await this.userCultureRepository.create(create);
+                    if(response.count > 0) {
+                        return {status: 200, message: {message: "Usuario atualizada"}}
+                    } else {
+                        return {status: 400, message: {message: "usuario não existe"}}
+                    }
                 }
             }
         } catch (err) {
-
+            console.log(err)
         }  
-    }
+    }   
 
     async update(data: object| any) {
         try {
@@ -243,6 +227,52 @@ export class UserCultureController {
             }
         } catch (err) {
 
+        }  
+    }
+
+    async delete(data: object| any) {
+        try {
+            if (data != null && data != undefined) {
+                const update: object | any  = new Object();
+                const where: object | any  = new Object();
+                const create: object | any  = new Object();
+                
+
+                if (typeof(data.userId) === 'string') {
+                    where.userId =  parseInt(data.userId);
+                    create.userId =  parseInt(data.userId);
+                    update.userId =  parseInt(data.userId);
+                } else { 
+                    where.userId =  data.userId;
+                    create.userId =  data.userId;
+                    update.userId =  data.userId;
+                }
+
+                let result: object | any= await this.getAll(where);
+
+                if (!result.response[0].id) {
+                    if (typeof(data.cultureId) === 'string') {
+                        where.cultureId =  parseInt(data.cultureId);
+                        create.cultureId =  parseInt(data.cultureId);
+                        update.cultureId =  parseInt(data.cultureId);
+                    } else { 
+                        where.cultureId =  data.cultureId;
+                        create.cultureId =  data.cultureId;
+                        update.cultureId =  data.cultureId;
+                    }
+
+                    create.created_by = 1;
+
+                    let response: object | any  = await this.userCultureRepository.upsert(update, where, create);
+                    if(response.count > 0) {
+                        return {status: 200, message: {message: "Usuario atualizada"}}
+                    } else {
+                        return {status: 400, message: {message: "usuario não existe"}}
+                    }
+                }
+            }
+        } catch (err) {
+            // console.log(err)
         }  
     }
 }

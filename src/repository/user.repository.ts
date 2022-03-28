@@ -29,11 +29,13 @@ export class UserRepository {
     }
 
     async findOne(id: number) {
-        let Result = await prisma.user.findMany({
+        let Result : object | any = await prisma.user.findMany({
                where: {
                    id: id
                }
              }) .finally(async () => { await prisma.$disconnect() })
+             Result.cultures = await prisma.users_cultures.findMany({where:{userId: id}});
+             console.log(Result)
         return Result;
     }
 

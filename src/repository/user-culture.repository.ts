@@ -2,6 +2,7 @@ import {prisma} from '../pages/api/db/db';
 
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
+        console.log(Cultures)
         let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
 
         return Result;
@@ -20,6 +21,12 @@ export class UserCultureRepository {
         } else {
             return false;
         }
+    }
+
+    async delete(params: object | any ) {
+        await prisma.users_cultures.deleteMany({
+            where: { cultureId: params.cultureId, userId: params.userId}
+          }) .finally(async () => { await prisma.$disconnect() })
     }
 
     async findOne(id: number) {
@@ -60,5 +67,15 @@ export class UserCultureRepository {
         return Result;
     }
     
+    async upsert(update: object | any, where: object | any, data:any) {
+        console.log(data)
+        let Result = await prisma.users_cultures.upsert({
+            update: update,
+            where: where,
+            create: data
+        }).finally(async () => { await prisma.$disconnect() })
+
+        return Result;
+    }
 }
 

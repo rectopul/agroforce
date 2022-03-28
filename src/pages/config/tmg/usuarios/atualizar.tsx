@@ -30,9 +30,10 @@ export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
   userEdit: IUsers | any;
+  Cultures: object | any;
 }
 
-export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
+export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
 
   tabs.map((tab) => (
@@ -361,6 +362,28 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 }
               </div>
             </div>
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Culturas
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  Cultures.map((culture) => (
+                    <>
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        id={`cultures.${culture.id}`}
+                        name="cultures"
+                        onChange={formik.handleChange}
+                        value={formik.values.id}
+                        defaultChecked={culture.includes(culture)}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
           </div>
 
           <div className="
@@ -410,9 +433,12 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const resD = await fetch(`${baseUrl}/departament`, requestOptions)
   const resP = await fetch(`${baseUrl}/profile`, requestOptions)
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
+  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
+
   const departments = await resD.json();
   const profiles = await resP.json();
-  const userEdit = await resU.json();
+  const userEdit = (await resU.json());
+  const Cultures = (await apiCulture.json()).response;
 
-  return { props: { departments, profiles, userEdit } }
+  return { props: { departments, profiles, userEdit, Cultures } }
 }

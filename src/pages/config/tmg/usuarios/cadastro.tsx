@@ -28,9 +28,10 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
+  Cultures: object | any;
 }
 
-export default function NovoUsuario({ departments, profiles }: IData) {
+export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
   const { tmgDropDown, tabs } = ITabs.default;
 
   tabs.map((tab) => (
@@ -351,6 +352,26 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 }
               </div>
             </div>
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Culturas
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  Cultures.map((culture) => (
+                    <>
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        name="profiles"
+                        onChange={formik.handleChange}
+                        value={culture.id}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
           </div>
 
           <div className="
@@ -399,9 +420,11 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
   const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
+  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();
+  const Cultures = (await apiCulture.json()).response;
 
-  return { props: { departments, profiles } }
+  return { props: { departments, profiles, Cultures } }
 }
