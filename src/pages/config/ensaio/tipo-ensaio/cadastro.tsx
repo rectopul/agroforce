@@ -5,7 +5,6 @@ import Swal from 'sweetalert2'
 import { typeAssayService } from "src/services";
 
 import {
-  TabHeader,
   Content,
   Input,
   Button,
@@ -24,12 +23,14 @@ interface ITypeAssayProps {
 
 
 export default function NovoLocal() {
-  const { ensaiosDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -70,9 +71,7 @@ export default function NovoLocal() {
         <title>Novo Tipo Ensaio</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

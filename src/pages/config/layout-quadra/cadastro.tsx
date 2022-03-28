@@ -46,12 +46,14 @@ export interface IData {
 }
 
 export default function NovoLocal({ local }: IData) {
-  const { layoutQuadrasDropDown, tabs } = ITabs.default;
-  
-  tabs.map((tab) => (
-    tab.title === 'QUADRAS'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'QUADRAS'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -135,9 +137,7 @@ export default function NovoLocal({ local }: IData) {
         <title>Novo Layoult</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={layoutQuadrasDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

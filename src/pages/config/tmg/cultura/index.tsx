@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
@@ -49,12 +49,14 @@ interface IData {
 }
 
 export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication}: IData) {
-  const { tabs, tmgDropDown } = ITabs;
-  
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -353,9 +355,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     <>
       <Head><title>Listagem de culturas</title></Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

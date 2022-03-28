@@ -11,7 +11,6 @@ import {
   Button,
   Content, 
   Input,
-  TabHeader,
   Radio
 } from "../../../../components";
 
@@ -32,12 +31,14 @@ interface ISafraProps {
 };
 
 export default function Safra() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -96,11 +97,7 @@ export default function Safra() {
         <title>Cadastro de safra</title>
       </Head>
 
-      <Content
-        headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
           onSubmit={formik.handleSubmit}

@@ -13,8 +13,7 @@ import {
   Button, 
   Content, 
   Input, 
-  Radio,
-  TabHeader 
+  Radio
 } from "src/components";
 import { safraService } from "src/services";
 import Swal from "sweetalert2";
@@ -31,12 +30,14 @@ interface ISafraProps {
 };
 
 export default function AtualizarSafra(safra: ISafraProps) {
-  const { tmgDropDown, tabs } = ITabs.default;
-  
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -102,9 +103,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
   return (
     <>
       <Head><title>Atualizar safra</title></Head>
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

@@ -1,5 +1,5 @@
 
-import { useEffect, ReactNode, useState } from "react";
+import { useEffect, ReactNode, useState, ReactChild, ReactFragment, ReactPortal } from "react";
 
 import {
   Aside,
@@ -28,7 +28,7 @@ interface IDropDown {
 
 interface IContentProps {
   titleTab: string;
-  valueTab: ReactNode;
+  valueTab: string | ReactNode;
   statusTab: boolean;
 
   data: IDropDown[];
@@ -39,7 +39,7 @@ interface IContentData {
   children: ReactNode;
 };
 
-export function Content({ contentHeader, children }: IContentData) {
+export function Content2({ contentHeader, children }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
   const cultures: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
@@ -114,6 +114,7 @@ export function Content({ contentHeader, children }: IContentData) {
                   valueTab={item.valueTab} 
                   statusTab={item.statusTab}
                   handleStatusTabs={handleStatusButton}
+
                 />
               ) : (
                 <TabHeader 

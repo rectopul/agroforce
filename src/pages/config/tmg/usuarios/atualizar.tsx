@@ -25,7 +25,6 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { useEffect, useState } from "react";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -34,12 +33,14 @@ export interface IData {
 }
 
 export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -111,11 +112,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       <Head>
         <title>Atualizar Usuário</title>
       </Head>
-      <Content
-        headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

@@ -9,9 +9,7 @@ import Swal from "sweetalert2";
 import { 
   Button, 
   Content, 
-  Input, 
-  Select, 
-  TabHeader 
+  Input,
 } from "src/components";
 
 import { IoMdArrowBack } from "react-icons/io";
@@ -31,12 +29,14 @@ export interface IUpdatePortfolio {
 }
 
 export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -86,9 +86,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
   return (
     <>
       <Head><title>Atualizar potfólio</title></Head>
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

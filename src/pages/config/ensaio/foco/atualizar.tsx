@@ -10,7 +10,6 @@ import {
   Button,
   Content, 
   Input,
-  TabHeader 
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
@@ -27,12 +26,14 @@ export interface IUpdateFoco {
 }
 
 export default function Atualizar(foco: IUpdateFoco) {
-  const { ensaiosDropDown, tabs } = ITabs.default;
-  
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -72,12 +73,7 @@ export default function Atualizar(foco: IUpdateFoco) {
         <title>Atualizar foco</title>
       </Head>
       
-      <Content
-        headerCotent={
-          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
-        }
-      >
-
+      <Content contentHeader={tabsDropDowns}>
       <form 
         className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 

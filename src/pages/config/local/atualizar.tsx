@@ -53,12 +53,14 @@ export interface IData {
 }
 
 export default function AtualizarLocal({ uf,localEdit }: IData) {
-  const { localsDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'LOCAL'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'LOCAL'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -137,14 +139,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
   return (
     <>
-      <Head>
-        <title>Novo Local</title>
-      </Head>
+      <Head><title>Novo Local</title></Head>
 
-
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={localsDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

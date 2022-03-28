@@ -16,7 +16,6 @@ import  IUsers  from "../../../../components/props/userDTO";
 import  IDepartment  from "../../../../components/props/departmentDTO";
 
 import {
-  TabHeader,
   Content,
   Input,
   Select,
@@ -25,6 +24,7 @@ import {
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
+
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -32,12 +32,14 @@ export interface IData {
 }
 
 export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -117,9 +119,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       </Head>
 
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

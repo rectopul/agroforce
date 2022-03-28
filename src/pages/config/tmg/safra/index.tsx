@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 
 import { safraService, userPreferencesService } from "src/services";
 
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 
 import ITabs from "../../../../shared/utils/dropdown";
 import getConfig from "next/config";
@@ -50,12 +50,14 @@ interface IData {
 }
 
 export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
-  const { tabs, tmgDropDown } = ITabs;
+  const { TabsDropDowns } = ITabs;
+
+  const tabsDropDowns = TabsDropDowns();
   
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -319,9 +321,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     <>
       <Head><title>Listagem de safras</title></Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

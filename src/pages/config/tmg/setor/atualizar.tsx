@@ -9,11 +9,9 @@ import { IoMdArrowBack } from "react-icons/io";
 import { departmentService } from "src/services";
 
 import { 
-  Button, 
-  Content, 
-  Input, 
-  Radio,
-  TabHeader 
+  Button,
+  Content,
+  Input,
 } from "src/components";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
@@ -25,24 +23,18 @@ interface IDepartmentProps {
 };
 
 export default function AtualizarSafra(item: IDepartmentProps) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
-
-  // const [checkeBox, setCheckeBox] = useState<boolean>();
-  // const select = [
-  //   { id: 1, name: "Ativo" },
-  //   { id: 2, name: "Inativo" },
-  // ];
-  
-  // const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
@@ -70,9 +62,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   return (
     <>
       <Head><title>Atualizar setor</title></Head>
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -97,7 +87,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Nome
+                Nome
               </label>
               <Input
                 type="text"

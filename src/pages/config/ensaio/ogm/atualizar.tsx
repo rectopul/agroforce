@@ -8,7 +8,6 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 import {
-  TabHeader,
   Content,
   Input,
   Button,
@@ -30,12 +29,14 @@ interface IData {
 
 
 export default function NovoLocal({ogmEdit}: IData) {
-  const { ensaiosDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -77,9 +78,7 @@ export default function NovoLocal({ogmEdit}: IData) {
         <title>Atualizar OGM</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

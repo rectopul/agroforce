@@ -48,12 +48,14 @@ interface IData {
 }
 
 export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
-  const { tabs, ensaiosDropDown } = ITabs;
+  const { TabsDropDowns } = ITabs;
 
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -348,9 +350,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     <>
       <Head><title>Listagem de focos</title></Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={ensaiosDropDown}  />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
