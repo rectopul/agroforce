@@ -1,5 +1,10 @@
 
 import { useEffect, ReactNode, useState } from "react";
+import { BiUser } from "react-icons/bi";
+import { BsCheckLg } from "react-icons/bs";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { MdDateRange } from "react-icons/md";
+import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
 import {
   Aside,
@@ -43,6 +48,20 @@ export function Content({ contentHeader, children }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
   const cultures: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
+
+  const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
+    !contentHeader ? [
+    {
+      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,
+      data: [
+        {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
+        {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
+        {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
+        {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
+        {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
+      ],
+    },
+  ] : () => contentHeader);
   
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
@@ -92,7 +111,7 @@ export function Content({ contentHeader, children }: IContentData) {
           </div>
         }
       >
-        {contentHeader.map((item, index) => (
+        {tabsHeader.map((item, index) => (
           <>
             <ToolTip
               key={index} 

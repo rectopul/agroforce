@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
 import InputMask from "react-input-mask";
 import { IoMdArrowBack } from "react-icons/io";
@@ -19,6 +19,7 @@ import {
 
 import * as ITabs from '../../../shared/utils/dropdown';
 import { FiUserPlus } from "react-icons/fi";
+import { useState } from "react";
 
 interface ILayoultProps {
   id: Number | any;
@@ -39,8 +40,13 @@ interface ILayoultProps {
   created_by: number | any;
   status: Number;
 };
-
-
+interface ILocationMap {
+  e: {
+  xb: {
+    x: number,
+  }
+}
+}
 export interface IData {
   local: object | any;
 }
@@ -56,10 +62,18 @@ export default function NovoLocal({ local }: IData) {
     : tab.statusTab = false
   ));
 
+  const [lat, setLat] = useState<number>(-23.180316642357926);
+  const [lng, setLng] = useState<number>(-45.888359100011186);
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
   });
+
+  const position = {
+    lat,
+    lng,
+  };
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
@@ -119,6 +133,7 @@ export default function NovoLocal({ local }: IData) {
   local.map((value: string | object | any) => {
     locais.push({id: value.id, name: value.name});
   })
+
   function validateInputs(values: any) {
     if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= ''; }
     if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor= 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor= ''; }
@@ -135,6 +150,16 @@ export default function NovoLocal({ local }: IData) {
     if (!values.df_inicial) { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor= 'red'; } else { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor= ''; }
     if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= ''; }
   }
+
+  function handleGetPositionMap(
+    lat: (() => number) | undefined, 
+    lon: (() => number) | undefined
+  ) {
+    setLat(Number(lat));
+    setLng(Number(lon));
+  };
+
+  console.log(lat, lng);
 
   return (
     <>
@@ -427,20 +452,32 @@ export default function NovoLocal({ local }: IData) {
 
           <div className="
             w-full
-            h-full
+            h-96
             my-4
           ">
             {isLoaded ? (
               <GoogleMap
-                mapContainerStyle={{ width: '100%', height: '100%'}}
-                center={{
-                  lat: -23.18,
-                  lng: -45.88,
+                mapContainerStyle={{
+                  width: '100%', 
+                  height: '100%', 
+                  borderRadius: 7,
+                  color: '#fff',
                 }}
+                center={position}
                 zoom={16}
+                onClick={(e) => handleGetPositionMap(e.latLng?.lat, e.latLng?.lng)}
                 // onLoad={onLoad}
                 // onUnmount={onUnmount}
               >
+                <Marker 
+                  position={position}
+                  options={{
+                    label: {
+                      text: "Posição selecionada",
+                      className: "ml-44 mt-3 text-gray-50"
+                    },
+                  }}
+                />
               </GoogleMap>
             ) : <></>}
           </div>
