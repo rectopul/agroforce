@@ -139,7 +139,7 @@ export default function NovoLocal({ local }: IData) {
   return (
     <>
       <Head>
-        <title>Novo Layoult</title>
+        <title>Novo Layout</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
@@ -159,7 +159,7 @@ export default function NovoLocal({ local }: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo Layoult</h1>
+            <h1 className="text-2xl">Novo Layout</h1>
           </div>
 
           <div className="w-full

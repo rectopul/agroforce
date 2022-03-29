@@ -9,7 +9,6 @@ import { layoultQuadraService } from "src/services";
 import InputMask from "react-input-mask";
 
 import {
-  TabHeader,
   Content,
   Input,
   Select,
@@ -135,7 +134,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
   return (
     <>
       <Head>
-        <title>Atualizar Layoult Quadra</title>
+        <title>Atualizar Layout Quadra</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
@@ -144,7 +143,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo Layoult</h1>
+            <h1 className="text-2xl">Novo Layout</h1>
           </div>
 
           <div className="w-full
