@@ -256,7 +256,7 @@ export default function NovoLocal({ uf }: IData) {
                  leading-tight
                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                "
-                mask="99.99" 
+                mask="99.99999"
                 type="text" 
                 placeholder="20.10"
                 id="latitude"
@@ -282,7 +282,7 @@ export default function NovoLocal({ uf }: IData) {
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
-                mask="99.99" 
+                mask="99.99999" 
                 type="text" 
                 placeholder="20.25"
                 id="longitude"
