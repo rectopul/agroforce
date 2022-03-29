@@ -115,33 +115,16 @@ export class UserCultureController {
 
     async save(data: object | any) {
         try {
-     
             if (data != null && data != undefined) {
                 const create: object | any  = new Object();
-                let result: object | any= await this.getAll({userId: data.userId, cultureId: data.cultureId});
-
-                if (result.total <= 0) {
-                    if (typeof(data.cultureId) === 'string') {
-                        create.cultureId =  parseInt(data.cultureId);
-                    } else { 
-                        create.cultureId =  data.cultureId;
-                    }
-
-                    if (typeof(data.userId) === 'string') {
-                        create.userId =  parseInt(data.userId);
-                    } else { 
-                        create.userId =  data.userId;
-                    }
-
+                await this.delete(parseInt(data.userId));
+                Object.keys(data.cultureId).forEach((item) => {
+                    create.cultureId =  parseInt(data.cultureId[item]);
+                    create.userId =  parseInt(data.userId);
                     create.created_by = data.created_by;
-
-                    let response: object | any  = await this.userCultureRepository.create(create);
-                    if(response.count > 0) {
-                        return {status: 200, message: {message: "Usuario atualizada"}}
-                    } else {
-                        return {status: 400, message: {message: "usuario não existe"}}
-                    }
-                }
+                    this.userCultureRepository.create(create);
+                });
+                
             }
         } catch (err) {
             console.log(err)
@@ -230,49 +213,17 @@ export class UserCultureController {
         }  
     }
 
-    async delete(data: object| any) {
+    async delete(userId: number) {
         try {
-            if (data != null && data != undefined) {
-                const update: object | any  = new Object();
-                const where: object | any  = new Object();
-                const create: object | any  = new Object();
-                
+            if(userId) {
+                let response: object | any  = await this.userCultureRepository.delete({userId: userId});
+                return {status: 200, response}
 
-                if (typeof(data.userId) === 'string') {
-                    where.userId =  parseInt(data.userId);
-                    create.userId =  parseInt(data.userId);
-                    update.userId =  parseInt(data.userId);
-                } else { 
-                    where.userId =  data.userId;
-                    create.userId =  data.userId;
-                    update.userId =  data.userId;
-                }
-
-                let result: object | any= await this.getAll(where);
-
-                if (!result.response[0].id) {
-                    if (typeof(data.cultureId) === 'string') {
-                        where.cultureId =  parseInt(data.cultureId);
-                        create.cultureId =  parseInt(data.cultureId);
-                        update.cultureId =  parseInt(data.cultureId);
-                    } else { 
-                        where.cultureId =  data.cultureId;
-                        create.cultureId =  data.cultureId;
-                        update.cultureId =  data.cultureId;
-                    }
-
-                    create.created_by = 1;
-
-                    let response: object | any  = await this.userCultureRepository.upsert(update, where, create);
-                    if(response.count > 0) {
-                        return {status: 200, message: {message: "Usuario atualizada"}}
-                    } else {
-                        return {status: 400, message: {message: "usuario não existe"}}
-                    }
-                }
+            } else {
+                return {status: 400, message: "id não informado"}
             }
         } catch (err) {
-            // console.log(err)
+            console.log(err)
         }  
     }
 }

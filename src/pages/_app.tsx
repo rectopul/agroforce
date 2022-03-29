@@ -34,7 +34,6 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     useEffect(() => {
         const handleStart = (url: any) => {
-          console.log(`Loading: ${url}`)
           NProgress.start()
         }
         const handleStop = () => {

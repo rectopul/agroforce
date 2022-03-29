@@ -14,7 +14,6 @@ export class DepartamentRepository {
     }
 
     async create(data: any) {
-        console.log('repo' + data)
         const result = await prisma.department.create({ data });
         return result;
     }

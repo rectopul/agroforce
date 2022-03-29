@@ -57,6 +57,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       password: '',
       confirmPassword: '',
       profiles: [{ id: 0 }],
+      cultureId: [0],
       registration: 0,
       departmentId: 0,
       jivochat: 0,
@@ -64,7 +65,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       app_login: 0,
       created_by: userLogado.id,
     },
-    onSubmit: (values) => {      
+    onSubmit: (values) => {
       validateInputs(values);
       if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
       let ObjProfiles;
@@ -82,6 +83,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         tel: values.tel,
         password: values.password,
         profiles: auxObject,
+        cultureId: values.cultureId,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,
@@ -358,12 +360,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <div className="flex gap-6 border-b border-gray-300">
                 {
-                  Cultures.map((culture) => (
+                  Cultures.map((culture: any) => (
                     <>
                       <CheckBox
                         key={culture.id}
                         title={culture.name}
-                        name="profiles"
+                        name="cultureId"
+                        id="cultureId"
                         onChange={formik.handleChange}
                         value={culture.id}
                       />

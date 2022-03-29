@@ -30,11 +30,11 @@ export interface IData {
   departments: IDepartment[];
   userEdit: IUsers | any;
   Cultures: object | any;
+  userCulture: object | any;
 }
 
-export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures }: IData) {
+export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures, userCulture }: IData) {
   const { TabsDropDowns } = ITabs.default;
-
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
@@ -47,8 +47,13 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
+  const userCultures = new Array();
 
-  const maskTel = '(99)99999-9999' || '(99)9999-9999';
+  if (userCulture) {
+    Object.keys(userCulture).forEach((_, item) => {
+      userCultures.push(userCulture[item].cultureId);
+    });
+  } 
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -60,6 +65,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       password: userEdit[0].password,
       confirmPassword: userEdit[0].password,
       profiles: [],
+      cultureId: '',
       registration: userEdit[0].registration,
       departmentId: userEdit[0].departmentId,
       jivochat: userEdit[0].jivochat,
@@ -89,6 +95,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
         tel: values.tel,
         password: values.password,
         profiles: auxObject,
+        cultureId: values.cultureId,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,
@@ -180,7 +187,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                 *CPF
               </label>
               <InputMask
-                mask="999.999.999-99"
+                mask=""
                 required
                 disabled
                 style={{ background: '#e5e7eb' }}
@@ -210,7 +217,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                 *Telefone
               </label>
               <InputMask
-                mask={maskTel}
+                mask=""
                 required
                 placeholder="(11) 99999-9999"
                 id="tel"
@@ -351,7 +358,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                         id={`profiles.${profile.id}`}
                         name="profiles"
                         onChange={formik.handleChange}
-                        value={formik.values.id}
+                        value={profile.id}
                         defaultChecked={profiles.includes(profile)}
                       />
                     </>
@@ -370,11 +377,10 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                       <CheckBox
                         key={culture.id}
                         title={culture.name}
-                        id={`cultures.${culture.id}`}
-                        name="cultures"
+                        name="cultureId"
                         onChange={formik.handleChange}
-                        value={formik.values.id}
-                        defaultChecked={culture.includes(culture)}
+                        value={culture.id}
+                        defaultChecked={userCultures.includes(culture.id)}
                       />
                     </>
                   ))
@@ -434,8 +440,9 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const departments = await resD.json();
   const profiles = await resP.json();
-  const userEdit = (await resU.json());
+  const users = await resU.json();
+  const userEdit = users.response;
   const Cultures = (await apiCulture.json()).response;
-
-  return { props: { departments, profiles, userEdit, Cultures } }
+  const userCulture = users.culture;
+  return { props: { departments, profiles, userEdit, Cultures, userCulture } }
 }

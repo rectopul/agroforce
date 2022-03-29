@@ -35,7 +35,6 @@ export class UserRepository {
                }
              }) .finally(async () => { await prisma.$disconnect() })
              Result.cultures = await prisma.users_cultures.findMany({where:{userId: id}});
-             console.log(Result)
         return Result;
     }
 
