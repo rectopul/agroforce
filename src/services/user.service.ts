@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
 import Router from 'next/router'
-
+import { userCultureService } from './user-culture.service';
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
@@ -16,7 +16,8 @@ export const userService = {
     getAll,
     getPermissions,
     create,
-    update
+    update,
+    logoutSign
 };
 
 async function login(email: any, password: any) {
@@ -43,6 +44,18 @@ function logout() {
     localStorage.removeItem('user');
     userSubject.next(null);
     Router.push('/login');
+}
+
+async function logoutSign(email: any, cultures: object | any) {
+   let user = await userService.getAll({email: email, paramSelect: ['password', 'id']});
+   userCultureService.update({userId:user.response[0].id});
+   let teste = await userCultureService.update({cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id});
+   console.log(teste)
+   userService.logout();
+   let login =  await userService.login(email, user.response[0].password) 
+   if (login) {
+       Router.push('/')
+   }
 }
 
 function getAll(parameters: any) {

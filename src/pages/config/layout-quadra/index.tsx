@@ -127,9 +127,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
             setTotaItems(response.total);
@@ -351,7 +351,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     });
   };
 
-  function handleOrderAddress(column: string, order: string | any): void {
+  async function handleOrderAddress(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -376,7 +376,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setQuadra(response.response)
       }
@@ -394,7 +394,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
   };
 
-  function handleOrderName(column: string, order: string | any): void {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -419,7 +419,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setQuadra(response.response)
       }
@@ -450,12 +450,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => {
+  const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    layoultQuadraService.getAll(filterAplication).then((response) => {
+    await layoultQuadraService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;

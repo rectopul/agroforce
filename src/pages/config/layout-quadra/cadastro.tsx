@@ -1,12 +1,12 @@
 import { GetServerSideProps } from "next";
-import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
 import InputMask from "react-input-mask";
-import { IoMdArrowBack } from "react-icons/io";
 
 import { layoultQuadraService } from "src/services";
 
@@ -18,6 +18,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { IoMdArrowBack } from "react-icons/io";
 import { FiUserPlus } from "react-icons/fi";
 
 interface ILayoultProps {
@@ -39,10 +40,16 @@ interface ILayoultProps {
   created_by: number | any;
   status: Number;
 };
-
-
 export interface IData {
   local: object | any;
+}
+
+interface ILocal {
+  id: number;
+  name: string;
+  latitude: string;
+  longitude: string;
+  status: number;
 }
 
 export default function NovoLocal({ local }: IData) {
@@ -56,10 +63,21 @@ export default function NovoLocal({ local }: IData) {
     : tab.statusTab = false
   ));
 
+  const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
+  const [idLocal, setIdLocal] = useState<number>(0);
+  const [lat, setLat] = useState<number>(0);
+  const [lng, setLng] = useState<number>(0);
+  const [titleLocal, setTitleLocal] = useState<string>('');
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
   });
+
+  const position = {
+    lat,
+    lng,
+  };
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
@@ -84,9 +102,10 @@ export default function NovoLocal({ local }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
+      if (!idLocal) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= ''; }
+      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal)  { return; } 
 
       await layoultQuadraService.create({
         esquema:values.esquema,
@@ -102,12 +121,12 @@ export default function NovoLocal({ local }: IData) {
         t4_final: Number(values.t4_final),
         df_inicial: Number(values.df_inicial),
         df_final: Number (values.df_final),
-        localId: Number(values.localId),
+        localId: idLocal,
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Local cadastrado com sucesso!')
+          Swal.fire('Layout Quadra cadastrado com sucesso!')
           router.back()
         } else {
           Swal.fire(response.message)
@@ -119,10 +138,10 @@ export default function NovoLocal({ local }: IData) {
   local.map((value: string | object | any) => {
     locais.push({id: value.id, name: value.name});
   })
+
   function validateInputs(values: any) {
     if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= ''; }
     if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor= 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor= ''; }
-    if (!values.localId) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= ''; }
     if (!values.semente_metros) { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor= 'red'; } else { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor= ''; }
     if (!values.disparos) { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor= 'red'; } else { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor= ''; }
     if (!values.divisor) { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor= 'red'; } else { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor= ''; }
@@ -136,10 +155,23 @@ export default function NovoLocal({ local }: IData) {
     if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= ''; }
   }
 
+  useEffect(() => {
+    localMap.map((item) => {
+      if (item.id === idLocal) {
+        setLat(Number(-item.latitude));
+        setLng(Number(-item.longitude));
+        setTitleLocal(item.name);
+      } else {
+        lat;
+        lng;
+      }
+    })
+  }, [idLocal]);
+
   return (
     <>
       <Head>
-        <title>Novo Layoult</title>
+        <title>Novo Layout</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
@@ -159,7 +191,7 @@ export default function NovoLocal({ local }: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo Layoult</h1>
+            <h1 className="text-2xl">Novo Layout</h1>
           </div>
 
           <div className="w-full
@@ -203,13 +235,12 @@ export default function NovoLocal({ local }: IData) {
                 values={locais}
                 id="localId"
                 name="localId"
-                onChange={formik.handleChange}
-                value={formik.values.localId}
-                selected={false}
+                onChange={(e) => setIdLocal(parseInt(e.target.value))}
+                value={idLocal}
+                selected={idLocal}
               />
             </div>  
           </div>
-
           <div className="w-full
             flex 
             justify-around
@@ -427,20 +458,32 @@ export default function NovoLocal({ local }: IData) {
 
           <div className="
             w-full
-            h-full
+            h-4/6
             my-4
+            mt-10
           ">
             {isLoaded ? (
               <GoogleMap
-                mapContainerStyle={{ width: '100%', height: '100%'}}
-                center={{
-                  lat: -23.18,
-                  lng: -45.88,
+                mapContainerStyle={{
+                  width: '100%', 
+                  height: '100%', 
+                  borderRadius: 7,
+                  color: '#fff',
                 }}
-                zoom={16}
+                center={position}
+                zoom={17}
                 // onLoad={onLoad}
                 // onUnmount={onUnmount}
               >
+                <Marker 
+                  position={position}
+                  options={{
+                    label: {
+                      text: titleLocal,
+                      className: "mb-14 text-gray-50"
+                    },
+                  }}
+                />
               </GoogleMap>
             ) : <></>}
           </div>
@@ -498,6 +541,7 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   let local = await apiLocal.json();
   local = local.response
+  console.log(local)
   return { props: { local } }
 }
 

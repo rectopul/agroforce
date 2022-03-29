@@ -3,13 +3,13 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from "react";
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
 import { layoultQuadraService } from "src/services";
 import InputMask from "react-input-mask";
 
 import {
-  TabHeader,
   Content,
   Input,
   Select,
@@ -17,6 +17,7 @@ import {
 } from "../../../components";
 
 import * as ITabs from '../../../shared/utils/dropdown';
+import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 
 interface ILayoultProps {
@@ -39,6 +40,13 @@ interface ILayoultProps {
   status: Number;
 };
 
+interface ILocal {
+  id: number;
+  name: string;
+  latitude: string;
+  longitude: string;
+  status: number;
+}
 
 export interface IData {
   local: object | any;
@@ -55,6 +63,22 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
+
+  const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
+  const [idLocal, setIdLocal] = useState<number>(layoultEdit.localId);
+  const [lat, setLat] = useState<number>(0);
+  const [lng, setLng] = useState<number>(0);
+  const [titleLocal, setTitleLocal] = useState<string>('');
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
+  });
+
+  const position = {
+    lat,
+    lng,
+  };
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
@@ -81,7 +105,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
     },
     onSubmit: async (values) => {      
       validateInputs(values);
-      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !values.localId)  { return; } 
+      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal)  { return; } 
 
       await layoultQuadraService.update({
         id: values.id,
@@ -98,12 +122,12 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         t4_final: Number(values.t4_final),
         df_inicial: Number(values.df_inicial),
         df_final: Number (values.df_final),
-        localId: Number(values.localId),
+        localId: idLocal,
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('Local atualizado com sucesso!');
+          Swal.fire('Layout quadra atualizado com sucesso!');
           router.back()
         } else {
           Swal.fire(response.message);
@@ -115,6 +139,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
   local.map((value: string | object | any) => {
     locais.push({id: value.id, name: value.name});
   })
+
   function validateInputs(values: any) {
     if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor= ''; }
     if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor= 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor= ''; }
@@ -132,19 +157,43 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
     if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor= ''; }
   }
 
+  useEffect(() => {
+    localMap.map((item) => {
+      if (item.id === idLocal) {
+        setLat(Number(-item.latitude));
+        setLng(Number(-item.longitude));
+        setTitleLocal(item.name);
+      } else {
+        lat;
+        lng;
+      }
+    })
+  }, [idLocal]);
+
   return (
     <>
       <Head>
-        <title>Atualizar Layoult Quadra</title>
+        <title>Atualizar Layout Quadra</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
         <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="
+          w-full
+          h-full
+          bg-white 
+          shadow-md 
+          rounded 
+          px-8 
+          pt-6 
+          pb-8 
+          mt-2
+          overflow-y-scroll
+        "
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo Layoult</h1>
+            <h1 className="text-2xl">Novo Layout</h1>
           </div>
 
           <div className="w-full
@@ -203,9 +252,9 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 values={locais}
                 id="localId"
                 name="localId"
-                onChange={formik.handleChange}
-                value={formik.values.localId}
-                selected={false}
+                onChange={(e) => setIdLocal(parseInt(e.target.value))}
+                value={idLocal}
+                selected={idLocal}
               />
             </div>  
           </div>
@@ -422,8 +471,39 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.df_final}
               />
-
             </div>
+          </div>
+
+          <div className="
+            w-full
+            h-4/6
+            my-4
+            mt-10
+          ">
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={{
+                  width: '100%', 
+                  height: '100%', 
+                  borderRadius: 7,
+                  color: '#fff',
+                }}
+                center={position}
+                zoom={17}
+                // onLoad={onLoad}
+                // onUnmount={onUnmount}
+              >
+                <Marker 
+                  position={position}
+                  options={{
+                    label: {
+                      text: titleLocal,
+                      className: "mb-14 text-gray-50"
+                    },
+                  }}
+                />
+              </GoogleMap>
+            ) : <></>}
           </div>
 
           <div className="

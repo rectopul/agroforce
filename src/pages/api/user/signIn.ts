@@ -34,14 +34,22 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       let preferences: object | any = new Object;
       let userCulture: object | any = new Object;
       if (user) {
-        const validateLogin = await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id, filterStatus: 1});
+        const validateLogin: object | any= await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id, filterStatus: 1});
 
         if (validateLogin.total <= 0 || validateLogin.status == 400) throw 'Você não tem acesso a essa pagina, entre em contato com seu líder!';
     
         userCulture.culturas = (await userCultureController.getByUserID(user.id)).response;
-        if (!userCulture.culturas || userCulture.culturas.status == 400 || userCulture.culturas.length === 0) throw 'Você está sem acesso as culturas, contate o seu lider!';
 
-        userCulture.cultura_selecionada = userCulture.culturas[0].cultureId;
+        if (!userCulture.culturas || userCulture.culturas.status == 400 || userCulture.culturas.length === 0) throw 'Você está sem acesso as culturas, contate o seu lider!';
+        
+        let cultureSelecionada; 
+        Object.keys(userCulture.culturas).forEach((item) => {
+          if (userCulture.culturas[item].status == 1) {
+            cultureSelecionada = userCulture.culturas[item].cultureId;
+          }
+        });
+
+        userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario =  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
         preferences.culture=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]

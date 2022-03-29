@@ -1,5 +1,4 @@
 import {prisma} from '../pages/api/db/db';
-
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
         let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
@@ -20,6 +19,14 @@ export class UserCultureRepository {
         } else {
             return false;
         }
+    }
+
+    async updateAllStatus(userId: any) {
+        await prisma.$executeRaw`UPDATE users_cultures SET status = 0 WHERE userId = ${userId}`;
+    }
+
+    async queryRaw(idUser: any, cultureId: any) {
+        await prisma.$executeRaw`UPDATE users_cultures SET status = 1 WHERE userId = ${idUser} AND cultureId = ${cultureId}`;
     }
 
     async delete(where: object ) {
@@ -53,14 +60,14 @@ export class UserCultureRepository {
         let Result = await prisma.users_cultures.findMany({
             where: {
                 userId: userId,
-                status: 1,
                 culture: {
                     status: 1
                 }
             }, 
             select: {
                 id: true,    
-                cultureId: true,        
+                cultureId: true,
+                status: true,        
                 culture: {select: {name: true}}
             },
           }) .finally(async () => { await prisma.$disconnect() })
