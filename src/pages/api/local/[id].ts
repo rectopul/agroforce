@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             res.status(200).json(resultPut);
             break;
         case 'GET':
-            let result = await Controller.getOneLocal(id);  
+            let result: any = await Controller.getOneLocal(id);  
             res.status(200).json(result.response);
             break;
         default:

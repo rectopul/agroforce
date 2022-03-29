@@ -38,7 +38,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
         if (validateLogin.total <= 0 || validateLogin.status == 400) throw 'Você não tem acesso a essa pagina, entre em contato com seu líder!';
     
-        userCulture.culturas = (await userCultureController.getByUserID(user.id)).response;
+        userCulture.culturas = await userCultureController.getByUserID(user.id);
+        userCulture.culturas = userCulture.culturas.response;
 
         if (!userCulture.culturas || userCulture.culturas.status == 400 || userCulture.culturas.length === 0) throw 'Você está sem acesso as culturas, contate o seu lider!';
         
@@ -51,17 +52,17 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
         userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
         permisions = await PermissionController.getUserPermissions(user.id); 
-        preferences.usuario =  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1})).response[0];
-        preferences.culture=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2})).response[0]
-        preferences.safra=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3})).response[0]
-        preferences.local=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 4})).response[0]
-        preferences.layout_quadra=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5})).response[0]
-        preferences.foco=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 6})).response[0]
-        preferences.delineamento=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 7})).response[0]
-        preferences.ogm=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8})).response[0]
-        preferences.tipo_ensaio=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9})).response[0]
-        preferences.portfolio=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10})).response[0]
-        preferences.department=  (await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11})).response[0]
+        preferences.usuario =  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1}); preferences.usuario = preferences.usuario.response[0];
+        preferences.culture=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2});  preferences.culture =  preferences.culture.response[0];
+        preferences.safra=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 3}); preferences.safra = preferences.safra.response[0];
+        preferences.local=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 4}); preferences.local = preferences.local.response[0];
+        preferences.layout_quadra=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5}); preferences.layout_quadra = preferences.layout_quadra.response[0];
+        preferences.foco=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 6}); preferences.foco = preferences.foco.response[0];
+        preferences.delineamento=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 7}); preferences.delineamento = preferences.delineamento.response[0];
+        preferences.ogm=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8}); preferences.ogm = preferences.ogm.response[0];
+        preferences.tipo_ensaio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9}); preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
+        preferences.portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10}); preferences.portfolio = preferences.portfolio.response[0];
+        preferences.department= await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11}); preferences.department = preferences.department.response[0];
       }
 
       if (!user) throw 'Email ou senha é invalida!';

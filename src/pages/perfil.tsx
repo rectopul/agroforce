@@ -9,7 +9,7 @@ export default function Perfil() {
         <title>Perfil do usuário</title>
       </Head>
       <Content
-        headerCotent={""}
+        contentHeader={[]}
       >
         
       </Content>

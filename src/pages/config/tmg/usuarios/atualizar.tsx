@@ -25,6 +25,7 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
+import { Key } from "react";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -372,7 +373,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
               </label>
               <div className="flex gap-6 border-b border-gray-300">
                 {
-                  Cultures.map((culture) => (
+                  Cultures.map((culture: { id: any | readonly string[] | null | undefined; name: string | undefined; }) => (
                     <>
                       <CheckBox
                         key={culture.id}
