@@ -10,7 +10,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET':
-      const result = await portfolioController.getOnePortfolio(Number(id));
+      const result: any = await portfolioController.getOnePortfolio(Number(id));
       res.status(result.status).json(result.response);
       break
     case 'PUT':

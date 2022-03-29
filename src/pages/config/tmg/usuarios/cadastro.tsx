@@ -57,7 +57,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       password: '',
       confirmPassword: '',
       profiles: [{ id: 0 }],
-      cultureId: [0],
+      cultureId: '',
       registration: 0,
       departmentId: 0,
       jivochat: 0,

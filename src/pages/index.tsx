@@ -26,7 +26,7 @@ export default function Listagem() {
       <Head>
         <title>Home</title>
       </Head>
-      <Content headerCotent={[]}>
+      <Content contentHeader={[]}>
         <main className="h-full
           flex flex-col
           items-start
