@@ -5,7 +5,7 @@ import { fetchWrapper } from '../helpers';
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/user/user-culture`;
 
-export const userPreferencesService = {
+export const userCultureService = {
     getAll,
     create,
     update

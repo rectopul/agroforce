@@ -6,6 +6,7 @@ import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
+import { userService } from 'src/services';
 import {
   Aside,
   DropDown,
@@ -79,7 +80,7 @@ export function Content({ contentHeader, children }: IContentData) {
         btn.statusTab = false;
       } else {
         btn.statusTab = true;
-      }
+    }
     });
 
     setTabs((oldUser) => {
@@ -93,10 +94,12 @@ export function Content({ contentHeader, children }: IContentData) {
     });
   };
 
-  useEffect(() => {
-      userLogado.userCulture.cultura_selecionada =  parseInt(culturaSelecionada);
-      localStorage.setItem('user', JSON.stringify(userLogado));
-  }, [culturaSelecionada]);
+  function validationCulture (value: any) {
+    if (value != culturaSelecionada) {
+      setCulturaSelecionada(value);
+      userService.logoutSign(userLogado.email, {anterior: culturaSelecionada, selecionada: value});
+    } 
+  }
 
   return (
     <>
@@ -106,8 +109,8 @@ export function Content({ contentHeader, children }: IContentData) {
 
         headerSelects={
           <div className="h-10 flex gap-2">
-            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
-            <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} />
+            <Select values={cultures}   onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
+            {/* <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} /> */}
           </div>
         }
       >

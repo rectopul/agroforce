@@ -12,7 +12,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             res.status(200).json(await Controller.getByUserID(req.query.userId));
             break
         case 'PUT':
-            res.status(200).json( await Controller.update(req.body));
+            if (req.body.userId === undefined) {
+                res.status(200).json( await Controller.update(req.body));
+            } else {
+                res.status(200).json( await Controller.updateAllStatus(req.body.userId));
+            }
             break
         case 'POST':
             res.status(200).json( await Controller.save(req.body));

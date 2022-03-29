@@ -107,7 +107,7 @@ model users_cultures {
   cultureId  Int
   created_at DateTime @default(now())
   created_by Int
-  status     Int      @default(1)
+  status     Int      @default(0)
   culture    culture  @relation(fields: [cultureId], references: [id], map: "Users_Cultures_cultureId_fkey")
   user       user     @relation(fields: [userId], references: [id], map: "Users_Cultures_userId_fkey")
 

@@ -141,75 +141,19 @@ export class UserCultureController {
                 } else { 
                     parameters.status =  data.status;
                 }
-
-                if (typeof(data.app_login) === 'string') {
-                    parameters.app_login =  parseInt(data.app_login);
-                } else { 
-                    parameters.app_login =  data.app_login;
-                }
-
-                if (typeof(data.jivochat) === 'string') {
-                    parameters.jivochat =  parseInt(data.jivochat);
-                } else { 
-                    parameters.jivochat =  data.jivochat;
-                }
-
-                if (typeof(data.departmentId) === 'string') {
-                    parameters.departmentId =  parseInt(data.departmentId);
-                } else { 
-                    parameters.departmentId =  data.departmentId;
-                }
-
-                if (data.name) {
-                    parameters.name = data.name;
-                } 
-
-                if (data.email) {
-                    parameters.email = data.email;
-                } 
-
-                if (data.cpf) {
-                    if(!functionsUtils.validationCPF(data.cpf)) return {message: 'CPF invalído'};
-                    parameters.cpf = data.cpf;
-                }
-
-                if (data.tel) {
-                    parameters.tel = data.tel;
-                }
-
-                if (data.password) {
-                    parameters.password = data.password;
-                }
-
-                if (data.created_by) {
-                    parameters.created_by = data.created_by;
-                }
-
-                let response: object | any  = await this.userCultureRepository.update(data.id, parameters);
-
-                if(response.count > 0) {
-                    if (data.profiles) {
-                        const parametersPermissions = new Object();
-                        // functionsUtils.getPermissions(data.id, data.profiles);
-                        // Object.keys(data.profiles).forEach((item) => {
-                        //     if (typeof(data.profiles[item].profileId) === 'string') {
-                        //         parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                        //     } else { 
-                        //         parametersPermissions.profileId = data.profiles[item].profileId;
-                        //     }
-                        //     parametersPermissions.userId = data.id;
-                        //     parametersPermissions.created_by = data.created_by;
-                        //     this.usersPermissionRepository.create(parametersPermissions);
-                        // });
-                    }
-                    return {status: 200, message: {message: "Usuario atualizada"}}
-                } else {
-                    return {status: 400, message: {message: "usuario não existe"}}
-
-                }
+                await this.userCultureRepository.queryRaw(parseInt(data.idUser), parseInt(data.cultureId));
+                return {status: 200}
             }
         } catch (err) {
+            console.log(err)
+        }  
+    }
 
+    async updateAllStatus(userId: any) {
+        try {
+            await this.userCultureRepository.updateAllStatus(userId);
+        } catch (err) {
+            console.log(err)
         }  
     }
 
