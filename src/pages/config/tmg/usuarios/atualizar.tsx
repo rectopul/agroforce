@@ -25,28 +25,35 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { useEffect, useState } from "react";
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
   userEdit: IUsers | any;
+  Cultures: object | any;
+  userCulture: object | any;
 }
 
-export default function AtualizarUsuario({ departments, profiles, userEdit }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures, userCulture }: IData) {
+  const { TabsDropDowns } = ITabs.default;
+  const tabsDropDowns = TabsDropDowns();
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
+  const userCultures = new Array();
 
-  const maskTel = '(99)99999-9999' || '(99)9999-9999';
+  if (userCulture) {
+    Object.keys(userCulture).forEach((_, item) => {
+      userCultures.push(userCulture[item].cultureId);
+    });
+  } 
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -58,6 +65,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       password: userEdit[0].password,
       confirmPassword: userEdit[0].password,
       profiles: [],
+      cultureId: '',
       registration: userEdit[0].registration,
       departmentId: userEdit[0].departmentId,
       jivochat: userEdit[0].jivochat,
@@ -87,6 +95,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
         tel: values.tel,
         password: values.password,
         profiles: auxObject,
+        cultureId: values.cultureId,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,
@@ -110,11 +119,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
       <Head>
         <title>Atualizar Usuário</title>
       </Head>
-      <Content
-        headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -160,7 +165,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 *Login
               </label>
               <Input 
-                type="email" 
+                type="email"
+                required 
                 placeholder="usuario@tmg.agr.br" 
                 id="email"
                 name="email"
@@ -181,7 +187,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 *CPF
               </label>
               <InputMask
-                mask="999.999.999-99"
+                mask=""
                 required
                 disabled
                 style={{ background: '#e5e7eb' }}
@@ -211,7 +217,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                 *Telefone
               </label>
               <InputMask
-                mask={maskTel}
+                mask=""
                 required
                 placeholder="(11) 99999-9999"
                 id="tel"
@@ -238,6 +244,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Select2
                 id="department.id"
+                required
                 name="departmentId"
                 onChange={formik.handleChange}
                 data={departments}
@@ -258,6 +265,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="number" 
+                required
                 placeholder="Campo númerico"
                 id="registration"
                 name="registration"
@@ -272,6 +280,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="password" 
+                required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -286,6 +295,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Input 
                 type="password"
+                required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -307,6 +317,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               </label>
               <Select
                 values={optionSorN}
+                required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -321,6 +332,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
               <div className="h-10">
                 <Select
                   values={optionSorN} 
+                  required
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}
@@ -346,8 +358,29 @@ export default function AtualizarUsuario({ departments, profiles, userEdit }: ID
                         id={`profiles.${profile.id}`}
                         name="profiles"
                         onChange={formik.handleChange}
-                        value={formik.values.id}
+                        value={profile.id}
                         defaultChecked={profiles.includes(profile)}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Culturas
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  Cultures.map((culture) => (
+                    <>
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        name="cultureId"
+                        onChange={formik.handleChange}
+                        value={culture.id}
+                        defaultChecked={userCultures.includes(culture.id)}
                       />
                     </>
                   ))
@@ -403,9 +436,13 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const resD = await fetch(`${baseUrl}/departament`, requestOptions)
   const resP = await fetch(`${baseUrl}/profile`, requestOptions)
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
+  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
+
   const departments = await resD.json();
   const profiles = await resP.json();
-  const userEdit = await resU.json();
-
-  return { props: { departments, profiles, userEdit } }
+  const users = await resU.json();
+  const userEdit = users.response;
+  const Cultures = (await apiCulture.json()).response;
+  const userCulture = users.culture;
+  return { props: { departments, profiles, userEdit, Cultures, userCulture } }
 }

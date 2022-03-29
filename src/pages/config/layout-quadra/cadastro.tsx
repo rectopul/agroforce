@@ -3,14 +3,14 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
-import { layoultQuadraService } from "src/services";
-import { useState } from "react";
 import InputMask from "react-input-mask";
+import { IoMdArrowBack } from "react-icons/io";
+
+import { layoultQuadraService } from "src/services";
 
 import {
-  TabHeader,
   Content,
   Input,
   Select,
@@ -46,13 +46,20 @@ export interface IData {
 }
 
 export default function NovoLocal({ local }: IData) {
-  const { layoutQuadrasDropDown, tabs } = ITabs.default;
-  
-  tabs.map((tab) => (
-    tab.title === 'QUADRAS'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'QUADRAS'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
+  });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any =  [];
@@ -135,11 +142,20 @@ export default function NovoLocal({ local }: IData) {
         <title>Novo Layoult</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={layoutQuadrasDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="
+            w-full
+            h-full
+            bg-white 
+            shadow-md 
+            rounded 
+            px-8 
+            pt-6 
+            pb-8 
+            mt-2
+            overflow-y-scroll
+          "
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
@@ -406,8 +422,27 @@ export default function NovoLocal({ local }: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.df_final}
               />
-
             </div>
+          </div>
+
+          <div className="
+            w-full
+            h-full
+            my-4
+          ">
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={{ width: '100%', height: '100%'}}
+                center={{
+                  lat: -23.18,
+                  lng: -45.88,
+                }}
+                zoom={16}
+                // onLoad={onLoad}
+                // onUnmount={onUnmount}
+              >
+              </GoogleMap>
+            ) : <></>}
           </div>
 
           <div className="

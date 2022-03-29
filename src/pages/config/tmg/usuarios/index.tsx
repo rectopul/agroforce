@@ -15,7 +15,6 @@ import {
   Content, 
   Select, 
   Input,
-  TabHeader,
   AccordionFilter,
   CheckBox
 } from "../../../../components";
@@ -61,12 +60,14 @@ interface Idata {
 }
 
 export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: Idata) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -483,11 +484,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       <Head>
         <title>Listagem de usuários</title>
       </Head>
-      <Content
-        headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

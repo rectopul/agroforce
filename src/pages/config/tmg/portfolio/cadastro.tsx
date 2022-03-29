@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 
 import { portfolioService } from "src/services/portfolio.service";
 
-import { Content, Input, TabHeader, Button } from "src/components";
+import { Content, Input, Button } from "src/components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -22,12 +22,14 @@ export interface ICreatePortfolio {
 }
 
 export default function  Portfolio() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -73,11 +75,7 @@ export default function  Portfolio() {
       <title>Cadastro de portfólio</title>
     </Head>
 
-    <Content
-      headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }
-    >
+    <Content contentHeader={tabsDropDowns}>
       <form 
         className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
         onSubmit={formik.handleSubmit}

@@ -1,10 +1,11 @@
 import {UserRepository} from '../repository/user.repository';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
-
+import { UserCultureController } from './user-culture.controller';
 export class UserController {
     userRepository = new UserRepository();
     usersPermissionRepository = new UsersPermissionsRepository();
+    userCultureController = new UserCultureController();
 
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
@@ -41,6 +42,11 @@ export class UserController {
             if (options.cpf) {
                 parameters.cpf = options.cpf;
             }
+
+            if (options.email) {
+                parameters.email = options.email;
+            }
+            
             
             if (options.tel) {
                 parameters.tel = options.tel;
@@ -102,7 +108,8 @@ export class UserController {
                 if (!response) {
                     return {status: 400, response:[], message: 'user não existe'};
                 } else {
-                    return {status:200 , response};
+                    let cultures: object | any= await this.userCultureController.getByUserID(id)
+                    return {status:200 , response, culture: response.cultures };
                 }
             } else {
                 return {status:405, response:{error: 'id não informado'}};
@@ -167,20 +174,23 @@ export class UserController {
                 parameters.created_by = data.created_by;
 
                 let response = await this.userRepository.create(parameters);
-
+        
                 if(response) {
-                    if (data.profiles) {
-                        Object.keys(data.profiles).forEach((item) => {
-                            if (typeof(data.profiles[item].profileId) === 'string') {
-                                parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                            } else { 
-                                parametersPermissions.profileId = data.profiles[item].profileId;
-                            }
-                            parametersPermissions.userId = response.id;
-                            parametersPermissions.created_by = data.created_by;
-                            this.usersPermissionRepository.create(parametersPermissions);
-                        });
+                    if (data.cultureId) {
+                            this.userCultureController.save({cultureId: data.cultureId, userId: response.id, created_by: data.created_by });
                     }
+                    // if (data.profiles) {
+                    //     Object.keys(data.profiles).forEach((item) => {
+                    //         if (typeof(data.profiles[item].profileId) === 'string') {
+                    //             parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
+                    //         } else { 
+                    //             parametersPermissions.profileId = data.profiles[item].profileId;
+                    //         }
+                    //         parametersPermissions.userId = response.id;
+                    //         parametersPermissions.created_by = data.created_by;
+                    //         this.usersPermissionRepository.create(parametersPermissions);
+                    //     });
+                    // }
         
                     return {status: 200, message: "users inseridos"}
                 } else {
@@ -188,7 +198,7 @@ export class UserController {
                 }
             }
         } catch(err) {
-
+            console.log(err)
         }
     }
 
@@ -259,6 +269,9 @@ export class UserController {
                 let response: object | any  = await this.userRepository.update(data.id, parameters);
 
                 if(response.count > 0) {
+                    if (data.cultureId) {
+                        this.userCultureController.save({cultureId: data.cultureId, userId: data.id, created_by: data.created_by });
+                    }
                     if (data.profiles) {
                         const parametersPermissions = new Object();
                         // functionsUtils.getPermissions(data.id, data.profiles);

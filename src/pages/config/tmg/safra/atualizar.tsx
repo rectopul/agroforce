@@ -13,8 +13,7 @@ import {
   Button, 
   Content, 
   Input, 
-  Radio,
-  TabHeader 
+  Radio
 } from "src/components";
 import { safraService } from "src/services";
 import Swal from "sweetalert2";
@@ -31,12 +30,14 @@ interface ISafraProps {
 };
 
 export default function AtualizarSafra(safra: ISafraProps) {
-  const { tmgDropDown, tabs } = ITabs.default;
-  
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -67,6 +68,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
     },
     onSubmit: async (values) => {
       if (values.id !== safra.id) throw new Error("Dados inválidos");
+      if (values.typeCrop === '' || !values.typeCrop) throw new Error("Dados inválidos");
 
       await safraService.updateSafras({
         id: safra.id,
@@ -101,9 +103,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
   return (
     <>
       <Head><title>Atualizar safra</title></Head>
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -128,7 +128,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Ano
+                Ano
               </label>
               <InputMask 
                 mask="99/99"
@@ -158,7 +158,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-4/12 h-10 justify-start">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Tipo de safra
+                Tipo de safra
               </label>
               <div className="w-full h-full flex gap-4 items-center">
                 <Radio
@@ -186,10 +186,11 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal de início de plantio
+                Período ideal de início de plantio
               </label>
               <Input
                 type="date"
+                required
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
@@ -200,10 +201,11 @@ export default function AtualizarSafra(safra: ISafraProps) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Período ideal do fim do plantio
+                Período ideal do fim do plantio
               </label>
               <Input
                 type="date"
+                required
                 id="plantingEndTime"
                 name="plantingEndTime"
                 onChange={formik.handleChange}

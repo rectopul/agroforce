@@ -12,7 +12,7 @@ import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { userPreferencesService, portfolioService } from "src/services";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
@@ -46,12 +46,14 @@ interface IData {
 }
 
 export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication}: IData) {
-  const { tabs, tmgDropDown } = ITabs;
+  const { TabsDropDowns } = ITabs;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -408,9 +410,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     <>
       <Head><title>Listagem de portfólio</title></Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

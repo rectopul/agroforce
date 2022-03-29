@@ -71,12 +71,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
-  const { layoutQuadrasDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
+  
+  const tabsDropDowns = TabsDropDowns();
 
-  tabs.map((tab) => (
-    tab.title === 'QUADRAS'
-    ? tab.status = true
-    : tab.status = false
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'QUADRAS'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -519,11 +521,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       <Head>
         <title>Listagem dos Layoults</title>
       </Head>
-      <Content
-        headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={layoutQuadrasDropDown}  />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

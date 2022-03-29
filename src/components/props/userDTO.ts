@@ -16,4 +16,5 @@ export default interface IUsers {
   created_by: number | any;
   confirmPassword: string;
   profiles: IProfile[];
+  cultureId: string;
 }

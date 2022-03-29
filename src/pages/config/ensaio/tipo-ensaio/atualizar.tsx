@@ -2,20 +2,19 @@ import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
 import { typeAssayService } from "src/services";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 import {
-  TabHeader,
   Content,
   Input,
   Button,
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { MdDateRange } from "react-icons/md";
+import { IoMdArrowBack } from "react-icons/io";
+import { RiOrganizationChart } from "react-icons/ri";
 
 interface ITypeAssayProps {
   id: Number | any;
@@ -30,12 +29,14 @@ interface IData {
 
 
 export default function NovoLocal({typeAssayEdit}: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -77,9 +78,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
         <title>Atualizar Tipo Ensaio</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -148,7 +147,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<MdDateRange size={18} />}
+                icon={<RiOrganizationChart size={18} />}
                 onClick={() => {}}
               />
             </div>

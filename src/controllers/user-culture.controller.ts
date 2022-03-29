@@ -34,26 +34,16 @@ export class UserCultureController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, name: true, cpf:true, email:true, tel:true, avatar:true, status: true};
+                select = {id: true, userId: true, cultureId: true};
             }
 
-            if (options.cpf) {
-                parameters.cpf = options.cpf;
-            }
-            
-            if (options.tel) {
-                parameters.tel = options.tel;
+            if (options.userId) {
+                parameters.userId = parseInt(options.userId);
             }
 
-            if (options.departmentId) {
-                parameters.departmentId = options.departmentId;
+            if (options.cultureId) {
+                parameters.cultureId = parseInt(options.cultureId);
             }
-
-            if (options.registration) {
-                parameters.registration = options.registration;
-            }
-
-
 
             if (options.take) {
                 if (typeof(options.take) === 'string') {
@@ -124,45 +114,22 @@ export class UserCultureController {
     }
 
     async save(data: object | any) {
-        const parameters: object | any = new Object();
         try {
             if (data != null && data != undefined) {
-                if (typeof(data.status) === 'string') {
-                    parameters.status =  parseInt(data.status);
-                } else { 
-                    parameters.status =  data.status;
-                }
-
-                if (!data.name) return {status: 400, message: 'Informe o nome do usuário'};
-                if (!data.email) return {status: 400, message: 'Informe o email do usuário'}; 
-                if (!data.cpf) return {status: 400, message: 'Informe o cpf do usuário'};
-                if (!data.tel) return {status: 400, message: 'Informe o telefone do usuário'};
-                if (!data.departmentId) return {status: 400, message: 'Informe o departamento do usuário'};
-                if (!data.password) return {status: 400, message: 'Informe a senha do usuário'};
-
-
-                parameters.name = data.name;
-                parameters.email = data.email;
-                parameters.cpf = data.cpf;
-                parameters.tel = data.tel;
-                parameters.password = data.password;
-                parameters.created_by = data.created_by;
-
-                let response = await this.userCultureRepository.create(parameters);
-
-                if(response) {
-                    if (data.cultures) {
-                        
-                    }
-                    return {status: 200, message: "users inseridos"}
-                } else {
-                    return {status: 400, message: "houve um erro, tente novamente"}
-                }
+                const create: object | any  = new Object();
+                await this.delete(parseInt(data.userId));
+                Object.keys(data.cultureId).forEach((item) => {
+                    create.cultureId =  parseInt(data.cultureId[item]);
+                    create.userId =  parseInt(data.userId);
+                    create.created_by = data.created_by;
+                    this.userCultureRepository.create(create);
+                });
+                
             }
         } catch (err) {
-
+            console.log(err)
         }  
-    }
+    }   
 
     async update(data: object| any) {
         try {
@@ -243,6 +210,20 @@ export class UserCultureController {
             }
         } catch (err) {
 
+        }  
+    }
+
+    async delete(userId: number) {
+        try {
+            if(userId) {
+                let response: object | any  = await this.userCultureRepository.delete({userId: userId});
+                return {status: 200, response}
+
+            } else {
+                return {status: 400, message: "id não informado"}
+            }
+        } catch (err) {
+            console.log(err)
         }  
     }
 }

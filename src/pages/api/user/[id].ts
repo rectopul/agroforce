@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             break;
         case 'GET':
             let result = await Controller.getOneUser(id);  
-            res.status(200).json(result.response);
+            res.status(200).json(result);
             break;
         default:
             res.status(405).end(`Method ${req.method} Not Allowed`);

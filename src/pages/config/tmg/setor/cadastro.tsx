@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { useFormik } from 'formik';
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
 
 import { departmentService } from 'src/services';
 
@@ -9,14 +8,13 @@ import {
   Button,
   Content, 
   Input,
-  TabHeader,
-  Radio
 } from "../../../../components";
 
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IDepartmentProps {
   name: string;
@@ -24,12 +22,14 @@ interface IDepartmentProps {
 };
 
 export default function Safra() {
-  const { tmgDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -67,11 +67,7 @@ export default function Safra() {
         <title>Cadastro de setor</title>
       </Head>
 
-      <Content
-        headerCotent={
-          <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
           onSubmit={formik.handleSubmit}
@@ -82,7 +78,7 @@ export default function Safra() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                *Nome
+                Nome
               </label>
               <Input
                 type="text"
@@ -90,6 +86,7 @@ export default function Safra() {
                 maxLength={50}
                 id="name"
                 name="name"
+                placeholder="ex: Administração"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
@@ -118,7 +115,7 @@ export default function Safra() {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                icon={<MdDateRange size={18} />}
+                icon={<HiOutlineOfficeBuilding size={18} />}
                 onClick={() => {}}
               />
             </div>

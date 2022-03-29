@@ -8,7 +8,6 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 import {
-  TabHeader,
   Content,
   Input,
   Button,
@@ -31,12 +30,14 @@ export interface IData {
 }
 
 export default function NovoLocal({delineamentoEdit}: IData) {
-  const { delineamentosDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'DELINEAMENTO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'DELINEAMENTO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -84,9 +85,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
         <title>Atualizar Delineamento</title>
       </Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={delineamentosDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

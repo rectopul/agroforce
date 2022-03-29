@@ -4,22 +4,23 @@ import { ReactNode, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 import { useRouter } from "next/router";
 
 import { departmentService, userPreferencesService } from "src/services";
 
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 
 import ITabs from "../../../../shared/utils/dropdown";
 import getConfig from "next/config";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { IoReloadSharp } from "react-icons/io5";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IFilter{
   filterStatus: object | any;
@@ -47,12 +48,14 @@ interface IData {
 }
 
 export default function Listagem({allDepartments, totalItems, itensPerPage, filterAplication}: IData) {
-  const { tabs, tmgDropDown } = ITabs;
+  const { TabsDropDowns } = ITabs;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -322,9 +325,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     <>
       <Head><title>Listagem de setores</title></Head>
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown}  />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
@@ -415,7 +416,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {router.push('setor/cadastro')}}
-                          icon={<MdDateRange size={20} />}
+                          icon={<HiOutlineOfficeBuilding size={20} />}
                         />
                       </div>
 

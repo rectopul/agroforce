@@ -56,12 +56,14 @@ interface Idata {
 }
 
 export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
-  const { ensaiosDropDown, tabs } = ITabs.default;
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'ENSAIO'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'ENSAIO'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -366,11 +368,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       <Head>
         <title>Listagem OGM</title>
       </Head>
-      <Content
-        headerCotent={  
-          <TabHeader data={tabs} dataDropDowns={ensaiosDropDown}  />
-        }
-      >
+      <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start

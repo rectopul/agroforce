@@ -22,6 +22,13 @@ export class UserCultureRepository {
         }
     }
 
+    async delete(where: object ) {
+        let Result = await prisma.users_cultures.deleteMany({
+            where: where
+          }) .finally(async () => { await prisma.$disconnect() })
+        return Result;
+    }
+
     async findOne(id: number) {
         let Result = await prisma.users_cultures.findMany({
                where: {
@@ -59,6 +66,5 @@ export class UserCultureRepository {
           }) .finally(async () => { await prisma.$disconnect() })
         return Result;
     }
-    
 }
 

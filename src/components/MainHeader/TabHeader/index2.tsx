@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 interface ITabProps {
   titleTab: string;
-  valueTab: ReactNode;
+  valueTab: string | ReactNode;
   statusTab: boolean;
   handleStatusTabs: (title: string, status: boolean) => void;
 }

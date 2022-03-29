@@ -16,7 +16,6 @@ import  IUsers  from "../../../../components/props/userDTO";
 import  IDepartment  from "../../../../components/props/departmentDTO";
 
 import {
-  TabHeader,
   Content,
   Input,
   Select,
@@ -25,18 +24,22 @@ import {
 } from "../../../../components";
 
 import * as ITabs from '../../../../shared/utils/dropdown';
+
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
+  Cultures: object | any;
 }
 
-export default function NovoUsuario({ departments, profiles }: IData) {
-  const { tmgDropDown, tabs } = ITabs.default;
+export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
+  const { TabsDropDowns } = ITabs.default;
 
-  tabs.map((tab) => (
-    tab.title === 'TMG'
-    ? tab.status = true
-    : tab.status = false
+  const tabsDropDowns = TabsDropDowns();
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+    ? tab.statusTab = true
+    : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -54,6 +57,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       password: '',
       confirmPassword: '',
       profiles: [{ id: 0 }],
+      cultureId: [0],
       registration: 0,
       departmentId: 0,
       jivochat: 0,
@@ -61,7 +65,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       app_login: 0,
       created_by: userLogado.id,
     },
-    onSubmit: (values) => {      
+    onSubmit: (values) => {
       validateInputs(values);
       if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
       let ObjProfiles;
@@ -79,6 +83,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
         tel: values.tel,
         password: values.password,
         profiles: auxObject,
+        cultureId: values.cultureId,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,
@@ -116,9 +121,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
       </Head>
 
 
-      <Content headerCotent={
-        <TabHeader data={tabs} dataDropDowns={tmgDropDown} />
-      }>
+      <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -139,7 +142,8 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 *Nome usuário
               </label>
               <Input 
-                type="text" 
+                type="text"
+                required
                 placeholder="José Oliveira"
                 max="40"
                 id="name"
@@ -155,6 +159,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="email" 
+                required
                 placeholder="usuario@tmg.agr.br" 
                 id="email"
                 name="email"
@@ -201,6 +206,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                 *Matricula
               </label>
               <Input 
+                required
                 type="number" 
                 placeholder="Campo númerico"
                 id="registration"
@@ -216,6 +222,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Select
                 values={departments}
+                required
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -264,6 +271,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="password" 
+                required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -278,6 +286,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Input 
                 type="password"
+                required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -299,6 +308,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               </label>
               <Select
                 values={optionSorN}
+                required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -313,6 +323,7 @@ export default function NovoUsuario({ departments, profiles }: IData) {
               <div className="h-10">
                 <Select
                   values={optionSorN} 
+                  required
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}
@@ -337,6 +348,27 @@ export default function NovoUsuario({ departments, profiles }: IData) {
                         name="profiles"
                         onChange={formik.handleChange}
                         value={profile.id}
+                      />
+                    </>
+                  ))
+                }
+              </div>
+            </div>
+            <div className="w-4/12 flex flex-col">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Culturas
+              </label>
+              <div className="flex gap-6 border-b border-gray-300">
+                {
+                  Cultures.map((culture: any) => (
+                    <>
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        name="cultureId"
+                        id="cultureId"
+                        onChange={formik.handleChange}
+                        value={culture.id}
                       />
                     </>
                   ))
@@ -391,9 +423,11 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
   const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
+  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();
+  const Cultures = (await apiCulture.json()).response;
 
-  return { props: { departments, profiles } }
+  return { props: { departments, profiles, Cultures } }
 }

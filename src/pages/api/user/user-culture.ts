@@ -17,6 +17,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         case 'POST':
             res.status(200).json( await Controller.save(req.body));
             break
+        case 'DELETE':
+            res.status(200).json( await Controller.delete(req.body));
+            break
         default:
           res.status(405).end(`Method ${req.method} Not Allowed`)
     }

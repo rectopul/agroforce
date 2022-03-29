@@ -1,9 +1,68 @@
+import { ReactNode, useState } from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
+
+interface IDropDown {
+  labelDropDown: string;
+  hrefDropDown: string;
+  iconDropDown: ReactNode;
+}
+interface IContentProps {
+  titleTab: string;
+  valueTab: ReactNode;
+  statusTab: boolean;
+  // handleStatusTabs?: (title: string, status: boolean) => void;
+
+  data: IDropDown[];
+};
+
+export function TabsDropDowns () {
+  const tabsConfig: IContentProps[] = [
+    { 
+      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,
+      data: [
+        {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
+        {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
+        {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
+        {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
+        {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
+      ],
+    },
+    { 
+      titleTab: 'ENSAIO', valueTab: <BsCheckLg />, statusTab: false,
+      data: [
+        { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
+        { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
+        { labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser/> },
+      ],
+    },
+    { 
+      titleTab: 'LOCAL', valueTab: <BsCheckLg />, statusTab: false , 
+      data: [
+        { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <AiOutlineFileSearch/> },
+      ],
+    },
+    { 
+      titleTab: 'DELINEAMENTO', valueTab: <BsCheckLg />, statusTab: false,
+      data: [
+        { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
+      ],
+    },
+    {
+      titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
+      data: [
+        { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <AiOutlineFileSearch/> },
+      ],
+    },
+  ];
+
+  return tabsConfig;
+}
+
 
 const tabs = [
   { title: 'TMG', value: <BsCheckLg />, status: true, href: '/config/tmg/usuarios' },
@@ -55,7 +114,8 @@ const configPlanilhasDropDown =  [
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  tabs, 
+  TabsDropDowns,
+  tabs,
   tmgDropDown,
   ensaiosDropDown,
   localsDropDown,
