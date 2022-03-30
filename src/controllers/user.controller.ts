@@ -2,6 +2,9 @@ import {UserRepository} from '../repository/user.repository';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import { UserCultureController } from './user-culture.controller';
+import hmacSHA512 from 'crypto-js/hmac-sha512';
+import Base64 from 'crypto-js/enc-base64';
+
 export class UserController {
     userRepository = new UserRepository();
     usersPermissionRepository = new UsersPermissionsRepository();
@@ -124,6 +127,7 @@ export class UserController {
         const parametersPermissions: object | any  = new Object();
         try {
             if (data != null && data != undefined) {
+                data.password = Base64.stringify(hmacSHA512('TMG2022', data.password));
                 if (typeof(data.status) === 'string') {
                     parameters.status =  parseInt(data.status);
                 } else { 
@@ -202,9 +206,10 @@ export class UserController {
         }
     }
 
-    async signinUSer(data: object) {
+    async signinUSer(data: object | any) {
         try {
             if (data != null && data != undefined) {
+                data.password = Base64.stringify(hmacSHA512('TMG2022', data.password));
                 return await this.userRepository.signIn(data);
             }
         } catch(err) {
@@ -259,7 +264,8 @@ export class UserController {
                 }
 
                 if (data.password) {
-                    parameters.password = data.password;
+                    parameters.password = Base64.stringify(hmacSHA512('TMG2022', data.password));
+
                 }
 
                 if (data.created_by) {

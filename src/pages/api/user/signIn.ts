@@ -4,6 +4,7 @@ import {UserController} from '../../../controllers/user.controller';
 import { UserPermissionController } from 'src/controllers/user-permission.controller';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { UserCultureController } from 'src/controllers/user-culture.controller';
+import { SafraController } from 'src/controllers/safra.controller';
 
 const jwt = require('jsonwebtoken');
 
@@ -19,6 +20,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     const PermissionController = new UserPermissionController();
     const PreferencesControllers = new UserPreferenceController();
     const userCultureController = new UserCultureController();
+    const safraController = new SafraController();
 
     switch (req.method) {
         case 'POST':
@@ -33,6 +35,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       let permisions;
       let preferences: object | any = new Object;
       let userCulture: object | any = new Object;
+      let safras: object | any = new Object;
+  
       if (user) {
         const validateLogin: object | any= await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id, filterStatus: 1});
 
@@ -51,6 +55,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         });
 
         userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
+        safras = await safraController.getAllSafra({id_culture: userCulture.cultura_selecionada, filterStatus: 1}); 
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario =  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1}); preferences.usuario = preferences.usuario.response[0];
         preferences.culture=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2});  preferences.culture =  preferences.culture.response[0];
@@ -81,7 +86,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           token: token,
           permission: permisions,
           preferences,
-          userCulture
+          userCulture,
+          safras: safras.response
       });
     }
 }

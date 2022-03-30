@@ -48,7 +48,9 @@ interface IContentData {
 export function Content({ contentHeader, children }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
   const cultures: object | any = [];
+  const safras: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
+  const [safraSelecionada, setSafraSelecionada] = useState<any>(userLogado.safras[0].id);
 
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
     !contentHeader ? [
@@ -67,6 +69,12 @@ export function Content({ contentHeader, children }: IContentData) {
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
       cultures.push({id: value.cultureId, name: value.culture.name});
+    })
+  }
+
+  if (userLogado.safras[0]) {
+    userLogado.safras.map((value: string | object | any) => {
+      safras.push({id: value.id, name: value.year});
     })
   }
 
@@ -101,6 +109,12 @@ export function Content({ contentHeader, children }: IContentData) {
     } 
   }
 
+  function validationSafras (value: any) {
+    if (value != safraSelecionada) {
+      setSafraSelecionada(value);
+    } 
+  }
+
   return (
     <>
       <MainHeader
@@ -110,7 +124,7 @@ export function Content({ contentHeader, children }: IContentData) {
         headerSelects={
           <div className="h-10 flex gap-2">
             <Select values={cultures}   onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
-            {/* <Select values={cultures}   onChange={e => setCulturaSelecionada(e.target.value)} selected={culturaSelecionada} /> */}
+            <Select values={safras}   onChange={e => validationSafras(e.target.value)} selected={safraSelecionada} />
           </div>
         }
       >
