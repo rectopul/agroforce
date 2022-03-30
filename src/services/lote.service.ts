@@ -12,12 +12,13 @@ interface UpdateLoteDTO {
   id: number;
   name: string;
   volume: number;
+  status?: number;
 }
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
 
-export const cultureService = {
+export const loteService = {
   getAll,
   create,
   update

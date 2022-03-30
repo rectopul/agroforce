@@ -5,15 +5,15 @@ import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
+import { RiFileExcel2Line } from "react-icons/ri";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 import { useRouter } from "next/router";
 
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { cultureService, userPreferencesService } from "src/services";
+import { loteService, userPreferencesService } from "src/services";
 
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 
@@ -28,11 +28,11 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export interface ICulture {
+export interface Lote {
   id: number;
-  genealogy: string;
-  cruza: string;
-  status: number;
+  name: string;
+  volume: number;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -42,13 +42,13 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allCultures: ICulture[];
+  allLote: Lote[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
 }
 
-export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allLote, totalItems, itensPerPage, filterAplication}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -61,20 +61,19 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.culture ||{id:0, table_preferences: "id,name,status"};
+  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,name,volume,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
+  const [lotes, setLotes] = useState<Lote[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
-  // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -100,34 +99,34 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     },
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
           setTotaItems(response.total);
-          setCultures(response.response);
+          setLotes(response.response);
           setFilter(parametersFilter);
       })
     },
   });
 
-  async function handleStatusCulture(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusLote(id: number, data: Lote): Promise<void> {
+    if (data.status) {
+      data.status = 1;
     } else {
-      status = 0;
+      data.status = 0;
     }
     
-    const index = cultures.findIndex((culture) => culture.id === id);
+    const index = lotes.findIndex((lote) => lote.id === id);
 
     if (index === -1) {
       return;
     }
 
-    await cultureService.updateCulture({id: id, status: status});
-
-    setCultures((oldCulture) => {
-      const copy = [...oldCulture];
-      copy[index].status = status;
+    setLotes((oldLote) => {
+      const copy = [...oldLote];
+      copy[index].status = data.status;
       return copy;
     });
+    
+    await loteService.update(data);
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -156,6 +155,13 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
           sorting: false
         },);
       }
+      if (ObjetCampos[index] == 'volume') {
+        arrOb.push({
+          title: "Volume",
+          field: "volume",
+          sorting: false
+        },);
+      }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
@@ -163,7 +169,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: ICulture) => (
+          render: (rowData: Lote) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
@@ -171,15 +177,18 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                   onClick={() =>{}}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/cultura/atualizar?id=${rowData.id}`}
+                  href={`/config/npe/lote/atualizar?id=${rowData.id}`}
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusCulture(
-                      rowData.id, !rowData.status
+                    onClick={() => handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status = 0,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -189,8 +198,11 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusCulture(
-                      rowData.id, !rowData.status
+                    onClick={() => handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status = 1,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -216,13 +228,13 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 2 }).then((response) => {
-        userLogado.preferences.culture = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.culture = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.lote = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -256,7 +268,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
       }
     }
 
-    await cultureService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setOrderName(response.response)
       }
@@ -292,7 +304,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await cultureService.getAll(filterAplication).then((response) => {
+    await loteService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
@@ -306,7 +318,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "cultures");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -319,7 +331,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Culturas.xlsx");
+        XLSX.writeFile(workBook, "Lotes.xlsx");
       }
     });
   };
@@ -339,9 +351,9 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await cultureService.getAll(parametersFilter).then((response) => {
+    await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        setCultures(response.response);
+        setLotes(response.response);
       }
     });
   };
@@ -353,7 +365,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   
   return (
     <>
-      <Head><title>Listagem de culturas</title></Head>
+      <Head><title>Listagem de Lotes</title></Head>
 
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -361,7 +373,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar cultura">
+          <AccordionFilter title="Filtrar lote">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -389,7 +401,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="cultura"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -415,7 +427,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={cultures}
+              data={lotes}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -441,13 +453,12 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar cultura"
-                        value="Cadastrar cultura"
+                        title="Cadastrar lote"
+                        value="Cadastrar lote"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push('cultura/cadastro')}}
-                        href="cultura/cadastro"
-                        icon={<RiPlantLine size={20} />}
+                        onClick={() => {router.push('lote/cadastro')}}
+                        icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
 
@@ -575,7 +586,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = "filterStatus=1";
@@ -587,15 +598,17 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const npe = await fetch(urlParameters.toString(), requestOptions);
-  const response = await npe.json();
+  const lote = await fetch(urlParameters.toString(), requestOptions);
+  const response = await lote.json();
 
-  const allNpe = response.response;
+  const allLote = response.response;
   const totalItems = response.total;
+
+  console.log(allLote)
 
   return {
     props: {
-      allNpe,
+      allLote,
       totalItems,
       itensPerPage,
       filterAplication

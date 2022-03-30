@@ -6,11 +6,12 @@ interface LoteDTO {
   name: string;
   volume: number;
   created_by: number;
+  status?: number;
 }
 
-type CreateLoteDTO = Omit<LoteDTO, 'id'>;
+type CreateLoteDTO = Omit<LoteDTO, 'id' | 'status'>;
 type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
-type FindOne = Omit<LoteDTO, 'name' | 'volume' | 'created_by'>;
+type FindOne = Omit<LoteDTO, 'name' | 'volume' | 'created_by' | 'status'>;
 
 export class LoteController {
   public readonly required = 'Campo obrigatório';
@@ -65,6 +66,7 @@ export class LoteController {
         id: number().integer().required(this.required),
         name: string().required(this.required),
         volume: number().required(this.required),
+        status: number().integer(),
       });
 
       const valid = schema.isValidSync(data);
