@@ -1,6 +1,8 @@
 import { FocoRepository } from '../repository/foco.repository';
-
+import { number, object, SchemaOf, string } from 'yup';
 export class FocoController {
+  public readonly required = 'Campo obrigátorio';
+
   focoRepository = new FocoRepository();
 
   async listAllFocos(options: any) {
@@ -97,21 +99,49 @@ export class FocoController {
 
   async createFoco(data: any) {
     try {
+      const schema: SchemaOf<any> = object({
+        name: string().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const focoAlreadyExists = await this.focoRepository.findByName(data.name);
+
+      if (focoAlreadyExists) return {status: 400, message: "Foco já existente"};
+
       await this.focoRepository.create(data);
 
-      return {status: 201, message: "Item cadastrado"}
+      return {status: 201, message: "Foco cadastrado"}
     } catch(err) {
-      return { status: 404, message: "Item não cadastrado"}
+      return { status: 404, message: "Foco não cadastrado"}
     }
   };
 
   async updateFoco(data: any) {
     try {
+      const schema: SchemaOf<any> = object({
+        id: number().integer().required(this.required),
+        name: string().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const focoAlreadyExists = await this.focoRepository.findByName(data.name);
+
+      if (focoAlreadyExists) return {status: 400, message: "Foco já existente"};
+
+
       await this.focoRepository.update(data.id, data);
 
-      return {status: 200, message: "Item atualizado"}
+      return {status: 200, message: "Foco atualizado"}
     } catch (err) {
-      return { status: 404, message: "Item não encontrado" }
+      return { status: 404, message: "Foco não encontrado" }
     }
   };
 };
