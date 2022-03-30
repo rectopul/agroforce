@@ -52,6 +52,12 @@ export function TabsDropDowns () {
         { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
       ],
     },
+    { 
+      titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false,
+      data: [
+        { labelDropDown: 'Lote', hrefDropDown: '/config/npe/lote', iconDropDown: <AiOutlineFileSearch/> },
+      ],
+    },
     {
       titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
       data: [

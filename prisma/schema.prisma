@@ -223,3 +223,13 @@ model ogm {
   created_at     DateTime? @default(now())
 }
 
+model Lote {
+  id            Int @id @default(autoincrement())
+  name          String
+  volume        Int
+  status        Int       @default(1)
+  created_by    Int
+  created_at    DateTime @default(now())
+
+  @@map("lote")
+}
