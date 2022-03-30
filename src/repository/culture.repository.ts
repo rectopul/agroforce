@@ -27,7 +27,7 @@ export class CulturaRepository {
         
         result.total = count;
         return result;
-      }
+    }
 
     async create(data: any) {
         const culture = await prisma.culture.create({ data });

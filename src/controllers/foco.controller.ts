@@ -1,7 +1,7 @@
 import { FocoRepository } from '../repository/foco.repository';
 import { number, object, SchemaOf, string } from 'yup';
 export class FocoController {
-  public readonly required = 'Campo obrigátorio';
+  public readonly required = 'Campo obrigatório';
 
   focoRepository = new FocoRepository();
 

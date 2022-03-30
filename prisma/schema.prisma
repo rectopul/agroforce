@@ -188,6 +188,8 @@ model portfolio {
   created_by Int
   created_at DateTime? @default(now())
   culture    culture   @relation(fields: [id_culture], references: [id])
+
+  LotePortfolio LotePortfolio[]
 }
 
 model delineamento {
@@ -231,5 +233,19 @@ model Lote {
   created_by    Int
   created_at    DateTime @default(now())
 
+  LotePortfolio LotePortfolio[]
+
   @@map("lote")
+}
+
+model LotePortfolio {
+  id           Int @id @default(autoincrement())
+  id_portfolio Int
+  id_lote      Int
+  created_at    DateTime @default(now())
+
+  portfolio portfolio @relation(fields: [id_portfolio], references: [id])
+  lote Lote @relation(fields: [id_lote], references: [id])
+
+  @@map("lote_portfolio")
 }

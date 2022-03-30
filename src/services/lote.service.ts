@@ -8,6 +8,12 @@ interface CreateLoteDTO {
   created_by: number;
 }
 
+interface UpdateLoteDTO {
+  id: number;
+  name: string;
+  volume: number;
+}
+
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
 
@@ -27,7 +33,7 @@ async function getAll(parameters: any) {
   return lote;
 }
 
-async function update(data: any) {
+async function update(data: UpdateLoteDTO) {
   const lote = await fetchWrapper.put(baseUrl, data);
   return lote;
 }
