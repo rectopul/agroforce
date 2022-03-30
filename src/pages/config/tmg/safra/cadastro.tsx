@@ -30,6 +30,12 @@ interface ISafraProps {
   created_by: number;
 };
 
+interface Input {
+  year: string;
+  plantingStartTime: string;
+  plantingEndTime: string;
+};
+
 export default function Safra() {
   const { TabsDropDowns } = ITabs.default;
 
@@ -46,7 +52,6 @@ export default function Safra() {
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
   const [typeCrop, setTypeCrop] = useState<string>('');
-
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -66,19 +71,31 @@ export default function Safra() {
       formik.values.typeCrop = typeCrop;
       const { main_safra, ...data } = values;
 
+      const { 
+        created_by, 
+        id_culture, 
+        status, 
+        typeCrop: checkBox, 
+        ...inputs
+      } = data;
+
+      validateInputs(inputs);
+
+      if (!inputs) return;
+
       if (typeCrop === '' || !typeCrop || !data) {
         Swal.fire('Dados Inválidos!');
         throw new Error("Dados Inválidos");
       };
       
       await safraService.create({
-        id_culture: formik.values.id_culture,
+        id_culture: Number(culture),
         year: formik.values.year,
         typeCrop,
         plantingStartTime: formik.values.plantingStartTime,
         plantingEndTime: formik.values.plantingEndTime,
         status: formik.values.status,
-        created_by: formik.values.created_by,
+        created_by: Number(userLogado.id),
       }).then((response) => {
         if (response.status === 201) {
           Swal.fire('Safra cadastrada com sucesso!');
@@ -90,6 +107,30 @@ export default function Safra() {
       });
     },
   });
+
+  function validateInputs(values: Input) {
+    if (!values.year) {
+      let inputYear: any = document.getElementById("year");
+      inputYear.style.borderColor= 'red';
+    } else {
+      let inputYear: any = document.getElementById("year");
+      inputYear.style.borderColor= '';
+    }
+    if (!values.plantingStartTime) {
+      let inputPlantingStartTime: any = document.getElementById("plantingStartTime"); 
+      inputPlantingStartTime.style.borderColor= 'red'; 
+    } else {
+      let inputPlantingStartTime: any = document.getElementById("plantingStartTime");
+      inputPlantingStartTime.style.borderColor= '';
+    }
+    if (!values.plantingEndTime) {
+      let inputplantingEndTime: any = document.getElementById("plantingEndTime"); 
+      inputplantingEndTime.style.borderColor= 'red'; 
+    } else {
+      let inputPlantingEndTime: any = document.getElementById("plantingEndTime");
+      inputPlantingEndTime.style.borderColor= '';
+    }
+  };
   
   return (
     <>
@@ -116,6 +157,7 @@ export default function Safra() {
                 required
                 id="year"
                 name="year"
+                placeholder="Mês e ano"
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="
@@ -172,7 +214,6 @@ export default function Safra() {
               <Input
                 type="date" 
                 required
-                placeholder="Ex: 04/23"
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
@@ -188,7 +229,6 @@ export default function Safra() {
               <Input
                 type="date"
                 required
-                placeholder="Ex: 03/24" 
                 id="plantingEndTime"
                 name="plantingEndTime"
                 onChange={formik.handleChange}

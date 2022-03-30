@@ -26,6 +26,16 @@ export class SafraRepository {
         return safra;
     }
 
+    async findByYear(year: string) {
+        const safra = await prisma.safra.findFirst({
+            where: {
+                year
+            }
+        });
+
+        return safra;
+    }
+
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
         if (orderBy){

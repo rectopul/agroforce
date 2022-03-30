@@ -1,5 +1,16 @@
+import { prisma } from 'src/pages/api/db/db';
 import {SafraRepository} from '../repository/safra.repository';
 
+interface Safra {
+    id_culture: number;
+    year: string;
+    typeCrop: string;
+    plantingStartTime: string;
+    plantingEndTime: string;
+    main_safra?: number;
+    status?: number;
+    created_by: number;
+  };
 export class SafraController {
     safraRepository = new SafraRepository();
 
@@ -107,9 +118,14 @@ export class SafraController {
         }
     }
 
-    async postSafra(data: any) {
+    async postSafra(data: Safra) {
         try {
             const safraRepository = new SafraRepository();
+
+            const safraAlreadyExists = await safraRepository.findByYear(data.year);
+        
+            if (safraAlreadyExists) return { status: 400, message: "Safra já existente" };
+
             await safraRepository.create(data);
 
             return {status: 201, message: "Item inserido"}
@@ -121,6 +137,11 @@ export class SafraController {
     async updateSafra(data: any) {
         try {
             const safraRepository = new SafraRepository();
+
+            const safraAlreadyExists = await safraRepository.findByYear(data.year);
+        
+            if (safraAlreadyExists) return { status: 400, message: "Safra já existente" };
+            
             await safraRepository.update(data.id, data);
 
             return {status: 200, message: "Item atualizado"}
