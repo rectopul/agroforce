@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useFormik } from "formik";
 import getConfig from 'next/config';
@@ -59,7 +59,7 @@ interface Idata {
   filterAplication: object | any;
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -127,7 +127,12 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] == 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
+        arrOb.push({ 
+          title: "Código", 
+          field: "id", 
+          sorting: false,
+          width: 0,
+        })
       }
       if (ObjetCampos[item] == 'avatar') {
         arrOb.push({
@@ -201,6 +206,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   <Button 
                     icon={<FaRegUserCircle size={16} />}
                     onClick={() =>{}}
+                    title={`Perfil de ${rowData.name}`}
                     bgColor="bg-yellow-500"
                     textColor="white"
                     href="perfil"
@@ -211,6 +217,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
+                    title={`Atualizar ${rowData.name}`}
                     onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -219,6 +226,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
+                    title="Ativo"
                     onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -232,6 +240,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 ">
                   <Button 
                     icon={<FaRegUserCircle size={16} />}
+                    title={`Perfil de ${rowData.name}`}
                     onClick={() =>{}}
                     bgColor="bg-yellow-500"
                     textColor="white"
@@ -243,6 +252,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
+                    title={`Atualizar ${rowData.name}`}
                     onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -251,6 +261,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
+                    title="Inativo"
                     onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
@@ -518,7 +529,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="name ou email"
+                      placeholder="nome ou email"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"

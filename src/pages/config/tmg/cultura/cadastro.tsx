@@ -22,7 +22,7 @@ interface ICreateCulture {
   created_by: number;
 }
 
-export default function Cadastro() {
+export default function Cadastro(props) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -46,6 +46,9 @@ export default function Cadastro() {
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
+      validateInputs(values);
+      if (!values.name) return; 
+
       await cultureService.createCulture({
         name: formik.values.name,
         status: formik.values.status,
@@ -63,6 +66,16 @@ export default function Cadastro() {
       });
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.name) {
+      let inputName: any = document.getElementById("name"); 
+      inputName.style.borderColor= 'red'; 
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor= '';
+    }
+  }
 
   return (
     <>
