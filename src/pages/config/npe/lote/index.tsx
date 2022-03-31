@@ -104,14 +104,14 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
     },
   });
 
-  async function handleStatusLote(id: number, data: Lote): Promise<void> {
-    if (data.status) {
-      data.status = 1;
-    } else {
+  async function handleStatusLote(idItem: number, data: Lote): Promise<void> {
+    if (data.status === 1) {
       data.status = 0;
+    } else {
+      data.status = 1;
     }
-    
-    const index = lotes.findIndex((lote) => lote.id === id);
+
+    const index = lotes.findIndex((lote) => lote.id === idItem);
 
     if (index === -1) {
       return;
@@ -122,8 +122,10 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
       copy[index].status = data.status;
       return copy;
     });
-    
-    await loteService.update(data);
+
+    const { id, name, volume, status } = lotes[index];
+
+    await loteService.update({id, name, volume, status});
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -181,9 +183,9 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusLote(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
-                        status: rowData.status = 0,
+                        status: rowData.status,
                         ...rowData
                       }
                     )}
@@ -195,9 +197,9 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusLote(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
-                        status: rowData.status = 1,
+                        status: rowData.status,
                         ...rowData
                       }
                     )}

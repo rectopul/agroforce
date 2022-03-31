@@ -61,11 +61,12 @@ export class LoteController {
 
   async update(data: UpdateLoteDTO) {
     try {
+      console.log(data);
       const schema: SchemaOf<UpdateLoteDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
         volume: number().required(this.required),
-        status: number().integer(),
+        status: number(),
       });
 
       const valid = schema.isValidSync(data);
