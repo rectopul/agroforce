@@ -2,13 +2,13 @@ import {prisma} from '../pages/api/db/db';
 
 export class UserRepository {   
     async create(User: object | any) {
-        let Result = await prisma.user.create({ data: User}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.user.create({ data: User})
 
         return Result;
     }
 
     async createUserCulture(Cultures: object | any) {
-        let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_cultures.createMany({ data: Cultures})
 
         return Result;
     }
@@ -21,7 +21,7 @@ export class UserRepository {
                     id: id
                 },
                 data: Data })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;
@@ -33,7 +33,7 @@ export class UserRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
              Result.cultures = await prisma.users_cultures.findMany({where:{userId: id}});
         return Result;
     }
@@ -44,13 +44,13 @@ export class UserRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.user.count({ where: where })
-        let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
     }
     
     async signIn (Where: object) {
-        let Result = await prisma.user.findFirst({where: Where}) .finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.user.findFirst({where: Where}) 
         return Result;
     }
 
@@ -62,7 +62,7 @@ export class UserRepository {
             select: {
                 acess_permission: true
             }
-          }) .finally(async () => { await prisma.$disconnect() })
+          }) 
         return Result;
     }
 

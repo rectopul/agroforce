@@ -1,4 +1,4 @@
-import {LayoultQuadraRepository} from '../repository/layoult-quadra.repository';
+import { LayoultQuadraRepository } from '../repository/layoult-quadra.repository';
 
 export class LayoultQuadraController {
     Repository = new LayoultQuadraRepository();
@@ -61,7 +61,7 @@ export class LayoultQuadraController {
                 return {status: 200, response, total: response.total}
             }             
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
  
@@ -79,7 +79,7 @@ export class LayoultQuadraController {
                 return {status:405, response:[], message:'id não informado'};
             }
         } catch (err) {
-            console.log(err);
+            return {status: 400, message: err};
         }
     }
 
@@ -94,7 +94,7 @@ export class LayoultQuadraController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 
@@ -132,7 +132,7 @@ export class LayoultQuadraController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 }

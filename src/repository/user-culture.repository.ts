@@ -1,7 +1,7 @@
 import {prisma} from '../pages/api/db/db';
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
-        let Result = await prisma.users_cultures.createMany({ data: Cultures}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_cultures.createMany({ data: Cultures})
 
         return Result;
     }
@@ -14,7 +14,7 @@ export class UserCultureRepository {
                     id: id
                 },
                 data: Data })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;
@@ -32,7 +32,7 @@ export class UserCultureRepository {
     async delete(where: object ) {
         let Result = await prisma.users_cultures.deleteMany({
             where: where
-          }) .finally(async () => { await prisma.$disconnect() })
+          }) 
         return Result;
     }
 
@@ -41,7 +41,7 @@ export class UserCultureRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
@@ -51,7 +51,7 @@ export class UserCultureRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.users_cultures.count({ where: where })
-        let Result: object | any = await prisma.users_cultures.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.users_cultures.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
     }
@@ -70,7 +70,7 @@ export class UserCultureRepository {
                 status: true,        
                 culture: {select: {name: true}}
             },
-          }) .finally(async () => { await prisma.$disconnect() })
+          }) 
         return Result;
     }
 }

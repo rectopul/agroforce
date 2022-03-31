@@ -6,17 +6,17 @@ export class ProfileRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
     async findAll () {
-        let Result = await prisma.profile.findMany() .finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.profile.findMany() 
         return Result;
     }
 
     async create(Profile: object | any) {
-        let Result = await prisma.profile.create({ data: Profile }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.profile.create({ data: Profile })
         return Result;
     }
 
@@ -28,7 +28,7 @@ export class ProfileRepository {
                     id: id
                 },
                 data: Profile })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;

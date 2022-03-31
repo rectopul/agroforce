@@ -1,4 +1,4 @@
-import {DepartamentRepository} from '../repository/departament.repository';
+import { DepartamentRepository } from '../repository/departament.repository';
 
 export class DepartamentController {
   departamentRepository = new DepartamentRepository();
@@ -8,7 +8,7 @@ export class DepartamentController {
       const response = await this.departamentRepository.findAll();
       return response;       
     } catch (err) {
-      console.log(err)
+      return {status: 400, message: err}
     } 
   };
 
@@ -20,7 +20,6 @@ export class DepartamentController {
     let select: any = [];
   
     try {
-      console.log(options);
       if (options.filterStatus) {
         if (typeof(options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -88,7 +87,7 @@ export class DepartamentController {
         return {status: 200, response, total: response.total}
       }    
     } catch (err) {
-      console.log(err)
+      return {status: 400, message: err}
     } 
   };
 

@@ -1,25 +1,22 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
 import { useRouter } from "next/router";
-
+import { ReactNode, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { loteService, userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
-
+import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
 
 interface IFilter{
   filterStatus: object | any;
@@ -54,7 +51,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
+    tab.titleTab === 'NPE'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
@@ -107,14 +104,14 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
     },
   });
 
-  async function handleStatusLote(id: number, data: Lote): Promise<void> {
-    if (data.status) {
-      data.status = 1;
-    } else {
+  async function handleStatusLote(idItem: number, data: Lote): Promise<void> {
+    if (data.status === 1) {
       data.status = 0;
+    } else {
+      data.status = 1;
     }
-    
-    const index = lotes.findIndex((lote) => lote.id === id);
+
+    const index = lotes.findIndex((lote) => lote.id === idItem);
 
     if (index === -1) {
       return;
@@ -125,8 +122,16 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
       copy[index].status = data.status;
       return copy;
     });
-    
-    await loteService.update(data);
+
+    const { id, name, volume, status } = lotes[index];
+
+    await loteService.update({id, name, volume, status}).then((response) => {
+      if (response.status === 200) {
+        alert('Lote atualizado com sucesso!');
+      } else {
+        alert(response.message);
+      }
+    });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -184,9 +189,9 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusLote(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
-                        status: rowData.status = 0,
+                        status: rowData.status,
                         ...rowData
                       }
                     )}
@@ -198,9 +203,9 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusLote(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
-                        status: rowData.status = 1,
+                        status: rowData.status,
                         ...rowData
                       }
                     )}
@@ -599,12 +604,10 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const lote = await fetch(urlParameters.toString(), requestOptions);
-  const response = await lote.json();
+  const Response = await lote.json();
 
-  const allLote = response.response;
-  const totalItems = response.total;
-
-  console.log(allLote)
+  const allLote = Response.response;
+  const totalItems = Response.total;
 
   return {
     props: {

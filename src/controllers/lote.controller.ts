@@ -1,6 +1,5 @@
-import { LoteRepository } from '../repository/lote.repository';
 import { number, object, SchemaOf, string } from 'yup';
-import { prisma } from 'src/pages/api/db/db';
+import { LoteRepository } from '../repository/lote.repository';
 interface LoteDTO {
   id: number;
   name: string;
@@ -50,7 +49,7 @@ export class LoteController {
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name);
 
-      if (loteAlreadyExists) return { status: 400, message: "Lote já existente" };
+      if (loteAlreadyExists?.name) return { status: 400, message: "Lote já existente" };
 
       await this.loteRepository.create(data);
   
@@ -66,17 +65,17 @@ export class LoteController {
         id: number().integer().required(this.required),
         name: string().required(this.required),
         volume: number().required(this.required),
-        status: number().integer(),
+        status: number(),
       });
 
       const valid = schema.isValidSync(data);
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const loteAlreadyExists = await this.loteRepository.findByName(data.name);
-
-      if (loteAlreadyExists) return {status: 400, message: "Lote já existente"};
-
+      const loteAlreadyExists = await this.loteRepository.findById(data.id);
+      
+      if (!loteAlreadyExists) return {status: 400, message: "Lote não existente"};
+      
       await this.loteRepository.update(data.id, data);
 
       return {status: 200, message: "Lote atualizado"}

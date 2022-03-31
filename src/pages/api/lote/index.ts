@@ -1,6 +1,6 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import {LoteController} from '../../../controllers/lote.controller';
+import { LoteController } from '../../../controllers/lote.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default  apiHandler(handler);
@@ -24,4 +24,6 @@ export default  apiHandler(handler);
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`)
   }
+
+  return;
 }

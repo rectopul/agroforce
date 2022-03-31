@@ -31,7 +31,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     async function authenticate() {
-      const user = await Controller.signinUSer(req.body);
+      const user: any = await Controller.signinUSer(req.body);
       let permisions;
       let preferences: object | any = new Object;
       let userCulture: object | any = new Object;
