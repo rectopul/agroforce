@@ -1,5 +1,5 @@
-import { FocoRepository } from '../repository/foco.repository';
 import { number, object, SchemaOf, string } from 'yup';
+import { FocoRepository } from '../repository/foco.repository';
 export class FocoController {
   public readonly required = 'Campo obrigatório';
 
@@ -79,7 +79,7 @@ export class FocoController {
         return {status: 200, response, total: response.total}
       }    
     } catch (err) {
-      console.log(err)
+      return {status: 400, message: err}
     }
   };
 

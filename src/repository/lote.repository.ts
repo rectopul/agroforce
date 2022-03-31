@@ -32,7 +32,7 @@ export class LoteRepository {
     const lote = await this.findById(id);
 
     if (lote !== null) {
-      const result = await prisma.culture.update({
+      const result = await prisma.lote.update({
         where: { id },
         data
       });

@@ -1,6 +1,6 @@
-import {UserRepository} from '../repository/user.repository';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
 var  CryptoJS  =  require ("crypto") ; 
 const alg = 'aes-256-ctr';
@@ -99,7 +99,7 @@ export class UserController {
             }
 
         } catch(err) {
-           console.log(err)
+            return {status: 400, message: err}
         }
             
     }
@@ -119,7 +119,7 @@ export class UserController {
                 return {status:405, response:{error: 'id não informado'}};
             }
         } catch(err) {
-            console.log(err);
+            return {status: 400, message: err}
         }
     }
 
@@ -203,7 +203,7 @@ export class UserController {
                 }
             }
         } catch(err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 
@@ -214,7 +214,7 @@ export class UserController {
                 return await this.userRepository.signIn(data);
             }
         } catch(err) {
-            console.log(err);
+            return {status: 400, message: err}
         }
     }
 

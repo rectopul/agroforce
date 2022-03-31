@@ -1,6 +1,5 @@
-import {UserCultureRepository} from '../repository/user-culture.repository';
+import { UserCultureRepository } from '../repository/user-culture.repository';
 
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
 export class UserCultureController {
     userCultureRepository = new UserCultureRepository();
 
@@ -109,7 +108,7 @@ export class UserCultureController {
                 return {status:405, response:{error: 'id não informado'}};
             }
         } catch (err) {
-            console.log(err);
+            return {status: 400, message: err}
         }  
     }
 
@@ -127,7 +126,7 @@ export class UserCultureController {
                 
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }   
 
@@ -145,7 +144,7 @@ export class UserCultureController {
                 return {status: 200}
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 
@@ -153,7 +152,7 @@ export class UserCultureController {
         try {
             await this.userCultureRepository.updateAllStatus(userId);
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 
@@ -167,7 +166,7 @@ export class UserCultureController {
                 return {status: 400, message: "id não informado"}
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 }

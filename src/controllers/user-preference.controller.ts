@@ -58,7 +58,7 @@ export class UserPreferenceController {
                 return {status: 200, response}
             }    
         } catch (err) {
-            
+            return {status: 400, response: []}
         }
     }
 

@@ -1,25 +1,24 @@
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
-import Head from "next/head";
 import getConfig from 'next/config';
+import Head from "next/head";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import Swal from 'sweetalert2'
-import InputMask from "react-input-mask";
-
-import { layoultQuadraService } from "src/services";
-
-import {
-  Content,
-  Input,
-  Select,
-  Button,
-} from "../../../components";
-
-import * as ITabs from '../../../shared/utils/dropdown';
-import { IoMdArrowBack } from "react-icons/io";
 import { FiUserPlus } from "react-icons/fi";
+import { IoMdArrowBack } from "react-icons/io";
+import InputMask from "react-input-mask";
+import { layoultQuadraService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input,
+  Select
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
+
 
 interface ILayoultProps {
   id: Number | any;
@@ -541,7 +540,6 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
 
   let local = await apiLocal.json();
   local = local.response
-  console.log(local)
   return { props: { local } }
 }
 

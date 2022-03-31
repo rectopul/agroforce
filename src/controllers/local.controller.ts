@@ -1,4 +1,4 @@
-import {LocalRepository} from '../repository/local.repository';
+import { LocalRepository } from '../repository/local.repository';
 export class LocalController {
     localRepository = new LocalRepository();
 
@@ -23,7 +23,7 @@ export class LocalController {
                 return response;
             }
         } catch (err) {
-            console.log(err);
+            throw new Error('Não encontrado');
         }
     }
 
@@ -41,7 +41,7 @@ export class LocalController {
             }
             return this.localRepository.findCitys(parameters, select, take, skip, orderBy);
         } catch (err) {
-            console.log(err);
+            throw new Error('Cidade não encontrada')
         }
     }
 
@@ -115,7 +115,7 @@ export class LocalController {
                 return {status: 200, response, total: response.total};
             }             
         } catch (err) {
-            console.log(err);
+            return {status: 400, message: err};
         }
     }
 
@@ -134,7 +134,7 @@ export class LocalController {
                 return {status:405, response:{error: 'id não informado'}};
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 
@@ -154,7 +154,7 @@ export class LocalController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 
@@ -185,7 +185,7 @@ export class LocalController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }
     }
 }

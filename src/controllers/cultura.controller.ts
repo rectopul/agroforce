@@ -1,4 +1,4 @@
-import {CulturaRepository} from '../repository/culture.repository';
+import { CulturaRepository } from '../repository/culture.repository';
 
 export class CulturaController {
   culturaRepository = new CulturaRepository();
@@ -78,7 +78,7 @@ export class CulturaController {
         return {status: 200, response, total: response.total}
       }    
     } catch (err) {
-      console.log(err)
+      return {status: 400, message: err}
     }  
   };
     

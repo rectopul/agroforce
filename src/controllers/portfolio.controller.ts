@@ -84,7 +84,7 @@ export class PortfolioController {
         return {status: 200, response, total: response.total}
       }    
     } catch(err) {  
-      console.log(err)
+      return {status: 400, message: err}
     }   
   }
 
@@ -98,7 +98,7 @@ export class PortfolioController {
 
       return {status: 200 , response};
     } catch (err) {
-      console.log(err);
+      return {status: 400, message: err}
     }
   }
 
@@ -108,7 +108,7 @@ export class PortfolioController {
 
       return {status: 201, message: "Item cadastrado"}
     } catch(err) {
-      console.log(err);
+      return {status: 400, message: err}
     }
   }
 
@@ -118,7 +118,7 @@ export class PortfolioController {
 
       return {status: 200, message: "Item atualizado!"}
     } catch (err) {
-     console.log(err);
+     return {status: 400, message: err}
     }
   }
 }

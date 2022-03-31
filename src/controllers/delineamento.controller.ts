@@ -1,4 +1,4 @@
-import {DelineamentoRepository} from '../repository/delineamento.repository';
+import { DelineamentoRepository } from '../repository/delineamento.repository';
 
 export class DelineamentoController {
     Repository = new DelineamentoRepository();
@@ -61,7 +61,7 @@ export class DelineamentoController {
                 return {status: 200, response, total: response.total}
             }           
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
  
@@ -79,7 +79,7 @@ export class DelineamentoController {
                 return {status:405, response:{error: 'id não informado'}};
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 
@@ -94,7 +94,7 @@ export class DelineamentoController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 
@@ -121,7 +121,7 @@ export class DelineamentoController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: err}
         }  
     }
 }

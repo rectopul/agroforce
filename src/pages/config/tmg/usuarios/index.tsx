@@ -1,35 +1,30 @@
-import { useEffect, useState } from "react";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import Head from "next/head";
 import { useFormik } from "formik";
-import getConfig from 'next/config';
 import MaterialTable from "material-table";
-import * as XLSX from 'xlsx';
+import { GetServerSideProps } from "next";
+import getConfig from 'next/config';
+import Head from "next/head";
 import { useRouter } from "next/router";
-
-import { userPreferencesService, userService } from "src/services";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-
-import { 
-  Button, 
-  Content, 
-  Select, 
-  Input,
-  AccordionFilter,
-  CheckBox
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-
-import { FiUserPlus } from "react-icons/fi";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { userPreferencesService, userService } from "src/services";
 import { handleFormatTel } from "src/shared/utils/tel";
+import * as XLSX from 'xlsx';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
+
 
 interface IUsers {
   id: number,
@@ -51,7 +46,7 @@ interface IGenarateProps {
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
+interface IData {
   alItems: IUsers[];
   totalItems: Number;
   filter: string | any;
@@ -59,7 +54,7 @@ interface Idata {
   filterAplication: object | any;
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
