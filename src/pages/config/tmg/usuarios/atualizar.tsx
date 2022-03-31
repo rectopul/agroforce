@@ -25,7 +25,9 @@ import {
 import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { Key } from "react";
+import { functionsUtils } from "src/shared/utils/functionsUtils";
+var  CryptoJS  =  require ( "crypto-js" ) ; 
+
 export interface IData {
   profiles: IProfile[];
   departments: IDepartment[];
@@ -63,8 +65,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       email: userEdit[0].email,
       cpf: userEdit[0].cpf,
       tel: userEdit[0].tel,
-      password: userEdit[0].password,
-      confirmPassword: userEdit[0].password,
+      password: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
+      confirmPassword: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
       profiles: [],
       cultureId: '',
       registration: userEdit[0].registration,
@@ -243,13 +245,13 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Setor
               </label>
-              <Select2
+              <Select
                 id="department.id"
                 required
                 name="departmentId"
                 onChange={formik.handleChange}
-                data={departments}
-                selected={formik.values.departmentId}
+                values={departments}
+                selected={userEdit[0].departmentId}
               />
             </div>
           </div>

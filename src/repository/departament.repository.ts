@@ -9,7 +9,7 @@ export class DepartamentRepository {
     }
 
     async findAll () {
-        const result = await prisma.department.findMany();
+        const result = await prisma.department.findMany({where: {status: 1}});
         return result;
     }
 

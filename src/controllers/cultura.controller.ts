@@ -18,6 +18,8 @@ export class CulturaController {
         } else {
           if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
         }
+      } else {
+        parameters.status =1;
       }
 
       if (options.filterSearch) {
