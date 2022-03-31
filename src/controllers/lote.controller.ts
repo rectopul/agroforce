@@ -61,7 +61,6 @@ export class LoteController {
 
   async update(data: UpdateLoteDTO) {
     try {
-      console.log(data);
       const schema: SchemaOf<UpdateLoteDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
@@ -76,12 +75,6 @@ export class LoteController {
       const loteAlreadyExists = await this.loteRepository.findById(data.id);
       
       if (!loteAlreadyExists) return {status: 400, message: "Lote não existente"};
-      
-      const loteNameAlreadyExists = await this.loteRepository.findByName(data.name);
-      
-      if (loteNameAlreadyExists) {
-        return {status: 400, message: "Lote já existente"};
-      }
       
       await this.loteRepository.update(data.id, data);
 
