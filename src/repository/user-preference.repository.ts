@@ -2,7 +2,7 @@ import {prisma} from '../pages/api/db/db';
 
 export class UserPreferenceRepository {   
     async create(Permission: object | any) {
-        let Result = await prisma.users_preferences.create({ data: Permission, select:{id: true}}).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.users_preferences.create({ data: Permission, select:{id: true}})
         return Result;
     }
 
@@ -16,7 +16,7 @@ export class UserPreferenceRepository {
                 },
                 data: {table_preferences: Data.table_preferences}
                 })
-                .finally(async () => { await prisma.$disconnect() })
+                
         } else {
             Result = await prisma.users_preferences.upsert({ 
                 update:{
@@ -30,7 +30,7 @@ export class UserPreferenceRepository {
                     userId: Data.userId,
                     module_id: Data.module_id
                 }})
-                .finally(async () => { await prisma.$disconnect() })
+                
         }
         return Result;
     }
@@ -41,7 +41,7 @@ export class UserPreferenceRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.users_preferences.count({ where: where })
-        let Result: object | any = await prisma.users_preferences.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.users_preferences.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
     }
@@ -51,7 +51,7 @@ export class UserPreferenceRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let Result: object | any = await prisma.config_gerais.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() });
+        let Result: object | any = await prisma.config_gerais.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) ;
         return Result;
     }
 }

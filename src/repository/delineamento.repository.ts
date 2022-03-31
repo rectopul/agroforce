@@ -6,7 +6,7 @@ export class DelineamentoRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
@@ -16,14 +16,14 @@ export class DelineamentoRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.delineamento.count({ where: where })
-        let Result: object | any = await prisma.delineamento.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.delineamento.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
     }
 
     async create(Local: object | any) {
         Local.created_at = new Date();
-        let Result = await prisma.delineamento.create({ data: Local }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.delineamento.create({ data: Local })
         return Result;
     }
 
@@ -35,7 +35,7 @@ export class DelineamentoRepository {
                     id: id
                 },
                 data: Local })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;

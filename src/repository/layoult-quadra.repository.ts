@@ -6,7 +6,7 @@ export class LayoultQuadraRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
@@ -16,7 +16,7 @@ export class LayoultQuadraRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.layoult_quadra.count({ where: where })
-        let Result: object | any = await prisma.layoult_quadra.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.layoult_quadra.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.map((value: string | object | any, item: any) => {
             Result[item].local = Result[item].local.name;
         })
@@ -26,7 +26,7 @@ export class LayoultQuadraRepository {
 
     async create(Local: object | any) {
         Local.created_at = new Date();
-        let Result = await prisma.layoult_quadra.create({ data: Local }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.layoult_quadra.create({ data: Local })
         return Result;
     }
 
@@ -38,7 +38,7 @@ export class LayoultQuadraRepository {
                     id: id
                 },
                 data: Local })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;
