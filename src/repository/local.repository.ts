@@ -6,7 +6,7 @@ export class LocalRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
@@ -16,7 +16,7 @@ export class LocalRepository {
             order = JSON.parse(orderBy);
         }
         let count = await prisma.local.count({ where: where })
-        let Result: object | any = await prisma.local.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.local.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
     }
@@ -26,7 +26,7 @@ export class LocalRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let Result: object | any = await prisma.uf.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.uf.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         return Result;
     }
 
@@ -35,7 +35,7 @@ export class LocalRepository {
                where: {
                    id: id
                }
-             }) .finally(async () => { await prisma.$disconnect() })
+             }) 
         return Result;
     }
 
@@ -44,13 +44,13 @@ export class LocalRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let Result: object | any = await prisma.city.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) .finally(async () => { await prisma.$disconnect() })
+        let Result: object | any = await prisma.city.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         return Result;
     }
 
     async create(Local: object | any) {
         Local.created_at = new Date();
-        let Result = await prisma.local.create({ data: Local }).finally(async () => { await prisma.$disconnect() })
+        let Result = await prisma.local.create({ data: Local })
         return Result;
     }
 
@@ -62,7 +62,7 @@ export class LocalRepository {
                     id: id
                 },
                 data: Local })
-                .finally(async () => { await prisma.$disconnect() })
+                
             return Result;
         } else {
             return false;
