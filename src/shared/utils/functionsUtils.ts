@@ -1,5 +1,10 @@
+var  CryptoJS  =  require ("crypto") ; 
+const alg = 'aes-256-ctr';
+const pwd = 'TMG2022';
+
 export const functionsUtils = {
-    validationCPF
+    validationCPF,
+	Crypto
 };
 
 function validationCPF(cpf: any) {
@@ -37,5 +42,18 @@ function validationCPF(cpf: any) {
 	if (rev != parseInt(cpf.charAt(10)))
 		return false;		
 	return true;   
+var  CryptoJS  =  require ("crypto") ; 
+}
+
+function Crypto (data: any, type: any) {
+	if (type == "cipher") {
+		const cipher: any = CryptoJS.createCipher(alg, pwd); 
+		data = cipher.update(data, 'utf8', 'hex');
+	} else if (type == 'decipher') { 
+		const decipher = CryptoJS.createDecipher(alg, pwd);
+		data = decipher.update(data, 'hex', 'utf8');
+	}
+
+	return data;
 }
 

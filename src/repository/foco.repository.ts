@@ -13,6 +13,15 @@ export class FocoRepository {
     return foco;
   }
 
+  async findByName(name: string) {
+    const foco = await prisma.foco.findFirst({
+      where: { 
+        name
+      }
+    });
+    return foco;
+  }
+
   async update(id: number, data: any) {
     const foco = await this.findOne(id);
 

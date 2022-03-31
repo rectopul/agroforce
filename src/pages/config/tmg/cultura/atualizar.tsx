@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from 'next/router';
 import getConfig from 'next/config';
 import { useFormik } from 'formik'
@@ -25,7 +25,7 @@ export interface IUpdateCulture {
   created_by: number;
 };
 
-export default function Cultura(culture: IUpdateCulture) {
+export default function Cultura(culture: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -47,6 +47,9 @@ export default function Cultura(culture: IUpdateCulture) {
       created_by: culture.created_by
     },
     onSubmit: async (values) => {
+      validateInputs(values);
+      if (!values.name) return; 
+      
       await cultureService.updateCulture({
         id: culture.id,
         name: formik.values.name,
@@ -65,6 +68,16 @@ export default function Cultura(culture: IUpdateCulture) {
       });
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.name) {
+      let inputName: any = document.getElementById("name"); 
+      inputName.style.borderColor= 'red'; 
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor= '';
+    }
+  }
 
   return (
     <>

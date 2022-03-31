@@ -1,103 +1,95 @@
-import { useEffect, useState } from "react";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
-import getConfig from 'next/config';
 import MaterialTable from "material-table";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import * as XLSX from 'xlsx';
 import { useRouter } from "next/router";
 
-import { userPreferencesService, userService } from "src/services";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { loteService, userPreferencesService } from "src/services";
 
-import { 
-  Button, 
-  Content, 
-  Select, 
-  Input,
-  AccordionFilter,
-  CheckBox
-} from "../../../../components";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 
-import  * as ITabs from '../../../../shared/utils/dropdown';
-
-import { FiUserPlus } from "react-icons/fi";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import ITabs from "../../../../shared/utils/dropdown";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { IoReloadSharp } from "react-icons/io5";
-import { handleFormatTel } from "src/shared/utils/tel";
 
-interface IUsers {
-  id: number,
-  name: string,
-  cpf: string,
-  email: string,
-  tel: string,
-  avatar: string,
-  status: boolean,
-}
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
+
+export interface Lote {
+  id: number;
+  name: string;
+  volume: number;
+  status?: number;
+}
+
 interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
-  alItems: IUsers[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
+
+interface IData {
+  allLote: Lote[];
+  totalItems: number;
+  itensPerPage: number;
   filterAplication: object | any;
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs.default;
+export default function Listagem({allLote, totalItems, itensPerPage, filterAplication}: IData) {
+  const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    tab.titleTab === 'TMG'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario ||{id:0, table_preferences: "id,avatar,name,tel,email,status"};
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [users, setData] = useState<IUsers[]>(() => alItems);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,name,volume,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
+  const [lotes, setLotes] = useState<Lote[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderEmail, setOrderEmail] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<any>('');
-  const [arrowEmail, setArrowEmail] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id", defaultChecked: () => camposGerenciados.includes('id')},
-    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar')},
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
-    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
-  ]);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" }
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
+
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = colums(camposGerenciados);
-  
+  const columns = columnsOrder(camposGerenciados);
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -106,52 +98,50 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
           setTotaItems(response.total);
+          setLotes(response.response);
           setFilter(parametersFilter);
-          setData(response.response);
       })
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
-  ];
+  async function handleStatusLote(id: number, data: Lote): Promise<void> {
+    if (data.status) {
+      data.status = 1;
+    } else {
+      data.status = 0;
+    }
+    
+    const index = lotes.findIndex((lote) => lote.id === id);
 
-  function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+    if (index === -1) {
+      return;
+    }
+
+    setLotes((oldLote) => {
+      const copy = [...oldLote];
+      copy[index].status = data.status;
+      return copy;
+    });
+    
+    await loteService.update(data);
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
 
-    Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'id') {
-        arrOb.push({ 
-          title: "Código", 
-          field: "id", 
-          sorting: false,
-          width: 0,
-        })
-      }
-      if (ObjetCampos[item] == 'avatar') {
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
         arrOb.push({
-          title: "Avatar", 
-          field: "avatar",
-          sorting: false, 
-          width: 0,
-          exports: false,
-          render: (rowData: IUsers) => (
-            !rowData.avatar || rowData.avatar === '' ? (
-              <FaRegUserCircle size={32} />
-              ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={rowData.avatar} alt={rowData.name} style={{ width: 45, height: 43, borderRadius: 99999 }} />
-            )
-          )
-        });
-      } 
-      if (ObjetCampos[item] == 'name') {
+          title: "Código",
+          field: "id",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -165,112 +155,61 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
           sorting: false
         },);
       }
-      
-      if (ObjetCampos[item] == 'email') {
+      if (ObjetCampos[index] == 'volume') {
         arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowEmail }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
-                E-mail
-              </button>
-            </div>
-          ), 
-          field: "email",
+          title: "Volume",
+          field: "volume",
           sorting: false
         },);
       }
-      if (ObjetCampos[item] == 'tel') {
-        arrOb.push({ 
-          title: "Telefone", 
-          field: "tel", 
-          sorting: false,
-          render: (rowData: IUsers) => (
-            handleFormatTel(rowData.tel)
-          )
-        })
-      }
-      if (ObjetCampos[item] == 'status') {
+      if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IUsers) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    title={`Perfil de ${rowData.name}`}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
+          render: (rowData: Lote) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button 
+                  icon={<BiEdit size={16} />}
+                  onClick={() =>{}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+                />
+              </div>
+              {rowData.status === 1 ? (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    title="Ativo"
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={() => handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status = 0,
+                        ...rowData
+                      }
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    title={`Perfil de ${rowData.name}`}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  />
-                </div>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
+              ) : (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    title="Inativo"
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={() => handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status = 1,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              </div>
-            )
+              )}
+            </div>
           ),
         })
       }
@@ -289,83 +228,19 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 1 }).then((response) => {
-        userLogado.preferences.usuario = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.usuario = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.lote = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await userService.update({id: id, status: status});
-    const index = users.findIndex((user) => user.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setData((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  };
-
-  async function handleOrderEmail(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setData(response.response)
-      }
-    })
-    if (orderEmail === 2) {
-      setOrderEmail(0);
-      setArrowEmail(<AiOutlineArrowDown />);
-    } else {
-      setOrderEmail(orderEmail + 1);
-      if (orderEmail === 1) {
-        setArrowEmail(<AiOutlineArrowUp />);
-      } else {
-        setArrowEmail('');
-      }
-    }
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -393,9 +268,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       }
     }
 
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setData(response.response)
+        setOrderName(response.response)
       }
     });
     
@@ -424,16 +299,14 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     setGenaratesProps(items);
   };
 
-  const downloadExcel = async(): Promise<void> => {
+  const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await userService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-
+    await loteService.getAll(filterAplication).then((response) => {
+      if (response.status === 200) {
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
             row.status = "Inativo";
           } else {
@@ -445,20 +318,20 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
     
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
-        // Download xlsx || csv
-        XLSX.writeFile(workBook, "Usuários.xlsx");
+        // Download
+        XLSX.writeFile(workBook, "Lotes.xlsx");
       }
     });
   };
@@ -478,9 +351,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await userService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setData(response.response);
+    await loteService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setLotes(response.response);
       }
     });
   };
@@ -489,19 +362,18 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-
+  
   return (
     <>
-      <Head>
-        <title>Listagem de usuários</title>
-      </Head>
+      <Head><title>Listagem de Lotes</title></Head>
+
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar usuários">
+          <AccordionFilter title="Filtrar lote">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -521,7 +393,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -529,7 +401,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="nome ou email"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -551,18 +423,16 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
             </div>
           </AccordionFilter>
 
-          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable
+            <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={users}
+              data={lotes}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20
                 },
-                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -583,21 +453,20 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar usuário"
-                        value="Cadastrar usuário"
+                        title="Cadastrar lote"
+                        value="Cadastrar lote"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push('usuarios/cadastro')}}
-                        icon={<FiUserPlus size={20} />}
+                        onClick={() => {router.push('lote/cadastro')}}
+                        icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
+                        <div className="w-72">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -618,11 +487,11 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                           {(provided) => (
                                             <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox 
-                                                name={genarate.name} 
-                                                title={genarate.title?.toString()} 
-                                                value={genarate.value} 
-                                                defaultChecked={camposGerenciados.includes(genarate.value)}
+                                              <CheckBox
+                                                name={genarate.name}
+                                                title={genarate.title?.toString()}
+                                                value={genarate.value}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -717,7 +586,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = "filterStatus=1";
@@ -729,15 +598,17 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await user.json();
-  
-  let alItems = Response.response;
-  let totalItems = Response.total;
+  const lote = await fetch(urlParameters.toString(), requestOptions);
+  const response = await lote.json();
+
+  const allLote = response.response;
+  const totalItems = response.total;
+
+  console.log(allLote)
 
   return {
     props: {
-      alItems,
+      allLote,
       totalItems,
       itensPerPage,
       filterAplication

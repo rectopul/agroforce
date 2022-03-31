@@ -133,7 +133,7 @@ export default function Atualizar(foco: IUpdateFoco) {
             <div className="w-40">
               <Button
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
