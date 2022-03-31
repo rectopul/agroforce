@@ -7,7 +7,7 @@ import { prisma } from "../pages/api/db/db";
 
 export class LoteRepository {
   async create(data: CreateLotePortfolioDTO) {
-    const lotePortfolio = await prisma.lotePortfolio.create({
+    const lotePortfolio = await prisma.lote_portfolio.create({
       data
     });
 
