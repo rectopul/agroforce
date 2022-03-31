@@ -189,7 +189,7 @@ model portfolio {
   created_at DateTime? @default(now())
   culture    culture   @relation(fields: [id_culture], references: [id])
 
-  LotePortfolio LotePortfolio[]
+  LotePortfolio lote_portfolio[]
 }
 
 model delineamento {
@@ -225,7 +225,7 @@ model ogm {
   created_at     DateTime? @default(now())
 }
 
-model Lote {
+model lote {
   id            Int @id @default(autoincrement())
   name          String
   volume        Int
@@ -233,19 +233,15 @@ model Lote {
   created_by    Int
   created_at    DateTime @default(now())
 
-  LotePortfolio LotePortfolio[]
-
-  @@map("lote")
+  LotePortfolio lote_portfolio[]
 }
 
-model LotePortfolio {
+model lote_portfolio {
   id           Int @id @default(autoincrement())
   id_portfolio Int
   id_lote      Int
   created_at    DateTime @default(now())
 
   portfolio portfolio @relation(fields: [id_portfolio], references: [id])
-  lote Lote @relation(fields: [id_lote], references: [id])
-
-  @@map("lote_portfolio")
+  lote lote @relation(fields: [id_lote], references: [id])
 }
