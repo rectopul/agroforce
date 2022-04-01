@@ -165,11 +165,11 @@ export class UserController {
 
                 // Validação de email existente. 
                 let validateEmail: object | any = await this.getAllUser({email:data.email});
-                if (validateEmail[0])return {status: 400, message: 'Email ja cadastrado'};
+                if (validateEmail.total > 0)return {status: 400, message: 'Email ja cadastrado'};
 
                 // Validação de cpf existente. 
                 let validateCPF: object | any  = await this.getAllUser({cpf:data.cpf});
-                if (validateCPF[0]) return {status: 400, message: 'CPF já cadastrado'};
+                if (validateCPF.total > 0) return {status: 400, message: 'CPF já cadastrado'};
 
                 // Validação cpf é valido
                 if(!functionsUtils.validationCPF(data.cpf))  return {status: 400, message: 'CPF invalído'};
