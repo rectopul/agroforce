@@ -12,6 +12,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 export interface ICreateLote {
   name: string;
   volume: number;
+  status: number;
   created_by: number;
 }
 
@@ -36,6 +37,7 @@ export default function  Cadastro() {
     initialValues: {
       name: '',
       volume: 0,
+      status: 1,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
@@ -48,6 +50,7 @@ export default function  Cadastro() {
       await loteService.create({
         name: formik.values.name,
         volume: formik.values.volume,
+        status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {

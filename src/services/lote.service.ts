@@ -1,10 +1,11 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
+
 
 interface CreateLoteDTO {
   name: string;
   volume: number;
+  status: number;
   created_by: number;
 }
 
