@@ -125,13 +125,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
 
     const { id, name, volume, status } = lotes[index];
 
-    await loteService.update({id, name, volume, status}).then((response) => {
-      if (response.status === 200) {
-        alert('Lote atualizado com sucesso!');
-      } else {
-        alert(response.message);
-      }
-    });
+    await loteService.update({id, name, volume, status});
   };
 
   function columnsOrder(camposGerenciados: string) {

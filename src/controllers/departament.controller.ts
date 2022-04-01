@@ -1,6 +1,20 @@
+import { number, object, SchemaOf, string } from 'yup';
 import { DepartamentRepository } from '../repository/departament.repository';
 
+interface DepartmentDTO {
+  id: number;
+  name: string;
+  status: number;
+  created_by: number;
+}
+
+type CreateDepartmentDTO = Omit<DepartmentDTO, 'id' | 'status'>;
+type UpdateDepartmentDTO = Omit<DepartmentDTO, 'created_by'>;
+type FindOne = Omit<DepartmentDTO, 'name' | 'created_by' | 'status'>;
+
 export class DepartamentController {
+  public readonly required = 'Campo obrigatório';
+
   departamentRepository = new DepartamentRepository();
 
   async getAllDepartaments() {
@@ -91,38 +105,72 @@ export class DepartamentController {
     } 
   };
 
-  async getOneDepartament(id: number) {
+  async getOneDepartament({ id }: FindOne) {
     try {
-      if (!id) throw new Error("Dados inválidos");
-  
+      const schema: SchemaOf<FindOne> = object({
+        id: number().integer().required(this.required),
+      });
+
+      if (!schema) throw new Error("Dados inválidos");
+
       const response = await this.departamentRepository.findOne(id);
-  
-      if (!response) throw new Error("Item não encontrado");
-  
+
+      if (!response) throw new Error("Setor não encontrado");
+
       return {status: 200 , response};
     } catch (e) {
-      return {status: 400, message: 'Item não encontrado'};
+      return {status: 400, message: 'Setor não encontrado'};
     }
   };
 
-  async postDepartament(data: any) {
+  async postDepartament(data: CreateDepartmentDTO) {
     try {
+      const schema: SchemaOf<CreateDepartmentDTO> = object({
+        name: string().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+      
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
+
+      if (departmentAlreadyExists) return { status: 400, message: "Nome do setor já existente" };
 
       await this.departamentRepository.create(data);
 
-      return {status: 201, message: "Item cadastrado"}
+      return {status: 201, message: "Setor cadastrado"}
     } catch(err) {
-      return { status: 404, message: "Item não cadastrado"}
+      return { status: 404, message: "Setor não cadastrado"}
     }
   };
 
-  async updateDepartament(data: any) {
+  async updateDepartament(data: UpdateDepartmentDTO) {
       try {
-        await this.departamentRepository.update(data.id, data);
+        const schema: SchemaOf<UpdateDepartmentDTO> = object({
+          id: number().integer().required(this.required),
+          name: string().required(this.required),
+          status: number().required(this.required),
+        });
   
-        return {status: 200, message: "Item atualizado"}
+        const valid = schema.isValidSync(data);
+  
+        if (!valid) return {status: 400, message: "Dados inválidos"};
+  
+        const departament = await this.departamentRepository.findOne(data.id);
+        
+        if (!departament) return {status: 400, message: "Setor não existente"};
+  
+        const departamentAlreadyExists = await this.departamentRepository.findByName(data.name);
+        
+        if (departamentAlreadyExists) return {status: 400, message: "Nome do setor já existente"};
+
+        await this.departamentRepository.update(data.id, departament);
+  
+        return {status: 200, message: "Setor atualizado"}
       } catch (err) {
-        return { status: 404, message: "Item não encontrado" }
+        return { status: 404, message: "Setor não atualizado" }
       }
   };
 }
