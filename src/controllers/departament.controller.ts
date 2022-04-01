@@ -136,7 +136,9 @@ export class DepartamentController {
 
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
-      if (departmentAlreadyExists) return { status: 400, message: "Nome do setor já existente" };
+      if (departmentAlreadyExists) {
+        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+      }
 
       await this.departamentRepository.create(data);
 
@@ -164,7 +166,12 @@ export class DepartamentController {
   
         const departamentAlreadyExists = await this.departamentRepository.findByName(data.name);
         
-        if (departamentAlreadyExists) return {status: 400, message: "Nome do setor já existente"};
+        if (departamentAlreadyExists) {
+          return {status: 400, message: "Esse item já está cadastro. favor consultar os inativos"};
+        }
+
+        departament.name = data.name;
+        departament.status = data.status;
 
         await this.departamentRepository.update(data.id, departament);
   

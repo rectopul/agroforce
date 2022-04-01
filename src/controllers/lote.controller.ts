@@ -49,7 +49,9 @@ export class LoteController {
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name);
 
-      if (loteAlreadyExists) return { status: 400, message: "Nome do lote já existente" };
+      if (loteAlreadyExists) {
+        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+      }
 
       await this.loteRepository.create(data);
   
@@ -78,7 +80,9 @@ export class LoteController {
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name)
       
-      if (loteAlreadyExists) return {status: 400, message: "Nome do lote já existente"};
+      if (loteAlreadyExists) {
+        return {status: 400, message: "Esse item já está cadastro. favor consultar os inativos"};
+      }
 
       lote.name = data.name;
       lote.volume = data.volume;
