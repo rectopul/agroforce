@@ -38,9 +38,11 @@ export class UserPermissionController {
         }
     }
 
-    async postUserPermission(data: object) {
+    async post(data: object | any) {
+        console.log(data);
         try {
             if (data != null && data != undefined) {
+                await this.delete(parseInt(data.userId));
                 let response = await this.userPermission.create(data);
                 if(response.count > 0) {
                     return {status: 200, message: {message: "permission criada"}}
@@ -49,11 +51,11 @@ export class UserPermissionController {
                 }
             }
         } catch (err) {
-
+            console.log(err)
         }
     }
 
-    async updateUserPermision(id: string, data: object) {
+    async update(id: string, data: object) {
         try {
             let newID = parseInt(id);
             if (data != null && data != undefined) {
@@ -68,5 +70,19 @@ export class UserPermissionController {
         } catch (err) {
 
         }
+    }
+
+    async delete(userId: number) {
+        try {
+            if(userId) {
+                let response: object | any  = await this.userPermission.delete({userId: userId});
+                return {status: 200, response}
+
+            } else {
+                return {status: 400, message: "id não informado"}
+            }
+        } catch (err) {
+            return {status: 400, message: err}
+        }  
     }
 }

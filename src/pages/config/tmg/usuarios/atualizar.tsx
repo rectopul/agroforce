@@ -1,3 +1,4 @@
+import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { useRouter } from 'next/router'
@@ -26,7 +27,6 @@ import  * as ITabs from '../../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { functionsUtils } from "src/shared/utils/functionsUtils";
-var  CryptoJS  =  require ( "crypto-js" ) ; 
 
 export interface IData {
   profiles: IProfile[];
@@ -67,29 +67,42 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       tel: userEdit[0].tel,
       password: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
       confirmPassword: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
-      profiles: [],
-      cultureId: '',
       registration: userEdit[0].registration,
       departmentId: userEdit[0].departmentId,
       jivochat: userEdit[0].jivochat,
       status: userEdit[0].status,
       app_login: userEdit[0].app_login,
       created_by: userLogado.id,
+      cultures:[]
     },
     onSubmit: async (values) => {
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
       }
-
+      // validateInputs(values);
+  
+      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
+      
       let ObjProfiles;
-      const auxObject = new Array();
+      let input: any; 
+      const auxObject: any = [];
+      let auxObject2: any = [];
 
-      Object.keys(values.profiles).forEach((_, item) => {
-        ObjProfiles = {profileId: values.profiles[item]}
+      Object.keys(values.cultures).forEach((item) => {
+        input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
+        auxObject2 = [];
+        for (let i = 0; i < input.options.length; i++) {
+          if (input.options[i].selected) {
+            auxObject2.push(input.options[i].value);
+          }
+        }
+        ObjProfiles = {
+          cultureId: values.cultures[item], 
+          profiles: auxObject2
+        }
         auxObject.push(ObjProfiles);
       });
-
       await userService.update({
         id: values.id,
         name: values.name,
@@ -97,25 +110,38 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
         cpf: values.cpf,
         tel: values.tel,
         password: values.password,
-        profiles: auxObject,
-        cultureId: values.cultureId,
         registration: values.registration,
         departmentId: values.departmentId,
         jivochat: values.jivochat,
         status: values.status,
         app_login: values.app_login,
         created_by: values.created_by,
+        cultures: auxObject,
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Usuário atualizado com sucesso!')
           router.back();
-
         } else {
           Swal.fire(response.message);
         }
       })
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
+    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= ''; }
+    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= ''; }
+    if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
+    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
+    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
+    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
+
+    if (values.password !== values.confirmPassword) {
+        Swal.fire("erro de credenciais")         
+    }
+  }
+
   
   return (
     <>
@@ -346,52 +372,51 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
             </div>
           </div>
 
-          <div className="w-full flex justify-between items-start">
-            <div className="flex flex-col">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Tipo de perfil
-              </label>
-              <div className="flex gap-6 border-b border-gray-300">
+          <div className="w-full mt-6">
+              <h2 className="text-gray-900 text-2xl mb-4">
+                Permissões de Culturas
+              </h2>
+              <div className="w-full grid grid-cols-3 gap-6">
                 {
-                  profiles.map((profile) => (
+                  Cultures.map((culture: any, index: any) => (
                     <>
-                      <CheckBox
-                        key={profile.id}
-                        title={profile.name}
-                        id={`profiles.${profile.id}`}
-                        name="profiles"
-                        onChange={formik.handleChange}
-                        value={profile.id}
-                        defaultChecked={profiles.includes(profile)}
-                      />
-                    </>
-                  ))
-                }
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Culturas
-              </label>
-              <div className="flex gap-6 border-b border-gray-300">
-                {
-                  Cultures.map((culture: { id: any | readonly string[] | null | undefined; name: string | undefined; }) => (
-                    <>
-                      <CheckBox
-                        key={culture.id}
-                        title={culture.name}
-                        name="cultureId"
-                        onChange={formik.handleChange}
-                        value={culture.id}
-                        defaultChecked={userCultures.includes(culture.id)}
-                      />
-                    </>
-                  ))
-                }
-              </div>
-            </div>
-          </div>
+                    <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
+                      <div className="w-full text-xl">
+                        <CheckBox
+                          key={culture.id}
+                          title={culture.name}
+                          id={`culture_${culture.id}`}
+                          name="cultures"
+                          onChange={formik.handleChange}
+                          value={culture.id}
+                        />
+                      </div>
 
+                      <div className="w-full">
+                        <h4 className='block text-gray-900 text-sm font-bold mb-2'>
+                          Permissões
+                        </h4>
+                        <div>
+                          <MultiSelectComponent
+                            id={`profiles_${culture.id}`}
+                            name={`profiles_${culture.id}`}
+                            onChange={formik.handleChange}
+                            dataSource={profiles as any}
+                            mode="Box"
+                            fields={{
+                              text: "name",
+                              value: "id"
+                            }}
+                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    </>
+                  ))
+                }
+              </div>
+          </div>
           <div className="
             h-10 w-full
             flex

@@ -24,12 +24,6 @@ interface IProfile {
   id: number;
   name: string;
 }
-
-interface CultureProfiles {
-  cultureId: number,
-  profiles: number[]
-}
-
 interface IUsers {
   id?: number;
   name: string;
@@ -46,7 +40,7 @@ interface IUsers {
   created_by: number | any;
   confirmPassword: string;
 
-  cultures: CultureProfiles[];
+  cultures: object | any;
 }
 export interface IData {
   profiles: IProfile[];
@@ -88,31 +82,31 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       status: 1,
       app_login: 0,
       created_by: userLogado.id,
-      cultures: [{
-        cultureId: 0,
-        profiles: []
-      }]
+      cultures:[]
     },
     onSubmit: async (values) => {
-      console.log(values.cultures);
-
-      // validateInputs(values);
-      // if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
+      validateInputs(values);
+      if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
+      
       let ObjProfiles;
-      const auxObject: CultureProfiles[] = values.cultures;
+      let input: any; 
+      const auxObject: any = [];
+      let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
+        input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
+        auxObject2 = [];
+        for (let i = 0; i < input.options.length; i++) {
+          if (input.options[i].selected) {
+            auxObject2.push(input.options[i].value);
+          }
+        }
         ObjProfiles = {
           cultureId: values.cultures[item], 
-          profiles: [ `values.profile_${values.cultures[item]}` ]
+          profiles: auxObject2
         }
         auxObject.push(ObjProfiles);
       });
-
-      // console.log(ObjProfiles);
-      // console.log(values);
-
-      return;
 
       await userService.create({
         name: values.name,
@@ -401,9 +395,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                         </h4>
                         <div>
                           <MultiSelectComponent
-                            id={`profiles`}
-                            name={`profiles[]`}
-                            // name="profiles"
+                            id={`profiles_${culture.id}`}
+                            name={`profiles_${culture.id}`}
                             onChange={formik.handleChange}
                             dataSource={profiles as any}
                             mode="Box"

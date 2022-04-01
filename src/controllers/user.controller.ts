@@ -1,7 +1,9 @@
+import { RiCreativeCommonsZeroLine } from 'react-icons/ri';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
+import { UserPermissionController} from './user-permission.controller';
 var  CryptoJS  =  require ("crypto") ; 
 const alg = 'aes-256-ctr';
 const pwd = 'TMG2022';
@@ -10,6 +12,7 @@ export class UserController {
     userRepository = new UserRepository();
     usersPermissionRepository = new UsersPermissionsRepository();
     userCultureController = new UserCultureController();
+    userPermissionsController = new UserPermissionController();
 
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
@@ -181,22 +184,16 @@ export class UserController {
                 let response = await this.userRepository.create(parameters);
         
                 if(response) {
+                    if (data.cultures) {
+                        Object.keys(data.cultures).forEach((item) => {
+                            data.cultures[item].profiles.forEach((profile: any) => {
+                                this.userPermissionsController.post({userId: response.id, profileId: parseInt(profile), cultureId: parseInt(data.cultures[item].cultureId), created_by: parseInt(data.created_by)});
+                            });
+                        });
+                    }
                     if (data.cultureId) {
                             this.userCultureController.save({cultureId: data.cultureId, userId: response.id, created_by: data.created_by });
                     }
-                    // if (data.profiles) {
-                    //     Object.keys(data.profiles).forEach((item) => {
-                    //         if (typeof(data.profiles[item].profileId) === 'string') {
-                    //             parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                    //         } else { 
-                    //             parametersPermissions.profileId = data.profiles[item].profileId;
-                    //         }
-                    //         parametersPermissions.userId = response.id;
-                    //         parametersPermissions.created_by = data.created_by;
-                    //         this.usersPermissionRepository.create(parametersPermissions);
-                    //     });
-                    // }
-        
                     return {status: 200, message: "users inseridos"}
                 } else {
                     return {status: 400, message: "houve um erro, tente novamente"}
@@ -276,32 +273,20 @@ export class UserController {
                 let response: object | any  = await this.userRepository.update(data.id, parameters);
 
                 if(response.count > 0) {
-                    if (data.cultureId) {
-                        this.userCultureController.save({cultureId: data.cultureId, userId: data.id, created_by: data.created_by });
-                    }
-                    if (data.profiles) {
-                        const parametersPermissions = new Object();
-                        // functionsUtils.getPermissions(data.id, data.profiles);
-                        // Object.keys(data.profiles).forEach((item) => {
-                        //     if (typeof(data.profiles[item].profileId) === 'string') {
-                        //         parametersPermissions.profileId =  parseInt( data.profiles[item].profileId);
-                        //     } else { 
-                        //         parametersPermissions.profileId = data.profiles[item].profileId;
-                        //     }
-                        //     parametersPermissions.userId = data.id;
-                        //     parametersPermissions.created_by = data.created_by;
-                        //     this.usersPermissionRepository.create(parametersPermissions);
-                        // });
+                    if (data.cultures) {
+                        Object.keys(data.cultures).forEach((item) => {
+                            data.cultures[item].profiles.forEach((profile: any) => {
+                                this.userPermissionsController.post({userId: data.id, profileId: parseInt(profile), cultureId: parseInt(data.cultures[item].cultureId), created_by: parseInt(data.created_by)});
+                            });
+                        });
                     }
                     return {status: 200, message: {message: "Usuario atualizada"}}
                 } else {
                     return {status: 400, message: {message: "usuario não existe"}}
-
                 }
             }
         } catch(err) {
 
         }
     }
-    
 }

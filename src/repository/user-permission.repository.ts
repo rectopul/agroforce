@@ -37,6 +37,12 @@ export class UsersPermissionsRepository {
           }) 
         return Result;
     }
-
+    
+    async delete(where: object ) {
+        let Result = await prisma.users_permissions.deleteMany({
+            where: where
+          }) 
+        return Result;
+    }
 }
 
