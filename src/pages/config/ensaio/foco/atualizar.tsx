@@ -107,7 +107,7 @@ export default function Atualizar(foco: IUpdateFoco) {
               name="name"
               type="text" 
               max="50" 
-              placeholder="ex: Soja"
+              placeholder="foco"
               onChange={formik.handleChange}
               value={formik.values.name}
             />

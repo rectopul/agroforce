@@ -91,7 +91,7 @@ export default function Cadastro() {
               name="name"
               type="text" 
               max="50" 
-              placeholder="ex: Foco 321"
+              placeholder="ex: Foco"
               onChange={formik.handleChange}
               value={formik.values.name}
             />
