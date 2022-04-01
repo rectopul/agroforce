@@ -1,4 +1,4 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
 export class CulturaRepository {   
     async findOne(id: number) {
@@ -31,6 +31,14 @@ export class CulturaRepository {
 
     async create(data: any) {
         const culture = await prisma.culture.create({ data });
+        return culture;
+    }
+
+    async findByName(name: string) {
+        const culture = await prisma.culture.findFirst({
+            where: { name }
+        });
+
         return culture;
     }
 

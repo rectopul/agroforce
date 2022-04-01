@@ -1,3 +1,4 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
@@ -50,7 +51,7 @@ export default function Atualizar(lote: IUpdateLote) {
       
       await loteService.update({
         id: values.id,
-        name: values.name,
+        name: capitalize(values.name),
         volume: values.volume,
       }).then((response) => {
         if (response.status === 200) {

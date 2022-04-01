@@ -1,22 +1,23 @@
-import Head from 'next/head';
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useRouter } from 'next/router';
 import getConfig from 'next/config';
-import { useFormik } from 'formik'
-
-import { cultureService } from 'src/services';
-
-import { 
-  Button,
-  Content, 
-  Input,
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import Swal from 'sweetalert2';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
-import { useState } from 'react';
+import { cultureService } from 'src/services';
+import Swal from 'sweetalert2';
+import {
+  Button,
+  Content,
+  Input
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
 
 export interface IUpdateCulture {
   id: number;
@@ -52,7 +53,7 @@ export default function Cultura(culture: InferGetServerSidePropsType<typeof getS
       
       await cultureService.updateCulture({
         id: culture.id,
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         status: formik.values.status,
         created_by: formik.values.created_by
       }).then((response) => {

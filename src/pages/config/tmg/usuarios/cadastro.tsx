@@ -1,3 +1,4 @@
+import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
@@ -109,7 +110,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       });
 
       await userService.create({
-        name: values.name,
+        name: capitalize(values.name),
         email: values.email,
         cpf: values.cpf,
         tel: values.tel,

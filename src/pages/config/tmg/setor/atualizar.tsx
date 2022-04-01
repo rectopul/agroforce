@@ -1,3 +1,4 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
@@ -46,7 +47,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
       await departmentService.update({
         id: item.id,
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         status: item.status
       }).then((response) => {
         if (response.status === 200) {

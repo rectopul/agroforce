@@ -1,3 +1,4 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -48,7 +49,7 @@ export default function  Cadastro() {
       }
 
       await loteService.create({
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         volume: formik.values.volume,
         status: formik.values.status,
         created_by: formik.values.created_by,

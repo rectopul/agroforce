@@ -1,24 +1,23 @@
-import { GetServerSideProps } from "next";
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import Head from "next/head";
+import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
+import Head from "next/head";
 import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
-import { localService } from "src/services";
 import { useState } from "react";
-import InputMask from "react-input-mask";
-
-import {
-  TabHeader,
-  Content,
-  Input,
-  Select,
-  Button,
-} from "../../../components";
-
-import * as ITabs from '../../../shared/utils/dropdown';
+import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
+import InputMask from "react-input-mask";
+import { localService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input,
+  Select
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
 
 interface ILocalProps {
   id: Number | any;
@@ -72,7 +71,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   const formik = useFormik<ILocalProps>({
     initialValues: {
       id: localEdit.id,
-      name: localEdit.name,
+      name: capitalize(localEdit.name),
       pais: localEdit.pais,
       uf: localEdit.uf,
       city: localEdit.city,

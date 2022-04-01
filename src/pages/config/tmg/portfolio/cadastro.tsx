@@ -1,17 +1,18 @@
-import Head from "next/head";
-import Swal from "sweetalert2";
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-
-import { portfolioService } from "src/services/portfolio.service";
-
-import { Content, Input, Button } from "src/components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-
-import { IoMdArrowBack } from "react-icons/io";
-import { SiMicrogenetics } from "react-icons/si";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { IoMdArrowBack } from "react-icons/io";
+import { SiMicrogenetics } from "react-icons/si";
+import { Button, Content, Input } from "src/components";
+import { portfolioService } from "src/services/portfolio.service";
+import Swal from "sweetalert2";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
+
 
 export interface ICreatePortfolio {
   id_culture: number;
@@ -50,7 +51,7 @@ export default function  Portfolio() {
     onSubmit: async (values) => {
       await portfolioService.create({
         id_culture: formik.values.id_culture,
-        genealogy: formik.values.genealogy,
+        genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
         status: formik.values.status,
         created_by: formik.values.created_by,
@@ -62,9 +63,6 @@ export default function  Portfolio() {
           setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
-      }).finally(() => {
-        formik.values.genealogy = '';
-        formik.values.cruza = '';
       });
     },
   });

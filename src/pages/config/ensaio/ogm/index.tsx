@@ -1,33 +1,27 @@
-import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { useFormik } from "formik";
-import getConfig from 'next/config';
-import * as XLSX from 'xlsx';
-
-import { userPreferencesService, ogmService } from "src/services";
-
-import { 
-  Button, 
-  Content, 
-  Select, 
-  Input,
-  TabHeader,
-  AccordionFilter,
-  CheckBox
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
-import { FiUserPlus } from "react-icons/fi";
+import { GetServerSideProps } from "next";
+import getConfig from 'next/config';
+import Head from "next/head";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { ogmService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
 
 interface IOGMProps {
   id: Number | any;
@@ -95,12 +89,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: (values) => {
+    
+    onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      ogmService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setTypeAssay(response.response);
+      await ogmService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setTypeAssay(response.response);
       })
     },
   });
@@ -220,14 +215,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setStatusAccordion(false);
     setCamposGerenciados(campos);
   };
-  function handleStatus(id: number, status: any): void {
+
+  async function handleStatus(id: number, status: any): Promise<void> {
     if (status) {
       status = 1;
     } else {
       status = 0;
     }
-    ogmService.update({id: id, status: status}).then((response) => {
-    });
+    
+    await ogmService.update({id: id, status: status});
+
     const index = ogm.findIndex((ogm) => ogm.id === id);
 
     if (index === -1) {
@@ -241,7 +238,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     });
   };
 
-  function handleOrderName(column: string, order: string | any): void {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -266,7 +263,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    ogmService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await ogmService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setTypeAssay(response.response)
       }
@@ -297,12 +294,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setGenaratesProps(items);
   };
 
-  const downloadExcel = (): void => { 
+  const downloadExcel = async (): Promise<void> => { 
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    ogmService.getAll(filterAplication).then((response) => {
+    await ogmService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;

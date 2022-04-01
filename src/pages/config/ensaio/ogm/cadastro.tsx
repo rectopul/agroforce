@@ -1,19 +1,18 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
+import { FiUserPlus } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
 import { ogmService } from "src/services";
-
+import Swal from 'sweetalert2';
 import {
-  TabHeader,
-  Content,
-  Input,
-  Button,
+  Button, Content,
+  Input
 } from "../../../../components";
-
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { FiUserPlus } from "react-icons/fi";
+
+
 
 interface IOGMProps {
   id: Number | any;
@@ -43,12 +42,12 @@ export default function NovoLocal() {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.name)  { return; } 
 
-      ogmService.create({
-        name:values.name,
+      await ogmService.create({
+        name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {

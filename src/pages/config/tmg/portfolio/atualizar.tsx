@@ -1,23 +1,24 @@
-import Head from "next/head";
+import { capitalize } from "@mui/material";
+import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
-import { useFormik } from "formik";
-
-import { portfolioService } from "src/services/portfolio.service";
-import Swal from "sweetalert2";
-
-import { 
-  Button, 
-  Content, 
-  Input,
-} from "src/components";
-
-import { IoMdArrowBack } from "react-icons/io";
-import { SiMicrogenetics } from "react-icons/si";
-
-import * as ITabs from '../../../../shared/utils/dropdown';
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { IoMdArrowBack } from "react-icons/io";
+import { SiMicrogenetics } from "react-icons/si";
+import {
+  Button,
+  Content,
+  Input
+} from "src/components";
+import { portfolioService } from "src/services/portfolio.service";
+import Swal from "sweetalert2";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
+
 
 export interface IUpdatePortfolio {
   id: number;
@@ -64,7 +65,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
       await portfolioService.update({
         id: portfolio.id,
         id_culture: formik.values.id_culture,
-        genealogy: formik.values.genealogy,
+        genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
         status: portfolio.status,
         created_by: formik.values.created_by,
@@ -76,9 +77,6 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
           setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
-      }).finally(() => {
-        formik.values.genealogy = portfolio.genealogy;
-        formik.values.cruza = portfolio.cruza;
       });
     },
   });

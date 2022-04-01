@@ -1,3 +1,4 @@
+import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -44,7 +45,7 @@ export default function Safra() {
       if (formik.values.name === '') throw new Error('Dados inválidos');
 
       await departmentService.create({
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {

@@ -1,32 +1,31 @@
+import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
-import Head from "next/head";
-import { GetServerSideProps } from "next";
-import { useRouter } from 'next/router'
-import getConfig from 'next/config';
 import { useFormik } from "formik";
-import Swal from 'sweetalert2'
+import { GetServerSideProps } from "next";
+import getConfig from 'next/config';
+import Head from "next/head";
+import { useRouter } from 'next/router';
+import { IoMdArrowBack } from "react-icons/io";
+import { RiUserSettingsLine } from "react-icons/ri";
 import InputMask from 'react-input-mask';
-
 import { userService } from "src/services";
-
-import  IProfile  from "../../../../components/props/profileDTO";
-import  IUsers  from "../../../../components/props/userDTO";
-import  IDepartment  from "../../../../components/props/departmentDTO";
-
-import { 
+import { functionsUtils } from "src/shared/utils/functionsUtils";
+import Swal from 'sweetalert2';
+import {
   Button,
   CheckBox,
   Content,
   Input,
-  Select,
-  Select2,
-  TabHeader
+  Select
 } from "../../../../components";
+import IDepartment from "../../../../components/props/departmentDTO";
+import IProfile from "../../../../components/props/profileDTO";
+import IUsers from "../../../../components/props/userDTO";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import { IoMdArrowBack } from "react-icons/io";
-import { RiUserSettingsLine } from "react-icons/ri";
-import { functionsUtils } from "src/shared/utils/functionsUtils";
+
+
+
 
 export interface IData {
   profiles: IProfile[];
@@ -105,7 +104,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       });
       await userService.update({
         id: values.id,
-        name: values.name,
+        name: capitalize(values.name),
         email: values.email,
         cpf: values.cpf,
         tel: values.tel,
