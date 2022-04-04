@@ -249,3 +249,18 @@ model lote_portfolio {
   portfolio portfolio @relation(fields: [id_portfolio], references: [id])
   lote lote @relation(fields: [id_lote], references: [id])
 }
+
+model npe {
+  id           Int @id @default(autoincrement())
+  idLocal Int 
+  idSafra Int 
+  idFoco Int 
+  idTipoEnsaio Int 
+  idOgm Int 
+  idEpoca Int 
+  npei Int 
+  prox_npe Int 
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
+}

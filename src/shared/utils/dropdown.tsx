@@ -55,6 +55,7 @@ export function TabsDropDowns () {
     { 
       titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false,
       data: [
+        { labelDropDown: 'NPE', hrefDropDown: '/config/npe/npe', iconDropDown: <AiOutlineFileSearch/> },
         { labelDropDown: 'Lote', hrefDropDown: '/config/npe/lote', iconDropDown: <AiOutlineFileSearch/> },
       ],
     },
