@@ -1,26 +1,23 @@
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-import { useRouter } from "next/router";
-
-import { departmentService, userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
-
-import ITabs from "../../../../shared/utils/dropdown";
+import { GetServerSideProps } from "next";
 import getConfig from "next/config";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { IoReloadSharp } from "react-icons/io5";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { ReactNode, useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { departmentService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -32,7 +29,7 @@ interface IFilter{
 interface IDepartment {
   id: number;
   name: string;
-  status: boolean;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -105,26 +102,28 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     },
   });
 
-  async function handleStatusItem(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusItem(idItem: number, data: IDepartment): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
     } else {
-      status = 0;
+      data.status = 1;
     }
 
-    const index = items.findIndex((item) => item.id === id);
+    const index = items.findIndex((item) => item.id === idItem);
 
     if (index === -1) {
       return;
     }
-
-    await departmentService.update({id: id, status: status});
     
     setItems((oldItem) => {
       const copy = [...oldItem];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
     });
+
+    const { id, status, name } = items[index];
+
+    await departmentService.update({ id, name, status });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -171,12 +170,15 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
 
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusItem(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusItem(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -186,8 +188,11 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusItem(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusItem(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"

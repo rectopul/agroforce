@@ -1,11 +1,19 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
+
+interface DepartmentDTO {
+    id: number;
+    name: string;
+    status?: number;
+    created_by: number;
+}
+  
+type CreateDepartmentDTO = Omit<DepartmentDTO, 'id' | 'status'>;
+type UpdateDepartmentDTO = Omit<DepartmentDTO, 'created_by'>;
 
 const { publicRuntimeConfig } = getConfig();
 
-const baseUrl = `${publicRuntimeConfig.apiUrl}/user/departament`;
-const baseUrl2 = `${publicRuntimeConfig.apiUrl}/department`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;
 
 export const departmentService = {
     getAll,
@@ -13,17 +21,17 @@ export const departmentService = {
     update
 };
 
-async function create(data: any) {
-    const result = await fetchWrapper.post(baseUrl2, data);
+async function create(data: CreateDepartmentDTO) {
+    const result = await fetchWrapper.post(baseUrl, data);
     return result;
 }
 
 async function getAll(parameters: any) {
-    const result = await fetchWrapper.get(baseUrl2, parameters);
+    const result = await fetchWrapper.get(baseUrl, parameters);
     return result;
 }
 
-async function update(parameters: any) {
-    const result = await fetchWrapper.put(baseUrl2, parameters);
+async function update(parameters: UpdateDepartmentDTO) {
+    const result = await fetchWrapper.put(baseUrl, parameters);
     return result;
 }

@@ -1,22 +1,22 @@
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
 import Head from 'next/head';
-import { useFormik } from 'formik'
-import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-
-import { focoService } from 'src/services/foco.service';
-
-import { 
-  Button,
-  Content, 
-  Input, 
-  TabHeader
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-
-import { IoMdArrowBack } from 'react-icons/io';
 import { AiOutlineFileSearch } from 'react-icons/ai';
+import { IoMdArrowBack } from 'react-icons/io';
+import { focoService } from 'src/services/foco.service';
+import Swal from 'sweetalert2';
+import {
+  Button,
+  Content,
+  Input
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
+
 
 interface ICreateFoco {
   name: string;
@@ -46,7 +46,7 @@ export default function Cadastro() {
     },
     onSubmit: async (values) => {
       await focoService.create({
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
@@ -91,7 +91,7 @@ export default function Cadastro() {
               name="name"
               type="text" 
               max="50" 
-              placeholder="ex: Foco 321"
+              placeholder="ex: Foco"
               onChange={formik.handleChange}
               value={formik.values.name}
             />

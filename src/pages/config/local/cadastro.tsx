@@ -1,23 +1,23 @@
-import { GetServerSideProps } from "next";
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import Head from "next/head";
+import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
+import Head from "next/head";
 import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
-import { localService } from "src/services";
 import { useState } from "react";
-import InputMask from "react-input-mask";
-
-import {
-  Content,
-  Input,
-  Select,
-  Button,
-} from "../../../components";
-
-import * as ITabs from '../../../shared/utils/dropdown';
 import { FiUserPlus } from "react-icons/fi";
+import { IoMdArrowBack } from "react-icons/io";
+import InputMask from "react-input-mask";
+import { localService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input,
+  Select
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
 
 interface ILocalProps {
   id: Number | any;
@@ -86,7 +86,7 @@ export default function NovoLocal({ uf }: IData) {
       if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
   
       await localService.create({
-        name: values.name,
+        name: capitalize(values.name),
         pais: values.pais,
         uf: values.uf,
         city: values.city,

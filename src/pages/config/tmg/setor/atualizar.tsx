@@ -1,25 +1,25 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { IoMdArrowBack } from "react-icons/io";
-
-import { departmentService } from "src/services";
-
-import { 
+import {
   Button,
   Content,
-  Input,
+  Input
 } from "src/components";
+import { departmentService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
 interface IDepartmentProps {
   id: number;
   name: string;
+  status: number;
 };
 
 export default function AtualizarSafra(item: IDepartmentProps) {
@@ -39,14 +39,16 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
       id: item.id,
-      name: item.name
+      name: item.name,
+      status: item.status
     },
     onSubmit: async (values) => {
       if (values.id !== item.id) throw new Error("Dados inválidos");
 
       await departmentService.update({
         id: item.id,
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
+        status: item.status
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Setor atualizado com sucesso!');

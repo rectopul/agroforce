@@ -1,6 +1,20 @@
+import { number, object, SchemaOf, string } from 'yup';
 import { CulturaRepository } from '../repository/culture.repository';
 
+interface CultureDTO {
+  id: number;
+  name: string;
+  created_by: number;
+  status: number;
+}
+
+type CreateCultureDTO = Omit<CultureDTO, 'id' | 'status'>;
+type UpdateCultureDTO = Omit<CultureDTO, 'created_by'>;
+type FindOne = Omit<CultureDTO, 'name' | 'created_by' | 'status'>;
+
 export class CulturaController {
+  public readonly required = 'Campo obrigatório';
+
   culturaRepository = new CulturaRepository();
 
   async getAllCulture(options: any) {
@@ -110,23 +124,62 @@ export class CulturaController {
     }
   }
 
-  async postCulture(data: any) {
+  async postCulture(data: CreateCultureDTO) {
     try {
+      const schema: SchemaOf<CreateCultureDTO> = object({
+        name: string().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+      
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const loteAlreadyExists = await this.culturaRepository.findByName(data.name);
+
+      if (loteAlreadyExists) {
+        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+      }
+
       await this.culturaRepository.create(data);
   
-      return {status: 201, message: "Item cadastrado"}
+      return {status: 201, message: "Cultura cadastrada"}
     } catch(err) {
-      return { status: 404, message: "Item não encontrado"}
+      return { status: 404, message: "Cultura não cadastrada"}
     }
   }
 
-  async updateCulture(data: any) {
+  async updateCulture(data: UpdateCultureDTO) {
     try {
-      await this.culturaRepository.update(data.id, data);
+      const schema: SchemaOf<UpdateCultureDTO> = object({
+        id: number().integer().required(this.required),
+        name: string().required(this.required),
+        status: number().integer().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
 
-      return { status: 200, message: "Item atualizado" }
+      const valid = schema.isValidSync(data);
+      
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const culture = await this.culturaRepository.findOne(data.id);
+      
+      if (!culture) return { status: 400, message: "Cultura não existente" };
+
+      const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
+
+      if (cultureAlreadyExists && cultureAlreadyExists.id !== culture.id) {
+        return { status: 400, message: "Nome da cultura já existente. favor consultar os inativos" };
+      }
+
+      culture.name = data.name;
+      culture.status = data.status;
+
+      await this.culturaRepository.update(data.id, culture);
+
+      return { status: 200, message: "Cultura atualizada" }
     } catch (err) {
-      return { status: 404, message: "Item não encontrado" }
+      return { status: 404, message: "Erro ao atualizar" }
     }
   }
 }

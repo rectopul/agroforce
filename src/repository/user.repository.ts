@@ -7,12 +7,6 @@ export class UserRepository {
         return Result;
     }
 
-    async createUserCulture(Cultures: object | any) {
-        let Result = await prisma.users_cultures.createMany({ data: Cultures})
-
-        return Result;
-    }
-
     async update(id: number, Data: Object) {
         let User = await this.findOne(id);
         if (User != null) { 
@@ -34,7 +28,8 @@ export class UserRepository {
                    id: id
                }
              }) 
-             Result.cultures = await prisma.users_cultures.findMany({where:{userId: id}});
+             Result.cultures = await this.getAllCulturesByuserID(id);
+             console.log(Result.cultures)
         return Result;
     }
 
@@ -43,7 +38,7 @@ export class UserRepository {
         if (orderBy){
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.user.count({ where: where })
+        let count = await prisma.user.count({ where: where  })
         let Result: object | any = await prisma.user.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order }) 
         Result.total = count;
         return Result;
@@ -62,6 +57,19 @@ export class UserRepository {
             select: {
                 acess_permission: true
             }
+          }) 
+        return Result;
+    }
+
+    async getAllCulturesByuserID (userId: Number | any) {
+        let Result = await prisma.users_permissions.findMany({
+            where: {
+                userId: userId
+            }, 
+            select: { 
+                cultureId: true,
+            },
+            distinct: ['cultureId'],
           }) 
         return Result;
     }

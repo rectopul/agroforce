@@ -1,10 +1,18 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
 export class DepartamentRepository {   
     async findOne(id: number) {
         const result = await prisma.department.findUnique({
             where: { id }
         });
+        return result;
+    }
+
+    async findByName(name: string) {
+        const result = await prisma.department.findFirst({
+            where: { name }
+        });
+        
         return result;
     }
 

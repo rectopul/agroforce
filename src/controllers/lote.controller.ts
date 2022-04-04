@@ -5,7 +5,7 @@ interface LoteDTO {
   name: string;
   volume: number;
   created_by: number;
-  status?: number;
+  status: number;
 }
 
 type CreateLoteDTO = Omit<LoteDTO, 'id' | 'status'>;
@@ -49,13 +49,15 @@ export class LoteController {
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name);
 
-      if (loteAlreadyExists?.name) return { status: 400, message: "Lote já existente" };
+      if (loteAlreadyExists) {
+        return { status: 400, message: "Nome do lote já cadastro. favor consultar os inativos" };
+      }
 
       await this.loteRepository.create(data);
   
       return {status: 201, message: "Lote cadastrado"};
     } catch(err) {
-      return { status: 404, message: "Lote não encontrado"};
+      return { status: 404, message: "Erro no encontrado"};
     };
   };
 
@@ -65,22 +67,32 @@ export class LoteController {
         id: number().integer().required(this.required),
         name: string().required(this.required),
         volume: number().required(this.required),
-        status: number(),
+        status: number().required(this.required),
       });
 
       const valid = schema.isValidSync(data);
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const loteAlreadyExists = await this.loteRepository.findById(data.id);
+      const lote = await this.loteRepository.findById(data.id);
       
-      if (!loteAlreadyExists) return {status: 400, message: "Lote não existente"};
+      if (!lote) return {status: 400, message: "Lote não existente"};
+
+      const loteAlreadyExists = await this.loteRepository.findByName(data.name)
       
-      await this.loteRepository.update(data.id, data);
+      if (loteAlreadyExists && loteAlreadyExists.id !== lote.id) {
+        return {status: 400, message: "Esse item já está cadastro. favor consultar os inativos"};
+      }
+
+      lote.name = data.name;
+      lote.volume = data.volume;
+      lote.status = data.status;
+
+      await this.loteRepository.update(data.id, lote);
 
       return {status: 200, message: "Lote atualizado"}
     } catch (err) {
-      return { status: 404, message: "Lote não encontrado" }
+      return { status: 404, message: "Erro ao atualizar" }
     }
   };
 

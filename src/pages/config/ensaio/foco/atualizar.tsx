@@ -1,22 +1,23 @@
-import Head from 'next/head';
-import { useFormik } from 'formik'
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
-import Swal from 'sweetalert2';
-
-import { focoService } from 'src/services/foco.service';
-
-import { 
-  Button,
-  Content, 
-  Input,
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import { IoMdArrowBack } from 'react-icons/io';
-import { AiOutlineFileSearch } from 'react-icons/ai';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { AiOutlineFileSearch } from 'react-icons/ai';
+import { IoMdArrowBack } from 'react-icons/io';
+import { focoService } from 'src/services/foco.service';
+import Swal from 'sweetalert2';
+import {
+  Button,
+  Content,
+  Input
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
+
 
 export interface IUpdateFoco {
   id: number;
@@ -52,7 +53,7 @@ export default function Atualizar(foco: IUpdateFoco) {
     onSubmit: async (values) => {
       await focoService.update({
         id: foco.id,
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         status: foco.status,
         created_by: foco.created_by,
       }).then((response) => {
@@ -106,7 +107,7 @@ export default function Atualizar(foco: IUpdateFoco) {
               name="name"
               type="text" 
               max="50" 
-              placeholder="ex: Soja"
+              placeholder="foco"
               onChange={formik.handleChange}
               value={formik.values.name}
             />

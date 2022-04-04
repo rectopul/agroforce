@@ -1,5 +1,20 @@
 import { PortfolioRepository } from "src/repository/portfolio.repository";
+import { number, object, SchemaOf, string } from 'yup';
+
+interface Portfolio {
+  id: number;
+  id_culture: number;
+  genealogy: string;
+  cruza: string;
+  status: number;
+  created_by: number;
+};
+
+type CreatePortfolio = Omit<Portfolio, 'id'>;
+type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
 export class PortfolioController {
+  public readonly required = 'Campo obrigatório';
+
   portfolioRepository = new PortfolioRepository();
 
   async listAllPortfolios(options: any) {
@@ -102,23 +117,68 @@ export class PortfolioController {
     }
   }
 
-  async createPortfolio(data: any) {
+  async createPortfolio(data: CreatePortfolio) {
     try {
+      const schema: SchemaOf<CreatePortfolio> = object({
+        id_culture: number().integer().required(this.required),
+        genealogy: string().required(this.required),
+        cruza: string().required(this.required),
+        status: number().integer().required(this.required),
+        created_by: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const portfolioAlreadyExists = await this.portfolioRepository.findByGenealogy(data.genealogy);
+
+      if (portfolioAlreadyExists) {
+        return { status: 400, message: "Genealogia já cadastra. favor consultar os inativos" };
+      }
+
       await this.portfolioRepository.create(data);
 
-      return {status: 201, message: "Item cadastrado"}
+      return {status: 201, message: "Genealogia cadastrada"}
     } catch(err) {
-      return {status: 400, message: err}
+      return {status: 400, message: "Erro no cadastrado"}
     }
   }
 
-  async updatePortfolio(data: any) {
+  async updatePortfolio(data: UpdatePortfolio) {
     try {
-      await this.portfolioRepository.update(data.id, data);
+      const schema: SchemaOf<UpdatePortfolio> = object({
+        id: number().integer().required(this.required),
+        id_culture: number().integer().required(this.required),
+        genealogy: string().required(this.required),
+        cruza: string().required(this.required),
+        status: number().integer().required(this.required),
+      });
 
-      return {status: 200, message: "Item atualizado!"}
+      const valid = schema.isValidSync(data);
+
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const portfolio = await this.portfolioRepository.findOne(data.id);
+      
+      if (!portfolio) return { status: 400, message: 'Portfólio não encontrado' };
+
+      const loteAlreadyExists = await this.portfolioRepository.findByGenealogy(data.genealogy);
+
+      if (loteAlreadyExists && loteAlreadyExists.id !== portfolio.id) {
+        return { status: 400, message: 'Genealogia do portfólio já cadastro. favor consultar os inativos' }
+      }
+
+      portfolio.id_culture = data.id_culture;
+      portfolio.genealogy = data.genealogy;
+      portfolio.cruza = data.cruza;
+      portfolio.status = data.status;
+
+      await this.portfolioRepository.update(portfolio.id, portfolio);
+
+      return {status: 200, message: "Genealogia atualizada"}
     } catch (err) {
-     return {status: 400, message: err}
+      return { status: 404, message: 'Erro ao atualizar' }
     }
   }
 }

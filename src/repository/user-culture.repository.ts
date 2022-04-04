@@ -2,7 +2,6 @@ import {prisma} from '../pages/api/db/db';
 export class UserCultureRepository {   
     async create(Cultures: object | any) {
         let Result = await prisma.users_cultures.createMany({ data: Cultures})
-
         return Result;
     }
 

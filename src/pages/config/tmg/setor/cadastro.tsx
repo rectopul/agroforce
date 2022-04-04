@@ -1,20 +1,18 @@
-import Head from "next/head";
+import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import { IoMdArrowBack } from "react-icons/io";
-
-import { departmentService } from 'src/services';
-
-import { 
-  Button,
-  Content, 
-  Input,
-} from "../../../../components";
-
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import Swal from "sweetalert2";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { IoMdArrowBack } from "react-icons/io";
+import { departmentService } from 'src/services';
+import Swal from "sweetalert2";
+import {
+  Button,
+  Content,
+  Input
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartmentProps {
   name: string;
@@ -47,7 +45,7 @@ export default function Safra() {
       if (formik.values.name === '') throw new Error('Dados inválidos');
 
       await departmentService.create({
-        name: formik.values.name,
+        name: capitalize(formik.values.name),
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {

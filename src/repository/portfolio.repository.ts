@@ -1,8 +1,15 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
 export class PortfolioRepository {
   async create(data: any) {
     const portfolio = await prisma.portfolio.create({ data });
+    return portfolio;
+  }
+
+  async findByGenealogy(genealogy: string) {
+    const portfolio = await prisma.portfolio.findFirst({
+      where: { genealogy }
+    });
     return portfolio;
   }
 

@@ -1,20 +1,20 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
-import { IoMdArrowBack } from "react-icons/io";
-import { delineamentoService } from "src/services";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
-
-import {
-  Content,
-  Input,
-  Button,
-} from "../../../components";
-
-import * as ITabs from '../../../shared/utils/dropdown';
+import Head from "next/head";
+import { useRouter } from 'next/router';
+import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
+import { delineamentoService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
 
 interface IDelineamentoProps {
   id: Number | any;
@@ -45,7 +45,7 @@ export default function NovoLocal({delineamentoEdit}: IData) {
   const formik = useFormik<IDelineamentoProps>({
     initialValues: {
       id: delineamentoEdit.id,
-      name: delineamentoEdit.name,
+      name: capitalize(delineamentoEdit.name),
       repeticao: delineamentoEdit.repeticao,
       trat_repeticao: delineamentoEdit.trat_repeticao,
       created_by: userLogado.id,

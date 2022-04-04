@@ -1,18 +1,18 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
+import { FiUserPlus } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
 import { delineamentoService } from "src/services";
-
+import Swal from 'sweetalert2';
 import {
-  Content,
-  Input,
-  Button,
+  Button, Content,
+  Input
 } from "../../../components";
-
 import * as ITabs from '../../../shared/utils/dropdown';
-import { FiUserPlus } from "react-icons/fi";
+
+
 
 interface IDelineamentoProps {
   id: Number | any;
@@ -50,7 +50,7 @@ export default function NovoLocal() {
       if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
 
       await delineamentoService.create({
-        name:values.name,
+        name: capitalize(values.name),
         repeticao: Number(values.repeticao),
         trat_repeticao: Number(values.trat_repeticao),
         created_by: Number(userLogado.id),

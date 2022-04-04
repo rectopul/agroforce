@@ -1,20 +1,20 @@
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from 'next/router';
-import Swal from 'sweetalert2'
-import { typeAssayService } from "src/services";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
-
-import {
-  Content,
-  Input,
-  Button,
-} from "../../../../components";
-
-import * as ITabs from '../../../../shared/utils/dropdown';
+import Head from "next/head";
+import { useRouter } from 'next/router';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiOrganizationChart } from "react-icons/ri";
+import { typeAssayService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+
 
 interface ITypeAssayProps {
   id: Number | any;
@@ -48,13 +48,13 @@ export default function NovoLocal({typeAssayEdit}: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: (values) => {      
+    onSubmit: async (values) => {      
       validateInputs(values);
       if (!values.name)  { return; } 
 
-      typeAssayService.update({
+      await typeAssayService.update({
         id: values.id,
-        name:values.name,
+        name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
