@@ -4,7 +4,7 @@ import { fetchWrapper } from '../helpers';
 interface DepartmentDTO {
     id: number;
     name: string;
-    status: number;
+    status?: number;
     created_by: number;
 }
   

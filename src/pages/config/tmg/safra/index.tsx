@@ -1,24 +1,21 @@
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-import { useRouter } from "next/router";
-
-import { safraService, userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
-
-import ITabs from "../../../../shared/utils/dropdown";
+import { GetServerSideProps } from "next";
 import getConfig from "next/config";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
+import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { safraService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -29,12 +26,13 @@ interface IFilter{
 
 interface ISafra {
   id: number;
+  id_culture: number;
   year: string;
   typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
   main_safra: string;
-  status: boolean;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -64,7 +62,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,typeCrop,plantingStartTime,plantingEndTime,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
@@ -111,25 +108,41 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     },
   });
 
-  async function handleStatusSafra(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusSafra(idItem: number, data: ISafra): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
     } else {
-      status = 0;
+      data.status = 1;
     }
 
-    const index = safras.findIndex((safra) => safra.id === id);
+    const index = safras.findIndex((safra) => safra.id === idItem);
 
     if (index === -1) {
       return;
     }
 
-    await safraService.updateSafras({id: id, status: status});
-    
     setSafras((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
+    });
+
+    const {
+      id,
+      year,
+      typeCrop,
+      plantingStartTime,
+      plantingEndTime,
+      status
+    } = safras[index];
+
+    await safraService.updateSafras({
+      id,
+      year,
+      typeCrop,
+      plantingStartTime,
+      plantingEndTime,
+      status,
     });
   };
 
@@ -211,12 +224,15 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusSafra(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusSafra(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -226,8 +242,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusSafra(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusSafra(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"

@@ -1,17 +1,23 @@
-import { prisma } from 'src/pages/api/db/db';
-import {SafraRepository} from '../repository/safra.repository';
+import { number, object, SchemaOf, string } from 'yup';
+import { SafraRepository } from '../repository/safra.repository';
 
 interface Safra {
+    id: number;
     id_culture: number;
     year: string;
     typeCrop: string;
     plantingStartTime: string;
     plantingEndTime: string;
     main_safra?: number;
-    status?: number;
+    status: number;
     created_by: number;
-  };
+};
+
+type CreateSafra = Omit<Safra, 'id' | 'main_safra'>;
+type UpdateSafra = Omit<Safra, 'id_culture' | 'created_by' | 'main_safra'>;
 export class SafraController {
+    public readonly required = 'Campo obrigatório';
+
     safraRepository = new SafraRepository();
 
     async getAllSafra(options: any) {
@@ -118,31 +124,67 @@ export class SafraController {
         }
     }
 
-    async postSafra(data: Safra) {
+    async postSafra(data: CreateSafra) {
         try {
-            const safraRepository = new SafraRepository();
-
-            const safraAlreadyExists = await safraRepository.findByYear(data.year);
+            console.log(data)
+            const schema: SchemaOf<CreateSafra> = object({
+                id_culture: number().integer().required(this.required),
+                year: string().required(this.required),
+                typeCrop: string().required(this.required),
+                plantingStartTime: string().required(this.required),
+                plantingEndTime: string().required(this.required),
+                status: number().integer().required(this.required),
+                created_by: number().integer().required(this.required),
+            });
         
-            if (safraAlreadyExists) return { status: 400, message: "Safra já existente" };
+            const valid = schema.isValidSync(data);
 
-            await safraRepository.create(data);
+            if (!valid) return {status: 400, message: "Dados inválidos"};
 
-            return {status: 201, message: "Item inserido"}
+            const safraAlreadyExists = await this.safraRepository.findByYear(data.year);
+        
+            if (safraAlreadyExists) return { status: 400, message: "Ano da safra já existente" };
+
+            await this.safraRepository.create(data);
+
+            return {status: 201, message: "Safra cadastrada"}
         } catch(err) {
-            return { status: 404, message: "Erro"}
+            return { status: 404, message: "Erro ao cadastrar safra"}
         }
     }
 
-    async updateSafra(data: any) {
+    async updateSafra(data: UpdateSafra) {
         try {
-            const safraRepository = new SafraRepository();
-
-            const safraAlreadyExists = await safraRepository.findByYear(data.year);
+            const schema: SchemaOf<UpdateSafra> = object({
+                id: number().integer().required(this.required),
+                year: string().required(this.required),
+                typeCrop: string().required(this.required),
+                plantingStartTime: string().required(this.required),
+                plantingEndTime: string().required(this.required),
+                status: number().integer().required(this.required),
+            });
         
-            if (safraAlreadyExists) return { status: 400, message: "Safra já existente" };
+            const valid = schema.isValidSync(data);
+
+            if (!valid) return {status: 400, message: "Dados inválidos"};
+
+            const safra = await this.safraRepository.findOne(data.id);
+
+            if (!safra) return { status: 400, message: 'Safra não existente' };
+
+            const safraAlreadyExists = await this.safraRepository.findByYear(data.year);
+        
+            if (safraAlreadyExists && safraAlreadyExists.id !== safra.id) {
+                return { status: 400, message: 'Ano da safra já existente. favor consultar os inativos' };
+            }
+
+            safra.year = data.year;
+            safra.typeCrop = data.typeCrop;
+            safra.plantingStartTime = data.plantingStartTime;
+            safra.plantingEndTime = data.plantingEndTime;
+            safra.status = data.status;
             
-            await safraRepository.update(data.id, data);
+            await this.safraRepository.update(safra.id, safra);
 
             return {status: 200, message: "Item atualizado"}
         } catch (err) {

@@ -4,24 +4,24 @@ import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import InputMask from 'react-input-mask';
-
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-
-import { 
-  Button, 
-  Content, 
-  Input, 
+import InputMask from 'react-input-mask';
+import {
+  Button,
+  Content,
+  Input,
   Radio
 } from "src/components";
 import { safraService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
+
+
 interface ISafraProps {
   id: number;
-  id_culture: number;
+  // id_culture: number;
   year: string;
   typeCrop: string;
   plantingStartTime: string;
@@ -59,7 +59,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id: safra.id,
-      id_culture: safra.id_culture,
+      // id_culture: safra.id_culture,
       year: safra.year,
       typeCrop,
       plantingStartTime: safra.plantingStartTime,
@@ -72,7 +72,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
       await safraService.updateSafras({
         id: safra.id,
-        id_culture: formik.values.id_culture,
+        // id_culture: safra.id_culture,
         year: formik.values.year,
         typeCrop,
         plantingStartTime: formik.values.plantingStartTime,

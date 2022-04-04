@@ -166,7 +166,7 @@ export class DepartamentController {
   
         const departamentAlreadyExists = await this.departamentRepository.findByName(data.name);
         
-        if (departamentAlreadyExists) {
+        if (departamentAlreadyExists && departamentAlreadyExists.id !== departament.id) {
           return {status: 400, message: "Esse item já está cadastro. favor consultar os inativos"};
         }
 
@@ -177,7 +177,7 @@ export class DepartamentController {
   
         return {status: 200, message: "Setor atualizado"}
       } catch (err) {
-        return { status: 404, message: "Setor não atualizado" }
+        return { status: 404, message: "Erro ao atualizar" }
       }
   };
 }

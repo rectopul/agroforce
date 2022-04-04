@@ -145,7 +145,7 @@ export class CulturaController {
   
       return {status: 201, message: "Cultura cadastrada"}
     } catch(err) {
-      return { status: 404, message: "Cultura não encontrada"}
+      return { status: 404, message: "Cultura não cadastrada"}
     }
   }
 
@@ -166,19 +166,20 @@ export class CulturaController {
       
       if (!culture) return { status: 400, message: "Cultura não existente" };
 
-      const loteAlreadyExists = await this.culturaRepository.findByName(data.name);
+      const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
-      if (loteAlreadyExists) {
-        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+      if (cultureAlreadyExists && cultureAlreadyExists.id !== culture.id) {
+        return { status: 400, message: "Nome da cultura já existente. favor consultar os inativos" };
       }
 
       culture.name = data.name;
+      culture.status = data.status;
 
       await this.culturaRepository.update(data.id, culture);
 
       return { status: 200, message: "Cultura atualizada" }
     } catch (err) {
-      return { status: 404, message: "Cultura não encontrada" }
+      return { status: 404, message: "Erro ao atualizar" }
     }
   }
 }

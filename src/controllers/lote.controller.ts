@@ -50,14 +50,14 @@ export class LoteController {
       const loteAlreadyExists = await this.loteRepository.findByName(data.name);
 
       if (loteAlreadyExists) {
-        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+        return { status: 400, message: "Nome do lote já cadastro. favor consultar os inativos" };
       }
 
       await this.loteRepository.create(data);
   
       return {status: 201, message: "Lote cadastrado"};
     } catch(err) {
-      return { status: 404, message: "Lote não encontrado"};
+      return { status: 404, message: "Erro no encontrado"};
     };
   };
 
@@ -80,7 +80,7 @@ export class LoteController {
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name)
       
-      if (loteAlreadyExists) {
+      if (loteAlreadyExists && loteAlreadyExists.id !== lote.id) {
         return {status: 400, message: "Esse item já está cadastro. favor consultar os inativos"};
       }
 
@@ -92,7 +92,7 @@ export class LoteController {
 
       return {status: 200, message: "Lote atualizado"}
     } catch (err) {
-      return { status: 404, message: "Lote não encontrado" }
+      return { status: 404, message: "Erro ao atualizar" }
     }
   };
 
