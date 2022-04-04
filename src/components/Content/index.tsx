@@ -112,8 +112,8 @@ export function Content({ contentHeader, children }: IContentData) {
   function validationSafras (value: any) {
     if (value != safraSelecionada) {
       setSafraSelecionada(value);
-      userLogado.safras.safra_selecioanda = JSON.stringify(value)
-      localStorage.setItem('user', userLogado);
+      userLogado.safras.safra_selecionada = parseInt(value);
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } 
   }
 
