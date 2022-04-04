@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
 import Router from 'next/router'
-import { userCultureService } from './user-culture.service';
+import { userPermissionService } from './user-permission';
 import { fetchWrapper } from '../helpers';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 
@@ -49,9 +49,8 @@ function logout() {
 
 async function logoutSign(email: any, cultures: object | any) {
    let user = await userService.getAll({email: email, paramSelect: ['password', 'id']});
-   userCultureService.update({userId:user.response[0].id});
-   userCultureService.update({cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id});
-   
+   userPermissionService.update({userId:user.response[0].id});
+   userPermissionService.update({cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id});
    localStorage.removeItem('user');
    userSubject.next(null);
    let login =  await userService.login(email, functionsUtils.Crypto(user.response[0].password, 'decipher')) 

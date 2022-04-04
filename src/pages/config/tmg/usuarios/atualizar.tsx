@@ -388,6 +388,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                           name="cultures"
                           onChange={formik.handleChange}
                           value={culture.id}
+                          defaultChecked={userCultures.includes(culture.id)}
                         />
                       </div>
 

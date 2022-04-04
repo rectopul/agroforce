@@ -123,6 +123,7 @@ model users_permissions {
   cultureId  Int
   created_at DateTime @default(now())
   created_by Int
+  status     Int
   profile    profile  @relation(fields: [profileId], references: [id], map: "Users_Permissions_profileId_fkey")
   user       user     @relation(fields: [userId], references: [id], map: "Users_Permissions_userId_fkey")
   culture    culture  @relation(fields: [cultureId], references: [id])

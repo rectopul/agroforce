@@ -22,18 +22,22 @@ export class UsersPermissionsRepository {
         return Result;
     }
 
-    async getPermissionsByUser(userId: any) {
+    async findAllByUser (userId: Number | any) {
         let Result = await prisma.users_permissions.findMany({
             where: {
-                userId: userId
-            },
+                userId: userId,
+                culture: {
+                    status: 1
+                }
+            }, 
             select: {
-                profile: {
-                    select: {
-                        acess_permission: true
-                    }
-                },
-              },
+                id: true,    
+                cultureId: true,
+                profileId: true,
+                status: true,        
+                culture: {select: {name: true}}
+            },
+            distinct: ['cultureId'],
           }) 
         return Result;
     }
@@ -43,6 +47,14 @@ export class UsersPermissionsRepository {
             where: where
           }) 
         return Result;
+    }
+
+    async updateAllStatus(userId: any) {
+        await prisma.$executeRaw`UPDATE users_permissions SET status = 0 WHERE userId = ${userId}`;
+    }
+
+    async queryRaw(idUser: any, cultureId: any) {
+        await prisma.$executeRaw`UPDATE users_permissions SET status = 1 WHERE userId = ${idUser} AND cultureId = ${cultureId}`;
     }
 }
 

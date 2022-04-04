@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {UserController} from '../../../controllers/user.controller';
 import { UserPermissionController } from 'src/controllers/user-permission.controller';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { UserCultureController } from 'src/controllers/user-culture.controller';
 import { SafraController } from 'src/controllers/safra.controller';
 
 const jwt = require('jsonwebtoken');
@@ -19,7 +18,6 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new UserController();
     const PermissionController = new UserPermissionController();
     const PreferencesControllers = new UserPreferenceController();
-    const userCultureController = new UserCultureController();
     const safraController = new SafraController();
 
     switch (req.method) {
@@ -42,7 +40,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
         if (validateLogin.total <= 0 || validateLogin.status == 400) throw 'Você não tem acesso a essa pagina, entre em contato com seu líder!';
     
-        userCulture.culturas = await userCultureController.getByUserID(user.id);
+        userCulture.culturas = await PermissionController.getByUserID(user.id);
         userCulture.culturas = userCulture.culturas.response;
 
         if (!userCulture.culturas || userCulture.culturas.status == 400 || userCulture.culturas.length === 0) throw 'Você está sem acesso as culturas, contate o seu lider!';
@@ -55,7 +53,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         });
 
         userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
-        safras = await safraController.getAllSafra({id_culture: userCulture.cultura_selecionada, filterStatus: 1}); 
+        safras.safras = await safraController.getAllSafra({id_culture: userCulture.cultura_selecionada, filterStatus: 1}); 
+        safras.safras = safras.safras.response;
+        safras.safra_selecionada = safras.safras[0].id;
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario =  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1}); preferences.usuario = preferences.usuario.response[0];
         preferences.culture=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2});  preferences.culture =  preferences.culture.response[0];
@@ -84,10 +84,10 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           name: user.name,
           avatar: user.avatar,
           token: token,
-          permission: permisions,
+          // permission: permisions,
           preferences,
           userCulture,
-          safras: safras.response
+          safras
       });
     }
 }
