@@ -21,7 +21,7 @@ jobs:
 
     # Setup gcloud CLI
     #https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-    - uses: google-github-actions/setup-gcloud@master
+    - uses: google-github-actions/setup-gcloud@v0
       with:
         service_account_key: ${{ secrets.SA_KEY }}
         project_id: machine-learning-195414
