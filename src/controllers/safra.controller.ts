@@ -114,7 +114,7 @@ export class SafraController {
                 return {status: 200, response, total: response.total}
             }      
         } catch (err) {
-            
+            return {status: 200, response: [], total: 0}
         } 
     }
 

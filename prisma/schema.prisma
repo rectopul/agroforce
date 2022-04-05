@@ -32,6 +32,8 @@ model culture {
   users_cultures users_cultures[]
   portfolio      portfolio[]
   users_permissions      users_permissions[]
+  ogm      ogm[]
+  delineamento      delineamento[]
 }
 
 model department {
@@ -198,12 +200,15 @@ model portfolio {
 
 model delineamento {
   id             Int       @id @default(autoincrement())
+  id_culture     Int
   name           String
   repeticao      Int
   trat_repeticao Int
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model foco {
@@ -223,10 +228,13 @@ model type_assay {
 
 model ogm {
   id             Int       @id @default(autoincrement())
+  id_culture     Int
   name           String
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model lote {

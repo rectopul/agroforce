@@ -1,4 +1,4 @@
-import {TypeAssayRepository} from '../repository/tipo-ensaio.repository';
+import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
 
 export class TypeAssayController {
     Repository = new TypeAssayRepository();
@@ -23,6 +23,24 @@ export class TypeAssayController {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
                 parameters.name  = JSON.parse(options.filterSearch);
             }
+
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {id: true, name: true, status:true};
+            }
+
+            if (options.id_culture) {
+                parameters.id_culture = parseInt(options.id_culture);
+            }
+
+            if (options.name) {
+                parameters.name = parseInt(options.name);
+            }
         
             if (options.take) {
                 if (typeof(options.take) === 'string') {
@@ -44,17 +62,8 @@ export class TypeAssayController {
                 orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
             }
 
-            if (options.paramSelect) {
-                let objSelect = options.paramSelect.split(',');
-                Object.keys(objSelect).forEach((item) => {
-                    select[objSelect[item]] = true;
-                });
-                select = Object.assign({}, select);
-            } else {
-                select = {id: true, name: true, status:true};
-            }
-
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+            
             if (!response || response.total <=0) { 
                 return {status: 400, response: [], total: 0, message: 'nenhum resultado encontrado'}
             } else {
