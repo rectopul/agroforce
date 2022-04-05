@@ -20,6 +20,7 @@ export interface IUpdateLote {
   id: number;
   name: string;
   volume: number;
+  status: number;
 }
 
 export default function Atualizar(lote: IUpdateLote) {
@@ -41,6 +42,7 @@ export default function Atualizar(lote: IUpdateLote) {
       id: lote.id,
       name: lote.name,
       volume: lote.volume,
+      status: lote.status,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -53,6 +55,7 @@ export default function Atualizar(lote: IUpdateLote) {
         id: values.id,
         name: capitalize(values.name),
         volume: values.volume,
+        status: lote.status,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Lote atualizado com sucesso!');
