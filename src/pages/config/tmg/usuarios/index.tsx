@@ -535,6 +535,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"

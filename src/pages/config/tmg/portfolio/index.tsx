@@ -99,9 +99,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setPortfolios(response.response);
-          setFilter(parametersFilter);
+        setTotaItems(response.total);
+        setPortfolios(response.response);
+        setFilter(parametersFilter);
       })
     },
   });
@@ -218,7 +218,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els:any = document.querySelectorAll("input[type='checkbox']");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
@@ -393,7 +393,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter;
+      parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
     }
     await portfolioService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
@@ -445,7 +445,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="portfólio"
+                      placeholder="genealogia ou cruza"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -456,6 +456,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"

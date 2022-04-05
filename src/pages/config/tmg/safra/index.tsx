@@ -100,8 +100,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
+      console.log(values)
+
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        console.log(response.response)
         setTotaItems(response.total);
         setFilter(parametersFilter);
         setSafras(response.response);
@@ -302,9 +305,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       if (response.status == 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativos";
+          } else if (row.status === 2) {
+            row.status = "Todos"
           } else {
-            row.status = "Ativo";
+            row.status = "Ativos";
           }
 
           return row;
@@ -360,7 +365,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       <label className="block text-gray-900 text-sm font-bold mb-2">
                         Status
                       </label>
-                      <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                      <Select name="filterStatus" id="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                     </div>
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -379,6 +384,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
                   <div className="h-16 w-32 mt-3">
                     <Button
+                      type="submit"
                       onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"

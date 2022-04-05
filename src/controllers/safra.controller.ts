@@ -28,11 +28,37 @@ export class SafraController {
         let select: any = [];
         try {
             if (options.filterStatus) {
-                if (typeof(options.filterStatus) === 'string') {
-                    parameters.status = parseInt(options.filterStatus);
+                if (typeof(options.status) === 'string') {
+                    options.filterStatus = parseInt(options.filterStatus);
+                    if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
                 } else {
-                    parameters.status = options.filterStatus;
+                    if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
                 }
+            }
+
+            if (options.filterSearch) {
+                options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+                parameters.year = JSON.parse(options.filterSearch);
+                // parameters.plantingStartTime =JSON.parse(options.filterSearch);
+                // parameters.plantingEndTime =JSON.parse(options.filterSearch);
+            }
+
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {
+                    id: true, 
+                    year: true, 
+                    typeCrop:true, 
+                    plantingStartTime:true, 
+                    plantingEndTime:true, 
+                    main_safra:false, 
+                    status: true
+                };
             }
 
             if (options.id_culture) {
@@ -57,24 +83,6 @@ export class SafraController {
 
             if (options.main_safra) {
                 parameters.main_safra = options.main_safra;
-            }
-
-            if (options.paramSelect) {
-                let objSelect = options.paramSelect.split(',');
-                Object.keys(objSelect).forEach((item) => {
-                    select[objSelect[item]] = true;
-                });
-                select = Object.assign({}, select);
-            } else {
-                select = {
-                    id: true, 
-                    year: true, 
-                    typeCrop:true, 
-                    plantingStartTime:true, 
-                    plantingEndTime:true, 
-                    main_safra:true, 
-                    status: true
-                };
             }
 
             if (options.take) {

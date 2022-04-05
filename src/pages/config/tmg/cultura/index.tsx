@@ -1,25 +1,25 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
 import { useRouter } from "next/router";
-
+import { ReactNode, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { cultureService, userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
-
+import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
+
+
+
 
 interface IFilter{
   filterStatus: object | any;
@@ -400,6 +400,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"

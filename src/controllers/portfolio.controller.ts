@@ -26,10 +26,10 @@ export class PortfolioController {
     try {
       if (options.filterStatus) {
         if (typeof(options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+            options.filterStatus = parseInt(options.filterStatus);
+            if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+            if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
         }
       }
 
@@ -37,10 +37,6 @@ export class PortfolioController {
         options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
         parameters.genealogy  = JSON.parse(options.filterSearch);
         parameters.cruza = JSON.parse(options.filterSearch);
-      }
-
-      if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
       }
 
       if (options.paramSelect) {
@@ -58,12 +54,12 @@ export class PortfolioController {
         };
       }
 
+      if (options.id_culture) {
+        parameters.id_culture = parseInt(options.id_culture);
+      }
+
       if (options.genealogy) {
         parameters.genealogy = options.genealogy;
-      }
-      
-      if (options.cruza) {
-        parameters.cruza = options.cruza;
       }
 
       if (options.cruza) {
@@ -98,7 +94,7 @@ export class PortfolioController {
         orderBy
       );
       if (!response && response.total <= 0) { 
-        return {status: 400, response: '', total: 0}  
+        return {status: 400, response:[], total: 0, message: 'nenhum resultado encontrado'};
       } else {
         return {status: 200, response, total: response.total}
       }    
