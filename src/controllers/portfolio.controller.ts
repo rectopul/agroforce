@@ -39,6 +39,10 @@ export class PortfolioController {
         parameters.cruza = JSON.parse(options.filterSearch);
       }
 
+      if (options.id_culture) {
+        parameters.id_culture = parseInt(options.id_culture);
+      }
+
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {

@@ -1,22 +1,22 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, portfolioService } from "src/services";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
-import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { portfolioService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -43,9 +43,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -96,7 +97,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
           setTotaItems(response.total);
           setPortfolios(response.response);
@@ -344,7 +345,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
     await portfolioService.getAll(filterAplication).then((response) => {
@@ -628,11 +629,12 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -652,7 +654,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       allPortfolios,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

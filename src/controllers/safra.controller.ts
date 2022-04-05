@@ -36,7 +36,7 @@ export class SafraController {
             }
 
             if (options.id_culture) {
-                parameters.id_culture = options.id_culture;
+                parameters.id_culture = parseInt(options.id_culture);
             }
 
             if (options.year) {
@@ -126,7 +126,6 @@ export class SafraController {
 
     async postSafra(data: CreateSafra) {
         try {
-            console.log(data)
             const schema: SchemaOf<CreateSafra> = object({
                 id_culture: number().integer().required(this.required),
                 year: string().required(this.required),
