@@ -48,9 +48,10 @@ interface Idata {
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -95,7 +96,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
@@ -309,7 +310,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
     await delineamentoService.getAll(filterAplication).then((response) => {
@@ -599,12 +600,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -617,12 +621,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const Response =  await local.json();
   const allItems = Response.response;
   const totalItems = Response.total;
+  
   return {
     props: {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

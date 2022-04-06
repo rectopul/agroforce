@@ -1,7 +1,8 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
-import { BiUser } from "react-icons/bi";
+import { BiArea, BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
+import { FiMapPin } from "react-icons/fi";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
@@ -27,9 +28,9 @@ export function TabsDropDowns () {
       data: [
         {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
         {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
+        {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
         {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
         {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
-        {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
       ],
     },
     { 
@@ -41,15 +42,15 @@ export function TabsDropDowns () {
       ],
     },
     { 
-      titleTab: 'LOCAL', valueTab: <BsCheckLg />, statusTab: false , 
-      data: [
-        { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <AiOutlineFileSearch/> },
-      ],
-    },
-    { 
       titleTab: 'DELINEAMENTO', valueTab: <BsCheckLg />, statusTab: false,
       data: [
         { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
+      ],
+    },
+    { 
+      titleTab: 'LOCAL', valueTab: <BsCheckLg />, statusTab: false , 
+      data: [
+        { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
     { 
@@ -61,7 +62,7 @@ export function TabsDropDowns () {
     {
       titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
       data: [
-        { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <AiOutlineFileSearch/> },
+        { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <BiArea/> },
       ],
     },
   ];

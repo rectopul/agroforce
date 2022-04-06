@@ -631,6 +631,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const  token  =  req.cookies.token;
   const  cultureId  =  req.cookies.cultureId;
+  
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
 
