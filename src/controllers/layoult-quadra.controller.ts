@@ -55,13 +55,14 @@ export class LayoultQuadraController {
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+            
             if (!response || response.total <= 0) { 
                 return {status: 400, response: [], total:0}
             } else {
                 return {status: 200, response, total: response.total}
             }             
         } catch (err) {
-            return {status: 400, message: err}
+            return {status: 400, response: [], total:0}
         }
     }
  

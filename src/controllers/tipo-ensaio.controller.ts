@@ -39,7 +39,7 @@ export class TypeAssayController {
             }
 
             if (options.name) {
-                parameters.name = parseInt(options.name);
+                parameters.name = options.name;
             }
         
             if (options.take) {
@@ -70,7 +70,7 @@ export class TypeAssayController {
                 return {status: 200, response, total: response.total}
             }             
         } catch (err) {
-
+            return {status: 400, response: [], total: 0, message: 'nenhum resultado encontrado'}
         }  
     }
  
@@ -94,6 +94,7 @@ export class TypeAssayController {
 
     async post(data: object | any) {
         try {
+            console.log(data)
             if (data != null && data != undefined) {
                 let response = await this.Repository.create(data);
                 if(response) {
