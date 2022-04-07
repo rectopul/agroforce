@@ -53,7 +53,7 @@ module.exports = {
         'container-all-main-contents': 'calc(100vw - 8rem)',
 
         // Importação de planilha
-        'aside-content-importation': 'calc(100% - 104rem)',
+        'aside-content-importation': 'calc(100vw - 104rem)',
       },
     },
   },

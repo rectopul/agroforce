@@ -69,7 +69,7 @@ export function ImportPlanilha({ data }: ImportsProps) {
           />
         </header>
 
-        <main className="
+        <main className="	
           w-full
           h-importation-header
           flex
@@ -79,8 +79,8 @@ export function ImportPlanilha({ data }: ImportsProps) {
           bg-blue-900
           text-white
         ">
-          <span className="w-32 border">Coluna do Excel</span>
-          <div className="h-full ml-24 flex items-center gap-3 overflow-x-visible hover:overflow-x-scroll">
+          <span className="w-32">Coluna do Excel</span>
+          <div className="w-full h-full ml-24 flex items-center gap-3 overflow-x-scroll">
             {items.map(item => (
               <div
                 key={item.title}
@@ -130,24 +130,23 @@ export function ImportPlanilha({ data }: ImportsProps) {
             flex
             flex-col
             gap-9
-            px-6
+            mx-6
             py-2
             bg-gray-200
             border-2 border-red-600
             overflow-y-scroll
-            overflow-x-scroll
           ">
-              <div className="w-full flex gap-3">
+              <div className="w-full flex gap-3 overflow-x-scroll">
                 {items.map(item => (
-                  <div key={item.title} className="h-11 w-32">
+                  <div key={item.title} className="min-w-32 h-11 w-32">
                     <Select selected={false} values={item.dataTable} />
                   </div>
                 ))}
               </div>
 
-              <div className="w-full flex gap-3">
+              <div className="w-full flex gap-3 overflow-x-scroll">
                 {items.map(item => (
-                  <div key={item.title} className="h-11 w-32">
+                  <div key={item.title} className="min-w-32 h-11 w-32">
                     <Select selected={false} values={item.dataTable} />
                   </div>
                 ))}
