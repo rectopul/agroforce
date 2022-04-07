@@ -26,7 +26,7 @@ export class UsersPermissionsRepository {
         let Result = await prisma.users_permissions.findMany({
             where: {
                 userId: userId,
-                culture: {
+                culture: <any> {
                     status: 1
                 }
             }, 
