@@ -1,4 +1,4 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
 export class UserRepository {   
     async create(User: object | any) {
@@ -29,7 +29,6 @@ export class UserRepository {
                }
              }) 
              Result.cultures = await this.getAllCulturesByuserID(id);
-             console.log(Result.cultures)
         return Result;
     }
 

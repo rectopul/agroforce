@@ -23,6 +23,32 @@ export class DelineamentoController {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
                 parameters.name  = JSON.parse(options.filterSearch);
             }
+
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {id: true, name: true, repeticao:true, trat_repeticao:true, status:true};
+            }
+
+            if (options.id_culture) {
+                parameters.id_culture = parseInt(options.id_culture);
+            }
+
+            if (options.name) {
+                parameters.name = options.name;
+            }
+
+            if (options.repeticao) {
+                parameters.repeticao = options.repeticao;
+            }
+
+            if (options.trat_repeticao) {
+                parameters.trat_repeticao = options.trat_repeticao;
+            }
         
             if (options.take) {
                 if (typeof(options.take) === 'string') {
@@ -42,16 +68,6 @@ export class DelineamentoController {
 
             if (options.orderBy) {
                 orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
-            }
-
-            if (options.paramSelect) {
-                let objSelect = options.paramSelect.split(',');
-                Object.keys(objSelect).forEach((item) => {
-                    select[objSelect[item]] = true;
-                });
-                select = Object.assign({}, select);
-            } else {
-                select = {id: true, name: true, repeticao:true, trat_repeticao:true, status:true};
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);

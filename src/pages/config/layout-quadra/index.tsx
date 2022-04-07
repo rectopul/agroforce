@@ -1,33 +1,27 @@
-import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { useFormik } from "formik";
-import getConfig from 'next/config';
-import * as XLSX from 'xlsx';
-
-import { userPreferencesService, layoultQuadraService } from "src/services";
-
-import { 
-  Button, 
-  Content, 
-  Select, 
-  Input,
-  TabHeader,
-  AccordionFilter,
-  CheckBox
-} from "../../../components";
-
-import  * as ITabs from '../../../shared/utils/dropdown';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import MaterialTable from "material-table";
-import { FiUserPlus } from "react-icons/fi";
+import { GetServerSideProps } from "next";
+import getConfig from 'next/config';
+import Head from "next/head";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { layoultQuadraService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
+
 
 interface ILayoultProps {
   id: Number | any;
@@ -745,6 +739,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
+  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterAplication = "filterStatus=1";
@@ -757,7 +752,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const local = await fetch(urlParameters.toString(), requestOptions);
-  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
+  const apiUF = await fetch(`${baseUrlLocal}/uf`, requestOptions);
   const uf = await apiUF.json();
   const Response =  await local.json();
   const allItems = Response.response;

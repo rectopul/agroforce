@@ -45,9 +45,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -99,7 +100,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      console.log(values)
+
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
@@ -199,13 +202,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           )
         })
       }
-      // if (ObjetCampos[index] == 'main_safra') {
-      //   arrOb.push({ 
-      //     title: "Safra principal", 
-      //     field: "main_safra", 
-      //     sorting: false 
-      //   })
-      // }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
@@ -301,16 +297,18 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
     await safraService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativos";
+          } else if (row.status === 2) {
+            row.status = "Todos"
           } else {
-            row.status = "Ativo";
+            row.status = "Ativos";
           }
 
           return row;
@@ -366,7 +364,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       <label className="block text-gray-900 text-sm font-bold mb-2">
                         Status
                       </label>
-                      <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                      <Select name="filterStatus" id="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                     </div>
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -385,6 +383,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
                   <div className="h-16 w-32 mt-3">
                     <Button
+                      type="submit"
                       onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
@@ -558,11 +557,12 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -577,12 +577,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   let allSafras = Response.response;
   let totalItems = Response.total;
 
+
   return {
     props: {
       allSafras,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

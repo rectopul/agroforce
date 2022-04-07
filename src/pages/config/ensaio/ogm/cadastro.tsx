@@ -16,6 +16,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IOGMProps {
   id: Number | any;
+  id_culture: number;
   name: String | any;
   created_by: Number;
   status: Number;
@@ -34,10 +35,14 @@ export default function NovoLocal() {
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const culture = userLogado.userCulture.cultura_selecionada as string;
+
   const router = useRouter();
+
   const formik = useFormik<IOGMProps>({
     initialValues: {
       id: 1,
+      id_culture: parseInt(culture),
       name: '',
       created_by: userLogado.id,
       status: 1
@@ -47,6 +52,7 @@ export default function NovoLocal() {
       if (!values.name)  { return; } 
 
       await ogmService.create({
+        id_culture: parseInt(culture),
         name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1
@@ -80,7 +86,7 @@ export default function NovoLocal() {
             <h1 className="text-2xl">Novo OGM</h1>
           </div>
 
-          <div className="w-full
+          <div className="w-1/2
             flex 
             justify-around
             gap-6

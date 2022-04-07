@@ -15,7 +15,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 
 
 interface IDelineamentoProps {
-  id: Number | any;
+  id_culture: number;
   name: String | any;
   repeticao: Number;
   trat_repeticao: Number;
@@ -35,10 +35,13 @@ export default function NovoLocal() {
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const id_culture = userLogado.userCulture.cultura_selecionada as string;
+
   const router = useRouter();
+
   const formik = useFormik<IDelineamentoProps>({
     initialValues: {
-      id: 1,
+      id_culture: parseInt(id_culture),
       name: '',
       repeticao: 0,
       trat_repeticao: 0,
@@ -50,6 +53,7 @@ export default function NovoLocal() {
       if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
 
       await delineamentoService.create({
+        id_culture: parseInt(id_culture),
         name: capitalize(values.name),
         repeticao: Number(values.repeticao),
         trat_repeticao: Number(values.trat_repeticao),

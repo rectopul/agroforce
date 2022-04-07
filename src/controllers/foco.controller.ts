@@ -116,7 +116,7 @@ export class FocoController {
 
       return {status: 201, message: "Foco cadastrado"}
     } catch(err) {
-      return { status: 404, message: "Foco não cadastrado"}
+      return { status: 404, message: "Erro no cadastrado"}
     }
   };
 
@@ -132,16 +132,21 @@ export class FocoController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
+      const foco = await this.focoRepository.findOne(data.id);
+
+      if (!foco) return {status: 400, message: "Foco não encontrado"};
+
       const focoAlreadyExists = await this.focoRepository.findByName(data.name);
 
-      if (focoAlreadyExists) return {status: 400, message: "Foco já existente"};
-
+      if (focoAlreadyExists && focoAlreadyExists.id !== foco.id) {
+        return {status: 400, message: "Foco já existente"};
+      }
 
       await this.focoRepository.update(data.id, data);
 
       return {status: 200, message: "Foco atualizado"}
     } catch (err) {
-      return { status: 404, message: "Foco não encontrado" }
+      return { status: 404, message: "Erro ao atualizar" }
     }
   };
 };

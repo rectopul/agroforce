@@ -1,25 +1,25 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle, FaSearchPlus } from "react-icons/fa";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-
-import { focoService } from "src/services/foco.service";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
-
+import { focoService } from "src/services/foco.service";
+import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
+
+
+
 
 interface IFilter{
   filterStatus: object | any;
@@ -384,7 +384,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="foco"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
