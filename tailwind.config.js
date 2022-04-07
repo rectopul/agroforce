@@ -44,6 +44,7 @@ module.exports = {
         'importation-input-header': '5vh',
         'importation-header': '10vh',
         'importation-aside': '85vh',
+        'importation-content': 'calc(100vh - 15vh)',
       },
       width: {
         // Header
@@ -53,7 +54,8 @@ module.exports = {
         'container-all-main-contents': 'calc(100vw - 8rem)',
 
         // Importação de planilha
-        'aside-content-importation': 'calc(100vw - 104rem)',
+        'aside-content-importation': 'calc(100vw - 88vw)',
+        'importation-content': 'calc(100vw - 12vw)',
       },
     },
   },
