@@ -131,6 +131,7 @@ model users_permissions {
   culture    culture  @relation(fields: [cultureId], references: [id])
 
   @@index([profileId], map: "Users_Permissions_profileId_fkey")
+  @@index([cultureId], map: "Users_Permissions_cultureId_fkey")
   @@index([userId], map: "Users_Permissions_userId_fkey")
 }
 
