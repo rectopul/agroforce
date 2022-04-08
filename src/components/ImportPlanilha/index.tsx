@@ -4,45 +4,17 @@ import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { Button, Select } from "src/components";
-
-interface ISelectData {
-  id: number;
-  name: string;
-}
+import { AZ } from "src/shared/utils/a-z";
 
 interface IImportPlanilhaProps {
-  title: string;
-  dataTable: ISelectData[];
+  data: string[];
+  moduleId: number;
 }
 
-interface ImportsProps {
-  data: IImportPlanilhaProps[];
-}
 
-export function ImportPlanilha({ data }: ImportsProps) {
+export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
   const router = useRouter();
-
   const [amount, setAmount] = useState<number>(0);
-  const [allData, setAllData] = useState<IImportPlanilhaProps[]>(
-    () => data
-  );
-
-  // const HandleGenerateSelectColumns = (title: string, newData: IImportPlanilhaProps) => {
-  //   const index = allData.findIndex(item => item.title = title);
-
-  //   if (index === -1) {
-  //     alert('erro')
-  //     return;
-  //   }
-
-  //   // if (totalSelect > allData.length) {
-  //   //   data.push(newData);
-  //   // }
-
-  //   setAllData([newData]);
-
-  //   return allData[index].dataTable;
-  // }
 
   return (
     <>
@@ -105,9 +77,9 @@ export function ImportPlanilha({ data }: ImportsProps) {
         ">
           <span className="w-32">Coluna do Excel</span>
           <div className="w-full h-full ml-20 flex justify-start items-center gap-3">
-            {allData.map(item => (
+            {AZ.map(item => (
               <div
-                key={item.title}
+                key={item}
                 className="
                   w-32
                   h-14   
@@ -124,7 +96,7 @@ export function ImportPlanilha({ data }: ImportsProps) {
                   rounded-full
                   text-2xl
                 ">
-                  { item.title }
+                  { item }
                 </strong>
               </div>
             ))}
@@ -167,22 +139,20 @@ export function ImportPlanilha({ data }: ImportsProps) {
             border-2 
             border-red-600
           ">
-            <div className="flex mx-1 pl-2 justify-start items-center gap-3">
-              {allData.map(item => (
-                <div key={item.title} className="h-11 w-32">
-                  <Select selected={false} values={item.dataTable} />
+           <div className="flex mx-1 pl-2 justify-start items-center gap-3">
+              {Array(data.length).fill('').map((_, index) => (
+                <div key={index} className="h-11 w-32">
+                  <Select selected={false} values={[{ id: index, name: data[index] }]}/>
                 </div>
               ))}
             </div>
 
             <div className="flex mx-1 pl-2 justify-start items-center gap-3">
-              {Array(amount).fill('').map((_, index) => {
-                return (
-                  <div key={index} className="h-11 w-32">
-                    <Select selected={false} values={allData[amount].dataTable}/>
-                  </div>
-                )
-              })}
+              {Array(amount).fill('').map((_, index) => (
+                <div key={index} className="h-11 w-32">
+                  <Select selected={false} values={[{ id: index, name: data[index] }]}/>
+                </div>
+              ))}
             </div>
 
             {/* {rows.map((newItem, index) => (
