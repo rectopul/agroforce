@@ -27,7 +27,7 @@ export function ImportPlanilha({ data }: ImportsProps) {
     () => data
   );
 
-  // const newSelectColumns = (title: string, newData: IImportPlanilhaProps, totalSelect: number) => {
+  // const HandleGenerateSelectColumns = (title: string, newData: IImportPlanilhaProps) => {
   //   const index = allData.findIndex(item => item.title = title);
 
   //   if (index === -1) {
@@ -35,11 +35,9 @@ export function ImportPlanilha({ data }: ImportsProps) {
   //     return;
   //   }
 
-  //   if (totalSelect >= allData.length) {
-  //     for(let i=0; i < totalSelect; i++) {
-  //       data.push(newData);
-  //     }
-  //   }
+  //   // if (totalSelect > allData.length) {
+  //   //   data.push(newData);
+  //   // }
 
   //   setAllData([newData]);
 
@@ -178,11 +176,13 @@ export function ImportPlanilha({ data }: ImportsProps) {
             </div>
 
             <div className="flex mx-1 pl-2 justify-start items-center gap-3">
-              {Array(amount).fill('').map((_, index) => (
-                <div key={index} className="h-11 w-32">
-                  <Select selected={false} values={allData[amount].dataTable}/>
-                </div>
-              ))}
+              {Array(amount).fill('').map((_, index) => {
+                return (
+                  <div key={index} className="h-11 w-32">
+                    <Select selected={false} values={allData[amount].dataTable}/>
+                  </div>
+                )
+              })}
             </div>
 
             {/* {rows.map((newItem, index) => (
