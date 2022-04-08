@@ -16,7 +16,7 @@ import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/c
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { loteService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import ITabs from "../../../../shared/utils/dropdown";
+import ITabs from "../../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;

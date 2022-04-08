@@ -1,14 +1,14 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import {UserController} from '../../../controllers/user.controller';
+import getConfig from 'next/config';
+import { SafraController } from 'src/controllers/safra.controller';
 import { UserPermissionController } from 'src/controllers/user-permission.controller';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { SafraController } from 'src/controllers/safra.controller';
+import { UserController } from '../../../controllers/user.controller';
+import { apiHandler } from '../../../helpers/api';
 
 const jwt = require('jsonwebtoken');
 
-import getConfig from 'next/config';
-import { apiHandler } from '../../../helpers/api';
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -68,6 +68,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         preferences.tipo_ensaio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9}); preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
         preferences.portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10}); preferences.portfolio = preferences.portfolio.response[0];
         preferences.department= await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11}); preferences.department = preferences.department.response[0];
+        preferences.portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 13}); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
       }
 
       if (!user) throw 'Email ou senha é invalida!';

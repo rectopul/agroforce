@@ -53,12 +53,6 @@ export function TabsDropDowns () {
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
-    { 
-      titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false,
-      data: [
-        { labelDropDown: 'Lote', hrefDropDown: '/config/npe/lote', iconDropDown: <AiOutlineFileSearch/> },
-      ],
-    },
     {
       titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
       data: [

@@ -8,7 +8,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { Button, Content, Input } from "src/components";
 import { loteService } from "src/services";
 import Swal from "sweetalert2";
-import * as ITabs from '../../../../shared/utils/dropdown';
+import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export interface ICreateLote {
   name: string;
