@@ -41,9 +41,8 @@ module.exports = {
         'content': 'calc(100vh - 5rem)',
 
         // Importação de planilha
-        'importation-input-header': '5vh',
-        'importation-header': '10vh',
-        'importation-aside': '85vh',
+        'importation-header': '17vh',
+        'importation-aside': '83vh',
         'importation-content': 'calc(100vh - 15vh)',
       },
       width: {
@@ -56,7 +55,7 @@ module.exports = {
         // Importação de planilha
         'aside-content-importation': 'calc(100vw - 88vw)',
         'importation-content': 'calc(100vw - 12vw)',
-      },
+      }
     },
   },
   plugins: [
