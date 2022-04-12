@@ -10,6 +10,8 @@ const data: string[] = [
   "nameEpoca",
   "npe",
   "prox_npe",
+
+  "teste",
 ];
 
 export default function ImportacaoPlanilha() {

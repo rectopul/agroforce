@@ -112,9 +112,14 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
               {AZ.map((item, index) => {
                 {return Array(data.length).fill('').map((_, indexArray) => (   
                   <div key={index} className="h-16 w-32 flex items-center justify-center">
-                    <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
-                      { AZ[indexArray].slice(index) }
-                    </strong>
+                    {!index
+                    ? (
+                      <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
+                        { AZ[indexArray].slice(index) }
+                      </strong>
+                    ): (
+                      <></>
+                    )}
                   </div>
                 ))}
               })}
