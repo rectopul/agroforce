@@ -1,5 +1,14 @@
 import { number, object, SchemaOf, string } from 'yup';
 import { FocoRepository } from '../repository/foco.repository';
+
+interface LoteDTO {
+  id: number;
+  name: string;
+  created_by: number;
+  status: number;
+}
+
+type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
 export class FocoController {
   public readonly required = 'Campo obrigatório';
 
@@ -120,12 +129,12 @@ export class FocoController {
     }
   };
 
-  async updateFoco(data: any) {
+  async updateFoco(data: UpdateLoteDTO) {
     try {
-      const schema: SchemaOf<any> = object({
+      const schema: SchemaOf<UpdateLoteDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
-        created_by: number().integer().required(this.required),
+        status: number().integer().required(this.required)
       });
 
       const valid = schema.isValidSync(data);
@@ -142,7 +151,10 @@ export class FocoController {
         return {status: 400, message: "Foco já existente"};
       }
 
-      await this.focoRepository.update(data.id, data);
+      foco.name = data.name;
+      foco.status = data.status;
+
+      await this.focoRepository.update(data.id, foco);
 
       return {status: 200, message: "Foco atualizado"}
     } catch (err) {

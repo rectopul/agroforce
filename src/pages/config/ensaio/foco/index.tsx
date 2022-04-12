@@ -31,7 +31,7 @@ interface IFilter{
 export interface IFocos {
   id: number;
   name: string;
-  status: number;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -104,26 +104,30 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     },
   });
 
-  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusPortfolio(idFoco: number, data: IFocos): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
     } else {
-      status = 0;
+      data.status = 1;
     }
     
-    const index = focos.findIndex((foco) => foco.id === id);
+    const index = focos.findIndex((foco) => foco.id === idFoco);
 
     if (index === -1) {
       return;
     }
 
-    await focoService.update({id: id, status: status});
-
     setFocos((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
     });
+
+    console.log(focos);
+
+    const { id, name, status } = focos[index];
+
+    await focoService.update({id, name,status});
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -170,12 +174,15 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                   href={`/config/ensaio/foco/atualizar?id=${rowData.id}`}
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -185,8 +192,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"

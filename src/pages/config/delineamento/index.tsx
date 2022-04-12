@@ -182,7 +182,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/delineamento/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/delineamento/atualizar-layout?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -377,7 +377,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem dos Layoults</title>
+        <title>Listagem dos Layout</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full

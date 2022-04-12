@@ -179,9 +179,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Divisor", field: "divisor", sorting: false })
       }
 
-      if (ObjetCampos[item] == 'largura') {
-        arrOb.push({ title: "Largura", field: "largura", sorting: false })
-      }
+      // if (ObjetCampos[item] == 'largura') {
+      //   arrOb.push({ title: "Largura", field: "largura", sorting: false })
+      // }
 
       if (ObjetCampos[item] == 'comp_fisico') {
         arrOb.push({ title: "Comp. Fisico", field: "comp_fisico", sorting: false })
@@ -478,7 +478,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Layoult_Quadra.xlsx");
+        XLSX.writeFile(workBook, "Layout_Quadra.xlsx");
       }
     });
   };
@@ -513,7 +513,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem dos Layoults</title>
+        <title>Listagem dos Layout</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -604,8 +604,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar Layoult"
-                        value="Cadastrar Layoult"
+                        title="Cadastrar Layout"
+                        value="Cadastrar Layout"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
@@ -738,7 +738,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
   const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;

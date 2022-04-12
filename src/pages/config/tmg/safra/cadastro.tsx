@@ -1,23 +1,23 @@
-import Head from "next/head";
 import { useFormik } from 'formik';
-import InputMask from 'react-input-mask';
-
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-
+import InputMask from 'react-input-mask';
 import { safraService } from 'src/services';
-
-import { 
+import Swal from "sweetalert2";
+import {
   Button,
-  Content, 
+  Content,
   Input,
   Radio
 } from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import Swal from "sweetalert2";
-import { useRouter } from "next/router";
-import { useState } from "react";
+
+
+
 
 interface ISafraProps {
   id_culture: number;
@@ -157,7 +157,7 @@ export default function Safra() {
                 required
                 id="year"
                 name="year"
-                placeholder="Mês e ano"
+                placeholder=""
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="
