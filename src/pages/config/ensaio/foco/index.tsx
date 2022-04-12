@@ -299,11 +299,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     
     await focoService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = focos.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;

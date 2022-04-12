@@ -426,7 +426,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     
     await userService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
+        const newData = users.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
 
           if (row.status === 0) {

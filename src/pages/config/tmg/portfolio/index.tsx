@@ -34,7 +34,7 @@ export interface IPortfolioLote {
 
   genealogy: string;
   cruza: string;
-  status_portfolio: number;
+  status_portfolio?: number;
   name_lote: string;
 }
 
@@ -113,14 +113,14 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     },
   });
 
-  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusPortfolio(idPortfolio: number, data: IPortfolioLote): Promise<void> {
+    if (data.status_portfolio === 0) {
+      data.status_portfolio = 1;
     } else {
-      status = 0;
+      data.status_portfolio = 0;
     }
     
-    const index = portfolios.findIndex((portfolio) => portfolio.status_portfolio === id);
+    const index = portfolios.findIndex((portfolio) => portfolio.id_portfolio === idPortfolio);
 
     if (index === -1) {
       return;
@@ -128,19 +128,29 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
     setPortfolios((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status_portfolio = status;
+      copy[index].status_portfolio = data.status_portfolio;
       return copy;
     });
 
     const {
       id_portfolio,
+      id_culture_portfolio,
       genealogy,
       cruza,
       status_portfolio
     } = portfolios[index];
 
+    console.log(
+      id_portfolio,
+      id_culture_portfolio,
+      genealogy,
+      cruza,
+      status_portfolio
+    );
+
     await portfolioService.update({
-      id: id_portfolio,
+      id_portfolio: id_portfolio,
+      id_culture_portfolio : id_culture_portfolio,
       genealogy: genealogy,
       cruza: cruza,
       status: status_portfolio
@@ -209,7 +219,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   bgColor="bg-yellow-500"
                   textColor="white"
                   title={`Visualizar ${rowData.name_lote}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/lote/atualizar?id=${rowData.id_portfolio}`)}}
+                  onClick={() =>{router.push(`/config/tmg/portfolio/lote/atualizar?id=${rowData.id_lote}`)}}
                 />
               </div>
               <div className="h-10">
@@ -221,12 +231,15 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   onClick={() =>{router.push(`/config/tmg/portfolio/atualizar?id=${rowData.id_portfolio}`)}}
                 />
               </div>
-              {rowData.status_portfolio ? (
+              {rowData.status_portfolio === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id_portfolio, !rowData.status_portfolio
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id_portfolio, {
+                        status_portfolio: rowData.status_portfolio,
+                        ...rowData
+                      }
                     )}
                     title={`Portfólio Ativo`}
                     bgColor="bg-green-600"
@@ -237,8 +250,11 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id_portfolio, !rowData.status_portfolio
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id_portfolio, {
+                        status_portfolio: rowData.status_portfolio,
+                        ...rowData
+                      }
                     )}
                     title={`Portfólio inativo`}
                     bgColor="bg-red-800"
@@ -386,12 +402,12 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     }
     
     await portfolioService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
-          if (row.status === 0) {
-            row.status = "Inativo";
+      if (response.status === 200) {
+        const newData = portfolios.map((row) => {
+          if (row.status_portfolio === 0) {
+            row.status_portfolio = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status_portfolio = "Ativo" as any;
           }
 
           return row;
@@ -690,12 +706,13 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const portfolioLote = await prisma.lote_portfolio.findMany({
     where: {
       portfolio: {
-        id_culture: parseInt(cultureId),
-      }
+        id_culture: Number(cultureId),
+      },
     },
     include: {
       portfolio: {
         select: {
+          id: true,
           id_culture: true,
           genealogy: true,
           cruza: true,
@@ -704,6 +721,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       },
       lote: {
         select: {
+          id: true,
           name: true,
         }
       }
@@ -713,17 +731,20 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const allPortfolios = portfolioLote.map(item => {
     return {
       code: item.id, // código da tabela no front
-      id_portfolio: item.id_portfolio,
-      id_culture_portfolio: item.portfolio.id_culture,
-      id_lote: item.id_lote,
 
+      id_portfolio: item.portfolio.id,
+      id_culture_portfolio: item.portfolio.id_culture,
+      id_lote: item.lote.id,
+      
       genealogy: item.portfolio.genealogy,
       cruza: item.portfolio.cruza,
       status_portfolio: item.portfolio.status,
 
-      name_lote: item.lote.name, 
+      name_lote: item.lote.name,
     }
   });
+
+  console.log(allPortfolios)
 
   const count = allPortfolios.length;
 

@@ -1,6 +1,14 @@
 import getConfig from 'next/config';
 import { fetchWrapper } from '../helpers';
 
+interface IPortfolioUpdate {
+  id_portfolio: number;
+  id_culture_portfolio: number;
+  genealogy: string;
+  cruza: string;
+  status?: number;
+}
+
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
 
@@ -15,7 +23,7 @@ async function create(data: any) {
   return portfolio;
 }
 
-async function update(data: any) {
+async function update(data: IPortfolioUpdate) {
   const portfolio = await fetchWrapper.put(baseUrl, data);
   return portfolio;
 }
