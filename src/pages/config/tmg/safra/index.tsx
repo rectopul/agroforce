@@ -372,7 +372,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       </label>
                       <Input 
                         type="text" 
-                        placeholder="safra"
+                        placeholder="Safra"
                         max="40"
                         id="filterSearch"
                         name="filterSearch"

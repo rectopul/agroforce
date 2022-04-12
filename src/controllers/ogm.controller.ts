@@ -120,7 +120,7 @@ export class OGMController {
             if (data != null && data != undefined) {
                 let response = await this.Repository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message: {message: "layoult atualizado"}}
+                    return {status: 200, message: {message: "OGM atualizado com sucesso"}}
                 } else {
                     return {status: 400, message: {message: "erro ao tentar fazer o update"}}
                 }

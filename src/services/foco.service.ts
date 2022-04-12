@@ -4,6 +4,12 @@ import { fetchWrapper } from '../helpers';
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
+interface UpdateLoteDTO {
+  id: number;
+  name: string;
+  status?: number;
+}
+
 export const focoService = {
   update,
   getAll,
@@ -15,7 +21,7 @@ async function create(data: any) {
   return foco;
 }
 
-async function update(data: any) {
+async function update(data: UpdateLoteDTO) {
   const foco = await fetchWrapper.put(baseUrl, data);
   return foco;
 }
