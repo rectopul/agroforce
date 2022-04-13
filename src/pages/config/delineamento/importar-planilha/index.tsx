@@ -1,18 +1,15 @@
 import Head from "next/head";
 import { ImportPlanilha } from "src/components/ImportPlanilha";
 
-const data: string[] = [
-  'nameLocal',
-  "nameSafra",
-  "nameFoco",
-  "nameTipoEnsaio",
-  "nameOgm",
-  "nameEpoca",
-  "npe",
-  "prox_npe",
-
-  "teste",
-];
+const data: object = [
+            { id: 'Local', name: '*Local'}, 
+            { id: 'Foco', name: 'Foco'}, 
+            { id: 'OGM', name: 'OGM'}, 
+            { id: 'Ensaio', name: 'Local'}, 
+            { id: 'NPEI', name: 'NPEI'}, 
+            { id: 'Epoca', name: 'Epoca'}, 
+            {id: 'Safra', name: 'Safra' }
+          ];
 
 export default function ImportacaoPlanilha() {
   return (

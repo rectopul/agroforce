@@ -15,9 +15,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             res.status(200).json(response);
             break;
         case 'POST':
-            await Controller.validateInfoTable({moduleId: 1});
-            // let Result = await Controller.post(req.body);
-            res.status(200).json("");
+            // await Controller.validateInfoTable({moduleId: 1});
+            let Result = await Controller.post(req.body);
+            res.status(200).json(Result);
             break;
         case 'PUT':
             // let resultPut = await Controller.updateCultures(req.body);

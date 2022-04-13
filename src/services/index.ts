@@ -13,3 +13,4 @@ export * from './ogm.service';
 export * from './portfolio.service';
 export * from './department.service';
 export * from './lote.service';
+export * from './import.service';

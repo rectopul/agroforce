@@ -23,7 +23,11 @@ export class TypeAssayController {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
                 parameters.name  = JSON.parse(options.filterSearch);
             }
-        
+
+            if (options.name) {
+                parameters.name  = options.name;
+            }
+
             if (options.take) {
                 if (typeof(options.take) === 'string') {
                     take = parseInt(options.take);
