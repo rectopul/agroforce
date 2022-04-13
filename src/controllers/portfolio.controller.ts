@@ -155,7 +155,6 @@ export class PortfolioController {
 
   async updatePortfolio(data: UpdatePortfolioLote) {
     try {
-      console.log(data)
       const schema: SchemaOf<UpdatePortfolioLote> = object({
         id_portfolio: number().integer().required(this.required),
         id_culture_portfolio: number().integer().required(this.required),

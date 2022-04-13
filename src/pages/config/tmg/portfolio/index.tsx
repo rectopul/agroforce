@@ -140,14 +140,6 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       status_portfolio
     } = portfolios[index];
 
-    console.log(
-      id_portfolio,
-      id_culture_portfolio,
-      genealogy,
-      cruza,
-      status_portfolio
-    );
-
     await portfolioService.update({
       id_portfolio: id_portfolio,
       id_culture_portfolio : id_culture_portfolio,
@@ -743,8 +735,6 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       name_lote: item.lote.name,
     }
   });
-
-  console.log(allPortfolios)
 
   const count = allPortfolios.length;
 
