@@ -581,11 +581,12 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-portfolio`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = "filterStatus=1";
@@ -602,6 +603,28 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
 
   const allLote = Response.response;
   const totalItems = Response.total;
+
+  // const response = await prisma.lote_portfolio.findMany({
+    
+  //   include: {
+  //     lote: {
+  //       select: {
+  //         id: true,
+  //         name: true,
+  //         volume: true,
+  //         status: true,
+  //       }
+  //     },
+  //     portfolio: {
+  //       select: {
+  //         id: true,
+  //         genealogy: true,
+  //       }
+  //     }
+  //   }
+  // });
+
+  // console.log(response);
 
   return {
     props: {

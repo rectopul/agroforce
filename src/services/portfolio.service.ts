@@ -2,8 +2,8 @@ import getConfig from 'next/config';
 import { fetchWrapper } from '../helpers';
 
 interface IPortfolioUpdate {
-  id_portfolio: number;
-  id_culture_portfolio: number;
+  id: number;
+  id_culture: number;
   genealogy: string;
   cruza: string;
   status?: number;

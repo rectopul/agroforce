@@ -5,6 +5,7 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 import Head from "next/head";
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
 import InputMask from 'react-input-mask';
@@ -84,6 +85,8 @@ export default function AtualizarUsuario({ /* departments, profiles, userEdit, C
   ));
 
   const router = useRouter();
+
+  const [nameProfile, setNameProfile] = useState<string>('');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
@@ -177,6 +180,28 @@ export default function AtualizarUsuario({ /* departments, profiles, userEdit, C
         Swal.fire("erro de credenciais")         
     }
   }
+
+  const allNamesProfile = [{ 1: ["Admin", "Gerente"], 2:[""], 3:["Admin"] }];
+
+  // console.log(allNamesProfile[0][1])
+
+  const profiles: any = [];
+
+  let aux = {};
+
+  data.users_permissions.map((item) => {
+    // console.log(item.cultures.id)
+    console.log(item.profiles)
+
+    // let id_culture: string = String(item.cultures.id)
+    let name_profile: string = String(item.profiles)
+
+    aux = {1: [name_profile]}
+
+    profiles.push(aux);
+  });
+
+  console.log(profiles)
   
   return (
     <>
@@ -443,7 +468,7 @@ export default function AtualizarUsuario({ /* departments, profiles, userEdit, C
                                 text: "name",
                                 value: "id"
                               }}
-                              value={profilesData.map(e => e.name)}
+                              value={data.users_permissions.map(item => item.profiles) as any}
                               placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
                             />
                           </div>
@@ -519,6 +544,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
       users_permissions: {
         where: {
           userId: parseInt(context.req.cookies.userId),
+          // cultureId: parseInt(context.req.cookies.cultureId),
         },
         select: {
           id: true,
@@ -601,8 +627,12 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     users_permissions: response.users_permissions.map(item => {
       return {
         id: item.id,
-        profiles: item.profile,
-        cultures: item.culture
+        
+        id_profiles: item.profile.id,
+        name_profiles: item.profile.name,
+        
+        id_cultures: item.culture.id,
+        name_cultures: item.culture.name,
       }
     }),
   };
@@ -627,6 +657,8 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
       name: culture.name
     }
   });
+
+  console.log(data.users_permissions);
 
   return { 
     props: { /*{ departments, profiles, userEdit, Cultures, userCulture },*/ 
