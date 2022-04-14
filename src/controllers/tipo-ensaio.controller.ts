@@ -94,7 +94,6 @@ export class TypeAssayController {
 
     async post(data: object | any) {
         try {
-            console.log(data)
             if (data != null && data != undefined) {
                 let response = await this.Repository.create(data);
                 if(response) {

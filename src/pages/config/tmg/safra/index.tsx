@@ -100,8 +100,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      console.log(values)
-
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);

@@ -108,6 +108,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       users_permissions: data.users_permissions,
     },
     onSubmit: async (values) => {
+      alert(JSON.stringify(values.users_permissions, null, 2))
+      return
+
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
@@ -174,11 +177,11 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     }
   }
 
-  data.users_permissions.map((item) => {
-    console.log(`Perfil => id: ${item.id_profiles} nome: ${item.name_profiles}`)
-    console.log(`Cultura => id: ${item.id_cultures} nome: ${item.name_cultures}`)
-    item.name_profiles
-  });
+  // data.users_permissions.map((item) => {
+  //   console.log(`Perfil => id: ${item.id_profiles} nome: ${item.name_profiles}`)
+  //   console.log(`Cultura => id: ${item.id_cultures} nome: ${item.name_cultures}`)
+  //   item.name_profiles
+  // });
   
   return (
     <>
@@ -438,6 +441,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                             <MultiSelectComponent
                               id={`profiles_${culture.id}`}
                               name={`profiles_${culture.id}`}
+                              onBlur={formik.handleBlur}
                               onChange={formik.handleChange}
                               dataSource={profilesData.map(e => e.name)}
                               mode="Box"

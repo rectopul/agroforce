@@ -6,7 +6,6 @@ export class LotePortfolioController {
 
   async list(id_portfolio: number, id_culture: number) {
     try {
-      console.log(id_portfolio, id_culture);
       const response = await this.lotePortfolioRepository.findAll(id_portfolio, id_culture)
 
       if (!response) {

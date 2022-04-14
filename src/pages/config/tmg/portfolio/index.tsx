@@ -255,7 +255,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   bgColor="bg-yellow-500"
                   textColor="white"
                   title={`Lote de ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/lote/?id_portfolio=${rowData.id}&id_culture=${rowData.id_culture}`)}}
+                  onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_lote=${rowData.id_lote}`)}}
                 />
               </div>
             </div>
@@ -712,8 +712,6 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       status: true,
     }
   });
-
-  console.log(response)
 
   const allPortfolios = response.map(item => {
     return {

@@ -61,8 +61,8 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
     },
     onSubmit: async (values) => {
       await portfolioService.update({
-        id_portfolio: portfolio.id,
-        id_culture_portfolio: formik.values.id_culture,
+        id: portfolio.id,
+        id_culture: formik.values.id_culture,
         genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
         status: portfolio.status,

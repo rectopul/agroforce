@@ -123,8 +123,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
       return copy;
     });
 
-    console.log(focos);
-
     const { id, name, status } = focos[index];
 
     await focoService.update({id, name,status});
