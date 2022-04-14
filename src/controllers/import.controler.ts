@@ -49,7 +49,7 @@ export class ImportController {
     async validateGeneral(data: object | any) {
         try {
             if (data != null && data != undefined) {
-
+                let Result: any;
                 if (!data.moduleId) return {status: 400, message: "precisa ser informado o modulo que está sendo acessado!"};
 
                 let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -58,10 +58,11 @@ export class ImportController {
 
                 switch (data.moduleId) {
                     case 1:
-                        this.validateNPE(data);
+                        console.log(await this.validateNPE(data));
                         break;
                 }
-            
+                // console.log(Result);
+                // return Result;
                 // console.log(await configModule.response);
             }
         } catch (err) {
@@ -77,16 +78,17 @@ export class ImportController {
                 let configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
                 if (configModule.status != 200) return {status: 400, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
-                Object.keys(configModule.response[0].fields[0]).forEach((key,item) => {
-                    switch (configModule.response[0].fields[item][key]) {
-                        case 'Local':
-                            Object.keys(data.spreadSheet).forEach(async (keySheet, item) => {
-                                if (keySheet != '0') { 
-                                    if (data.spreadSheet[keySheet][key] != "") {
-                                        if (typeof(data.spreadSheet[keySheet][key]) == 'string') {
-                                            let locais: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][key]});
+
+                Object.keys(data.spreadSheet).forEach(async (keySheet, columns) => {
+                    Object.keys(data.spreadSheet[keySheet]).forEach(async (sheet, columns) => {
+                        if (keySheet != '0') { 
+                            switch(configModule.response[0].fields[sheet]) { 
+                                case "Local":
+                                    if (data.spreadSheet[keySheet][sheet]!= "") {
+                                        if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
+                                            let locais: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
                                             if (locais.total == 0) {
-                                                return {status: 404, message: `O Local ${data.spreadSheet[keySheet][key]}  não existe no sistema`}
+                                                return {status: 404, message: `O Local ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
                                             }
                                         } else { 
                                             return {status: 404, message: "A informação esperada para coluna de nome do local é um texto"}
@@ -94,17 +96,13 @@ export class ImportController {
                                     } else {
                                         return {status: 404, message: "A Coluna com o Nome do Local é obrigatório"}
                                     }
-                                }
-                            });
-                            break;
-                        case 'Safra':   
-                            Object.keys(data.spreadSheet).forEach(async (keySheet, item) => {
-                                console.log(data.spreadSheet[parseInt(keySheet)][key]) 
-                                    if (data.spreadSheet[keySheet][key] != "") {
-                                        if (typeof(data.spreadSheet[keySheet][key]) == 'string') {
-                                            let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][key]});
+                                    break;
+                                case "Safra":
+                                    if (data.spreadSheet[keySheet][sheet] != "") {
+                                        if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
+                                            let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
                                             if (safras.total == 0) {
-                                                return {status: 404, message: `A Safra ${data.spreadSheet[keySheet][key]}  não existe no sistema`}
+                                                return {status: 404, message: `A Safra ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
                                             }
                                         } else { 
                                             return {status: 404, message: "Safra não existe no sistema"}
@@ -112,45 +110,58 @@ export class ImportController {
                                     } else {
                                         return {status: 404, message: "Campo com nome da Safra é obrigatorio"}
                                     }
-                                
-                            });
-                            break;
-                        case 'Foco':   
-                            Object.keys(data.spreadSheet).forEach(async (keySheet, item) => {
-                                if (data.spreadSheet[keySheet][key] != "") {
-                                    if (typeof(data.spreadSheet[keySheet][key]) == 'string') {
-                                        let safras: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][key]});
-                                        if (safras.total == 0) {
-                                            return {status: 404, message: `O Foco ${data.spreadSheet[keySheet][key]}  não existe no sistema`}
+                                    break;
+                                case "OGM":
+                                    if (data.spreadSheet[keySheet][sheet] != "") {
+                                        if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
+                                            let safras: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                            if (safras.total == 0) {
+                                                return {status: 404, message: `O OGM  ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
+                                            }
+                                        } else { 
+                                            return {status: 404, message: "OGM deve ser um campo de texto"}
                                         }
-                                    } else { 
-                                        return {status: 404, message: "Foco deve ser um campo de texto"}
+                                    } else {
+                                        return {status: 404, message: "Campo com nome do OGM é obrigatorio"}
                                     }
-                                } else {
-                                    return {status: 404, message: "Campo com nome do Foco é obrigatorio"}
-                                }
-                                
-                            });
-                            break;
-                        case 'Ensaio':   
-                            Object.keys(data.spreadSheet).forEach(async (keySheet, item) => {
-                                if (data.spreadSheet[keySheet][key] != "") {
-                                    if (typeof(data.spreadSheet[keySheet][key]) == 'string') {
-                                        let safras: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][key]});
-                                        if (safras.total == 0) {
-                                            return {status: 404, message: `O Tipo de Ensaio ${data.spreadSheet[keySheet][key]}  não existe no sistema`}
+                                    break;
+                                case "Foco":
+                                    if (data.spreadSheet[keySheet][sheet] != "") {
+                                        if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
+                                            let safras: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
+                                            if (safras.total == 0) {
+                                                return {status: 404, message: `O Foco ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
+                                            }
+                                        } else { 
+                                            return {status: 404, message: "Foco deve ser um campo de texto"}
                                         }
-                                    } else { 
-                                        return {status: 404, message: "Tipo de Ensaio deve ser um campo de texto"}
+                                    } else {
+                                        return {status: 404, message: "Campo com nome do Foco é obrigatorio"}
                                     }
-                                } else {
-                                    return {status: 404, message: "Campo com nome do Tipo de Ensaio é obrigatorio"}
-                                }
-                            });
-                            break;
-                        default:
-                            break;
-                    }
+                                                                    
+                                    break;
+                                case "Ensaio":
+                                    if (data.spreadSheet[keySheet][sheet] != "") {
+                                        if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
+                                            let safras: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                            if (safras.total == 0) {
+                                                return {status: 404, message: `O Tipo de Ensaio ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
+                                            }
+                                        } else { 
+                                            return {status: 404, message: "Tipo de Ensaio deve ser um campo de texto"}
+                                        }
+                                    } else {
+                                        return {status: 404, message: "Campo com nome do Tipo de Ensaio é obrigatorio"}
+                                    }
+                                    break;
+                                case "Epoca":
+                                    break;
+                                case "NPEI":
+                                    break;
+                                
+                            }
+                        }
+                    });
                 });
             }
         } catch (err) {

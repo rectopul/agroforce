@@ -54,7 +54,7 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
 
 
   function saveConfig () {
-    let ObjProfiles;
+    let Teste;
     let input: any; 
     const auxObject: any = [];
     let auxObject2: any = [];
@@ -63,11 +63,13 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
       auxObject2 = [];
       for (let v = 0; v < input.options.length; v++) {
         if (input.options[v].selected) {
-          auxObject.push(`{"${i}" : "${input.options[v].value}"}`);
+          auxObject.push(input.options[v].value);
         }
       }
-      // auxObject.push(auxObject2[0]);
     }
+    console.log(auxObject);
+    // return;
+
     importService.create({moduleId: moduleId, fields: auxObject}).then((response) => {
       console.log(response);
     });

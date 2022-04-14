@@ -14,7 +14,9 @@ export default function Teste() {
   function readExcel(value: any) {
     console.log(value);
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 1});
+      importService.validate({spreadSheet: rows, moduleId: 1}).then((response) => {
+        console.log(response);
+      });
     })
   }
 
