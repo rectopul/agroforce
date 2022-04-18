@@ -183,7 +183,4 @@ export class ImportController {
         }  
     }
 }
-function ResponseNPE(ResponseNPE: any) {
-    throw new Error('Function not implemented.');
-}
 
