@@ -33,7 +33,6 @@ export class ImportController {
                 await this.delete(parseInt(data.moduleId));
                 parameters.moduleId = parseInt(data.moduleId);
                 parameters.fields = data.fields;
-                console.log(parameters)
                 let response = await this.importRepository.create(parameters);
                 if(response.count > 0) {
                     return {status: 200, message: {message: "config planilha criada"}}
@@ -55,13 +54,12 @@ export class ImportController {
                 let configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
                 if (configModule.status != 200) return {status: 400, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
-
-                switch (data.moduleId) {
-                    case 1:
-                        console.log(await this.validateNPE(data));
-                        break;
-                }
-                // console.log(Result);
+                let response; 
+                if (data.moduleId == 1) {
+                    response = await this.validateNPE(data);
+                } 
+           
+                console.log(response);
                 // return Result;
                 // console.log(await configModule.response);
             }
@@ -113,12 +111,14 @@ export class ImportController {
                                     break;
                                 case "OGM":
                                     if (data.spreadSheet[keySheet][sheet] != "") {
+                                        console.log(data.spreadSheet[keySheet][sheet])
                                         if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                            let safras: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                            let safras: any = await this.ogmController.getAll({name: data.spreadSheet[keySheet][sheet]});
                                             if (safras.total == 0) {
                                                 return {status: 404, message: `O OGM  ${data.spreadSheet[keySheet][sheet]}  não existe no sistema`}
                                             }
                                         } else { 
+                                            console.log('aqui');
                                             return {status: 404, message: "OGM deve ser um campo de texto"}
                                         }
                                     } else {
@@ -183,3 +183,7 @@ export class ImportController {
         }  
     }
 }
+function ResponseNPE(ResponseNPE: any) {
+    throw new Error('Function not implemented.');
+}
+
