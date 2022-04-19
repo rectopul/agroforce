@@ -629,7 +629,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const api = await fetch(`${baseUrl}/lote?id_portfolio=${id_portfolio}`, requestOptions);
 
   const allLote: LotePortfolio[] = await api.json();
-  const totalItems = allLote.length;
+  const totalItems = allLote.length || 0;
 
   return {
     props: {

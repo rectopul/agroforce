@@ -33,6 +33,8 @@ model culture {
   portfolio      portfolio[]
   users_permissions      users_permissions[]
   ogm      ogm[]
+  foco      foco[]
+  type_assay      type_assay[]
   delineamento      delineamento[]
 }
 
@@ -213,17 +215,23 @@ model delineamento {
 
 model foco {
   id          Int @id @default(autoincrement())
+  id_culture  Int
   name        String
   status      Int?       @default(1)
   created_by  Int
   created_at  DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 model type_assay {
   id             Int       @id @default(autoincrement())
+  id_culture  Int
   name           String
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model ogm {
