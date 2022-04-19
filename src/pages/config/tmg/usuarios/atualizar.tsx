@@ -86,8 +86,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
   const userCultures = new Array();
   const userPermissions: any = new Array();
-  let Teste;
-  const [selected, setSelected] = useState([]);
 
   if (data.users_permissions) {
     Object.keys(data.users_permissions).forEach((_, item) => {
@@ -133,7 +131,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       let input: any; 
       const auxObject: any = [];
       let auxObject2: any = [];
-      console.log(values.cultures);
+
       Object.keys(values.cultures).forEach((item) => {
         input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
         auxObject2 = [];

@@ -14,7 +14,7 @@ export function Aside() {
       <nav className="flex flex-col gap-6
         pt-4
       ">
-        <ButtonAside 
+        {/* <ButtonAside 
           title='Lista'
           icon={<HiOutlineClipboardList size={32} />}
           href='config/'
@@ -58,7 +58,7 @@ export function Aside() {
           title='Notificações e Relatórios'
           icon={ <VscGraph  size={32} />}
           href='relatorios'
-        />
+        /> */}
 
         <ButtonAside 
           title='Configurações'
