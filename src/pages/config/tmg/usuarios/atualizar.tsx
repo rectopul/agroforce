@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
 import { useFormik } from "formik";
@@ -84,13 +85,22 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
   
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
   const userCultures = new Array();
+  const userPermissions: any = new Array();
+  let Teste;
+  const [selected, setSelected] = useState([]);
 
   if (data.users_permissions) {
     Object.keys(data.users_permissions).forEach((_, item) => {
       userCultures.push(data.users_permissions[item].id_cultures);
+      if (userPermissions[data.users_permissions[item].id_cultures]) {
+        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, userPermissions[data.users_permissions[item].id_cultures]]
+      } else {  
+        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles];
+      }
     });
   } 
 
+  // console.log(userPermissions[2]);
   const formik = useFormik<IUserProps>({
     initialValues: {
       id: data.id,
@@ -138,8 +148,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         }
         auxObject.push(ObjProfiles);
       });
-      alert(JSON.stringify(auxObject, null, 2))
-      return;
+
       await userService.update({
         id: values.id,
         name: capitalize(values.name),
@@ -179,6 +188,10 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     }
   }
   
+  function teste (cultureId: any, newvalue: any) {
+    // console.log(cultureId);
+    console.log(newvalue);
+  }
   return (
     <>
       <Head>
@@ -437,23 +450,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                             <MultiSelectComponent
                               id={`profiles_${culture.id}`}
                               name={`profiles_${culture.id}`}
-                              onBlur={formik.handleBlur}
-                              onChange={formik.handleChange}
                               dataSource={profilesData as any}
                               mode="Box"
                               fields={{
                                 text: "name",
                                 value: "id"
                               }}
-                              value={
-                                data.users_permissions.map((item: any) => {
-                                  if (item.id_cultures === culture.id) {
-                                    return item.id_profiles
-                                  } else {
-                                    return ['']
-                                  }
-                                }) as string[]
-                              }
+                              value={userPermissions[culture.id]}
                               placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
                             />
                           </div>
@@ -638,7 +641,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     }
   });
 
-  console.log(data.users_permissions)
+  // console.log(data.users_permissions)
   return { 
     props: {
       data,
