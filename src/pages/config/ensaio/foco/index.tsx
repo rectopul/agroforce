@@ -577,11 +577,13 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
