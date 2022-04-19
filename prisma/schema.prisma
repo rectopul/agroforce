@@ -189,16 +189,13 @@ model layoult_quadra {
 model portfolio {
   id         Int       @id @default(autoincrement())
   id_culture Int
-  id_lote    Int
   genealogy  String
   cruza      String
   status     Int       @default(1)
   created_by Int
-  created_at DateTime? @default(now())
+  created_at DateTime  @default(now())
   culture    culture   @relation(fields: [id_culture], references: [id])
-  lote       lote   @relation(fields: [id_lote], references: [id])
-
-  LotePortfolio lote_portfolio[]
+  lote lote[]
 }
 
 model delineamento {
@@ -242,22 +239,11 @@ model ogm {
 
 model lote {
   id            Int @id @default(autoincrement())
+  id_portfolio  Int
   name          String
   volume        Int
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime @default(now())
-
-  LotePortfolio lote_portfolio[]
-  portfolio portfolio[]
-}
-
-model lote_portfolio {
-  id           Int @id @default(autoincrement())
-  id_portfolio Int
-  id_lote      Int
-  created_at    DateTime @default(now())
-
   portfolio portfolio @relation(fields: [id_portfolio], references: [id])
-  lote lote @relation(fields: [id_lote], references: [id])
 }

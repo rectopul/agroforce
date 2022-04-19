@@ -2,6 +2,7 @@ import { number, object, SchemaOf, string } from 'yup';
 import { LoteRepository } from '../repository/lote.repository';
 interface LoteDTO {
   id: number;
+  id_portfolio: number;
   name: string;
   volume: number;
   created_by: number;
@@ -9,8 +10,8 @@ interface LoteDTO {
 }
 
 type CreateLoteDTO = Omit<LoteDTO, 'id' | 'status'>;
-type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
-type FindOne = Omit<LoteDTO, 'name' | 'volume' | 'created_by' | 'status'>;
+type UpdateLoteDTO = Omit<LoteDTO, 'created_by' | 'id_portfolio'>;
+type FindOne = Omit<LoteDTO, 'name' | 'id_portfolio' | 'volume' | 'created_by' | 'status'>;
 
 export class LoteController {
   public readonly required = 'Campo obrigatório';
@@ -39,6 +40,7 @@ export class LoteController {
     try {
       const schema: SchemaOf<CreateLoteDTO> = object({
         name: string().required(this.required),
+        id_portfolio: number().required(this.required),
         volume: number().required(this.required),
         created_by: number().integer().required(this.required),
       });
@@ -102,6 +104,7 @@ export class LoteController {
     let skip;
     let orderBy: object | any;
     let select: any = [];
+    let include: any;
 
     try {
       if (options.filterStatus) {
@@ -125,13 +128,16 @@ export class LoteController {
           select[objSelect[item]] = true;
         });
         select = Object.assign({}, select);
+        include = select;
       } else {
-        select = {
-          id: true,
-          name:true,
-          volume: true,
-          status: true
-        };
+        include = {
+          portfolio: {
+            select: {
+              id: true,
+              genealogy:true
+            }
+          }
+        }
       }
 
       if (options.name) {

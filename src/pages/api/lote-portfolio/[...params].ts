@@ -1,42 +1,55 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { LoteController } from '../../../controllers/lote.controller';
 import { apiHandler } from '../../../helpers/api';
 import { prisma } from '../db/db';
 
 export default  apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { id_lote } = req.query;
+  const loteController = new LoteController();
+  
+  const { id_portfolio } = req.query;
 
-  if (req.method !== 'GET') res.status(405).end(`Method ${req.method} Not Allowed`);
+  switch (req.method) {
+    case 'GET':
+      // const responseGet = loteController.listAll({id_portfolio, ...req});
+      // res.status(200).json(responseGet);
 
-  const response = await prisma.portfolio.findMany({
-    where: {
-      id_lote: Number(id_lote),
-    },
-    include: {
-      lote: {
-        select: {
-          id: true,
-          name: true,
-          volume: true,
-          status: true,
+      const responseGet = await prisma.lote.findMany({
+        where: {
+          id_portfolio: Number(id_portfolio),
+        },
+        include: {
+          portfolio: {
+            select: {
+              id: true,
+              genealogy: true,
+              id_culture: true,
+            }
+          }
         }
-      }
-    }
-  });
+      });
+    
+      const data = responseGet.map(item => {
+        return {
+          id: item.id,
+          id_portfolio: item.portfolio.id,
+          id_culture: item.portfolio.id_culture,
+          genealogy: item.portfolio.genealogy,
+          name: item.name,
+          volume: item.volume,
+          status: item.status,
+        }
+      });
+    
+      res.status(200).json(data);
 
-  const data = response.map(item => {
-    return {
-      id: item.id,
-      id_culture: item.id_culture,
-      genealogy: item.genealogy,
-
-      id_lote: item.lote.id,
-      name_lote: item.lote.name,
-			volume_lote: item.lote.volume,
-			status_lote: item.lote.status,
-    }
-  });
-
-  return res.status(200).json(data);
+      break
+    case 'PUT':
+        const resultPut = await loteController.update(req.body);
+        res.status(200).json(resultPut);
+        break
+    default:
+      res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
 }

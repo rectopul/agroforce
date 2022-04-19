@@ -29,7 +29,6 @@ interface IFilter{
 export interface IPortfolio {
   id: number;
   id_culture: number;
-  id_lote: number;
   genealogy: string;
   cruza: string;
   status?: number;
@@ -62,7 +61,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
+  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status,id_portfolio"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [portfolios, setPortfolios] = useState<IPortfolio[]>(allPortfolios);
@@ -78,7 +77,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Lote", value: "id_lote" },
+    { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 
@@ -240,10 +239,10 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           ),
         })
       }
-      if (ObjetCampos[index] == 'id_lote') {
+      if (ObjetCampos[index] == 'id_portfolio') {
         arrOb.push({
           title: "Lote",
-          field: "id_lote",
+          field: "id_portfolio",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
@@ -255,7 +254,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   bgColor="bg-yellow-500"
                   textColor="white"
                   title={`Lote de ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_lote=${rowData.id_lote}`)}}
+                  onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_portfolio=${rowData.id}`)}}
                 />
               </div>
             </div>
@@ -706,7 +705,6 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     select: {
       id: true,
       id_culture: true,
-      id_lote: true,
       genealogy: true,
       cruza: true,
       status: true,
@@ -717,7 +715,6 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     return {
       id: item.id,
       id_culture: item.id_culture,
-      id_lote: item.id_lote,
       genealogy: item.genealogy,
       cruza: item.cruza,
       status: item.status,
