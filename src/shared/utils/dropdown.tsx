@@ -71,7 +71,7 @@ const tabs = [
   { title: 'LOCAL', value: <BsCheckLg />, status: false , href: '/config/local' },
   { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false , href: '/config/delineamento' },
   // { title: 'NPE', value: <BsCheckLg />, status: false , href: '/config/npe' },
-  { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: '/config/layout-quadra' },
+  // { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: '/config/layout-quadra' },
   // { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false, href: '/config/conf-planilhas' },
 ];
 
