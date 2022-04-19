@@ -57,14 +57,14 @@ interface IUserProps {
   jivochat: number;
   app_login: number;
   status: number;
-  users_permissions: IUserPermissions[];
-  
+  cultures: object | any;
+  created_by: number | any;
   avatar?: string;
   confirmPassword?: string;
 }
 
 export interface IData {
-  data: IUserProps;
+  data: IUserProps | any;
   profilesData: IProfileUser[];
   culturesData: ICultureUser[];
   departmentsData: IDepartment[];
@@ -105,12 +105,12 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       jivochat: data.jivochat,
       status: data.status,
       app_login: data.app_login,
-      users_permissions: data.users_permissions,
+      created_by: data.created_by,
+      cultures:[]
     },
     onSubmit: async (values) => {
-      alert(JSON.stringify(values.users_permissions, null, 2))
-      return
-
+      // alert(JSON.stringify(values, null, 2))
+      // return;
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
@@ -123,22 +123,23 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       let input: any; 
       const auxObject: any = [];
       let auxObject2: any = [];
-
-      // Object.keys(values.cultures).forEach((item) => {
-      //   input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
-      //   auxObject2 = [];
-      //   for (let i = 0; i < input.options.length; i++) {
-      //     if (input.options[i].selected) {
-      //       auxObject2.push(input.options[i].value);
-      //     }
-      //   }
-      //   ObjProfiles = {
-      //     cultureId: values.cultures[item], 
-      //     profiles: auxObject2
-      //   }
-      //   auxObject.push(ObjProfiles);
-      // });
-
+      console.log(values.cultures);
+      Object.keys(values.cultures).forEach((item) => {
+        input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
+        auxObject2 = [];
+        for (let i = 0; i < input.options.length; i++) {
+          if (input.options[i].selected) {
+            auxObject2.push(input.options[i].value);
+          }
+        }
+        ObjProfiles = {
+          cultureId: values.cultures[item], 
+          profiles: auxObject2
+        }
+        auxObject.push(ObjProfiles);
+      });
+      alert(JSON.stringify(auxObject, null, 2))
+      return;
       await userService.update({
         id: values.id,
         name: capitalize(values.name),
@@ -151,7 +152,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         jivochat: values.jivochat,
         status: values.status,
         app_login: values.app_login,
-        users_permissions: values.users_permissions,
+        cultures: auxObject,
+        created_by: values.created_by
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Usuário atualizado com sucesso!')
@@ -176,12 +178,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         Swal.fire("erro de credenciais")         
     }
   }
-
-  // data.users_permissions.map((item) => {
-  //   console.log(`Perfil => id: ${item.id_profiles} nome: ${item.name_profiles}`)
-  //   console.log(`Cultura => id: ${item.id_cultures} nome: ${item.name_cultures}`)
-  //   item.name_profiles
-  // });
   
   return (
     <>
@@ -443,16 +439,16 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                               name={`profiles_${culture.id}`}
                               onBlur={formik.handleBlur}
                               onChange={formik.handleChange}
-                              dataSource={profilesData.map(e => e.name)}
+                              dataSource={profilesData as any}
                               mode="Box"
                               fields={{
                                 text: "name",
                                 value: "id"
                               }}
                               value={
-                                data.users_permissions.map((item) => {
+                                data.users_permissions.map((item: any) => {
                                   if (item.id_cultures === culture.id) {
-                                    return item.name_profiles
+                                    return item.id_profiles
                                   } else {
                                     return ['']
                                   }
@@ -515,24 +511,19 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const resD = await fetch(`${baseUrl}/departament`, requestOptions)
   const resP = await fetch(`${baseUrl}/profile`, requestOptions)
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
-  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
-
   const departments = await resD.json();
   const profiles = await resP.json();
   const users = await resU.json();
   const userEdit = users.response;
-  const Cultures = (await apiCulture.json()).response;
-  const userCulture = users.culture;
-
 
   const response = await prisma.user.findFirst({
     where: {
-      id: parseInt(context.req.cookies.userId),
+      id: Number(context.query.id),
     },
     include: {
       users_permissions: {
         where: {
-          userId: parseInt(context.req.cookies.userId),
+          userId: Number(context.query.id),
           // cultureId: parseInt(context.req.cookies.cultureId),
         },
         select: {
@@ -599,7 +590,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
       }
     }
   }
-
   const data = {
     id: response.id,
     name: response.name,
@@ -613,6 +603,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     jivochat: response.jivochat,
     app_login: response.app_login,
     status: response.status,
+    created_by: response.created_by,
     users_permissions: response.users_permissions.map(item => {
       return {
         id: item.id,
@@ -647,6 +638,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     }
   });
 
+  console.log(data.users_permissions)
   return { 
     props: {
       data,
