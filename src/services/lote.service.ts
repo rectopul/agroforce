@@ -17,7 +17,7 @@ interface UpdateLoteDTO {
 }
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-portfolio/lote`;
 
 export const loteService = {
   getAll,

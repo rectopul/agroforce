@@ -25,8 +25,11 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export interface Lote {
+export interface LotePortfolio {
   id: number;
+  id_culture: number;
+  id_portfolio: number;
+  genealogy: string;
   name: string;
   volume: number;
   status?: number;
@@ -39,29 +42,30 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allLote: Lote[];
+  allLote: LotePortfolio[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  id_portfolio: number;
 }
 
-export default function Listagem({allLote, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allLote, totalItems, itensPerPage, filterAplication, id_portfolio}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'NPE'
+    tab.titleTab === 'TMG'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,name,volume,status"};
+  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,genealogy,name,volume,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [lotes, setLotes] = useState<Lote[]>(() => allLote);
+  const [lotes, setLotes] = useState<LotePortfolio[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
@@ -69,10 +73,12 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Genealógia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" }
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
   ]);
+  
   const [filter, setFilter] = useState<any>(filterAplication);
 
   const filtersStatusItem = [
@@ -95,16 +101,17 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setLotes(response.response);
-          setFilter(parametersFilter);
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_portfolio;
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LotePortfolio[]) => {
+        console.log("Response" + response)
+        setLotes(response);
+        setTotaItems(response.length);
+        setFilter(parametersFilter);
       })
     },
   });
 
-  async function handleStatusLote(idItem: number, data: Lote): Promise<void> {
+  async function handleStatusLote(idItem: number, data: LotePortfolio): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
     } else {
@@ -123,9 +130,17 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
       return copy;
     });
 
+    
     const { id, name, volume, status } = lotes[index];
-
-    await loteService.update({id, name, volume, status});
+    
+    console.log(id, name, volume, status);
+    
+    await loteService.update({
+      id,
+      name,
+      volume,
+      status,
+    });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -140,16 +155,23 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'name') {
+      if (ObjetCampos[index] == 'genealogy') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowName }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('genealogy', orderName)}>
+                Genealógia
               </button>
             </div>
           ),
+          field: "genealogy",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[index] == 'name') {
+        arrOb.push({
+          title: "Nome",
           field: "name",
           sorting: false
         },);
@@ -168,7 +190,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: Lote) => (
+          render: (rowData: LotePortfolio) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
@@ -181,7 +203,8 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
               </div>
               {rowData.status === 1 ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={async () => await handleStatusLote(
                       rowData.id, {
@@ -195,7 +218,8 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={async () => await handleStatusLote(
                       rowData.id, {
@@ -300,7 +324,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_portfolio}`;
     }
     
     await loteService.getAll(filterAplication).then((response) => {
@@ -345,7 +369,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
 
   async function handlePagination(): Promise<void> {
     let skip = currentPage * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    let parametersFilter = "skip=" + skip + "&take=" + take + "&id_portfolio=" + id_portfolio;
 
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
@@ -411,6 +435,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -451,7 +476,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                     border-gray-200
                   '>
                     <div className='h-12'>
-                      <Button 
+                      <Button
                         title="Cadastrar lote"
                         value="Cadastrar lote"
                         bgColor="bg-blue-600"
@@ -584,7 +609,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const  token  =  context.req.cookies.token;
-  // const  cultureId  =  context.req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-portfolio`;
 
@@ -600,20 +624,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}/lote` + context.query.id_lote, requestOptions);
+  const id_portfolio = Number(context.query.id_portfolio);
 
-  // const Response = await lotePortfolio.json();
+  const api = await fetch(`${baseUrl}/lote?id_portfolio=${id_portfolio}`, requestOptions);
 
-  const allLote = await api.json();
-  // const allLote = Response.response;
-  // const totalItems = Response.total;
+  const allLote: LotePortfolio[] = await api.json();
+  const totalItems = allLote.length;
 
   return {
     props: {
       allLote,
-      // totalItems,
+      totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      id_portfolio
     },
   }
 }
