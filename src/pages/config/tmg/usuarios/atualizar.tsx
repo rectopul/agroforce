@@ -8,34 +8,69 @@ import { useRouter } from 'next/router';
 import { IoMdArrowBack } from "react-icons/io";
 import { RiUserSettingsLine } from "react-icons/ri";
 import InputMask from 'react-input-mask';
+import { prisma } from 'src/pages/api/db/db';
 import { userService } from "src/services";
 import { functionsUtils } from "src/shared/utils/functionsUtils";
 import Swal from 'sweetalert2';
 import {
-  Button,
-  CheckBox,
-  Content,
+  Button, CheckBox, Content,
   Input,
   Select
 } from "../../../../components";
-import IDepartment from "../../../../components/props/departmentDTO";
-import IProfile from "../../../../components/props/profileDTO";
-import IUsers from "../../../../components/props/userDTO";
+// import IDepartment from '../../../../components/props/departmentDTO';
+// import IProfile from '../../../../components/props/profileDTO';
+// import IUsers from '../../../../components/props/userDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
-
-export interface IData {
-  profiles: IProfile[];
-  departments: IDepartment[];
-  userEdit: IUsers | any;
-  Cultures: object | any;
-  userCulture: object | any;
+interface IDepartment {
+  id: number;
+  name: string;
 }
 
-export default function AtualizarUsuario({ departments, profiles, userEdit, Cultures, userCulture }: IData) {
+interface IProfileUser {
+  id: number;
+  name: string;
+}
+
+interface ICultureUser {
+  id: number;
+  name: string;
+}
+
+interface IUserPermissions {
+  id: number;
+  id_profiles: number;
+  name_profiles: string;
+  id_cultures: number;
+  name_cultures: string;
+}
+
+interface IUserProps {
+  id: number;
+  name: string;
+  email: string;
+  cpf: string;
+  tel: string;
+  password: string;
+  registration: number;
+  departmentId: number;
+  jivochat: number;
+  app_login: number;
+  status: number;
+  cultures: object | any;
+  created_by: number | any;
+  avatar?: string;
+  confirmPassword?: string;
+}
+
+export interface IData {
+  data: IUserProps | any;
+  profilesData: IProfileUser[];
+  culturesData: ICultureUser[];
+  departmentsData: IDepartment[];
+}
+
+export default function AtualizarUsuario({ departmentsData, data, profilesData, culturesData }: IData) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns();
 
@@ -47,34 +82,35 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
 
   const router = useRouter();
   
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
   const userCultures = new Array();
 
-  if (userCulture) {
-    Object.keys(userCulture).forEach((_, item) => {
-      userCultures.push(userCulture[item].cultureId);
+  if (data.users_permissions) {
+    Object.keys(data.users_permissions).forEach((_, item) => {
+      userCultures.push(data.users_permissions[item].id_cultures);
     });
   } 
 
-  const formik = useFormik<IUsers>({
+  const formik = useFormik<IUserProps>({
     initialValues: {
-      id: userEdit[0].id,
-      name: userEdit[0].name,
-      email: userEdit[0].email,
-      cpf: userEdit[0].cpf,
-      tel: userEdit[0].tel,
-      password: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
-      confirmPassword: functionsUtils.Crypto(userEdit[0].password, 'decipher'),
-      registration: userEdit[0].registration,
-      departmentId: userEdit[0].departmentId,
-      jivochat: userEdit[0].jivochat,
-      status: userEdit[0].status,
-      app_login: userEdit[0].app_login,
-      created_by: userLogado.id,
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      cpf: data.cpf,
+      tel: data.tel,
+      password: functionsUtils.Crypto(data.password, 'decipher'),
+      confirmPassword: functionsUtils.Crypto(data.password, 'decipher'),
+      registration: data.registration,
+      departmentId: data.departmentId,
+      jivochat: data.jivochat,
+      status: data.status,
+      app_login: data.app_login,
+      created_by: data.created_by,
       cultures:[]
     },
     onSubmit: async (values) => {
+      // alert(JSON.stringify(values, null, 2))
+      // return;
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
@@ -87,7 +123,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
       let input: any; 
       const auxObject: any = [];
       let auxObject2: any = [];
-
+      console.log(values.cultures);
       Object.keys(values.cultures).forEach((item) => {
         input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
         auxObject2 = [];
@@ -102,6 +138,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
         }
         auxObject.push(ObjProfiles);
       });
+      alert(JSON.stringify(auxObject, null, 2))
+      return;
       await userService.update({
         id: values.id,
         name: capitalize(values.name),
@@ -114,8 +152,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
         jivochat: values.jivochat,
         status: values.status,
         app_login: values.app_login,
-        created_by: values.created_by,
         cultures: auxObject,
+        created_by: values.created_by
       }).then((response) => {
         if (response.status == 200) {
           Swal.fire('Usuário atualizado com sucesso!')
@@ -140,7 +178,6 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
         Swal.fire("erro de credenciais")         
     }
   }
-
   
   return (
     <>
@@ -168,7 +205,7 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
               <Input 
                 disabled
                 type="text"
-                value={userEdit[0].id}
+                value={data.id}
                 style={{ background: '#e5e7eb' }}
               />
             </div>
@@ -275,8 +312,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                 required
                 name="departmentId"
                 onChange={formik.handleChange}
-                values={departments}
-                selected={userEdit[0].departmentId}
+                values={departmentsData}
+                selected={data.departmentId}
               />
             </div>
           </div>
@@ -349,8 +386,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
-                value={formik.values.jivochat}
-                selected={userEdit[0].jivochat}
+                value={Number(formik.values.jivochat)}
+                selected={data.jivochat}
               />
             </div>
             <div className="w-full">
@@ -364,8 +401,8 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}
-                  value={formik.values.app_login}
-                  selected={userEdit[0].app_login}
+                  value={Number(formik.values.app_login)}
+                  selected={data.app_login}
                 />
               </div>
             </div>
@@ -377,41 +414,51 @@ export default function AtualizarUsuario({ departments, profiles, userEdit, Cult
               </h2>
               <div className="w-full grid grid-cols-3 gap-6">
                 {
-                  Cultures.map((culture: any, index: any) => (
-                    <>
-                    <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                      <div className="w-full text-xl">
-                        <CheckBox
-                          key={culture.id}
-                          title={culture.name}
-                          id={`culture_${culture.id}`}
-                          name="cultures"
-                          onChange={formik.handleChange}
-                          value={culture.id}
-                          defaultChecked={userCultures.includes(culture.id)}
-                        />
-                      </div>
-
-                      <div className="w-full">
-                        <h4 className='block text-gray-900 text-sm font-bold mb-2'>
-                          Permissões
-                        </h4>
-                        <div>
-                          <MultiSelectComponent
-                            id={`profiles_${culture.id}`}
-                            name={`profiles_${culture.id}`}
+                    culturesData.map((culture: ICultureUser) => (
+                      <>
+                      <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
+                        <div className="w-full text-xl">
+                          <CheckBox
+                            key={culture.id}
+                            title={culture.name}
+                            id={`culture_${culture.id}`}
+                            name="cultures"
                             onChange={formik.handleChange}
-                            dataSource={profiles as any}
-                            mode="Box"
-                            fields={{
-                              text: "name",
-                              value: "id"
-                            }}
-                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
+                            value={culture.id as any}
+                            defaultChecked={userCultures.includes(culture.id)}
                           />
                         </div>
+
+                        <div className="w-full">
+                          <h4 className='block text-gray-900 text-sm font-bold mb-2'>
+                            Permissões
+                          </h4>
+                          <div>
+                            <MultiSelectComponent
+                              id={`profiles_${culture.id}`}
+                              name={`profiles_${culture.id}`}
+                              onBlur={formik.handleBlur}
+                              onChange={formik.handleChange}
+                              dataSource={profilesData as any}
+                              mode="Box"
+                              fields={{
+                                text: "name",
+                                value: "id"
+                              }}
+                              value={
+                                data.users_permissions.map((item: any) => {
+                                  if (item.id_cultures === culture.id) {
+                                    return item.id_profiles
+                                  } else {
+                                    return ['']
+                                  }
+                                }) as string[]
+                              }
+                              placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
                     </>
                   ))
                 }
@@ -464,13 +511,140 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const resD = await fetch(`${baseUrl}/departament`, requestOptions)
   const resP = await fetch(`${baseUrl}/profile`, requestOptions)
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
-  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
-
   const departments = await resD.json();
   const profiles = await resP.json();
   const users = await resU.json();
   const userEdit = users.response;
-  const Cultures = (await apiCulture.json()).response;
-  const userCulture = users.culture;
-  return { props: { departments, profiles, userEdit, Cultures, userCulture } }
+
+  const response = await prisma.user.findFirst({
+    where: {
+      id: Number(context.query.id),
+    },
+    include: {
+      users_permissions: {
+        where: {
+          userId: Number(context.query.id),
+          // cultureId: parseInt(context.req.cookies.cultureId),
+        },
+        select: {
+          id: true,
+
+          profile: {
+            select: {
+              id: true,
+              name: true,
+            }
+          },
+          culture: {
+            select: {
+              id: true,
+              name: true,
+            }
+          }
+        },
+      },
+      department: {
+        select: {
+          id: true,
+        }
+      },
+    }
+  });
+
+  const responseDepartment = await prisma.department.findMany({
+    where: {
+      status: 1,
+    },
+    select: {
+      id: true,
+      name: true,
+    }
+  });
+
+  const responseProfile = await prisma.profile.findMany({
+    where: {
+      status: 1,
+    },
+    select: {
+      id: true,
+      name: true,
+    }
+  });
+
+  const responseCulture = await prisma.culture.findMany({
+    where: {
+      status: 1,
+    },
+    select: {
+      id: true,
+      name: true,
+    }
+  });
+
+  if (!response?.id) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+        statusCode: 404
+      }
+    }
+  }
+  const data = {
+    id: response.id,
+    name: response.name,
+    email: response.email,
+    cpf: response.cpf,
+    tel: response.tel,
+    password: response.password,
+    avatar: response.avatar,
+    registration: response.registration,
+    departmentId: response.departmentId,
+    jivochat: response.jivochat,
+    app_login: response.app_login,
+    status: response.status,
+    created_by: response.created_by,
+    users_permissions: response.users_permissions.map(item => {
+      return {
+        id: item.id,
+        
+        id_profiles: item.profile.id,
+        name_profiles: item.profile.name,
+        
+        id_cultures: item.culture.id,
+        name_cultures: item.culture.name,
+      }
+    }),
+  };
+
+  const departmentsData = responseDepartment.map(department => {
+    return {
+      id: department.id,
+      name: department.name
+    }
+  });
+
+  const profilesData = responseProfile.map(profile => {
+    return {
+      id: profile.id,
+      name: profile.name
+    }
+  });
+
+  const culturesData = responseCulture.map(culture => {
+    return {
+      id: culture.id,
+      name: culture.name
+    }
+  });
+
+  console.log(data.users_permissions)
+  return { 
+    props: {
+      data,
+      departmentsData,
+      profilesData,
+      culturesData,
+    }
+  }
 }

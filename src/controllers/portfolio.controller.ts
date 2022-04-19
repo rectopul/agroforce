@@ -10,8 +10,16 @@ interface Portfolio {
   created_by: number;
 };
 
+interface UpdatePortfolioLote {
+  id_portfolio: number;
+  id_culture_portfolio: number;
+  genealogy: string;
+  cruza: string;
+  status: number;
+}
+
 type CreatePortfolio = Omit<Portfolio, 'id'>;
-type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
+// type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
 export class PortfolioController {
   public readonly required = 'Campo obrigatório';
 
@@ -145,11 +153,11 @@ export class PortfolioController {
     }
   }
 
-  async updatePortfolio(data: UpdatePortfolio) {
+  async updatePortfolio(data: UpdatePortfolioLote) {
     try {
-      const schema: SchemaOf<UpdatePortfolio> = object({
-        id: number().integer().required(this.required),
-        id_culture: number().integer().required(this.required),
+      const schema: SchemaOf<UpdatePortfolioLote> = object({
+        id_portfolio: number().integer().required(this.required),
+        id_culture_portfolio: number().integer().required(this.required),
         genealogy: string().required(this.required),
         cruza: string().required(this.required),
         status: number().integer().required(this.required),
@@ -159,7 +167,7 @@ export class PortfolioController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const portfolio = await this.portfolioRepository.findOne(data.id);
+      const portfolio = await this.portfolioRepository.findOne(data.id_portfolio);
       
       if (!portfolio) return { status: 400, message: 'Portfólio não encontrado' };
 
@@ -169,7 +177,7 @@ export class PortfolioController {
         return { status: 400, message: 'Genealogia do portfólio já cadastro. favor consultar os inativos' }
       }
 
-      portfolio.id_culture = data.id_culture;
+      portfolio.id_culture = data.id_culture_portfolio;
       portfolio.genealogy = data.genealogy;
       portfolio.cruza = data.cruza;
       portfolio.status = data.status;

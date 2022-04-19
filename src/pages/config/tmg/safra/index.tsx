@@ -100,8 +100,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      console.log(values)
-
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
@@ -302,13 +300,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     
     await safraService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = safras.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativos";
-          } else if (row.status === 2) {
-            row.status = "Todos"
+            row.status = "Inativos" as any;
           } else {
-            row.status = "Ativos";
+            row.status = "Ativos" as any;
           }
 
           return row;

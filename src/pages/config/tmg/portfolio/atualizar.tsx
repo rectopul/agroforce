@@ -26,7 +26,6 @@ export interface IUpdatePortfolio {
   genealogy: string;
   cruza: string;
   status: number;
-  created_by: number;
 }
 
 export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
@@ -59,7 +58,6 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
       genealogy: portfolio.genealogy,
       cruza: portfolio.cruza,
       status: portfolio.status,
-      created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       await portfolioService.update({
@@ -68,7 +66,6 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
         genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
         status: portfolio.status,
-        created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Portfólio atualizado com sucesso!');

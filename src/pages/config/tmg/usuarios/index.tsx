@@ -426,7 +426,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     
     await userService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
+        const newData = users.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
 
           if (row.status === 0) {
@@ -709,7 +709,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

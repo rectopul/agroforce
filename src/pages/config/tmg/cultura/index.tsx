@@ -30,9 +30,8 @@ interface IFilter{
 
 export interface ICulture {
   id: number;
-  genealogy: string;
-  cruza: string;
-  status: number;
+  name: string;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -108,26 +107,28 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     },
   });
 
-  async function handleStatusCulture(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusCulture(idCulture: number, data: ICulture): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
     } else {
-      status = 0;
+      data.status = 0;
     }
     
-    const index = cultures.findIndex((culture) => culture.id === id);
+    const index = cultures.findIndex((culture) => culture.id === idCulture);
 
     if (index === -1) {
       return;
     }
 
-    await cultureService.updateCulture({id: id, status: status});
-
     setCultures((oldCulture) => {
       const copy = [...oldCulture];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
     });
+
+    const { id, name, status } = cultures[index];
+
+    await cultureService.updateCulture({ id, name, status });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -178,8 +179,11 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusCulture(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusCulture(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -189,8 +193,11 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusCulture(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusCulture(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -294,11 +301,11 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     
     await cultureService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = cultures.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -572,7 +579,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

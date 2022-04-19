@@ -1,14 +1,35 @@
 import { prisma } from "../pages/api/db/db";
 
- interface CreateLotePortfolioDTO {
-  id_lote: number;
-  id_portfolio: number;
- }
+export class LotePortfolioRepository {
+  async findAll(id_portfolio: number, id_culture: number) {
+    const lotePortfolio = await prisma.lote_portfolio.findMany({
+      where: {
+        id_portfolio,
+        portfolio: {
+          culture: {
+            id: id_culture
+          }
+        }
+      },
+      select: {
+        id: true,
 
-export class LoteRepository {
-  async create(data: CreateLotePortfolioDTO) {
-    const lotePortfolio = await prisma.lote_portfolio.create({
-      data
+        lote: {
+          select: {
+            id: true,
+            name: true,
+            volume: true,
+            status: true,
+          }
+        },
+        portfolio: {
+          select: {
+            id: true,
+            id_culture: true,
+            genealogy: true,
+          }
+        }
+      },
     });
 
     return lotePortfolio;

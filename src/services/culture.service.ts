@@ -1,6 +1,12 @@
 import getConfig from 'next/config';
-
 import { fetchWrapper } from '../helpers';
+
+
+interface CultureUpdate {
+    id: number;
+    name: string;
+    status?: number;
+  }
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -21,7 +27,7 @@ async function getAll(parameters: any) {
     return culture;
 }
 
-async function updateCulture(data: any) {
+async function updateCulture(data: CultureUpdate) {
     const culture = await fetchWrapper.put(baseUrl, data);
     return culture;
 }

@@ -579,34 +579,39 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const  token  =  req.cookies.token;
+  const  token  =  context.req.cookies.token;
+  // const  cultureId  =  context.req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-portfolio`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
+  
   urlParameters.search = new URLSearchParams(param).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const lote = await fetch(urlParameters.toString(), requestOptions);
-  const Response = await lote.json();
+  const api = await fetch(`${baseUrl}/lote` + context.query.id_lote, requestOptions);
 
-  const allLote = Response.response;
-  const totalItems = Response.total;
+  // const Response = await lotePortfolio.json();
+
+  const allLote = await api.json();
+  // const allLote = Response.response;
+  // const totalItems = Response.total;
 
   return {
     props: {
       allLote,
-      totalItems,
+      // totalItems,
       itensPerPage,
       filterAplication
     },

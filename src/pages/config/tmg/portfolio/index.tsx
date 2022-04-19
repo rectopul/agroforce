@@ -26,16 +26,14 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export interface IPortfolioLote {
-  code: number;
-  id_portfolio: number;
-  id_culture_portfolio: number;
+export interface IPortfolio {
+  id: number;
+  id_culture: number;
   id_lote: number;
-
   genealogy: string;
   cruza: string;
-  status_portfolio: number;
-  name_lote: string;
+  status?: number;
+  LotePortfolio: number;
 }
 
 interface IGenarateProps {
@@ -45,7 +43,7 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allPortfolios: IPortfolioLote[];
+  allPortfolios: IPortfolio[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
@@ -67,7 +65,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [portfolios, setPortfolios] = useState<IPortfolioLote[]>(allPortfolios);
+  const [portfolios, setPortfolios] = useState<IPortfolio[]>(allPortfolios);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
@@ -76,11 +74,11 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "code" },
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
-    { name: "CamposGerenciados[]", title: "Lote", value: "name_lote" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status_portfolio" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+    { name: "CamposGerenciados[]", title: "Lote", value: "id_lote" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 
@@ -113,14 +111,14 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     },
   });
 
-  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusPortfolio(idPortfolio: number, data: IPortfolio): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
     } else {
-      status = 0;
+      data.status = 0;
     }
     
-    const index = portfolios.findIndex((portfolio) => portfolio.status_portfolio === id);
+    const index = portfolios.findIndex((portfolio) => portfolio.id === idPortfolio);
 
     if (index === -1) {
       return;
@@ -128,22 +126,24 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
     setPortfolios((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status_portfolio = status;
+      copy[index].status = data.status;
       return copy;
     });
 
     const {
-      id_portfolio,
+      id,
+      id_culture,
       genealogy,
       cruza,
-      status_portfolio
+      status
     } = portfolios[index];
 
     await portfolioService.update({
-      id: id_portfolio,
-      genealogy: genealogy,
-      cruza: cruza,
-      status: status_portfolio
+      id,
+      id_culture,
+      genealogy,
+      cruza,
+      status
     });
   };
 
@@ -152,10 +152,10 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((_, index) => {
-      if (ObjetCampos[index] == 'code') {
+      if (ObjetCampos[index] == 'id') {
         arrOb.push({
           title: "Código",
-          field: "code",
+          field: "id",
           sorting: false
         },);
       }
@@ -187,46 +187,33 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'name_lote') {
-        arrOb.push({
-          title: "Lote",
-          field: "name_lote",
-          sorting: false
-        },);
-      }
-      if (ObjetCampos[index] == 'status_portfolio') {
+      if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
-          field: "status_portfolio",
+          field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IPortfolioLote) => (
+          render: (rowData: IPortfolio) => (
             <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<AiOutlineFileSearch size={16} />}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  title={`Visualizar ${rowData.name_lote}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/lote/atualizar?id=${rowData.id_portfolio}`)}}
-                />
-              </div>
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  title={`Editar potfólio ${rowData.id_portfolio} - ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/atualizar?id=${rowData.id_portfolio}`)}}
+                  title={`Editar potfólio ${rowData.genealogy}`}
+                  onClick={() =>{router.push(`/config/tmg/portfolio/atualizar?id=${rowData.id}`)}}
                 />
               </div>
-              {rowData.status_portfolio ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id_portfolio, !rowData.status_portfolio
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData,
+                      }
                     )}
                     title={`Portfólio Ativo`}
                     bgColor="bg-green-600"
@@ -237,8 +224,11 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id_portfolio, !rowData.status_portfolio
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData,
+                      }
                     )}
                     title={`Portfólio inativo`}
                     bgColor="bg-red-800"
@@ -246,6 +236,28 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   />
                 </div>
               )}
+            </div>
+          ),
+        })
+      }
+      if (ObjetCampos[index] == 'id_lote') {
+        arrOb.push({
+          title: "Lote",
+          field: "id_lote",
+          sorting: false,
+          searchable: false,
+          filterPlaceholder: "Filtrar por status",
+          render: (rowData: IPortfolio) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button 
+                  icon={<AiOutlineFileSearch size={16} />}
+                  bgColor="bg-yellow-500"
+                  textColor="white"
+                  title={`Lote de ${rowData.genealogy}`}
+                  onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_lote=${rowData.id_lote}`)}}
+                />
+              </div>
             </div>
           ),
         })
@@ -386,12 +398,12 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     }
     
     await portfolioService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+      if (response.status === 200) {
+        const newData = portfolios.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -687,42 +699,29 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   // let allPortfolios = response.response;
   // let totalItems = response.total;
 
-  const portfolioLote = await prisma.lote_portfolio.findMany({
+  const response = await prisma.portfolio.findMany({
     where: {
-      portfolio: {
-        id_culture: parseInt(cultureId),
-      }
+      id_culture: Number(cultureId),
     },
-    include: {
-      portfolio: {
-        select: {
-          id_culture: true,
-          genealogy: true,
-          cruza: true,
-          status: true,
-        },
-      },
-      lote: {
-        select: {
-          name: true,
-        }
-      }
+    select: {
+      id: true,
+      id_culture: true,
+      id_lote: true,
+      genealogy: true,
+      cruza: true,
+      status: true,
     }
   });
 
-  const allPortfolios = portfolioLote.map(item => {
+  const allPortfolios = response.map(item => {
     return {
-      code: item.id, // código da tabela no front
-      id_portfolio: item.id_portfolio,
-      id_culture_portfolio: item.portfolio.id_culture,
+      id: item.id,
+      id_culture: item.id_culture,
       id_lote: item.id_lote,
-
-      genealogy: item.portfolio.genealogy,
-      cruza: item.portfolio.cruza,
-      status_portfolio: item.portfolio.status,
-
-      name_lote: item.lote.name, 
-    }
+      genealogy: item.genealogy,
+      cruza: item.cruza,
+      status: item.status,
+    };
   });
 
   const count = allPortfolios.length;
