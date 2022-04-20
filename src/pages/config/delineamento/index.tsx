@@ -25,7 +25,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 interface IDelineamentoProps {
   id: Number | any;
   name: String | any;
-  repeticao: Number;
+  repeticao: string;
   trat_repeticao: Number;
   created_by: Number;
   status: Number;
@@ -408,12 +408,35 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Nome
                     </label>
                     <Input 
                       type="text" 
                       placeholder="nome"
-                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Repetição
+                    </label>
+                    <Input 
+                      type="number" 
+                      placeholder="Repetição"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Trat. Repetição
+                    </label>
+                    <Input 
+                      type="number"
+                      placeholder="Trat. Repetição"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}

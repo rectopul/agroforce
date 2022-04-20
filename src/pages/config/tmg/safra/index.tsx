@@ -11,7 +11,8 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import InputMask from 'react-input-mask';
+import { AccordionFilter, Button, CheckBox, Content, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
@@ -181,11 +182,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           title: "Período ideal de início de plantio", 
           field: "plantingStartTime", 
           sorting: false,
-          render: (rowData: ISafra) => (
-            new Intl.DateTimeFormat('pt-BR').format(
-              new Date(rowData.plantingStartTime)
-            )
-          )
         })
       }
       if (ObjetCampos[index] == 'plantingEndTime') {
@@ -193,11 +189,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           title: "Período ideal do fim do plantio", 
           field: "plantingEndTime", 
           sorting: false,
-          render: (rowData: ISafra) => (
-            new Intl.DateTimeFormat('pt-BR').format(
-              new Date(rowData.plantingEndTime)
-            )
-          )
         })
       }
       if (ObjetCampos[index] == 'status') {
@@ -364,15 +355,60 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                     </div>
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Pesquisar
+                        Safra
                       </label>
-                      <Input 
-                        type="text" 
-                        placeholder="Safra"
-                        max="40"
+                      <InputMask
+                        mask={"99/99"}
+                        placeholder="__/__"
                         id="filterSearch"
                         name="filterSearch"
                         onChange={formik.handleChange}
+                        className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Tipo de safra
+                      </label>
+                      <Select
+                        id="filterSearch"
+                        name="filterSearch"
+                        onChange={formik.handleChange}
+                        values={[{name: "Inverno"}, {name: "Verão"}]}
+                        selected={false}
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Data do período de plantio
+                      </label>
+                      <InputMask 
+                        mask={"99/99/9999"} 
+                        placeholder="__/__/____"
+                        id="filterSearch"
+                        name="filterSearch"
+                        onChange={formik.handleChange}
+                        className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
                       />
                     </div>
                   </div>

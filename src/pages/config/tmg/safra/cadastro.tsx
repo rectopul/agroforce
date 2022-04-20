@@ -87,13 +87,21 @@ export default function Safra() {
         Swal.fire('Dados Inválidos!');
         throw new Error("Dados Inválidos");
       };
+
+      const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingStartTime)
+      );
+
+      const plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingEndTime)
+      );
       
       await safraService.create({
         id_culture: Number(culture),
         year: formik.values.year,
         typeCrop,
-        plantingStartTime: formik.values.plantingStartTime,
-        plantingEndTime: formik.values.plantingEndTime,
+        plantingStartTime: plantingStartTime,
+        plantingEndTime: plantingEndTime,
         status: formik.values.status,
         created_by: Number(userLogado.id),
       }).then((response) => {

@@ -37,10 +37,19 @@ export class SafraController {
             }
 
             if (options.filterSearch) {
-                options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-                parameters.year = JSON.parse(options.filterSearch);
-                // parameters.plantingStartTime =JSON.parse(options.filterSearch);
-                // parameters.plantingEndTime =JSON.parse(options.filterSearch);
+                options.filterSearch = String(options.filterSearch).toLowerCase().trim();
+                
+                if (options.filterSearch === "inverno" || options.filterSearch === "verão") {
+                    options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+                    parameters.typeCrop = JSON.parse(options.filterSearch);
+                } else if (String(options.filterSearch).length > 7) {
+                    options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+                    parameters.plantingStartTime = JSON.parse(options.filterSearch);
+                    parameters.plantingEndTime = JSON.parse(options.filterSearch);
+                } else {
+                    options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+                    parameters.year = JSON.parse(options.filterSearch);
+                }
             }
 
             if (options.paramSelect) {

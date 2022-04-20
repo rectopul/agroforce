@@ -1,14 +1,14 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 // import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-
 import { userService } from '../services';
+
+
 
 
 export default Login;
@@ -35,6 +35,7 @@ function Login() {
     const { errors } = formState;
 
     async function onSubmit({ email, password }: any) {
+      console.log(email, password)
       await userService.login(email, password).then(() => {
         // get return url from query parameters or default to '/'
         const returnUrl = router.query.returnUrl || '/';

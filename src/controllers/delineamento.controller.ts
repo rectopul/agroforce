@@ -20,8 +20,18 @@ export class DelineamentoController {
             }
 
             if (options.filterSearch) {
-                options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-                parameters.name  = JSON.parse(options.filterSearch);
+                options.filterSearch = String(options.filterSearch).toLowerCase().trim();
+
+                options.filterSearch = `{"contains": "${options.filterSearch}"}`;
+                parameters.name = JSON.parse(String(options.filterSearch));
+
+                // if (!isNaN(options.filterSearch)) {
+                //     options.filterSearch = `{"contains": "${options.filterSearch}"}`;
+                //     parameters.repeticao = JSON.parse(options.filterSearch);
+                // } else {
+                //     options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
+                //     parameters.name  = JSON.parse(options.filterSearch);
+                // }
             }
 
             if (options.paramSelect) {
