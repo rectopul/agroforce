@@ -8,6 +8,7 @@ import { AZ } from "src/shared/utils/a-z";
 import { Input } from "../../components";
 import { useFormik } from "formik";
 import { importService } from "src/services";
+import Swal from 'sweetalert2';
 
 
 interface IImportPlanilhaProps {
@@ -24,7 +25,9 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
   const router = useRouter();
 
   const [quantityColumns, setQuantityColumns] = useState<number>(data.length);
-
+  const [Letras, setLetras] = useState<String[]>(AZ);
+  const [Options, setOptions] = useState<String[]>(data);
+ 
   const formik = useFormik<IImport>({
     initialValues: {
       moduleId: '',
@@ -63,7 +66,11 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
       auxObject2 = [];
       for (let v = 0; v < input.options.length; v++) {
         if (input.options[v].selected) {
-          auxObject.push(input.options[v].value);
+          if (!auxObject.includes(input.options[v].selected)) {
+            auxObject.push(input.options[v].value);
+          } else { 
+
+          }
         }
       }
     }
@@ -73,7 +80,40 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
     importService.create({moduleId: moduleId, fields: auxObject}).then((response) => {
       console.log(response);
     });
-    console.log(auxObject);
+  }
+  function toLetter(columnNumber: any) {
+
+    let letras = "ABCDEFGHIJKLMNOPQRSTUVXWYZ";
+  
+    let columnName = "";
+  
+    while (columnNumber > 0) {
+      let rem = columnNumber % 26;
+  
+      if (rem == 0) {
+        columnName = "Z" + columnName;
+        columnNumber = Math.floor(columnNumber / 26) - 1;
+      } else {
+        columnName = letras.charAt(rem - 1) + columnName;
+        columnNumber = Math.floor(columnNumber / 26);
+      }
+    }
+    return columnName;
+  }
+  // console.log(toLetter(33))
+
+  function validateColumns(value: any) {
+    let Terste =[];
+    let letra = "";
+    setQuantityColumns(value);
+    console.log(value);
+    for(let i = 0; i <= value; i++) {
+      letra =  toLetter(i);
+      if (letra != "") {
+        Terste.push(letra)
+      }
+    }
+    setLetras(Terste);
   }
 
   return (
@@ -104,7 +144,7 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
                 id="quantity-columns"
                 min={`${data.length}`}
                 value={quantityColumns}
-                onChange={(e) => setQuantityColumns(parseInt(e.target.value))}
+                onChange={(e) => validateColumns(parseInt(e.target.value))}
               />
             </div>
 
@@ -154,13 +194,13 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
               >
               <main style={{height: '100%'}}  className="relative bottom-32 w-importation-content mt-2.5 -mb-28 flex flex-col overflow-x-scroll">
                 <div className="absolute flex pl-2 justify-start items-center py-9 gap-3 text-white">
-                  {AZ.map((item, index) => {
+                  {Letras.map((item, index) => {
                     if (index < quantityColumns) {
                       {return (
                           <>
                             <div key={index} className="h-16 w-32 flex items-center justify-center">
                               <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
-                              {AZ[index]}
+                              {Letras[index]}
                               </strong>
                             </div>
                           </>
@@ -173,7 +213,7 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
                   <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
                       {Array(quantityColumns).fill('').map((_, index) => (
                         <div key={index} className="h-11 w-32">
-                          <Select name={`fields_${index}`} onChange={formik.handleChange} selected={false} values={data}/>
+                          <Select name={`fields_${index}`}  onChange={formik.handleChange}  selected={false} values={Options}/>
                         </div>
                       ))}
                   </div>               
