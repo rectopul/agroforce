@@ -1,9 +1,9 @@
-import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
-import { userPermissionService } from './user-permission';
-import { fetchWrapper } from '../helpers';
+import Router from 'next/router';
+import { BehaviorSubject } from 'rxjs';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import { fetchWrapper } from '../helpers';
+import { userPermissionService } from './user-permission';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
@@ -18,7 +18,8 @@ export const userService = {
     getPermissions,
     create,
     update,
-    logoutSign
+    logoutSign,
+    findUserByEmail
 };
 
 async function login(email: any, password: any) {
@@ -38,6 +39,11 @@ function create(data: any) {
 
 function update(data: any) {
     return fetchWrapper.put(baseUrl, data);
+}
+
+async function findUserByEmail(email:string) {
+    const user = await fetchWrapper.post(baseUrl, email);
+    return user;
 }
 
 function logout() {

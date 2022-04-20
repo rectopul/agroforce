@@ -1,7 +1,45 @@
 import Head from "next/head";
+import { FormEvent, useState } from "react";
 import { Button, Input } from "src/components";
+import { userService } from "src/services";
+import Swal from "sweetalert2";
 
 export default function TrocarSenha() {
+  const [email, setEmail] = useState<string>('');
+  const [confirmEmail, setConfirmEmail] = useState<string>('');
+
+  async function handleSendEmail(event: FormEvent) {
+    event.preventDefault();
+
+    if (email !== confirmEmail) {
+      Swal.fire({
+        title: "Credenciais  inválidas!",
+        text: "Usuário não encontrado! mais dúvidas procure o suporte.",
+      });
+
+      return;
+    }
+
+    const user = await userService.findUserByEmail(email).then(response => {
+      if (response.status === 200) {
+        Swal.fire('Cultura atualizada com sucesso');
+        return email;
+      } else {
+        Swal.fire(response.message);
+      }
+    });
+
+    if (!user) {
+      Swal.fire({
+        title: "E-mail confirmado!",
+        text: "Enviaremos no seu e-mail um link para a alteração da sua senha!",
+      });
+      return;
+    }
+
+    return user;
+  }
+  
   return (
     <>
       <Head>
@@ -25,7 +63,7 @@ export default function TrocarSenha() {
               justify-between
               gap-4 
               mt-10'
-              onSubmit={() => {}}
+              onSubmit={handleSendEmail}
             >
               <div className='
                 h-40
@@ -39,6 +77,8 @@ export default function TrocarSenha() {
                   <Input
                     type="email"
                     placeholder="E-mail"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -47,6 +87,8 @@ export default function TrocarSenha() {
                   <Input
                     type="email"
                     placeholder="E-mail"
+                    value={confirmEmail}
+                    onChange={(e) => setConfirmEmail(e.target.value)}
                   />
                 </div>
               </div>
@@ -55,11 +97,14 @@ export default function TrocarSenha() {
                 w-2/4
                 flex
               '>
-                <Button 
+                <Button
                   type='submit'
                   value='Confirmar'
-                  onClick={() => {}} 
-                  disabled={false}
+                  onClick={() => {}}
+                  // disabled={
+                  //   email !== confirmEmail ||
+                  //   email === '' || confirmEmail === ''
+                  // }
                   bgColor="bg-blue-600"
                   textColor="white"
                 />

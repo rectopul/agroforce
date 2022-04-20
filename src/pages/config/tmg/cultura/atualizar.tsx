@@ -1,6 +1,6 @@
 import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -25,7 +25,7 @@ export interface IUpdateCulture {
   status: number;
 };
 
-export default function Cultura(culture: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Cultura(culture: IUpdateCulture) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();

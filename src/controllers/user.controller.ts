@@ -1,9 +1,8 @@
-import { RiCreativeCommonsZeroLine } from 'react-icons/ri';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
-import { UserPermissionController} from './user-permission.controller';
+import { UserPermissionController } from './user-permission.controller';
 var  CryptoJS  =  require ("crypto") ; 
 const alg = 'aes-256-ctr';
 const pwd = 'TMG2022';
@@ -13,6 +12,19 @@ export class UserController {
     usersPermissionRepository = new UsersPermissionsRepository();
     userCultureController = new UserCultureController();
     userPermissionsController = new UserPermissionController();
+
+    async findUserByEmail(email: string) {
+        try {
+            console.log(email);
+            const user = await this.userRepository.findByEmail(email.trim());
+
+            if (!user) return { status: 400, message: 'Usuário não encontrado.' };
+
+            return {status: 200, user}
+        } catch (err) {
+            return { status: 400, message: err }
+        }
+    }
 
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
