@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -133,10 +134,12 @@ function Login() {
                   {errors.apiError &&  <div className="alert alert-danger mt-3 mb-0">{errors.apiError?.message}</div>  }
                 </form>
     
-                <a href="#" className='text-blue-600 mb-64
-                '>
-                  Esqueci minha senha - I forgot my password - Olvide mi contraseña
-                </a>
+                <Link href="/trocar-senha">
+                  <a className='text-blue-600 mb-64
+                  '>
+                    Esqueci minha senha - I forgot my password - Olvide mi contraseña
+                  </a>
+                </Link>
               </div>
             </main>
     
