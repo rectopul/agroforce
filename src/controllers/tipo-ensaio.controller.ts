@@ -103,7 +103,7 @@ export class TypeAssayController {
                 }
             }
         } catch (err) {
-
+            console.log(err);
         }
     }
 

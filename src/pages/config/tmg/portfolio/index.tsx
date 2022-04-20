@@ -61,7 +61,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status,id_portfolio"};
+  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [portfolios, setPortfolios] = useState<IPortfolio[]>(allPortfolios);
@@ -77,7 +77,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
+    // { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 
@@ -239,28 +239,28 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           ),
         })
       }
-      if (ObjetCampos[index] == 'id_portfolio') {
-        arrOb.push({
-          title: "Lote",
-          field: "id_portfolio",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: IPortfolio) => (
-            <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<AiOutlineFileSearch size={16} />}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  title={`Lote de ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_portfolio=${rowData.id}`)}}
-                />
-              </div>
-            </div>
-          ),
-        })
-      }
+      // if (ObjetCampos[index] == 'id_portfolio') {
+      //   arrOb.push({
+      //     title: "Lote",
+      //     field: "id_portfolio",
+      //     sorting: false,
+      //     searchable: false,
+      //     filterPlaceholder: "Filtrar por status",
+      //     render: (rowData: IPortfolio) => (
+      //       <div className='h-10 flex'>
+      //         <div className="h-10">
+      //           <Button 
+      //             icon={<AiOutlineFileSearch size={16} />}
+      //             bgColor="bg-yellow-500"
+      //             textColor="white"
+      //             title={`Lote de ${rowData.genealogy}`}
+      //             onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_portfolio=${rowData.id}`)}}
+      //           />
+      //         </div>
+      //       </div>
+      //     ),
+      //   })
+      // }
     });
     return arrOb;
   };
@@ -393,7 +393,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
     await portfolioService.getAll(filterAplication).then((response) => {
@@ -424,6 +424,8 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
         });
         // Download
         XLSX.writeFile(workBook, "Portfólios.xlsx");
+      } else {
+        alert(response);
       }
     });
   };

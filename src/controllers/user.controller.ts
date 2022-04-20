@@ -244,6 +244,12 @@ export class UserController {
                     parameters.departmentId =  data.departmentId;
                 }
 
+                if (typeof(data.registration) === 'string') {
+                    parameters.registration =  parseInt(data.registration);
+                } else { 
+                    parameters.registration =  data.registration;
+                }
+
                 if (data.name) {
                     parameters.name = data.name;
                 } 
@@ -286,7 +292,7 @@ export class UserController {
                 }
             }
         } catch(err) {
-
+            
         }
     }
 }

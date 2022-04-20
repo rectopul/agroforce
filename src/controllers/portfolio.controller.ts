@@ -11,8 +11,8 @@ interface Portfolio {
 };
 
 interface UpdatePortfolioLote {
-  id_portfolio: number;
-  id_culture_portfolio: number;
+  id: number;
+  id_culture: number;
   genealogy: string;
   cruza: string;
   status: number;
@@ -33,7 +33,7 @@ export class PortfolioController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof(options.status) === 'string') {
+        if (typeof(options.filterStatus) === 'string') {
             options.filterStatus = parseInt(options.filterStatus);
             if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
@@ -61,7 +61,6 @@ export class PortfolioController {
           status: true 
         };
       }
-
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
       }
@@ -106,7 +105,7 @@ export class PortfolioController {
       } else {
         return {status: 200, response, total: response.total}
       }    
-    } catch(err) {  
+    } catch(err) { 
       return {status: 400, message: err}
     }   
   }
@@ -156,8 +155,8 @@ export class PortfolioController {
   async updatePortfolio(data: UpdatePortfolioLote) {
     try {
       const schema: SchemaOf<UpdatePortfolioLote> = object({
-        id_portfolio: number().integer().required(this.required),
-        id_culture_portfolio: number().integer().required(this.required),
+        id: number().integer().required(this.required),
+        id_culture: number().integer().required(this.required),
         genealogy: string().required(this.required),
         cruza: string().required(this.required),
         status: number().integer().required(this.required),
@@ -167,7 +166,7 @@ export class PortfolioController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const portfolio = await this.portfolioRepository.findOne(data.id_portfolio);
+      const portfolio = await this.portfolioRepository.findOne(data.id);
       
       if (!portfolio) return { status: 400, message: 'Portfólio não encontrado' };
 
@@ -177,7 +176,7 @@ export class PortfolioController {
         return { status: 400, message: 'Genealogia do portfólio já cadastro. favor consultar os inativos' }
       }
 
-      portfolio.id_culture = data.id_culture_portfolio;
+      portfolio.id_culture = data.id_culture;
       portfolio.genealogy = data.genealogy;
       portfolio.cruza = data.cruza;
       portfolio.status = data.status;

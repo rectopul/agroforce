@@ -5,8 +5,11 @@ import { GiThreeLeaves } from 'react-icons/gi';
 import { VscGraph } from 'react-icons/vsc';
 import { BsGear } from 'react-icons/bs';
 import { ButtonAside } from './ButtonAside';
+import { useRouter } from 'next/router';
 
 export function Aside() {
+  const router = useRouter();
+
   return (
     <aside className="h-aside w-32
       bg-gray-450 
@@ -14,7 +17,7 @@ export function Aside() {
       <nav className="flex flex-col gap-6
         pt-4
       ">
-        <ButtonAside 
+        {/* <ButtonAside 
           title='Lista'
           icon={<HiOutlineClipboardList size={32} />}
           href='config/'
@@ -58,12 +61,12 @@ export function Aside() {
           title='Notificações e Relatórios'
           icon={ <VscGraph  size={32} />}
           href='relatorios'
-        />
+        /> */}
 
         <ButtonAside 
           title='Configurações'
           icon={ <BsGear  size={32} />}
-          href='config/tmg/usuarios'
+          href='/config/tmg/usuarios'
           active
         />
       </nav>

@@ -59,7 +59,7 @@ export class UserCultureRepository {
         let Result = await prisma.users_cultures.findMany({
             where: {
                 userId: userId,
-                culture: {
+                culture:<any> {
                     status: 1
                 }
             }, 
