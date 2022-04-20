@@ -23,9 +23,6 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 
-
-
-
 interface IUsers {
   id: number,
   name: string,
@@ -198,25 +195,25 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div className="
                   h-10
                 ">
-                  <Button 
+                  {/* <Button 
                     icon={<FaRegUserCircle size={16} />}
                     onClick={() =>{}}
                     title={`Perfil de ${rowData.name}`}
                     bgColor="bg-yellow-500"
                     textColor="white"
                     href="perfil"
-                  />
+                  /> */}
                 </div>
                 <div className="
                   h-10
                 ">
-                  <Button 
+                  {/* <Button 
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                  />
+                  /> */}
                 </div>
                 <div>
                   <Button 
@@ -577,7 +574,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
+                    {/* <div className='h-12'>
                       <Button 
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
@@ -586,7 +583,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                         onClick={() => {router.push('usuarios/cadastro')}}
                         icon={<FiUserPlus size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 

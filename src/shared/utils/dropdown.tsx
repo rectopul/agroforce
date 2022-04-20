@@ -53,12 +53,12 @@ export function TabsDropDowns () {
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
-    {
-      titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
-      data: [
-        { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <BiArea/> },
-      ],
-    },
+    // {
+    //   titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
+    //   data: [
+    //     { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <BiArea/> },
+    //   ],
+    // },
   ];
 
   return tabsConfig;

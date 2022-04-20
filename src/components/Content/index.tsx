@@ -126,7 +126,7 @@ export function Content({ contentHeader, children }: IContentData) {
         headerSelects={
           <div className="h-10 flex gap-2">
             <Select values={cultures}   onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
-            <Select values={safras}   onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+            {/* <Select values={safr  as}   onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} /> */}
           </div>
         }
       >

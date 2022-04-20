@@ -123,7 +123,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         Swal.fire("erro de credenciais")     
         return
       }
-      // validateInputs(values);
+      validateInputs(values);
   
       if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
       
@@ -319,7 +319,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                 *Setor
               </label>
               <Select
-                id="department.id"
+                id="departmentId"
                 required
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -639,7 +639,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     }
   });
 
-  // console.log(data.users_permissions)
   return { 
     props: {
       data,
