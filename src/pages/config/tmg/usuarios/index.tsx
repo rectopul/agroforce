@@ -9,7 +9,6 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
@@ -230,14 +229,14 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div className="
                   h-10
                 ">
-                  <Button 
+                  {/* <Button 
                     icon={<FaRegUserCircle size={16} />}
                     title={`Perfil de ${rowData.name}`}
                     onClick={() =>{}}
                     bgColor="bg-yellow-500"
                     textColor="white"
                     href="perfil"
-                  />
+                  /> */}
                 </div>
                 <div className="
                   h-10

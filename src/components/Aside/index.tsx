@@ -5,8 +5,11 @@ import { GiThreeLeaves } from 'react-icons/gi';
 import { VscGraph } from 'react-icons/vsc';
 import { BsGear } from 'react-icons/bs';
 import { ButtonAside } from './ButtonAside';
+import { useRouter } from 'next/router';
 
 export function Aside() {
+  const router = useRouter();
+
   return (
     <aside className="h-aside w-32
       bg-gray-450 
@@ -63,7 +66,7 @@ export function Aside() {
         <ButtonAside 
           title='Configurações'
           icon={ <BsGear  size={32} />}
-          href='config/tmg/usuarios'
+          href='/config/tmg/usuarios'
           active
         />
       </nav>
