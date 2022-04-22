@@ -57,7 +57,6 @@ export class UserPermissionController {
     }
 
     async post(data: object | any) {
-        console.log(data)
         try {
             if (data != null && data != undefined) {
                 await this.delete(parseInt(data.userId));

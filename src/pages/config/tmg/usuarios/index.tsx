@@ -12,6 +12,7 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa"
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
+import { FiUserPlus } from "react-icons/fi";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { userPreferencesService, userService } from "src/services";
 import { handleFormatTel } from "src/shared/utils/tel";
@@ -206,13 +207,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div className="
                   h-10
                 ">
-                  {/* <Button 
+                  <Button 
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                  /> */}
+                  />
                 </div>
                 <div>
                   <Button 
@@ -573,7 +574,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     border-solid border-b
                     border-gray-200
                   '>
-                    {/* <div className='h-12'>
+                    <div className='h-12'>
                       <Button 
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
@@ -582,7 +583,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                         onClick={() => {router.push('usuarios/cadastro')}}
                         icon={<FiUserPlus size={20} />}
                       />
-                    </div> */}
+                    </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 

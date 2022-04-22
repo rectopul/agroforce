@@ -13,14 +13,7 @@ import { prisma } from 'src/pages/api/db/db';
 import { userService } from "src/services";
 import { functionsUtils } from "src/shared/utils/functionsUtils";
 import Swal from 'sweetalert2';
-import {
-  Button, CheckBox, Content,
-  Input,
-  Select
-} from "../../../../components";
-// import IDepartment from '../../../../components/props/departmentDTO';
-// import IProfile from '../../../../components/props/profileDTO';
-// import IUsers from '../../../../components/props/userDTO';
+import {  Button, CheckBox, Content, Input,  Select } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartment {
@@ -45,7 +38,6 @@ interface IUserPermissions {
   id_cultures: number;
   name_cultures: string;
 }
-
 interface IUserProps {
   id: number;
   name: string;
@@ -63,7 +55,6 @@ interface IUserProps {
   avatar?: string;
   confirmPassword?: string;
 }
-
 export interface IData {
   data: IUserProps | any;
   profilesData: IProfileUser[];
@@ -91,14 +82,14 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     Object.keys(data.users_permissions).forEach((_, item) => {
       userCultures.push(data.users_permissions[item].id_cultures);
       if (userPermissions[data.users_permissions[item].id_cultures]) {
-        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, userPermissions[data.users_permissions[item].id_cultures]]
+        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, Number(userPermissions[data.users_permissions[item].id_cultures].join())]
       } else {  
         userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles];
       }
     });
   } 
+  const [Permissions, setPermissions] = useState<any>(userPermissions);
 
-  // console.log(userPermissions[2]);
   const formik = useFormik<IUserProps>({
     initialValues: {
       id: data.id,
@@ -117,8 +108,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       cultures:[]
     },
     onSubmit: async (values) => {
-      // alert(JSON.stringify(values, null, 2))
-      // return;
       if (values.password !== values.confirmPassword) {
         Swal.fire("erro de credenciais")     
         return
@@ -126,7 +115,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       validateInputs(values);
   
       if (!values.name || !values.email || !values.cpf || !values.registration || !values.departmentId || !values.password || !values.confirmPassword) { return; }
-      
+      let checkbox: any =  document.getElementsByName('cultures');
+      values.cultures = [];
+      for (var i = 0; i < checkbox.length; i++){
+        if ( checkbox[i].checked ) {
+            values.cultures.push(checkbox[i].value);
+        }
+      }
       let ObjProfiles;
       let input: any; 
       const auxObject: any = [];
@@ -186,9 +181,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     }
   }
   
-  function teste (cultureId: any, newvalue: any) {
-    // console.log(cultureId);
-    console.log(newvalue);
+  function defineProfiles(culturedId: number, profiles: any) {
+    Permissions[culturedId] = profiles.value;
+    setPermissions(Permissions)
   }
   return (
     <>
@@ -435,7 +430,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                             id={`culture_${culture.id}`}
                             name="cultures"
                             onChange={formik.handleChange}
-                            value={culture.id as any}
+                            value={culture.id}
                             defaultChecked={userCultures.includes(culture.id)}
                           />
                         </div>
@@ -449,12 +444,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                               id={`profiles_${culture.id}`}
                               name={`profiles_${culture.id}`}
                               dataSource={profilesData as any}
+                              onChange={(e: any) => defineProfiles(culture.id, e)}
                               mode="Box"
                               fields={{
                                 text: "name",
                                 value: "id"
                               }}
-                              value={userPermissions[culture.id]}
+                              value={Permissions[culture.id]}
                               placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
                             />
                           </div>
@@ -509,13 +505,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   };
-  const resD = await fetch(`${baseUrl}/departament`, requestOptions)
-  const resP = await fetch(`${baseUrl}/profile`, requestOptions)
-  const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
-  const departments = await resD.json();
-  const profiles = await resP.json();
-  const users = await resU.json();
-  const userEdit = users.response;
 
   const response = await prisma.user.findFirst({
     where: {
@@ -525,7 +514,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
       users_permissions: {
         where: {
           userId: Number(context.query.id),
-          // cultureId: parseInt(context.req.cookies.cultureId),
         },
         select: {
           id: true,
