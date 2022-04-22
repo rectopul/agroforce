@@ -7,7 +7,6 @@ export default  apiHandler(handler);
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { userEmail } = req.body;
-    console.log(userEmail);
 
     if (req.method !== 'POST') {
       return res.status(404).end({message: 'Erro de requisição!'});
@@ -24,6 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       email: user.email,
     }
 
+    // console.log(JSON.stringify(user, null, 2))
     console.log(JSON.stringify(result, null, 2))
 
     return res.status(200).json(result);

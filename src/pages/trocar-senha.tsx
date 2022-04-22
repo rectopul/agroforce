@@ -7,23 +7,42 @@ import { Button, Input } from "src/components";
 import Swal from "sweetalert2";
 import { forgotPasswordService } from '../services';
 
+interface IResponse {
+  name: string;
+  email: string;
+}
+
 export default function TrocarSenha() {
-  const [userEmail, setUserEmail] = useState<string>('');
-  const [userConfirmEmail, setUserConfirmEmail] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [confirmEmail, setConfirmEmail] = useState<string>('');
 
   async function handleSendEmail(event: FormEvent) {
     event.preventDefault();
 
-    if (userEmail !== userConfirmEmail) {
+    if (email !== confirmEmail) {
       Swal.fire({
-        title: "Credenciais  inválidas!",
-        text: "Usuário não encontrado! mais dúvidas procure o suporte.",
+        title: "Campos inválidos!",
+        text: "E-mails não iguais.",
       });
 
       return;
     }
 
-    await forgotPasswordService.sendEmail({ userEmail: userEmail });
+    await forgotPasswordService.sendEmail({ userEmail: email }).then(
+      (response: IResponse) => {
+        Swal.fire({
+          title: "E-mail de recuperação de senha enviado com sucesso!",
+          text: `Verifique seu e-mail para concluir sua troca de senha. Usuário: ${response.name}, ${response.email}`,
+        });
+
+        router.back();
+      }
+    ).catch(() => {
+      Swal.fire({
+        title: "Credenciais  inválidas!",
+        text: "Usuário não encontrado! mais dúvidas procure o suporte.",
+      });
+    });
   };
   
   return (
@@ -64,8 +83,8 @@ export default function TrocarSenha() {
                     type="email"
                     required
                     placeholder="E-mail"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -75,8 +94,8 @@ export default function TrocarSenha() {
                     type="email"
                     required
                     placeholder="Confirmar e-mail"
-                    value={userConfirmEmail}
-                    onChange={(e) => setUserConfirmEmail(e.target.value)}
+                    value={confirmEmail}
+                    onChange={(e) => setConfirmEmail(e.target.value)}
                   />
                 </div>
               </div>
@@ -114,7 +133,7 @@ export default function TrocarSenha() {
 
         <aside className='flex-initial'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/agroforce.png" alt="teste" className='w-screen h-screen' />
+          <img src="/images/agroforce.png" alt="Agroforce" className='w-screen h-screen' />
         </aside>
       </div>
     </>

@@ -145,7 +145,7 @@ function Login() {
     
             <aside className='flex-initial'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/agroforce.png" alt="teste" className='w-screen h-screen' />
+              <img src="/images/agroforce.png" alt="Agroforce" className='w-screen h-screen' />
             </aside>
           </div>
         </>
