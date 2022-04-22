@@ -1,20 +1,20 @@
 
-import { useEffect, ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
-
 import { userService } from 'src/services';
 import {
   Aside,
   DropDown,
   MainHeader,
   Select,
-  ToolTip,
+  ToolTip
 } from '../../components';
 import { TabHeader } from "../MainHeader/TabHeader/index2";
+
 
 interface IUsers {
   id: number,
@@ -36,7 +36,7 @@ interface IContentProps {
   titleTab: string;
   valueTab: ReactNode;
   statusTab: boolean;
-
+  hrefTab: string;
   data: IDropDown[];
 };
 
@@ -55,7 +55,7 @@ export function Content({ contentHeader, children }: IContentData) {
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
     !contentHeader ? [
     {
-      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,
+      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,  hrefTab: '/config/tmg/usuarios',
       data: [
         {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
         {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
@@ -147,14 +147,16 @@ export function Content({ contentHeader, children }: IContentData) {
                 ))
             }>
               {item.statusTab ? (
-                <TabHeader 
+                <TabHeader
+                  hrefTab={item.hrefTab} 
                   titleTab={item.titleTab} 
                   valueTab={item.valueTab} 
                   statusTab={item.statusTab}
                   handleStatusTabs={handleStatusButton}
                 />
               ) : (
-                <TabHeader 
+                <TabHeader
+                  hrefTab={item.hrefTab} 
                   titleTab={item.titleTab} 
                   valueTab={item.valueTab} 
                   statusTab={item.statusTab} 

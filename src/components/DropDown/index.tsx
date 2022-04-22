@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
-import { RiPlantLine } from 'react-icons/ri';
 
 interface IDropDownProps {
   label: string;
