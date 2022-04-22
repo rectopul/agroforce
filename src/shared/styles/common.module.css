@@ -1,0 +1,15 @@
+.container {
+  @apply w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2;
+}
+
+.titlePage {
+  @apply text-2xl;
+}
+
+.labelForm {
+  @apply block text-gray-900 text-sm font-bold mb-2;
+}
+
+.containerButtonSubmit {
+  @apply h-10 w-full flex gap-3 justify-center mt-10;
+}

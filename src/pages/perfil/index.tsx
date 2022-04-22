@@ -1,6 +1,6 @@
 import Head from "next/head";
+import { Content } from "../../components/Content";
 
-import { Content } from "../components/Content";
 
 export default function Perfil() {
   return (

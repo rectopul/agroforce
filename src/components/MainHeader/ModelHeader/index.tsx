@@ -1,16 +1,13 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, ReactNode } from 'react'
-import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-
+import { Menu, Transition } from '@headlessui/react';
+import Link from 'next/link';
+import { Fragment, ReactNode, useEffect, useState } from 'react';
 import { FaRegEdit, FaRegUserCircle } from "react-icons/fa";
-import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineExitToApp } from "react-icons/md";
-
+import { RiLockPasswordLine } from "react-icons/ri";
 import { userService } from "../../../services";
-import { useState, useEffect } from 'react';
-import { BiUser } from 'react-icons/bi';
-import { Observer } from 'react-hook-form/dist/utils/createSubject';
+
+
  
 interface IModelProps {
   name: string;
@@ -122,44 +119,47 @@ export function ModelHeader({ name, avatar }: IModelProps) {
 
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                  href="#"
-                  className={classNames(
-                    active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                    'px-4 py-2 text-base flex flex-row items-center gap-1'
-                    )}
+                  <Link href="/perfil">
+                    <a
+                      className={classNames(
+                        active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                        'px-4 py-2 text-base flex flex-row items-center gap-1'
+                      )}
                     >
-                    <FaRegUserCircle />
-                    <span>Perfil</span>
-                  </a>
+                      <FaRegUserCircle />
+                      <span>Perfil</span>
+                    </a>
+                  </Link>
                 )}
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    href="#"
-                    className={classNames(
-                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                      'px-4 py-2 text-base flex items-center gap-1'
-                    )}
-                  >
-                    <FaRegEdit />
-                    Alterar dados pessoais
-                  </a>
+                  <Link href="/perfil/alterar-dados-pessoais">
+                    <a
+                      className={classNames(
+                        active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                        'px-4 py-2 text-base flex items-center gap-1'
+                      )}
+                    >
+                      <FaRegEdit />
+                      Alterar dados pessoais
+                    </a>
+                  </Link>
                 )}
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    href="#"
-                    className={classNames(
-                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                      'px-4 py-2 text-base flex items-center gap-1'
-                    )}
-                  >
-                    <RiLockPasswordLine />
-                    Editar senha
-                  </a>
+                  <Link href="/perfil/alterar-senha">
+                    <a
+                      className={classNames(
+                        active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                        'px-4 py-2 text-base flex items-center gap-1'
+                      )}
+                    >
+                      <RiLockPasswordLine />
+                      Editar senha
+                    </a>
+                  </Link>
                 )}
               </Menu.Item>
               <form method="POST" action="#" className='mt-2 border-t border-gray-300'>
