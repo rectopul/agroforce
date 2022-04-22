@@ -1,17 +1,23 @@
 import Head from "next/head";
+import router from "next/router";
 import { FormEvent, useState } from "react";
+import { GiConfirmed } from "react-icons/gi";
+import { IoMdArrowBack } from "react-icons/io";
 import { Button, Input } from "src/components";
-import { userService } from "src/services";
 import Swal from "sweetalert2";
 
+// interface IForgotPasswordProps {
+//   email: string;
+// }
+
 export default function TrocarSenha() {
-  const [email, setEmail] = useState<string>('');
-  const [confirmEmail, setConfirmEmail] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userConfirmEmail, setUserConfirmEmail] = useState<string>('');
 
   async function handleSendEmail(event: FormEvent) {
     event.preventDefault();
 
-    if (email !== confirmEmail) {
+    if (userEmail !== userConfirmEmail) {
       Swal.fire({
         title: "Credenciais  inválidas!",
         text: "Usuário não encontrado! mais dúvidas procure o suporte.",
@@ -19,25 +25,6 @@ export default function TrocarSenha() {
 
       return;
     }
-
-    const user = await userService.findUserByEmail(email).then(response => {
-      if (response.status === 200) {
-        Swal.fire('Cultura atualizada com sucesso');
-        return email;
-      } else {
-        Swal.fire(response.message);
-      }
-    });
-
-    if (!user) {
-      Swal.fire({
-        title: "E-mail confirmado!",
-        text: "Enviaremos no seu e-mail um link para a alteração da sua senha!",
-      });
-      return;
-    }
-
-    return user;
   }
   
   return (
@@ -77,8 +64,8 @@ export default function TrocarSenha() {
                   <Input
                     type="email"
                     placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
                   />
                 </div>
 
@@ -87,27 +74,38 @@ export default function TrocarSenha() {
                   <Input
                     type="email"
                     placeholder="E-mail"
-                    value={confirmEmail}
-                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    value={userConfirmEmail}
+                    onChange={(e) => setUserConfirmEmail(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div className='h-10
-                w-2/4
+              <div className="
+                h-10 w-full
                 flex
-              '>
-                <Button
-                  type='submit'
-                  value='Confirmar'
-                  onClick={() => {}}
-                  // disabled={
-                  //   email !== confirmEmail ||
-                  //   email === '' || confirmEmail === ''
-                  // }
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                />
+                gap-3
+                justify-center
+              ">
+                <div className="w-30">
+                  <Button 
+                    type="button"
+                    value="Voltar"
+                    bgColor="bg-red-600"
+                    textColor="white"
+                    icon={<IoMdArrowBack size={18} />}
+                    onClick={() => router.back()}
+                  />
+                </div>
+                <div className="w-40">
+                  <Button 
+                    type="submit"
+                    value="Confirmar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<GiConfirmed size={18} />}
+                    onClick={() => {}}
+                  />
+                </div>
               </div>
             </form>
           </div>
@@ -121,3 +119,15 @@ export default function TrocarSenha() {
     </>
   );
 }
+
+// export async function getStaticProps(): GetStaticProps {
+//   const res = await fetch('https://localhost:3000/api/not-auth/forgot-password');
+
+//   const email = await res.json();
+  
+//   return {
+//     props: {
+//       email,
+//     },
+//   }
+// }

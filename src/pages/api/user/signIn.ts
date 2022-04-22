@@ -69,6 +69,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         preferences.portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10}); preferences.portfolio = preferences.portfolio.response[0];
         preferences.department= await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11}); preferences.department = preferences.department.response[0];
         preferences.lote_portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 13}); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
+        preferences.epoca=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 15}); preferences.epoca = preferences.epoca.response[0];
       }
 
       if (!user) throw 'Email ou senha é invalida!';

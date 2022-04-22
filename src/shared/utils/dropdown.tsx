@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
-import { BiArea, BiUser } from "react-icons/bi";
+import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FiMapPin } from "react-icons/fi";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { MdDateRange } from "react-icons/md";
+import { MdDateRange, MdUpdate } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
 interface IDropDown {
@@ -39,6 +39,7 @@ export function TabsDropDowns () {
         { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
         { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
         { labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser/> },
+        { labelDropDown: 'Época', hrefDropDown: '/config/ensaio/epoca', iconDropDown: <MdUpdate/> },
       ],
     },
     { 
