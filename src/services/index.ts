@@ -5,6 +5,7 @@ export * from './epoca.service';
 export * from './layoult-quadra.service';
 export * from './local.service';
 export * from './lote.service';
+export * from './not-auth/forgot-password.service';
 export * from './ogm.service';
 export * from './portfolio.service';
 export * from './profile.service';

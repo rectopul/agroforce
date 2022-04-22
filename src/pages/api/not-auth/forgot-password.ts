@@ -6,15 +6,15 @@ export default  apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { email } = req.body;
-    console.log(email);
+    const { userEmail } = req.body;
+    console.log(userEmail);
 
     if (req.method !== 'POST') {
       return res.status(404).end({message: 'Erro de requisição!'});
     }
 
     const user = await prisma.user.findFirst({
-      where: { email: String(email) }
+      where: { email: String(userEmail) }
     });
 
     if (!user) return res.status(400).json({message: 'Usuário não encontrado.'});

@@ -5,10 +5,7 @@ import { GiConfirmed } from "react-icons/gi";
 import { IoMdArrowBack } from "react-icons/io";
 import { Button, Input } from "src/components";
 import Swal from "sweetalert2";
-
-// interface IForgotPasswordProps {
-//   email: string;
-// }
+import { forgotPasswordService } from '../services';
 
 export default function TrocarSenha() {
   const [userEmail, setUserEmail] = useState<string>('');
@@ -25,7 +22,9 @@ export default function TrocarSenha() {
 
       return;
     }
-  }
+
+    await forgotPasswordService.sendEmail({ userEmail: userEmail });
+  };
   
   return (
     <>
@@ -63,6 +62,7 @@ export default function TrocarSenha() {
                   <span className="block text-sm font-medium text-blue-600">E-mail</span>
                   <Input
                     type="email"
+                    required
                     placeholder="E-mail"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
@@ -73,7 +73,8 @@ export default function TrocarSenha() {
                   <span className="block text-sm font-medium text-blue-600">Confirmar e-mail</span>
                   <Input
                     type="email"
-                    placeholder="E-mail"
+                    required
+                    placeholder="Confirmar e-mail"
                     value={userConfirmEmail}
                     onChange={(e) => setUserConfirmEmail(e.target.value)}
                   />
@@ -119,15 +120,3 @@ export default function TrocarSenha() {
     </>
   );
 }
-
-// export async function getStaticProps(): GetStaticProps {
-//   const res = await fetch('https://localhost:3000/api/not-auth/forgot-password');
-
-//   const email = await res.json();
-  
-//   return {
-//     props: {
-//       email,
-//     },
-//   }
-// }
