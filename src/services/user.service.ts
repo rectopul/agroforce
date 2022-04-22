@@ -19,7 +19,6 @@ export const userService = {
     create,
     update,
     logoutSign,
-    findUserByEmail
 };
 
 async function login(email: any, password: any) {
@@ -39,11 +38,6 @@ function create(data: any) {
 
 function update(data: any) {
     return fetchWrapper.put(baseUrl, data);
-}
-
-async function findUserByEmail(email:string) {
-    const user = await fetchWrapper.post(baseUrl, email);
-    return user;
 }
 
 function logout() {

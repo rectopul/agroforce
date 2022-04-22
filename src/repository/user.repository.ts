@@ -32,16 +32,6 @@ export class UserRepository {
         return Result;
     }
 
-    async findByEmail(email: string) {
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
-        });
-
-        return user;
-    }
-
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
         if (orderBy){
@@ -82,6 +72,4 @@ export class UserRepository {
           }) 
         return Result;
     }
-
 }
-

@@ -24,6 +24,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       email: user.email,
     }
 
+    console.log(JSON.stringify(result, null, 2))
+
     return res.status(200).json(result);
   } catch(err) {
     return res.status(404).end({message: `Erro de requisição! [ERRO]: ${err}`});

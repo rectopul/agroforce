@@ -13,19 +13,6 @@ export class UserController {
     userCultureController = new UserCultureController();
     userPermissionsController = new UserPermissionController();
 
-    async findUserByEmail(email: string) {
-        try {
-            console.log(email);
-            const user = await this.userRepository.findByEmail(email.trim());
-
-            if (!user) return { status: 400, message: 'Usuário não encontrado.' };
-
-            return {status: 200, user}
-        } catch (err) {
-            return { status: 400, message: err }
-        }
-    }
-
     async getAllUser(options: any) {
         const parameters: object | any = new Object();
         let take; 
