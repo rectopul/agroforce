@@ -16,6 +16,8 @@ interface IModelProps {
 
 
 export function ModelHeader({ name, avatar }: IModelProps) {
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ')
   }
@@ -119,7 +121,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
 
               <Menu.Item>
                 {({ active }) => (
-                  <Link href="/perfil">
+                  <Link href={`/perfil?id=${userLogado.id}`}>
                     <a
                       className={classNames(
                         active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',

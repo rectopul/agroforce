@@ -13,3 +13,7 @@
 .containerButtonSubmit {
   @apply h-10 w-full flex gap-3 justify-center mt-10;
 }
+
+.avatarSm {
+  @apply h-20 w-20 border-2 rounded-full;
+}

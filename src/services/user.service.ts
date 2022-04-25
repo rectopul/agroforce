@@ -7,6 +7,7 @@ import { userPermissionService } from './user-permission';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+const profikeBaseUrl = `${publicRuntimeConfig.apiUrl}/testes`;
 const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user') as string));
 
 export const userService = {
@@ -19,6 +20,7 @@ export const userService = {
     create,
     update,
     logoutSign,
+    profileUser
 };
 
 async function login(email: any, password: any) {
@@ -65,4 +67,9 @@ function getAll(parameters: any) {
 
 function getPermissions(parameters: any) {
     return fetchWrapper.get(baseUrl + '/permissions', parameters);
+}
+
+async function profileUser(parameters: any) {
+    const user = fetchWrapper.get(profikeBaseUrl, parameters);
+    return user;
 }
