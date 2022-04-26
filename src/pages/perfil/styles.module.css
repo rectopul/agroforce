@@ -1,0 +1,43 @@
+.container {
+  @apply w-full h-full rounded p-7 bg-white;
+}
+
+.headerProfile {
+  @apply flex flex-col justify-center items-center;
+}
+
+.containerAvatarHeader {
+  @apply  flex items-center gap-4 justify-center;
+}
+
+.avatarLg {
+  @apply max-h-40 w-40 border border-gray-900 rounded-full;
+}
+
+/* .inputUploadAvatar {
+  @apply 
+} */
+
+.containerUserName {
+  @apply flex flex-col items-center mt-2;
+}
+
+.userName {
+  @apply text-lg;
+}
+
+.userDepartment {
+  @apply text-base opacity-75;
+}
+
+.containerContent {
+  @apply space-y-3
+}
+
+.content {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4 p-5 rounded border border-gray-300 shadow;
+}
+
+.buttonFooter {
+  @apply h-10 w-full flex gap-3 justify-center mt-10;
+}

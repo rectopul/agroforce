@@ -1,9 +1,8 @@
-import { ReactChild, ReactFragment, ReactNode, ReactPortal, useState } from 'react';
-import Button from '@mui/material/Button';
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-
-import * as React from 'react';
 import { styled } from '@mui/material/styles';
+import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
+import * as React from 'react';
+import { ReactChild, ReactFragment, ReactNode, ReactPortal } from 'react';
+
 
 interface IToolTipProps {
   children: ReactNode;
@@ -30,7 +29,8 @@ export function ToolTip({
     <HtmlTooltip
       title={<React.Fragment>{contentMenu}</React.Fragment>}
     >
-      <Button style={{ padding: 0 }}>{ children }</Button>
+      {/* <Button style={{ padding: 0 }}>{ children }</Button> */}
+      <div style={{ padding: 0 }}>{ children }</div>
     </HtmlTooltip>
   );
 }

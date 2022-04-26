@@ -8,39 +8,27 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { MdFirstPage, MdLastPage, MdUpdate } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { localService, userPreferencesService } from "src/services";
-import { getDegreesCelsius } from "src/shared/utils/formatDegreesCelsius";
+import { epocaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../components";
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-interface ILocalProps {
-  id: Number | any;
-  name: String | any;
-  pais: String | any;
-  uf: String | any;
-  city: String | any;
-  address: String | any;
-  latitude: string;
-  longitude: string;
-  altitude: String | any;
-  created_by: Number;
-  status: Number;
+interface IEpoca {
+  id: number;
+  id_culture: number;
+  name: string;
+  status?: number;
 };
+
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
-  filterUF: string | any;
-  filterCity: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -50,79 +38,61 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-  allItems: ILocalProps[];
+  allItems: IEpoca[];
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
-  uf: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LOCAL'
+    tab.titleTab === 'ENSAIO'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local ||{id:0, table_preferences: "id,name,pais,uf,city,address,latitude,longitude,altitude,status"};
+  const preferences = userLogado.preferences.tipo_epoca ||{id:0, table_preferences: "id,name,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const ufs: object | any =  [];
-  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
-  const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
+
+  const [epoca, setEpoca] = useState<IEpoca[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
-  const [orderAddress, setOrderAddress] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
-  const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Nome ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Pais", value: "pais", defaultChecked: () => camposGerenciados.includes('pais') },
-    { name: "CamposGerenciados[]", title: "Estado", value: "uf", defaultChecked: () => camposGerenciados.includes('uf') },
-    { name: "CamposGerenciados[]", title: "Município", value: "city", defaultChecked: () => camposGerenciados.includes('city') },
-    { name: "CamposGerenciados[]", title: "Endereço", value: "address", defaultChecked: () => camposGerenciados.includes('address') },
-    { name: "CamposGerenciados[]", title: "Latitude", value: "latitude", defaultChecked: () => camposGerenciados.includes('latitude') },
-    { name: "CamposGerenciados[]", title: "Longitude", value: "longitude", defaultChecked: () => camposGerenciados.includes('longitude') },
-    { name: "CamposGerenciados[]", title: "Altitude", value: "altitude", defaultChecked: () => camposGerenciados.includes('altitude') },
+    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [selectedRowById, setSelectedRowById] = useState<number>();
-  
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
   const columns = colums(camposGerenciados);
   
-  uf.map((value: string | object | any) => {
-    ufs.push({id: value.id, name: value.sigla, ufid: value.id});
-  })
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
-      filterUF: '',
-      filterCity: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      await epocaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
-        setLocal(response.response);
+        setEpoca(response.response);
       })
     },
   });
@@ -133,6 +103,34 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { id: 0, name: 'Inativos'},
   ];
 
+  async function handleStatus(idItem: number, data: IEpoca): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
+    } else {
+      data.status = 0;
+    }
+
+    const index = epoca.findIndex(epoca => epoca.id === idItem);
+
+    if (index === -1) {
+      return;
+    }
+
+    setEpoca((oldUser) => {
+      const copy = [...oldUser];
+      copy[index].status = data.status;
+      return copy;
+    });
+
+    const { id, name, status } = epoca[index];
+
+    await epocaService.update({
+      id,
+      name,
+      status,
+    });
+  };
+
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
@@ -140,75 +138,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       if (ObjetCampos[item] == 'id') {
         arrOb.push({ title: "Código", field: "id", sorting: false })
       }
-
       if (ObjetCampos[item] == 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowName }
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
+                Name
               </button>
             </div>
           ),
           field: "name",
-          sorting: false,
-        },);
-      }
-      
-      if (ObjetCampos[item] == 'pais') {
-        arrOb.push({ title: "País", field: "pais", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'uf') {
-        arrOb.push({ title: "Estado", field: "uf", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'city') {
-        arrOb.push({ title: "Município", field: "city", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'address') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowAddress }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderAddress('address', orderAddress)}>
-                Endereço
-              </button>
-            </div>
-          ), 
-          field: "address",
           sorting: false
         },);
       }
   
-      if (ObjetCampos[item] == 'latitude') {
-        arrOb.push({
-          title: "Latitude",
-          field: "latitude", 
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.latitude)
-          )
-        })
-      }
-
-      if (ObjetCampos[item] == 'longitude') {
-        arrOb.push({
-          title: "Longitude",
-          field: "longitude",
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.longitude)
-          )
-        })
-      }
-
-      if (ObjetCampos[item] == 'altitude') {
-        arrOb.push({ title: "Altitude", field: "altitude", sorting: false })
-      }
-
       if (ObjetCampos[item] == 'status') {
         arrOb.push({
           title: "Status",
@@ -216,58 +160,57 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: ILocalProps) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/local/atualizar?id=${rowData.id}`}
-                  />
-                </div>
+          render: (rowData: IEpoca) => (
+            <div className='h-10 flex'>
+              <div className="
+                h-10
+              ">
+                <Button 
+                  icon={<BiEdit size={16} />}
+                  onClick={() =>{}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  href={`/config/ensaio/epoca/atualizar?id=${rowData.id}`}
+                  title={`Atualizar ${rowData.name}`}
+                />
+              </div>
+              {rowData.status === 1 ? (
                 <div>
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={async () => await handleStatus(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
+                    )}
+                    title={`Ativo`}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
+              ) : (
+              <div>
+                <Button
+                  icon={<FaRegThumbsDown size={16} />}
+                  onClick={async () => await handleStatus(
+                    rowData.id, {
+                      status: rowData.status,
+                      ...rowData
+                    }
+                  )}
+                  title={`Inativo`}
+                  bgColor="bg-red-800"
+                  textColor="white"
+                />
               </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/localatualizar?id=${rowData.id}`}
-                  />
-                </div>
-                <div>
-                  <Button 
-                    icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
-                    )}
-                    bgColor="bg-red-800"
-                    textColor="white"
-                  />
-                </div>
-              </div>
-            )
-          ),
+              )}
+            </div>
+          )
         })
       }
     });
+
     return arrOb;
   };
 
@@ -282,85 +225,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 4 }).then((response) => {
-        userLogado.preferences.local = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 15 }).then((response) => {
+        userLogado.preferences.tipo_epoca = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.local = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.tipo_epoca = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
-
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await localService.update({id: id, status: status});
-
-    const index = local.findIndex((local) => local.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLocal((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  };
-
-  async function handleOrderAddress(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setLocal(response.response)
-      }
-    })
-    if (orderAddress === 2) {
-      setOrderAddress(0);
-      setArrowAddress(<AiOutlineArrowDown />);
-    } else {
-      setOrderAddress(orderAddress + 1);
-      if (orderAddress === 1) {
-        setArrowAddress(<AiOutlineArrowUp />);
-      } else {
-        setArrowAddress('');
-      }
-    }
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -388,9 +265,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await epocaService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setLocal(response.response)
+        setEpoca(response.response)
       }
     });
     
@@ -421,12 +298,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
-    await localService.getAll(filterAplication).then((response) => {
+    await epocaService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = local.map((row) => {
+        const newData = epoca.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
           } else {
@@ -438,7 +315,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "locais");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Época");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -451,7 +328,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Locais.xlsx");
+        XLSX.writeFile(workBook, "Época.xlsx");
       }
     });
   };
@@ -471,25 +348,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await localService.getAll(parametersFilter).then((response) => {
+    await epocaService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setLocal(response.response);
+        setEpoca(response.response);
       }
     });
   };
-
-  async function showCitys(uf: any): Promise<void> {
-    if (uf) {
-      let param = '?ufId=' + uf; 
-      let city: object | any = [];
-      await localService.getCitys(param).then((response) => {
-        response.map((value: string | object | any) => {
-          city.push({id: value.nome, name: value.nome});
-        })
-          setCitys(city)
-      });
-    }
-  }
 
   useEffect(() => {
     handlePagination();
@@ -499,7 +363,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem dos Locais</title>
+        <title>Listagem de Épocas</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -507,7 +371,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar época">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -529,31 +393,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      UF
-                    </label>
-                    <Select
-                      values={ufs}
-                      id="filterUF"
-                      name="filterUF"
-                      onChange={formik.handleChange}
-                      onBlur={e => showCitys(e.target.value)}
-                      selected={false}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Município
-                    </label>
-                    <Select
-                      values={citys}
-                      id="filterCity"
-                      name="filterCity"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
+  
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
@@ -571,6 +411,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -585,25 +426,23 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              style={{ background: '#f9fafb' }}
               columns={columns}
-              data={local}
-              onRowClick={((evt?, selectedRow?: ILocalProps) => {
-                setSelectedRowById(selectedRow?.id)
-              })}
+              data={epoca}
               options={{
                 showTitle: false,
+                headerStyle: {
+                  zIndex: 20
+                },
+                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
-                rowStyle: (rowData: ILocalProps) => ({
-                  backgroundColor: (selectedRowById == rowData.id ? '#c7e3f5' : '#fff')
-                }),
-                selection: true
+                pageSize: itensPerPage
               }}
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-max	
+                  className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -616,13 +455,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar Local"
-                        value="Cadastrar Local"
+                        title="Cadastrar época"
+                        value="Cadastrar época"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="local/cadastro"
-                        icon={<FiUserPlus size={20} />}
+                        href="/config/ensaio/epoca/cadastro"
+                        icon={<MdUpdate size={20} />}
                       />
                     </div>
 
@@ -748,25 +587,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
-  const  token  =  req.cookies.token;
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
+
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const local = await fetch(urlParameters.toString(), requestOptions);
-  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
-  const uf = await apiUF.json();
-  const Response =  await local.json();
+  const epoca = await fetch(urlParameters.toString(), requestOptions);
+  const Response =  await epoca.json();
   const allItems = Response.response;
   const totalItems = Response.total;
 
@@ -776,7 +614,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      uf
+      cultureId
     },
   }
 }

@@ -23,19 +23,20 @@ model config_gerais {
 }
 
 model culture {
-  id             Int              @id @default(autoincrement())
-  name           String?          @unique(map: "Culture_name_key")
-  created_at     DateTime         @default(now())
-  created_by     Int
-  status         Int              @default(1)
-  safra          safra[]
-  users_cultures users_cultures[]
-  portfolio      portfolio[]
-  users_permissions      users_permissions[]
-  ogm      ogm[]
-  foco      foco[]
-  type_assay      type_assay[]
-  delineamento      delineamento[]
+  id                  Int              @id @default(autoincrement())
+  name                String?          @unique(map: "Culture_name_key")
+  created_at          DateTime         @default(now())
+  created_by          Int
+  status              Int              @default(1)
+  safra               safra[]
+  users_cultures      users_cultures[]
+  portfolio           portfolio[]
+  users_permissions   users_permissions[]
+  ogm                 ogm[]
+  foco                foco[]
+  type_assay          type_assay[]
+  delineamento        delineamento[]
+  epoca               epoca[]
 }
 
 model department {
@@ -254,4 +255,15 @@ model lote {
   created_by    Int
   created_at    DateTime @default(now())
   portfolio portfolio @relation(fields: [id_portfolio], references: [id])
+}
+
+model epoca {
+  id             Int       @id @default(autoincrement())
+  id_culture  Int
+  name           String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }

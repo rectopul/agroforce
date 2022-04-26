@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
-import { BiArea, BiUser } from "react-icons/bi";
+import { BiUser } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FiMapPin } from "react-icons/fi";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { MdDateRange } from "react-icons/md";
+import { MdDateRange, MdUpdate } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 
 interface IDropDown {
@@ -14,6 +14,7 @@ interface IDropDown {
 }
 interface IContentProps {
   titleTab: string;
+  hrefTab: string;
   valueTab: ReactNode;
   statusTab: boolean;
   // handleStatusTabs?: (title: string, status: boolean) => void;
@@ -24,7 +25,7 @@ interface IContentProps {
 export function TabsDropDowns () {
   const tabsConfig: IContentProps[] = [
     { 
-      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,
+      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true, hrefTab: '/config/tmg/usuarios',
       data: [
         {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
         {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
@@ -34,21 +35,22 @@ export function TabsDropDowns () {
       ],
     },
     { 
-      titleTab: 'ENSAIO', valueTab: <BsCheckLg />, statusTab: false,
+      titleTab: 'ENSAIO', valueTab: <BsCheckLg />, statusTab: false, hrefTab: '/config/ensaio/tipo-ensaio',
       data: [
         { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
         { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
         { labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser/> },
+        { labelDropDown: 'Época', hrefDropDown: '/config/ensaio/epoca', iconDropDown: <MdUpdate/> },
       ],
     },
     { 
-      titleTab: 'DELINEAMENTO', valueTab: <BsCheckLg />, statusTab: false,
+      titleTab: 'DELINEAMENTO', valueTab: <BsCheckLg />, statusTab: false, hrefTab: '/config/delineamento',
       data: [
         { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
       ],
     },
     { 
-      titleTab: 'LOCAL', valueTab: <BsCheckLg />, statusTab: false , 
+      titleTab: 'LOCAL', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/local',
       data: [
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],

@@ -72,6 +72,4 @@ export class UserRepository {
           }) 
         return Result;
     }
-
 }
-
