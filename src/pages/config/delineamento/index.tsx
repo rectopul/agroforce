@@ -25,7 +25,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 interface IDelineamentoProps {
   id: Number | any;
   name: String | any;
-  repeticao: Number;
+  repeticao: string;
   trat_repeticao: Number;
   created_by: Number;
   status: Number;
@@ -48,9 +48,10 @@ interface Idata {
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -95,7 +96,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
@@ -181,7 +182,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() =>{}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/delineamento/atualizar-layoult?id=${rowData.id}`}
+                    href={`/config/delineamento/atualizar-layout?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -309,18 +310,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
     await delineamentoService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-
+        const newData = delineamento.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -376,7 +375,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem dos Layoults</title>
+        <title>Listagem dos Layout</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -409,12 +408,35 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Nome
                     </label>
                     <Input 
                       type="text" 
                       placeholder="nome"
-                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Repetição
+                    </label>
+                    <Input 
+                      type="number" 
+                      placeholder="Repetição"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Trat. Repetição
+                    </label>
+                    <Input 
+                      type="number"
+                      placeholder="Trat. Repetição"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -599,12 +621,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -617,12 +642,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const Response =  await local.json();
   const allItems = Response.response;
   const totalItems = Response.total;
+  
   return {
     props: {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

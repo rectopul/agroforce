@@ -1,7 +1,7 @@
 import Head from "next/head";
-import { Content } from "../components/Content";
-import { setCookie } from 'nookies';
 import { useRouter } from 'next/router';
+import { setCookie } from 'nookies';
+import { Content } from "../components/Content";
 
 export default function Listagem() {
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -13,6 +13,11 @@ export default function Listagem() {
   });
 
   setCookie(null, 'userId',  userLogado.id, {
+    maxAge: 86400 * 7,
+    path: '/',
+  });
+
+  setCookie(null, 'cultureId',  userLogado.userCulture.cultura_selecionada, {
     maxAge: 86400 * 7,
     path: '/',
   });

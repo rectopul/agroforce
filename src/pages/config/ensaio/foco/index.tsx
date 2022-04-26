@@ -1,25 +1,25 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle, FaSearchPlus } from "react-icons/fa";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-
-import { focoService } from "src/services/foco.service";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { userPreferencesService } from "src/services";
-
-import { AccordionFilter, Button, CheckBox, Content, Input, Select, TabHeader } from "src/components";
-
+import { focoService } from "src/services/foco.service";
+import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
+
+
+
 
 interface IFilter{
   filterStatus: object | any;
@@ -31,7 +31,7 @@ interface IFilter{
 export interface IFocos {
   id: number;
   name: string;
-  status: number;
+  status?: number;
 }
 
 interface IGenarateProps {
@@ -104,26 +104,28 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     },
   });
 
-  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusPortfolio(idFoco: number, data: IFocos): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
     } else {
-      status = 0;
+      data.status = 1;
     }
     
-    const index = focos.findIndex((foco) => foco.id === id);
+    const index = focos.findIndex((foco) => foco.id === idFoco);
 
     if (index === -1) {
       return;
     }
 
-    await focoService.update({id: id, status: status});
-
     setFocos((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
     });
+
+    const { id, name, status } = focos[index];
+
+    await focoService.update({id, name,status});
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -170,12 +172,15 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                   href={`/config/ensaio/foco/atualizar?id=${rowData.id}`}
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -185,8 +190,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -289,11 +297,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     
     await focoService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = focos.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -384,7 +392,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="foco"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -569,11 +577,13 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

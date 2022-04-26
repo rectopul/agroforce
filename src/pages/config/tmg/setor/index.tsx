@@ -296,11 +296,11 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     
     await departmentService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = items.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -375,6 +375,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
 
                   <div className="h-16 w-32 mt-3">
                     <Button
+                      type="submit"
                       onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"

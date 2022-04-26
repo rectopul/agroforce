@@ -23,15 +23,20 @@ model config_gerais {
 }
 
 model culture {
-  id             Int              @id @default(autoincrement())
-  name           String?          @unique(map: "Culture_name_key")
-  created_at     DateTime         @default(now())
-  created_by     Int
-  status         Int              @default(1)
-  safra          safra[]
-  users_cultures users_cultures[]
-  portfolio      portfolio[]
-  users_permissions      users_permissions[]
+  id                  Int              @id @default(autoincrement())
+  name                String?          @unique(map: "Culture_name_key")
+  created_at          DateTime         @default(now())
+  created_by          Int
+  status              Int              @default(1)
+  safra               safra[]
+  users_cultures      users_cultures[]
+  portfolio           portfolio[]
+  users_permissions   users_permissions[]
+  ogm                 ogm[]
+  foco                foco[]
+  type_assay          type_assay[]
+  delineamento        delineamento[]
+  epoca               epoca[]
 }
 
 model department {
@@ -129,6 +134,7 @@ model users_permissions {
   culture    culture  @relation(fields: [cultureId], references: [id])
 
   @@index([profileId], map: "Users_Permissions_profileId_fkey")
+  @@index([cultureId], map: "Users_Permissions_cultureId_fkey")
   @@index([userId], map: "Users_Permissions_userId_fkey")
 }
 
@@ -190,64 +196,76 @@ model portfolio {
   cruza      String
   status     Int       @default(1)
   created_by Int
-  created_at DateTime? @default(now())
+  created_at DateTime  @default(now())
   culture    culture   @relation(fields: [id_culture], references: [id])
-
-  LotePortfolio lote_portfolio[]
+  lote lote[]
 }
 
 model delineamento {
   id             Int       @id @default(autoincrement())
+  id_culture     Int
   name           String
   repeticao      Int
   trat_repeticao Int
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model foco {
   id          Int @id @default(autoincrement())
+  id_culture  Int
   name        String
   status      Int?       @default(1)
   created_by  Int
   created_at  DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 model type_assay {
   id             Int       @id @default(autoincrement())
+  id_culture  Int
   name           String
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model ogm {
   id             Int       @id @default(autoincrement())
+  id_culture     Int
   name           String
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model lote {
   id            Int @id @default(autoincrement())
+  id_portfolio  Int
   name          String
   volume        Int
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime @default(now())
-
-  LotePortfolio lote_portfolio[]
+  portfolio portfolio @relation(fields: [id_portfolio], references: [id])
 }
 
-model lote_portfolio {
-  id           Int @id @default(autoincrement())
-  id_portfolio Int
-  id_lote      Int
-  created_at    DateTime @default(now())
+model epoca {
+  id             Int       @id @default(autoincrement())
+  id_culture  Int
+  name           String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
 
-  portfolio portfolio @relation(fields: [id_portfolio], references: [id])
-  lote lote @relation(fields: [id_lote], references: [id])
+  culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model import_spreadsheet {

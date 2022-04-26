@@ -1,11 +1,11 @@
+import { useRouter } from 'next/router';
+import NProgress from 'nprogress';
+import { useEffect, useState } from 'react';
+import '../../public/nprogress.css';
+import { userService } from '../services';
 import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { userService  } from '../services';
 import PermisssionGate from "../shared/utils/PermissionUser";
-import NProgress from 'nprogress'
-import '../../public/nprogress.css'
 
 
 export default App;
@@ -53,7 +53,7 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     function authCheck(url: any) {
         // redirect to login page if accessing a private page and not logged in 
-        const publicPaths = ['/login'];
+        const publicPaths = ['/login', '/trocar-senha'];
         const path = url.split('?')[0];
         if (!userService.userValue && !publicPaths.includes(path)) {
             setAuthorized(false);

@@ -1,24 +1,23 @@
-import { GetServerSideProps } from "next";
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { useFormik } from "formik";
-import Head from "next/head";
+import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
+import Head from "next/head";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import Swal from 'sweetalert2'
-import { layoultQuadraService } from "src/services";
-import InputMask from "react-input-mask";
-
-import {
-  Content,
-  Input,
-  Select,
-  Button,
-} from "../../../components";
-
-import * as ITabs from '../../../shared/utils/dropdown';
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
+import InputMask from "react-input-mask";
+import { layoultQuadraService } from "src/services";
+import Swal from 'sweetalert2';
+import {
+  Button, Content,
+  Input,
+  Select
+} from "../../../components";
+import * as ITabs from '../../../shared/utils/dropdown';
+
+
 
 interface ILayoultProps {
   id: Number | any;
@@ -542,7 +541,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
+  const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
   const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
   const  token  =  context.req.cookies.token;

@@ -1,9 +1,8 @@
-import { RiCreativeCommonsZeroLine } from 'react-icons/ri';
 import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
-import { UserPermissionController} from './user-permission.controller';
+import { UserPermissionController } from './user-permission.controller';
 var  CryptoJS  =  require ("crypto") ; 
 const alg = 'aes-256-ctr';
 const pwd = 'TMG2022';
@@ -244,6 +243,12 @@ export class UserController {
                     parameters.departmentId =  data.departmentId;
                 }
 
+                if (typeof(data.registration) === 'string') {
+                    parameters.registration =  parseInt(data.registration);
+                } else { 
+                    parameters.registration =  data.registration;
+                }
+
                 if (data.name) {
                     parameters.name = data.name;
                 } 
@@ -286,7 +291,7 @@ export class UserController {
                 }
             }
         } catch(err) {
-
+            
         }
     }
 }

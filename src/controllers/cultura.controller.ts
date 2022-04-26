@@ -155,7 +155,6 @@ export class CulturaController {
         id: number().integer().required(this.required),
         name: string().required(this.required),
         status: number().integer().required(this.required),
-        created_by: number().integer().required(this.required),
       });
 
       const valid = schema.isValidSync(data);

@@ -55,7 +55,6 @@ export default function Atualizar(foco: IUpdateFoco) {
         id: foco.id,
         name: capitalize(formik.values.name),
         status: foco.status,
-        created_by: foco.created_by,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Foco atualizado com sucesso!');

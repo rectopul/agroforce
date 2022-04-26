@@ -23,6 +23,24 @@ export class OGMController {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
                 parameters.name  = JSON.parse(options.filterSearch);
             }
+
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {id: true, name: true, status:true};
+            }
+
+            if (options.id_culture) {
+                parameters.id_culture = parseInt(options.id_culture);
+            }
+
+            if (options.name) {
+                parameters.name = options.name;
+            }
         
             if (options.take) {
                 if (typeof(options.take) === 'string') {
@@ -42,16 +60,6 @@ export class OGMController {
 
             if (options.orderBy) {
                 orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
-            }
-
-            if (options.paramSelect) {
-                let objSelect = options.paramSelect.split(',');
-                Object.keys(objSelect).forEach((item) => {
-                    select[objSelect[item]] = true;
-                });
-                select = Object.assign({}, select);
-            } else {
-                select = {id: true, name: true, status:true};
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
@@ -112,7 +120,7 @@ export class OGMController {
             if (data != null && data != undefined) {
                 let response = await this.Repository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message: {message: "layoult atualizado"}}
+                    return {status: 200, message: {message: "OGM atualizado com sucesso"}}
                 } else {
                     return {status: 400, message: {message: "erro ao tentar fazer o update"}}
                 }

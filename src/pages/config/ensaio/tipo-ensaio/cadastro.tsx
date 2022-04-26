@@ -15,7 +15,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 
 interface ITypeAssayProps {
-  id: Number | any;
+  id_culture: number;
   name: String | any;
   created_by: Number;
   status: Number;
@@ -34,10 +34,13 @@ export default function NovoLocal() {
   ));
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const culture = userLogado.userCulture.cultura_selecionada as string;
+
   const router = useRouter();
+
   const formik = useFormik<ITypeAssayProps>({
     initialValues: {
-      id: 1,
+      id_culture: parseInt(culture),
       name: '',
       created_by: userLogado.id,
       status: 1
@@ -47,6 +50,7 @@ export default function NovoLocal() {
       if (!values.name)  { return; } 
 
       await typeAssayService.create({
+        id_culture: parseInt(culture),
         name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1

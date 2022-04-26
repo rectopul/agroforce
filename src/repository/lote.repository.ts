@@ -2,6 +2,7 @@ import { prisma } from "../pages/api/db/db";
 
   interface CreateLoteDTO {
     name: string;
+    id_portfolio: number;
     volume: number;
     created_by: number;
   }
@@ -52,7 +53,7 @@ export class LoteRepository {
     return lote;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll (where: any, include: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
     if (orderBy){
@@ -62,7 +63,7 @@ export class LoteRepository {
     const count = await prisma.lote.count({ where: where });
 
     const result: object | any = await prisma.lote.findMany({
-      select: select, 
+      include: include, 
       skip: skip, 
       take: take, 
       where: where,

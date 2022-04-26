@@ -1,23 +1,23 @@
-import Head from "next/head";
 import { useFormik } from 'formik';
-import InputMask from 'react-input-mask';
-
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-
+import InputMask from 'react-input-mask';
 import { safraService } from 'src/services';
-
-import { 
+import Swal from "sweetalert2";
+import {
   Button,
-  Content, 
+  Content,
   Input,
   Radio
 } from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import Swal from "sweetalert2";
-import { useRouter } from "next/router";
-import { useState } from "react";
+
+
+
 
 interface ISafraProps {
   id_culture: number;
@@ -87,13 +87,21 @@ export default function Safra() {
         Swal.fire('Dados Inválidos!');
         throw new Error("Dados Inválidos");
       };
+
+      const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingStartTime)
+      );
+
+      const plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingEndTime)
+      );
       
       await safraService.create({
         id_culture: Number(culture),
         year: formik.values.year,
         typeCrop,
-        plantingStartTime: formik.values.plantingStartTime,
-        plantingEndTime: formik.values.plantingEndTime,
+        plantingStartTime: plantingStartTime,
+        plantingEndTime: plantingEndTime,
         status: formik.values.status,
         created_by: Number(userLogado.id),
       }).then((response) => {
@@ -157,7 +165,7 @@ export default function Safra() {
                 required
                 id="year"
                 name="year"
-                placeholder="Mês e ano"
+                placeholder=""
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="

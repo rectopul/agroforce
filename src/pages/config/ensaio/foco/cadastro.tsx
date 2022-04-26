@@ -20,6 +20,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICreateFoco {
   name: string;
+  id_culture: number;
   created_by: number;
 }
 
@@ -38,15 +39,18 @@ export default function Cadastro() {
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ICreateFoco>({
     initialValues: {
+      id_culture: parseInt(culture),
       name: '',
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       await focoService.create({
         name: capitalize(formik.values.name),
+        id_culture: parseInt(culture),
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {

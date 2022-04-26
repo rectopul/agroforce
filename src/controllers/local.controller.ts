@@ -158,7 +158,7 @@ export class LocalController {
                 }
             }
         } catch (err) {
-            return {status: 400, message: err}
+            return {status: 400, message: "Erro no cadastro"}
         }
     }
 

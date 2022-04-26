@@ -11,7 +11,8 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import InputMask from 'react-input-mask';
+import { AccordionFilter, Button, CheckBox, Content, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
@@ -45,9 +46,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -99,7 +101,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
@@ -180,11 +182,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           title: "Período ideal de início de plantio", 
           field: "plantingStartTime", 
           sorting: false,
-          render: (rowData: ISafra) => (
-            new Intl.DateTimeFormat('pt-BR').format(
-              new Date(rowData.plantingStartTime)
-            )
-          )
         })
       }
       if (ObjetCampos[index] == 'plantingEndTime') {
@@ -192,20 +189,8 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           title: "Período ideal do fim do plantio", 
           field: "plantingEndTime", 
           sorting: false,
-          render: (rowData: ISafra) => (
-            new Intl.DateTimeFormat('pt-BR').format(
-              new Date(rowData.plantingEndTime)
-            )
-          )
         })
       }
-      // if (ObjetCampos[index] == 'main_safra') {
-      //   arrOb.push({ 
-      //     title: "Safra principal", 
-      //     field: "main_safra", 
-      //     sorting: false 
-      //   })
-      // }
       if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
@@ -301,16 +286,16 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
     await safraService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = safras.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativos" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativos" as any;
           }
 
           return row;
@@ -366,25 +351,71 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       <label className="block text-gray-900 text-sm font-bold mb-2">
                         Status
                       </label>
-                      <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                      <Select name="filterStatus" id="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                     </div>
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Pesquisar
+                        Safra
                       </label>
-                      <Input 
-                        type="text" 
-                        placeholder="safra"
-                        max="40"
+                      <InputMask
+                        mask={"99/99"}
+                        placeholder="__/__"
                         id="filterSearch"
                         name="filterSearch"
                         onChange={formik.handleChange}
+                        className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Tipo de safra
+                      </label>
+                      <Select
+                        id="filterSearch"
+                        name="filterSearch"
+                        onChange={formik.handleChange}
+                        values={[{name: "Inverno"}, {name: "Verão"}]}
+                        selected={false}
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Data do período de plantio
+                      </label>
+                      <InputMask 
+                        mask={"99/99/9999"} 
+                        placeholder="__/__/____"
+                        id="filterSearch"
+                        name="filterSearch"
+                        onChange={formik.handleChange}
+                        className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
                       />
                     </div>
                   </div>
 
                   <div className="h-16 w-32 mt-3">
                     <Button
+                      type="submit"
                       onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
@@ -558,11 +589,12 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -577,12 +609,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   let allSafras = Response.response;
   let totalItems = Response.total;
 
+
   return {
     props: {
       allSafras,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

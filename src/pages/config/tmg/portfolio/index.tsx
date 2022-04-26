@@ -1,22 +1,23 @@
-import getConfig from "next/config";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { ReactNode, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import * as XLSX from 'xlsx';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, portfolioService } from "src/services";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
-import ITabs from "../../../../shared/utils/dropdown";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { IoReloadSharp } from "react-icons/io5";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { prisma } from "src/pages/api/db/db";
+import { portfolioService, userPreferencesService } from "src/services";
+import * as XLSX from 'xlsx';
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -27,9 +28,11 @@ interface IFilter{
 
 export interface IPortfolio {
   id: number;
+  id_culture: number;
   genealogy: string;
   cruza: string;
-  status: number;
+  status?: number;
+  LotePortfolio: number;
 }
 
 interface IGenarateProps {
@@ -43,9 +46,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  cultureId: number;
 }
 
-export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -60,7 +64,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [portfolios, setPortfolios] = useState<IPortfolio[]>(() => allPortfolios);
+  const [portfolios, setPortfolios] = useState<IPortfolio[]>(allPortfolios);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
@@ -72,7 +76,8 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" }
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+    // { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 
@@ -96,42 +101,56 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setPortfolios(response.response);
-          setFilter(parametersFilter);
+        setTotaItems(response.total);
+        setPortfolios(response.response);
+        setFilter(parametersFilter);
       })
     },
   });
 
-  async function handleStatusPortfolio(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatusPortfolio(idPortfolio: number, data: IPortfolio): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
     } else {
-      status = 0;
+      data.status = 0;
     }
     
-    const index = portfolios.findIndex((portfolio) => portfolio.id === id);
+    const index = portfolios.findIndex((portfolio) => portfolio.id === idPortfolio);
 
     if (index === -1) {
       return;
     }
 
-    await portfolioService.update({id: id, status: status});
-
     setPortfolios((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status = status;
+      copy[index].status = data.status;
       return copy;
+    });
+
+    const {
+      id,
+      id_culture,
+      genealogy,
+      cruza,
+      status
+    } = portfolios[index];
+
+    await portfolioService.update({
+      id,
+      id_culture,
+      genealogy,
+      cruza,
+      status
     });
   };
 
-  function columnsOrder(camposGerenciados: string) {
-    let ObjetCampos: string[] = camposGerenciados.split(',');
+  function columnsOrder(camposGerenciados: any): any {
+    let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
 
-    Object.keys(ObjetCampos).forEach((item, index) => {
+    Object.keys(ObjetCampos).forEach((_, index) => {
       if (ObjetCampos[index] == 'id') {
         arrOb.push({
           title: "Código",
@@ -181,17 +200,21 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
+                  title={`Editar potfólio ${rowData.genealogy}`}
                   onClick={() =>{router.push(`/config/tmg/portfolio/atualizar?id=${rowData.id}`)}}
-
                 />
               </div>
-              {rowData.status ? (
+              {rowData.status === 1 ? (
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData,
+                      }
                     )}
+                    title={`Portfólio Ativo`}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -200,9 +223,13 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                 <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatusPortfolio(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusPortfolio(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData,
+                      }
                     )}
+                    title={`Portfólio inativo`}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -212,12 +239,34 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           ),
         })
       }
+      // if (ObjetCampos[index] == 'id_portfolio') {
+      //   arrOb.push({
+      //     title: "Lote",
+      //     field: "id_portfolio",
+      //     sorting: false,
+      //     searchable: false,
+      //     filterPlaceholder: "Filtrar por status",
+      //     render: (rowData: IPortfolio) => (
+      //       <div className='h-10 flex'>
+      //         <div className="h-10">
+      //           <Button 
+      //             icon={<AiOutlineFileSearch size={16} />}
+      //             bgColor="bg-yellow-500"
+      //             textColor="white"
+      //             title={`Lote de ${rowData.genealogy}`}
+      //             onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_portfolio=${rowData.id}`)}}
+      //           />
+      //         </div>
+      //       </div>
+      //     ),
+      //   })
+      // }
     });
     return arrOb;
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els:any = document.querySelectorAll("input[type='checkbox']");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
@@ -228,12 +277,12 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.portfolio = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        userLogado.preferences.lote_portfolio = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.portfolio = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.lote_portfolio = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -348,12 +397,12 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     }
     
     await portfolioService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = response.response.map((row: { status: any }) => {
+      if (response.status === 200) {
+        const newData = portfolios.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -375,6 +424,8 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
         });
         // Download
         XLSX.writeFile(workBook, "Portfólios.xlsx");
+      } else {
+        alert(response);
       }
     });
   };
@@ -392,7 +443,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter;
+      parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
     }
     await portfolioService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
@@ -402,7 +453,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   };
 
   useEffect(() => {
-    handlePagination();
+    // handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
   
@@ -444,7 +495,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="portfólio"
+                      placeholder="genealogia ou cruza"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -455,6 +506,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -534,7 +586,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                                                 name={genarate.name}
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                defaultChecked={camposGerenciados.includes(String(genarate.value))}
                                               />
                                             </li>
                                           )}
@@ -625,14 +677,16 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
 
   const  token  =  req.cookies.token;
+  const  cultureId  =  req.cookies.cultureId;
+  
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -641,18 +695,43 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const portfolios = await fetch(urlParameters.toString(), requestOptions);
-  let response = await portfolios.json();
+  // const portfolios = await fetch(urlParameters.toString(), requestOptions);
+  // let response = await portfolios.json();
+  // let allPortfolios = response.response;
+  // let totalItems = response.total;
 
-  let allPortfolios = response.response;
-  let totalItems = response.total;
+  const response = await prisma.portfolio.findMany({
+    where: {
+      id_culture: Number(cultureId),
+    },
+    select: {
+      id: true,
+      id_culture: true,
+      genealogy: true,
+      cruza: true,
+      status: true,
+    }
+  });
+
+  const allPortfolios = response.map(item => {
+    return {
+      id: item.id,
+      id_culture: item.id_culture,
+      genealogy: item.genealogy,
+      cruza: item.cruza,
+      status: item.status,
+    };
+  });
+
+  const count = allPortfolios.length;
 
   return {
     props: {
       allPortfolios,
-      totalItems,
+      totalItems: count,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      cultureId
     },
   }
 }

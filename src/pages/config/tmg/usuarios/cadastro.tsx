@@ -61,9 +61,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     ));
     
     const router = useRouter();
-
-    // console.log(permissions)
-    // console.log(idProfile)
     
     const maskTel = '(99)99999-9999' || '(99)9999-9999';
     const userLogado = JSON.parse(localStorage.getItem("user") as string);

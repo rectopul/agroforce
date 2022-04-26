@@ -10,8 +10,16 @@ interface Portfolio {
   created_by: number;
 };
 
+interface UpdatePortfolioLote {
+  id: number;
+  id_culture: number;
+  genealogy: string;
+  cruza: string;
+  status: number;
+}
+
 type CreatePortfolio = Omit<Portfolio, 'id'>;
-type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
+// type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
 export class PortfolioController {
   public readonly required = 'Campo obrigatório';
 
@@ -25,11 +33,11 @@ export class PortfolioController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof(options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+        if (typeof(options.filterStatus) === 'string') {
+            options.filterStatus = parseInt(options.filterStatus);
+            if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+            if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
         }
       }
 
@@ -53,13 +61,12 @@ export class PortfolioController {
           status: true 
         };
       }
+      if (options.id_culture) {
+        parameters.id_culture = parseInt(options.id_culture);
+      }
 
       if (options.genealogy) {
         parameters.genealogy = options.genealogy;
-      }
-      
-      if (options.cruza) {
-        parameters.cruza = options.cruza;
       }
 
       if (options.cruza) {
@@ -94,11 +101,11 @@ export class PortfolioController {
         orderBy
       );
       if (!response && response.total <= 0) { 
-        return {status: 400, response: '', total: 0}  
+        return {status: 400, response:[], total: 0, message: 'nenhum resultado encontrado'};
       } else {
         return {status: 200, response, total: response.total}
       }    
-    } catch(err) {  
+    } catch(err) { 
       return {status: 400, message: err}
     }   
   }
@@ -145,9 +152,9 @@ export class PortfolioController {
     }
   }
 
-  async updatePortfolio(data: UpdatePortfolio) {
+  async updatePortfolio(data: UpdatePortfolioLote) {
     try {
-      const schema: SchemaOf<UpdatePortfolio> = object({
+      const schema: SchemaOf<UpdatePortfolioLote> = object({
         id: number().integer().required(this.required),
         id_culture: number().integer().required(this.required),
         genealogy: string().required(this.required),

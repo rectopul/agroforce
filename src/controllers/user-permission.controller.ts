@@ -57,7 +57,7 @@ export class UserPermissionController {
     }
 
     async post(data: object | any) {
-        console.log(data);
+        console.log(data)
         try {
             if (data != null && data != undefined) {
                 await this.delete(parseInt(data.userId));
@@ -70,7 +70,7 @@ export class UserPermissionController {
                 }
             }
         } catch (err) {
-            console.log(err)
+            return {status: 400, message: {message: "erro"}}
         }
     }
 
@@ -88,7 +88,6 @@ export class UserPermissionController {
                 return {status: 200}
             }
         } catch (err) {
-            console.log(err)
             return {status: 400, message: err}
         }  
     }

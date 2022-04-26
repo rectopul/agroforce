@@ -14,6 +14,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { localService, userPreferencesService } from "src/services";
+import { getDegreesCelsius } from "src/shared/utils/formatDegreesCelsius";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
@@ -29,8 +30,8 @@ interface ILocalProps {
   uf: String | any;
   city: String | any;
   address: String | any;
-  latitude: String | any;
-  longitude: String | any;
+  latitude: string;
+  longitude: string;
   altitude: String | any;
   created_by: Number;
   status: Number;
@@ -95,6 +96,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [selectedRowById, setSelectedRowById] = useState<number>();
   
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -150,13 +152,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             </div>
           ),
           field: "name",
-          sorting: false
+          sorting: false,
         },);
       }
       
       if (ObjetCampos[item] == 'pais') {
         arrOb.push({ title: "País", field: "pais", sorting: false })
-
       }
 
       if (ObjetCampos[item] == 'uf') {
@@ -183,11 +184,25 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
   
       if (ObjetCampos[item] == 'latitude') {
-        arrOb.push({ title: "Latitude", field: "latitude", sorting: false })
+        arrOb.push({
+          title: "Latitude",
+          field: "latitude", 
+          sorting: false,
+          render: (rowData: ILocalProps) => (
+            getDegreesCelsius(rowData.latitude)
+          )
+        })
       }
 
       if (ObjetCampos[item] == 'longitude') {
-        arrOb.push({ title: "Longitude", field: "longitude", sorting: false })
+        arrOb.push({
+          title: "Longitude",
+          field: "longitude",
+          sorting: false,
+          render: (rowData: ILocalProps) => (
+            getDegreesCelsius(rowData.longitude)
+          )
+        })
       }
 
       if (ObjetCampos[item] == 'altitude') {
@@ -411,13 +426,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     
     await localService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-
+        const newData = local.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = "Inativo" as any;
           } else {
-            row.status = "Ativo";
+            row.status = "Ativo" as any;
           }
 
           return row;
@@ -572,18 +585,20 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
               columns={columns}
               data={local}
+              onRowClick={((evt?, selectedRow?: ILocalProps) => {
+                setSelectedRowById(selectedRow?.id)
+              })}
               options={{
                 showTitle: false,
-                headerStyle: {
-                  zIndex: 20
-                },
-                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage
+                pageSize: itensPerPage,
+                rowStyle: (rowData: ILocalProps) => ({
+                  backgroundColor: (selectedRowById == rowData.id ? '#c7e3f5' : '#fff')
+                }),
+                selection: true
               }}
               components={{
                 Toolbar: () => (
@@ -732,7 +747,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;

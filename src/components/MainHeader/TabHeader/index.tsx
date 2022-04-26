@@ -1,16 +1,19 @@
+import Link from "next/link";
 import { ReactNode } from "react";
 
 interface ITabProps {
   titleTab: string;
   valueTab: ReactNode;
   statusTab: boolean;
+  href: string;
   handleStatusTabs: (title: string, status: boolean) => void;
 }
 
-export function TabHeader({ titleTab, valueTab, statusTab, handleStatusTabs }: ITabProps) {
+export function TabHeader({ titleTab, valueTab, statusTab, handleStatusTabs, href }: ITabProps) {
   return (
     statusTab ? (
-      <button
+      <Link href={href}>
+      <a
         onClick={() => handleStatusTabs(titleTab, !statusTab)}
         className="
         h-full
@@ -47,9 +50,11 @@ export function TabHeader({ titleTab, valueTab, statusTab, handleStatusTabs }: I
         `}>
           {titleTab}
         </span>
-      </button>
+      </a>
+      </Link>
     ) : (
-      <button
+      <Link href={href}>
+      <a
         onClick={() => handleStatusTabs(titleTab, !statusTab)}
         className="
         h-full
@@ -80,7 +85,8 @@ export function TabHeader({ titleTab, valueTab, statusTab, handleStatusTabs }: I
         </div>
 
         <span className={`border-gray-300 text-sm text-gray-50`}>{titleTab}</span>
-      </button>
+      </a>
+      </Link>
     )
   );
 }

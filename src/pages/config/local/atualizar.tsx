@@ -9,6 +9,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
 import InputMask from "react-input-mask";
 import { localService } from "src/services";
+import { saveDegreesCelsius } from "src/shared/utils/formatDegreesCelsius";
 import Swal from 'sweetalert2';
 import {
   Button, Content,
@@ -26,8 +27,8 @@ interface ILocalProps {
   uf: String | any;
   city: String | any;
   address: String | any;
-  latitude: String | any;
-  longitude: String | any;
+  latitude: string;
+  longitude: string;
   altitude: String | any;
   created_by: Number;
   status: Number;
@@ -93,8 +94,8 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
         uf: values.uf,
         city: values.city,
         address: values.address,
-        latitude: values.latitude,
-        longitude: values.longitude,
+        latitude: saveDegreesCelsius(values.latitude),
+        longitude: saveDegreesCelsius(values.longitude),
         altitude: values.altitude,
         created_by: values.created_by,
       }).then((response) => {
@@ -273,9 +274,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                  leading-tight
                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                "
-                mask="99.99999" 
+                mask={`99°99'99.99"`}
                 type="text" 
-                placeholder="20.10"
+                placeholder={`99°99'99.99"`}
                 id="latitude"
                 name="latitude"
                 onChange={formik.handleChange}
@@ -299,9 +300,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
-                mask="99.99999" 
+                mask={`99°99'99.99"`}
                 type="text" 
-                placeholder="20.25"
+                placeholder={`99°99'99.99"`}
                 id="longitude"
                 name="longitude"
                 onChange={formik.handleChange}

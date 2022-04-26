@@ -55,13 +55,14 @@ export class LayoultQuadraController {
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+            
             if (!response || response.total <= 0) { 
                 return {status: 400, response: [], total:0}
             } else {
                 return {status: 200, response, total: response.total}
             }             
         } catch (err) {
-            return {status: 400, message: err}
+            return {status: 400, response: [], total:0}
         }
     }
  
@@ -126,7 +127,7 @@ export class LayoultQuadraController {
             if (data != null && data != undefined) {
                 let response = await this.Repository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message: {message: "layoult atualizado"}}
+                    return {status: 200, message: {message: "Layout atualizado com sucesso"}}
                 } else {
                     return {status: 400, message: {message: "erro ao tentar fazer o update"}}
                 }

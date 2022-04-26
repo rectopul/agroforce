@@ -70,13 +70,21 @@ export default function AtualizarSafra(safra: ISafraProps) {
       if (values.id !== safra.id) throw new Error("Dados inválidos");
       if (values.typeCrop === '' || !values.typeCrop) throw new Error("Dados inválidos");
 
+      const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingStartTime)
+      );
+
+      const plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+        new Date(formik.values.plantingEndTime)
+      );
+
       await safraService.updateSafras({
         id: safra.id,
         // id_culture: safra.id_culture,
         year: formik.values.year,
         typeCrop,
-        plantingStartTime: formik.values.plantingStartTime,
-        plantingEndTime: formik.values.plantingEndTime,
+        plantingStartTime: plantingStartTime,
+        plantingEndTime: plantingEndTime,
         status: formik.values.status,
       }).then((response) => {
         if (response.status === 200) {

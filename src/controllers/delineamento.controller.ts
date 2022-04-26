@@ -20,8 +20,44 @@ export class DelineamentoController {
             }
 
             if (options.filterSearch) {
-                options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-                parameters.name  = JSON.parse(options.filterSearch);
+                options.filterSearch = String(options.filterSearch).toLowerCase().trim();
+
+                options.filterSearch = `{"contains": "${options.filterSearch}"}`;
+                parameters.name = JSON.parse(String(options.filterSearch));
+
+                // if (!isNaN(options.filterSearch)) {
+                //     options.filterSearch = `{"contains": "${options.filterSearch}"}`;
+                //     parameters.repeticao = JSON.parse(options.filterSearch);
+                // } else {
+                //     options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
+                //     parameters.name  = JSON.parse(options.filterSearch);
+                // }
+            }
+
+            if (options.paramSelect) {
+                let objSelect = options.paramSelect.split(',');
+                Object.keys(objSelect).forEach((item) => {
+                    select[objSelect[item]] = true;
+                });
+                select = Object.assign({}, select);
+            } else {
+                select = {id: true, name: true, repeticao:true, trat_repeticao:true, status:true};
+            }
+
+            if (options.id_culture) {
+                parameters.id_culture = parseInt(options.id_culture);
+            }
+
+            if (options.name) {
+                parameters.name = options.name;
+            }
+
+            if (options.repeticao) {
+                parameters.repeticao = options.repeticao;
+            }
+
+            if (options.trat_repeticao) {
+                parameters.trat_repeticao = options.trat_repeticao;
             }
         
             if (options.take) {
@@ -42,16 +78,6 @@ export class DelineamentoController {
 
             if (options.orderBy) {
                 orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
-            }
-
-            if (options.paramSelect) {
-                let objSelect = options.paramSelect.split(',');
-                Object.keys(objSelect).forEach((item) => {
-                    select[objSelect[item]] = true;
-                });
-                select = Object.assign({}, select);
-            } else {
-                select = {id: true, name: true, repeticao:true, trat_repeticao:true, status:true};
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
@@ -115,7 +141,7 @@ export class DelineamentoController {
             if (data != null && data != undefined) {
                 let response = await this.Repository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message:"layoult atualizado"}
+                    return {status: 200, message:"Delineamento atualizado com sucesso"}
                 } else {
                     return {status: 400, message:"erro ao tentar fazer o update"}
                 }

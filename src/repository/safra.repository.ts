@@ -1,4 +1,4 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
 export class SafraRepository {   
     async create(data: any) {
@@ -38,11 +38,20 @@ export class SafraRepository {
 
     async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
         let order: object | any;
-        if (orderBy){
+        if (orderBy) {
             order = JSON.parse(orderBy);
         }
-        let count = await prisma.safra.count({ where: where })
-        let Result: object | any = await prisma.safra.findMany({ select: select, skip: skip, take: take, where: where,  orderBy: order })
+
+        let count = await prisma.safra.count({ where: where });
+
+        let Result: object | any = await prisma.safra.findMany({
+            select: select,
+            skip: skip,
+            take: take,
+            where: where,
+            orderBy: order,
+        });
+
         Result.total = count;
         return Result;
     }
