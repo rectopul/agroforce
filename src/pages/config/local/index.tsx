@@ -96,6 +96,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [selectedRowById, setSelectedRowById] = useState<number>();
   
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -584,17 +585,20 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
               columns={columns}
               data={local}
+              onRowClick={((evt?, selectedRow?: ILocalProps) => {
+                setSelectedRowById(selectedRow?.id)
+              })}
               options={{
                 showTitle: false,
-                headerStyle: {
-                  zIndex: 20
-                },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage
+                pageSize: itensPerPage,
+                rowStyle: (rowData: ILocalProps) => ({
+                  backgroundColor: (selectedRowById == rowData.id ? '#c7e3f5' : '#fff')
+                }),
+                selection: true
               }}
               components={{
                 Toolbar: () => (
