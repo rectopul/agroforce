@@ -1,8 +1,11 @@
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
+import router from "next/router";
 import { useState } from "react";
 import { BiUser } from "react-icons/bi";
+import { IoMdArrowBack } from "react-icons/io";
+import { Button } from "src/components";
 import { Content } from "../../components/Content";
 import commonStyles from '../../shared/styles/common.module.css';
 import styles from './styles.module.css';
@@ -145,6 +148,19 @@ export default function Perfil({user}: User) {
                 ))}
               </div>
             </div>
+
+            <div className={styles.buttonFooter}>
+            <div className="w-40">
+              <Button
+                type="button"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => {router.back();}}
+              />
+            </div>
+          </div>
           </div>
         </div>
       </Content>
