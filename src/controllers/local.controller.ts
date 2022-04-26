@@ -68,6 +68,10 @@ export class LocalController {
                 parameters.uf = uf?.sigla;
             }
 
+            if (options.name) { 
+                parameters.name = options.name;
+            }
+
             if (options.filterCity) {
                 parameters.city =options.filterCity;
             }

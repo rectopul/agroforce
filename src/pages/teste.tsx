@@ -12,10 +12,10 @@ import React from "react";
 export default function Teste() {
   const { TabsDropDowns } = ITabs;
   function readExcel(value: any) {
-    console.log(value);
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({spreadSheet: rows, moduleId: 1}).then((response) => {
-        console.log(response);
+        console.log(response)
+        Swal.fire(response.message);
       });
     })
   }
