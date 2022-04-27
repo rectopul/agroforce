@@ -22,6 +22,23 @@ export class UserRepository {
         }
     }
 
+    async findById(id: number) {
+        const user = await prisma.user.findUnique({
+            where: { id }
+        });
+        
+        return user;
+    }
+
+    async updateAvatar(id: number, avatar: string) {
+        const user = await prisma.user.update({
+            where: { id },
+            data: { avatar },
+        });
+
+        return user;
+    }
+
     async findOne(id: number) {
         let Result : object | any = await prisma.user.findMany({
                where: {

@@ -2,18 +2,15 @@
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
 import { Fragment, ReactNode, useEffect, useState } from 'react';
-import { FaRegEdit, FaRegUserCircle } from "react-icons/fa";
+import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineExitToApp } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { userService } from "../../../services";
-
-
  
 interface IModelProps {
   name: string;
   avatar: string | ReactNode;
 }
-
 
 export function ModelHeader({ name, avatar }: IModelProps) {
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -134,7 +131,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   </Link>
                 )}
               </Menu.Item>
-              <Menu.Item>
+              {/* <Menu.Item>
                 {({ active }) => (
                   <Link href="/perfil/alterar-dados-pessoais">
                     <a
@@ -148,7 +145,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     </a>
                   </Link>
                 )}
-              </Menu.Item>
+              </Menu.Item> */}
               <Menu.Item>
                 {({ active }) => (
                   <Link href="/perfil/alterar-senha">

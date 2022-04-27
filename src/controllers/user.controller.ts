@@ -214,6 +214,24 @@ export class UserController {
         }
     }
 
+    async updateAvatar(id: number, avatar: string) {
+        try {
+            const user = await this.userRepository.findById(id);
+
+            if (!user) {
+                return {status: 400, message: 'Usuário não encontrado!'};
+            }
+
+            user.avatar = avatar;
+
+            await this.userRepository.updateAvatar(id, user.avatar);
+
+            return {status: 200, message: "Avatar atualizado com sucesso!"};
+        } catch(err) {
+            return {status: 400, message: 'Erro ao atualizar avatar!'};
+        }
+    }
+
     async updateUser(data: object| any) {
         try {
             if (data != null && data != undefined) {

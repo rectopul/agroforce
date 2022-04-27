@@ -7,16 +7,16 @@
 }
 
 .containerAvatarHeader {
-  @apply  flex items-center gap-4 justify-center;
+  @apply  flex items-center gap-4 justify-center ml-56;
 }
 
-.avatarLg {
-  @apply max-h-40 w-40 border border-gray-900 rounded-full;
+.form {
+  @apply w-full flex justify-center items-center gap-4;
 }
 
-/* .inputUploadAvatar {
-  @apply 
-} */
+.avatarEdit {
+  @apply max-h-40 w-40 border border-gray-900 rounded-full cursor-pointer;
+}
 
 .containerUserName {
   @apply flex flex-col items-center mt-2;
@@ -37,6 +37,10 @@
 .content {
   @apply grid grid-cols-1 md:grid-cols-3 gap-4 p-5 rounded border border-gray-300 shadow;
 }
+
+/* .buttonSubmit {
+  @apply w-full h-full p-2 flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md;
+} */
 
 .buttonFooter {
   @apply h-10 w-full flex gap-3 justify-center mt-10;
