@@ -54,7 +54,7 @@ export default function Perfil({user}: User) {
   const [avatar, setAvatar] = useState<string>(user.avatar);
   const [visibleTag, setVisibleTag] = useState<string>('hidden');
 
-  const uploadAvatar = async (event: FormEvent) => {
+  const uploadAvatar = async (event: FormEvent | any) => {
     setVisibleTag('flex');
     
     const file = event.target.files[0];
