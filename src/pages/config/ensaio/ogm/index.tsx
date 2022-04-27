@@ -3,10 +3,12 @@ import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 import Head from "next/head";
+import router from "next/router";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
@@ -511,7 +513,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                      <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('ogm/importacao')}} />
+                      </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Download lista de ogm" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
                     </div>
                   </div>

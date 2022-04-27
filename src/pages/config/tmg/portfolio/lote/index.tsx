@@ -8,6 +8,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -533,8 +534,11 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                      <Button icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                      </div>
+                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('lote/importacao')}} />
+                        </div>
+                        <div className='h-12 flex items-center justify-center w-full'>
+                          <Button title="Download lista de lotes" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        </div>
                     </div>
                   </div>
                 ),
