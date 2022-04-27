@@ -32,7 +32,7 @@ interface IUsers {
   cpf: string;
   tel: string;
   password: string;
-  avatar?: string;
+  avatar: string;
   registration: number;
   departmentId: number;
   jivochat: number;
@@ -69,6 +69,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     const formik = useFormik<IUsers>({
     initialValues: {
       name: '',
+      avatar: '',
       email: '',
       cpf: '',
       tel: '',
@@ -107,6 +108,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       });
 
       await userService.create({
+        avatar: 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
         name: capitalize(values.name),
         email: values.email,
         cpf: values.cpf,

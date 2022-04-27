@@ -6,9 +6,10 @@ import router from "next/router";
 import { FormEvent, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdOutlineAddAPhoto } from "react-icons/md";
-import { RiUser6Line } from "react-icons/ri";
 import { Button } from "src/components";
 import { userService } from "src/services";
+import { getCPF } from "src/shared/utils/formatCpf";
+import { handleFormatTel } from "src/shared/utils/tel";
 import Swal from "sweetalert2";
 import { Content } from "../../components/Content";
 import commonStyles from '../../shared/styles/common.module.css';
@@ -127,21 +128,13 @@ export default function Perfil({user}: User) {
                           uploadAvatar(e)
                         }}
                       />
-                      {!avatar ? (
-                        <>
-                          <RiUser6Line />
-                        </>
-                      ): (
-                        <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={formik.values.avatar}
-                          alt="upload de foto"
-                          className={styles.avatarEdit}
-                          title={`Editar avatar de ${user.name}`}
-                        />
-                        </>
-                      )}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={formik.values.avatar}
+                        alt="upload de foto"
+                        className={styles.avatarEdit}
+                        title={`Editar avatar de ${user.name}`}
+                      />
                     </label>
                   </div>
                 </div>
@@ -178,12 +171,12 @@ export default function Perfil({user}: User) {
 
                 <div>
                   <label>CPF: </label>
-                  <span>{user.cpf}</span>
+                  <span>{getCPF(user.cpf)}</span>
                 </div>
 
                 <div>
                   <label>Contato: </label>
-                  <span>{user.tel}</span>
+                  <span>{handleFormatTel(user.tel)}</span>
                 </div>
 
                 <div>
@@ -261,6 +254,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const reponse = await fetch(`${baseUrl}/` + Number(id), requestOptions);
 
   const user = await reponse.json();
+
+  if (!user.avatar) {
+    user.avatar = "https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag";
+  }
 
   return {
     props: {
