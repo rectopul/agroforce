@@ -1,7 +1,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
-import { Fragment, ReactNode, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineExitToApp } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -9,7 +9,7 @@ import { userService } from "../../../services";
  
 interface IModelProps {
   name: string;
-  avatar: string | ReactNode;
+  avatar: string;
 }
 
 export function ModelHeader({ name, avatar }: IModelProps) {
@@ -95,24 +95,10 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 py-2
                 px-2
               '>
-                {
-                  !avatar || avatar === '' ? (
-                    <div className='
-                      flex items-center justify-center
-                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-gray-700
-                    '>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src='/images/logo-agro-escuro.png' alt={name} className='h-14 w-14
-                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-                    '/>
-                    </div>
-                  ) : (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={String(avatar)} alt={name} className='h-14 w-14
-                      rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
-                    '/>
-                  )
-                }
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={String(avatar)} alt={name} className='h-14 w-14
+                  rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
+                '/>
                 <strong className='text-xs text-gray-700'>{name}</strong>
               </div>
 
@@ -131,21 +117,6 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   </Link>
                 )}
               </Menu.Item>
-              {/* <Menu.Item>
-                {({ active }) => (
-                  <Link href="/perfil/alterar-dados-pessoais">
-                    <a
-                      className={classNames(
-                        active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
-                        'px-4 py-2 text-base flex items-center gap-1'
-                      )}
-                    >
-                      <FaRegEdit />
-                      Alterar dados pessoais
-                    </a>
-                  </Link>
-                )}
-              </Menu.Item> */}
               <Menu.Item>
                 {({ active }) => (
                   <Link href="/perfil/alterar-senha">

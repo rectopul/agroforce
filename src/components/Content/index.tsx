@@ -22,7 +22,7 @@ interface IUsers {
   cpf: string,
   email: string,
   tel: string,
-  avatar: string | ReactNode,
+  avatar: string,
   status: boolean,
 };
 
@@ -51,6 +51,8 @@ export function Content({ contentHeader, children }: IContentData) {
   const safras: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
   const [safraSelecionada, setSafraSelecionada] = useState<any>(userLogado.safras.safra_selecionada);
+
+  const avatarDefault = "https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag";
 
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
     !contentHeader ? [
@@ -121,7 +123,7 @@ export function Content({ contentHeader, children }: IContentData) {
     <>
       <MainHeader
         name={userLogado.name}
-        avatar={ userLogado.avatar }
+        avatar={ !userLogado.avatar ? avatarDefault : userLogado.avatar }
 
         headerSelects={
           <div className="h-10 flex gap-2">

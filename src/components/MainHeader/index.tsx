@@ -1,12 +1,12 @@
 import { ReactNode } from 'react';
-
 import { ModelHeader } from './ModelHeader';
+
 
 interface IMainHeaderProps {
   headerSelects: ReactNode;
   children: ReactNode;
   name: string;
-  avatar: string | ReactNode;
+  avatar: string;
 }
 
 export function MainHeader({ children, name, avatar, headerSelects }: IMainHeaderProps) {
