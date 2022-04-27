@@ -9,7 +9,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp, FaRegUserCircle } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -136,7 +136,12 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
           exports: false,
           render: (rowData: IUsers) => (
             !rowData.avatar || rowData.avatar === '' ? (
-              <FaRegUserCircle size={32} />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag" 
+                  alt={rowData.name} 
+                  style={{ width: 45, height: 43, borderRadius: 99999 }} 
+                />
               ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={rowData.avatar} alt={rowData.name} style={{ width: 45, height: 43, borderRadius: 99999 }} />
