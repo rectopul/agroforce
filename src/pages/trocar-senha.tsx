@@ -7,11 +7,6 @@ import { Button, Input } from "src/components";
 import Swal from "sweetalert2";
 import { forgotPasswordService } from '../services';
 
-interface IResponse {
-  name: string;
-  email: string;
-}
-
 export default function TrocarSenha() {
   const [email, setEmail] = useState<string>('');
   const [confirmEmail, setConfirmEmail] = useState<string>('');
@@ -28,21 +23,18 @@ export default function TrocarSenha() {
       return;
     }
 
-    await forgotPasswordService.sendEmail({ userEmail: email }).then(
-      (response: IResponse) => {
+    await forgotPasswordService.sendEmail({
+      email,
+      confirmEmail,
+    }).then(() => {
         Swal.fire({
           title: "E-mail de recuperação de senha enviado com sucesso!",
-          text: `Verifique seu e-mail para concluir sua troca de senha. Usuário: ${response.name}, ${response.email}`,
+          text: `Verifique seu e-mail para concluir sua troca de senha.`,
         });
-
-        router.back();
       }
-    ).catch(() => {
-      Swal.fire({
-        title: "Credenciais  inválidas!",
-        text: "Usuário não encontrado! mais dúvidas procure o suporte.",
-      });
-    });
+    ).finally(() => {
+      router.back();
+    })
   };
   
   return (

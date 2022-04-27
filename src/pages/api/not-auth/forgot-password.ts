@@ -16,15 +16,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       where: { email: String(userEmail) }
     });
 
-    if (!user) return res.status(400).json({message: 'Usuário não encontrado.'});
+    // if (!user) return res.status(400).json({message: 'Usuário não encontrado.'});
 
     const result = {
-      name: user.name,
-      email: user.email,
+      name: user?.name,
+      email: user?.email,
     }
-
-    // console.log(JSON.stringify(user, null, 2))
-    console.log(JSON.stringify(result, null, 2))
 
     return res.status(200).json(result);
   } catch(err) {
