@@ -52,6 +52,7 @@
     "react-icons": "^4.3.1",
     "react-input-mask": "^2.0.4",
     "react-popup-alert": "^1.0.7",
+    "read-excel-file": "^5.2.28",
     "rxjs": "^7.5.5",
     "rxjs-compat": "^6.6.7",
     "styled-components": "^5.3.3",
