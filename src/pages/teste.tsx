@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { ReactNode, useState } from "react";
 
-import { Content2 } from "../components/Content/index2";
+import { Content } from "../components/Content/index";
 
 import ITabs from "../shared/utils/dropdown";
 
@@ -13,9 +13,9 @@ export default function Teste() {
       <Head>
         <title>Teste</title>
       </Head>
-      <Content2 contentHeader={TabsDropDowns()}>
+      <Content contentHeader={TabsDropDowns()}>
         <h2>Hello World</h2>
-      </Content2>
+      </Content>
    </>
   );
 }
