@@ -12,6 +12,11 @@ const nextConfig = {
           ? 'http://localhost:3000/api' // development api
           : 'https://server.seedsforce.com.br:18601/api' // production api
   },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   presets: ["next/babel"]
 }
 
