@@ -28,7 +28,7 @@ export const HandleImgUpload = forwardRef<HandleImgUpload, { avatar?: string }>(
 
       const reader = new FileReader();
 
-      reader.onload = (e) => {
+      reader.onload = (e: any) => {
         const data = e.target.result;
 
         setImg(data);
