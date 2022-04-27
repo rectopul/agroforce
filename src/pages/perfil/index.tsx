@@ -1,11 +1,15 @@
+import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import router from "next/router";
-import { useState } from "react";
-import { BiUser } from "react-icons/bi";
+import { FormEvent, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
+import { MdOutlineAddAPhoto } from "react-icons/md";
+import { RiUser6Line } from "react-icons/ri";
 import { Button } from "src/components";
+import { userService } from "src/services";
+import Swal from "sweetalert2";
 import { Content } from "../../components/Content";
 import commonStyles from '../../shared/styles/common.module.css';
 import styles from './styles.module.css';
@@ -22,8 +26,8 @@ interface ICulture {
 }
 
 interface IProfileProps {
-  id?: number;
-  avatar?: string;
+  id: number;
+  avatar: string;
   name: string;
   email: string;
   cpf: string;
@@ -40,17 +44,63 @@ interface User {
   user: IProfileProps;
 }
 
+interface IUpdateAvatar {
+  id: number;
+  avatar: string;
+}
+
 export default function Perfil({user}: User) {
-  const [avatar, setAvatar] = useState(user.avatar);
-  const inputUploadAvatar = `block w-full text-sm text-slate-500
-  file:mr-4 file:py-2 file:px-4
-  file:rounded-full file:border-0
-  file:text-sm file:font-semibold
-  file:bg-violet-50 file:text-violet-700
-  hover:file:bg-violet-100`;
+  const [avatar, setAvatar] = useState<string>(user.avatar);
+  const [visibleTag, setVisibleTag] = useState<string>('hidden');
 
-  // console.log(JSON.stringify(user, null, 2));
+  const uploadAvatar = async (event: FormEvent) => {
+    setVisibleTag('flex');
+    
+    const file = event.target.files[0];
+    const base64 = await convertBase64(file) as string;
+    
+    setAvatar(base64);
+  }
 
+  const convertBase64 = (file: Blob) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = (() => {
+        resolve(fileReader.result);
+      });
+
+      fileReader.onerror = ((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  const formik = useFormik<IUpdateAvatar>({
+    initialValues: {
+      id: user.id,
+      avatar,
+    },
+    onSubmit: async () => {
+      await userService.profileUpdateAvatar({
+        id: user.id,
+        avatar,
+      }).then(() => {
+        Swal.fire({
+          title: 'Avatar atualizado com sucesso!',
+        });
+      }).catch(() => {
+        Swal.fire({
+          title: 'Erro ao atualizar o avatar do usuário!',
+        });
+      }).finally(() => {
+        setVisibleTag('hidden');
+        document.location.reload();
+      });
+    }
+  });
+  
   return (
     <>
       <Head>
@@ -62,28 +112,55 @@ export default function Perfil({user}: User) {
         <div className={styles.container}>
           <div>
             <div className={styles.headerProfile}>
-              {avatar !== '' ? (
-                  <div className={styles.containerAvatarHeader}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className={styles.avatarLg}
-                      src={String(avatar)}
-                      alt={user.name}
-                    />
-                    <input
-                      type="file"
-                      className={inputUploadAvatar}
-                      onChange={(e) => console.log(e.target.files?.item(0)?.name)}
-                    />
-                  </div>
-              ) : (
+              <form id="form" className={styles.form} onSubmit={formik.handleSubmit}>
                 <div className={styles.containerAvatarHeader}>
-                  <div className={styles.avatarLg}>
-                    <BiUser size='95%' className="m-auto" />
+                  <div className="shrink-0">
+                    <label htmlFor="avatar">
+                      <input
+                        style={{ display: 'none' }}
+                        type="file"
+                        id="avatar"
+                        name="avatar"
+                        accept='image/*'
+                        multiple={false}
+                        onChange={(e) => {
+                          uploadAvatar(e)
+                        }}
+                      />
+                      {!avatar ? (
+                        <>
+                          <RiUser6Line />
+                        </>
+                      ): (
+                        <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={formik.values.avatar}
+                          alt="upload de foto"
+                          className={styles.avatarEdit}
+                          title={`Editar avatar de ${user.name}`}
+                        />
+                        </>
+                      )}
+                    </label>
                   </div>
-                  <input type="file" className={inputUploadAvatar}/>
                 </div>
-              )}
+                {avatar && (
+                  <div className={"w-52 h-11"}>
+                    <button
+                      type="submit"
+                      className={
+                        visibleTag === 'flex' ?
+                        visibleTag + "w-full h-full px-2 flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
+                        : visibleTag + "w-full h-full flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
+                      }
+                    >
+                      <MdOutlineAddAPhoto className={visibleTag} />
+                      <span className={visibleTag}>Atualizar avatar</span>
+                    </button>
+                  </div>
+                )}
+              </form>
 
               <div className={styles.containerUserName}>
                 <span className={styles.userName}>{user.name}</span>
@@ -181,11 +258,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
   
-  const reponse = await fetch(`${baseUrl}/` + id, requestOptions);
+  const reponse = await fetch(`${baseUrl}/` + Number(id), requestOptions);
 
   const user = await reponse.json();
-
-  // console.log(JSON.stringify(user, null, 2));
 
   return {
     props: {

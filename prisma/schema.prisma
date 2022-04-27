@@ -91,7 +91,7 @@ model user {
   cpf               String              @unique(map: "User_cpf_key")
   tel               String?
   password          String
-  avatar            String?
+  avatar            String?             @db.Text
   registration      Int?
   departmentId      Int
   jivochat          Int?                @default(0)
