@@ -267,3 +267,27 @@ model epoca {
 
   culture culture @relation(fields: [id_culture], references: [id])
 }
+
+model import_spreadsheet {
+  id           Int @id @default(autoincrement())
+  moduleId Int @unique
+  fields Json
+}
+
+
+model npe {
+  id           Int @id @default(autoincrement())
+  idLocal Int 
+  idSafra Int 
+  idFoco Int 
+  idTipoEnsaio Int 
+  idOgm Int 
+  idEpoca Int 
+  npei Int 
+  prox_npe Int 
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
+}
+
+// ["title", "nameLocal", "nameSafra", "nameFoco", "nameTipoEnsaio", "nameOgm", "nameEpoca", "npe", "prox_npe"]
