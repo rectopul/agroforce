@@ -347,29 +347,32 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     });
   };
 
-  function handleTotalPages(): void {
-    if (currentPage < 0) {
-      setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
-  };
 
-  async function handlePagination(): Promise<void> {
-    let skip = currentPage * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
 
-    if (filter) {
-      parametersFilter = parametersFilter + "&" + filter;
-    }
-    await delineamentoService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setDelineamento(response.response);
-      }
-    });
-  };
+ 
 
   useEffect(() => {
+    async function handlePagination(): Promise<void> {
+      let skip = currentPage * Number(take);
+      let parametersFilter = "skip=" + skip + "&take=" + take;
+  
+      if (filter) {
+        parametersFilter = parametersFilter + "&" + filter;
+      }
+      await delineamentoService.getAll(parametersFilter).then((response) => {
+        if (response.status == 200) {
+          setDelineamento(response.response);
+        }
+      });
+    };
+
+    function handleTotalPages(): void {
+      if (currentPage < 0) {
+        setCurrentPage(0);
+      } else if (currentPage >= pages) {
+        setCurrentPage(pages - 1);
+      }
+    };
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
