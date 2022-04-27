@@ -232,6 +232,36 @@ export class UserController {
         }
     }
 
+    async updatePassword(
+        id: number,
+        currentPassword: string, 
+        password: string,
+        confirmPassword: string
+    ) {
+        try {
+            const user = await this.userRepository.findById(id);
+
+            if (!user) {
+                return {status: 400, message: 'Usuário não encontrado!'};
+            }
+
+            const comparePassword = functionsUtils.Crypto(user.password, 'decipher');
+
+            if (currentPassword !== String(comparePassword) || password !== confirmPassword) {
+                return {status: 400, message: 'Dados inválidos!'};
+            }
+
+            password = functionsUtils.Crypto(password, 'cipher');
+            user.password = password;
+
+            await this.userRepository.updatePassword(id, user.password);
+
+            return {status: 200, message: "Senha atualizada com sucesso!"};
+        } catch(err) {
+            return {status: 400, message: 'Erro ao atualizar senha.'};
+        }
+    }
+
     async updateUser(data: object| any) {
         try {
             if (data != null && data != undefined) {

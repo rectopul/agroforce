@@ -240,7 +240,7 @@ export default function Perfil({user}: User) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/testes`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/profile-user`;
 
   const { token } =  context.req.cookies;
   const { id } = context.query;
