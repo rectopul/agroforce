@@ -39,6 +39,15 @@ export class UserRepository {
         return user;
     }
 
+    async updatePassword(id: number, password: string) {
+        const user = await prisma.user.update({
+            where: { id },
+            data: { password },
+        });
+
+        return user;
+    }
+
     async findOne(id: number) {
         let Result : object | any = await prisma.user.findMany({
                where: {

@@ -4,22 +4,47 @@ import { FormEvent, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { Button, Input } from "src/components";
+import { userService } from "src/services";
+import Swal from "sweetalert2";
 import { Content } from "../../components/Content";
 import stylesCommon from '../../shared/styles/common.module.css';
 
-interface ChangePasswordProps {
-  password: string;
+interface IResponse {
+  name: string;
 }
 
 export default function AlterarDadosPessoais() {
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  function handleChangePassword(event: FormEvent) {
+  async function handleChangePassword(event: FormEvent) {
     event.preventDefault();
 
-    // TODO
+    await userService.updatePassword({
+      id: Number(userLogado.id),
+      currentPassword: currentPassword,
+      password: newPassword,
+      confirmPassword: confirmPassword,
+    }).then((response) => {
+      if(response.status === 200) {
+        Swal.fire({
+          title: "Senha atualizada com sucesso!",
+          text: `Nova senha de ${userLogado.name}! cadastrada.`,
+        });
+      } else {
+        Swal.fire({
+          title: "Credenciais  inválidas!",
+          text: "Verifique os campos e tente novamente / procure o suporte.",
+        });
+      }
+    }).finally(() => {
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    });
   }
 
   return (

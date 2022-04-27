@@ -21,7 +21,8 @@ export const userService = {
     update,
     logoutSign,
     profileUser,
-    profileUpdateAvatar
+    profileUpdateAvatar,
+    updatePassword
 };
 
 async function login(email: any, password: any) {
@@ -79,5 +80,10 @@ async function profileUser(parameters: any) {
 
 async function profileUpdateAvatar(data: any) {
     const user = fetchWrapper.put(profileBaseUrl, data);
+    return user;
+}
+
+async function updatePassword(data: any) {
+    const user = fetchWrapper.put(`${baseUrl}/change-password`, data);
     return user;
 }
