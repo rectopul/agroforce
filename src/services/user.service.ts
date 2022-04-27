@@ -7,7 +7,7 @@ import { userPermissionService } from './user-permission';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-const profileBaseUrl = `${publicRuntimeConfig.apiUrl}/testes`;
+const baseUrlProfile = `${publicRuntimeConfig.apiUrl}/profile-user`;
 const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user') as string));
 
 export const userService = {
@@ -74,12 +74,12 @@ function getPermissions(parameters: any) {
 // Tela de Perfil
 
 async function profileUser(parameters: any) {
-    const user = fetchWrapper.get(profileBaseUrl, parameters);
+    const user = fetchWrapper.get(baseUrlProfile, parameters);
     return user;
 }
 
 async function profileUpdateAvatar(data: any) {
-    const user = fetchWrapper.put(profileBaseUrl, data);
+    const user = fetchWrapper.put(baseUrlProfile, data);
     return user;
 }
 
