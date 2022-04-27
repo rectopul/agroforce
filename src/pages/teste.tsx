@@ -1,6 +1,6 @@
 import Head from "next/head";
 import readXlsxFile from 'read-excel-file'
-import { Content2 } from "../components/Content/index2";
+import { Content } from "../components/Content/index";
 import { importService } from "../services/";
 import ITabs from "../shared/utils/dropdown";
 import Swal from 'sweetalert2';
@@ -15,30 +15,15 @@ export default function Teste() {
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({spreadSheet: rows, moduleId: 1}).then((response) => {
         console.log(response)
-        Swal.fire(response.message);
+        if (response.message != '') {
+          Swal.fire({
+            text: response.message, 
+            width: "800"});
+        }
       });
     })
   }
 
-  function toLetter(columnNumber: any) {
-
-    let letras = "ABCDEFGHIJKLMNOPQRSTUVXWYZ";
-  
-    let columnName = "";
-  
-    while (columnNumber > 0) {
-      let rem = columnNumber % 26;
-  
-      if (rem == 0) {
-        columnName = "Z" + columnName;
-        columnNumber = Math.floor(columnNumber / 26) - 1;
-      } else {
-        columnName = letras.charAt(rem - 1) + columnName;
-        columnNumber = Math.floor(columnNumber / 26);
-      }
-    }
-    return columnName;
-  }
   
   const formik = useFormik({
     initialValues: {
@@ -54,7 +39,7 @@ export default function Teste() {
       <Head>
         <title>Nova NPE</title>
       </Head>
-      <Content2 contentHeader={TabsDropDowns()}>
+      <Content contentHeader={TabsDropDowns()}>
         <form 
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -85,7 +70,7 @@ export default function Teste() {
               </div>
             </div>
         </form>
-      </Content2>
+      </Content>
    </>
   );
 }
