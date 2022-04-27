@@ -37,7 +37,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
   
       if (user) {
         const validateLogin: object | any= await Controller.getAllUser({paramSelect:'id', app_login: 1, id: user.id, filterStatus: 1});
-        console.log(validateLogin);
+
         if (validateLogin.total <= 0 || validateLogin.status == 400) throw 'Você não tem acesso a essa pagina, entre em contato com seu líder!';
     
         userCulture.culturas = await PermissionController.getByUserID(user.id);
