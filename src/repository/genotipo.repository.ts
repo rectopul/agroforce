@@ -1,29 +1,29 @@
 import { prisma } from '../pages/api/db/db';
 
-export class PortfolioRepository {
+export class GenotipoRepository {
   async create(data: any) {
-    const portfolio = await prisma.portfolio.create({ data });
-    return portfolio;
+    const genotipo = await prisma.portfolio.create({ data });
+    return genotipo;
   }
 
   async findByGenealogy(genealogy: string) {
-    const portfolio = await prisma.portfolio.findFirst({
+    const genotipo = await prisma.portfolio.findFirst({
       where: { genealogy }
     });
-    return portfolio;
+    return genotipo;
   }
 
   async findOne(id: number) {
-    const portfolio = await prisma.portfolio.findUnique({
+    const genotipo = await prisma.portfolio.findUnique({
       where: { id }
     });
-    return portfolio;
+    return genotipo;
   }
 
   async update(id: number, data: any) {
-    const portfolio = await this.findOne(id);
+    const genotipo = await this.findOne(id);
 
-    if (portfolio !== null) {
+    if (genotipo !== null) {
       const result = await prisma.portfolio.update({
         where: { id },
         data

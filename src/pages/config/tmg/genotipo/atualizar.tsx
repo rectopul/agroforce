@@ -12,15 +12,11 @@ import {
   Content,
   Input
 } from "src/components";
-import { portfolioService } from "src/services/portfolio.service";
+import { genotipoService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
-
-export interface IUpdatePortfolio {
+export interface IUpdateGenotipo {
   id: number;
   id_culture: number;
   genealogy: string;
@@ -28,7 +24,7 @@ export interface IUpdatePortfolio {
   status: number;
 }
 
-export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
+export default function Atualizargenotipo(genotipo: IUpdateGenotipo) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -42,33 +38,24 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-
-  const select = [
-    { id: 1, name: "Ativo" },
-    { id: 2, name: "Inativo" },
-  ]
-  
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  // const id_culture = userLogado.userCulture.cultura_selecionada as string;
-
-  const formik = useFormik<IUpdatePortfolio>({
+  const formik = useFormik<IUpdateGenotipo>({
     initialValues: {
-      id: portfolio.id,
-      id_culture: portfolio.id_culture,
-      genealogy: portfolio.genealogy,
-      cruza: portfolio.cruza,
-      status: portfolio.status,
+      id: genotipo.id,
+      id_culture: genotipo.id_culture,
+      genealogy: genotipo.genealogy,
+      cruza: genotipo.cruza,
+      status: genotipo.status,
     },
     onSubmit: async (values) => {
-      await portfolioService.update({
-        id: portfolio.id,
+      await genotipoService.update({
+        id: genotipo.id,
         id_culture: formik.values.id_culture,
         genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
-        status: portfolio.status,
+        status: genotipo.status,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Portfólio atualizado com sucesso!');
+          Swal.fire('Genótipo atualizado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
@@ -80,13 +67,13 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
 
   return (
     <>
-      <Head><title>Atualizar potfólio</title></Head>
+      <Head><title>Atualizar genótipo</title></Head>
       <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar potfólio</h1>
+          <h1 className="text-2xl">Atualizar genótipo</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">
@@ -98,7 +85,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
               style={{ background: '#e5e7eb'}}
               required
               disabled
-              value={portfolio.id}
+              value={genotipo.id}
             />
           </div>
           <div className="w-full h-10">
@@ -165,7 +152,7 @@ export default function AtualizarPortfolio(portfolio: IUpdatePortfolio) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const  token  =  context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
@@ -174,9 +161,9 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiPortfolio = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+  const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
 
-  const portfolio = await apiPortfolio.json();
+  const genotipo = await apiGenotipo.json();
 
-  return { props: portfolio }
+  return { props: genotipo }
 }

@@ -6,15 +6,11 @@ import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { SiMicrogenetics } from "react-icons/si";
 import { Button, Content, Input } from "src/components";
-import { portfolioService } from "src/services/portfolio.service";
+import { genotipoService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
-
-export interface ICreatePortfolio {
+export interface ICreateGenotipo {
   id_culture: number;
   genealogy: string;
   cruza: string;
@@ -22,7 +18,7 @@ export interface ICreatePortfolio {
   created_by: number;
 }
 
-export default function  Portfolio() {
+export default function  Cadastro() {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -40,7 +36,7 @@ export default function  Portfolio() {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
-  const formik = useFormik<ICreatePortfolio>({
+  const formik = useFormik<ICreateGenotipo>({
     initialValues: {
       id_culture: Number(id_culture),
       genealogy: '',
@@ -49,7 +45,7 @@ export default function  Portfolio() {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
-      await portfolioService.create({
+      await genotipoService.create({
         id_culture: formik.values.id_culture,
         genealogy: capitalize(formik.values.genealogy),
         cruza: formik.values.cruza,
@@ -57,7 +53,7 @@ export default function  Portfolio() {
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
-          Swal.fire('Portfólio cadastrado com sucesso!');
+          Swal.fire('Genótipo cadastrado com sucesso!');
           router.back();
         } else {
           setCheckInput("text-red-600");
@@ -70,7 +66,7 @@ export default function  Portfolio() {
   return (
     <>
     <Head>
-      <title>Cadastro de portfólio</title>
+      <title>Cadastro de genótipo</title>
     </Head>
 
     <Content contentHeader={tabsDropDowns}>
@@ -78,7 +74,7 @@ export default function  Portfolio() {
         className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
         onSubmit={formik.handleSubmit}
       >
-        <h1 className="text-2xl">Novo portfólio</h1>
+        <h1 className="text-2xl">Novo genótipo</h1>
 
         <div className="w-full flex justify-between items-start gap-5 mt-5">
           <div className="w-full h-10">

@@ -1,7 +1,7 @@
-import { PortfolioRepository } from "src/repository/portfolio.repository";
+import { GenotipoRepository } from "src/repository/genotipo.repository";
 import { number, object, SchemaOf, string } from 'yup';
 
-interface Portfolio {
+interface Genotipo {
   id: number;
   id_culture: number;
   genealogy: string;
@@ -10,7 +10,7 @@ interface Portfolio {
   created_by: number;
 };
 
-interface UpdatePortfolioLote {
+interface UpdateGenotipoLote {
   id: number;
   id_culture: number;
   genealogy: string;
@@ -18,14 +18,14 @@ interface UpdatePortfolioLote {
   status: number;
 }
 
-type CreatePortfolio = Omit<Portfolio, 'id'>;
-// type UpdatePortfolio = Omit<Portfolio, 'created_by'>;
-export class PortfolioController {
+type Creategenotipo = Omit<Genotipo, 'id'>;
+// type Updategenotipo = Omit<genotipo, 'created_by'>;
+export class GenotipoController {
   public readonly required = 'Campo obrigatório';
 
-  portfolioRepository = new PortfolioRepository();
+  genotipoRepository = new GenotipoRepository();
 
-  async listAllPortfolios(options: any) {
+  async listAllGenotipos(options: any) {
     const parameters: object | any = new Object();
     let take; 
     let skip;
@@ -33,12 +33,14 @@ export class PortfolioController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof(options.filterStatus) === 'string') {
-            options.filterStatus = parseInt(options.filterStatus);
-            if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+        if (typeof(options.status) === 'string') {
+          options.filterStatus = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-            if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
         }
+      } else {
+        parameters.status =1;
       }
 
       if (options.filterSearch) {
@@ -93,7 +95,7 @@ export class PortfolioController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
       
-      let response: object | any = await this.portfolioRepository.findAll(
+      let response: object | any = await this.genotipoRepository.findAll(
         parameters,
         select,
         take,
@@ -110,11 +112,11 @@ export class PortfolioController {
     }   
   }
 
-  async getOnePortfolio(id: number) {
+  async getOneGenotipo(id: number) {
     try {
       if (!id) throw new Error("Dados inválidos");
 
-      const response = await this.portfolioRepository.findOne(id);
+      const response = await this.genotipoRepository.findOne(id);
 
       if (!response) throw new Error("Item não encontrado");
 
@@ -124,9 +126,9 @@ export class PortfolioController {
     }
   }
 
-  async createPortfolio(data: CreatePortfolio) {
+  async createGenotipo(data: Creategenotipo) {
     try {
-      const schema: SchemaOf<CreatePortfolio> = object({
+      const schema: SchemaOf<Creategenotipo> = object({
         id_culture: number().integer().required(this.required),
         genealogy: string().required(this.required),
         cruza: string().required(this.required),
@@ -138,13 +140,13 @@ export class PortfolioController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const portfolioAlreadyExists = await this.portfolioRepository.findByGenealogy(data.genealogy);
+      const genotipoAlreadyExists = await this.genotipoRepository.findByGenealogy(data.genealogy);
 
-      if (portfolioAlreadyExists) {
+      if (genotipoAlreadyExists) {
         return { status: 400, message: "Genealogia já cadastra. favor consultar os inativos" };
       }
 
-      await this.portfolioRepository.create(data);
+      await this.genotipoRepository.create(data);
 
       return {status: 201, message: "Genealogia cadastrada"}
     } catch(err) {
@@ -152,9 +154,9 @@ export class PortfolioController {
     }
   }
 
-  async updatePortfolio(data: UpdatePortfolioLote) {
+  async updategenotipo(data: UpdateGenotipoLote) {
     try {
-      const schema: SchemaOf<UpdatePortfolioLote> = object({
+      const schema: SchemaOf<UpdateGenotipoLote> = object({
         id: number().integer().required(this.required),
         id_culture: number().integer().required(this.required),
         genealogy: string().required(this.required),
@@ -166,24 +168,24 @@ export class PortfolioController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const portfolio = await this.portfolioRepository.findOne(data.id);
+      const genotipo = await this.genotipoRepository.findOne(data.id);
       
-      if (!portfolio) return { status: 400, message: 'Portfólio não encontrado' };
+      if (!genotipo) return { status: 400, message: 'Genótipo não encontrado' };
 
-      const loteAlreadyExists = await this.portfolioRepository.findByGenealogy(data.genealogy);
+      const loteAlreadyExists = await this.genotipoRepository.findByGenealogy(data.genealogy);
 
-      if (loteAlreadyExists && loteAlreadyExists.id !== portfolio.id) {
-        return { status: 400, message: 'Genealogia do portfólio já cadastro. favor consultar os inativos' }
+      if (loteAlreadyExists && loteAlreadyExists.id !== genotipo.id) {
+        return { status: 400, message: 'Genealogia já cadastra. favor consultar os inativos' }
       }
 
-      portfolio.id_culture = data.id_culture;
-      portfolio.genealogy = data.genealogy;
-      portfolio.cruza = data.cruza;
-      portfolio.status = data.status;
+      genotipo.id_culture = data.id_culture;
+      genotipo.genealogy = data.genealogy;
+      genotipo.cruza = data.cruza;
+      genotipo.status = data.status;
 
-      await this.portfolioRepository.update(portfolio.id, portfolio);
+      await this.genotipoRepository.update(genotipo.id, genotipo);
 
-      return {status: 200, message: "Genealogia atualizada"}
+      return {status: 200, message: "Genótipo atualizado"}
     } catch (err) {
       return { status: 404, message: 'Erro ao atualizar' }
     }

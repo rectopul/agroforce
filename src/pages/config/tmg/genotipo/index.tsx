@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
@@ -16,7 +16,7 @@ import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { prisma } from "src/pages/api/db/db";
-import { portfolioService, userPreferencesService } from "src/services";
+import { genotipoService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
 
@@ -27,7 +27,7 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export interface IPortfolio {
+export interface IGenotipos {
   id: number;
   id_culture: number;
   genealogy: string;
@@ -43,14 +43,14 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allPortfolios: IPortfolio[];
+  allGenotipos: IGenotipos[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
   cultureId: number;
 }
 
-export default function Listagem({allPortfolios, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
+export default function Listagem({allGenotipos, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -65,7 +65,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [portfolios, setPortfolios] = useState<IPortfolio[]>(allPortfolios);
+  const [genotipos, setGenotipo] = useState<IGenotipos[]>(allGenotipos);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
@@ -103,28 +103,28 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await portfolioService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
-        setPortfolios(response.response);
+        setGenotipo(response.response);
         setFilter(parametersFilter);
       })
     },
   });
 
-  async function handleStatusPortfolio(idPortfolio: number, data: IPortfolio): Promise<void> {
+  async function handleStatusPortfolio(idGenotipo: number, data: IGenotipos): Promise<void> {
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
     
-    const index = portfolios.findIndex((portfolio) => portfolio.id === idPortfolio);
+    const index = genotipos.findIndex((genotipo) => genotipo.id === idGenotipo);
 
     if (index === -1) {
       return;
     }
 
-    setPortfolios((oldSafra) => {
+    setGenotipo((oldSafra) => {
       const copy = [...oldSafra];
       copy[index].status = data.status;
       return copy;
@@ -136,9 +136,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       genealogy,
       cruza,
       status
-    } = portfolios[index];
+    } = genotipos[index];
 
-    await portfolioService.update({
+    await genotipoService.update({
       id,
       id_culture,
       genealogy,
@@ -194,15 +194,15 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IPortfolio) => (
+          render: (rowData: IGenotipos) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  title={`Editar potfólio ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/portfolio/atualizar?id=${rowData.id}`)}}
+                  title={`Editar ${rowData.genealogy}`}
+                  onClick={() =>{router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`)}}
                 />
               </div>
               {rowData.status === 1 ? (
@@ -215,7 +215,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                         ...rowData,
                       }
                     )}
-                    title={`Portfólio Ativo`}
+                    title={`Ativo`}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -230,7 +230,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                         ...rowData,
                       }
                     )}
-                    title={`Portfólio inativo`}
+                    title={`Inativo`}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -240,28 +240,28 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           ),
         })
       }
-      // if (ObjetCampos[index] == 'id_portfolio') {
-      //   arrOb.push({
-      //     title: "Lote",
-      //     field: "id_portfolio",
-      //     sorting: false,
-      //     searchable: false,
-      //     filterPlaceholder: "Filtrar por status",
-      //     render: (rowData: IPortfolio) => (
-      //       <div className='h-10 flex'>
-      //         <div className="h-10">
-      //           <Button 
-      //             icon={<AiOutlineFileSearch size={16} />}
-      //             bgColor="bg-yellow-500"
-      //             textColor="white"
-      //             title={`Lote de ${rowData.genealogy}`}
-      //             onClick={() =>{router.push(`/config/tmg/portfolio/lote?id_portfolio=${rowData.id}`)}}
-      //           />
-      //         </div>
-      //       </div>
-      //     ),
-      //   })
-      // }
+      if (ObjetCampos[index] == 'id_portfolio') {
+        arrOb.push({
+          title: "Lote",
+          field: "id_portfolio",
+          sorting: false,
+          searchable: false,
+          filterPlaceholder: "Filtrar por status",
+          render: (rowData: IGenotipos) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button 
+                  icon={<AiOutlineFileSearch size={16} />}
+                  bgColor="bg-yellow-500"
+                  textColor="white"
+                  title={`Lote de ${rowData.genealogy}`}
+                  onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_portfolio=${rowData.id}`)}}
+                />
+              </div>
+            </div>
+          ),
+        })
+      }
     });
     return arrOb;
   };
@@ -318,7 +318,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     }
 
-    await portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
         setOrderGenealogy(response.response)
       }
@@ -361,7 +361,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       }
     }
 
-    await portfolioService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setOrderCruza(response.response)
       }
@@ -397,9 +397,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await portfolioService.getAll(filterAplication).then((response) => {
+    await genotipoService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
-        const newData = portfolios.map((row) => {
+        const newData = genotipos.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
           } else {
@@ -411,7 +411,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "portfolios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "genotipos");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -424,7 +424,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Portfólios.xlsx");
+        XLSX.writeFile(workBook, "Genótipos.xlsx");
       } else {
         alert(response);
       }
@@ -446,9 +446,9 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
     }
-    await portfolioService.getAll(parametersFilter).then((response) => {
+    await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setPortfolios(response.response);
+        setGenotipo(response.response);
       }
     });
   };
@@ -460,7 +460,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
   
   return (
     <>
-      <Head><title>Listagem de portfólio</title></Head>
+      <Head><title>Listagem de genótipos</title></Head>
 
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -468,7 +468,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar portfólios">
+          <AccordionFilter title="Filtrar genótipos">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -523,7 +523,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={portfolios}
+              data={genotipos}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -549,11 +549,11 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar Portfólio"
-                        value="Cadastrar Portfólio"
+                        title="Cadastrar genótipo"
+                        value="Cadastrar genótipo"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push('portfolio/cadastro')}}
+                        onClick={() => {router.push('genotipo/cadastro')}}
                         icon={<RiPlantLine size={20} />}
                       />
                     </div>
@@ -608,7 +608,7 @@ export default function Listagem({allPortfolios, totalItems, itensPerPage, filte
                           <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} />
                         </div>
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de portfólios" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                     </div>
                   </div>
@@ -687,7 +687,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const  cultureId  =  req.cookies.cultureId;
   
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/portfolio`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   let filterAplication = "filterStatus=1&id_culture=" + cultureId;
@@ -699,9 +699,9 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  // const portfolios = await fetch(urlParameters.toString(), requestOptions);
-  // let response = await portfolios.json();
-  // let allPortfolios = response.response;
+  // const genotipos = await fetch(urlParameters.toString(), requestOptions);
+  // let response = await genotipos.json();
+  // let allgenotipos = response.response;
   // let totalItems = response.total;
 
   const response = await prisma.portfolio.findMany({
@@ -717,7 +717,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     }
   });
 
-  const allPortfolios = response.map(item => {
+  const allGenotipos = response.map(item => {
     return {
       id: item.id,
       id_culture: item.id_culture,
@@ -727,11 +727,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
     };
   });
 
-  const count = allPortfolios.length;
+  const count = allGenotipos.length;
 
   return {
     props: {
-      allPortfolios,
+      allGenotipos,
       totalItems: count,
       itensPerPage,
       filterAplication,

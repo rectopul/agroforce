@@ -1,24 +1,24 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PortfolioController } from '../../../controllers/portfolio.controller';
+import { GenotipoController } from '../../../controllers/genotipo.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default  apiHandler(handler);
 
  async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const portfolioController =  new PortfolioController();
+  const genotipoController =  new GenotipoController();
 
   switch (req.method) {
     case 'GET':
-      const result = await portfolioController.listAllPortfolios(req.query);
+      const result = await genotipoController.listAllGenotipos(req.query);
       res.status(200).json(result);
       break
     case 'POST':
-      const resultPost = await portfolioController.createPortfolio(req.body);
+      const resultPost = await genotipoController.createGenotipo(req.body);
       res.status(201).json(resultPost);
       break
     case 'PUT':
-      let resultPut = await portfolioController.updatePortfolio(req.body);  
+      let resultPut = await genotipoController.updategenotipo(req.body);
       res.status(200).json(resultPut);
       break
     default:
