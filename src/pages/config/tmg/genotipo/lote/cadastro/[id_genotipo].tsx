@@ -9,7 +9,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { Button, Content, Input } from "src/components";
 import { loteGenotipoService } from "src/services";
 import Swal from "sweetalert2";
-import * as ITabs from '../../../../../shared/utils/dropdown';
+import * as ITabs from '../../../../../../shared/utils/dropdown';
 
 interface ICreateLoteGenotipo {
   id_genotipo: number;
@@ -18,7 +18,9 @@ interface ICreateLoteGenotipo {
   created_by: number;
 };
 
-type IIdGenotipo = Omit<ICreateLoteGenotipo, "name" | "volume" | "created_by">;
+interface IIdGenotipo {
+  id_genotipo: number;
+}
 
 export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
   const { TabsDropDowns } = ITabs.default;
@@ -35,6 +37,8 @@ export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+
+  console.log(id_genotipo);
 
   const formik = useFormik<ICreateLoteGenotipo>({
     initialValues: {
@@ -145,10 +149,8 @@ export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
-  const url = req.url as string;
-  const result = url.substr(47);
-  const id_genotipo = parseInt(result);
+export const getServerSideProps:GetServerSideProps = async ({ req, params }) => {
+  const { id_genotipo } = params as any;
 
   return { 
     props: {

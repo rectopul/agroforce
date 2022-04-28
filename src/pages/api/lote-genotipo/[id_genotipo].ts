@@ -3,15 +3,26 @@ import { LoteGenotipoController } from "src/controllers/lote-genotipo.controller
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id_genotipo } = req.query;
+  // const { id_genotipo } = req.query;
+  const {
+    id_genotipo,
+    name,
+    volume,
+    created_by,
+  } = req.body;
 
   const loteGenotipoController = new LoteGenotipoController();
 
   switch(req.method) {
-    case 'GET':
-      const resultGet = await loteGenotipoController.list(Number(id_genotipo));
-    
-      res.status(200).json(resultGet.data);
+    case 'POST':
+      const resultPost = await loteGenotipoController.create({
+        id_genotipo: Number(id_genotipo),
+        name,
+        volume,
+        created_by,
+      });
+
+      res.status(200).json(resultPost);
     break;
 
     default:

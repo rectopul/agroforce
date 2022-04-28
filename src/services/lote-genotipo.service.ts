@@ -21,7 +21,7 @@ export const loteGenotipoService = {
 };
 
 async function create(data: ICreateLoteGenotipo) {
-  const lote = await fetchWrapper.post(baseUrl, data);
+  const lote = await fetchWrapper.post(`${baseUrl}/id_genotipo`, data);
   return lote;
 }
 

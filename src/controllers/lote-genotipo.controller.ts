@@ -1,3 +1,4 @@
+import { prisma } from "src/pages/api/db/db";
 import { LoteGenotipoRepository } from "src/repository/lote-genotipo.repository";
 import { number, object, SchemaOf, string } from "yup";
 
@@ -47,15 +48,36 @@ export class LoteGenotipoController {
     }
   }
 
-  async list(id_portfolio: number, id_culture: number) {
+  async list(id_genotipo: number) {
     try {
-      const response = await this.loteGenotipoRepository.findAll()
+      const responseGet = await prisma.lote.findMany({
+        where: {
+          id_portfolio: Number(id_genotipo),
+        },
+        include: {
+          portfolio: {
+            select: {
+              id: true,
+              genealogy: true,
+              id_culture: true,
+            }
+          }
+        }
+      });
+    
+      const data = responseGet.map(item => {
+        return {
+          id: item.id,
+          id_culture: item.portfolio.id_culture,
+          id_genotipo: item.portfolio.id,
+          genealogy: item.portfolio.genealogy,
+          name: item.name,
+          volume: item.volume,
+          status: item.status,
+        }
+      });
 
-      if (!response) {
-        return { status: 400, response: [] }
-      }
-
-      return {status: 200 , response};
+      return {status: 200 , data};
     } catch (e) {
       return { status: 400, response: [] };
     }

@@ -104,7 +104,6 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_genotipo;
       await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LoteGenotipo[]) => {
-        console.log("Response" + response)
         setLotes(response);
         setTotaItems(response.length);
         setFilter(parametersFilter);
@@ -480,7 +479,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                         value="Cadastrar lote"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push(`lote/cadastro?id_genotipo=${id_genotipo}`)}}
+                        onClick={() => {router.push(`lote/cadastro/${id_genotipo}`)}}
                         icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
@@ -628,9 +627,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const id_genotipo = Number(context.query.id_genotipo);
 
-  const api = await fetch(`${baseUrl}/lote?id_genotipo=${id_genotipo}`, requestOptions);
+  const api = await fetch(`${baseUrl}?id_genotipo=${id_genotipo}`, requestOptions);
 
   const allLote: LoteGenotipo[] = await api.json();
+
   const totalItems = allLote.length || 0;
 
   return {
