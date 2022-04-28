@@ -21,7 +21,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         created_by,
       });
 
-      res.status(200).json(resultPost);
+      res.status(201).json(resultPost);
     break;
 
     default:

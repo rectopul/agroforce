@@ -12,6 +12,7 @@ interface ILoteGenotipoDTO {
 };
 
 type ICreateLoteGenotipo = Omit<ILoteGenotipoDTO, "id" | "status">;
+type IUpdateLoteGenotipo = Omit<ILoteGenotipoDTO, "created_by" | "status" | "id_genotipo">;
 type IfindOneLoteGenotipo = Omit<ILoteGenotipoDTO, "id_genotipo" | "name" | "volume" | "status" | "created_by">;
 
 export class LoteGenotipoController {
@@ -30,6 +31,44 @@ export class LoteGenotipoController {
       return { status: 200, loteGenotipo };
     } catch {
       return { status: 400, message: "Item não encontrado!" };
+    }
+  }
+
+  async update(data: IUpdateLoteGenotipo) {
+    try {
+      const schema: SchemaOf<IUpdateLoteGenotipo> = object({
+        id: number().integer().required(this.required),
+        name: string().required(this.required),
+        volume: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+      
+      if (!valid) return {status: 400, message: "Dados inválidos"};
+
+      const loteGenotipo = await this.loteGenotipoRepository.findById(data.id);
+
+      if (!loteGenotipo) {
+        return { status: 400, message: "Lote não encontrado!" };
+      }
+      
+      const loteGenotipoExists = await this.loteGenotipoRepository.findByName(
+        data.name
+      );
+
+      if (loteGenotipoExists && loteGenotipoExists.id !== loteGenotipo.id) {
+        return { status: 400, message: "Nome da cultura já existente. favor consultar os inativos" };
+      }
+
+      await this.loteGenotipoRepository.update({
+        id: data.id,
+        name: data.name,
+        volume: data.volume,
+      });
+  
+      return {status: 200, message: "Lote atualizado com sucesso!"};
+    } catch (e) {
+      return { status: 400, message: "Erro ao atualizar lote!" };
     }
   }
 

@@ -11,6 +11,7 @@ interface ILoteGenotipoDTO {
 };
 
 type ICreateLoteGenotipo = Omit<ILoteGenotipoDTO, "id" | "status">;
+type IUpdateLoteGenotipo = Omit<ILoteGenotipoDTO, "created_by" | "status" | "id_genotipo">;
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
@@ -19,6 +20,7 @@ export const loteGenotipoService = {
   listAll,
   create,
   findOne,
+  update,
 };
 
 async function create(data: ICreateLoteGenotipo) {
@@ -33,5 +35,10 @@ async function listAll(id_portfolio: number, id_culture: number) {
 
 async function findOne(id: number) {
   const lote = await fetchWrapper.get(baseUrl, id);
+  return lote;
+}
+
+async function update(data: IUpdateLoteGenotipo) {
+  const lote = await fetchWrapper.put(baseUrl, data);
   return lote;
 }

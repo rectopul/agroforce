@@ -10,7 +10,7 @@ interface ILoteGenotipoDTO {
 };
 
 type ICreateLoteGenotipo = Omit<ILoteGenotipoDTO, "id" | "status">;
-type IUpdateLoteGenotipo = Omit<ILoteGenotipoDTO, "created_by" | "status">;
+type IUpdateLoteGenotipo = Omit<ILoteGenotipoDTO, "created_by" | "status" | "id_genotipo">;
 
 export class LoteGenotipoRepository {
   async findAll() {
@@ -24,6 +24,16 @@ export class LoteGenotipoRepository {
       where: {
         name: name,
         id_portfolio: id_genotipo,
+      }
+    });
+
+    return lote;
+  }
+
+  async findByName(name: string) {
+    const lote = await prisma.lote.findFirst({
+      where: {
+        name: name,
       }
     });
 
@@ -53,10 +63,10 @@ export class LoteGenotipoRepository {
 
   async update(data: IUpdateLoteGenotipo) {
     const lote = await prisma.lote.update({
-      where: { id: data.id },
-      data: {
+      where: { 
         id: data.id,
-        id_portfolio: data.id_genotipo,
+      },
+      data: {
         name: data.name,
         volume: data.volume,
       },

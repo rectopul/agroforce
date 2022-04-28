@@ -12,7 +12,7 @@ import {
   Content,
   Input
 } from "src/components";
-import { loteService } from "src/services";
+import { loteGenotipoService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -20,7 +20,6 @@ export interface IUpdateLote {
   id: number;
   name: string;
   volume: number;
-  status: number;
 }
 
 export default function Atualizar(lote: IUpdateLote) {
@@ -42,7 +41,6 @@ export default function Atualizar(lote: IUpdateLote) {
       id: lote.id,
       name: lote.name,
       volume: lote.volume,
-      status: lote.status,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -51,11 +49,10 @@ export default function Atualizar(lote: IUpdateLote) {
         throw new Error();
       }
       
-      await loteService.update({
-        id: values.id,
+      await loteGenotipoService.update({
+        id: lote.id,
         name: capitalize(values.name),
         volume: values.volume,
-        status: lote.status,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Lote atualizado com sucesso!');

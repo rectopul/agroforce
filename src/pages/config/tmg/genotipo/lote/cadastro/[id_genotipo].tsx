@@ -38,8 +38,6 @@ export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
-  console.log(id_genotipo);
-
   const formik = useFormik<ICreateLoteGenotipo>({
     initialValues: {
       id_genotipo: 0,
