@@ -12,11 +12,26 @@ interface ILoteGenotipoDTO {
 };
 
 type ICreateLoteGenotipo = Omit<ILoteGenotipoDTO, "id" | "status">;
+type IfindOneLoteGenotipo = Omit<ILoteGenotipoDTO, "id_genotipo" | "name" | "volume" | "status" | "created_by">;
 
 export class LoteGenotipoController {
   loteGenotipoRepository = new LoteGenotipoRepository();
 
   public readonly required = 'Campo obrigatório';
+
+  async findOne({ id }: IfindOneLoteGenotipo) {
+    try {
+      const loteGenotipo = await this.loteGenotipoRepository.findById(id);
+
+      if(!loteGenotipo) {
+        return { status: 400, message: "Item não encontrado!" };
+      }
+
+      return { status: 200, loteGenotipo };
+    } catch {
+      return { status: 400, message: "Item não encontrado!" };
+    }
+  }
 
   async create(data: ICreateLoteGenotipo) {
     try {

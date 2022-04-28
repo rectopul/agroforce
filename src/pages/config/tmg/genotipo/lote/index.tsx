@@ -193,10 +193,10 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
-                  onClick={() =>{}}
+                  onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}} 
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+                  // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status === 1 ? (

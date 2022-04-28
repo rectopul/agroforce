@@ -18,6 +18,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
 export const loteGenotipoService = {
   listAll,
   create,
+  findOne,
 };
 
 async function create(data: ICreateLoteGenotipo) {
@@ -27,5 +28,10 @@ async function create(data: ICreateLoteGenotipo) {
 
 async function listAll(id_portfolio: number, id_culture: number) {
   const lote = await fetchWrapper.get(baseUrl, { id_portfolio, id_culture });
+  return lote;
+}
+
+async function findOne(id: number) {
+  const lote = await fetchWrapper.get(baseUrl, id);
   return lote;
 }

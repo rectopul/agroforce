@@ -157,7 +157,7 @@ export default function Atualizar(lote: IUpdateLote) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
   const  token  =  context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
@@ -166,7 +166,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   };
 
-  const apiLote = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+  const apiLote = await fetch(`${baseUrl}/find-one?id=` + context.query.id, requestOptions);
 
   const lote = await apiLote.json();
 
