@@ -155,6 +155,12 @@ export class UserController {
                     parameters.departmentId =  data.departmentId;
                 }
 
+                if (typeof(data.registration) === 'string') {
+                    parameters.registration =  parseInt(data.registration);
+                } else { 
+                    parameters.registration =  data.registration;
+                }
+
                 if (!data.name) return {status: 400, message: 'Informe o nome do usuário'};
                 if (!data.email) return {status: 400, message: 'Informe o email do usuário'}; 
                 if (!data.cpf) return {status: 400, message: 'Informe o cpf do usuário'};
