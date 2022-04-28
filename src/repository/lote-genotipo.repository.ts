@@ -61,6 +61,15 @@ export class LoteGenotipoRepository {
     return lote;
   }
 
+  async changeStatus(id: number, status: number) {
+    const lote = await prisma.lote.update({
+      where: { id },
+      data: { status },
+    });
+
+    return lote;
+  }
+
   async update(data: IUpdateLoteGenotipo) {
     const lote = await prisma.lote.update({
       where: { 

@@ -14,11 +14,40 @@ interface ILoteGenotipoDTO {
 type ICreateLoteGenotipo = Omit<ILoteGenotipoDTO, "id" | "status">;
 type IUpdateLoteGenotipo = Omit<ILoteGenotipoDTO, "created_by" | "status" | "id_genotipo">;
 type IfindOneLoteGenotipo = Omit<ILoteGenotipoDTO, "id_genotipo" | "name" | "volume" | "status" | "created_by">;
+type IChangeStatusLoteGenotipo = Omit<ILoteGenotipoDTO, "id_genotipo" | "name" | "volume" | "created_by">;
 
 export class LoteGenotipoController {
   loteGenotipoRepository = new LoteGenotipoRepository();
 
   public readonly required = 'Campo obrigatório';
+
+  async changeStatus(data: IChangeStatusLoteGenotipo) {
+    try {
+      const schema: SchemaOf<IChangeStatusLoteGenotipo> = object({
+        id: number().integer().required(this.required),
+        status: number().integer().required(this.required),
+      });
+
+      const valid = schema.isValidSync(data);
+      
+      if (!valid) return {status: 400, message: "Dados inválidos!"};
+
+      const loteGenotipo = await this.loteGenotipoRepository.findById(data.id);
+
+      if (!loteGenotipo) {
+        return {status: 400, message: "Lote não encontrado!"};
+      }
+
+      await this.loteGenotipoRepository.changeStatus(
+        data.id,
+        data.status
+      );
+      
+      return {status: 200, loteGenotipo };
+    } catch {
+      return {status: 400, message: "Erro ao atualizar status de lote!"};
+    }
+  }
 
   async findOne({ id }: IfindOneLoteGenotipo) {
     try {
