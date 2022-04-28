@@ -255,7 +255,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                   bgColor="bg-yellow-500"
                   textColor="white"
                   title={`Lote de ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_portfolio=${rowData.id}`)}}
+                  onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_genotipo=${rowData.id}`)}}
                 />
               </div>
             </div>

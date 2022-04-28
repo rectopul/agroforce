@@ -29,7 +29,7 @@ export default function Atualizar(lote: IUpdateLote) {
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'NPE'
+    tab.titleTab === 'TMG'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));

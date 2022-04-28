@@ -1,29 +1,32 @@
 import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaSortAmountUpAlt } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { Button, Content, Input } from "src/components";
-import { loteService } from "src/services";
+import { loteGenotipoService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
-export interface ICreateLote {
+interface ICreateLoteGenotipo {
   id_genotipo: number;
   name: string;
   volume: number;
   created_by: number;
-}
+};
 
-export default function  Cadastro() {
+type IIdGenotipo = Omit<ICreateLoteGenotipo, "name" | "volume" | "created_by">;
+
+export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'NPE'
+    tab.titleTab === 'TMG'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
@@ -32,11 +35,10 @@ export default function  Cadastro() {
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
-  const formik = useFormik<ICreateLote>({
+  const formik = useFormik<ICreateLoteGenotipo>({
     initialValues: {
-      id_genotipo: parseInt(id_culture),
+      id_genotipo: 0,
       name: '',
       volume: 0,
       created_by: userLogado.id,
@@ -44,12 +46,8 @@ export default function  Cadastro() {
     onSubmit: async (values) => {
       validateInputs(values);
 
-      if (!values.name || values.volume === 0) {
-        throw new Error();
-      }
-
-      await loteService.create({
-        id_genotipo: parseInt(id_culture),
+      await loteGenotipoService.create({
+        id_genotipo: id_genotipo,
         name: capitalize(formik.values.name),
         volume: formik.values.volume,
         created_by: formik.values.created_by,
@@ -65,7 +63,7 @@ export default function  Cadastro() {
     },
   });
 
-  function validateInputs(values: ICreateLote) {
+  function validateInputs(values: ICreateLoteGenotipo) {
     if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
     if (!values.volume) { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor= 'red'; } else { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor= '' }
   }
@@ -145,4 +143,16 @@ export default function  Cadastro() {
     </Content>
   </>
   );
+}
+
+export const getServerSideProps:GetServerSideProps = async ({req}) => {
+  const url = req.url as string;
+  const result = url.substr(47);
+  const id_genotipo = parseInt(result);
+
+  return { 
+    props: {
+      id_genotipo
+    },
+  }
 }
