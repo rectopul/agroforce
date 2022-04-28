@@ -3,9 +3,9 @@ import { fetchWrapper } from '../helpers';
 
 
 interface CreateLoteDTO {
+  id_genotipo: number;
   name: string;
   volume: number;
-  status: number;
   created_by: number;
 }
 
@@ -17,7 +17,8 @@ interface UpdateLoteDTO {
 }
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-portfolio/lote`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+// const baseUrlRelation = `${publicRuntimeConfig.apiUrl}/lote-portfolio/lote`;
 
 export const loteService = {
   getAll,

@@ -40,13 +40,13 @@ export class GenotipoController {
           if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
         }
       } else {
-        parameters.status =1;
+        parameters.status = 1;
       }
 
       if (options.filterSearch) {
         options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
         parameters.genealogy  = JSON.parse(options.filterSearch);
-        parameters.cruza = JSON.parse(options.filterSearch);
+        // parameters.cruza = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {

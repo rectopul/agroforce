@@ -1,8 +1,8 @@
 import { prisma } from "../pages/api/db/db";
 
   interface CreateLoteDTO {
+    id_genotipo: number;
     name: string;
-    id_portfolio: number;
     volume: number;
     created_by: number;
   }
@@ -15,7 +15,12 @@ import { prisma } from "../pages/api/db/db";
 export class LoteRepository {
   async create(data: CreateLoteDTO) {
     const lote = await prisma.lote.create({
-      data
+      data: {
+        id_portfolio: data.id_genotipo,
+        name: data.name,
+        volume: data.volume,
+        created_by: data.created_by,
+      }
     });
 
     return lote;

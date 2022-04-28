@@ -78,7 +78,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    // { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
+    { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 

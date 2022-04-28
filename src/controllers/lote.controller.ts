@@ -2,7 +2,7 @@ import { number, object, SchemaOf, string } from 'yup';
 import { LoteRepository } from '../repository/lote.repository';
 interface LoteDTO {
   id: number;
-  id_portfolio: number;
+  id_genotipo: number;
   name: string;
   volume: number;
   created_by: number;
@@ -10,8 +10,8 @@ interface LoteDTO {
 }
 
 type CreateLoteDTO = Omit<LoteDTO, 'id' | 'status'>;
-type UpdateLoteDTO = Omit<LoteDTO, 'created_by' | 'id_portfolio'>;
-type FindOne = Omit<LoteDTO, 'name' | 'id_portfolio' | 'volume' | 'created_by' | 'status'>;
+type UpdateLoteDTO = Omit<LoteDTO, 'created_by' | 'id_genotipo'>;
+type FindOne = Omit<LoteDTO, 'name' | 'id_genotipo' | 'volume' | 'created_by' | 'status'>;
 
 export class LoteController {
   public readonly required = 'Campo obrigatório';
@@ -39,8 +39,8 @@ export class LoteController {
   async create(data: CreateLoteDTO) {
     try {
       const schema: SchemaOf<CreateLoteDTO> = object({
+        id_genotipo: number().required(this.required),
         name: string().required(this.required),
-        id_portfolio: number().required(this.required),
         volume: number().required(this.required),
         created_by: number().integer().required(this.required),
       });
@@ -59,7 +59,7 @@ export class LoteController {
   
       return {status: 201, message: "Lote cadastrado"};
     } catch(err) {
-      return { status: 404, message: "Erro no encontrado"};
+      return { status: 404, message: "Erro de cadastro"};
     };
   };
 

@@ -11,9 +11,9 @@ import Swal from "sweetalert2";
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export interface ICreateLote {
+  id_genotipo: number;
   name: string;
   volume: number;
-  status: number;
   created_by: number;
 }
 
@@ -32,13 +32,13 @@ export default function  Cadastro() {
   const [checkInput, setCheckInput] = useState('text-black');
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  // const id_culture = userLogado.userCulture.cultura_selecionada as string;
+  const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ICreateLote>({
     initialValues: {
+      id_genotipo: parseInt(id_culture),
       name: '',
       volume: 0,
-      status: 1,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
@@ -49,9 +49,9 @@ export default function  Cadastro() {
       }
 
       await loteService.create({
+        id_genotipo: parseInt(id_culture),
         name: capitalize(formik.values.name),
         volume: formik.values.volume,
-        status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
@@ -132,6 +132,7 @@ export default function  Cadastro() {
           </div>
           <div className="w-40">
             <Button
+              type="submit"
               value="Cadastrar"
               bgColor="bg-blue-600"
               textColor="white"
