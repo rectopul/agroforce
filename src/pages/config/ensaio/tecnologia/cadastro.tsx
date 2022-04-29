@@ -1,12 +1,10 @@
 import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
 import Head from "next/head";
 import { useRouter } from 'next/router';
+import { FiUserPlus } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import { ogmService } from "src/services";
+import { ogmService as tecnologiaService } from "src/services";
 import Swal from 'sweetalert2';
 import {
   Button, Content,
@@ -14,21 +12,15 @@ import {
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-interface ITypeAssayProps {
+interface ITecnologiaProps {
   id: Number | any;
+  id_culture: number;
   name: String | any;
   created_by: Number;
   status: Number;
 };
 
-interface IData {
-  ogmEdit: ITypeAssayProps;
-}
-
-
-export default function NovoLocal({ogmEdit}: IData) {
+export default function NovoLocal() {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -38,13 +30,17 @@ export default function NovoLocal({ogmEdit}: IData) {
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const culture = userLogado.userCulture.cultura_selecionada as string;
+
   const router = useRouter();
-  const formik = useFormik<ITypeAssayProps>({
+
+  const formik = useFormik<ITecnologiaProps>({
     initialValues: {
-      id: ogmEdit.id,
-      name: capitalize(ogmEdit.name),
+      id: 1,
+      id_culture: parseInt(culture),
+      name: '',
       created_by: userLogado.id,
       status: 1
     },
@@ -52,14 +48,14 @@ export default function NovoLocal({ogmEdit}: IData) {
       validateInputs(values);
       if (!values.name)  { return; } 
 
-      await ogmService.update({
-        id: values.id,
-        name:values.name,
+      await tecnologiaService.create({
+        id_culture: parseInt(culture),
+        name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status == 200) {
-          Swal.fire('OGM atualizado com sucesso!')
+          Swal.fire('Tecnologia cadastrada com sucesso!');
           router.back();
         } else {
           Swal.fire(response.message)
@@ -75,7 +71,7 @@ export default function NovoLocal({ogmEdit}: IData) {
     return (
     <>
       <Head>
-        <title>Atualizar OGM</title>
+        <title>Nova tecnologia</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
@@ -84,30 +80,16 @@ export default function NovoLocal({ogmEdit}: IData) {
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar OGM</h1>
+            <h1 className="text-2xl">Nova tecnologia</h1>
           </div>
 
-          <div className="w-full
+          <div className="w-1/2
             flex 
             justify-around
             gap-6
             mt-4
             mb-4
           ">
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input 
-                type="text" 
-                id="id"
-                style={{ background: '#e5e7eb' }}
-                name="id"
-                disabled
-                onChange={formik.handleChange}
-                value={formik.values.id}
-              />
-            </div> 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
@@ -132,7 +114,7 @@ export default function NovoLocal({ogmEdit}: IData) {
           ">
             <div className="w-30">
               <Button 
-                type="submit"
+                type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
@@ -143,9 +125,9 @@ export default function NovoLocal({ogmEdit}: IData) {
             <div className="w-40">
               <Button 
                 type="submit"
-                value="Atualizar"
+                icon={<FiUserPlus size={18} />}
+                value="Cadastrar"
                 bgColor="bg-blue-600"
-                icon={<MdDateRange size={18} />}
                 textColor="white"
                 onClick={() => {}}
               />
@@ -155,23 +137,4 @@ export default function NovoLocal({ogmEdit}: IData) {
       </Content>
     </>
   );
-}
-
-
-export const getServerSideProps:GetServerSideProps = async (context) => {
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/ogm`;
-  const  token  =  context.req.cookies.token;
-  
-  const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
-  };
-
-  const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
-
-  const ogmEdit = await resU.json();
-
-  return { props: { ogmEdit  } }
 }

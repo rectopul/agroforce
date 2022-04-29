@@ -39,7 +39,7 @@ export function TabsDropDowns () {
       data: [
         { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange/> },
         { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch/> },
-        { labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser/> },
+        { labelDropDown: 'Tecnologia', hrefDropDown: '/config/ensaio/tecnologia', iconDropDown: <BiUser/> },
         { labelDropDown: 'Época', hrefDropDown: '/config/ensaio/epoca', iconDropDown: <MdUpdate/> },
       ],
     },

@@ -15,17 +15,14 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { ogmService, userPreferencesService } from "src/services";
+import { ogmService as tecnologiaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
-interface IOGMProps {
+interface ITecnologiaProps {
   id: Number | any;
   name: String | any;
   created_by: Number;
@@ -44,7 +41,7 @@ interface IGenarateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-  allItems: IOGMProps[];
+  allItems: ITecnologiaProps[];
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
@@ -67,7 +64,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const preferences = userLogado.preferences.ogm ||{id:0, table_preferences: "id,name,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [ogm, setTypeAssay] = useState<IOGMProps[]>(() => allItems);
+  const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
@@ -95,10 +92,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await ogmService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await tecnologiaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
-        setTypeAssay(response.response);
+        setTecnologias(response.response);
       })
     },
   });
@@ -138,7 +135,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IOGMProps) => (
+          render: (rowData: ITecnologiaProps) => (
             rowData.status ? (
               <div className='h-10 flex'>
                 <div className="
@@ -146,15 +143,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    title={`Atualizar ${rowData.name}`}
+                    onClick={() => {router.push(`tecnologia/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/ensaio/ogm/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
+                    title={`Ativo`}
                     onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -168,15 +166,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    title={`Atualizar ${rowData.name}`}
+                    onClick={() => {router.push(`tecnologia/atualizar?id=${rowData.id}`)}}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/ensaio/ogm/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
+                    title={`Inativo`}
                     onClick={() => handleStatus(
                       rowData.id, !rowData.status
                     )}
@@ -226,15 +225,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       status = 0;
     }
     
-    await ogmService.update({id: id, status: status});
+    await tecnologiaService.update({id: id, status: status});
 
-    const index = ogm.findIndex((ogm) => ogm.id === id);
+    const index = tecnologias.findIndex((tec) => tec.id === id);
 
     if (index === -1) {
       return;
     }
 
-    setTypeAssay((oldUser) => {
+    setTecnologias((oldUser) => {
       const copy = [...oldUser];
       copy[index].status = status;
       return copy;
@@ -266,9 +265,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await ogmService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await tecnologiaService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setTypeAssay(response.response)
+        setTecnologias(response.response)
       }
     });
     
@@ -302,9 +301,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
     
-    await ogmService.getAll(filterAplication).then((response) => {
+    await tecnologiaService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
-        const newData = ogm.map((row) => {
+        const newData = tecnologias.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
           } else {
@@ -316,7 +315,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "OGM");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Tecnologias");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -329,7 +328,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "ogm.xlsx");
+        XLSX.writeFile(workBook, "Tecnologias.xlsx");
       }
     });
   };
@@ -349,9 +348,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await ogmService.getAll(parametersFilter).then((response) => {
+    await tecnologiaService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setTypeAssay(response.response);
+        setTecnologias(response.response);
       }
     });
   };
@@ -364,7 +363,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   return (
     <>
       <Head>
-        <title>Listagem OGM</title>
+        <title>Listagem de Tecnologias</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -372,7 +371,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar tecnologia">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -428,7 +427,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={ogm}
+              data={tecnologias}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -455,12 +454,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar OGM"
-                        value="Cadastrar OGM"
+                        title="Cadastrar Tecnologias"
+                        value="Cadastrar Tecnologias"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
-                        href="/config/ensaio/ogm/cadastro"
+                        onClick={() => {router.push('tecnologia/cadastro')}}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
@@ -513,10 +511,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('ogm/importacao')}} />
+                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('tecnologia/importacao')}} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de ogm" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        <Button title="Download lista de tecnologias" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
                     </div>
                   </div>
