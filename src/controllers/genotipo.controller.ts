@@ -108,8 +108,19 @@ export class GenotipoController {
         return {status: 200, response, total: response.total}
       }    
     } catch(err) { 
-      return {status: 400, message: err}
+      return { status: 400, response: [], total: 0 }
     }   
+  }
+
+  async list(id_culture: number) {
+    try {
+      const data = await this.genotipoRepository.list(id_culture);
+      const count = data.length;
+
+      return { status: 200, response: data, total: count };
+    } catch {
+      return { status: 400, response: [], total: 0 };
+    }
   }
 
   async getOneGenotipo(id: number) {

@@ -15,7 +15,6 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { prisma } from "src/pages/api/db/db";
 import { genotipoService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
@@ -33,7 +32,6 @@ export interface IGenotipos {
   genealogy: string;
   cruza: string;
   status?: number;
-  LotePortfolio: number;
 }
 
 interface IGenarateProps {
@@ -60,12 +58,14 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
+
+  console.log(allGenotipos);
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status"};
+  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status,id_genotipo"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [genotipos, setGenotipo] = useState<IGenotipos[]>(allGenotipos);
+  const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
@@ -78,7 +78,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Lote", value: "id_portfolio" },
+    { name: "CamposGerenciados[]", title: "Lote", value: "id_genotipo" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
 
@@ -240,10 +240,10 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           ),
         })
       }
-      if (ObjetCampos[index] == 'id_portfolio') {
+      if (ObjetCampos[index] == 'id_genotipo') {
         arrOb.push({
           title: "Lote",
-          field: "id_portfolio",
+          field: "id_genotipo",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
@@ -684,7 +684,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
 
   const  token  =  req.cookies.token;
-  const  cultureId  =  req.cookies.cultureId;
+  const  cultureId: number  = Number(req.cookies.cultureId);
   
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
@@ -693,46 +693,23 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
+  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  // const genotipos = await fetch(urlParameters.toString(), requestOptions);
-  // let response = await genotipos.json();
-  // let allgenotipos = response.response;
-  // let totalItems = response.total;
+  const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
+  const data = await api.json();
 
-  const response = await prisma.portfolio.findMany({
-    where: {
-      id_culture: Number(cultureId),
-    },
-    select: {
-      id: true,
-      id_culture: true,
-      genealogy: true,
-      cruza: true,
-      status: true,
-    }
-  });
-
-  const allGenotipos = response.map(item => {
-    return {
-      id: item.id,
-      id_culture: item.id_culture,
-      genealogy: item.genealogy,
-      cruza: item.cruza,
-      status: item.status,
-    };
-  });
-
-  const count = allGenotipos.length;
+  const allGenotipos  = data.response;
+  const totalItems = data.total;
 
   return {
     props: {
-      allGenotipos,
-      totalItems: count,
+      allGenotipos ,
+      totalItems,
       itensPerPage,
       filterAplication,
       cultureId

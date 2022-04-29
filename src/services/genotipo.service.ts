@@ -16,6 +16,7 @@ export const genotipoService = {
   update,
   getAll,
   create,
+  list
 };
 
 async function create(data: any) {
@@ -30,5 +31,10 @@ async function update(data: IGenotipoUpdate) {
 
 async function getAll(parameters: any) {
   const genotipo = await fetchWrapper.get(baseUrl, parameters);
+  return genotipo;
+}
+
+async function list(id_culture: number) {
+  const genotipo = await fetchWrapper.get(baseUrl, id_culture);
   return genotipo;
 }

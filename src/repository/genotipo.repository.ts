@@ -34,6 +34,21 @@ export class GenotipoRepository {
     }
   }
 
+  async list(id_culture: number) {
+    const genotipo = await prisma.genotipo.findMany({
+      where: { id_culture },
+      select: {
+        id: true,
+        id_culture: true,
+        genealogy: true,
+        cruza: true,
+        status: true,
+      }
+    });
+
+    return genotipo;
+  }
+
   async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 

@@ -64,11 +64,13 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         preferences.layout_quadra=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 5}); preferences.layout_quadra = preferences.layout_quadra.response[0];
         preferences.foco=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 6}); preferences.foco = preferences.foco.response[0];
         preferences.delineamento=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 7}); preferences.delineamento = preferences.delineamento.response[0];
-        preferences.ogm=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8}); preferences.ogm = preferences.ogm.response[0];
+        preferences.tecnologia = await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 8}); preferences.tecnologia = preferences.tecnologia.response[0];
         preferences.tipo_ensaio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 9}); preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
-        preferences.portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10}); preferences.portfolio = preferences.portfolio.response[0];
+        preferences.genotipo =  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 10}); preferences.genotipo = preferences.genotipo.response[0];
         preferences.department= await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 11}); preferences.department = preferences.department.response[0];
-        preferences.lote_portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 13}); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
+        preferences.lote= await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 12}); preferences.lote = preferences.lote.response[0];
+        // preferences.lote_portfolio=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 13}); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
+        // preferences.npe=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 14}); preferences.npe = preferences.npe.response[0];
         preferences.epoca=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 15}); preferences.epoca = preferences.epoca.response[0];
       }
 
