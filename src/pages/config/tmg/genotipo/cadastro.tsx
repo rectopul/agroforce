@@ -1,7 +1,5 @@
 import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -139,22 +137,4 @@ export default function  Cadastro() {
     </Content>
   </>
   );
-}
-
-export const getServerSideProps:GetServerSideProps = async (context) => {
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
-  const  token  =  context.req.cookies.token;
-
-  const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
-  };
-
-  const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
-
-  const genotipo = await apiGenotipo.json();
-
-  return { props: genotipo }
 }
