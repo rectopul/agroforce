@@ -1,6 +1,6 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
-export class OGMRepository {   
+export class TecnologiaRepository {   
     async findOne(id: number) {
         let Result = await prisma.ogm.findUnique({
                where: {

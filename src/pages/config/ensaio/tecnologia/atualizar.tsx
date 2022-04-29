@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-import { ogmService as tecnologiaService } from "src/services";
+import { tecnologiaService } from "src/services";
 import Swal from 'sweetalert2';
 import {
   Button, Content,
@@ -24,7 +24,6 @@ interface ITecnologiaProps {
 interface IData {
   tecnologia: ITecnologiaProps;
 }
-
 
 export default function NovoLocal({tecnologia}: IData) {
   const { TabsDropDowns } = ITabs.default;
@@ -158,7 +157,7 @@ export default function NovoLocal({tecnologia}: IData) {
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/ogm`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
   const  token  =  context.req.cookies.token;
   
   const requestOptions: RequestInit | undefined = {

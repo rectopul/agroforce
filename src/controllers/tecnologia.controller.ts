@@ -1,7 +1,7 @@
-import { OGMRepository } from '../repository/ogm.repository';
+import { TecnologiaRepository } from '../repository/tecnologia.repository';
 
-export class OGMController {
-    Repository = new OGMRepository();
+export class TecnologiaController {
+    tecnologiaRepository = new TecnologiaRepository();
  
     async getAll(options: object | any) {
         const parameters: object | any = new Object();
@@ -62,7 +62,7 @@ export class OGMController {
                 orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
             }
 
-            let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+            let response =  await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
             if (!response || response.total <=0) { 
                 return {status: 400, response: [], total: 0}
             } else {
@@ -77,7 +77,7 @@ export class OGMController {
         let newID = parseInt(id);
         try {
             if (id && id != '{id}') {
-                let response = await this.Repository.findOne(newID); 
+                let response = await this.tecnologiaRepository.findOne(newID); 
                 if (!response) {
                 return {status: 400, response:{error: 'local não existe'}};
                 } else {
@@ -94,7 +94,7 @@ export class OGMController {
     async post(data: object | any) {
         try {
             if (data != null && data != undefined) {
-                let response = await this.Repository.create(data);
+                let response = await this.tecnologiaRepository.create(data);
                 if(response) {
                     return {status: 200, message: "tipo ensaio inserido"}
                 } else {
@@ -118,7 +118,7 @@ export class OGMController {
             if(data.name) parameters.name = data.name;
             if(data.status) parameters.status = data.status;
             if (data != null && data != undefined) {
-                let response = await this.Repository.update(data.id, parameters);
+                let response = await this.tecnologiaRepository.update(data.id, parameters);
                 if(response) {
                     return {status: 200, message: {message: "OGM atualizado com sucesso"}}
                 } else {

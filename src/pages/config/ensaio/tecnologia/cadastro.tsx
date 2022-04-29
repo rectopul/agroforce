@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { FiUserPlus } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
-import { ogmService as tecnologiaService } from "src/services";
+import { tecnologiaService } from "src/services";
 import Swal from 'sweetalert2';
 import {
   Button, Content,
@@ -13,11 +13,11 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {
-  id: Number | any;
+  id: number;
   id_culture: number;
-  name: String | any;
-  created_by: Number;
-  status: Number;
+  name: string;
+  created_by: number;
+  status: number;
 };
 
 export default function NovoLocal() {

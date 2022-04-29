@@ -15,7 +15,7 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { ogmService as tecnologiaService, userPreferencesService } from "src/services";
+import { tecnologiaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
@@ -593,7 +593,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const  cultureId  =  req.cookies.cultureId;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/ogm`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   const filterAplication = "filterStatus=1&id_culture=" + cultureId;
