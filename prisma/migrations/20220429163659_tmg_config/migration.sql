@@ -97,7 +97,7 @@ CREATE TABLE `user` (
     `cpf` VARCHAR(191) NOT NULL,
     `tel` VARCHAR(191) NULL,
     `password` VARCHAR(191) NOT NULL,
-    `avatar` VARCHAR(191) NULL,
+    `avatar` TEXT NULL,
     `registration` INTEGER NULL,
     `departmentId` INTEGER NOT NULL,
     `jivochat` INTEGER NULL DEFAULT 0,
@@ -137,6 +137,7 @@ CREATE TABLE `users_permissions` (
     `status` INTEGER NOT NULL,
 
     INDEX `Users_Permissions_profileId_fkey`(`profileId`),
+    INDEX `Users_Permissions_cultureId_fkey`(`cultureId`),
     INDEX `Users_Permissions_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -197,14 +198,14 @@ CREATE TABLE `layoult_quadra` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `portfolio` (
+CREATE TABLE `genotipo` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `id_culture` INTEGER NOT NULL,
     `genealogy` VARCHAR(191) NOT NULL,
     `cruza` VARCHAR(191) NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -212,6 +213,7 @@ CREATE TABLE `portfolio` (
 -- CreateTable
 CREATE TABLE `delineamento` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_culture` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `repeticao` INTEGER NOT NULL,
     `trat_repeticao` INTEGER NOT NULL,
@@ -225,6 +227,7 @@ CREATE TABLE `delineamento` (
 -- CreateTable
 CREATE TABLE `foco` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_culture` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `status` INTEGER NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
@@ -236,6 +239,7 @@ CREATE TABLE `foco` (
 -- CreateTable
 CREATE TABLE `type_assay` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_culture` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
@@ -245,8 +249,9 @@ CREATE TABLE `type_assay` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ogm` (
+CREATE TABLE `tecnologia` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_culture` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
@@ -258,6 +263,7 @@ CREATE TABLE `ogm` (
 -- CreateTable
 CREATE TABLE `lote` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_portfolio` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `volume` INTEGER NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
@@ -268,10 +274,12 @@ CREATE TABLE `lote` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `lote_portfolio` (
+CREATE TABLE `epoca` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_portfolio` INTEGER NOT NULL,
-    `id_lote` INTEGER NOT NULL,
+    `id_culture` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `status` INTEGER NOT NULL DEFAULT 1,
+    `created_by` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -281,7 +289,26 @@ CREATE TABLE `lote_portfolio` (
 CREATE TABLE `import_spreadsheet` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `moduleId` INTEGER NOT NULL,
-    `fields` VARCHAR(191) NOT NULL,
+    `fields` JSON NOT NULL,
+
+    UNIQUE INDEX `import_spreadsheet_moduleId_key`(`moduleId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `npe` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `idLocal` INTEGER NOT NULL,
+    `idSafra` INTEGER NOT NULL,
+    `idFoco` INTEGER NOT NULL,
+    `idTipoEnsaio` INTEGER NOT NULL,
+    `idOgm` INTEGER NOT NULL,
+    `idEpoca` INTEGER NOT NULL,
+    `npei` INTEGER NOT NULL,
+    `prox_npe` INTEGER NOT NULL,
+    `status` INTEGER NOT NULL DEFAULT 1,
+    `created_by` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -317,13 +344,22 @@ ALTER TABLE `users_preferences` ADD CONSTRAINT `Users_Preferences_userId_fkey` F
 ALTER TABLE `layoult_quadra` ADD CONSTRAINT `layoult_quadra_localId_fkey` FOREIGN KEY (`localId`) REFERENCES `local`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `portfolio` ADD CONSTRAINT `portfolio_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `genotipo` ADD CONSTRAINT `genotipo_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `lote_portfolio` ADD CONSTRAINT `lote_portfolio_id_portfolio_fkey` FOREIGN KEY (`id_portfolio`) REFERENCES `portfolio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `delineamento` ADD CONSTRAINT `delineamento_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `lote_portfolio` ADD CONSTRAINT `lote_portfolio_id_lote_fkey` FOREIGN KEY (`id_lote`) REFERENCES `lote`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `foco` ADD CONSTRAINT `foco_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `import_spreadsheet` ADD CONSTRAINT `import_spreadsheet_moduleId_fkey` FOREIGN KEY (`moduleId`) REFERENCES `modules`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `type_assay` ADD CONSTRAINT `type_assay_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `tecnologia` ADD CONSTRAINT `tecnologia_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `lote` ADD CONSTRAINT `lote_id_portfolio_fkey` FOREIGN KEY (`id_portfolio`) REFERENCES `genotipo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `epoca` ADD CONSTRAINT `epoca_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

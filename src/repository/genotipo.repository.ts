@@ -2,19 +2,19 @@ import { prisma } from '../pages/api/db/db';
 
 export class GenotipoRepository {
   async create(data: any) {
-    const genotipo = await prisma.portfolio.create({ data });
+    const genotipo = await prisma.genotipo.create({ data });
     return genotipo;
   }
 
   async findByGenealogy(genealogy: string) {
-    const genotipo = await prisma.portfolio.findFirst({
+    const genotipo = await prisma.genotipo.findFirst({
       where: { genealogy }
     });
     return genotipo;
   }
 
   async findOne(id: number) {
-    const genotipo = await prisma.portfolio.findUnique({
+    const genotipo = await prisma.genotipo.findUnique({
       where: { id }
     });
     return genotipo;
@@ -24,7 +24,7 @@ export class GenotipoRepository {
     const genotipo = await this.findOne(id);
 
     if (genotipo !== null) {
-      const result = await prisma.portfolio.update({
+      const result = await prisma.genotipo.update({
         where: { id },
         data
       });
@@ -41,9 +41,9 @@ export class GenotipoRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.portfolio.count({ where: where });
+    const count = await prisma.genotipo.count({ where: where });
 
-    const result: object | any = await prisma.portfolio.findMany({
+    const result: object | any = await prisma.genotipo.findMany({
       select: select, 
       skip: skip, 
       take: take, 

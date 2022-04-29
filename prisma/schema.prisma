@@ -30,9 +30,9 @@ model culture {
   status              Int              @default(1)
   safra               safra[]
   users_cultures      users_cultures[]
-  portfolio           portfolio[]
+  genotipo            genotipo[]
   users_permissions   users_permissions[]
-  ogm                 ogm[]
+  tecnologia          tecnologia[]
   foco                foco[]
   type_assay          type_assay[]
   delineamento        delineamento[]
@@ -189,7 +189,7 @@ model layoult_quadra {
   local          local    @relation(fields: [localId], references: [id])
 }
 
-model portfolio {
+model genotipo {
   id         Int       @id @default(autoincrement())
   id_culture Int
   genealogy  String
@@ -235,7 +235,7 @@ model type_assay {
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
-model ogm {
+model tecnologia {
   id             Int       @id @default(autoincrement())
   id_culture     Int
   name           String
@@ -254,7 +254,7 @@ model lote {
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime @default(now())
-  portfolio portfolio @relation(fields: [id_portfolio], references: [id])
+  portfolio genotipo @relation(fields: [id_portfolio], references: [id])
 }
 
 model epoca {
