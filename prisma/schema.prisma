@@ -212,6 +212,7 @@ model delineamento {
   created_at     DateTime? @default(now())
 
   culture culture @relation(fields: [id_culture], references: [id])
+  sequencia_delineamento sequencia_delineamento[]
 }
 
 model foco {
@@ -248,13 +249,13 @@ model tecnologia {
 
 model lote {
   id            Int @id @default(autoincrement())
-  id_portfolio  Int
+  id_genotipo  Int
   name          String
   volume        Int
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime @default(now())
-  portfolio genotipo @relation(fields: [id_portfolio], references: [id])
+  genotipo      genotipo @relation(fields: [id_genotipo], references: [id])
 }
 
 model epoca {
@@ -274,7 +275,6 @@ model import_spreadsheet {
   fields Json
 }
 
-
 model npe {
   id           Int @id @default(autoincrement())
   idLocal Int 
@@ -288,6 +288,21 @@ model npe {
   status         Int       @default(1)
   created_by     Int
   created_at     DateTime? @default(now())
+}
+
+model sequencia_delineamento {
+  id                Int       @id @default(autoincrement())
+  id_delineamento   Int
+  name              String
+  repeticao         Int
+  sorteio           Int
+  nt                Int
+  bloco             Int
+  status            Int       @default(1)
+  created_by        Int
+  created_at        DateTime  @default(now())
+
+  delineamento delineamento @relation(fields: [id_delineamento], references: [id])
 }
 
 // ["title", "nameLocal", "nameSafra", "nameFoco", "nameTipoEnsaio", "nameOgm", "nameEpoca", "npe", "prox_npe"]

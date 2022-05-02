@@ -263,7 +263,7 @@ CREATE TABLE `tecnologia` (
 -- CreateTable
 CREATE TABLE `lote` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_portfolio` INTEGER NOT NULL,
+    `id_genotipo` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `volume` INTEGER NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
@@ -309,6 +309,22 @@ CREATE TABLE `npe` (
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
     `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sequencia_delineamento` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_delineamento` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `repeticao` INTEGER NOT NULL,
+    `sorteio` INTEGER NOT NULL,
+    `nt` INTEGER NOT NULL,
+    `bloco` INTEGER NOT NULL,
+    `status` INTEGER NOT NULL DEFAULT 1,
+    `created_by` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -359,7 +375,10 @@ ALTER TABLE `type_assay` ADD CONSTRAINT `type_assay_id_culture_fkey` FOREIGN KEY
 ALTER TABLE `tecnologia` ADD CONSTRAINT `tecnologia_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `lote` ADD CONSTRAINT `lote_id_portfolio_fkey` FOREIGN KEY (`id_portfolio`) REFERENCES `genotipo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `lote` ADD CONSTRAINT `lote_id_genotipo_fkey` FOREIGN KEY (`id_genotipo`) REFERENCES `genotipo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `epoca` ADD CONSTRAINT `epoca_id_culture_fkey` FOREIGN KEY (`id_culture`) REFERENCES `culture`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sequencia_delineamento` ADD CONSTRAINT `sequencia_delineamento_id_delineamento_fkey` FOREIGN KEY (`id_delineamento`) REFERENCES `delineamento`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

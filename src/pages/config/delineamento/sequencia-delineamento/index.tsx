@@ -1,37 +1,23 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
+import getConfig from "next/config";
 import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineTable } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { delineamentoService, userPreferencesService } from "src/services";
+import { sequenciaDelineamentoService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../components";
-import * as ITabs from '../../../shared/utils/dropdown';
-
-
-
-interface IDelineamentoProps {
-  id: Number | any;
-  name: String | any;
-  repeticao: string;
-  trat_repeticao: Number;
-  created_by: Number;
-  status: Number;
-};
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -39,22 +25,34 @@ interface IFilter{
   orderBy: object | any;
   typeOrder: object | any;
 }
+
+interface ISequenciaDelineamento {
+  id: number;
+  id_delineamento: number;
+  name: string;
+  repeticao: number;
+  sorteio: number;
+  nt: number;
+  bloco: number;
+  status?: number;
+}
+
 interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
-  allItems: IDelineamentoProps[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
+
+interface IData {
+  allItems: ISequenciaDelineamento[];
+  totalItems: number;
+  itensPerPage: number;
   filterAplication: object | any;
-  cultureId: number;
+  id_delineamento: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId}: Idata) {
-  const { TabsDropDowns } = ITabs.default;
+export default function Listagem({allItems, totalItems, itensPerPage, filterAplication, id_delineamento}: IData) {
+  const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -64,33 +62,42 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     : tab.statusTab = false
   ));
 
+  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.delineamento ||{id:0, table_preferences: "id,name,repeticao,trat_repeticao,status,sequencia"};
+  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,name,repeticao,sorteio,nt,bloco,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [delineamento, setDelineamento] = useState<IDelineamentoProps[]>(() => allItems);
+  const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderAddress, setOrderAddress] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<any>('');
-  const [arrowAddress, setArrowAddress] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Repetiçao ", value: "repeticao", defaultChecked: () => camposGerenciados.includes('repeticao') },
-    { name: "CamposGerenciados[]", title: "Trat. Repetição", value: "trat_repeticao", defaultChecked: () => camposGerenciados.includes('trat_repeticao') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') },
-    { name: "CamposGerenciados[]", title: "Sequência", value: "sequencia", defaultChecked: () => camposGerenciados.includes('sequencia') },
-  ]);
+  // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(0);
+  // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Repetição", value: "repeticao" },
+    { name: "CamposGerenciados[]", title: "Sorteio", value: "sorteio" },
+    { name: "CamposGerenciados[]", title: "NT", value: "nt" },
+    { name: "CamposGerenciados[]", title: "Bloco", value: "bloco" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
+
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = colums(camposGerenciados);
-  
+  const columns = columnsOrder(camposGerenciados);
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -99,35 +106,58 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setFilter(parametersFilter);
-        setDelineamento(response.response);
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" +  id_delineamento;
+      await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+          setTotaItems(response.total);
+          setItems(response.response);
+          setFilter(parametersFilter);
       })
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
-  ];
+  async function handleStatusCulture(idCulture: number, data: ISequenciaDelineamento): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
+    } else {
+      data.status = 0;
+    }
+    
+    const index = items.findIndex((item) => item.id === idCulture);
 
-  function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+    if (index === -1) {
+      return;
+    }
+
+    setItems((oldCulture) => {
+      const copy = [...oldCulture];
+      copy[index].status = data.status;
+      return copy;
+    });
+
+    const { id, name, status } = items[index];
+
+    // await sequenciaDelineamentoService.updateCulture({ id, name, status });
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
-    Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
+
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
+        },);
       }
-      if (ObjetCampos[item] == 'name') {
+      if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowName }
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Name
+                Nome
               </button>
             </div>
           ),
@@ -135,97 +165,84 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           sorting: false
         },);
       }
-  
-      if (ObjetCampos[item] == 'repeticao') {
-        arrOb.push({ title: "Repetição", field: "repeticao", sorting: false })
+      if (ObjetCampos[index] == 'repeticao') {
+        arrOb.push({
+          title: "Repetição",
+          field: "repeticao",
+          sorting: false
+        },);
       }
-      
-      if (ObjetCampos[item] == 'trat_repeticao') {
-        arrOb.push({ title: "Trat. Repetição", field: "trat_repeticao", sorting: false })
+      if (ObjetCampos[index] == 'sorteio') {
+        arrOb.push({
+          title: "Sorteio",
+          field: "sorteio",
+          sorting: false
+        },);
       }
-
-      if (ObjetCampos[item] == 'status') {
+      if (ObjetCampos[index] == 'nt') {
+        arrOb.push({
+          title: "NT",
+          field: "nt",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[index] == 'bloco') {
+        arrOb.push({
+          title: "Bloco",
+          field: "bloco",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IDelineamentoProps) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {router.push(`delineamento/atualizar?id=${rowData.id}`)}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
+          render: (rowData: ISequenciaDelineamento) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button 
+                  icon={<BiEdit size={16} />}
+                  title={`Atualizar ${rowData.name}`}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {router.push(`sequencia-delineamento/atualizar?id=${rowData.id}`)}}
+                />
+              </div>
+              {rowData.status ? (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
                     title="Ativo"
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={async () => await handleStatusCulture(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {router.push(`delineamento/atualizar?id=${rowData.id}`)}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
+              ) : (
+                <div className="h-10">
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
                     title="Inativo"
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusCulture(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              </div>
-            )
-          ),
-        })
-      }
-
-      if (ObjetCampos[item] == 'sequencia') {
-        arrOb.push({
-          title: "Sequência",
-          field: "sequencia",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: IDelineamentoProps) => (
-            <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<AiOutlineTable size={16} />}
-                    onClick={() => {router.push(`delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`)}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    title={`Sequência de ${rowData.name}`}
-                  />
-                </div>
-              </div>
+              )}
+            </div>
           ),
         })
       }
@@ -244,41 +261,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 7 }).then((response) => {
-        userLogado.preferences.delineamento = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 16 }).then((response) => {
+        userLogado.preferences.sequencia_delineamento = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.delineamento = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.sequencia_delineamento = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await delineamentoService.update({id: id, status: status});
-
-    const index = delineamento.findIndex((delineamento) => delineamento.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setDelineamento((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -306,9 +301,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await delineamentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setDelineamento(response.response)
+        setOrderName(response.response)
       }
     });
     
@@ -325,7 +320,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
   };
 
-  function handleOnDragEnd(result: DropResult) {
+  function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result)  return;
     
@@ -339,12 +334,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await delineamentoService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = delineamento.map((row) => {
+    await sequenciaDelineamentoService.getAll(filterAplication).then((response) => {
+      if (response.status === 200) {
+        const newData = items.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
           } else {
@@ -356,7 +351,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "delineamento");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Sequencia de delineamento");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -369,49 +364,49 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Delineamento.xlsx");
+        XLSX.writeFile(workBook, "Sequencia de delineamento.xlsx");
+      }
+    });
+  };
+
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  };
+
+  async function handlePagination(): Promise<void> {
+    let skip = currentPage * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    if (filter) {
+      parametersFilter = parametersFilter + "&" + filter;
+    }
+    await sequenciaDelineamentoService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setItems(response.response);
       }
     });
   };
 
   useEffect(() => {
-    async function handlePagination(): Promise<void> {
-      let skip = currentPage * Number(take);
-      let parametersFilter = "skip=" + skip + "&take=" + take;
-  
-      if (filter) {
-        parametersFilter = parametersFilter + "&" + filter;
-      }
-      await delineamentoService.getAll(parametersFilter).then((response) => {
-        if (response.status == 200) {
-          setDelineamento(response.response);
-        }
-      });
-    };
-
-    function handleTotalPages(): void {
-      if (currentPage < 0) {
-        setCurrentPage(0);
-      } else if (currentPage >= pages) {
-        setCurrentPage(pages - 1);
-      }
-    };
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-
+  
   return (
     <>
-      <Head>
-        <title>Listagem dos Layout</title>
-      </Head>
+      <Head><title>Listagem de sequência de delineamento</title></Head>
+
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar sequência de delineamento">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -431,40 +426,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
-  
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Nome
+                      Pesquisar
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="nome"
-                      id="filterSearch"
-                      name="filterSearch"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Repetição
-                    </label>
-                    <Input 
-                      type="number" 
-                      placeholder="Repetição"
-                      id="filterSearch"
-                      name="filterSearch"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Trat. Repetição
-                    </label>
-                    <Input 
-                      type="number"
-                      placeholder="Trat. Repetição"
+                      placeholder="name"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -474,6 +444,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -485,18 +456,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             </div>
           </AccordionFilter>
 
-          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable
+            <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={delineamento}
+              data={items}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20
                 },
-                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -517,21 +486,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button 
-                        title="Cadastrar Delineamento"
-                        value="Cadastrar Delineamento"
+                        value="Cadastrar sequência de delineamento"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push('delineamento/cadastro')}}
-                        icon={<FiUserPlus size={20} />}
+                        onClick={() => {router.push(`sequencia-delineamento/cadastro/${id_delineamento}`)}}
+                        icon={<RiPlantLine size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
+                        <div className="w-72">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -552,11 +519,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                           {(provided) => (
                                             <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox 
-                                                name={genarate.name} 
-                                                title={genarate.title?.toString()} 
-                                                value={genarate.value} 
-                                                defaultChecked={camposGerenciados.includes(genarate.value)}
+                                              <CheckBox
+                                                name={genarate.name}
+                                                title={genarate.title?.toString()}
+                                                value={genarate.value}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -573,12 +540,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         </div>
                       </div>
 
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('sequencia-delineamento/importacao')}} />
-                      </div>
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de delineamento" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                      </div>
+                        <div className='h-12 flex items-center justify-center w-full'>
+                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('sequencia-delineamento/importacao')}} />
+                        </div>
+                        <div className='h-12 flex items-center justify-center w-full'>
+                          <Button title="Download lista de sequência de delineamento" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        </div>
                     </div>
                   </div>
                 ),
@@ -648,39 +615,46 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
-  
-  const  token  =  req.cookies.token;
-  const  cultureId  =  req.cookies.cultureId;
+
+  const  token  =  context.req.cookies.token;
+  const  cultureId: number  = Number(context.req.cookies.cultureId);
+  const id_delineamento: number = Number(context.query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const local = await fetch(urlParameters.toString(), requestOptions);
-  const Response =  await local.json();
-  const allItems = Response.response;
-  const totalItems = Response.total;
-  
+  // const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
+  // const data = await api.json();
+
+  // const allItems  = data.response;
+  // const totalItems = data.total;
+
+  const api = await fetch(`${baseUrl}/list?id_culture=${cultureId}`, requestOptions);
+  const data = await api.json();
+  const allItems  = data.response;
+  const totalItems = data.total;
+
   return {
     props: {
       allItems,
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      id_delineamento,
     },
   }
 }

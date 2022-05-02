@@ -12,8 +12,6 @@ import {
 } from "../../../components";
 import * as ITabs from '../../../shared/utils/dropdown';
 
-
-
 interface IDelineamentoProps {
   id_culture: number;
   name: String | any;

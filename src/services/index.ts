@@ -11,6 +11,7 @@ export * from './lote.service';
 export * from './not-auth/forgot-password.service';
 export * from './profile.service';
 export * from './safra.service';
+export * from './sequencia-delineamento.service';
 export * from './tecnologia.service';
 export * from './tipo-ensaio.service';
 export * from './user-permission';
