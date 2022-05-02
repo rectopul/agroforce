@@ -70,9 +70,16 @@ export class SequenciaDelineamentoRepository {
     return result;
   }
 
-  async listAll(id_delineamento: number) {
+  async list(id_delineamento: number) {
     const result = await prisma.sequencia_delineamento.findMany({
       where: { id_delineamento },
+      include: {
+        delineamento: {
+          select: {
+            name: true,
+          }
+        }
+      }
     });
 
     return result;

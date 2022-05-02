@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
@@ -29,6 +29,7 @@ interface IFilter{
 interface ISequenciaDelineamento {
   id: number;
   id_delineamento: number;
+  delineamento: string;
   name: string;
   repeticao: number;
   sorteio: number;
@@ -62,9 +63,11 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     : tab.statusTab = false
   ));
 
+  console.log(allItems);
+
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,name,repeticao,sorteio,nt,bloco,status"};
+  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,delineamento,name,repeticao,sorteio,nt,bloco,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
@@ -77,6 +80,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Delineamento", value: "delineamento" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Repetição", value: "repeticao" },
     { name: "CamposGerenciados[]", title: "Sorteio", value: "sorteio" },
@@ -107,7 +111,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" +  id_delineamento;
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_delineamento=" +  id_delineamento;
       await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
           setTotaItems(response.total);
           setItems(response.response);
@@ -185,6 +189,13 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
           sorting: false
         },);
       }
+      if (ObjetCampos[index] == 'delineamento') {
+        arrOb.push({
+          title: "Delineamento",
+          field: "delineamento",
+          sorting: false
+        },);
+      }
       if (ObjetCampos[index] == 'name') {
         arrOb.push({
           title: (
@@ -236,7 +247,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
           filterPlaceholder: "Filtrar por status",
           render: (rowData: ISequenciaDelineamento) => (
             <div className='h-10 flex'>
-              <div className="h-10">
+              {/* <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
                   title={`Atualizar ${rowData.name}`}
@@ -244,7 +255,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                   textColor="white"
                   onClick={() => {router.push(`sequencia-delineamento/atualizar?id=${rowData.id}`)}}
                 />
-              </div>
+              </div> */}
               {rowData.status ? (
                 <div className="h-10">
                   <Button 
@@ -368,7 +379,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
     }
     
     await sequenciaDelineamentoService.getAll(filterAplication).then((response) => {
@@ -413,7 +424,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
 
   async function handlePagination(): Promise<void> {
     let skip = currentPage * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    let parametersFilter = "skip=" + skip + "&take=" + take + "&id_delineamento=" + id_delineamento;
 
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
@@ -426,7 +437,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   };
 
   useEffect(() => {
-    handlePagination();
+    // handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
   
@@ -654,7 +665,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
   const  token  =  context.req.cookies.token;
-  const  cultureId: number  = Number(context.req.cookies.cultureId);
   const id_delineamento: number = Number(context.query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
@@ -671,16 +681,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  // const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
-  // const data = await api.json();
-
-  // const allItems  = data.response;
-  // const totalItems = data.total;
-
-  const api = await fetch(`${baseUrl}/list?id_culture=${cultureId}`, requestOptions);
+  const api = await fetch(`${baseUrl}/list-relation?id_delineamento=${id_delineamento}`, requestOptions);
   const data = await api.json();
   const allItems  = data.response;
   const totalItems = data.total;
+
+  console.log(allItems)
 
   return {
     props: {

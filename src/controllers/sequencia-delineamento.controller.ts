@@ -41,10 +41,25 @@ export class SequenciaDelineamentoController {
 
   async list(id_delineamento: number) {
     try {
-      const data = await this.SequenciaDelineamentoRepository.listAll(id_delineamento);
-      const count = data.length;
+      const result = await this.SequenciaDelineamentoRepository.list(id_delineamento);
 
-      return { status: 200, response: data, total: count };
+      const data = result.map((item) => {
+        return {
+          id: item.id,
+          id_delineamento: item.id_delineamento,
+          delineamento: item.delineamento.name,
+          name: item.name,
+          repeticao: item.repeticao,
+          sorteio: item.sorteio,
+          nt: item.nt,
+          bloco: item.bloco,
+          status: item.status,
+        }
+      });
+
+      const total = data.length;
+
+      return { status: 200, response: data, total };
     } catch {
       return { status: 400, response: [], total: 0 };
     }
