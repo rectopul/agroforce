@@ -6,7 +6,7 @@ import Head from "next/head";
 import router from "next/router";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
@@ -21,9 +21,6 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../components";
 import * as ITabs from '../../../shared/utils/dropdown';
-
-
-
 
 interface ILayoultProps {
   id: Number | any;
@@ -108,6 +105,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [colorStar, setColorStar] = useState<string>('');
+  
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -147,6 +146,39 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({
+          title: "",
+          field: "id",
+          width: 0,
+          render: () => (
+            colorStar === '#eba417' ? (
+              <div className='h-10 flex'>
+                <div>
+                  <Button
+                    icon={<AiTwotoneStar size={25} color={'#eba417'} />}
+                    onClick={() => setColorStar('')}
+                    bgColor=" border-0"
+                    textColor=" shadow-none hover:shadow-none"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div>
+                  <Button 
+                    icon={<AiTwotoneStar size={25} color={colorStar} />}
+                    onClick={() => setColorStar('#eba417')}
+                    bgColor=" border-0"
+                    textColor=" shadow-none hover:shadow-none"
+                  />
+                </div>
+              </div>
+            )
+          ),
+        })
+      }
+      
       if (ObjetCampos[item] == 'id') {
         arrOb.push({ title: "Código", field: "id", sorting: false })
       }

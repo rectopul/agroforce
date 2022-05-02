@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
@@ -79,8 +79,8 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
     { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
   ]);
-  
   const [filter, setFilter] = useState<any>(filterAplication);
+  const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
     { id: 2, name: 'Todos'},
@@ -140,6 +140,39 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "",
+          field: "id",
+          width: 0,
+          render: () => (
+            colorStar === '#eba417' ? (
+              <div className='h-10 flex'>
+                <div>
+                  <Button
+                    icon={<AiTwotoneStar size={25} color={'#eba417'} />}
+                    onClick={() => setColorStar('')}
+                    bgColor=" border-0"
+                    textColor=" shadow-none hover:shadow-none"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div>
+                  <Button 
+                    icon={<AiTwotoneStar size={25} color={colorStar} />}
+                    onClick={() => setColorStar('#eba417')}
+                    bgColor=" border-0"
+                    textColor=" shadow-none hover:shadow-none"
+                  />
+                </div>
+              </div>
+            )
+          ),
+        })
+      }
+      
       if (ObjetCampos[index] == 'id') {
         arrOb.push({
           title: "Código",
