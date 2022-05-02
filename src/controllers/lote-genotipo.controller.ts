@@ -135,10 +135,10 @@ export class LoteGenotipoController {
     try {
       const responseGet = await prisma.lote.findMany({
         where: {
-          id_portfolio: Number(id_genotipo),
+          id_genotipo
         },
         include: {
-          portfolio: {
+          genotipo: {
             select: {
               id: true,
               genealogy: true,
@@ -151,9 +151,9 @@ export class LoteGenotipoController {
       const data = responseGet.map(item => {
         return {
           id: item.id,
-          id_culture: item.portfolio.id_culture,
-          id_genotipo: item.portfolio.id,
-          genealogy: item.portfolio.genealogy,
+          id_culture: item.genotipo.id_culture,
+          id_genotipo: item.genotipo.id,
+          genealogy: item.genotipo.genealogy,
           name: item.name,
           volume: item.volume,
           status: item.status,

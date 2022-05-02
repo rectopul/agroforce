@@ -121,23 +121,23 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             colorStar === '#eba417' ? (
               <div className='h-10 flex'>
                 <div>
-                  <Button
-                    icon={<AiTwotoneStar size={25} color={'#eba417'} />}
+                  <button
+                    className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('')}
-                    bgColor=" border-0"
-                    textColor=" shadow-none hover:shadow-none"
-                  />
+                  >
+                    <AiTwotoneStar size={25} color={'#eba417'} />
+                  </button>
                 </div>
               </div>
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <Button 
-                    icon={<AiTwotoneStar size={25} color={colorStar} />}
+                  <button 
+                    className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
-                    bgColor=" border-0"
-                    textColor=" shadow-none hover:shadow-none"
-                  />
+                  >
+                    <AiTwotoneStar size={25} />
+                  </button>
                 </div>
               </div>
             )
