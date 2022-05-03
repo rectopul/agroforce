@@ -74,11 +74,13 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
         }
       }
     }
-    console.log(auxObject);
     // return;
 
     importService.create({moduleId: moduleId, fields: auxObject}).then((response) => {
-      console.log(response);
+      if (response.status === 200) {
+        Swal.fire(response.message);
+        router.back();
+      }
     });
   }
   function toLetter(columnNumber: any) {

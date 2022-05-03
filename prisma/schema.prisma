@@ -76,6 +76,8 @@ model safra {
   status            Int?      @default(1)
   created_by        Int
   created_at        DateTime? @default(now())
+
+  npe       npe[]
 }
 
 model uf {
@@ -165,6 +167,7 @@ model local {
   created_by     Int
   status         Int              @default(1)
   layoult_quadra layoult_quadra[]
+  npe       npe[]
 }
 
 model layoult_quadra {
@@ -194,11 +197,11 @@ model genotipo {
   id_culture Int
   genealogy  String
   cruza      String
-  status     Int       @default(1)
+  status     Int      @default(1)
   created_by Int
-  created_at DateTime  @default(now())
-  culture    culture   @relation(fields: [id_culture], references: [id])
-  lote lote[]
+  created_at DateTime @default(now())
+  culture    culture  @relation(fields: [id_culture], references: [id])
+  lote       lote[]
 }
 
 model delineamento {
@@ -216,23 +219,26 @@ model delineamento {
 }
 
 model foco {
-  id          Int @id @default(autoincrement())
-  id_culture  Int
-  name        String
-  status      Int?       @default(1)
-  created_by  Int
-  created_at  DateTime? @default(now())
+  id         Int       @id @default(autoincrement())
+  id_culture Int
+  name       String
+  status     Int?      @default(1)
+  created_by Int
+  created_at DateTime? @default(now())
 
+  npe       npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
-model type_assay {
-  id             Int       @id @default(autoincrement())
-  id_culture  Int
-  name           String
-  status         Int       @default(1)
-  created_by     Int
-  created_at     DateTime? @default(now())
 
+model type_assay {
+  id         Int       @id @default(autoincrement())
+  id_culture Int
+  name       String
+  status     Int       @default(1)
+  created_by Int
+  created_at DateTime? @default(now())
+
+  npe       npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
@@ -244,6 +250,7 @@ model tecnologia {
   created_by     Int
   created_at     DateTime? @default(now())
 
+  npe       npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
@@ -259,35 +266,44 @@ model lote {
 }
 
 model epoca {
-  id             Int       @id @default(autoincrement())
-  id_culture  Int
-  name           String
-  status         Int       @default(1)
-  created_by     Int
-  created_at     DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  id_culture Int
+  name       String
+  status     Int      @default(1)
+  created_by Int
+  created_at DateTime @default(now())
 
+  npe       npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model import_spreadsheet {
-  id           Int @id @default(autoincrement())
-  moduleId Int @unique
-  fields Json
+  id       Int  @id @default(autoincrement())
+  moduleId Int  @unique
+  fields   Json
 }
 
 model npe {
-  id           Int @id @default(autoincrement())
-  idLocal Int 
-  idSafra Int 
-  idFoco Int 
-  idTipoEnsaio Int 
-  idOgm Int 
-  idEpoca Int 
-  npei Int 
-  prox_npe Int 
-  status         Int       @default(1)
-  created_by     Int
-  created_at     DateTime? @default(now())
+  id            Int       @id @default(autoincrement())
+  id_local      Int
+  id_safra      Int
+  id_foco       Int
+  id_type_assay Int
+  id_ogm        Int
+  id_epoca      Int
+  npei          Int
+  npef          Int?
+  prox_npe      Int?
+  status        Int       @default(1)
+  created_by    Int
+  created_at    DateTime? @default(now())
+
+  local local @relation(fields: [id_local], references: [id])
+  safra safra @relation(fields: [id_safra], references: [id])
+  foco foco @relation(fields: [id_foco], references: [id])
+  type_assay type_assay @relation(fields: [id_type_assay], references: [id])
+  tecnologia tecnologia @relation(fields: [id_ogm], references: [id])
+  epoca epoca @relation(fields: [id_epoca], references: [id])
 }
 
 model sequencia_delineamento {
@@ -304,5 +320,3 @@ model sequencia_delineamento {
 
   delineamento delineamento @relation(fields: [id_delineamento], references: [id])
 }
-
-// ["title", "nameLocal", "nameSafra", "nameFoco", "nameTipoEnsaio", "nameOgm", "nameEpoca", "npe", "prox_npe"]

@@ -322,9 +322,41 @@ CREATE TABLE `sequencia_delineamento` (
     `sorteio` INTEGER NOT NULL,
     `nt` INTEGER NOT NULL,
     `bloco` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_culture` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `import_spreadsheet` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `moduleId` INTEGER NOT NULL,
+    `fields` JSON NOT NULL,
+
+    UNIQUE INDEX `import_spreadsheet_moduleId_key`(`moduleId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `npe` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_local` INTEGER NOT NULL,
+    `id_safra` INTEGER NOT NULL,
+    `id_foco` INTEGER NOT NULL,
+    `id_type_assay` INTEGER NOT NULL,
+    `id_ogm` INTEGER NOT NULL,
+    `id_epoca` INTEGER NOT NULL,
+    `npei` INTEGER NOT NULL,
+    `npef` INTEGER NOT NULL,
+    `prox_npe` INTEGER NOT NULL,
+    `status` INTEGER NOT NULL DEFAULT 1,
+    `created_by` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

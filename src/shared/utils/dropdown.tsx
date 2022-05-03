@@ -55,6 +55,13 @@ export function TabsDropDowns () {
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
+    { 
+      titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/npe',
+      data: [
+        { labelDropDown: 'NPE', hrefDropDown: '/config/npe', iconDropDown: <FiMapPin/> },
+        { labelDropDown: 'Lote', hrefDropDown: '/config/npe/lote', iconDropDown: <FiMapPin/> },
+      ],
+    },
     // {
     //   titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
     //   data: [
@@ -72,7 +79,7 @@ const tabs = [
   { title: 'ENSAIO', value: <BsCheckLg />, status: false , href: '/config/ensaio/foco' },
   { title: 'LOCAL', value: <BsCheckLg />, status: false , href: '/config/local' },
   { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false , href: '/config/delineamento' },
-  // { title: 'NPE', value: <BsCheckLg />, status: false , href: '/config/npe' },
+  { title: 'NPE', value: <BsCheckLg />, status: false , href: '/config/npe' },
   // { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: '/config/layout-quadra' },
   // { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false, href: '/config/conf-planilhas' },
 ];

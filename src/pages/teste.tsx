@@ -13,11 +13,10 @@ export default function Teste() {
   const { TabsDropDowns } = ITabs;
   function readExcel(value: any) {
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 1}).then((response) => {
-        console.log(response)
+      importService.validate({spreadSheet: rows, moduleId: 1, safra: "22/21", foco: "SUL", grupoF: 1, created_by: 1}).then((response) => {
         if (response.message != '') {
           Swal.fire({
-            text: response.message, 
+            html: response.message,
             width: "800"});
         }
       });

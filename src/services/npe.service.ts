@@ -1,26 +1,24 @@
 import getConfig from 'next/config';
+
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-export const npeService = {
-  update,
-  getAll,
-  create,
+export const layoultQuadraService = {
+    getAll,
+    create,
+    update
 };
 
-async function create(data: any) {
-  const foco = await fetchWrapper.post(baseUrl, data);
-  return foco;
+function create(data: any) {
+    return fetchWrapper.post(baseUrl, data);
 }
 
-async function update(data: any) {
-  const foco = await fetchWrapper.put(baseUrl, data);
-  return foco;
+function update(data: any) {
+    return fetchWrapper.put(baseUrl, data);
 }
 
-async function getAll(parameters: any) {
-  const portfolio = await fetchWrapper.get(baseUrl, parameters);
-  return portfolio;
+function getAll(parameters: any) {
+    return fetchWrapper.get(baseUrl, parameters);
 }

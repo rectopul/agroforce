@@ -4,9 +4,8 @@ import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import {  useJsApiLoader } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
-import InputMask from "react-input-mask";
 
 import { layoultQuadraService } from "src/services";
 
