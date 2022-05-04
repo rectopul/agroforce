@@ -148,7 +148,7 @@ export class ImportController {
                             
                             if (configModule.response[0].fields[sheet] == 'OGM') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                        let ogm: any = await this.ogmController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                        let ogm: any = await this.ogmController.getAll({name: String(data.spreadSheet[keySheet][sheet])});
                                         if (ogm.total == 0) {
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tecnologia informado não existe no sistema.</span><br>`;
                                         } else {
@@ -198,7 +198,7 @@ export class ImportController {
                             
                             if (configModule.response[0].fields[sheet] == 'Epoca') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                    let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
+                                    let epoca: any = await this.epocaController.listAll({name: String(data.spreadSheet[keySheet][sheet])});
                                     if (epoca.total == 0) {      
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
                                     } else {
@@ -284,7 +284,6 @@ export class ImportController {
                 }
                 return "save";
             }
-
             return Resposta;
         } catch (err) {
             console.log(err)
