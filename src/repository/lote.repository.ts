@@ -16,7 +16,7 @@ export class LoteRepository {
   async create(data: CreateLoteDTO) {
     const lote = await prisma.lote.create({
       data: {
-        id_portfolio: data.id_genotipo,
+        id_genotipo: data.id_genotipo,
         name: data.name,
         volume: data.volume,
         created_by: data.created_by,
