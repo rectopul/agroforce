@@ -93,12 +93,13 @@ export class ImportController {
     async validateNPE(data: object | any) {
         var Resposta: string = '';
         let npeiAnterior: number = 0;
+        let Column: number;
+
         try {
-             
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
             if (data != null && data != undefined) {
-                let configModule: object | any = await this.getAll(parseInt(data.moduleId));
                 let Line: number;
-                let Column: number;
                 for (const [keySheet, lines] of data.spreadSheet.entries()) {
                     Line = Number(keySheet) + 1;
                     for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
@@ -231,6 +232,53 @@ export class ImportController {
                                     Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do NPEI é obrigatorio`;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {  
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {   
+                            this.aux.status = 1;   
+                            this.aux.created_by = data.created_by;   
+                            this.aux.npef = 0;
+                            this.aux.prox_npe = 0;
+                            if (configModule.response[0].fields[sheet] == 'Local') {
+                                let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_local = local.response[0].id;
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Safra') {
+                                let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_safra = safras.response[0].id;                              
+                            } 
+                            
+                            if (configModule.response[0].fields[sheet] == 'OGM') {
+                                let ogm: any = await this.ogmController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_ogm = ogm.response[0].id;
+                            }
+                            
+                            if (configModule.response[0].fields[sheet] == 'Foco') {
+                                let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_foco = foco.response[0].id;              
+                            } 
+                            
+                            if (configModule.response[0].fields[sheet] == 'Ensaio') {
+                                let ensaio: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_type_assay = ensaio.response[0].id;
+                            } 
+                            
+                            if (configModule.response[0].fields[sheet] == 'Epoca') {
+                                let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
+                                this.aux.id_epoca = epoca.response[0].id;
+                            }
+
+                            if (configModule.response[0].fields[sheet] == "NPEI") {
+                                this.aux.npei = data.spreadSheet[keySheet][sheet];
+                            }
 
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                                 this.npeController.post(this.aux);
@@ -238,10 +286,9 @@ export class ImportController {
                         }
                     }
                 }
+                return "save";
             }
-            if (Resposta == "") {
-               return "save";
-            }
+
             return Resposta.replace(/\\n/g, '<br>');
         } catch (err) {
             console.log(err)
