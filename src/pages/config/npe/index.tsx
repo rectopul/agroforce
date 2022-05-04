@@ -111,7 +111,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_safra=" + userLogado.safras.safra_selecionada;
       await npeService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
@@ -693,8 +693,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
   const  token  =  req.cookies.token;
-  const  safraId  =  req.cookies.safraId;
+  let  safraId: any  =  req.cookies.safraId;
 
+  if (safraId == NaN || safraId == undefined) {
+      safraId= '0';
+  } 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
