@@ -114,15 +114,15 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
                                         if (local.total == 0) {      
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema.</span><br>`;
                                         }  else {
                                             this.aux.id_local = local.response[0].id;
                                         }
                                     } else {
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Local deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Local deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Local é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Local é obrigatorio.</span><br>`;
                                 } 
                             }
 
@@ -130,19 +130,19 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         if (data.spreadSheet[keySheet][sheet] != data.safra) {
-                                            return "\nA safra a ser importada tem que ser a mesma selecionada!";
+                                            // return "<span> A safra a ser importada tem que ser a mesma selecionada!";
                                         }
                                         let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
                                         if (safras.total == 0) {
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, A Safra não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Safra não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_safra = safras.response[0].id;
                                         }
                                     } else { 
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Safra deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Safra deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome da Safra é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome da Safra é obrigatorio.</span><br>`;
                                 }                              
                             } 
                             
@@ -150,12 +150,12 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                         let ogm: any = await this.ogmController.getAll({name: data.spreadSheet[keySheet][sheet]});
                                         if (ogm.total == 0) {
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, O OGM informado não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tecnologia informado não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_ogm = ogm.response[0].id;
                                         }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do OGM é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Tecnologia é obrigatorio.</span><br>`;
                                 }
                             }
                             
@@ -163,19 +163,19 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         if (data.spreadSheet[keySheet][sheet] != data.foco) {
-                                            return "\nO foco a ser importado tem que ser o mesmo selecionado!";
+                                            // return "<span> O foco a ser importado tem que ser o mesmo selecionado!";
                                         }
                                         let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
                                         if (foco.total == 0) {
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, O Foco não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Foco não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_foco = foco.response[0].id;
                                         }
                                     } else { 
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Foco deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Foco deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Foco é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Foco é obrigatorio.</span><br>`;
                                 }                 
                             } 
                             
@@ -184,15 +184,15 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let ensaio: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
                                         if (ensaio.total == 0) {      
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, O Tipo de Ensaio não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tipo de Ensaio não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_type_assay = ensaio.response[0].id;
                                         }
                                     } else { 
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Tipo de Ensaio deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Tipo de Ensaio deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Tipo de Ensaio é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Tipo de Ensaio é obrigatorio.</span><br>`;
                                 }
                             } 
                             
@@ -201,15 +201,15 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
                                         if (epoca.total == 0) {      
-                                            Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_epoca = epoca.response[0].id;
                                         }
                                     } else { 
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Epoca deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Epoca deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Epoca é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Epoca é obrigatorio.</span><br>`;
                                 }   
                             }
 
@@ -217,7 +217,7 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {                    
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'number') {
                                         if (npeiAnterior > data.spreadSheet[keySheet][sheet]) {
-                                            Resposta += `\nO NPEI tem que está em ordem crescente`;
+                                            Resposta += `<span>O NPEI tem que está em ordem crescente </br>.</span><br>`;
                                         } else {
                                             Resposta += await this.npeController.validateNpeiDBA({Column: Column, Line: Line, safra: data.safra, foco: data.foco, npei: data.spreadSheet[keySheet][sheet]});
                                             if (Resposta == "") {
@@ -226,10 +226,10 @@ export class ImportController {
                                             npeiAnterior = data.spreadSheet[keySheet][sheet];
                                         }
                                     } else { 
-                                        Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `\nA ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do NPEI é obrigatorio`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do NPEI é obrigatorio.</span><br>`;
                                 }
                             }
                         }
@@ -289,7 +289,7 @@ export class ImportController {
                 return "save";
             }
 
-            return Resposta.replace(/\\n/g, '<br>');
+            return Resposta;
         } catch (err) {
             console.log(err)
         }

@@ -68,7 +68,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.npe ||{id:0, table_preferences: "id,local,safra,foco,ensaio,ogm,epoca,npei,npef,status"};
+  const preferences = userLogado.preferences.npe ||{id:0, table_preferences: "id,local,safra,foco,ensaio,ogm,epoca,npei,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [npe, setNPE] = useState(allItems);
@@ -87,10 +87,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Safra ", value: "safra", defaultChecked: () => camposGerenciados.includes('safra') },
     { name: "CamposGerenciados[]", title: "Foco ", value: "foco", defaultChecked: () => camposGerenciados.includes('foco') },
     { name: "CamposGerenciados[]", title: "Ensaio ", value: "ensaio", defaultChecked: () => camposGerenciados.includes('ensaio') },
-    { name: "CamposGerenciados[]", title: "OGM ", value: "ogm", defaultChecked: () => camposGerenciados.includes('ogm') },
+    { name: "CamposGerenciados[]", title: "OGM", value: "Técnologia", defaultChecked: () => camposGerenciados.includes('ogm') },
     { name: "CamposGerenciados[]", title: "Epoca ", value: "epoca", defaultChecked: () => camposGerenciados.includes('epoca') },
     { name: "CamposGerenciados[]", title: "NPE Inicial ", value: "npei", defaultChecked: () => camposGerenciados.includes('npei') },
-    { name: "CamposGerenciados[]", title: "NPE Final ", value: "npef", defaultChecked: () => camposGerenciados.includes('npef') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -184,16 +183,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Ensaio", field: "type_assay.name", sorting: false })
       }
       if (ObjetCampos[item] == 'ogm') {
-        arrOb.push({ title: "OGM", field: "ogm.name", sorting: false })
+        arrOb.push({ title: "Técnologia", field: "ogm.name", sorting: false })
       }   
       if (ObjetCampos[item] == 'epoca') {
         arrOb.push({ title: "Epoca", field: "epoca.name", sorting: false })
       }
       if (ObjetCampos[item] == 'npei') {
         arrOb.push({ title: "NPE Inicial", field: "npei", sorting: false })
-      }
-      if (ObjetCampos[item] == 'epoca') {
-        arrOb.push({ title: "NPE Final", field: "npef", sorting: false })
       }
 
       if (ObjetCampos[item] == 'status') {
