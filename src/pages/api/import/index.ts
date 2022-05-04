@@ -10,12 +10,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const Controller =  new ImportController();
     switch (req.method) {
         case 'GET':
-            let response = await Controller.getAll(1);
-            console.log(response);
+            let response = await Controller.getAll(Number(req.query.moduleId));
             res.status(200).json(response);
             break;
         case 'POST':
-            // await Controller.validateInfoTable({moduleId: 1});
             let Result = await Controller.post(req.body);
             res.status(200).json(Result);
             break;

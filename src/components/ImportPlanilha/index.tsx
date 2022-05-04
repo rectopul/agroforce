@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 
 interface IImportPlanilhaProps {
   data: object | any;
+  configSalva: object | any;
   moduleId: number;
 }
 
@@ -21,12 +22,13 @@ interface IImport{
   fields: object | any;
 }
 
-export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
+export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaProps) {
   const router = useRouter();
 
   const [quantityColumns, setQuantityColumns] = useState<number>(data.length);
   const [Letras, setLetras] = useState<String[]>(AZ);
   const [Options, setOptions] = useState<String[]>(data);
+  const [configPlanilhaSalva, setConfigSalva] = useState<String[]>(configSalva);
  
   const formik = useFormik<IImport>({
     initialValues: {
@@ -215,7 +217,7 @@ export function ImportPlanilha({ data, moduleId }: IImportPlanilhaProps) {
                   <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
                       {Array(quantityColumns).fill('').map((_, index) => (
                         <div key={index} className="h-11 w-32">
-                          <Select name={`fields_${index}`}  onChange={formik.handleChange}  selected={false} values={Options}/>
+                          <Select name={`fields_${index}`}  onChange={formik.handleChange}  selected={configPlanilhaSalva[index]} values={Options}/>
                         </div>
                       ))}
                   </div>               

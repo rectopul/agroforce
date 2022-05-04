@@ -152,19 +152,29 @@ export default function Importar({safra, foco}: Idata) {
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
     const { publicRuntimeConfig } = getConfig();
     const  token  =  req.cookies.token;
+    const  cultureId  =  req.cookies.cultureId;
   
+    let param = `filterStatus=1&id_culture=${cultureId}`;
+
+    const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
+    urlParametersSafra.search = new URLSearchParams(param).toString();
+
+    const urlParametersFoco: any = new URL(`${publicRuntimeConfig.apiUrl}/foco`);
+    urlParametersFoco.search = new URLSearchParams(param).toString();
+
     const requestOptions: RequestInit | undefined = {
       method: 'GET',
       credentials: 'include',
       headers:  { Authorization: `Bearer ${token}` }
     };
   
-    const apiSafra = await fetch(`${publicRuntimeConfig.apiUrl}/safra`, requestOptions);
-    const apiFoco = await fetch(`${publicRuntimeConfig.apiUrl}/foco`, requestOptions);
+    const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
+    const apiFoco = await fetch(urlParametersFoco.toString(), requestOptions);
     let safra:any = await apiSafra.json();
     let foco = await apiFoco.json();
     
     safra = safra.response;
     foco = foco.response;
+
     return { props: { safra, foco } }
 }

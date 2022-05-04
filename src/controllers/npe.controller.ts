@@ -104,7 +104,7 @@ export class NpeController {
                                                                 ORDER BY npei DESC 
                                                                 LIMIT 1`;
                     if ((safraAndFoco[0]) && safraAndFoco[0].npei > data.npei) {
-                        return `\nA ${data.Column}º coluna da ${data.Line}º linha está incorreta, NPEI ja cadastrado`;
+                        return `<span>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, NPEI ja cadastrado</span><br>`;
                     }
                 }
            }
