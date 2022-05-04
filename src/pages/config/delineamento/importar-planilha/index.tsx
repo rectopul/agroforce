@@ -18,6 +18,7 @@ export default function ImportacaoPlanilha() {
 
         <ImportPlanilha
           data={data}
+          configSalva={[]}
           moduleId={1}
         />
     </>
