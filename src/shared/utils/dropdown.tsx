@@ -59,7 +59,6 @@ export function TabsDropDowns () {
       titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/npe',
       data: [
         { labelDropDown: 'NPE', hrefDropDown: '/config/npe', iconDropDown: <FiMapPin/> },
-        { labelDropDown: 'Lote', hrefDropDown: '/config/npe/lote', iconDropDown: <FiMapPin/> },
       ],
     },
     // {
