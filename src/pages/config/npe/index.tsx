@@ -13,7 +13,7 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { layoultQuadraService, userPreferencesService } from "src/services";
+import { npeService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
@@ -113,7 +113,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await npeService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         if (response.status == 200) {
           if (response.total > 0) {
             setTotaItems(response.total);
@@ -290,7 +290,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    await layoultQuadraService.update({id: id, status: status});
+    await npeService.update({id: id, status: status});
     const index = npe.findIndex((npe: { id: number; }) => npe.id === id);
 
     if (index === -1) {
@@ -329,7 +329,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await npeService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setNPE(response.response)
       }
@@ -372,7 +372,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await npeService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
         setNPE(response.response)
       }
@@ -408,7 +408,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await layoultQuadraService.getAll(filterAplication).then((response) => {
+    await npeService.getAll(filterAplication).then((response) => {
       if (response.status == 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
@@ -457,7 +457,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await layoultQuadraService.getAll(parametersFilter).then((response) => {
+    await npeService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
         setNPE(response.response);
       }

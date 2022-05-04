@@ -25,7 +25,7 @@ export class ImportController {
             if (response) {
                 return {response, status: 200}
             } else { 
-                return {status: 400, message: "ainda não há configuração de planilha para esse modulo!"};
+                return {status: 200, message: "ainda não há configuração de planilha para esse modulo!"};
             }
         } catch (err) {
             console.log(err);
@@ -73,11 +73,11 @@ export class ImportController {
 
                 let configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
-                if (configModule.response == "") return {status: 400, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
+                if (configModule.response == "") return {status: 200, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
 
                 let response:any;
     
-                if (data.moduleId == 1) {
+                if (data.moduleId == 14) {
                     response = await this.validateNPE(data);
                     if (response == 'save') {
                        response = "Items cadastrado com sucesso!";

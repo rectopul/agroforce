@@ -17,4 +17,5 @@ export * from './tipo-ensaio.service';
 export * from './user-permission';
 export * from './user-preferences.service';
 export * from './user.service';
+export * from './npe.service';
 
