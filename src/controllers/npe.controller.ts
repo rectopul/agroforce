@@ -25,7 +25,7 @@ export class NpeController {
                 parameters.name  = JSON.parse(options.filterSearch);
             }
 
-            if (options.id_safra) {
+            if (options.id_safra && options.id_safra > 0) {
                 parameters.id_safra = parseInt(options.id_safra);
             }
         
