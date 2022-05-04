@@ -198,15 +198,11 @@ export class ImportController {
                             
                             if (configModule.response[0].fields[sheet] == 'Epoca') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                    if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                        let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
-                                        if (epoca.total == 0) {      
-                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
-                                        } else {
-                                            this.aux.id_epoca = epoca.response[0].id;
-                                        }
-                                    } else { 
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Epoca deve ser um campo de texto.</span><br>`;
+                                    let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
+                                    if (epoca.total == 0) {      
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
+                                    } else {
+                                        this.aux.id_epoca = epoca.response[0].id;
                                     }
                                 } else {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Epoca é obrigatorio.</span><br>`;

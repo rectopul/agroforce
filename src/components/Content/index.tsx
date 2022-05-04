@@ -6,6 +6,7 @@ import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
 import { userService } from 'src/services';
+import { setCookie } from 'nookies';
 import {
   Aside,
   DropDown,
@@ -113,9 +114,14 @@ export function Content({ contentHeader, children }: IContentData) {
 
   function validationSafras (value: any) {
     if (value != safraSelecionada) {
+      setCookie(null, 'safraId', value, {
+        maxAge: 86400 * 7,
+        path: '/',
+      });
       setSafraSelecionada(value);
       userLogado.safras.safra_selecionada = parseInt(value);
       localStorage.setItem('user', JSON.stringify(userLogado));
+      location. reload();
     } 
   }
 
@@ -128,7 +134,7 @@ export function Content({ contentHeader, children }: IContentData) {
         headerSelects={
           <div className="h-10 flex gap-2">
             <Select values={cultures}   onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
-            {/* <Select values={safr  as}   onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} /> */}
+            <Select values={safras}   onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
           </div>
         }
       >

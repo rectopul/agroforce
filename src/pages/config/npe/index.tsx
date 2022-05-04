@@ -693,11 +693,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
   const  token  =  req.cookies.token;
+  const  safraId  =  req.cookies.safraId;
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_safra=${safraId}`;
+
+  const filterAplication = `filterStatus=1&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -710,8 +713,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const Response =  await local.json();
 
   const allItems =  Response.response;
-  console.log(allItems);
-  const totalItems = Response.response.length;
+  const totalItems = Response.total;
   return {
     props: {
       allItems,

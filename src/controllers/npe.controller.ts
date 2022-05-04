@@ -24,6 +24,10 @@ export class NpeController {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
                 parameters.name  = JSON.parse(options.filterSearch);
             }
+
+            if (options.id_safra) {
+                parameters.id_safra = parseInt(options.id_safra);
+            }
         
             if (options.take) {
                 if (typeof(options.take) === 'string') {

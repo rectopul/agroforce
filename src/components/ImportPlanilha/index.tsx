@@ -104,7 +104,6 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     }
     return columnName;
   }
-  // console.log(toLetter(33))
 
   function validateColumns(value: any) {
     let Terste =[];
@@ -215,11 +214,15 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 </div>
                 <div className="flex pl-2 justify-start items-center py-9 gap-3">
                   <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
-                      {Array(quantityColumns).fill('').map((_, index) => (
+                    {(quantityColumns > 0)
+                      ?
+                      Array(quantityColumns).fill('').map((_, index) => (
                         <div key={index} className="h-11 w-32">
                           <Select name={`fields_${index}`}  onChange={formik.handleChange}  selected={configPlanilhaSalva[index]} values={Options}/>
                         </div>
-                      ))}
+                      ))
+                      : ''
+                    } 
                   </div>               
                 </div>
               </main>
