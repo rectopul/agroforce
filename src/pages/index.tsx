@@ -22,6 +22,11 @@ export default function Listagem() {
     path: '/',
   });
 
+  setCookie(null, 'safraId',  userLogado.safras.safra_selecionada, {
+    maxAge: 86400 * 7,
+    path: '/',
+  });
+
   if (userLogado.token) {
     router.push('/config/tmg/usuarios/')
   }
