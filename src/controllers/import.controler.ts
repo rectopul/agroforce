@@ -6,6 +6,7 @@ import {TypeAssayController} from '../controllers/tipo-ensaio.controller';
 import {TecnologiaController} from '../controllers/tecnologia.controller';
 import {EpocaController} from '../controllers/epoca.controller';
 import {NpeController} from '../controllers/npe.controller';
+import { VscDebugConsole } from 'react-icons/vsc';
 
 export class ImportController {
     importRepository = new ImportRepository();
@@ -139,7 +140,8 @@ export class ImportController {
                             if (configModule.response[0].fields[sheet] == 'Safra') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                        if (data.spreadSheet[keySheet][sheet] != data.safra) {
+                                        let validateSafra: any = await this.safraController.getOneSafra(Number(data.safra));
+                                        if (data.spreadSheet[keySheet][sheet] != validateSafra.response.year) {
                                             return "<span> A safra a ser importada tem que ser a mesma selecionada!";
                                         }
                                         let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
@@ -174,7 +176,8 @@ export class ImportController {
                             if (configModule.response[0].fields[sheet] == 'Foco') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                        if (data.spreadSheet[keySheet][sheet] != data.foco) {
+                                        let validateFoco: any = await this.focoController.getOneFoco(Number(data.foco));
+                                        if (data.spreadSheet[keySheet][sheet] != validateFoco.response.name) {
                                             return "<span> O foco a ser importado tem que ser o mesmo selecionado!";
                                         }
                                         let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
@@ -250,7 +253,7 @@ export class ImportController {
 
             console.log(Resposta);
             if (Resposta == "") {
-                console.log('AQUI R');
+                // console.log('AQUI R');
                 for (const [keySheet, lines] of data.spreadSheet.entries()) {
                     for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
                         Column = Number(sheet) + 1;

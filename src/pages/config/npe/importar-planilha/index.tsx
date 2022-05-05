@@ -23,11 +23,11 @@ export default function Importar({safra, foco}: Idata) {
   const router = useRouter();
 
   safra.map((value: string | object | any) => {
-    safras.push({id: value.year, name: value.year});
+    safras.push({id: value.id, name: value.year});
   })
 
   foco.map((value: string | object | any) => {
-    focos.push({id: value.name, name: value.name});
+    focos.push({id: value.id, name: value.name});
   })
 
   function readExcel(value: any, safra: any, foco: any) {
@@ -39,7 +39,7 @@ export default function Importar({safra, foco}: Idata) {
           Swal.fire({
             html: response.message,
             width: "800"});
-            router.back();
+            // router.back();
         }
       });
     })
