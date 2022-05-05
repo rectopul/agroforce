@@ -13,10 +13,11 @@ export class FocoRepository {
     return foco;
   }
 
-  async findByName(name: string) {
+  async findByName(data: any) {
     const foco = await prisma.foco.findFirst({
       where: { 
-        name
+        name: data.name,
+        id_culture: data.id_culture,
       }
     });
     return foco;

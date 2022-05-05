@@ -6,6 +6,7 @@ interface LoteDTO {
   name: string;
   created_by: number;
   status: number;
+  // group: number;
 }
 
 type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
@@ -121,7 +122,7 @@ export class FocoController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const focoAlreadyExists = await this.focoRepository.findByName(data.name);
+      const focoAlreadyExists = await this.focoRepository.findByName({name:data.name, id_culture: data.id_culture});
 
       if (focoAlreadyExists) return {status: 400, message: "Foco já existente"};
 
@@ -138,7 +139,8 @@ export class FocoController {
       const schema: SchemaOf<UpdateLoteDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
-        status: number().integer().required(this.required)
+        status: number().integer().required(this.required),
+        // group: number().integer().required(this.required)
       });
 
       const valid = schema.isValidSync(data);
@@ -151,7 +153,7 @@ export class FocoController {
 
       const focoAlreadyExists = await this.focoRepository.findByName(data.name);
 
-      if (focoAlreadyExists && focoAlreadyExists.id !== foco.id) {
+      if ((focoAlreadyExists) && focoAlreadyExists.id !== foco.id) {
         return {status: 400, message: "Foco já existente"};
       }
 
