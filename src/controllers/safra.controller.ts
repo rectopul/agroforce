@@ -157,8 +157,8 @@ export class SafraController {
 
             if (!valid) return {status: 400, message: "Dados inválidos"};
 
-            const safraAlreadyExists = await this.safraRepository.findByYear(data.year);
-        
+            const safraAlreadyExists = await this.safraRepository.findByYear({year: data.year, id_culture: data.id_culture});
+
             if (safraAlreadyExists) return { status: 400, message: "Ano da safra já existente" };
 
             await this.safraRepository.create(data);

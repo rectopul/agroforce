@@ -76,13 +76,22 @@ export class ImportController {
                 if (configModule.response == "") return {status: 200, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
 
                 let response:any;
-    
+                
+                // Validação do modulo Delineamento
+                if (data.moduleId == 7) {
+                    response = await this.validateDelineamento(data);
+                    if (response == 'save') {
+                       response = "Items cadastrado com sucesso!";
+                    } 
+                }
+
+                // Validação do modulo NPE
                 if (data.moduleId == 14) {
                     response = await this.validateNPE(data);
                     if (response == 'save') {
                        response = "Items cadastrado com sucesso!";
                     } 
-                } 
+                }
                 return {status: 200, message: response};
             }
         } catch (err) {
@@ -114,6 +123,7 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
                                         if (local.total == 0) {      
+                                            // console.log('aqui Local');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema.</span><br>`;
                                         }  else {
                                             this.aux.id_local = local.response[0].id;
@@ -130,10 +140,11 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         if (data.spreadSheet[keySheet][sheet] != data.safra) {
-                                            // return "<span> A safra a ser importada tem que ser a mesma selecionada!";
+                                            return "<span> A safra a ser importada tem que ser a mesma selecionada!";
                                         }
                                         let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
                                         if (safras.total == 0) {
+                                            // console.log('aqui Safra');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Safra não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_safra = safras.response[0].id;
@@ -150,6 +161,7 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                         let ogm: any = await this.ogmController.getAll({name: String(data.spreadSheet[keySheet][sheet])});
                                         if (ogm.total == 0) {
+                                            // console.log('aqui OGM');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tecnologia informado não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_ogm = ogm.response[0].id;
@@ -163,10 +175,11 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         if (data.spreadSheet[keySheet][sheet] != data.foco) {
-                                            // return "<span> O foco a ser importado tem que ser o mesmo selecionado!";
+                                            return "<span> O foco a ser importado tem que ser o mesmo selecionado!";
                                         }
                                         let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
                                         if (foco.total == 0) {
+                                            // console.log('aqui Foco');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Foco não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_foco = foco.response[0].id;
@@ -183,7 +196,8 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let ensaio: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
-                                        if (ensaio.total == 0) {      
+                                        if (ensaio.total == 0) {  
+                                            // console.log('aqui Ensaio');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tipo de Ensaio não existe no sistema.</span><br>`;
                                         } else {
                                             this.aux.id_type_assay = ensaio.response[0].id;
@@ -200,6 +214,7 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     let epoca: any = await this.epocaController.listAll({name: String(data.spreadSheet[keySheet][sheet])});
                                     if (epoca.total == 0) {      
+                                        // console.log('aqui Epoca');
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
                                     } else {
                                         this.aux.id_epoca = epoca.response[0].id;
@@ -233,9 +248,11 @@ export class ImportController {
                 }
             }
 
+            console.log(Resposta);
             if (Resposta == "") {
+                console.log('AQUI R');
                 for (const [keySheet, lines] of data.spreadSheet.entries()) {
-                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {  
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
                         Column = Number(sheet) + 1;
                         if (keySheet != '0') {   
                             this.aux.status = 1;   
@@ -243,32 +260,38 @@ export class ImportController {
                             this.aux.npef = 0;
                             this.aux.prox_npe = 0;
                             if (configModule.response[0].fields[sheet] == 'Local') {
+                                // console.log("Local R");
                                 let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
                                 this.aux.id_local = local.response[0].id;
                             }
 
                             if (configModule.response[0].fields[sheet] == 'Safra') {
+                                // console.log("Safra R");
                                 let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
                                 this.aux.id_safra = safras.response[0].id;                              
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'OGM') {
-                                let ogm: any = await this.ogmController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                // console.log("OGM R");
+                                let ogm: any = await this.ogmController.getAll({name: String(data.spreadSheet[keySheet][sheet])});
                                 this.aux.id_ogm = ogm.response[0].id;
                             }
                             
                             if (configModule.response[0].fields[sheet] == 'Foco') {
+                                // console.log("FOCO R");
                                 let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
                                 this.aux.id_foco = foco.response[0].id;              
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'Ensaio') {
+                                // console.log("Ensaio R");
                                 let ensaio: any = await this.typeAssayController.getAll({name: data.spreadSheet[keySheet][sheet]});
                                 this.aux.id_type_assay = ensaio.response[0].id;
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'Epoca') {
-                                let epoca: any = await this.epocaController.listAll({name: data.spreadSheet[keySheet][sheet]});
+                                // console.log("Epoca R");
+                                let epoca: any = await this.epocaController.listAll({name: String(data.spreadSheet[keySheet][sheet])});
                                 this.aux.id_epoca = epoca.response[0].id;
                             }
 
@@ -279,6 +302,47 @@ export class ImportController {
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                                 this.npeController.post(this.aux);
                             }
+                        }
+                    }
+                }
+                return "save";
+            }
+            return Resposta;
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async validateDelineamento(data: object | any) {
+        var Resposta: string = '';
+        let Column: number;
+
+        try {
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
+            if (data != null && data != undefined) {
+                let Line: number;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    Line = Number(keySheet) + 1;
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {   
+                            if (configModule.response[0].fields[sheet] == 'Delineamento') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema.</span><br>`;
+                                }
+                            }
+                       }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {  
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {   
+                          
                         }
                     }
                 }
