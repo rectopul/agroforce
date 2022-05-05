@@ -92,19 +92,16 @@ export class NpeController {
     async validateNpeiDBA(data: any) {
         try {
             if (data.safra) {
-                let safra: any = await prisma.$queryRaw`SELECT (npei + 1) as npei, s.year as safra
+                let safra: any = await prisma.$queryRaw`SELECT (npei + 1) as npei
                                                         FROM npe n
-                                                        INNER JOIN safra s on s.id = n.id_safra
-                                                        WHERE s.year = ${data.safra}
+                                                        WHERE n.id_safra = ${data.safra}
                                                         ORDER BY npei DESC 
                                                         LIMIT 1`;
                 if ((safra[0]) && safra[0].npei > data.npei) {
-                    let safraAndFoco: any = await prisma.$queryRaw`SELECT (npei + 1) as npei, s.year as safra, f.name as foco 
+                    let safraAndFoco: any = await prisma.$queryRaw`SELECT (npei + 1) as npei
                                                                 FROM npe n
-                                                                INNER JOIN safra s on s.id = n.id_safra
-                                                                INNER JOIN foco f on f.id = n.id_foco
-                                                                WHERE s.year = ${data.safra}
-                                                                AND f.name = ${data.foco}
+                                                                WHERE n.id_safra = ${data.safra}
+                                                                AND n.id_foco = ${data.foco}
                                                                 ORDER BY npei DESC 
                                                                 LIMIT 1`;
                     if ((safraAndFoco[0]) && safraAndFoco[0].npei > data.npei) {
