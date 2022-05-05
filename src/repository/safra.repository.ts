@@ -26,10 +26,11 @@ export class SafraRepository {
         return safra;
     }
 
-    async findByYear(year: string) {
+    async findByYear(data: any) {
         const safra = await prisma.safra.findFirst({
             where: {
-                year
+                year: data.year,
+                id_culture: data.id_culture,
             }
         });
 
