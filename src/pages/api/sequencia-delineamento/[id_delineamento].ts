@@ -9,7 +9,6 @@ export default  apiHandler(handler);
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {
         id_delineamento,
-        name,
         repeticao,
         sorteio,
         nt,
@@ -34,7 +33,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             console.log("API")
             const resultPost = await sequenciaDelineamentoController.create({
                 id_delineamento,
-                name,
                 repeticao,
                 sorteio,
                 nt,
