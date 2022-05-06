@@ -142,7 +142,7 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let validateSafra: any = await this.safraController.getOneSafra(Number(data.safra));
                                         if (data.spreadSheet[keySheet][sheet] != validateSafra.response.year) {
-                                            return "<span> A safra a ser importada tem que ser a mesma selecionada!";
+                                            return "A safra a ser importada tem que ser a mesma selecionada!";
                                         }
                                         let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
                                         if (safras.total == 0) {
@@ -178,7 +178,7 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
                                         let validateFoco: any = await this.focoController.getOneFoco(Number(data.foco));
                                         if (data.spreadSheet[keySheet][sheet] != validateFoco.response.name) {
-                                            return "<span> O foco a ser importado tem que ser o mesmo selecionado!";
+                                            return "O foco a ser importado tem que ser o mesmo selecionado!";
                                         }
                                         let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
                                         if (foco.total == 0) {
@@ -251,7 +251,6 @@ export class ImportController {
                 }
             }
 
-            console.log(Resposta);
             if (Resposta == "") {
                 // console.log('AQUI R');
                 for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -270,8 +269,7 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Safra') {
                                 // console.log("Safra R");
-                                let safras: any = await this.safraController.getAllSafra({year: data.spreadSheet[keySheet][sheet]});
-                                this.aux.id_safra = safras.response[0].id;                              
+                                this.aux.id_safra = Number(data.safra);                              
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'OGM') {
@@ -282,8 +280,7 @@ export class ImportController {
                             
                             if (configModule.response[0].fields[sheet] == 'Foco') {
                                 // console.log("FOCO R");
-                                let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
-                                this.aux.id_foco = foco.response[0].id;              
+                                this.aux.id_foco = Number(data.foco);              
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'Ensaio') {
