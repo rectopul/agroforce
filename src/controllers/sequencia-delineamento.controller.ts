@@ -4,7 +4,6 @@ import { number, object, SchemaOf, string } from "yup";
 interface ISequenciaDelineamento {
   id: number;
   id_delineamento: number;
-  name: string;
   repeticao: number;
   sorteio: number;
   nt: number;
@@ -48,7 +47,6 @@ export class SequenciaDelineamentoController {
           id: item.id,
           id_delineamento: item.id_delineamento,
           delineamento: item.delineamento.name,
-          name: item.name,
           repeticao: item.repeticao,
           sorteio: item.sorteio,
           nt: item.nt,
@@ -93,7 +91,6 @@ export class SequenciaDelineamentoController {
     try {
       const schema: SchemaOf<IUpdateSequenciaDelineamento> = object({
         id: number().integer().required(this.required),
-        name: string().required(this.required),
         repeticao: number().integer().required(this.required),
         sorteio: number().integer().required(this.required),
         nt: number().integer().required(this.required),
@@ -108,13 +105,6 @@ export class SequenciaDelineamentoController {
       
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
 
-      const sequenciaDelineamentoAlreadyExists = await this.SequenciaDelineamentoRepository.findByName(data.name);
-
-      if (sequenciaDelineamentoAlreadyExists && sequenciaDelineamentoAlreadyExists.id !== sequenciaDelineamento.id) {
-        return { status: 400, message: 'Sequência de delineamento já cadastra. favor consultar os inativos' }
-      }
-
-      sequenciaDelineamento.name = data.name;
       sequenciaDelineamento.repeticao = data.repeticao;
       sequenciaDelineamento.sorteio = data.sorteio;
       sequenciaDelineamento.nt = data.nt;
@@ -147,7 +137,6 @@ export class SequenciaDelineamentoController {
 
       if (options.filterSearch) {
         options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-        parameters.name  = JSON.parse(options.filterSearch);
         parameters.volume  = JSON.parse(options.filterSearch);
       }
 
