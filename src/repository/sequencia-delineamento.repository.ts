@@ -3,7 +3,6 @@ import { prisma } from '../pages/api/db/db';
 interface ISequenciaDelineamento {
   id: number;
   id_delineamento: number;
-  name: string;
   repeticao: number;
   sorteio: number;
   nt: number;
