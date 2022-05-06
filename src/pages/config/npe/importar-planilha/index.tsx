@@ -39,7 +39,7 @@ export default function Importar({safra, foco}: Idata) {
           Swal.fire({
             html: response.message,
             width: "800"});
-            // router.back();
+            router.back();
         }
       });
     })
