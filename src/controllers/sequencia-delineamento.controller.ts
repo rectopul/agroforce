@@ -69,7 +69,6 @@ export class SequenciaDelineamentoController {
     try {
       const schema: SchemaOf<ICreateSequenciaDelineamento> = object({
         id_delineamento: number().integer().required(this.required),
-        name: string().required(this.required),
         repeticao: number().integer().required(this.required),
         sorteio: number().integer().required(this.required),
         nt: number().integer().required(this.required),
@@ -81,16 +80,11 @@ export class SequenciaDelineamentoController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const itemAlreadyExists = await this.SequenciaDelineamentoRepository.findByName(data.name);
-
-      if (itemAlreadyExists) {
-        return { status: 400, message: "Item já cadastro. favor consultar os inativos" };
-      }
-
       await this.SequenciaDelineamentoRepository.create(data);
 
       return {status: 201, message: "Item cadastrado com sucesso!"};
     } catch(err) {
+      console.log(err);
       return {status: 400, message: "Erro no cadastrado"};
     }
   }
@@ -166,17 +160,12 @@ export class SequenciaDelineamentoController {
       } else {
         select = {
           id: true,
-          name: true,
           repeticao: true,
           sorteio: true,
           nt: true,
           bloco: true,
           status: true,
         }
-      }
-
-      if (options.name) {
-        parameters.name = options.name;
       }
 
       if (options.repeticao) {
