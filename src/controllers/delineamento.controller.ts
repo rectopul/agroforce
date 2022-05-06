@@ -114,7 +114,7 @@ export class DelineamentoController {
             if (data != null && data != undefined) {
                 let response = await this.Repository.create(data);
                 if(response) {
-                    return {status: 200, message: "delineamento inserido"}
+                    return {status: 200, message: "delineamento inserido", response}
                 } else {
                     return {status: 400, message: "erro"}
                 }

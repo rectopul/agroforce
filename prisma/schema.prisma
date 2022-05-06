@@ -222,7 +222,7 @@ model foco {
   id         Int       @id @default(autoincrement())
   id_culture Int
   name       String
-  group      Int?
+  // group      Int?
   status     Int?      @default(1)
   created_by Int
   created_at DateTime? @default(now())
@@ -310,7 +310,6 @@ model npe {
 model sequencia_delineamento {
   id                Int       @id @default(autoincrement())
   id_delineamento   Int
-  name              String
   repeticao         Int
   sorteio           Int
   nt                Int

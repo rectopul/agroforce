@@ -30,7 +30,6 @@ interface ISequenciaDelineamento {
   id: number;
   id_delineamento: number;
   delineamento: string;
-  name: string;
   repeticao: number;
   sorteio: number;
   nt: number;
@@ -63,11 +62,9 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     : tab.statusTab = false
   ));
 
-  console.log(allItems);
-
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,delineamento,name,repeticao,sorteio,nt,bloco,status"};
+  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,delineamento,repeticao,sorteio,nt,bloco,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
@@ -81,7 +78,6 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
     { name: "CamposGerenciados[]", title: "Delineamento", value: "delineamento" },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Repetição", value: "repeticao" },
     { name: "CamposGerenciados[]", title: "Sorteio", value: "sorteio" },
     { name: "CamposGerenciados[]", title: "NT", value: "nt" },
@@ -193,20 +189,6 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
         arrOb.push({
           title: "Delineamento",
           field: "delineamento",
-          sorting: false
-        },);
-      }
-      if (ObjetCampos[index] == 'name') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowName }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
-              </button>
-            </div>
-          ),
-          field: "name",
           sorting: false
         },);
       }
@@ -529,15 +511,8 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
-                      <Button 
-                        value="Cadastrar sequência de delineamento"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => {router.push(`sequencia-delineamento/cadastro/${id_delineamento}`)}}
-                        icon={<RiPlantLine size={20} />}
-                      />
-                    </div>
+            
+            
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
@@ -685,8 +660,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const data = await api.json();
   const allItems  = data.response;
   const totalItems = data.total;
-
-  console.log(allItems)
 
   return {
     props: {
