@@ -10,16 +10,14 @@ import Swal from 'sweetalert2';
 import {
   Button,
   Content,
+  Select,
   Input
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
-
 interface ICreateFoco {
   name: string;
+  group: number;
   id_culture: number;
   created_by: number;
 }
@@ -40,17 +38,28 @@ export default function Cadastro() {
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
+  const grupos =  [
+    {id: 1, name: "Grupo 1"},
+    {id: 2, name: "Grupo 2"},
+    {id: 3, name: "Grupo 3"},
+    {id: 4, name: "Grupo 4"},
+    {id: 5, name: "Grupo 5"},
+    {id: 6, name: "Grupo 6"},
+    {id: 7, name: "Grupo 7"}
+  ];
 
   const formik = useFormik<ICreateFoco>({
     initialValues: {
       id_culture: parseInt(culture),
       name: '',
+      group: 0,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       await focoService.create({
         name: capitalize(formik.values.name),
         id_culture: parseInt(culture),
+        group: Number(values.group),
         created_by: formik.values.created_by,
       }).then((response) => {
         if (response.status === 201) {
@@ -99,6 +108,20 @@ export default function Cadastro() {
               onChange={formik.handleChange}
               value={formik.values.name}
             />
+          </div>
+          <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                  *Grupos
+              </label>
+              <Select
+                  values={grupos}
+                  id="group"
+                  name="group"
+                  // required
+                  onChange={formik.handleChange}
+                  value={formik.values.group}
+                  selected={false}
+              />
           </div>
         </div>
 

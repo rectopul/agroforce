@@ -87,7 +87,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Safra ", value: "safra", defaultChecked: () => camposGerenciados.includes('safra') },
     { name: "CamposGerenciados[]", title: "Foco ", value: "foco", defaultChecked: () => camposGerenciados.includes('foco') },
     { name: "CamposGerenciados[]", title: "Ensaio ", value: "ensaio", defaultChecked: () => camposGerenciados.includes('ensaio') },
-    { name: "CamposGerenciados[]", title: "Técnologia", value: "tecnologia", defaultChecked: () => camposGerenciados.includes('tecnologia') },
+    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia", defaultChecked: () => camposGerenciados.includes('tecnologia') },
     { name: "CamposGerenciados[]", title: "Epoca ", value: "epoca", defaultChecked: () => camposGerenciados.includes('epoca') },
     { name: "CamposGerenciados[]", title: "NPE Inicial ", value: "npei", defaultChecked: () => camposGerenciados.includes('npei') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
@@ -183,7 +183,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Ensaio", field: "type_assay.name", sorting: false })
       }
       if (ObjetCampos[item] == 'tecnologia') {
-        arrOb.push({ title: "Técnologia", field: "tecnologia.name", sorting: false })
+        arrOb.push({ title: "Tecnologia", field: "tecnologia.name", sorting: false })
       }   
       if (ObjetCampos[item] == 'epoca') {
         arrOb.push({ title: "Epoca", field: "epoca.name", sorting: false })
