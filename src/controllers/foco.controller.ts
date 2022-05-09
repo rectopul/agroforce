@@ -41,6 +41,10 @@ export class FocoController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
+      if (options.group) {
+        parameters.group = parseInt(options.group);
+      }
+
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
@@ -51,7 +55,8 @@ export class FocoController {
         select = {
           id: true,
           name:true,
-          status: true
+          status: true,
+          group: true
         };
       }
 
@@ -130,6 +135,7 @@ export class FocoController {
 
       return {status: 201, message: "Foco cadastrado"}
     } catch(err) {
+      console.log(err)
       return { status: 404, message: "Erro no cadastrado"}
     }
   };

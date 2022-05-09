@@ -80,13 +80,16 @@ export class ImportController {
                 if (configModule.response == "") return {status: 200, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!"};
 
                 let response:any;
-                
+                let erro: any = false;
+
                 // Validação do modulo Delineamento
                 if (data.moduleId == 7) {
                     response = await this.validateDelineamento(data);
                     if (response == 'save') {
                        response = "Items cadastrado com sucesso!";
-                    } 
+                    } else { 
+                        erro = true;
+                    }
                 }
 
                 // Validação do modulo NPE
@@ -96,7 +99,7 @@ export class ImportController {
                        response = "Items cadastrado com sucesso!";
                     } 
                 }
-                return {status: 200, message: response};
+                return {status: 200, message: response, erro};
             }
         } catch (err) {
             console.log(err)
@@ -179,10 +182,12 @@ export class ImportController {
                             if (configModule.response[0].fields[sheet] == 'Foco') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                        let validateFoco: any = await this.focoController.getOneFoco(Number(data.foco));
-                                        if (data.spreadSheet[keySheet][sheet] != validateFoco.response.name) {
-                                            return "O foco a ser importado tem que ser o mesmo selecionado!";
+                                        let testeFoco: any = await this.focoController.listAllFocos({group: data.foco, name: data.spreadSheet[keySheet][sheet]});
+                                        
+                                        if (testeFoco.total == 0) {
+                                            return "O foco a ser importado tem que fazer parte do grupo selecionado!";
                                         }
+
                                         let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
                                         if (foco.total == 0) {
                                             // console.log('aqui Foco');
@@ -419,7 +424,8 @@ export class ImportController {
                             }
 
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                                this.sequenciaDelineamentoController.create(this.aux);
+                                console.log(this.aux);
+                                // this.sequenciaDelineamentoController.create(this.aux);
                             }
                         }
                     }

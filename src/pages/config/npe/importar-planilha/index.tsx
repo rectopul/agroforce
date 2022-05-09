@@ -21,7 +21,15 @@ export default function Importar({safra, foco}: Idata) {
   const safras: object | any =  [];
   const focos: object | any =  [];
   const router = useRouter();
-
+  const grupos =  [
+    {id: 1, name: "Grupo 1"},
+    {id: 2, name: "Grupo 2"},
+    {id: 3, name: "Grupo 3"},
+    {id: 4, name: "Grupo 4"},
+    {id: 5, name: "Grupo 5"},
+    {id: 6, name: "Grupo 6"},
+    {id: 7, name: "Grupo 7"}
+  ];
   safra.map((value: string | object | any) => {
     safras.push({id: value.id, name: value.year});
   })
@@ -39,7 +47,9 @@ export default function Importar({safra, foco}: Idata) {
           Swal.fire({
             html: response.message,
             width: "800"});
-            router.back();
+            if (!response.erro) { 
+              router.back();
+            }
         }
       });
     })
@@ -89,15 +99,15 @@ export default function Importar({safra, foco}: Idata) {
                 </div> 
                 <div className="w-full h-10">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                        *Foco
+                        *Grupo dos Focos
                     </label>
                     <Select
-                        values={focos}
+                        values={grupos}
                         id="foco"
                         name="foco"
                         required
                         onChange={formik.handleChange}
-                        value={formik.values.name}
+                        value={formik.values.foco}
                         selected={0}
                     />
                 </div>
