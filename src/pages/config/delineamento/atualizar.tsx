@@ -137,6 +137,8 @@ export default function NovoLocal({delineamentoEdit}: IData) {
                 placeholder="4" 
                 id="repeticao"
                 name="repeticao"
+                style={{ background: '#e5e7eb' }}
+                disabled
                 onChange={formik.handleChange}
                 value={Number(formik.values.repeticao)}
               />
@@ -150,6 +152,8 @@ export default function NovoLocal({delineamentoEdit}: IData) {
                 placeholder="14x08(p4)-PY" 
                 id="trat_repeticao"
                 name="trat_repeticao"
+                style={{ background: '#e5e7eb' }}
+                disabled
                 onChange={formik.handleChange}
                 value={Number(formik.values.trat_repeticao)}
               />

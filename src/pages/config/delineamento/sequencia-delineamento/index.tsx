@@ -419,7 +419,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   };
 
   useEffect(() => {
-    // handlePagination();
+    handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
   

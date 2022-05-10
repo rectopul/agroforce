@@ -9,6 +9,7 @@ interface UpdateLoteDTO {
   name: string;
   status?: number;
   group?: number;
+  id_culture?: number;
 }
 
 export const focoService = {

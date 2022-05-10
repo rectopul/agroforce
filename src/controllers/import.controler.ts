@@ -85,8 +85,9 @@ export class ImportController {
                 // Validação do modulo Delineamento
                 if (data.moduleId == 7) {
                     response = await this.validateDelineamento(data);
-                    if (response == 'save') {
-                       response = "Items cadastrado com sucesso!";
+                    if (response.save) {
+                        await this.saveDelineamento(data, response.id_delineamento, configModule);
+                        response = "Items cadastrado com sucesso!";
                     } else { 
                         erro = true;
                     }
@@ -97,9 +98,11 @@ export class ImportController {
                     response = await this.validateNPE(data);
                     if (response == 'save') {
                        response = "Items cadastrado com sucesso!";
-                    } 
+                    } else { 
+                        erro = true;
+                    }
                 }
-                return {status: 200, message: response, erro};
+                return {status: 200, message: response, error: erro};
             }
         } catch (err) {
             console.log(err)
@@ -110,7 +113,7 @@ export class ImportController {
         var Resposta: string = '';
         let npeiAnterior: number = 0;
         let Column: number;
-
+        Resposta += "<div class='' style='' >";
         try {
             let configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
@@ -327,7 +330,6 @@ export class ImportController {
 
         try {
             let configModule: object | any = await this.getAll(parseInt(data.moduleId));
-            let trat_anterior: any;
             let sorteio_anterior: number = 0;
             let repeticao: number = 1;
             let countTrat = 0;
@@ -397,44 +399,47 @@ export class ImportController {
             if (Resposta == "") {
                 let delineamento: any = await this.delineamentoController.post({id_culture: data.id_culture, name: data.delineamento, repeticao: repeticao, trat_repeticao: countTrat, status: 1, created_by: data.created_by});
 
-                if (delineamento) {
-                    this.aux.id_delineamento = delineamento.response.id;
-                }
-
-                this.aux.created_by = data.created_by;
-
-                for (const [keySheet, lines] of data.spreadSheet.entries()) {
-                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {  
-                        Column = Number(sheet) + 1;
-                        if (keySheet != '0') {
-                            if (configModule.response[0].fields[sheet] == 'Repeticao') {
-                               this.aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
-                            }
-
-                            if (configModule.response[0].fields[sheet] == 'Sorteio') {
-                               this.aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
-                            }
-
-                            if (configModule.response[0].fields[sheet] == 'Tratamento') {
-                                this.aux.nt = Number(data.spreadSheet[keySheet][sheet]);
-                            }
-
-                            if (configModule.response[0].fields[sheet] == 'Bloco') {
-                                this.aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
-                            }
-
-                            if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                                console.log(this.aux);
-                                // this.sequenciaDelineamentoController.create(this.aux);
-                            }
-                        }
-                    }
-                }
-                return "save";
+                return {save: true, id_delineamento: delineamento.response.id};
             }
             return Resposta;
         } catch (err) {
             console.log(err)
+        }
+    }
+
+    async saveDelineamento(data: any, id_delineamento: number, configModule: any) {
+        let aux: object | any = {};
+        let Column;
+
+        aux.id_delineamento = id_delineamento;
+        aux.created_by = data.created_by;
+
+        for (const [keySheet, lines] of data.spreadSheet.entries()) {
+            for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
+                Column = Number(sheet) + 1;
+                if (keySheet != '0') {
+                    if (configModule.response[0].fields[sheet] == 'Repeticao') {
+                       aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
+                    }
+
+                    if (configModule.response[0].fields[sheet] == 'Sorteio') {
+                       aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
+                    }
+
+                    if (configModule.response[0].fields[sheet] == 'Tratamento') {
+                        aux.nt = Number(data.spreadSheet[keySheet][sheet]);
+                    }
+
+                    if (configModule.response[0].fields[sheet] == 'Bloco') {
+                        aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
+                    }
+
+                    if (data.spreadSheet[keySheet].length == Column && aux != []) {
+                        // console.log(aux);;
+                        await this.sequenciaDelineamentoController.create(aux);
+                    }
+                }
+            }
         }
     }
 }
