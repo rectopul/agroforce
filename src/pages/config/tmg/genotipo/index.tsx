@@ -12,7 +12,7 @@ import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { genotipoService, userPreferencesService } from "src/services";
@@ -75,7 +75,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
-    { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
+    { name: "CamposGerenciados[]", title: "Genótipo", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
     { name: "CamposGerenciados[]", title: "Lote", value: "id_genotipo" },
@@ -199,7 +199,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
             <div className='flex items-center'>
               { arrowGenealogy }
               <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
-                Genealogia
+              Genótipo
               </button>
             </div>
           ),
@@ -581,7 +581,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
+                    {/* <div className='h-12'>
                       <Button 
                         title="Cadastrar genótipo"
                         value="Cadastrar genótipo"
@@ -589,6 +589,17 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                         textColor="white"
                         onClick={() => {router.push('genotipo/cadastro')}}
                         icon={<RiPlantLine size={20} />}
+                      />
+                    </div> */}
+                      <div className='h-12'>
+                      <Button 
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => {}}
+                        href="genotipo/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
 
@@ -639,10 +650,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} />
+                          {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
+                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="genotipo/importar-planilha/config-planilha"  />
                         </div>
                     </div>
                   </div>

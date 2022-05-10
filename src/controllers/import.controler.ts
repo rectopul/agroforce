@@ -8,6 +8,7 @@ import {EpocaController} from '../controllers/epoca.controller';
 import {NpeController} from '../controllers/npe.controller';
 import {DelineamentoController} from '../controllers/delineamento.controller';
 import {SequenciaDelineamentoController} from '../controllers/sequencia-delineamento.controller';
+import {GenotipoController} from '../controllers/genotipo.controller';
 
 export class ImportController {
     importRepository = new ImportRepository();
@@ -20,6 +21,7 @@ export class ImportController {
     npeController = new NpeController();
     delineamentoController = new DelineamentoController();
     sequenciaDelineamentoController = new SequenciaDelineamentoController();
+    genotipoController = new GenotipoController();
 
     aux: object | any = {};
 
@@ -87,7 +89,17 @@ export class ImportController {
                     response = await this.validateDelineamento(data);
                     if (response.save) {
                         await this.saveDelineamento(data, response.id_delineamento, configModule);
-                        response = "Items cadastrado com sucesso!";
+                        response = "Itens cadastrado com sucesso!";
+                    } else { 
+                        erro = true;
+                    }
+                }
+
+                // Validação do modulo Delineamento
+                if (data.moduleId == 8) {
+                    response = await this.validateGenotipo(data);
+                    if (response == 'save') {
+                        response = "Itens cadastrado com sucesso!";
                     } else { 
                         erro = true;
                     }
@@ -97,11 +109,12 @@ export class ImportController {
                 if (data.moduleId == 14) {
                     response = await this.validateNPE(data);
                     if (response == 'save') {
-                       response = "Items cadastrado com sucesso!";
+                       response = "Itens cadastrado com sucesso!";
                     } else { 
                         erro = true;
                     }
                 }
+
                 return {status: 200, message: response, error: erro};
             }
         } catch (err) {
@@ -406,6 +419,84 @@ export class ImportController {
             console.log(err)
         }
     }
+
+    async validateGenotipo(data: object | any) {
+        var Resposta: string = '';
+        let Column: number;
+        try {
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
+            if (data != null && data != undefined) {
+
+                let Line: number;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    Line = Number(keySheet) + 1;
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'Genotipo') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Genótipo é obrigatorio.</span><br>`;
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Cruza') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Genótipo é obrigatorio.</span><br>`;
+                                }
+                            }
+                       }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                // this.aux = "";
+                this.aux.created_by = Number(data.created_by);
+                this.aux.id_culture = Number(data.id_culture);
+                this.aux.status =1;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'Genotipo') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    let geno = await this.genotipoController.listAllGenotipos({genealogy: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                    if (geno.total > 0) {
+                                        this.aux.id = geno.response[0].id;
+                                        this.aux.genealogy = geno.response[0].genealogy;
+                                    } else {
+                                        this.aux.genealogy =data.spreadSheet[keySheet][sheet];
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Cruza') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.cruza =data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+                       }
+
+                       if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
+                        if (this.aux.id) {
+                            await this.genotipoController.updategenotipo(this.aux);
+                        } else {
+                            await this.genotipoController.createGenotipo(this.aux);
+                        }
+                    }
+                    }
+                }
+                return "save";
+            }
+            return Resposta;
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
     async saveDelineamento(data: any, id_delineamento: number, configModule: any) {
         let aux: object | any = {};

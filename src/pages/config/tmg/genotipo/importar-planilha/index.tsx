@@ -1,14 +1,12 @@
 import Head from "next/head";
 import readXlsxFile from 'read-excel-file'
 import { importService } from "src/services/";
-import  * as ITabs from '../../../../shared/utils/dropdown';
-import {  Button,  Content, Input, Select } from "../../../../components";
+import  * as ITabs from '../../../../../shared/utils/dropdown';
+import {  Button,  Content, Input } from "../../../../../components";
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import { FiUserPlus } from "react-icons/fi";
 import React from "react";
-import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
 import { IoMdArrowBack } from "react-icons/io";
 import { useRouter } from 'next/router';
 
@@ -16,11 +14,11 @@ export default function Importar() {
   const { TabsDropDowns } = ITabs;
   const router = useRouter();
 
-  function readExcel(value: any, delineamento: any) {
+  function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 7, delineamento: delineamento, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
+      importService.validate({spreadSheet: rows, moduleId: 8, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
         if (response.message != '') {
           Swal.fire({
             html: response.message,
@@ -36,17 +34,17 @@ export default function Importar() {
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      delineamento: ''
+      genotipo: ''
     },
     onSubmit: async (values) => {
         var inputFile: any = document.getElementById("inputFile");
-        readExcel(inputFile.files, values.delineamento);
+        readExcel(inputFile.files);
     },
   });
   return (
     <>
       <Head>
-        <title>Importação Delineamento</title>
+        <title>Importação Genótipo</title>
       </Head>
       <Content contentHeader={TabsDropDowns()}>
         <form 
@@ -60,20 +58,6 @@ export default function Importar() {
                 mt-4
                 mb-4
             ">
-            
-              <div className="w-full h-10">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                        *Delineamento
-                    </label>
-                        <Input 
-                            type="text"
-                            required
-                            id="delineamento"
-                            name="delineamento"
-                            onChange={formik.handleChange}
-                            value={formik.values.delineamento}
-                        />
-                </div>
                 <div className="w-full h-10">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                         *Excel
@@ -119,34 +103,3 @@ export default function Importar() {
    </>
   );
 }
-
-
-// export const getServerSideProps:GetServerSideProps = async ({req}) => {
-//     const { publicRuntimeConfig } = getConfig();
-//     const  token  =  req.cookies.token;
-//     const  cultureId  =  req.cookies.cultureId;
-  
-//     let param = `filterStatus=1&id_culture=${cultureId}`;
-
-//     const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
-//     urlParametersSafra.search = new URLSearchParams(param).toString();
-
-//     const urlParametersFoco: any = new URL(`${publicRuntimeConfig.apiUrl}/foco`);
-//     urlParametersFoco.search = new URLSearchParams(param).toString();
-
-//     const requestOptions: RequestInit | undefined = {
-//       method: 'GET',
-//       credentials: 'include',
-//       headers:  { Authorization: `Bearer ${token}` }
-//     };
-  
-//     const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
-//     const apiFoco = await fetch(urlParametersFoco.toString(), requestOptions);
-//     let safra:any = await apiSafra.json();
-//     let foco = await apiFoco.json();
-    
-//     safra = safra.response;
-//     foco = foco.response;
-
-//     return { props: { safra, foco } }
-// }
