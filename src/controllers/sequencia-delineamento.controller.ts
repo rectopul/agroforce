@@ -63,30 +63,20 @@ export class SequenciaDelineamentoController {
     }
   }
 
-  async create(data: ICreateSequenciaDelineamento) {
+  async create(data: object | any) {
     try {
-      const schema: SchemaOf<ICreateSequenciaDelineamento> = object({
-        id_delineamento: number().integer().required(this.required),
-        repeticao: number().integer().required(this.required),
-        sorteio: number().integer().required(this.required),
-        nt: number().integer().required(this.required),
-        bloco: number().integer().required(this.required),
-        created_by: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return {status: 400, message: "Dados inválidos"};
-
-      await this.SequenciaDelineamentoRepository.create(data);
-
-      return {status: 201, message: "Item cadastrado com sucesso!"};
-    } catch(err) {
-      console.log(err);
-      return {status: 400, message: "Erro no cadastrado"};
+        if (data != null && data != undefined) {
+           let response = await this.SequenciaDelineamentoRepository.create(data)
+            if(response) {
+                return {status: 200, message: "itens inseridos"}
+            } else {
+                return {status: 400, message: "erro"}
+            }
+        }
+    } catch (err) {
+        console.log(err)
     }
-  }
-
+}
   async update(data: IUpdateSequenciaDelineamento) {
     try {
       const schema: SchemaOf<IUpdateSequenciaDelineamento> = object({
@@ -124,7 +114,7 @@ export class SequenciaDelineamentoController {
     let skip;
     let orderBy: object | any;
     let select: any = [];
-
+    
     try {
       if (options.filterStatus) {
         if (typeof(options.status) === 'string') {
@@ -160,7 +150,9 @@ export class SequenciaDelineamentoController {
       if (options.repeticao) {
         parameters.repeticao = options.repeticao;
       }
-
+      if (options.id_delineamento) {
+        parameters.id_delineamento = Number(options.id_delineamento);
+      }
       if (options.sorteio) {
         parameters.sorteio = options.sorteio;
       }
@@ -204,13 +196,15 @@ export class SequenciaDelineamentoController {
         skip,
         orderBy
       );
+
       if (!response || response.total <= 0) { 
         return {status: 400, response: [], total: 0}
 
       } else {
         return {status: 200, response, total: response.total }
       }    
-    } catch (err) {
+    } catch (err) { 
+      console.log(err)
       return {status: 400, response: [], total: 0}
     }
   };

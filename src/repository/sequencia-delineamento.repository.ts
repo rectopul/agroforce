@@ -53,14 +53,6 @@ export class SequenciaDelineamentoRepository {
     return culture;
   }
 
-  async findByName(name: string) {
-    const culture = await prisma.sequencia_delineamento.findFirst({
-      where: { name }
-    });
-
-    return culture;
-  }
-
   async update(id: number, data: IUpdateSequenciaDelineamento) {
     const result = await prisma.culture.update({
       where: { id },
