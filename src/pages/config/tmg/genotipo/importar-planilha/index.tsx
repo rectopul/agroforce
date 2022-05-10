@@ -24,7 +24,7 @@ export default function Importar() {
             html: response.message,
             width: "800"});
             if (!response.erro) { 
-              // router.back();
+              router.back();
             }
         }
       });
