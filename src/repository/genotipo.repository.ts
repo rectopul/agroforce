@@ -6,7 +6,7 @@ export class GenotipoRepository {
     return genotipo;
   }
 
-  async findByGenealogy(genealogy: string) {
+  async findByGenealogy(genealogy: any) {
     const genotipo = await prisma.genotipo.findFirst({
       where: { genealogy }
     });

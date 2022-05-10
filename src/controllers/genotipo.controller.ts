@@ -151,16 +151,10 @@ export class GenotipoController {
 
       if (!valid) return {status: 400, message: "Dados inválidos"};
 
-      const genotipoAlreadyExists = await this.genotipoRepository.findByGenealogy(data.genealogy);
-
-      if (genotipoAlreadyExists) {
-        return { status: 400, message: "Genealogia já cadastra. favor consultar os inativos" };
-      }
-
-      await this.genotipoRepository.create(data);
-
+      let response = await this.genotipoRepository.create(data);
       return {status: 201, message: "Genealogia cadastrada"}
     } catch(err) {
+      console.log(err);
       return {status: 400, message: "Erro no cadastrado"}
     }
   }
