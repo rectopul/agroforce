@@ -31,7 +31,7 @@ export class TecnologiaController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, name: true, status:true};
+                select = {id: true, name: true, desc:true, status:true};
             }
 
             if (options.id_culture) {
@@ -116,11 +116,12 @@ export class TecnologiaController {
             }
 
             if(data.name) parameters.name = data.name;
+            if(data.desc) parameters.desc = data.desc;
             if(data.status) parameters.status = data.status;
             if (data != null && data != undefined) {
                 let response = await this.tecnologiaRepository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message: {message: "OGM atualizado com sucesso"}}
+                    return {status: 200, message: {message: "Técnologia atualizado com sucesso"}}
                 } else {
                     return {status: 400, message: {message: "erro ao tentar fazer o update"}}
                 }

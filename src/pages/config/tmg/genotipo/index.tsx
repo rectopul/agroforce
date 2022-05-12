@@ -30,6 +30,7 @@ export interface IGenotipos {
   id: number;
   id_culture: number;
   genealogy: string;
+  genotipo: string;
   cruza: string;
   status?: number;
 }
@@ -62,7 +63,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   console.log(allGenotipos);
   
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.portfolio ||{id:0, table_preferences: "id,genealogy,cruza,status,id_genotipo"};
+  const preferences = userLogado.preferences.genotipo ||{id:0, table_preferences: "id,genealogy,cruza,status,genotipo, tecnologia"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
@@ -75,10 +76,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
-    { name: "CamposGerenciados[]", title: "Genótipo", value: "genealogy" },
+    { name: "CamposGerenciados[]", title: "Genótipo", value: "genotipo" },
+    { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Lote", value: "id_genotipo" },
+    { name: "CamposGerenciados[]", title: "Técnologia", value: "tecnologia" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -135,6 +137,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       id,
       id_culture,
       genealogy,
+      genotipo,
       cruza,
       status
     } = genotipos[index];
@@ -143,6 +146,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       id,
       id_culture,
       genealogy,
+      genotipo,
       cruza,
       status
     });
@@ -193,13 +197,20 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           sorting: false
         },);
       }
+      if (ObjetCampos[index] == 'genotipo') {
+        arrOb.push({
+          title: 'Genótipo',
+          field: "genotipo",
+          sorting: false
+        },);
+      }
       if (ObjetCampos[index] == 'genealogy') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowGenealogy }
               <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
-              Genótipo
+              Genealogia
               </button>
             </div>
           ),
@@ -218,6 +229,13 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
             </div>
           ),
           field: "cruza",
+          sorting: false
+        },);
+      }
+      if (ObjetCampos[index] == 'tecnologia') {
+        arrOb.push({
+          title: "Técnologia",
+          field: "tecnologia.name",
           sorting: false
         },);
       }
@@ -274,28 +292,28 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           ),
         })
       }
-      if (ObjetCampos[index] == 'id_genotipo') {
-        arrOb.push({
-          title: "Lote",
-          field: "id_genotipo",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: IGenotipos) => (
-            <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<AiOutlineFileSearch size={16} />}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  title={`Lote de ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_genotipo=${rowData.id}`)}}
-                />
-              </div>
-            </div>
-          ),
-        })
-      }
+      // if (ObjetCampos[index] == 'id_genotipo') {
+      //   arrOb.push({
+      //     title: "Lote",
+      //     field: "id_genotipo",
+      //     sorting: false,
+      //     searchable: false,
+      //     filterPlaceholder: "Filtrar por status",
+      //     render: (rowData: IGenotipos) => (
+      //       <div className='h-10 flex'>
+      //         <div className="h-10">
+      //           <Button 
+      //             icon={<AiOutlineFileSearch size={16} />}
+      //             bgColor="bg-yellow-500"
+      //             textColor="white"
+      //             title={`Lote de ${rowData.genealogy}`}
+      //             onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_genotipo=${rowData.id}`)}}
+      //           />
+      //         </div>
+      //       </div>
+      //     ),
+      //   })
+      // }
     });
     return arrOb;
   };
@@ -312,12 +330,12 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.lote_portfolio = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        userLogado.preferences.genotipo = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote_portfolio = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.genotipo = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -488,7 +506,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   };
 
   useEffect(() => {
-    // handlePagination();
+    handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
   

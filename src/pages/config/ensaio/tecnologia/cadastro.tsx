@@ -16,6 +16,7 @@ interface ITecnologiaProps {
   id: number;
   id_culture: number;
   name: string;
+  desc: string;
   created_by: number;
   status: number;
 };
@@ -41,6 +42,7 @@ export default function NovoLocal() {
       id: 1,
       id_culture: parseInt(culture),
       name: '',
+      desc: '',
       created_by: userLogado.id,
       status: 1
     },
@@ -51,6 +53,7 @@ export default function NovoLocal() {
       await tecnologiaService.create({
         id_culture: parseInt(culture),
         name: capitalize(values.name),
+        desc: capitalize(values.desc),
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
@@ -102,7 +105,20 @@ export default function NovoLocal() {
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>       
+            </div> 
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Descrição
+              </label>
+              <Input 
+                type="text" 
+                placeholder="Descrição" 
+                id="desc"
+                name="desc"
+                onChange={formik.handleChange}
+                value={formik.values.desc}
+              />
+            </div>        
           </div>
 
           <div className="

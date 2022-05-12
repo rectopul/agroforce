@@ -23,7 +23,6 @@ interface ISafraProps {
   id: number;
   // id_culture: number;
   year: string;
-  typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
   status: number;
@@ -46,7 +45,6 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
-  const [typeCrop, setTypeCrop] = useState<string>(safra.typeCrop);
 
   const select = [
     { id: 1, name: "Ativo" },
@@ -61,14 +59,12 @@ export default function AtualizarSafra(safra: ISafraProps) {
       id: safra.id,
       // id_culture: safra.id_culture,
       year: safra.year,
-      typeCrop,
       plantingStartTime: safra.plantingStartTime,
       plantingEndTime: safra.plantingEndTime,
       status: safra.status,
     },
     onSubmit: async (values) => {
       if (values.id !== safra.id) throw new Error("Dados inválidos");
-      if (values.typeCrop === '' || !values.typeCrop) throw new Error("Dados inválidos");
 
       const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
         new Date(formik.values.plantingStartTime)
@@ -82,7 +78,6 @@ export default function AtualizarSafra(safra: ISafraProps) {
         id: safra.id,
         // id_culture: safra.id_culture,
         year: formik.values.year,
-        typeCrop,
         plantingStartTime: plantingStartTime,
         plantingEndTime: plantingEndTime,
         status: formik.values.status,
@@ -98,15 +93,6 @@ export default function AtualizarSafra(safra: ISafraProps) {
     },
   });
 
-  useEffect(() => {
-    if (typeCrop === "Inverno") {
-      setCheckeBox2(true);
-      setCheckeBox(false);
-    } else {
-      setCheckeBox2(false);
-      setCheckeBox(true);
-    }
-  }, [typeCrop]);
 
   return (
     <>
@@ -163,34 +149,6 @@ export default function AtualizarSafra(safra: ISafraProps) {
               />
             </div>
 
-            <div className="w-4/12 h-10 justify-start">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Tipo de safra
-              </label>
-              <div className="w-full h-full flex gap-4 items-center">
-                <Radio
-                  title="Verão"
-                  id="typeCrop"
-                  name="typeCrop"
-                  checked={checkeBox}
-                  onChange={event => setTypeCrop(event.target.value)}
-                  value='Verão'
-                />
-
-                <Radio
-                  title="Inverno"
-                  id="typeCrop"
-                  name="typeCrop"
-                  checked={checkeBox2}
-                  onChange={event => setTypeCrop(event.target.value)}
-                  value='Inverno'
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="w-8/12 flex justify-between items-start gap-5 mt-4">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>

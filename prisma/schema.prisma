@@ -23,20 +23,20 @@ model config_gerais {
 }
 
 model culture {
-  id                  Int              @id @default(autoincrement())
-  name                String?          @unique(map: "Culture_name_key")
-  created_at          DateTime         @default(now())
-  created_by          Int
-  status              Int              @default(1)
-  safra               safra[]
-  users_cultures      users_cultures[]
-  genotipo            genotipo[]
-  users_permissions   users_permissions[]
-  tecnologia          tecnologia[]
-  foco                foco[]
-  type_assay          type_assay[]
-  delineamento        delineamento[]
-  epoca               epoca[]
+  id                Int                 @id @default(autoincrement())
+  name              String?             @unique(map: "Culture_name_key")
+  created_at        DateTime            @default(now())
+  created_by        Int
+  status            Int                 @default(1)
+  safra             safra[]
+  users_cultures    users_cultures[]
+  genotipo          genotipo[]
+  users_permissions users_permissions[]
+  tecnologia        tecnologia[]
+  foco              foco[]
+  type_assay        type_assay[]
+  delineamento      delineamento[]
+  epoca             epoca[]
 }
 
 model department {
@@ -68,16 +68,15 @@ model safra {
   id                Int       @id @default(autoincrement())
   id_culture        Int
   culture           culture   @relation(fields: [id_culture], references: [id])
-  year              String 
-  typeCrop          String
-  plantingStartTime String
-  plantingEndTime   String
+  year              String
+  plantingStartTime String?
+  plantingEndTime   String?
   main_safra        Int?      @default(0)
   status            Int?      @default(1)
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe       npe[]
+  npe npe[]
 }
 
 model uf {
@@ -155,19 +154,20 @@ model users_preferences {
 
 model local {
   id             Int              @id @default(autoincrement())
-  name           String
+  cod_local      String           @unique
+  cod_red_local  String?           @unique
   pais           String
   uf             String
   city           String
-  address        String
-  latitude       String
-  longitude      String
-  altitude       String
+  name_farm      String
+  latitude       String?
+  longitude      String?
+  altitude       String?
   created_at     DateTime         @default(now())
   created_by     Int
   status         Int              @default(1)
   layoult_quadra layoult_quadra[]
-  npe       npe[]
+  npe            npe[]
 }
 
 model layoult_quadra {
@@ -193,15 +193,18 @@ model layoult_quadra {
 }
 
 model genotipo {
-  id         Int       @id @default(autoincrement())
-  id_culture Int
-  genealogy  String
-  cruza      String
-  status     Int      @default(1)
-  created_by Int
-  created_at DateTime @default(now())
-  culture    culture  @relation(fields: [id_culture], references: [id])
-  lote       lote[]
+  id            Int        @id @default(autoincrement())
+  id_culture    Int
+  id_tecnologia Int
+  genotipo      String
+  genealogy     String?
+  cruza         String
+  status        Int        @default(1)
+  created_by    Int
+  created_at    DateTime   @default(now())
+  culture       culture    @relation(fields: [id_culture], references: [id])
+  tecnologia    tecnologia @relation(fields: [id_tecnologia], references: [id])
+  lote          lote[]
 }
 
 model delineamento {
@@ -214,7 +217,7 @@ model delineamento {
   created_by     Int
   created_at     DateTime? @default(now())
 
-  culture culture @relation(fields: [id_culture], references: [id])
+  culture                culture                  @relation(fields: [id_culture], references: [id])
   sequencia_delineamento sequencia_delineamento[]
 }
 
@@ -227,7 +230,7 @@ model foco {
   created_by Int
   created_at DateTime? @default(now())
 
-  npe       npe[]
+  npe     npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
@@ -239,31 +242,33 @@ model type_assay {
   created_by Int
   created_at DateTime? @default(now())
 
-  npe       npe[]
+  npe     npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
 model tecnologia {
-  id             Int       @id @default(autoincrement())
-  id_culture     Int
-  name           String
-  status         Int       @default(1)
-  created_by     Int
-  created_at     DateTime? @default(now())
+  id         Int       @id @default(autoincrement())
+  id_culture Int
+  name       String
+  desc       String?
+  status     Int       @default(1)
+  created_by Int
+  created_at DateTime? @default(now())
 
-  npe       npe[]
-  culture culture @relation(fields: [id_culture], references: [id])
+  npe      npe[]
+  genotipo genotipo[]
+  culture  culture    @relation(fields: [id_culture], references: [id])
 }
 
 model lote {
-  id            Int @id @default(autoincrement())
-  id_genotipo  Int
-  name          String
-  volume        Int
-  status        Int       @default(1)
-  created_by    Int
-  created_at    DateTime @default(now())
-  genotipo      genotipo @relation(fields: [id_genotipo], references: [id])
+  id          Int      @id @default(autoincrement())
+  id_genotipo Int
+  name        String
+  volume      Int
+  status      Int      @default(1)
+  created_by  Int
+  created_at  DateTime @default(now())
+  genotipo    genotipo @relation(fields: [id_genotipo], references: [id])
 }
 
 model epoca {
@@ -274,7 +279,7 @@ model epoca {
   created_by Int
   created_at DateTime @default(now())
 
-  npe       npe[]
+  npe     npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
@@ -299,24 +304,24 @@ model npe {
   created_by    Int
   created_at    DateTime? @default(now())
 
-  local local @relation(fields: [id_local], references: [id])
-  safra safra @relation(fields: [id_safra], references: [id])
-  foco foco @relation(fields: [id_foco], references: [id])
+  local      local      @relation(fields: [id_local], references: [id])
+  safra      safra      @relation(fields: [id_safra], references: [id])
+  foco       foco       @relation(fields: [id_foco], references: [id])
   type_assay type_assay @relation(fields: [id_type_assay], references: [id])
   tecnologia tecnologia @relation(fields: [id_ogm], references: [id])
-  epoca epoca @relation(fields: [id_epoca], references: [id])
+  epoca      epoca      @relation(fields: [id_epoca], references: [id])
 }
 
 model sequencia_delineamento {
-  id                Int       @id @default(autoincrement())
-  id_delineamento   Int
-  repeticao         Int
-  sorteio           Int
-  nt                Int
-  bloco             Int
-  status            Int       @default(1)
-  created_by        Int
-  created_at        DateTime  @default(now())
+  id              Int      @id @default(autoincrement())
+  id_delineamento Int
+  repeticao       Int
+  sorteio         Int
+  nt              Int
+  bloco           Int
+  status          Int      @default(1)
+  created_by      Int
+  created_at      DateTime @default(now())
 
   delineamento delineamento @relation(fields: [id_delineamento], references: [id])
 }

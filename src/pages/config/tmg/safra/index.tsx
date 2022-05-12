@@ -31,7 +31,6 @@ interface ISafra {
   id: number;
   id_culture: number;
   year: string;
-  typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
   main_safra: string;
@@ -64,7 +63,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,typeCrop,plantingStartTime,plantingEndTime,status"};
+  const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,plantingStartTime,plantingEndTime,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -75,7 +74,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id"},
     { name: "CamposGerenciados[]", title: "Safra", value: "year"},
-    { name: "CamposGerenciados[]", title: "Tipo de safra", value: "typeCrop" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
     { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
     // { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
@@ -135,7 +133,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     const {
       id,
       year,
-      typeCrop,
       plantingStartTime,
       plantingEndTime,
       status
@@ -144,7 +141,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     await safraService.updateSafras({
       id,
       year,
-      typeCrop,
       plantingStartTime,
       plantingEndTime,
       status,
@@ -209,9 +205,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           field: "year",
           sorting: false
         },);
-      }
-      if (ObjetCampos[index] == 'typeCrop') {
-        arrOb.push({ title: "Tipo de safra", field: "typeCrop", sorting: false })
       }
       if (ObjetCampos[index] == 'plantingStartTime') {
         arrOb.push({ 
@@ -412,18 +405,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                         "
                       />
                     </div>
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Tipo de safra
-                      </label>
-                      <Select
-                        id="filterSearch"
-                        name="filterSearch"
-                        onChange={formik.handleChange}
-                        values={[{name: "Inverno"}, {name: "Verão"}]}
-                        selected={false}
-                      />
-                    </div>
+  
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-2">
                         Data do período de plantio

@@ -22,7 +22,6 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 interface ISafraProps {
   id_culture: number;
   year: string;
-  typeCrop: string;
   plantingStartTime: string;
   plantingEndTime: string;
   main_safra: number;
@@ -51,7 +50,6 @@ export default function Safra() {
   const [checkInput, setCheckInput] = useState('text-black');
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
-  const [typeCrop, setTypeCrop] = useState<string>('');
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -60,7 +58,6 @@ export default function Safra() {
     initialValues: {
       id_culture: Number(culture),
       year: '',
-      typeCrop,
       plantingStartTime: '',
       plantingEndTime: '',
       main_safra: 0,
@@ -68,25 +65,18 @@ export default function Safra() {
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
-      formik.values.typeCrop = typeCrop;
       const { main_safra, ...data } = values;
 
       const { 
         created_by, 
         id_culture, 
         status, 
-        typeCrop: checkBox, 
         ...inputs
       } = data;
 
       validateInputs(inputs);
 
       if (!inputs) return;
-
-      if (typeCrop === '' || !typeCrop || !data) {
-        Swal.fire('Dados Inválidos!');
-        throw new Error("Dados Inválidos");
-      };
 
       const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
         new Date(formik.values.plantingStartTime)
@@ -99,7 +89,6 @@ export default function Safra() {
       await safraService.create({
         id_culture: Number(culture),
         year: formik.values.year,
-        typeCrop,
         plantingStartTime: plantingStartTime,
         plantingEndTime: plantingEndTime,
         status: formik.values.status,
@@ -154,7 +143,7 @@ export default function Safra() {
           <h1 className="text-2xl">Nova safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5">
-            <div className="w-2/4 h-10 mt-2">
+            <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
                 Ano
@@ -186,34 +175,7 @@ export default function Safra() {
               />
             </div>
 
-            <div className="w-2/4 h-10 justify-start">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Tipo de safra
-              </label>
-              <div className="w-full h-full flex gap-4 items-center">
-              <Radio
-                title="Verão"
-                id="typeCrop"
-                name="typeCrop"
-                checked={checkeBox}
-                onChange={event => setTypeCrop(event.target.value)}
-                value='Verão'
-              />
-
-              <Radio
-                title="Inverno"
-                id="typeCrop"
-                name="typeCrop"
-                checked={checkeBox2}
-                onChange={event => setTypeCrop(event.target.value)}
-                value='Inverno'
-              />
-              </div>
-            </div>
-          </div>
-
-          <div className="w-full flex justify-between items-start gap-5 mt-10">
+    
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>

@@ -5,6 +5,7 @@ interface IGenotipoUpdate {
   id: number;
   id_culture: number;
   genealogy: string;
+  genotipo: string;
   cruza: string;
   status?: number;
 }

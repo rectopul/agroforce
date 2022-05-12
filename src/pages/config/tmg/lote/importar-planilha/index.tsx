@@ -18,7 +18,7 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 10, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
+      importService.validate({spreadSheet: rows, moduleId: 12, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
         if (response.message != '') {
           Swal.fire({
             html: response.message,
@@ -44,7 +44,7 @@ export default function Importar() {
   return (
     <>
       <Head>
-        <title>Importação Genótipo</title>
+        <title>Importação Lote</title>
       </Head>
       <Content contentHeader={TabsDropDowns()}>
         <form 

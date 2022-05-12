@@ -5,9 +5,8 @@ interface Safra {
     id: number;
     id_culture: number;
     year: string;
-    typeCrop: string;
-    plantingStartTime: string;
-    plantingEndTime: string;
+    plantingStartTime?: string;
+    plantingEndTime?: string;
     main_safra?: number;
     status: number;
     created_by: number;
@@ -39,10 +38,7 @@ export class SafraController {
             if (options.filterSearch) {
                 options.filterSearch = String(options.filterSearch).toLowerCase().trim();
                 
-                if (options.filterSearch === "inverno" || options.filterSearch === "verão") {
-                    options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-                    parameters.typeCrop = JSON.parse(options.filterSearch);
-                } else if (String(options.filterSearch).length > 7) {
+                if (String(options.filterSearch).length > 7) {
                     options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
                     parameters.plantingStartTime = JSON.parse(options.filterSearch);
                     parameters.plantingEndTime = JSON.parse(options.filterSearch);
@@ -62,7 +58,6 @@ export class SafraController {
                 select = {
                     id: true, 
                     year: true, 
-                    typeCrop:true, 
                     plantingStartTime:true, 
                     plantingEndTime:true, 
                     main_safra:false, 
@@ -76,10 +71,6 @@ export class SafraController {
 
             if (options.year) {
                 parameters.year = options.year;
-            }
-
-            if (options.typeCrop) {
-                parameters.typeCrop = options.typeCrop;
             }
             
             if (options.plantingStartTime) {
@@ -146,9 +137,8 @@ export class SafraController {
             const schema: SchemaOf<CreateSafra> = object({
                 id_culture: number().integer().required(this.required),
                 year: string().required(this.required),
-                typeCrop: string().required(this.required),
-                plantingStartTime: string().required(this.required),
-                plantingEndTime: string().required(this.required),
+                plantingStartTime: string().optional(),
+                plantingEndTime: string().optional(),
                 status: number().integer().required(this.required),
                 created_by: number().integer().required(this.required),
             });
@@ -165,6 +155,7 @@ export class SafraController {
 
             return {status: 201, message: "Safra cadastrada"}
         } catch(err) {
+            console.log(err)
             return { status: 404, message: "Erro ao cadastrar safra"}
         }
     }
@@ -174,9 +165,8 @@ export class SafraController {
             const schema: SchemaOf<UpdateSafra> = object({
                 id: number().integer().required(this.required),
                 year: string().required(this.required),
-                typeCrop: string().required(this.required),
-                plantingStartTime: string().required(this.required),
-                plantingEndTime: string().required(this.required),
+                plantingStartTime: string().optional(),
+                plantingEndTime: string().optional(),
                 status: number().integer().required(this.required),
             });
         
@@ -184,7 +174,7 @@ export class SafraController {
 
             if (!valid) return {status: 400, message: "Dados inválidos"};
 
-            const safra = await this.safraRepository.findOne(data.id);
+            const safra: any = await this.safraRepository.findOne(data.id);
 
             if (!safra) return { status: 400, message: 'Safra não existente' };
 
@@ -195,7 +185,6 @@ export class SafraController {
             }
 
             safra.year = data.year;
-            safra.typeCrop = data.typeCrop;
             safra.plantingStartTime = data.plantingStartTime;
             safra.plantingEndTime = data.plantingEndTime;
             safra.status = data.status;

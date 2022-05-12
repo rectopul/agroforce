@@ -1,148 +1,146 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
+import getConfig from "next/config";
 import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { localService, userPreferencesService } from "src/services";
+import { loteGenotipoService, loteService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../components";
-import * as ITabs from '../../../shared/utils/dropdown';
-import { getDegreesCelsius } from "../../../shared/utils/formatDegreesCelsius";
+import ITabs from "../../../../shared/utils/dropdown";
 
-
-
-interface ILocalProps {
-  id: Number | any;
-  cod_local: String | any;
-  cod_red_local: String | any;
-  pais: String | any;
-  uf: String | any;
-  city: String | any;
-  name_farm: String | any;
-  latitude: string;
-  longitude: string;
-  altitude: String | any;
-  created_by: Number;
-  status: Number;
-};
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
-  filterUF: string | any;
-  filterCity: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
+
+export interface LoteGenotipo {
+  id: number;
+  id_culture: number;
+  id_genotipo: number;
+  genealogy: string;
+  name: string;
+  volume: number;
+  status?: number;
+}
+
 interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
-  allItems: ILocalProps[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
+
+interface IData {
+  allLote: LoteGenotipo[];
+  totalItems: number;
+  itensPerPage: number;
   filterAplication: object | any;
-  uf: object | any;
+  id_genotipo: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
-  const { TabsDropDowns } = ITabs.default;
+export default function Listagem({allLote, totalItems, itensPerPage, filterAplication, id_genotipo}: IData) {
+  const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LOCAL'
+    tab.titleTab === 'TMG'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
 
+  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local ||{id:0, table_preferences: "id, cod_local, cod_red_local, pais,uf,city,name_farm,latitude,longitude,altitude,status"};
+  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,genealogy,name,volume,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const ufs: object | any =  [];
-  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
-  const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
+  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderAddress, setOrderAddress] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<any>('');
-  const [arrowAddress, setArrowAddress] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Código Local ", value: "cod_local", defaultChecked: () => camposGerenciados.includes('cod_local') },
-    { name: "CamposGerenciados[]", title: "Código Reduzido ", value: "cod_red_local", defaultChecked: () => camposGerenciados.includes('cod_red_local') },
-    { name: "CamposGerenciados[]", title: "Pais", value: "pais", defaultChecked: () => camposGerenciados.includes('pais') },
-    { name: "CamposGerenciados[]", title: "Estado", value: "uf", defaultChecked: () => camposGerenciados.includes('uf') },
-    { name: "CamposGerenciados[]", title: "Município", value: "city", defaultChecked: () => camposGerenciados.includes('city') },
-    { name: "CamposGerenciados[]", title: "Nome Fazenda", value: "name_farm", defaultChecked: () => camposGerenciados.includes('name_farm') },
-    { name: "CamposGerenciados[]", title: "Latitude", value: "latitude", defaultChecked: () => camposGerenciados.includes('latitude') },
-    { name: "CamposGerenciados[]", title: "Longitude", value: "longitude", defaultChecked: () => camposGerenciados.includes('longitude') },
-    { name: "CamposGerenciados[]", title: "Altitude", value: "altitude", defaultChecked: () => camposGerenciados.includes('altitude') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') },
-  ]);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [selectedRowById, setSelectedRowById] = useState<number>();
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Genótipo", value: "genotipo" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
-  
-  const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
-  const pages = Math.ceil(total / take);
 
-  const columns = colums(camposGerenciados);
-  
-  uf.map((value: string | object | any) => {
-    ufs.push({id: value.id, name: value.sigla, ufid: value.id});
-  })
-
-  const formik = useFormik<IFilter>({
-    initialValues: {
-      filterStatus: '',
-      filterSearch: '',
-      filterUF: '',
-      filterCity: '',
-      orderBy: '',
-      typeOrder: '',
-    },
-    onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setFilter(parametersFilter);
-        setLocal(response.response);
-      })
-    },
-  });
-
-  const filters = [
+  const filtersStatusItem = [
     { id: 2, name: 'Todos'},
     { id: 1, name: 'Ativos'},
     { id: 0, name: 'Inativos'},
   ];
 
-  function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+  const take: number = itensPerPage;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const pages = Math.ceil(total / take);
+
+  const columns = columnsOrder(camposGerenciados);
+
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async (values) => {
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_genotipo;
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LoteGenotipo[]) => {
+        setLotes(response);
+        setTotaItems(response.length);
+        setFilter(parametersFilter);
+      })
+    },
+  });
+
+  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
+    } else {
+      data.status = 1;
+    }
+
+    const index = lotes.findIndex((lote) => lote.id === idItem);
+
+    if (index === -1) {
+      return;
+    }
+
+    setLotes((oldLote) => {
+      const copy = [...oldLote];
+      copy[index].status = data.status;
+      return copy;
+    });
+    
+    const { id, status } = lotes[index];
+    
+    await loteGenotipoService.changeStatus({ id, status });
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
-    Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'id') {
+
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -175,137 +173,91 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         })
       }
       
-      if (ObjetCampos[item] == 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
+        },);
       }
-
-      if (ObjetCampos[item] == 'cod_local') {
+      if (ObjetCampos[index] == 'genotipo') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               { arrowName }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('cod_local', orderName)}>
-                Código Local
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('genotipo', orderName)}>
+                Genótipo
               </button>
             </div>
           ),
-          field: "cod_local",
-          sorting: false,
-        },);
-      }
-      
-      if (ObjetCampos[item] == 'cod_red_local') {
-        arrOb.push({ title: "Código Reduzido", field: "cod_red_local", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'pais') {
-        arrOb.push({ title: "País", field: "pais", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'uf') {
-        arrOb.push({ title: "Estado", field: "uf", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'city') {
-        arrOb.push({ title: "Município", field: "city", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'name_farm') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowAddress }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderAddress('name_farm', orderAddress)}>
-                Endereço
-              </button>
-            </div>
-          ), 
-          field: "name_farm",
+          field: "genotipo.genealogy",
           sorting: false
         },);
       }
-  
-      if (ObjetCampos[item] == 'latitude') {
+      if (ObjetCampos[index] == 'name') {
         arrOb.push({
-          title: "Latitude",
-          field: "latitude", 
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.latitude)
-          )
-        })
+          title: "Nome",
+          field: "name",
+          sorting: false
+        },);
       }
-
-      if (ObjetCampos[item] == 'longitude') {
+      if (ObjetCampos[index] == 'volume') {
         arrOb.push({
-          title: "Longitude",
-          field: "longitude",
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.longitude)
-          )
-        })
+          title: "Volume",
+          field: "volume",
+          sorting: false
+        },);
       }
-
-      if (ObjetCampos[item] == 'altitude') {
-        arrOb.push({ title: "Altitude", field: "altitude", sorting: false })
-      }
-
-      if (ObjetCampos[item] == 'status') {
+      if (ObjetCampos[index] == 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: ILocalProps) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/local/atualizar?id=${rowData.id}`}
-                  />
-                </div>
-                <div>
-                  <Button 
+          render: (rowData: LoteGenotipo) => (
+            <div className='h-10 flex'>
+              {/* <div className="h-10">
+                <Button 
+                  icon={<BiEdit size={16} />}
+                  onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}} 
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+                />
+              </div> */}
+              {rowData.status === 1 ? (
+                <div className="h-10">
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={async () => await handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button 
-                    icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    href={`/config/localatualizar?id=${rowData.id}`}
-                  />
-                </div>
-                <div>
-                  <Button 
+              ) : (
+                <div className="h-10">
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusLote(
+                      rowData.id, {
+                        status: rowData.status,
+                        ...rowData
+                      }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              </div>
-            )
+              )}
+            </div>
           ),
         })
       }
@@ -324,85 +276,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 4 }).then((response) => {
-        userLogado.preferences.local = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.local = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.lote = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
-
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await localService.update({id: id, status: status});
-
-    const index = local.findIndex((local) => local.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLocal((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  };
-
-  async function handleOrderAddress(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
-        setLocal(response.response)
-      }
-    })
-    if (orderAddress === 2) {
-      setOrderAddress(0);
-      setArrowAddress(<AiOutlineArrowDown />);
-    } else {
-      setOrderAddress(orderAddress + 1);
-      if (orderAddress === 1) {
-        setArrowAddress(<AiOutlineArrowUp />);
-      } else {
-        setArrowAddress('');
-      }
-    }
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -430,9 +316,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setLocal(response.response)
+        setOrderName(response.response)
       }
     });
     
@@ -449,7 +335,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
   };
 
-  function handleOnDragEnd(result: DropResult) {
+  function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result)  return;
     
@@ -463,16 +349,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
     
-    await localService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
-        const newData = local.map((row) => {
+    await loteService.getAll(filterAplication).then((response) => {
+      if (response.status === 200) {
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = "Inativo";
           } else {
-            row.status = "Ativo" as any;
+            row.status = "Ativo";
           }
 
           return row;
@@ -480,7 +366,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "locais");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -493,7 +379,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Locais.xlsx");
+        XLSX.writeFile(workBook, "Lotes.xlsx");
       }
     });
   };
@@ -513,43 +399,29 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await localService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setLocal(response.response);
+    await loteService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setLotes(response.response);
       }
     });
   };
-
-  async function showCitys(uf: any): Promise<void> {
-    if (uf) {
-      let param = '?ufId=' + uf; 
-      let city: object | any = [];
-      await localService.getCitys(param).then((response) => {
-        response.map((value: string | object | any) => {
-          city.push({id: value.nome, name: value.nome});
-        })
-          setCitys(city)
-      });
-    }
-  }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-
+  
   return (
     <>
-      <Head>
-        <title>Listagem dos Locais</title>
-      </Head>
+      <Head><title>Listagem de Lotes</title></Head>
+
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar lote">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -569,32 +441,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      UF
-                    </label>
-                    <Select
-                      values={ufs}
-                      id="filterUF"
-                      name="filterUF"
-                      onChange={formik.handleChange}
-                      onBlur={e => showCitys(e.target.value)}
-                      selected={false}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Município
-                    </label>
-                    <Select
-                      values={citys}
-                      id="filterCity"
-                      name="filterCity"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -602,7 +449,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="nome"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -613,6 +460,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
                 <div className="h-16 w-32 mt-3">
                   <Button
+                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -624,27 +472,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             </div>
           </AccordionFilter>
 
-          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable
+            <MaterialTable 
+              style={{ background: '#f9fafb' }}
               columns={columns}
-              data={local}
-              onRowClick={((evt?, selectedRow?: ILocalProps) => {
-                setSelectedRowById(selectedRow?.id)
-              })}
+              data={lotes}
               options={{
                 showTitle: false,
+                headerStyle: {
+                  zIndex: 20
+                },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
-                rowStyle: (rowData: ILocalProps) => ({
-                  backgroundColor: (selectedRowById == rowData.id ? '#c7e3f5' : '#fff')
-                }),
+                pageSize: itensPerPage
               }}
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-max	
+                  className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -655,24 +500,23 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
+                      <div className='h-12'>
                       <Button 
-                        title="Cadastrar Local"
-                        value="Cadastrar Local"
+                        title="Importar Planilha"
+                        value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="local/cadastro"
-                        icon={<FiUserPlus size={20} />}
+                        href="lote/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
+                        <div className="w-72">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -693,11 +537,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                           {(provided) => (
                                             <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox 
-                                                name={genarate.name} 
-                                                title={genarate.title?.toString()} 
-                                                value={genarate.value} 
-                                                defaultChecked={camposGerenciados.includes(genarate.value)}
+                                              <CheckBox
+                                                name={genarate.name}
+                                                title={genarate.title?.toString()}
+                                                value={genarate.value}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -715,11 +559,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('local/importacao')}} />
-                      </div>
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de locais" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                      </div>
+                          <Button title="Download lista de lotes" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        </div>
+                        <div className='h-12 flex items-center justify-center w-full'>
+                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="lote/importar-planilha/config-planilha"  />
+                        </div>
                     </div>
                   </div>
                 ),
@@ -789,38 +633,39 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
-  const  token  =  req.cookies.token;
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  const  token  =  context.req.cookies.token;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
+
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(param).toString();
   
+  urlParameters.search = new URLSearchParams(param).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const local = await fetch(urlParameters.toString(), requestOptions);
-  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
-  const uf = await apiUF.json();
-  const Response =  await local.json();
-  const allItems = Response.response;
-  const totalItems = Response.total;
+  const api = await fetch(`${urlParameters}`, requestOptions);
+  let allLote: any = await api.json();
+  const totalItems = allLote.total || 0;
+
+  allLote = allLote.response;
+
 
   return {
     props: {
-      allItems,
+      allLote,
       totalItems,
       itensPerPage,
-      filterAplication,
-      uf
+      filterAplication
     },
   }
 }
