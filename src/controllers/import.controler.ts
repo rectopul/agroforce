@@ -156,7 +156,7 @@ export class ImportController {
                             if (configModule.response[0].fields[sheet] == 'Local') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) == 'string') {
-                                        let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
+                                        let local: any = await this.localController.getAllLocal({cod_local: data.spreadSheet[keySheet][sheet]});
                                         if (local.total == 0) {      
                                             // console.log('aqui Local');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema.</span><br>`;
@@ -299,7 +299,7 @@ export class ImportController {
                             this.aux.prox_npe = 0;
                             if (configModule.response[0].fields[sheet] == 'Local') {
                                 // console.log("Local R");
-                                let local: any = await this.localController.getAllLocal({name: data.spreadSheet[keySheet][sheet]});
+                                let local: any = await this.localController.getAllLocal({cod_local: data.spreadSheet[keySheet][sheet]});
                                 this.aux.id_local = local.response[0].id;
                             }
 
