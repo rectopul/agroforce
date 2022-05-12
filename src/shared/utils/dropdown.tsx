@@ -32,6 +32,7 @@ export function TabsDropDowns () {
         {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
         {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
         {labelDropDown: 'Genótipo', hrefDropDown: '/config/tmg/genotipo', iconDropDown: <RiPlantLine/> },
+        {labelDropDown: 'Lotes', hrefDropDown: '/config/tmg/lote', iconDropDown: <RiPlantLine/> },
       ],
     },
     { 

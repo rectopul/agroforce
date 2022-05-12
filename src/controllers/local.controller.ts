@@ -68,8 +68,8 @@ export class LocalController {
                 parameters.uf = uf?.sigla;
             }
 
-            if (options.name) { 
-                parameters.name = options.name;
+            if (options.cod_local) { 
+                parameters.cod_local = options.cod_local;
             }
 
             if (options.filterCity) {
@@ -78,8 +78,8 @@ export class LocalController {
 
             if (options.filterSearch) {
                 options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-                parameters.name  = JSON.parse(options.filterSearch);
-                parameters.address =JSON.parse(options.filterSearch);
+                parameters.cod_local  = JSON.parse(options.filterSearch);
+                parameters.name_farm =JSON.parse(options.filterSearch);
             }
         
             if (options.take) {
@@ -109,7 +109,7 @@ export class LocalController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, name: true, pais:true, uf:true, city:true, address:true, latitude: true, longitude: true, altitude: true,  status:true};
+                select = {id: true, cod_local: true, cod_red_local: true, pais:true, uf:true, city:true, name_farm:true, latitude: true, longitude: true, altitude: true,  status:true};
             }
 
             let response =  await this.localRepository.findAll(parameters, select, take, skip, orderBy);
@@ -119,6 +119,7 @@ export class LocalController {
                 return {status: 200, response, total: response.total};
             }             
         } catch (err) {
+            console.log(err);
             return {status: 400, message: err};
         }
     }
@@ -158,6 +159,7 @@ export class LocalController {
                 }
             }
         } catch (err) {
+            console.log(err)
             return {status: 400, message: "Erro no cadastro"}
         }
     }
@@ -172,9 +174,10 @@ export class LocalController {
                 parameters.status =  data.status;
             }
 
-            if(data.name) parameters.name = data.name;
+            if(data.cod_local) parameters.cod_local = data.cod_local;
+            if(data.cod_red_local) parameters.cod_red_local = data.cod_red_local;
             if(data.uf) parameters.uf = data.uf;
-            if(data.address) parameters.address = data.address;
+            if(data.name_farm) parameters.name_farm = data.name_farm;
             if(data.city) parameters.city = data.city;
             if(data.pais) parameters.pais = data.pais;
             if(data.latitude) parameters.latitude = data.latitude;

@@ -99,10 +99,11 @@ export class LoteController {
   };
 
   async listAll(options: any) {
+    console.log(options)
     const parameters: object | any = new Object();
     let take; 
     let skip;
-    let orderBy: object | any;
+    let orderBy: object | any = '';
     let select: any = [];
     let include: any;
 
@@ -125,25 +126,19 @@ export class LoteController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
+            select[objSelect[item]] = true;
         });
         select = Object.assign({}, select);
-        include = select;
       } else {
-        include = {
-          portfolio: {
-            select: {
-              id: true,
-              genealogy:true
-            }
-          }
-        }
+          select = {id: true, genotipo:{select:{genealogy:true}}, volume: true, name:true, status: true};
       }
 
       if (options.name) {
         parameters.name = options.name;
       }
-
+      if (options.id_genotipo) {
+        parameters.id_genotipo = Number(options.id_genotipo);
+      }
       if (options.take) {
         if (typeof(options.take) === 'string') {
           take = parseInt(options.take);
@@ -171,13 +166,15 @@ export class LoteController {
         skip,
         orderBy
       );
+      // console.log(response);
       if (!response || response.total <= 0) { 
         return {status: 400, response: [], total: 0}
 
       } else {
-        return {status: 200, response, total: response.total}
+        return {status: 200, response: response, total: response.total}
       }    
     } catch (err) {
+      console.log(err)
       return {status: 400, response: [], total: 0}
     }
   };

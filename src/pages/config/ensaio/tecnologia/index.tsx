@@ -61,7 +61,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.ogm ||{id:0, table_preferences: "id,name,status"};
+  const preferences = userLogado.preferences.ogm ||{id:0, table_preferences: "id,name,desc,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
@@ -72,7 +72,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Nome ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Descrição ", value: "desc", defaultChecked: () => camposGerenciados.includes('namdesce') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -161,6 +162,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           field: "name",
           sorting: false
         },);
+      }
+      if (ObjetCampos[item] == 'desc') {
+        arrOb.push({ title: "Descrição", field: "desc", sorting: false })
       }
   
       if (ObjetCampos[item] == 'status') {

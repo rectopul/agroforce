@@ -5,9 +5,8 @@ import getConfig from 'next/config';
 
 const data: object = [
             { id: 'Genotipo', name: '*Genótipo'}, 
-            { id: 'Cruza', name: '*Cruza'},
-            { id: 'Tecnologia', name: '*Técnologia'},
-            { id: 'Genealogy', name: 'Genealogia'}
+            { id: 'Lote', name: '*Lote'}, 
+            { id: 'Volume', name: '*Volume'}
           ];
 
 export default function ImportacaoPlanilha({config}: any) {
@@ -18,7 +17,7 @@ export default function ImportacaoPlanilha({config}: any) {
         <ImportPlanilha
           data={data}
           configSalva ={(config != "") ? config[0].fields : []}
-          moduleId={10}
+          moduleId={12}
         />
     </>
   );
@@ -29,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
-  const param = `moduleId=10`;
+  const param = `moduleId=12`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

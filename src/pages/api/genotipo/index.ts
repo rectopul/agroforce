@@ -11,7 +11,7 @@ export default  apiHandler(handler);
 
   switch (req.method) {
     case 'GET':
-      const resultGet = await genotipoController.list(Number(id_culture));
+      const resultGet = await genotipoController.listAllGenotipos(req.query);
       res.status(200).json(resultGet);
       break
     case 'POST':

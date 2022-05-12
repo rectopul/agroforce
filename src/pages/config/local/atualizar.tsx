@@ -22,11 +22,12 @@ import * as ITabs from '../../../shared/utils/dropdown';
 
 interface ILocalProps {
   id: Number | any;
-  name: String | any;
+  cod_local: String | any;
+  cod_red_local: String | any;
   pais: String | any;
   uf: String | any;
   city: String | any;
-  address: String | any;
+  name_farm: String | any;
   latitude: string;
   longitude: string;
   altitude: String | any;
@@ -72,11 +73,12 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   const formik = useFormik<ILocalProps>({
     initialValues: {
       id: localEdit.id,
-      name: capitalize(localEdit.name),
+      cod_local: capitalize(localEdit.cod_local),
+      cod_red_local: capitalize(localEdit.cod_red_local),
       pais: localEdit.pais,
       uf: localEdit.uf,
       city: localEdit.city,
-      address: localEdit.address,
+      name_farm: localEdit.name_farm,
       latitude: localEdit.latitude,
       longitude: localEdit.longitude,
       altitude: localEdit.altitude,
@@ -85,15 +87,16 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
     },
     onSubmit: async (values) => {   
       validateInputs(values);
-      if (!values.name || !values.pais || !values.uf || !values.city || !values.address || !values.latitude || !values.latitude || !values.altitude) { return; } 
+      if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; } 
 
       await localService.update({
         id: values.id,
-        name: values.name,
+        cod_local: values.cod_local,
+        cod_red_local: values.cod_red_local,
         pais: values.pais,
         uf: values.uf,
         city: values.city,
-        address: values.address,
+        name_farm: values.name_farm,
         latitude: saveDegreesCelsius(values.latitude),
         longitude: saveDegreesCelsius(values.longitude),
         altitude: values.altitude,
@@ -127,14 +130,11 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   }
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
+    if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= ''; }
     if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= ''; }
     if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= ''; }
     if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= ''; }
-    if (!values.address) { let inputAddress: any = document.getElementById("address"); inputAddress.style.borderColor= 'red'; } else { let inputAddress: any = document.getElementById("address"); inputAddress.style.borderColor= ''; }
-    if (!values.latitude) { let inputLatitude: any = document.getElementById("latitude"); inputLatitude.style.borderColor= 'red'; } else { let inputLatitude: any = document.getElementById("latitude"); inputLatitude.style.borderColor= ''; }
-    if (!values.longitude) { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= 'red'; } else { let inputLongitude: any = document.getElementById("longitude"); inputLongitude.style.borderColor= ''; }
-    if (!values.altitude) { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= 'red'; } else { let inputAltitude: any = document.getElementById("altitude"); inputAltitude.style.borderColor= ''; }
+    if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= ''; }
   }
 
   return (
@@ -177,15 +177,31 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Nome do Local
+                *Código Local
               </label>
               <Input 
-                type="name" 
+                type="text" 
                 placeholder="TMG-Agroforce" 
-                id="name"
-                name="name"
+                id="cod_local"
+                maxLength={10}
+                name="cod_local"
                 onChange={formik.handleChange}
-                value={formik.values.name}
+                value={formik.values.cod_local}
+              />
+            </div>
+
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Código Reduzido
+              </label>
+              <Input 
+                type="text" 
+                placeholder="TMG-Agroforce" 
+                maxLength={5}
+                id="cod_red_local"
+                name="cod_red_local"
+                onChange={formik.handleChange}
+                value={formik.values.cod_red_local}
               />
             </div>
 
@@ -239,15 +255,15 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Endereço
+                *Nome Fazenda
               </label>
               <Input 
                 type="text" 
                 placeholder="R: São Paulo"
-                id="address"
-                name="address"
+                id="name_farm"
+                name="name_farm"
                 onChange={formik.handleChange}
-                value={formik.values.address}
+                value={formik.values.name_farm}
               />
             </div>
           </div>
@@ -260,7 +276,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Latitude
+                Latitude
               </label>
               <InputMask 
                  className="shadow
@@ -286,7 +302,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Longitude
+                Longitude
               </label>
               <InputMask
                 className="shadow
@@ -312,7 +328,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Altitude
+                Altitude
               </label>
               <Input 
                 type="text" 
@@ -377,6 +393,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
   const localEdit = await resU.json();
-
+  console.log(localEdit);
   return { props: { localEdit, uf } }
 }

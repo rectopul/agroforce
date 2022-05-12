@@ -9,6 +9,7 @@ import {NpeController} from '../controllers/npe.controller';
 import {DelineamentoController} from '../controllers/delineamento.controller';
 import {SequenciaDelineamentoController} from '../controllers/sequencia-delineamento.controller';
 import {GenotipoController} from '../controllers/genotipo.controller';
+import {LoteController} from '../controllers/lote.controller';
 
 export class ImportController {
     importRepository = new ImportRepository();
@@ -22,6 +23,7 @@ export class ImportController {
     delineamentoController = new DelineamentoController();
     sequenciaDelineamentoController = new SequenciaDelineamentoController();
     genotipoController = new GenotipoController();
+    loteController = new LoteController();
 
     aux: object | any = {};
 
@@ -95,9 +97,19 @@ export class ImportController {
                     }
                 }
 
-                // Validação do modulo Delineamento
-                if (data.moduleId == 8) {
+                // Validação do modulo Genotipo
+                if (data.moduleId == 10) {
                     response = await this.validateGenotipo(data);
+                    if (response == 'save') {
+                        response = "Itens cadastrado com sucesso!";
+                    } else { 
+                        erro = true;
+                    }
+                }
+
+                // Validação do modulo Lote
+                if (data.moduleId == 12) {
+                    response = await this.validateLote(data);
                     if (response == 'save') {
                         response = "Itens cadastrado com sucesso!";
                     } else { 
@@ -443,7 +455,19 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Cruza') {
                                 if (data.spreadSheet[keySheet][sheet] == "") {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Genótipo é obrigatorio.</span><br>`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Cruza é obrigatorio.</span><br>`;
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Tecnologia') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Técnologia é obrigatorio.</span><br>`;
+                                } else { 
+                                    let tec:any = await this.ogmController.getAll({id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet])});
+
+                                    if (tec.total == 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Técnologia informado não existe no sistema.</span><br>`;
+                                    }
                                 }
                             }
                        }
@@ -460,15 +484,16 @@ export class ImportController {
                     for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
                         Column = Number(sheet) + 1;
                         if (keySheet != '0') {
-
+                            this.aux.genealogy = "";
                             if (configModule.response[0].fields[sheet] == 'Genotipo') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                    let geno = await this.genotipoController.listAllGenotipos({genealogy: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                    let geno = await this.genotipoController.listAllGenotipos({genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                                     if (geno.total > 0) {
                                         this.aux.id = geno.response[0].id;
-                                        this.aux.genealogy = geno.response[0].genealogy;
+                                        this.aux.genotipo = geno.response[0].genotipo;
                                     } else {
-                                        this.aux.genealogy =data.spreadSheet[keySheet][sheet];
+                                        this.aux.id =0;
+                                        this.aux.genotipo =data.spreadSheet[keySheet][sheet];
                                     }
                                 }
                             }
@@ -478,12 +503,23 @@ export class ImportController {
                                     this.aux.cruza =data.spreadSheet[keySheet][sheet];
                                 }
                             }
+
+                            if (configModule.response[0].fields[sheet] == 'Tecnologia') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.id_tecnologia =data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Genealogy') {
+                                this.aux.genealogy =data.spreadSheet[keySheet][sheet];
+                            }
                        }
 
                        if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                        if (this.aux.id) {
+                        if (this.aux.id && this.aux.id > 0) {
                             await this.genotipoController.updategenotipo(this.aux);
                         } else {
+                            delete  this.aux.id;
                             await this.genotipoController.createGenotipo(this.aux);
                         }
                     }
@@ -497,6 +533,93 @@ export class ImportController {
         }
     }
 
+    async validateLote(data: object | any) {
+        var Resposta: string = '';
+        let Column: number;
+        try {
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
+            if (data != null && data != undefined) {
+                let Line: number;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    Line = Number(keySheet) + 1;
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'Genotipo') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Genótipo é obrigatorio.</span><br>`;
+                                } else {
+                                    let geno = await this.genotipoController.listAllGenotipos({genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                    if (geno.total == 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Genótipo não existe no sistema.</span><br>`;
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Lote') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Lote é obrigatorio.</span><br>`;
+                                } else {
+
+                                }
+                            } 
+
+                            if (configModule.response[0].fields[sheet] == 'Volume') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo Volume é obrigatorio.</span><br>`;
+                                } else {
+                                    
+                                }
+                            }
+                       }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                this.aux.created_by = Number(data.created_by);
+                this.aux.status =1;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'Genotipo') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    let geno = await this.genotipoController.listAllGenotipos({genealogy: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                    if (geno.total > 0) {
+                                        this.aux.id_genotipo = geno.response[0].id;
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Lote') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.name =data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Volume') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.volume =data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
+                                await this.loteController.create(this.aux);
+                            }
+                       }
+                    }
+                }
+                return "save";
+            }
+            return Resposta;
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     async saveDelineamento(data: any, id_delineamento: number, configModule: any) {
         let aux: object | any = {};
