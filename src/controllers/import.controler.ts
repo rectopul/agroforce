@@ -138,7 +138,6 @@ export class ImportController {
         var Resposta: string = '';
         let npeiAnterior: number = 0;
         let Column: number;
-        Resposta += "<div class='' style='' >";
         try {
             let configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
