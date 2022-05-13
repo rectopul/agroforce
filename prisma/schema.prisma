@@ -279,7 +279,6 @@ model epoca {
   created_by Int
   created_at DateTime @default(now())
 
-  npe     npe[]
   culture culture @relation(fields: [id_culture], references: [id])
 }
 
@@ -296,7 +295,7 @@ model npe {
   id_foco       Int
   id_type_assay Int
   id_ogm        Int
-  id_epoca      Int
+  epoca         String?
   npei          Int
   npef          Int?
   prox_npe      Int?
@@ -309,7 +308,6 @@ model npe {
   foco       foco       @relation(fields: [id_foco], references: [id])
   type_assay type_assay @relation(fields: [id_type_assay], references: [id])
   tecnologia tecnologia @relation(fields: [id_ogm], references: [id])
-  epoca      epoca      @relation(fields: [id_epoca], references: [id])
 }
 
 model sequencia_delineamento {

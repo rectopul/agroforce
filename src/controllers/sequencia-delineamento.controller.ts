@@ -140,6 +140,7 @@ export class SequenciaDelineamentoController {
         select = {
           id: true,
           repeticao: true,
+          delineamento: {select: {name: true}},
           sorteio: true,
           nt: true,
           bloco: true,

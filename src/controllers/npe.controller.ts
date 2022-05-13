@@ -56,7 +56,7 @@ export class NpeController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, local:{select:{cod_local:true}}, safra:{select:{year:true}}, foco:{select:{name:true}}, epoca:{select:{name:true}}, tecnologia: {select:{name:true}}, type_assay: {select:{name:true}}, npei: true, npef: true, status: true};
+                select = {id: true, local:{select:{cod_local:true}}, safra:{select:{year:true}}, foco:{select:{name:true}}, epoca:true, tecnologia: {select:{name:true}}, type_assay: {select:{name:true}}, npei: true, npef: true, status: true};
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);

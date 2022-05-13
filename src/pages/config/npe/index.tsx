@@ -171,7 +171,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Código", field: "id", sorting: false })
       }
       if (ObjetCampos[item] == 'local') {
-        arrOb.push({ title: "Local", field: "local.name", sorting: false })
+        arrOb.push({ title: "Local", field: "local.cod_local", sorting: false })
       }
       if (ObjetCampos[item] == 'safra') {
         arrOb.push({ title: "Safra", field: "safra.year", sorting: false })
@@ -186,7 +186,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Tecnologia", field: "tecnologia.name", sorting: false })
       }   
       if (ObjetCampos[item] == 'epoca') {
-        arrOb.push({ title: "Epoca", field: "epoca.name", sorting: false })
+        arrOb.push({ title: "Epoca", field: "epoca", sorting: false })
       }
       if (ObjetCampos[item] == 'npei') {
         arrOb.push({ title: "NPE Inicial", field: "npei", sorting: false })

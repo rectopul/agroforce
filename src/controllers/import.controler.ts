@@ -4,7 +4,6 @@ import {LocalController} from '../controllers/local.controller';
 import {FocoController} from '../controllers/foco.controller';
 import {TypeAssayController} from '../controllers/tipo-ensaio.controller';
 import {TecnologiaController} from '../controllers/tecnologia.controller';
-import {EpocaController} from '../controllers/epoca.controller';
 import {NpeController} from '../controllers/npe.controller';
 import {DelineamentoController} from '../controllers/delineamento.controller';
 import {SequenciaDelineamentoController} from '../controllers/sequencia-delineamento.controller';
@@ -18,7 +17,6 @@ export class ImportController {
     focoController = new FocoController();
     typeAssayController = new TypeAssayController();
     ogmController = new TecnologiaController();
-    epocaController = new EpocaController();
     npeController = new NpeController();
     delineamentoController = new DelineamentoController();
     sequenciaDelineamentoController = new SequenciaDelineamentoController();
@@ -86,6 +84,15 @@ export class ImportController {
                 let response:any;
                 let erro: any = false;
 
+                // Validação do modulo Local
+                if (data.moduleId == 4) {
+                    response = await this.validateLocal(data);
+                    if (response.save) {                    
+                        response = "Itens cadastrado com sucesso!";
+                    } else { 
+                        erro = true;
+                    }
+                }
                 // Validação do modulo Delineamento
                 if (data.moduleId == 7) {
                     response = await this.validateDelineamento(data);
@@ -158,15 +165,15 @@ export class ImportController {
                                         let local: any = await this.localController.getAllLocal({cod_local: data.spreadSheet[keySheet][sheet]});
                                         if (local.total == 0) {      
                                             // console.log('aqui Local');
-                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Local não existe no sistema.</span><br>`;
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</span><br>`;
                                         }  else {
                                             this.aux.id_local = local.response[0].id;
                                         }
                                     } else {
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Local deve ser um campo de texto.</span><br>`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, local deve ser um campo de texto.</span><br>`;
                                     }
                                 } else {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Local é obrigatorio.</span><br>`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do local é obrigatorio.</span><br>`;
                                 } 
                             }
 
@@ -247,20 +254,6 @@ export class ImportController {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Tipo de Ensaio é obrigatorio.</span><br>`;
                                 }
                             } 
-                            
-                            if (configModule.response[0].fields[sheet] == 'Epoca') {
-                                if (data.spreadSheet[keySheet][sheet] != "") {
-                                    let epoca: any = await this.epocaController.listAll({name: String(data.spreadSheet[keySheet][sheet])});
-                                    if (epoca.total == 0) {      
-                                        // console.log('aqui Epoca');
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Epoca não existe no sistema.</span><br>`;
-                                    } else {
-                                        this.aux.id_epoca = epoca.response[0].id;
-                                    }
-                                } else {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Campo com nome do Epoca é obrigatorio.</span><br>`;
-                                }   
-                            }
 
                             if (configModule.response[0].fields[sheet] == "NPEI") {
                                 if (data.spreadSheet[keySheet][sheet] != "") {                    
@@ -325,9 +318,7 @@ export class ImportController {
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'Epoca') {
-                                // console.log("Epoca R");
-                                let epoca: any = await this.epocaController.listAll({name: String(data.spreadSheet[keySheet][sheet])});
-                                this.aux.id_epoca = epoca.response[0].id;
+                                this.aux.epoca = String(data.spreadSheet[keySheet][sheet]);
                             }
 
                             if (configModule.response[0].fields[sheet] == "NPEI") {
@@ -604,6 +595,128 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     this.aux.volume =data.spreadSheet[keySheet][sheet];
                                 }
+                            }
+
+                            if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
+                                await this.loteController.create(this.aux);
+                            }
+                       }
+                    }
+                }
+                return "save";
+            }
+            return Resposta;
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async validateLocal(data: object | any) {
+        var Resposta: string = '';
+        let Column: number;
+        try {
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
+            if (data != null && data != undefined) {
+                let Line: number;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    Line = Number(keySheet) + 1;
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'CodLocal') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo código local é obrigatorio.</span><br>`;
+                                } else {
+                                    let local = await this.localController.getAllLocal({cod_local: data.spreadSheet[keySheet][sheet]});
+                                    if (local.total > 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, código local ja cadastrado no sistema.</span><br>`;
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'CodRedLocal') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo código reduzido do local é obrigatorio.</span><br>`;
+                                } else {
+                                    let local = await this.localController.getAllLocal({cod_red_local: data.spreadSheet[keySheet][sheet]});
+                                    if (local.total > 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, código reduzido do local ja cadastrado no sistema.</span><br>`;
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'pais') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta,  pais é obrigatorio.</span><br>`;
+                                }
+                            } 
+
+                            if (configModule.response[0].fields[sheet] == 'uf') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, estado é obrigatorio.</span><br>`;
+                                } 
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'city') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, cidade é obrigatorio.</span><br>`;
+                                } 
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'NameFarm') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, nome da fazenda é obrigatorio.</span><br>`;
+                                } 
+                            }
+                       }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                this.aux.created_by = Number(data.created_by);
+                this.aux.status =1;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+
+                            if (configModule.response[0].fields[sheet] == 'CodLocal') {
+                                this.aux.cod_local = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'CodRedLocal') {
+                                this.aux.cod_red_local = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'pais') {
+                                this.aux.pais = data.spreadSheet[keySheet][sheet];
+                            } 
+
+                            if (configModule.response[0].fields[sheet] == 'uf') {
+                                this.aux.uf = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'city') {
+                                this.aux.city = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'NameFarm') {
+                                this.aux.name_farm = data.spreadSheet[keySheet][sheet];
+                            }
+                           
+                            if (configModule.response[0].fields[sheet] == 'Altitude') {
+                                this.aux.altitude = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Latitude') {
+                                this.aux.latitude = data.spreadSheet[keySheet][sheet];
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Longitude') {
+                                this.aux.longitude = data.spreadSheet[keySheet][sheet];
                             }
 
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {

@@ -188,7 +188,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
       if (ObjetCampos[index] == 'delineamento') {
         arrOb.push({
           title: "Delineamento",
-          field: "delineamento",
+          field: "delineamento.name",
           sorting: false
         },);
       }
@@ -656,7 +656,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}/list-relation?id_delineamento=${id_delineamento}`, requestOptions);
+  const api = await fetch(`${baseUrl}/list?id_delineamento=${id_delineamento}`, requestOptions);
   const data = await api.json();
   const allItems  = data.response;
   const totalItems = data.total;

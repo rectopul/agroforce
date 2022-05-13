@@ -95,12 +95,12 @@ export default function Atualizar(foco: IUpdateFoco) {
       >
         <h1 className="text-2xl">Atualizar foco</h1>
 
-        <div className="w-full
-          flex 
-          justify-around
-          gap-2
-          mt-4
-          mb-4
+        <div className="w-1/2
+            flex 
+            justify-around
+            gap-6
+            mt-4
+            mb-4
         ">
           <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -110,7 +110,7 @@ export default function Atualizar(foco: IUpdateFoco) {
             <Input value={foco.id} disabled style={{ background: '#e5e7eb' }} />
           </div>
 
-          <div className="w-full h-10">
+          <div className="w-full">
             <label className="block text-gray-900 text-sm font-bold mb-2">
               <strong className={checkInput}>*</strong>
               Nome
