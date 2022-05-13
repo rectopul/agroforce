@@ -89,12 +89,14 @@ export default function Cadastro() {
       >
         <h1 className="text-2xl">Novo foco</h1>
 
-        <div className="w-full
-          flex
-          mt-4
-          mb-4
+        <div className="w-1/2
+            flex 
+            justify-around
+            gap-6
+            mt-4
+            mb-4
         ">
-          <div className="w-2/4 h-10">
+          <div className="w-full h-10">
             <label className="block text-gray-900 text-sm font-bold mb-2">
               <strong className={checkInput}>*</strong>
               Nome
