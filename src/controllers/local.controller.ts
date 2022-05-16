@@ -146,10 +146,10 @@ export class LocalController {
     async postLocal(data: object | any) {
         try {
             if (data != null && data != undefined) {
-                if (data.uf) {
-                let uf = await this.getOnUFs(parseInt(data.uf));
-                data.uf = uf?.sigla;
-                }
+                // if (data.uf) {
+                //     let uf = await this.getOnUFs(parseInt(data.uf));
+                //     data.uf = uf?.sigla;
+                // }
                 let response = await this.localRepository.create(data);
                 if(response) {
                     return {status: 200, message: "local inserido"}

@@ -9,6 +9,7 @@ import {DelineamentoController} from '../controllers/delineamento.controller';
 import {SequenciaDelineamentoController} from '../controllers/sequencia-delineamento.controller';
 import {GenotipoController} from '../controllers/genotipo.controller';
 import {LoteController} from '../controllers/lote.controller';
+import { saveDegreesCelsius } from "src/shared/utils/formatDegreesCelsius";
 
 export class ImportController {
     importRepository = new ImportRepository();
@@ -87,7 +88,7 @@ export class ImportController {
                 // Validação do modulo Local
                 if (data.moduleId == 4) {
                     response = await this.validateLocal(data);
-                    if (response.save) {                    
+                    if (response == 'save') {                    
                         response = "Itens cadastrado com sucesso!";
                     } else { 
                         erro = true;
@@ -587,6 +588,11 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Lote') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
+                                    let lote = await this.loteController.listAll({name: data.spreadSheet[keySheet][sheet]});
+                                    if (lote.total > 0) {
+                                        this.aux.name = data.spreadSheet[keySheet][sheet];
+                                        this.aux.id = lote.response[0].id;
+                                    }
                                     this.aux.name =data.spreadSheet[keySheet][sheet];
                                 }
                             }
@@ -598,7 +604,11 @@ export class ImportController {
                             }
 
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                                await this.loteController.create(this.aux);
+                                if (this.aux.id) {
+                                    await this.loteController.update(this.aux);
+                                } else {
+                                    await this.loteController.create(this.aux);
+                                }
                             }
                        }
                     }
@@ -641,6 +651,7 @@ export class ImportController {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O campo código reduzido do local é obrigatorio.</span><br>`;
                                 } else {
                                     let local = await this.localController.getAllLocal({cod_red_local: data.spreadSheet[keySheet][sheet]});
+                                    console.log(local);
                                     if (local.total > 0) {
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, código reduzido do local ja cadastrado no sistema.</span><br>`;
                                     }
@@ -712,15 +723,15 @@ export class ImportController {
                             }
 
                             if (configModule.response[0].fields[sheet] == 'Latitude') {
-                                this.aux.latitude = data.spreadSheet[keySheet][sheet];
+                                this.aux.latitude = saveDegreesCelsius(data.spreadSheet[keySheet][sheet]);
                             }
 
                             if (configModule.response[0].fields[sheet] == 'Longitude') {
-                                this.aux.longitude = data.spreadSheet[keySheet][sheet];
+                                this.aux.longitude = saveDegreesCelsius(data.spreadSheet[keySheet][sheet]);
                             }
 
                             if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                                await this.loteController.create(this.aux);
+                                await this.localController.postLocal(this.aux);
                             }
                        }
                     }

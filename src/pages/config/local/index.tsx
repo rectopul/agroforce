@@ -13,7 +13,7 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { localService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
@@ -666,6 +666,17 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
+                    <div className='h-12'>
+                      <Button 
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => {}}
+                        href="local/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
@@ -713,13 +724,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                           </AccordionFilter>
                         </div>
                       </div>
-
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('local/importacao')}} />
-                      </div>
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button title="Download lista de locais" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="local/importar-planilha/config-planilha"  />
+                      </div>
+                     
                     </div>
                   </div>
                 ),

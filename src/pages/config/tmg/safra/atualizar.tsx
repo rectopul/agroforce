@@ -125,7 +125,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 Ano
               </label>
               <InputMask 
-                mask="99/99"
+                mask="9999a_9999a"
                 required
                 id="year"
                 name="year"
