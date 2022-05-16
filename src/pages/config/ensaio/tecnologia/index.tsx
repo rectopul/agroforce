@@ -73,7 +73,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Descrição ", value: "desc", defaultChecked: () => camposGerenciados.includes('namdesce') },
+    { name: "CamposGerenciados[]", title: "Descrição ", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
+    { name: "CamposGerenciados[]", title: "Código Técnologia ", value: "cod_tec", defaultChecked: () => camposGerenciados.includes('cod_tec') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -166,7 +167,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       if (ObjetCampos[item] == 'desc') {
         arrOb.push({ title: "Descrição", field: "desc", sorting: false })
       }
-  
+      if (ObjetCampos[item] == 'cod_tec') {
+        arrOb.push({ title: "Código Técnologia", field: "cod_tec", sorting: false })
+      }
       if (ObjetCampos[item] == 'status') {
         arrOb.push({
           title: "Status",

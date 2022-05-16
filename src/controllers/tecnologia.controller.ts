@@ -31,7 +31,7 @@ export class TecnologiaController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, name: true, desc:true, status:true};
+                select = {id: true, name: true, desc:true, cod_tec:true, status:true};
             }
 
             if (options.id_culture) {
@@ -40,6 +40,10 @@ export class TecnologiaController {
 
             if (options.name) {
                 parameters.name = options.name;
+            }
+
+            if (options.cod_tec) {
+                parameters.cod_tec = options.cod_tec;
             }
         
             if (options.take) {
@@ -94,6 +98,11 @@ export class TecnologiaController {
     async post(data: object | any) {
         try {
             if (data != null && data != undefined) {
+                let validate = await this.getAll({cod_tec: data.cod_tec, id_culture: data.id_culture});
+                console.log(validate);
+                if (validate.total > 0) {
+                    return {status: 400, message: 'Código técnologia ja cadastrado nessa cultura'}
+                }
                 let response = await this.tecnologiaRepository.create(data);
                 if(response) {
                     return {status: 200, message: "tipo ensaio inserido"}
@@ -102,6 +111,7 @@ export class TecnologiaController {
                 }
             }
         } catch (err) {
+            console.log(err);
             return {status: 400, message: err}
         }
     }
