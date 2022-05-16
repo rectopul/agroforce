@@ -248,6 +248,7 @@ model type_assay {
 
 model tecnologia {
   id         Int       @id @default(autoincrement())
+  cod_tec    String @default("")
   id_culture Int
   name       String
   desc       String?

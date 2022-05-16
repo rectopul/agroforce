@@ -16,6 +16,7 @@ interface ITecnologiaProps {
   id: number;
   id_culture: number;
   name: string;
+  cod_tec: string;
   desc: string;
   created_by: number;
   status: number;
@@ -42,6 +43,7 @@ export default function NovoLocal() {
       id: 1,
       id_culture: parseInt(culture),
       name: '',
+      cod_tec: '',
       desc: '',
       created_by: userLogado.id,
       status: 1
@@ -53,6 +55,7 @@ export default function NovoLocal() {
       await tecnologiaService.create({
         id_culture: parseInt(culture),
         name: capitalize(values.name),
+        cod_tec: capitalize(values.cod_tec),
         desc: capitalize(values.desc),
         created_by: Number(userLogado.id),
         status: 1
@@ -95,12 +98,28 @@ export default function NovoLocal() {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Código Técnologia
+              </label>
+              <Input 
+                type="text" 
+                placeholder="TA" 
+                required
+                id="cod_tec"
+                name="cod_tec"
+                maxLength={2}
+                onChange={formik.handleChange}
+                value={formik.values.cod_tec}
+              />
+            </div> 
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
               <Input 
                 type="text" 
                 placeholder="Nome" 
                 id="name"
+                required
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}

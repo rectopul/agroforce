@@ -17,6 +17,8 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 interface ITecnologiaProps {
   id: number;
   name: string;
+  desc: string;
+  cod_tec: string;
   created_by: number;
   status: number;
 };
@@ -41,7 +43,9 @@ export default function NovoLocal({tecnologia}: IData) {
   const formik = useFormik<ITecnologiaProps>({
     initialValues: {
       id: tecnologia.id,
+      cod_tec: tecnologia.cod_tec,
       name: capitalize(tecnologia.name),
+      desc: capitalize(tecnologia.desc),
       created_by: userLogado.id,
       status: 1
     },
@@ -52,6 +56,8 @@ export default function NovoLocal({tecnologia}: IData) {
       await tecnologiaService.update({
         id: values.id,
         name:values.name,
+        desc:values.desc,
+        cod_tec:values.cod_tec,
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
@@ -107,6 +113,23 @@ export default function NovoLocal({tecnologia}: IData) {
             </div> 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Código Técnologia
+              </label>
+              <Input 
+                type="text" 
+                placeholder="TA" 
+                required
+                style={{ background: '#e5e7eb' }}
+                id="cod_tec"
+                disabled
+                name="cod_tec"
+                maxLength={2}
+                onChange={formik.handleChange}
+                value={formik.values.cod_tec}
+              />
+            </div> 
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
               <Input 
@@ -117,7 +140,20 @@ export default function NovoLocal({tecnologia}: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>       
+            </div>    
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Descrição
+              </label>
+              <Input 
+                type="text" 
+                placeholder="Descrição" 
+                id="desc"
+                name="desc"
+                onChange={formik.handleChange}
+                value={formik.values.desc}
+              />
+            </div>    
           </div>
 
           <div className="
