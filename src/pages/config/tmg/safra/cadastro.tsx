@@ -150,7 +150,7 @@ export default function Safra() {
               </label>
 
               <InputMask
-                mask="99/99"
+                mask="9999a_9999a"
                 required
                 id="year"
                 name="year"
