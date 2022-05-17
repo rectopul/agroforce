@@ -347,6 +347,8 @@ export class ImportController {
         try {
             let configModule: object | any = await this.getAll(parseInt(data.moduleId));
             let sorteio_anterior: number = 0;
+            let tratamento_anterior: number = 0;
+            let bloco_anterior: number = 0;
             let repeticao: number = 1;
             let countTrat = 0;
 
@@ -370,10 +372,20 @@ export class ImportController {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A Repetição tem que ser um numero.</span><br>`;
                                     } else {
+                                        if (repeticao == 1 && countTrat == 0) {
+                                            if (data.spreadSheet[keySheet][sheet] != 1) {
+                                                return 'A repetição deve iniciar com 1';
+                                            }
+                                        }
+
                                         if (data.spreadSheet[keySheet][sheet] > repeticao) { 
                                             repeticao ++;
                                             countTrat = 1;
+                                            tratamento_anterior = 0;
                                         } else {
+                                            if (data.spreadSheet[keySheet][sheet] < repeticao) {
+                                                Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, A repetição está incorreta.</span><br>`;
+                                            }
                                             countTrat++;
                                         }
                                     }
@@ -387,6 +399,8 @@ export class ImportController {
                                     } else { 
                                         if (sorteio_anterior > data.spreadSheet[keySheet][sheet]) {
                                             return 'A coluna de sorteio deve está em ordem crescente.';
+                                        } else {
+                                            sorteio_anterior = data.spreadSheet[keySheet][sheet];
                                         }
                                     }
                                 }
@@ -396,6 +410,17 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Tratamento tem que ser um numero.</span><br>`;
+                                    } else {
+                                        if (tratamento_anterior == 0) {
+                                            if (data.spreadSheet[keySheet][sheet] != 1) {
+                                                return 'O número de tratamento deve iniciar com 1';
+                                            }
+                                        }
+                                        if (tratamento_anterior >= data.spreadSheet[keySheet][sheet]) {
+                                            return 'A coluna de tratamento deve está em ordem crescente para cada repetição.';
+                                        } else { 
+                                            tratamento_anterior = data.spreadSheet[keySheet][sheet];
+                                        }
                                     }
                                 }
                             }
@@ -404,6 +429,12 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
                                     if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
                                         Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, O Bloco tem que ser um numero.</span><br>`;
+                                    } else {
+                                        if (bloco_anterior != 0 && bloco_anterior != data.spreadSheet[keySheet][sheet]) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, Os blocos não podem ser diferentes.</span><br>`; 
+                                        } else { 
+                                            bloco_anterior = data.spreadSheet[keySheet][sheet];
+                                        }
                                     }
                                 }
                             }
