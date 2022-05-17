@@ -45,6 +45,12 @@ export function TabsDropDowns () {
       ],
     },
     { 
+      titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/npe',
+      data: [
+        { labelDropDown: 'NPE', hrefDropDown: '/config/npe', iconDropDown: <FiMapPin/> },
+      ],
+    },
+    { 
       titleTab: 'DELINEAMENTO', valueTab: <BsCheckLg />, statusTab: false, hrefTab: '/config/delineamento',
       data: [
         { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch/> },
@@ -56,12 +62,7 @@ export function TabsDropDowns () {
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
-    { 
-      titleTab: 'NPE', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/npe',
-      data: [
-        { labelDropDown: 'NPE', hrefDropDown: '/config/npe', iconDropDown: <FiMapPin/> },
-      ],
-    },
+ 
     // {
     //   titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
     //   data: [
