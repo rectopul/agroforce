@@ -528,7 +528,8 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                    this.aux.id_tecnologia =data.spreadSheet[keySheet][sheet];
+                                    let tec:any = await this.ogmController.getAll({id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet])});
+                                    this.aux.id_tecnologia =tec.response[0].id;
                                 }
                             }
 
