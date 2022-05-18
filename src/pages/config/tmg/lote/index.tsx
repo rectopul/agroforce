@@ -190,7 +190,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
               </button>
             </div>
           ),
-          field: "genotipo.genealogy",
+          field: "genotipo.genotipo",
           sorting: false
         },);
       }

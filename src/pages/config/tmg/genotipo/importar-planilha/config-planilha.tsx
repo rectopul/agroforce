@@ -6,7 +6,7 @@ import getConfig from 'next/config';
 const data: object = [
             { id: 'Genotipo', name: '*Genótipo'}, 
             { id: 'Cruza', name: '*Cruza'},
-            { id: 'Tecnologia', name: '*Técnologia'},
+            { id: 'Tecnologia', name: '*Tecnologia'},
             { id: 'Genealogy', name: 'Genealogia'}
           ];
 

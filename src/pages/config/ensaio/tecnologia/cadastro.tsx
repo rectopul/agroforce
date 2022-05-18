@@ -98,7 +98,7 @@ export default function NovoLocal() {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Código Técnologia
+                *Código Tecnologia
               </label>
               <Input 
                 type="text" 
