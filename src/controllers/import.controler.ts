@@ -611,7 +611,7 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Genotipo') {
                                 if (data.spreadSheet[keySheet][sheet] != "") {
-                                    let geno = await this.genotipoController.listAllGenotipos({genealogy: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                    let geno = await this.genotipoController.listAllGenotipos({genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                                     if (geno.total > 0) {
                                         this.aux.id_genotipo = geno.response[0].id;
                                     }
