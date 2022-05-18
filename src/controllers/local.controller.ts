@@ -72,6 +72,10 @@ export class LocalController {
                 parameters.cod_local = options.cod_local;
             }
 
+            if (options.cod_red_local) { 
+                parameters.cod_red_local = options.cod_red_local;
+            }
+
             if (options.filterCity) {
                 parameters.city =options.filterCity;
             }

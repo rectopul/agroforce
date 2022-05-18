@@ -9,10 +9,7 @@ const data: object = [
             { id: 'NameFarm', name: '*Nome Fazenda'}, 
             { id: 'pais', name: 'País'}, 
             { id: 'uf', name: 'Estado'}, 
-            { id: 'city', name: 'Municipio'}, 
-            { id: 'Altitude', name: 'Altitude'},
-            { id: 'Latitude', name: 'Latitude'},
-            { id: 'Longitude', name: 'Longitude'}
+            { id: 'city', name: 'Municipio'}
           ];
 
 export default function ImportacaoPlanilha({config}: any) {
