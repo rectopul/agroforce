@@ -54,8 +54,11 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
         userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
         safras.safras = await safraController.getAllSafra({id_culture: userCulture.cultura_selecionada, filterStatus: 1}); 
-        safras.safras = safras.safras.response;
-        safras.safra_selecionada = safras.safras[0].id;
+        if (safras.safras.total > 0) {
+          safras.safras = safras.safras.response;
+          safras.safra_selecionada = safras.safras[0].id || 0;
+        }
+
         permisions = await PermissionController.getUserPermissions(user.id); 
         preferences.usuario =  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 1}); preferences.usuario = preferences.usuario.response[0];
         preferences.culture=  await PreferencesControllers.getAllPreferences({userId: user.id, module_id: 2});  preferences.culture =  preferences.culture.response[0];
