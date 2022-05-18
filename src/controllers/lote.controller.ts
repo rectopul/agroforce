@@ -129,7 +129,7 @@ export class LoteController {
         });
         select = Object.assign({}, select);
       } else {
-          select = {id: true, genotipo:{select:{genealogy:true}}, volume: true, name:true, status: true};
+          select = {id: true, genotipo:{select:{genotipo:true}}, volume: true, name:true, status: true};
       }
 
       if (options.name) {

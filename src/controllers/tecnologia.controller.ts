@@ -101,7 +101,7 @@ export class TecnologiaController {
                 let validate = await this.getAll({cod_tec: data.cod_tec, id_culture: data.id_culture});
                 console.log(validate);
                 if (validate.total > 0) {
-                    return {status: 400, message: 'Código técnologia ja cadastrado nessa cultura'}
+                    return {status: 400, message: 'Código tecnologia ja cadastrado nessa cultura'}
                 }
                 let response = await this.tecnologiaRepository.create(data);
                 if(response) {
@@ -131,7 +131,7 @@ export class TecnologiaController {
             if (data != null && data != undefined) {
                 let response = await this.tecnologiaRepository.update(data.id, parameters);
                 if(response) {
-                    return {status: 200, message: {message: "Técnologia atualizado com sucesso"}}
+                    return {status: 200, message: {message: "Tecnologia atualizado com sucesso"}}
                 } else {
                     return {status: 400, message: {message: "erro ao tentar fazer o update"}}
                 }

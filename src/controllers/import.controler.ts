@@ -484,12 +484,12 @@ export class ImportController {
 
                             if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                                 if (data.spreadSheet[keySheet][sheet] == "") {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo técnologia é obrigatorio.</span><br>`;
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</span><br>`;
                                 } else { 
                                     let tec:any = await this.ogmController.getAll({id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet])});
 
                                     if (tec.total == 0) {
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a técnologia informado não existe no sistema.</span><br>`;
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</span><br>`;
                                     }
                                 }
                             }
