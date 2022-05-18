@@ -223,7 +223,7 @@ export class ImportController {
                                             return "O foco a ser importado tem que fazer parte do grupo selecionado!";
                                         }
 
-                                        let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet]});
+                                        let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                                         if (foco.total == 0) {
                                             // console.log('aqui Foco');
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</span><br>`;
@@ -309,7 +309,8 @@ export class ImportController {
                             
                             if (configModule.response[0].fields[sheet] == 'Foco') {
                                 // console.log("FOCO R");
-                                this.aux.id_foco = Number(data.foco);              
+                                let foco: any = await this.focoController.listAllFocos({name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                                this.aux.id_foco = Number(foco.response[0].id);              
                             } 
                             
                             if (configModule.response[0].fields[sheet] == 'Ensaio') {
