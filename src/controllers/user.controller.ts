@@ -164,7 +164,6 @@ export class UserController {
                 if (!data.name) return {status: 400, message: 'Informe o nome do usuário'};
                 if (!data.email) return {status: 400, message: 'Informe o email do usuário'}; 
                 if (!data.cpf) return {status: 400, message: 'Informe o cpf do usuário'};
-                if (!data.tel) return {status: 400, message: 'Informe o telefone do usuário'};
                 if (!data.departmentId) return {status: 400, message: 'Informe o departamento do usuário'};
                 if (!data.password) return {status: 400, message: 'Informe a senha do usuário'};
 

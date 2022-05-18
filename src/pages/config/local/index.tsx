@@ -216,7 +216,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             <div className='flex items-center'>
               { arrowAddress }
               <button className='font-medium text-gray-900' onClick={() => handleOrderAddress('name_farm', orderAddress)}>
-                Endereço
+                Nome Fazenda
               </button>
             </div>
           ), 
@@ -231,7 +231,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           field: "latitude", 
           sorting: false,
           render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.latitude)
+            (rowData.latitude) 
+              ?
+              getDegreesCelsius(rowData.latitude)
+              : ''
           )
         })
       }
@@ -242,7 +245,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           field: "longitude",
           sorting: false,
           render: (rowData: ILocalProps) => (
-            getDegreesCelsius(rowData.longitude)
+            (rowData.longitude) ? getDegreesCelsius(rowData.longitude) : ''
           )
         })
       }
@@ -655,7 +658,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
+                    {/* <div className='h-12'>
                       <Button 
                         title="Cadastrar Local"
                         value="Cadastrar Local"
@@ -665,7 +668,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         href="local/cadastro"
                         icon={<FiUserPlus size={20} />}
                       />
-                    </div>
+                    </div> */}
                     <div className='h-12'>
                       <Button 
                         title="Importar Planilha"
@@ -691,10 +694,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                   (provided) => (
                                     <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
+                                        <Button
                                           value="Atualizar" 
                                           bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
