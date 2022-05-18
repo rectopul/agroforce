@@ -120,7 +120,6 @@ export class LoteController {
       if (options.filterSearch) {
         options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
         parameters.name  = JSON.parse(options.filterSearch);
-        parameters.volume  = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {

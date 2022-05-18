@@ -75,17 +75,23 @@ export default function Safra() {
       } = data;
 
       validateInputs(inputs);
+      let plantingStartTime;
+      let plantingEndTime;
 
       if (!inputs) return;
 
-      const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
-        new Date(formik.values.plantingStartTime)
-      );
-
-      const plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
-        new Date(formik.values.plantingEndTime)
-      );
+      if (values.plantingStartTime) {
+        plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingStartTime)
+        );
+      }
       
+      if (values.plantingEndTime) {
+        plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingEndTime)
+        );
+      }
+
       await safraService.create({
         id_culture: Number(culture),
         year: formik.values.year,
@@ -112,20 +118,6 @@ export default function Safra() {
     } else {
       let inputYear: any = document.getElementById("year");
       inputYear.style.borderColor= '';
-    }
-    if (!values.plantingStartTime) {
-      let inputPlantingStartTime: any = document.getElementById("plantingStartTime"); 
-      inputPlantingStartTime.style.borderColor= 'red'; 
-    } else {
-      let inputPlantingStartTime: any = document.getElementById("plantingStartTime");
-      inputPlantingStartTime.style.borderColor= '';
-    }
-    if (!values.plantingEndTime) {
-      let inputplantingEndTime: any = document.getElementById("plantingEndTime"); 
-      inputplantingEndTime.style.borderColor= 'red'; 
-    } else {
-      let inputPlantingEndTime: any = document.getElementById("plantingEndTime");
-      inputPlantingEndTime.style.borderColor= '';
     }
   };
   
@@ -178,12 +170,11 @@ export default function Safra() {
     
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
+                
                 Período ideal de início de plantio
               </label>
               <Input
                 type="date" 
-                required
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
@@ -193,12 +184,11 @@ export default function Safra() {
             
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
+                
                 Período ideal do fim do plantio
               </label>
               <Input
                 type="date"
-                required
                 id="plantingEndTime"
                 name="plantingEndTime"
                 onChange={formik.handleChange}

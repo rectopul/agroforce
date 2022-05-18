@@ -3,8 +3,8 @@ import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
@@ -350,6 +350,34 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     });
   };
   
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  };
+  
+  async function handlePagination(): Promise<void> {
+    let skip = currentPage * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    if (filter) {
+      parametersFilter = parametersFilter + "&" + filter;
+    }
+    await safraService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setSafras(response.response);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage, pages]);
+
+
   return (
     <>
       <Head><title>Listagem de safras</title></Head>
@@ -387,7 +415,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                         Safra
                       </label>
                       <InputMask
-                        mask={"99/99"}
+                        mask={"9999a_9999a"}
                         placeholder="__/__"
                         id="filterSearch"
                         name="filterSearch"

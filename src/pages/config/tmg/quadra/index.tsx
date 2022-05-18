@@ -80,7 +80,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
+    { name: "CamposGerenciados[]", title: "Técnologia", value: "tecnologia" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -234,7 +234,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       }
       if (ObjetCampos[index] == 'tecnologia') {
         arrOb.push({
-          title: "Tecnologia",
+          title: "Técnologia",
           field: "tecnologia.name",
           sorting: false
         },);

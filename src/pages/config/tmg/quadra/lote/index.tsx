@@ -6,18 +6,18 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
+import { RiFileExcel2Line } from "react-icons/ri";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { genotipoService, userPreferencesService } from "src/services";
+import { loteGenotipoService, loteService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import ITabs from "../../../../shared/utils/dropdown";
+import ITabs from "../../../../../shared/utils/dropdown";
 
 interface IFilter{
   filterStatus: object | any;
@@ -26,12 +26,13 @@ interface IFilter{
   typeOrder: object | any;
 }
 
-export interface IGenotipos {
+export interface LoteGenotipo {
   id: number;
   id_culture: number;
+  id_genotipo: number;
   genealogy: string;
-  genotipo: string;
-  cruza: string;
+  name: string;
+  volume: number;
   status?: number;
 }
 
@@ -42,14 +43,14 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allGenotipos: IGenotipos[];
+  allLote: LoteGenotipo[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
-  cultureId: number;
+  id_genotipo: number;
 }
 
-export default function Listagem({allGenotipos, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
+export default function Listagem({allLote, totalItems, itensPerPage, filterAplication, id_genotipo}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -60,27 +61,23 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     : tab.statusTab = false
   ));
 
-  console.log(allGenotipos);
-  
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.genotipo ||{id:0, table_preferences: "id,genealogy,cruza,status,genotipo, tecnologia"};
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,genealogy,name,volume,status"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
+  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
-  const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
-  const [orderCruza, setOrderCruza] = useState<number>(0);
-  const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
-  const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
-    { name: "CamposGerenciados[]", title: "Genótipo", value: "genotipo" },
-    { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
-    { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
+    { name: "CamposGerenciados[]", title: "Genealógia", value: "genealogy" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -105,58 +102,44 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setGenotipo(response.response);
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_genotipo;
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LoteGenotipo[]) => {
+        setLotes(response);
+        setTotaItems(response.length);
         setFilter(parametersFilter);
       })
     },
   });
 
-  async function handleStatusPortfolio(idGenotipo: number, data: IGenotipos): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
+  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
+    if (data.status === 1) {
       data.status = 0;
+    } else {
+      data.status = 1;
     }
-    
-    const index = genotipos.findIndex((genotipo) => genotipo.id === idGenotipo);
+
+    const index = lotes.findIndex((lote) => lote.id === idItem);
 
     if (index === -1) {
       return;
     }
 
-    setGenotipo((oldSafra) => {
-      const copy = [...oldSafra];
+    setLotes((oldLote) => {
+      const copy = [...oldLote];
       copy[index].status = data.status;
       return copy;
     });
-
-    const {
-      id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
-      status
-    } = genotipos[index];
-
-    await genotipoService.update({
-      id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
-      status
-    });
+    
+    const { id, status } = lotes[index];
+    
+    await loteGenotipoService.changeStatus({ id, status });
   };
 
-  function columnsOrder(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
 
-    Object.keys(ObjetCampos).forEach((_, index) => {
+    Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] == 'id') {
         arrOb.push({
           title: "",
@@ -197,20 +180,13 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'genotipo') {
-        arrOb.push({
-          title: 'Genótipo',
-          field: "genotipo",
-          sorting: false
-        },);
-      }
       if (ObjetCampos[index] == 'genealogy') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowGenealogy }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
-              Genealogia
+              { arrowName }
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('genealogy', orderName)}>
+                Genealógia
               </button>
             </div>
           ),
@@ -218,24 +194,17 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'cruza') {
+      if (ObjetCampos[index] == 'name') {
         arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowCruza }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderCruza('cruza', orderCruza)}>
-                Cruza
-              </button>
-            </div>
-          ),
-          field: "cruza",
+          title: "Nome",
+          field: "name",
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'tecnologia') {
+      if (ObjetCampos[index] == 'volume') {
         arrOb.push({
-          title: "Tecnologia",
-          field: "tecnologia.name",
+          title: "Volume",
+          field: "volume",
           sorting: false
         },);
       }
@@ -246,43 +215,43 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IGenotipos) => (
+          render: (rowData: LoteGenotipo) => (
             <div className='h-10 flex'>
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
+                  onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}} 
                   bgColor="bg-blue-600"
                   textColor="white"
-                  title={`Editar ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`)}}
+                  // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status === 1 ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
                         status: rowData.status,
-                        ...rowData,
+                        ...rowData
                       }
                     )}
-                    title={`Ativo`}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
+                    type="submit"
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
+                    onClick={async () => await handleStatusLote(
                       rowData.id, {
                         status: rowData.status,
-                        ...rowData,
+                        ...rowData
                       }
                     )}
-                    title={`Inativo`}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -292,34 +261,12 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           ),
         })
       }
-      // if (ObjetCampos[index] == 'id_genotipo') {
-      //   arrOb.push({
-      //     title: "Lote",
-      //     field: "id_genotipo",
-      //     sorting: false,
-      //     searchable: false,
-      //     filterPlaceholder: "Filtrar por status",
-      //     render: (rowData: IGenotipos) => (
-      //       <div className='h-10 flex'>
-      //         <div className="h-10">
-      //           <Button 
-      //             icon={<AiOutlineFileSearch size={16} />}
-      //             bgColor="bg-yellow-500"
-      //             textColor="white"
-      //             title={`Lote de ${rowData.genealogy}`}
-      //             onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_genotipo=${rowData.id}`)}}
-      //           />
-      //         </div>
-      //       </div>
-      //     ),
-      //   })
-      // }
     });
     return arrOb;
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox']");
+    var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
@@ -329,13 +276,13 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.genotipo = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotipo = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.lote = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -344,8 +291,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     setCamposGerenciados(campos);
   };
 
-
-  async function handleOrderGenealogy(column: string, order: string | any): Promise<void> {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -370,64 +316,21 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       }
     }
 
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setOrderGenealogy(response.response)
-      }
-    })
-    if (orderGenealogy === 2) {
-      setOrderGenealogy(0);
-      setArrowGenealogy(<AiOutlineArrowDown />);
-    } else {
-      setOrderGenealogy(orderGenealogy + 1);
-      if (orderGenealogy === 1) {
-        setArrowGenealogy(<AiOutlineArrowUp />);
-      } else {
-        setArrowGenealogy('');
-      }
-    }
-  };
-
-  async function handleOrderCruza(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder != '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setOrderCruza(response.response)
+        setOrderName(response.response)
       }
     });
     
-    if (orderCruza === 2) {
-      setOrderCruza(0);
-      setArrowCruza(<AiOutlineArrowDown />);
+    if (orderName === 2) {
+      setOrderName(0);
+      setArrowName(<AiOutlineArrowDown />);
     } else {
-      setOrderCruza(orderCruza + 1);
-      if (orderCruza === 1) {
-        setArrowCruza(<AiOutlineArrowUp />);
+      setOrderName(orderName + 1);
+      if (orderName === 1) {
+        setArrowName(<AiOutlineArrowUp />);
       } else {
-        setArrowCruza('');
+        setArrowName('');
       }
     }
   };
@@ -446,16 +349,16 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
   const downloadExcel = async (): Promise<void> => {
     if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
     
-    await genotipoService.getAll(filterAplication).then((response) => {
+    await loteService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
-        const newData = genotipos.map((row) => {
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = "Inativo";
           } else {
-            row.status = "Ativo" as any;
+            row.status = "Ativo";
           }
 
           return row;
@@ -463,7 +366,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "genotipos");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -476,9 +379,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Genótipos.xlsx");
-      } else {
-        alert(response);
+        XLSX.writeFile(workBook, "Lotes.xlsx");
       }
     });
   };
@@ -493,14 +394,14 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
   async function handlePagination(): Promise<void> {
     let skip = currentPage * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    let parametersFilter = "skip=" + skip + "&take=" + take + "&id_portfolio=" + id_genotipo;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
+      parametersFilter = parametersFilter + "&" + filter;
     }
-    await genotipoService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
-        setGenotipo(response.response);
+    await loteService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setLotes(response.response);
       }
     });
   };
@@ -512,7 +413,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   
   return (
     <>
-      <Head><title>Listagem de genótipos</title></Head>
+      <Head><title>Listagem de Lotes</title></Head>
 
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
@@ -520,7 +421,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar genótipos">
+          <AccordionFilter title="Filtrar lote">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -548,7 +449,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="genealogia ou cruza"
+                      placeholder="Nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -575,7 +476,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={genotipos}
+              data={lotes}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -599,25 +500,14 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     border-solid border-b
                     border-gray-200
                   '>
-                    {/* <div className='h-12'>
-                      <Button 
-                        title="Cadastrar genótipo"
-                        value="Cadastrar genótipo"
+                    <div className='h-12'>
+                      <Button
+                        title="Cadastrar lote"
+                        value="Cadastrar lote"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push('genotipo/cadastro')}}
-                        icon={<RiPlantLine size={20} />}
-                      />
-                    </div> */}
-                      <div className='h-12'>
-                      <Button 
-                        title="Importar Planilha"
-                        value="Importar Planilha"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => {}}
-                        href="genotipo/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
+                        onClick={() => {router.push(`lote/cadastro/${id_genotipo}`)}}
+                        icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
 
@@ -650,7 +540,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                                                 name={genarate.name}
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(String(genarate.value))}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                               />
                                             </li>
                                           )}
@@ -668,11 +558,10 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                          {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('lote/importacao')}} />
                         </div>
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="genotipo/importar-planilha/config-planilha"  />
+                          <Button title="Download lista de lotes" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                     </div>
                   </div>
@@ -743,40 +632,41 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const  token  =  req.cookies.token;
-  const  cultureId: number  = Number(req.cookies.cultureId);
-  
+  const  token  =  context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(param).toString();
   
+  urlParameters.search = new URLSearchParams(param).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
-  const data = await api.json();
+  const id_genotipo = Number(context.query.id_genotipo);
 
-  const allGenotipos  = data.response;
-  const totalItems = data.total;
+  const api = await fetch(`${baseUrl}?id_genotipo=${id_genotipo}`, requestOptions);
+
+  const allLote: LoteGenotipo[] = await api.json();
+
+  const totalItems = allLote.length || 0;
 
   return {
     props: {
-      allGenotipos ,
+      allLote,
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      id_genotipo
     },
   }
 }
