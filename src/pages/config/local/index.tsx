@@ -728,7 +728,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                         </div>
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de locais" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="local/importar-planilha/config-planilha"  />

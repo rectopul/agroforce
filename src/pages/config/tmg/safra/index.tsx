@@ -557,12 +557,8 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                             </AccordionFilter>
                           </div>
                         </div>
-
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('safra/importacao')}} />
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de safras" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Exportar planilha de safras" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                       </div>
                     </div>

@@ -671,12 +671,8 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                           </AccordionFilter>
                         </div>
                       </div>
-
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('usuarios/importacao-usuario')}} />
-                      </div>
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de usuários" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        <Button title="Exportar planilha de usuários" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
                     </div>
                   </div>
