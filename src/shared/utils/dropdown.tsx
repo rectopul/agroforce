@@ -62,13 +62,12 @@ export function TabsDropDowns () {
         { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <FiMapPin/> },
       ],
     },
- 
-    // {
-    //   titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false,
-    //   data: [
-    //     { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <BiArea/> },
-    //   ],
-    // },
+    { 
+      titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false ,  hrefTab: '/config/quadra',
+      data: [
+        { labelDropDown: 'Quadra', hrefDropDown: '/config/quadra', iconDropDown: <FiMapPin/> },
+      ],
+    },
   ];
 
   return tabsConfig;
@@ -81,8 +80,7 @@ const tabs = [
   { title: 'LOCAL', value: <BsCheckLg />, status: false , href: '/config/local' },
   { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false , href: '/config/delineamento' },
   { title: 'NPE', value: <BsCheckLg />, status: false , href: '/config/npe' },
-  // { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: '/config/layout-quadra' },
-  // { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false, href: '/config/conf-planilhas' },
+  { title: 'QUADRAS', value: <BsCheckLg />, status: false , href: '/config/tmg/quadra' },
 ];
 
 const tmgDropDown =  [

@@ -4,21 +4,32 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-            { id: 'Genotipo', name: '*Genótipo'}, 
-            { id: 'Cruza', name: '*Cruza'},
-            { id: 'Tecnologia', name: '*Tecnologia'},
-            { id: 'Genealogy', name: 'Genealogia'}
+            { id: 'Safra', name: '*Safra'}, 
+            { id: 'Cultura', name: '*Cultura'},
+            { id: 'LocalPrep', name: '*Local Preparo'},
+            { id: 'CodigoQuadra', name: 'Código Quadra'},
+            { id: 'LargQ', name: 'Largura Q'},
+            { id: 'CompP', name: 'Comp P'},
+            { id: 'LinhaP', name: 'Linha P'},
+            { id: 'CompC', name: 'Comp C'},
+            { id: 'Esquema', name: 'Esquema'},
+            { id: 'Divisor', name: 'Divisor'},
+            { id: 'Semente', name: 'Semmetro'},
+            { id: 'T4I', name: 'T4I'},
+            { id: 'T4F', name: 'T4F'},
+            { id: 'DI', name: 'DI'},
+            { id: 'DF', name: 'DF'},
           ];
 
 export default function ImportacaoPlanilha({config}: any) {
   return (
     <>
-      <Head><title>Importação de planilha Genótipo</title></Head>
+      <Head><title>Importação de planilha Quadra</title></Head>
 
         <ImportPlanilha
           data={data}
           configSalva ={(config != "") ? config[0].fields : []}
-          moduleId={10}
+          moduleId={17}
         />
     </>
   );
@@ -29,7 +40,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
-  const param = `moduleId=10`;
+  const param = `moduleId=17`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

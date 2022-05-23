@@ -37,6 +37,7 @@ model culture {
   type_assay        type_assay[]
   delineamento      delineamento[]
   epoca             epoca[]
+  quadra            quadra[]
 }
 
 model department {
@@ -76,7 +77,8 @@ model safra {
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe npe[]
+  npe    npe[]
+  quadra quadra[]
 }
 
 model uf {
@@ -155,7 +157,7 @@ model users_preferences {
 model local {
   id             Int              @id @default(autoincrement())
   cod_local      String           @unique
-  cod_red_local  String?           @unique
+  cod_red_local  String?          @unique
   pais           String
   uf             String
   city           String
@@ -168,6 +170,7 @@ model local {
   status         Int              @default(1)
   layoult_quadra layoult_quadra[]
   npe            npe[]
+  quadra         quadra[]
 }
 
 model layoult_quadra {
@@ -190,6 +193,45 @@ model layoult_quadra {
   created_by     Int
   created_at     DateTime @default(now())
   local          local    @relation(fields: [localId], references: [id])
+}
+
+model quadra {
+  id            Int        @id @default(autoincrement())
+  cod_quadra    String
+  id_culture    Int
+  id_safra      Int
+  local_preparo Int
+  local_plantio String?
+  larg_q        Int
+  comp_p        Int
+  linha_p       Int
+  comp_c        Int
+  esquema       String?
+  tiro_fixo     String?
+  disparo_fixo  String?
+  q             String?
+  status        Int        @default(1)
+  created_by    Int
+  created_at    DateTime   @default(now())
+  localPreparo  local      @relation(fields: [local_preparo], references: [id])
+  Safra         safra      @relation(fields: [id_safra], references: [id])
+  Culture       culture    @relation(fields: [id_culture], references: [id])
+  disparos      disparos[]
+}
+
+model disparos {
+  id         Int      @id @default(autoincrement())
+  id_quadra  Int
+  t4_i       Int
+  t4_f       Int
+  di         Int
+  divisor    Int
+  df         Int
+  sem_metros Int
+  status     Int      @default(1)
+  created_by Int
+  created_at DateTime @default(now())
+  quadra     quadra   @relation(fields: [id_quadra], references: [id])
 }
 
 model genotipo {
@@ -248,7 +290,7 @@ model type_assay {
 
 model tecnologia {
   id         Int       @id @default(autoincrement())
-  cod_tec    String @default("")
+  cod_tec    String    @default("")
   id_culture Int
   name       String
   desc       String?

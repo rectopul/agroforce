@@ -18,4 +18,6 @@ export * from './user-permission';
 export * from './user-preferences.service';
 export * from './user.service';
 export * from './npe.service';
+export * from './quadra.service';
+export * from './disparos.service';
 
