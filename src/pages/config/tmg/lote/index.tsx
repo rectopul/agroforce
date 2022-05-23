@@ -559,7 +559,7 @@ export default function Listagem({allLote, totalItems, itensPerPage, filterAplic
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de lotes" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                         <div className='h-12 flex items-center justify-center w-full'>
                           <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="lote/importar-planilha/config-planilha"  />

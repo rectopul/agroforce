@@ -669,7 +669,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
                       <div className='h-12 flex items-center justify-center w-full'>
                           {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                         <div className='h-12 flex items-center justify-center w-full'>
                           <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="genotipo/importar-planilha/config-planilha"  />
