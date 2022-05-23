@@ -28,7 +28,7 @@ export default function Listagem() {
   });
 
   if (userLogado.token) {
-    router.push('/config/tmg/usuarios/')
+    router.push('/dashboard')
   }
 
   return (
