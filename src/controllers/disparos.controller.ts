@@ -1,9 +1,9 @@
-import { QuadraRepository } from "src/repository/quadra.repository";
+import { DisparoRepository } from "src/repository/disparos.repository";
 
-export class QuadraController {
+export class DisparosController {
   public readonly required = 'Campo obrigatório';
 
-  quadraRepository = new QuadraRepository();
+  disparoRepository = new DisparoRepository();
 
   async listAll(options: any) {
     const parameters: object | any = new Object();
@@ -25,8 +25,7 @@ export class QuadraController {
 
       if (options.filterSearch) {
         options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-        // parameters.genotipo  = JSON.parse(options.filterSearch);
-        // parameters.cruza = JSON.parse(options.filterSearch);
+
       }
 
       if (options.paramSelect) {
@@ -40,15 +39,16 @@ export class QuadraController {
         });
         select = Object.assign({}, select);
       } else {
-        select = {id: true, cod_quadra: true, local_preparo:true, local_plantio: true, larg_q:true, comp_p: true, linha_p: true, comp_c: true, esquema:true, tiro_fixo:true, disparo_fixo:true, q:true, Safra:{select:{year:true}}, status: true};
+        select = {id: true, t4_i: true, t4_f: true, divisor: true, di: true, df: true, sem_metros:true, quadra:{select:{esquema:true}}, status: true};
       }
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
-      if (options.cod_quadra) {
-        parameters.cod_quadra = options.cod_quadra;
+      if (options.id_quadra) {
+        parameters.id_quadra = parseInt(options.id_quadra);
       }
+    
 
       if (options.take) {
         if (typeof(options.take) === 'string') {
@@ -70,7 +70,7 @@ export class QuadraController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
       
-      let response: object | any = await this.quadraRepository.findAll(
+      let response: object | any = await this.disparoRepository.findAll(
         parameters,
         select,
         take,
@@ -93,7 +93,7 @@ export class QuadraController {
     try {
       if (!id) throw new Error("Dados inválidos");
 
-      const response = await this.quadraRepository.findOne(id);
+      const response = await this.disparoRepository.findOne(id);
 
       if (!response) throw new Error("Item não encontrado");
 
@@ -105,9 +105,9 @@ export class QuadraController {
 
   async create(data: any) {
     try {
-      console.log(data);
-      let response = await this.quadraRepository.create(data);
-      return {status: 201, message: "Genealogia cadastrada", response}
+      console.log(data)
+      let response = await this.disparoRepository.create(data);
+      return {status: 201, message: "Disparo cadastrado"}
     } catch(err) {
       console.log(err);
       return {status: 400, message: "Erro no cadastrado"}
@@ -117,15 +117,9 @@ export class QuadraController {
   async update(data: any) {
     try {
 
-      const quadra: any = await this.quadraRepository.findOne(data.id);
+      const quadra: any = await this.disparoRepository.findOne(data.id);
       
       if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
-
-      const loteAlreadyExists = await this.quadraRepository.findByQuadra(data.quadra);
-
-      if (loteAlreadyExists && loteAlreadyExists.id !== quadra.id) {
-        return { status: 400, message: 'Genealogia já cadastra. favor consultar os inativos' }
-      }
 
       quadra.id_culture = data.id_culture;
       quadra.id_tecnologia = data.id_tecnologia;
@@ -133,7 +127,7 @@ export class QuadraController {
       quadra.cruza = data.cruza;
       quadra.status = data.status;
 
-      await this.quadraRepository.update(quadra.id, quadra);
+      await this.disparoRepository.update(quadra.id, quadra);
 
       return {status: 200, message: "Genótipo atualizado"}
     } catch (err) {

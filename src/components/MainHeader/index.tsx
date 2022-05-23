@@ -22,8 +22,10 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
       ">
         <div className='w-96 gap-2 flex justify-between items-center pr-3'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo-tmg.png" alt="TMG" className='w-32 h-24
-          '/>
+          <a href="/">
+            <img src="/images/logo-tmg.png" alt="TMG" className='w-32 h-24
+            '/> 
+          </a>
           { headerSelects }
         </div>
 

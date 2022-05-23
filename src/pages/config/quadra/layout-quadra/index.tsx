@@ -1,163 +1,144 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
-import getConfig from "next/config";
+import getConfig from 'next/config';
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import router from "next/router";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
+import { RiFileExcel2Line } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { genotipoService, userPreferencesService } from "src/services";
+import { layoultQuadraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import ITabs from "../../../../shared/utils/dropdown";
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
+
+interface ILayoultProps {
+  id: Number | any;
+  esquema: String | any;
+  semente_metros: Number | any;
+  disparos: Number | any;
+  divisor: Number | any;
+  largura: Number | any;
+  comp_fisico: Number | any;
+  comp_parcela: Number | any;
+  comp_corredor: Number | any;
+  t4_inicial: Number | any;
+  t4_final: Number | any;
+  df_inicial: Number | any;
+  df_final: Number | any;
+  created_by: Number;
+  local: String | any;
+  status: Number;
+};
 
 interface IFilter{
   filterStatus: object | any;
   filterSearch: string | any;
+  filterUF: string | any;
+  filterCity: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
-
-export interface IGenotipos {
-  id: number;
-  id_culture: number;
-  genealogy: string;
-  genotipo: string;
-  cruza: string;
-  status?: number;
-}
-
 interface IGenarateProps {
   name: string | undefined;
   title:  string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-
-interface IData {
-  allGenotipos: IGenotipos[];
-  totalItems: number;
-  itensPerPage: number;
+interface Idata {
+  allItems: ILayoultProps[];
+  totalItems: Number;
+  filter: string | any;
+  itensPerPage: number | any;
   filterAplication: object | any;
-  cultureId: number;
+  local: object | any;
 }
 
-export default function Listagem({allGenotipos, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
-  const { TabsDropDowns } = ITabs;
-
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
+  const { TabsDropDowns } = ITabs.default;
+  
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
+    tab.titleTab === 'QUADRAS'
     ? tab.statusTab = true
     : tab.statusTab = false
   ));
 
-  console.log(allGenotipos);
-  
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.genotipo ||{id:0, table_preferences: "id,genealogy,cruza,status,genotipo, tecnologia"};
+  const preferences = userLogado.preferences.layout_quadra ||{id:0, table_preferences: "id,esquema,plantadeira,tiros,disparos,parcelas, status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const router = useRouter();
-  const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
+
+  const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
-  const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
-  const [orderCruza, setOrderCruza] = useState<number>(0);
-  const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
-  const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
-    { name: "CamposGerenciados[]", title: "Genótipo", value: "genotipo" },
-    { name: "CamposGerenciados[]", title: "Genealogia", value: "genealogy" },
-    { name: "CamposGerenciados[]", title: "Cruza", value: "cruza" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
-  ]);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [orderAddress, setOrderAddress] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<any>('');
+  const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+    { name: "CamposGerenciados[]", title: "Esquema ", value: "esquema", defaultChecked: () => camposGerenciados.includes('esquema') },
+    { name: "CamposGerenciados[]", title: "Plantadeira ", value: "plantadeira", defaultChecked: () => camposGerenciados.includes('local') },
+    { name: "CamposGerenciados[]", title: "Tiros", value: "tiros", defaultChecked: () => camposGerenciados.includes('divisor') },
+    { name: "CamposGerenciados[]", title: "Disparos", value: "disparos", defaultChecked: () => camposGerenciados.includes('disparos') },
+    { name: "CamposGerenciados[]", title: "Parcelas", value: "parcelas", defaultChecked: () => camposGerenciados.includes('largura') },
+    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
+  ]);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
-  ];
-
+  
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
+  const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
+      filterUF: '',
+      filterCity: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setGenotipo(response.response);
-        setFilter(parametersFilter);
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
+      await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        if (response.status == 200) {
+          if (response.total > 0) {
+            setTotaItems(response.total);
+          }
+          setFilter(parametersFilter);
+          setQuadra(response.response);
+        }
       })
     },
   });
 
-  async function handleStatusPortfolio(idGenotipo: number, data: IGenotipos): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
-    
-    const index = genotipos.findIndex((genotipo) => genotipo.id === idGenotipo);
+  const filters = [
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
 
-    if (index === -1) {
-      return;
-    }
-
-    setGenotipo((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const {
-      id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
-      status
-    } = genotipos[index];
-
-    await genotipoService.update({
-      id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
-      status
-    });
-  };
-
-  function columnsOrder(camposGerenciados: any): any {
+  function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
-
-    Object.keys(ObjetCampos).forEach((_, index) => {
-      if (ObjetCampos[index] == 'id') {
+    Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] == 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -190,136 +171,120 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
         })
       }
       
-      if (ObjetCampos[index] == 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        },);
+      if (ObjetCampos[item] == 'id') {
+        arrOb.push({ title: "Código", field: "id", sorting: false })
       }
-      if (ObjetCampos[index] == 'genotipo') {
-        arrOb.push({
-          title: 'Genótipo',
-          field: "genotipo",
-          sorting: false
-        },);
-      }
-      if (ObjetCampos[index] == 'genealogy') {
+      if (ObjetCampos[item] == 'esquema') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowGenealogy }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
-              Genealogia
+              { arrowName }
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('esquema', orderName)}>
+                Esquema
               </button>
             </div>
           ),
-          field: "genealogy",
+          field: "esquema",
           sorting: false
         },);
       }
-      if (ObjetCampos[index] == 'cruza') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              { arrowCruza }
-              <button className='font-medium text-gray-900' onClick={() => handleOrderCruza('cruza', orderCruza)}>
-                Cruza
-              </button>
-            </div>
-          ),
-          field: "cruza",
-          sorting: false
-        },);
+  
+      if (ObjetCampos[item] == 'local') {
+        arrOb.push({ title: "Local", field: "local", sorting: false })
       }
-      if (ObjetCampos[index] == 'tecnologia') {
-        arrOb.push({
-          title: "Tecnologia",
-          field: "tecnologia.name",
-          sorting: false
-        },);
+      
+      if (ObjetCampos[item] == 'semente_metros') {
+        arrOb.push({ title: "Sementes por Metros", field: "semente_metros", sorting: false })
       }
-      if (ObjetCampos[index] == 'status') {
+
+      if (ObjetCampos[item] == 'disparos') {
+        arrOb.push({ title: "Disparos", field: "disparos", sorting: false })
+      }
+
+      if (ObjetCampos[item] == 'divisor') {
+        arrOb.push({ title: "Divisor", field: "divisor", sorting: false })
+      }
+
+      // if (ObjetCampos[item] == 'largura') {
+      //   arrOb.push({ title: "Largura", field: "largura", sorting: false })
+      // }
+
+      if (ObjetCampos[item] == 'comp_fisico') {
+        arrOb.push({ title: "Comp. Fisico", field: "comp_fisico", sorting: false })
+      }
+
+      if (ObjetCampos[item] == 'comp_parcela') {
+        arrOb.push({ title: "Comp. Parcel", field: "comp_parcela", sorting: false })
+      }
+      
+      if (ObjetCampos[item] == 'comp_corredor') {
+        arrOb.push({ title: "Comp. Corretor", field: "comp_corredor", sorting: false })
+      }
+
+      if (ObjetCampos[item] == 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IGenotipos) => (
-            <div className='h-10 flex'>
-              <div className="h-10">
-                <Button 
-                  icon={<BiEdit size={16} />}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  title={`Editar ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`)}}
-                />
-              </div>
-              {rowData.status === 1 ? (
-                <div className="h-10">
+          render: (rowData: ILayoultProps) => (
+            rowData.status ? (
+              <div className='h-10 flex'>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<BiEdit size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
                   <Button 
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
-                      rowData.id, {
-                        status: rowData.status,
-                        ...rowData,
-                      }
-                    )}
-                    title={`Ativo`}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              ) : (
-                <div className="h-10">
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div className="
+                  h-10
+                ">
+                  <Button 
+                    icon={<BiEdit size={16} />}
+                    onClick={() =>{}}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
                   <Button 
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
-                      rowData.id, {
-                        status: rowData.status,
-                        ...rowData,
-                      }
+                    onClick={() => handleStatus(
+                      rowData.id, !rowData.status
                     )}
-                    title={`Inativo`}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            )
           ),
         })
       }
-      // if (ObjetCampos[index] == 'id_genotipo') {
-      //   arrOb.push({
-      //     title: "Lote",
-      //     field: "id_genotipo",
-      //     sorting: false,
-      //     searchable: false,
-      //     filterPlaceholder: "Filtrar por status",
-      //     render: (rowData: IGenotipos) => (
-      //       <div className='h-10 flex'>
-      //         <div className="h-10">
-      //           <Button 
-      //             icon={<AiOutlineFileSearch size={16} />}
-      //             bgColor="bg-yellow-500"
-      //             textColor="white"
-      //             title={`Lote de ${rowData.genealogy}`}
-      //             onClick={() =>{router.push(`/config/tmg/genotipo/lote?id_genotipo=${rowData.id}`)}}
-      //           />
-      //         </div>
-      //       </div>
-      //     ),
-      //   })
-      // }
     });
     return arrOb;
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox']");
+    var els:any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
@@ -329,13 +294,13 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     var totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString- 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.genotipo = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 5 }).then((response) => {
+        userLogado.preferences.layout_quadra = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotipo = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      userLogado.preferences.layout_quadra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
       await userPreferencesService.update({table_preferences: campos, id: preferences.id});
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -344,8 +309,27 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     setCamposGerenciados(campos);
   };
 
+  async function handleStatus(id: number, status: any): Promise<void> {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+    await layoultQuadraService.update({id: id, status: status});
+    const index = quadras.findIndex((quadras) => quadras.id === id);
 
-  async function handleOrderGenealogy(column: string, order: string | any): Promise<void> {
+    if (index === -1) {
+      return;
+    }
+
+    setQuadra((oldUser) => {
+      const copy = [...oldUser];
+      copy[index].status = status;
+      return copy;
+    });
+  };
+
+  async function handleOrderAddress(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -370,25 +354,25 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       }
     }
 
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setOrderGenealogy(response.response)
+    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
+        setQuadra(response.response)
       }
     })
-    if (orderGenealogy === 2) {
-      setOrderGenealogy(0);
-      setArrowGenealogy(<AiOutlineArrowDown />);
+    if (orderAddress === 2) {
+      setOrderAddress(0);
+      setArrowAddress(<AiOutlineArrowDown />);
     } else {
-      setOrderGenealogy(orderGenealogy + 1);
-      if (orderGenealogy === 1) {
-        setArrowGenealogy(<AiOutlineArrowUp />);
+      setOrderAddress(orderAddress + 1);
+      if (orderAddress === 1) {
+        setArrowAddress(<AiOutlineArrowUp />);
       } else {
-        setArrowGenealogy('');
+        setArrowAddress('');
       }
     }
   };
 
-  async function handleOrderCruza(column: string, order: string | any): Promise<void> {
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any; 
     let parametersFilter: any;
     if (order === 1) {
@@ -413,26 +397,26 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       }
     }
 
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status == 200) {
-        setOrderCruza(response.response)
+        setQuadra(response.response)
       }
     });
     
-    if (orderCruza === 2) {
-      setOrderCruza(0);
-      setArrowCruza(<AiOutlineArrowDown />);
+    if (orderName === 2) {
+      setOrderName(0);
+      setArrowName(<AiOutlineArrowDown />);
     } else {
-      setOrderCruza(orderCruza + 1);
-      if (orderCruza === 1) {
-        setArrowCruza(<AiOutlineArrowUp />);
+      setOrderName(orderName + 1);
+      if (orderName === 1) {
+        setArrowName(<AiOutlineArrowUp />);
       } else {
-        setArrowCruza('');
+        setArrowName('');
       }
     }
   };
 
-  function handleOnDragEnd(result: DropResult): void {
+  function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result)  return;
     
@@ -449,9 +433,9 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
     
-    await genotipoService.getAll(filterAplication).then((response) => {
-      if (response.status === 200) {
-        const newData = genotipos.map((row) => {
+    await layoultQuadraService.getAll(filterAplication).then((response) => {
+      if (response.status == 200) {
+        const newData = quadras.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
           } else {
@@ -463,7 +447,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "genotipos");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "quadras");
     
         // Buffer
         let buf = XLSX.write(workBook, {
@@ -476,9 +460,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Genótipos.xlsx");
-      } else {
-        alert(response);
+        XLSX.writeFile(workBook, "Layout_Quadra.xlsx");
       }
     });
   };
@@ -496,11 +478,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
+      parametersFilter = parametersFilter + "&" + filter;
     }
-    await genotipoService.getAll(parametersFilter).then((response) => {
+    await layoultQuadraService.getAll(parametersFilter).then((response) => {
       if (response.status == 200) {
-        setGenotipo(response.response);
+        setQuadra(response.response);
       }
     });
   };
@@ -509,18 +491,19 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-  
+
   return (
     <>
-      <Head><title>Listagem de genótipos</title></Head>
-
+      <Head>
+        <title>Listagem dos Layout</title>
+      </Head>
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar genótipos">
+          <AccordionFilter title="Filtrar">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -540,15 +523,16 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
                   </div>
+  
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="genealogia ou cruza"
+                      placeholder="esquema"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -559,7 +543,6 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    type="submit"
                     onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
@@ -571,16 +554,18 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
             </div>
           </AccordionFilter>
 
+          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable 
+            <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={genotipos}
+              data={quadras}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20
                 },
+                rowStyle: { background: '#f9fafb'},
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -588,7 +573,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                  className='w-full max-h-max		
                     flex
                     items-center
                     justify-between
@@ -599,33 +584,24 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     border-solid border-b
                     border-gray-200
                   '>
-                    {/* <div className='h-12'>
+                    <div className='h-12'>
                       <Button 
-                        title="Cadastrar genótipo"
-                        value="Cadastrar genótipo"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => {router.push('genotipo/cadastro')}}
-                        icon={<RiPlantLine size={20} />}
-                      />
-                    </div> */}
-                      <div className='h-12'>
-                      <Button 
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Cadastrar Layout"
+                        value="Cadastrar Layout"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {}}
-                        href="genotipo/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
+                        href="layout-quadra/cadastro"
+                        icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
-                    <div className='h-full flex items-center gap-2'>
+                    <div className='h-full flex items-center gap-2
+                    '>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
+                        <div className="w-64">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -646,11 +622,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                                         <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                           {(provided) => (
                                             <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(String(genarate.value))}
+                                              <CheckBox 
+                                                name={genarate.name} 
+                                                title={genarate.title?.toString()} 
+                                                value={genarate.value} 
+                                                defaultChecked={camposGerenciados.includes(genarate.value)}
                                               />
                                             </li>
                                           )}
@@ -668,12 +644,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                          {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                          <Button title="Download lista de genótipos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="genotipo/importar-planilha/config-planilha"  />
-                        </div>
+                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('layout-quadra/importacao')}} />
+                      </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Download lista de layout quadra" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                      </div>
                     </div>
                   </div>
                 ),
@@ -745,38 +720,35 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
-
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
   const  token  =  req.cookies.token;
-  const  cultureId: number  = Number(req.cookies.cultureId);
-  
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
+  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers:  { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
-  const data = await api.json();
-
-  const allGenotipos  = data.response;
-  const totalItems = data.total;
-
+  const local = await fetch(urlParameters.toString(), requestOptions);
+  const apiUF = await fetch(`${baseUrlLocal}/uf`, requestOptions);
+  const uf = await apiUF.json();
+  const Response =  await local.json();
+  const allItems = Response.response;
+  const totalItems = Response.total;
   return {
     props: {
-      allGenotipos ,
+      allItems,
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      uf
     },
   }
 }

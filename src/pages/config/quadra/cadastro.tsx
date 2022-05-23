@@ -8,7 +8,7 @@ import { SiMicrogenetics } from "react-icons/si";
 import { Button, Content, Input } from "src/components";
 import { genotipoService } from "src/services";
 import Swal from "sweetalert2";
-import * as ITabs from '../../../../shared/utils/dropdown';
+import * as ITabs from '../../../shared/utils/dropdown';
 
 export interface ICreateGenotipo {
   id_culture: number;
