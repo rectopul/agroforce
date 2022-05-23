@@ -135,7 +135,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
       return copy;
     });
 
-    const { id, name, status } = items[index];
+    // const { id, name, status }: any = items[index];
 
     // await sequenciaDelineamentoService.updateCulture({ id, name, status });
   };
