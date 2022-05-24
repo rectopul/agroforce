@@ -22,7 +22,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
-
+import { destroyCookie, setCookie } from 'nookies';
 
 interface IUsers {
   id: number,
@@ -50,9 +50,10 @@ interface IData {
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
+  pageBeforeEdit: string | any
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems}: IData) {
+export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -90,8 +91,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
+
   const columns = colums(camposGerenciados);
-  
+    
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -101,8 +103,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
+      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {          
           setFilter(parametersFilter);
           setData(response.response);
       })
@@ -250,7 +251,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   <Button 
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
-                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
+                    onClick={() =>{
+                      setCookie(null, "pageBeforeEdit", currentPage.toString(), {
+                        path: '/',
+                        maxAge: 60 * 60 * 24
+                      })
+                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
+                    }}
                     bgColor="bg-blue-600"
                     textColor="white"
                   />
@@ -285,7 +292,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   <Button 
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
-                    onClick={() =>{router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)}}
+                    onClick={() => {
+                      setCookie(null, "pageBeforeEdit", currentPage.toString(), {
+                        path: '/',
+                        maxAge: 60 * 60 * 24
+                      })
+                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
+                    }}
                     bgColor="bg-blue-600"
                     textColor="white"
                   />
@@ -496,7 +509,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   function handleTotalPages(): void {
-    if (currentPage < 0) {
+    if (!!pageBeforeEdit) {
+      setCurrentPage((Number(pageBeforeEdit)));
+      destroyCookie({}, "pageBeforeEdit", {
+        path: '/'
+      })
+    }
+    else if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
@@ -573,7 +592,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => formik.handleChange}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -747,6 +766,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : null;
+
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
@@ -772,7 +793,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       alItems,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      pageBeforeEdit
     },
   }
 }

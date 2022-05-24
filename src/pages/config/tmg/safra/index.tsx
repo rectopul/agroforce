@@ -104,7 +104,6 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setFilter(parametersFilter);
         setSafras(response.response);
       })

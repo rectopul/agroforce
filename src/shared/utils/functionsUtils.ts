@@ -1,4 +1,4 @@
-var  CryptoJS  =  require ("crypto") ; 
+const  CryptoJS  =  require ("crypto") ; 
 const alg = 'aes-256-ctr';
 const pwd = 'TMG2022';
 
@@ -42,7 +42,6 @@ function validationCPF(cpf: any) {
 	if (rev != parseInt(cpf.charAt(10)))
 		return false;		
 	return true;   
-var  CryptoJS  =  require ("crypto") ; 
 }
 
 function Crypto (data: any, type: any) {

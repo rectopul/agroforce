@@ -99,7 +99,6 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + userLogado.userCulture.cultura_selecionada;
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
           setFocos(response.response);
           setFilter(parametersFilter);
       })

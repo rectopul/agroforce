@@ -449,7 +449,9 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   }, [currentPage, pages]);
   return (
     <>
-      <Head><title>Atualizar genótipo</title></Head>
+      <Head>
+        <title>Atualizar genótipo</title>
+      </Head>
       <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
@@ -553,7 +555,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
           gap-8
         ">
 
-          <div  style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+          <div  style={{ marginTop: '1%' }} className="w-full h-full">
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -712,7 +714,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
   const  token  =  context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
 
@@ -737,7 +739,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const api = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions);
 
   let allLote: any = await api.json();
-  console.log(allLote)
   const totalItems = allLote.total;
   allLote = allLote.response;
 

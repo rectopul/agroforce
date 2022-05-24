@@ -97,7 +97,6 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setFilter(parametersFilter);
         setItems(response.response);
       })
