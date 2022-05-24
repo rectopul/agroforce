@@ -84,8 +84,15 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       cultures:[]
     },
     onSubmit: async (values) => {
-      validateInputs(values);
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) { return; }
+      const inputsCheck = validateInputs(values);
+      if (!inputsCheck) {
+        Swal.fire('Senhas devem ser iguais')
+        return;
+      }
+      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) { 
+        Swal.fire('Preencha todos os campos obrigatórios')  
+        return
+      }
       
       let ObjProfiles;
       let input: any; 
@@ -140,10 +147,14 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
     if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
     if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
-
+    console.log("password " + values.password)
+    console.log("confirmPassword " + values.confirmPassword)
     if (values.password !== values.confirmPassword) {
-        Swal.fire("erro de credenciais")         
+        Swal.fire("Senhas tem que ser iguais")   
+        return false;      
     }
+
+    return true;
   }
 
   // useEffect(() => {
