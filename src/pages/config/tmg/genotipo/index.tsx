@@ -107,7 +107,6 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setGenotipo(response.response);
         setFilter(parametersFilter);
       })
@@ -548,7 +547,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="genealogia ou cruza"
+                      placeholder="genótipo"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"

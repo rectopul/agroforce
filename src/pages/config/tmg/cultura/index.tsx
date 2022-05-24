@@ -99,9 +99,8 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setCultures(response.response);
-          setFilter(parametersFilter);
+        setCultures(response.response);
+        setFilter(parametersFilter);        
       })
     },
   });

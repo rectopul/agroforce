@@ -104,10 +104,9 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setQuadra(response.response);
-        setFilter(parametersFilter);
+      await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {        
+          setQuadra(response.response);
+          setFilter(parametersFilter)
       })
     },
   });
