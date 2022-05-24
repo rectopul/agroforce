@@ -20,7 +20,7 @@ function Login() {
     useEffect(() => {
         // redirect to home if already logged in
         if (userService.userValue) {
-            router.push('/dashboard');
+            router.push('/');
         }
     }, [router]);
 
@@ -39,7 +39,7 @@ function Login() {
 
       await userService.login(email, password).then(() => {
         // get return url from query parameters or default to '/'
-        const returnUrl = router.query.returnUrl || '/dashboard';
+        const returnUrl = router.query.returnUrl || '/';
         router.push(returnUrl as string);
       })
       .catch(error => {

@@ -22,7 +22,9 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { destroyCookie, setCookie } from 'nookies';
+import { setCookie } from 'nookies';
+import { removeCookies } from 'cookies-next';
+
 
 interface IUsers {
   id: number,
@@ -69,7 +71,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [users, setData] = useState<IUsers[]>(() => alItems);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderName, setOrderName] = useState<number>(0);
   const [orderEmail, setOrderEmail] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
@@ -86,14 +88,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  
+ 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-
   const columns = colums(camposGerenciados);
-    
+  
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -101,8 +102,12 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async (values) => {
+    onSubmit: async (values) => {      
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      setCookie(null, "filterBeforeEdit", parametersFilter, {
+        path: '/',
+        maxAge: 60 * 60 * 24
+      })
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {          
           setFilter(parametersFilter);
           setData(response.response);
@@ -509,13 +514,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   function handleTotalPages(): void {
-    if (!!pageBeforeEdit) {
-      setCurrentPage((Number(pageBeforeEdit)));
-      destroyCookie({}, "pageBeforeEdit", {
-        path: '/'
-      })
-    }
-    else if (currentPage < 0) {
+    if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
@@ -523,7 +522,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   async function handlePagination(): Promise<void> {
-    let skip = currentPage * Number(take);
+    let skip = Number(currentPage) * Number(take);
     let parametersFilter = "skip=" + skip + "&take=" + take;
 
     if (filter) {
@@ -762,18 +761,23 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : null;
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
+  
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
