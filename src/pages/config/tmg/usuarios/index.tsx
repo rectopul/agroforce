@@ -22,8 +22,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { setCookie } from 'nookies';
-import { removeCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 
 
 interface IUsers {
@@ -104,10 +103,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     },
     onSubmit: async (values) => {      
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      setCookie(null, "filterBeforeEdit", parametersFilter, {
-        path: '/',
-        maxAge: 60 * 60 * 24
-      })
+      setCookies("filterBeforeEdit", parametersFilter)
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {          
           setFilter(parametersFilter);
           setData(response.response);
@@ -257,10 +253,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() =>{
-                      setCookie(null, "pageBeforeEdit", currentPage.toString(), {
-                        path: '/',
-                        maxAge: 60 * 60 * 24
-                      })
+                      setCookies("pageBeforeEdit", currentPage?.toString())
                       router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
                     }}
                     bgColor="bg-blue-600"
@@ -298,10 +291,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() => {
-                      setCookie(null, "pageBeforeEdit", currentPage.toString(), {
-                        path: '/',
-                        maxAge: 60 * 60 * 24
-                      })
+                      setCookies("pageBeforeEdit", currentPage?.toString())
                       router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
                     }}
                     bgColor="bg-blue-600"
