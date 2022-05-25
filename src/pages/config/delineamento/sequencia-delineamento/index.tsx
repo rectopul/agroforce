@@ -558,12 +558,8 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                           </AccordionFilter>
                         </div>
                       </div>
-
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('sequencia-delineamento/importacao')}} />
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de sequência de delineamento" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Exportar planilha de delineamento" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                     </div>
                   </div>
