@@ -1,10 +1,11 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
@@ -43,9 +44,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  pageBeforeEdit: string | any;
 }
 
-export default function Listagem({allDepartments, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allDepartments, totalItems, itensPerPage, filterAplication, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -62,7 +64,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [items, setItems] = useState<IDepartment[]>(() => allDepartments);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
@@ -95,7 +97,8 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      setCookies("filterBeforeEdit", parametersFilter)
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setItems(response.response);
@@ -128,7 +131,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   };
 
   function columnsOrder(camposGerenciados: string) {
-    let ObjetCampos: string[] = camposGerenciados.split(',');
+    const ObjetCampos: string[] = camposGerenciados.split(',');
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
@@ -200,7 +203,10 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  onClick={() =>{router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)}}
+                  onClick={() =>{
+                    setCookies("pageBeforeEdit", currentPage?.toString())
+                    router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)}
+                  }
 
                 />
               </div>
@@ -345,7 +351,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
         XLSX.utils.book_append_sheet(workBook, workSheet, "setores");
     
         // Buffer
-        let buf = XLSX.write(workBook, {
+        const buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
           type: "buffer",
         });
@@ -359,6 +365,33 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
       }
     });
   };
+
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  };
+
+  async function handlePagination(): Promise<void> {
+    let skip = Number(currentPage) * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take;
+
+    if (filter) {
+      parametersFilter = parametersFilter + "&" + filter;
+    }
+    await departmentService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
+        setItems(response.response);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage, pages]);
   
   return (
     <>
@@ -577,16 +610,25 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+
+  console.log(filterAplication)
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -596,17 +638,18 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   } as RequestInit | undefined;
 
   const departments = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await departments.json();
+  const Response = await departments.json();
   
-  let allDepartments = Response.response;
-  let totalItems = Response.total;
+  const allDepartments = Response.response;
+  const totalItems = Response.total;
 
   return {
     props: {
       allDepartments,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      pageBeforeEdit
     },
   }
 }
