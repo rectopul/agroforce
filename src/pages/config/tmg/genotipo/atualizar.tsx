@@ -449,9 +449,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   }, [currentPage, pages]);
   return (
     <>
-      <Head>
-        <title>Atualizar genótipo</title>
-      </Head>
+      <Head><title>Atualizar genótipo</title></Head>
       <Content contentHeader={tabsDropDowns}>
         <form 
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
@@ -549,13 +547,13 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
             </div>
           </div>
         </form>
-        <main className="h-full w-full
+        <main className="h-4/6 w-full
           flex flex-col
           items-start
           gap-8
         ">
 
-          <div  style={{ marginTop: '1%' }} className="w-full h-full">
+          <div  style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -739,6 +737,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const api = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions);
 
   let allLote: any = await api.json();
+  console.log(allLote)
   const totalItems = allLote.total;
   allLote = allLote.response;
 
