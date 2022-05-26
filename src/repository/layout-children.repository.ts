@@ -27,21 +27,6 @@ export class LayoutChildrenRepository {
     }
   }
 
-  async list(id_culture: number) {
-    const disparos = await prisma.layout_children.findMany({
-      where: { id_culture },
-      select: {
-        id: true,
-        id_culture: true,
-        genealogy: true,
-        cruza: true,
-        status: true,
-      }
-    });
-
-    return disparos;
-  }
-
   async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
