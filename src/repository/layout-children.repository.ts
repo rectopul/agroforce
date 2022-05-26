@@ -6,13 +6,6 @@ export class LayoutChildrenRepository {
     return disparos;
   }
 
-  async findByDisparo(genealogy: any) {
-    const disparos = await prisma.layout_children.findFirst({
-      where: { genealogy }
-    });
-    return disparos;
-  }
-
   async findOne(id: number) {
     const disparos = await prisma.layout_children.findUnique({
       where: { id }
