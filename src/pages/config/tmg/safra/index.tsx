@@ -19,6 +19,7 @@ import { UserPreferenceController } from "src/controllers/user-preference.contro
 import { safraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
+import { removeCookies, setCookies } from "cookies-next";
 
 interface IFilter{
   filterStatus: object | any;
@@ -48,9 +49,10 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   cultureId: number;
+  pageBeforeEdit: string | any;
 }
 
-export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
+export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -66,7 +68,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,plantingStartTime,plantingEndTime,status"};
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
   const [arrowDescription, setArrowDescription] = useState<string>('');
@@ -103,8 +105,8 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      setCookies("filterBeforeEdit", parametersFilter)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setFilter(parametersFilter);
         setSafras(response.response);
       })
@@ -234,7 +236,10 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  onClick={() =>{router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)}}
+                  onClick={() =>{
+                    setCookies("pageBeforeEdit", currentPage?.toString())
+                    router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)
+                  }}
 
                 />
               </div>
@@ -629,17 +634,23 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
-
+  
   let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -661,7 +672,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      cultureId,
+      pageBeforeEdit
     },
   }
 }

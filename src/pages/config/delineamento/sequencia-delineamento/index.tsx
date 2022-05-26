@@ -109,7 +109,6 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_delineamento=" +  id_delineamento;
       await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
           setItems(response.response);
           setFilter(parametersFilter);
       })

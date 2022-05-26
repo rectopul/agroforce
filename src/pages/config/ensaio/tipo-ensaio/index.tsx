@@ -1,8 +1,10 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
@@ -44,9 +46,10 @@ interface Idata {
   itensPerPage: number | any;
   filterAplication: object | any;
   cultureId: number;
+  pageBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId, pageBeforeEdit}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -63,7 +66,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -75,7 +78,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  
+  const router = useRouter();
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -91,8 +94,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      setCookies("filterBeforeEdit", parametersFilter)
       await typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setFilter(parametersFilter);
         setTypeAssay(response.response);
       })
@@ -175,10 +178,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    title={`Atualizar ${rowData.name}`}
+                    onClick={() => {
+                      setCookies("pageBeforeEdit", currentPage?.toString())
+                      router.push(`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`)
+                    }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -613,17 +619,22 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const  cultureId  =  req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -643,7 +654,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      cultureId,
+      pageBeforeEdit
     },
   }
 }

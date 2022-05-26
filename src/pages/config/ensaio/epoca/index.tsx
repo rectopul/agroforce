@@ -93,7 +93,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await epocaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setFilter(parametersFilter);
         setEpoca(response.response);
       })

@@ -1,9 +1,11 @@
+import { removeCookies, setCookies  } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { setCookie } from "nookies";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
@@ -43,9 +45,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  pageBeforeEdit: string | any
 }
 
-export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allCultures, totalItems, itensPerPage, filterAplication, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -62,7 +65,7 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
@@ -98,10 +101,10 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
     },
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      setCookies("filterBeforeEdit", parametersFilter)
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setCultures(response.response);
-          setFilter(parametersFilter);
+        setCultures(response.response);
+        setFilter(parametersFilter);        
       })
     },
   });
@@ -201,10 +204,13 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
-                  onClick={() =>{}}
+                  title={`Atualizar ${rowData.name}`}
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString())
+                    router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`)
+                  }}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/tmg/cultura/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status ? (
@@ -608,16 +614,22 @@ export default function Listagem({allCultures, totalItems, itensPerPage, filterA
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
+  
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -637,7 +649,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       allCultures,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      pageBeforeEdit
     },
   }
 }

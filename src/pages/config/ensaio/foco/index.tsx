@@ -1,3 +1,4 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
@@ -45,9 +46,10 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
+  pageBeforeEdit: string | any
 }
 
-export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication}: IData) {
+export default function Listagem({allFocos, totalItems, itensPerPage, filterAplication, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -63,7 +65,7 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
@@ -98,8 +100,8 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + userLogado.userCulture.cultura_selecionada;
+      setCookies("filterBeforeEdit", parametersFilter)
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
           setFocos(response.response);
           setFilter(parametersFilter);
       })
@@ -208,10 +210,13 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
               <div className="h-10">
                 <Button 
                   icon={<BiEdit size={16} />}
-                  onClick={() =>{}}
+                  title={`Atualizar ${rowData.name}`}
+                    onClick={() =>{
+                      setCookies("pageBeforeEdit", currentPage?.toString())
+                      router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`)
+                    }}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  href={`/config/ensaio/foco/atualizar?id=${rowData.id}`}
                 />
               </div>
               {rowData.status === 1 ? (
@@ -613,10 +618,11 @@ export default function Listagem({allFocos, totalItems, itensPerPage, filterApli
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const  cultureId  =  req.cookies.cultureId;
 
@@ -624,7 +630,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -644,7 +654,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       allFocos,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      pageBeforeEdit
     },
   }
 }

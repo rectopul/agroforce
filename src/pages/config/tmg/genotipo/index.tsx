@@ -1,9 +1,11 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { setCookie } from "nookies";
 import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
@@ -47,9 +49,10 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   cultureId: number;
+  pageBeforeEdit: string | any;
 }
 
-export default function Listagem({allGenotipos, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
+export default function Listagem({allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit}: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -67,7 +70,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderCruza, setOrderCruza] = useState<number>(0);
@@ -106,8 +109,8 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      setCookies("filterBeforeEdit", parametersFilter)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
         setGenotipo(response.response);
         setFilter(parametersFilter);
       })
@@ -254,7 +257,10 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                   bgColor="bg-blue-600"
                   textColor="white"
                   title={`Editar ${rowData.genealogy}`}
-                  onClick={() =>{router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`)}}
+                  onClick={() =>{
+                    setCookies("pageBeforeEdit", currentPage?.toString())
+                    router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`)}
+                  }
                 />
               </div>
               {rowData.status === 1 ? (
@@ -548,7 +554,7 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
                     </label>
                     <Input 
                       type="text" 
-                      placeholder="genealogia ou cruza"
+                      placeholder="genótipo"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -743,10 +749,11 @@ export default function Listagem({allGenotipos, totalItems, itensPerPage, filter
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const  cultureId: number  = Number(req.cookies.cultureId);
   
@@ -754,7 +761,11 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  let filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1"
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   
@@ -776,7 +787,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      cultureId,
+      pageBeforeEdit
     },
   }
 }

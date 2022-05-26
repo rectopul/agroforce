@@ -1,3 +1,4 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
@@ -59,9 +60,10 @@ interface Idata {
   itensPerPage: number | any;
   filterAplication: object | any;
   uf: object | any;
+  pageBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf, pageBeforeEdit}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -79,7 +81,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const ufs: object | any =  [];
   const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderName, setOrderName] = useState<number>(0);
   const [orderAddress, setOrderAddress] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
@@ -124,10 +126,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
+      setCookies("filterBeforeEdit", parametersFilter)
       await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setTotaItems(response.total);
-        setFilter(parametersFilter);
-        setLocal(response.response);
+          setFilter(parametersFilter);
+          setLocal(response.response);
       })
     },
   });
@@ -269,10 +271,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    title={`Atualizar ${rowData.name_farm}`}
+                    onClick={() =>{
+                      setCookies("pageBeforeEdit", currentPage?.toString())
+                      router.push(`/config/local/atualizar?id=${rowData.id}`)
+                    }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/local/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -291,10 +296,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button 
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    title={`Atualizar ${rowData.name_farm}`}
+                    onClick={() =>{
+                      setCookies("pageBeforeEdit", currentPage?.toString())
+                      router.push(`/config/local/atualizar?id=${rowData.id}`)
+                    }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/localatualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -803,15 +811,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
+
+  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const  token  =  req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = "filterStatus=1";
+  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+
+  removeCookies('filterBeforeEdit', { req, res });
+
+  removeCookies('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   
@@ -834,7 +848,8 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      uf
+      uf,
+      pageBeforeEdit
     },
   }
 }
