@@ -21,7 +21,6 @@ import { ReactNode, useEffect } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt} from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -547,13 +546,13 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
             </div>
           </div>
         </form>
-        <main className="h-full w-full
+        <main className="h-4/6 w-full
           flex flex-col
           items-start
           gap-8
         ">
 
-          <div  style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+          <div  style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable 
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -639,7 +638,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                       </div>
 
                         <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de lotes" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                          <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                         </div>
                     </div>
                   </div>
@@ -712,7 +711,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
   const  token  =  context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
 
