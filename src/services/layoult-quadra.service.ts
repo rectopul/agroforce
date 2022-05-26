@@ -5,7 +5,7 @@ import { fetchWrapper } from '../helpers';
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
 
-export const layoultQuadraService = {
+export const layoutQuadraService = {
     getAll,
     create,
     update,

@@ -4,32 +4,30 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-            { id: 'Safra', name: '*Safra'}, 
-            { id: 'Cultura', name: '*Cultura'},
-            { id: 'LocalPrep', name: '*Local Preparo'},
-            { id: 'CodigoQuadra', name: 'Código Quadra'},
-            { id: 'LargQ', name: 'Largura Q'},
-            { id: 'CompP', name: 'Comp P'},
-            { id: 'LinhaP', name: 'Linha P'},
-            { id: 'CompC', name: 'Comp C'},
-            { id: 'Esquema', name: 'Esquema'},
-            { id: 'Divisor', name: 'Divisor'},
-            { id: 'Semente', name: 'Semmetro'},
-            { id: 'T4I', name: 'T4I'},
-            { id: 'T4F', name: 'T4F'},
-            { id: 'DI', name: 'DI'},
-            { id: 'DF', name: 'DF'},
+            { id: 'Esquema', name: '*Código Esquema'}, 
+            { id: 'Plantadeiras', name: '*Plantadeiras'},
+            { id: 'SL', name: '*SL'},
+            { id: 'SC', name: '*SC'},
+            { id: 'SALOC', name: '*SALOC'},
+            { id: 'Tiro', name: '*Tiro'},
+            { id: 'Disparo', name: '*Disparo'},
+            { id: 'CJ', name: '*CJ'},
+            { id: 'Dist', name: '*Dist'},
+            { id: 'ST', name: '*ST'},
+            { id: 'SPC', name: '*SPC'},
+            { id: 'SColheita', name: '*SColheita'},
+            { id: 'TipoParcela', name: '*Tipo_Parcela'},
           ];
 
 export default function ImportacaoPlanilha({config}: any) {
   return (
     <>
-      <Head><title>Importação de planilha Quadra</title></Head>
+      <Head><title>Importação de planilha Layout Quadra</title></Head>
 
         <ImportPlanilha
           data={data}
           configSalva ={(config != "") ? config[0].fields : []}
-          moduleId={17}
+          moduleId={5}
         />
     </>
   );
@@ -40,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
-  const param = `moduleId=17`;
+  const param = `moduleId=5`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
