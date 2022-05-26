@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import {  useJsApiLoader } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
 
-import { layoultQuadraService } from "src/services";
+import { layoutQuadraService } from "src/services";
 
 import {
   Content,
@@ -106,7 +106,7 @@ export default function NovoNPE({ local }: IData) {
       if (!idLocal) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= ''; }
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal)  { return; } 
 
-      await layoultQuadraService.create({
+      await layoutQuadraService.create({
         esquema:values.esquema,
         op:values.op,
         semente_metros: Number(values.semente_metros),
