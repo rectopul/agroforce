@@ -42,30 +42,30 @@ export class GenotipoRepository {
         id_culture: true,
         genealogy: true,
         cruza: true,
-        status: true,
+        status: true
       }
     });
 
     return genotipo;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.genotipo.count({ where: where });
+    const count = await prisma.genotipo.count({ where });
 
     const result: object | any = await prisma.genotipo.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
-      where: where,
+      select,
+      skip,
+      take,
+      where,
       orderBy: order
     });
-    
+
     result.total = count;
     return result;
   }
