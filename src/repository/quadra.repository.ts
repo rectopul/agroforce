@@ -6,13 +6,6 @@ export class QuadraRepository {
     return quadra;
   }
 
-  async findByQuadra(genealogy: any) {
-    const quadra = await prisma.quadra.findFirst({
-      where: { genealogy }
-    });
-    return quadra;
-  }
-
   async findOne(id: number) {
     const quadra = await prisma.quadra.findUnique({
       where: { id }
@@ -32,21 +25,6 @@ export class QuadraRepository {
     } else {
       return false;
     }
-  }
-
-  async list(id_culture: number) {
-    const quadra = await prisma.quadra.findMany({
-      where: { id_culture },
-      select: {
-        id: true,
-        id_culture: true,
-        genealogy: true,
-        cruza: true,
-        status: true,
-      }
-    });
-
-    return quadra;
   }
 
   async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {

@@ -121,12 +121,6 @@ export class QuadraController {
       
       if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
 
-      const loteAlreadyExists = await this.quadraRepository.findByQuadra(data.quadra);
-
-      if (loteAlreadyExists && loteAlreadyExists.id !== quadra.id) {
-        return { status: 400, message: 'Genealogia já cadastra. favor consultar os inativos' }
-      }
-
       quadra.id_culture = data.id_culture;
       quadra.id_tecnologia = data.id_tecnologia;
       quadra.quadra = data.quadra;
