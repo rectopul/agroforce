@@ -6,13 +6,6 @@ export class DisparoRepository {
     return disparos;
   }
 
-  async findByDisparo(genealogy: any) {
-    const disparos = await prisma.disparos.findFirst({
-      where: { genealogy }
-    });
-    return disparos;
-  }
-
   async findOne(id: number) {
     const disparos = await prisma.disparos.findUnique({
       where: { id }
@@ -32,21 +25,6 @@ export class DisparoRepository {
     } else {
       return false;
     }
-  }
-
-  async list(id_culture: number) {
-    const disparos = await prisma.disparos.findMany({
-      where: { id_culture },
-      select: {
-        id: true,
-        id_culture: true,
-        genealogy: true,
-        cruza: true,
-        status: true,
-      }
-    });
-
-    return disparos;
   }
 
   async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
