@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { FiUserPlus } from "react-icons/fi";
 import { IoMdArrowBack } from "react-icons/io";
 import InputMask from "react-input-mask";
-import { layoultQuadraService } from "src/services";
+import { layoutQuadraService } from "src/services";
 import Swal from 'sweetalert2';
 import {
   Button, Content,
@@ -106,7 +106,7 @@ export default function NovoLocal({ local }: IData) {
       if (!idLocal) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor= ''; }
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela  || !values.comp_corredor  || !values.t4_inicial  || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal)  { return; } 
 
-      await layoultQuadraService.create({
+      await layoutQuadraService.create({
         esquema:values.esquema,
         op:values.op,
         semente_metros: Number(values.semente_metros),
