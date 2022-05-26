@@ -252,7 +252,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                   bgColor="bg-blue-600"
                   textColor="white"
                   title={`Editar`}
-                  onClick={() =>{router.push(`/config/tmg/quadra/atualizar?id=${rowData.id}`)}}
+                  onClick={() =>{router.push(`/config/quadra/atualizar?id=${rowData.id}`)}}
                 />
               </div>
               {rowData.status === 1 ? (
@@ -487,7 +487,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                     border-solid border-b
                     border-gray-200
                   '>
-                      <div className='h-12'>
+                    <div className='h-12'>
                       <Button 
                         title="Importar Planilha"
                         value="Importar Planilha"

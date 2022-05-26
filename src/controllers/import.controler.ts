@@ -13,7 +13,9 @@ import {LoteController} from '../controllers/lote.controller';
 import {QuadraController} from '../controllers/quadra.controller';
 import {DisparosController} from '../controllers/disparos.controller';
 import {CulturaController} from '../controllers/cultura.controller';
-import { exit } from 'process';
+import {LayoutQuadraController} from '../controllers/layout-quadra.controller';
+import {LayoutChildrenController} from '../controllers/layout-children.controller';
+import { threadId } from 'worker_threads';
 
 export class ImportController {
     importRepository = new ImportRepository();
@@ -30,6 +32,8 @@ export class ImportController {
     quadraController = new QuadraController();
     disparosController = new DisparosController();
     culturaController = new CulturaController();
+    layoutQuadraController = new LayoutQuadraController();
+    layoutChildrenController = new LayoutChildrenController();
     aux: object | any = {};
 
     async getAll(moduleId: number) {
@@ -100,12 +104,23 @@ export class ImportController {
                         erro = true;
                     }
                 }
+
+                // Validação do modulo Layout Quadra
+                if (data.moduleId == 5) {
+                    response = await this.validateLayoutQuadra(data);
+                    if (response == 'save') {
+                        response = "Itens cadastrados com sucesso!";
+                    } else { 
+                        erro = true;
+                    }
+                }
+
                 // Validação do modulo Delineamento
                 if (data.moduleId == 7) {
                     response = await this.validateDelineamento(data);
                     if (response.save) {
                         await this.saveDelineamento(data, response.id_delineamento, configModule);
-                        response = "Itens cadastrado com sucesso!";
+                        response = "Itens cadastrados com sucesso!";
                     } else { 
                         erro = true;
                     }
@@ -115,7 +130,7 @@ export class ImportController {
                 if (data.moduleId == 10) {
                     response = await this.validateGenotipo(data);
                     if (response == 'save') {
-                        response = "Itens cadastrado com sucesso!";
+                        response = "Itens cadastrados com sucesso!";
                     } else { 
                         erro = true;
                     }
@@ -125,7 +140,7 @@ export class ImportController {
                 if (data.moduleId == 12) {
                     response = await this.validateLote(data);
                     if (response == 'save') {
-                        response = "Itens cadastrado com sucesso!";
+                        response = "Itens cadastrados com sucesso!";
                     } else { 
                         erro = true;
                     }
@@ -135,21 +150,24 @@ export class ImportController {
                 if (data.moduleId == 14) {
                     response = await this.validateNPE(data);
                     if (response == 'save') {
-                       response = "Itens cadastrado com sucesso!";
+                       response = "Itens cadastrados com sucesso!";
                     } else { 
                         erro = true;
                     }
                 }
 
-                // Validação do modulo NPE
+                // Validação do modulo quadra
                 if (data.moduleId == 17) {
                     response = await this.validateQuadra(data);
                     if (response == 'save') {
-                        response = "Itens cadastrado com sucesso!";
+                        response = "Itens cadastrados com sucesso!";
                     } else { 
                         erro = true;
                     }
                 }
+
+             
+            
         
 
                 return {status: 200, message: response, error: erro};
@@ -1169,6 +1187,341 @@ export class ImportController {
                                     created_by: this.aux.created_by,
                                 });
                                 
+                            }
+                        }
+                    }
+                }
+                return "save";
+            }
+            return Resposta;
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async validateLayoutQuadra(data: object | any) {
+        var Resposta: string = '';
+        let Column: number;
+
+        try {
+            let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+
+            if (data != null && data != undefined) {
+                let cod_esquema: any = '', cod_esquema_anterior: any = '', disparo: any = 0;
+                let sl: any = 0, sc: any, s_aloc: any, scolheita: any = 0,  tiro: any = 0;
+                let combinacao: any = '', combinacao_anterior: any = '';
+                let count_linhas = 0;
+                let auxTiros: object = {};
+                let Line: number;
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    Line = Number(keySheet) + 1;
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+                            if (configModule.response[0].fields[sheet] == 'Esquema') {
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</span><br>`;
+                                } else {
+                                    let esquema:any = await this.layoutQuadraController.getAll({id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet], filterStatus: 1});
+                                    if (esquema.total > 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, ja existe um esquema ativo com esse código.</span><br>`;
+                                    } else {
+                                        cod_esquema_anterior = cod_esquema;
+                                        cod_esquema = data.spreadSheet[keySheet][sheet];
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
+                                console.log('Plantadeira');
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</span><br>`;
+                                } else {
+                                                                   
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Tiro') {
+                                console.log('Tiros');
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</span><br>`;
+                                } else {
+                                    if (tiro == 0) {
+                                        if (data.spreadSheet[keySheet][sheet] != 1) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro precisa começar com 1`;
+                                        }
+                                        tiro = data.spreadSheet[keySheet][sheet];
+                                    } else {
+                                        tiro = data.spreadSheet[keySheet][sheet];
+                                    }
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Disparo') {
+                                console.log('Disparos')
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo disparos é obrigatorio.</span><br>`;
+                                } else { 
+                                    if (tiro == 0) {
+                                        return 'O campo tiro precisa vir antes que a campo disparo';
+                                    } else {                                       
+                                        combinacao_anterior = combinacao;
+                                        combinacao = tiro + 'x' + data.spreadSheet[keySheet][sheet];
+                                        if (combinacao == combinacao_anterior) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a combinacao de tiros e disparos deve ser unica dentro do esquema.</span><br>`;
+                                        }
+                                    }
+
+                                }
+                            }
+
+
+                            if (configModule.response[0].fields[sheet] == 'SL') {
+                                console.log('SL')
+                                
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</span><br>`;
+                                } else {
+                                    if (cod_esquema == cod_esquema_anterior) {
+                                        if (data.spreadSheet[keySheet][sheet] == sl) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o sl não pode se repetir no mesmo esquema.</span><br>`;
+                                        }
+                                        count_linhas++;
+                                    } else {
+                                        tiro = 0;
+                                        count_linhas = 0;
+
+                                    }
+                                    sl = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SC') {
+                                console.log('SC')
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</span><br>`;
+                                } else {
+                                    if (cod_esquema == cod_esquema_anterior) {
+                                        if (data.spreadSheet[keySheet][sheet] == sc) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o sc não pode se repetir no mesmo esquema.</span><br>`;
+                                        }
+                                    }
+                                    sc = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SALOC') {
+                                console.log('SALOC')
+                                
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</span><br>`;
+                                } else {
+                                    if (cod_esquema == cod_esquema_anterior) {
+                                        if (data.spreadSheet[keySheet][sheet] == s_aloc) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o saloc não pode se repetir no mesmo esquema.</span><br>`;
+                                        }
+                                    }
+                                    s_aloc = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'CJ') {
+                                console.log('CJ')
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</span><br>`;
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Dist') {
+                                console.log('Dist')
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</span><br>`;
+                                } 
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'ST') {
+                                console.log('ST')
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</span><br>`;
+                                } else {
+                                
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SPC') {
+                                console.log('SPC')
+
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</span><br>`;
+                                } else {
+                                  
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SColheita') {
+                                console.log('Scolheita')
+                                console.log(data.spreadSheet[keySheet][sheet])
+
+                                if (String(data.spreadSheet[keySheet][sheet]) == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</span><br>`;
+                                } else {
+                                    if (cod_esquema == cod_esquema_anterior) {
+                                        if (data.spreadSheet[keySheet][sheet] == scolheita) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o scolheita não pode se repetir no mesmo esquema.</span><br>`;
+                                        }
+                                    }
+                                    scolheita = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'TipoParcela') {
+                                console.log('TipoParcela')
+                                if (data.spreadSheet[keySheet][sheet] == "") {
+                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</span><br>`;
+                                } else {
+                                    if ((data.spreadSheet[keySheet][sheet] != "P" && data.spreadSheet[keySheet][sheet] != "p") && (data.spreadSheet[keySheet][sheet] != 'V' &&  data.spreadSheet[keySheet][sheet] != 'v')) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, no tipo de parcela só é aceitado p ou v`;
+                                    }
+                                }
+                            }
+                       }
+                    }
+                }
+            }
+
+            if (Resposta == "") {
+                this.aux.created_by = Number(data.created_by);
+                this.aux.id_culture = Number(data.id_culture);
+                this.aux.status =1;
+                let count = 1;
+
+                for (const [keySheet, lines] of data.spreadSheet.entries()) {
+                    for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {     
+                        Column = Number(sheet) + 1;
+                        if (keySheet != '0') {
+                            if (configModule.response[0].fields[sheet] == 'Esquema') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    if ((this.aux.esquema) && this.aux.esquema != data.spreadSheet[keySheet][sheet]) {
+                                        count = 1;
+                                    }
+                                    let teste = data.spreadSheet[keySheet][sheet].split('');
+                                    this.aux.tiroFixo = teste[0] + teste[1];
+                                    this.aux.disparoFixo = teste[3] + teste[4];
+                                    this.aux.parcelas = (Number(this.aux.tiroFixo) * Number(this.aux.disparoFixo));
+                                    this.aux.esquema = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.plantadeira = data.spreadSheet[keySheet][sheet];
+                                } 
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Tiro') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                   this.aux.tiro = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Disparo') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {  
+                                    this.aux.disparo = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+
+                            if (configModule.response[0].fields[sheet] == 'SL') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.sl = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SC') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.sc = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SALOC') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.s_aloc = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'CJ') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.cj = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'Dist') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.dist = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'ST') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.st = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SPC') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.spc = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'SColheita') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.scolheita = data.spreadSheet[keySheet][sheet];
+                                } 
+                            }
+
+                            if (configModule.response[0].fields[sheet] == 'TipoParcela') {
+                                if (data.spreadSheet[keySheet][sheet] != "") {
+                                    this.aux.tipo_parcela = data.spreadSheet[keySheet][sheet];
+                                }
+                            }
+
+                            if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
+                                if (count == 1) {
+                                    let saveLayout: any = await this.layoutQuadraController.post({
+                                        id_culture: Number(this.aux.id_culture), 
+                                        esquema: this.aux.esquema,
+                                        plantadeira: this.aux.plantadeira,
+                                        parcelas: this.aux.parcelas,
+                                        tiros:  Number(this.aux.tiroFixo),
+                                        disparos:  Number(this.aux.disparoFixo),
+                                        status: this.aux.status,
+                                        created_by: this.aux.created_by,
+                                    });
+                                    this.aux.id_layout = saveLayout.response.id;
+                                    count++;
+                                }  
+
+                                await this.layoutChildrenController.create({
+                                    id_layout: this.aux.id_layout,
+                                    sl: this.aux.sl,
+                                    sc: this.aux.sc,
+                                    s_aloc: this.aux.s_aloc,
+                                    tiro: this.aux.tiro,
+                                    cj: this.aux.cj,
+                                    disparo: this.aux.disparo,
+                                    dist: this.aux.dist,
+                                    st: this.aux.st,
+                                    spc: this.aux.spc,
+                                    scolheita: this.aux.scolheita,
+                                    tipo_parcela: this.aux.tipo_parcela,
+                                    status: this.aux.status,
+                                    created_by: this.aux.created_by,
+                                });
                             }
                         }
                     }
