@@ -178,7 +178,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
     
     const { id, status } = disparos[index];
     
-    await layoutChildrenService.update({id: id, status: status});1919www
+    await layoutChildrenService.update({id: id, status: status});
   };
 
   function columnsOrder(camposGerenciados: string) {
