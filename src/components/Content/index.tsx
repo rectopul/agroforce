@@ -57,32 +57,32 @@ export function Content({ contentHeader, children }: IContentData) {
 
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
     !contentHeader ? [
-    {
-      titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true,  hrefTab: '/config/tmg/usuarios',
-      data: [
-        {labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine/>},
-        {labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser/> },
-        {labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding/> },
-        {labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange/> },
-        {labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine/> },
-      ],
-    },
-  ] : () => contentHeader);
-  
+      {
+        titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true, hrefTab: '/config/tmg/usuarios',
+        data: [
+          { labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine /> },
+          { labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser /> },
+          { labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding /> },
+          { labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange /> },
+          { labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine /> },
+        ],
+      },
+    ] : () => contentHeader);
+
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
-      cultures.push({id: value.cultureId, name: value.culture.name});
+      cultures.push({ id: value.cultureId, name: value.culture.name });
     })
   }
 
   if (userLogado.safras.safras[0]) {
     userLogado.safras.safras.map((value: string | object | any) => {
-      safras.push({id: value.id, name: value.year});
+      safras.push({ id: value.id, name: value.year });
     })
   }
 
   const [tabs, setTabs] = useState<IContentProps[]>(() => contentHeader);
-  
+
   function handleStatusButton(title: string, status: boolean): void {
     const index = tabs.findIndex((tab) => tab.titleTab === title);
 
@@ -91,7 +91,7 @@ export function Content({ contentHeader, children }: IContentData) {
         btn.statusTab = false;
       } else {
         btn.statusTab = true;
-    }
+      }
     });
 
     setTabs((oldUser) => {
@@ -105,15 +105,15 @@ export function Content({ contentHeader, children }: IContentData) {
     });
   };
 
-  function validationCulture (value: any) {
-    if (value != culturaSelecionada) {
+  function validationCulture(value: any) {
+    if (value !== culturaSelecionada) {
       setCulturaSelecionada(value);
-      userService.logoutSign(userLogado.email, {anterior: culturaSelecionada, selecionada: value});
-    } 
+      userService.logoutSign(userLogado.email, { anterior: culturaSelecionada, selecionada: value });
+    }
   }
 
-  function validationSafras (value: any) {
-    if (value != safraSelecionada) {
+  function validationSafras(value: any) {
+    if (value !== safraSelecionada) {
       setCookie(null, 'safraId', value, {
         maxAge: 86400 * 7,
         path: '/',
@@ -121,53 +121,53 @@ export function Content({ contentHeader, children }: IContentData) {
       setSafraSelecionada(value);
       userLogado.safras.safra_selecionada = parseInt(value);
       localStorage.setItem('user', JSON.stringify(userLogado));
-      location. reload();
-    } 
+      location.reload();
+    }
   }
 
   return (
     <>
       <MainHeader
         name={userLogado.name}
-        avatar={ !userLogado.avatar ? avatarDefault : userLogado.avatar }
+        avatar={!userLogado.avatar ? avatarDefault : userLogado.avatar}
 
         headerSelects={
           <div className="h-10 flex gap-2">
-            <Select values={cultures}   onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
-            <Select values={safras}   onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+            <Select values={cultures} onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
+            <Select values={safras} onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
           </div>
         }
       >
         {tabsHeader.map((item, index) => (
           <>
             <ToolTip
-              key={index} 
+              key={index}
               contentMenu={
                 item.data.map((dropdown, index) => (
-                 <>
-                   <DropDown
+                  <>
+                    <DropDown
                       key={index}
                       label={dropdown.labelDropDown}
                       href={dropdown.hrefDropDown}
                       icon={dropdown.iconDropDown}
                     />
-                 </>
+                  </>
                 ))
-            }>
+              }>
               {item.statusTab ? (
                 <TabHeader
-                  hrefTab={item.hrefTab} 
-                  titleTab={item.titleTab} 
-                  valueTab={item.valueTab} 
+                  hrefTab={item.hrefTab}
+                  titleTab={item.titleTab}
+                  valueTab={item.valueTab}
                   statusTab={item.statusTab}
                   handleStatusTabs={handleStatusButton}
                 />
               ) : (
                 <TabHeader
-                  hrefTab={item.hrefTab} 
-                  titleTab={item.titleTab} 
-                  valueTab={item.valueTab} 
-                  statusTab={item.statusTab} 
+                  hrefTab={item.hrefTab}
+                  titleTab={item.titleTab}
+                  valueTab={item.valueTab}
+                  statusTab={item.statusTab}
                   handleStatusTabs={handleStatusButton}
                 />
               )}
@@ -187,7 +187,7 @@ export function Content({ contentHeader, children }: IContentData) {
             border border-gray-700
             bg-gray-300
           ">
-          { children }
+          {children}
         </div>
       </div>
 

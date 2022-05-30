@@ -58,8 +58,8 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'QUADRAS'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
   
   const router = useRouter();
@@ -178,7 +178,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
     
     const { id, status } = disparos[index];
     
-    await layoutChildrenService.update({id: id, status: status});
+    await layoutChildrenService.update({id: id, status: status});1919www
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -584,7 +584,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -757,7 +757,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;

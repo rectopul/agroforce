@@ -36,7 +36,7 @@ function toLetter(columnNumber: any) {
   while (columnNumber > 0) {
     let rem = columnNumber % 26;
 
-    if (rem == 0) {
+    if (rem === 0) {
       columnName = "Z" + columnName;
       columnNumber = Math.floor(columnNumber / 26) - 1;
     } else {

@@ -17,7 +17,7 @@ interface IImportPlanilhaProps {
   moduleId: number;
 }
 
-interface IImport{
+interface IImport {
   moduleId: number | any;
   fields: object | any;
 }
@@ -29,7 +29,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   const [Letras, setLetras] = useState<String[]>(AZ);
   const [Options, setOptions] = useState<String[]>(data);
   const [configPlanilhaSalva, setConfigSalva] = useState<String[]>(configSalva);
- 
+
   const formik = useFormik<IImport>({
     initialValues: {
       moduleId: '',
@@ -37,12 +37,12 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     },
     onSubmit: async (values) => {
       let ObjProfiles;
-      let input: any; 
+      let input: any;
       const auxObject: any = [];
       let auxObject2: any = [];
 
-      for (var i = 0; i < quantityColumns; i ++) {
-        input =  document.querySelector('select[name="fields_'+i+'"]');
+      for (var i = 0; i < quantityColumns; i++) {
+        input = document.querySelector('select[name="fields_' + i + '"]');
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i++) {
           if (input.options[i].selected) {
@@ -58,19 +58,19 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   });
 
 
-  function saveConfig () {
+  function saveConfig() {
     let Teste;
-    let input: any; 
+    let input: any;
     const auxObject: any = [];
     let auxObject2: any = [];
-    for (var i = 0; i < quantityColumns; i ++) {
-      input =  document.querySelector('select[name="fields_'+i+'"]');
+    for (var i = 0; i < quantityColumns; i++) {
+      input = document.querySelector('select[name="fields_' + i + '"]');
       auxObject2 = [];
       for (let v = 0; v < input.options.length; v++) {
         if (input.options[v].selected) {
           if (!auxObject.includes(input.options[v].selected)) {
             auxObject.push(input.options[v].value);
-          } else { 
+          } else {
 
           }
         }
@@ -78,7 +78,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     }
     // return;
 
-    importService.create({moduleId: moduleId, fields: auxObject}).then((response) => {
+    importService.create({ moduleId: moduleId, fields: auxObject }).then((response) => {
       if (response.status === 200) {
         Swal.fire(response.message);
         router.back();
@@ -88,13 +88,13 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   function toLetter(columnNumber: any) {
 
     let letras = "ABCDEFGHIJKLMNOPQRSTUVXWYZ";
-  
+
     let columnName = "";
-  
+
     while (columnNumber > 0) {
       let rem = columnNumber % 26;
-  
-      if (rem == 0) {
+
+      if (rem === 0) {
         columnName = "Z" + columnName;
         columnNumber = Math.floor(columnNumber / 26) - 1;
       } else {
@@ -106,13 +106,12 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   }
 
   function validateColumns(value: any) {
-    let Terste =[];
+    let Terste = [];
     let letra = "";
     setQuantityColumns(value);
-    console.log(value);
-    for(let i = 0; i <= value; i++) {
-      letra =  toLetter(i);
-      if (letra != "") {
+    for (let i = 0; i <= value; i++) {
+      letra = toLetter(i);
+      if (letra !== "") {
         Terste.push(letra)
       }
     }
@@ -136,13 +135,13 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 onClick={() => router.back()}
               />
             </div>
-            
+
             <div className="flex items-center">
               <strong>
                 Adicionar colunas:
               </strong>
-               <Input 
-                type="number" 
+              <Input
+                type="number"
                 name="quantity-columns"
                 id="quantity-columns"
                 min={`${data.length}`}
@@ -158,7 +157,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiFileExcel2Line size={20} />}
-                onClick={() => {saveConfig()}}
+                onClick={() => { saveConfig() }}
               />
             </div>
           </div>
@@ -186,48 +185,49 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
           ">
             <span className="w-full py-7">Campo(s)</span>
           </aside>
-            <form
-                className="flex flex-col
+          <form
+            className="flex flex-col
                   w-full
                   items-center
                   px-4
                   bg-white
                 "
-                onSubmit={formik.handleSubmit}
-              >
-              <main style={{height: '100%'}}  className="relative bottom-32 w-importation-content mt-2.5 -mb-28 flex flex-col overflow-x-scroll">
-                <div className="absolute flex pl-2 justify-start items-center py-9 gap-3 text-white">
-                  {Letras.map((item, index) => {
-                    if (index < quantityColumns) {
-                      {return (
-                          <>
-                            <div key={index} className="h-16 w-32 flex items-center justify-center">
-                              <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
+            onSubmit={formik.handleSubmit}
+          >
+            <main style={{ height: '100%' }} className="relative bottom-32 w-importation-content mt-2.5 -mb-28 flex flex-col overflow-x-scroll">
+              <div className="absolute flex pl-2 justify-start items-center py-9 gap-3 text-white">
+                {Letras.map((item, index) => {
+                  if (index < quantityColumns) {
+                    {
+                      return (
+                        <>
+                          <div key={index} className="h-16 w-32 flex items-center justify-center">
+                            <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
                               {Letras[index]}
-                              </strong>
-                            </div>
-                          </>
-                        )                
-                      }
+                            </strong>
+                          </div>
+                        </>
+                      )
                     }
-                  })}
+                  }
+                })}
+              </div>
+              <div className="flex pl-2 justify-start items-center py-9 gap-3">
+                <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
+                  {(quantityColumns > 0)
+                    ?
+                    Array(quantityColumns).fill('').map((_, index) => (
+                      <div key={index} className="h-11 w-32">
+                        <Select name={`fields_${index}`} onChange={formik.handleChange} selected={configPlanilhaSalva[index]} values={Options} />
+                      </div>
+                    ))
+                    : ''
+                  }
                 </div>
-                <div className="flex pl-2 justify-start items-center py-9 gap-3">
-                  <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
-                    {(quantityColumns > 0)
-                      ?
-                      Array(quantityColumns).fill('').map((_, index) => (
-                        <div key={index} className="h-11 w-32">
-                          <Select name={`fields_${index}`}  onChange={formik.handleChange}  selected={configPlanilhaSalva[index]} values={Options}/>
-                        </div>
-                      ))
-                      : ''
-                    } 
-                  </div>               
-                </div>
-              </main>
-            </form>
-       </div>
+              </div>
+            </main>
+          </form>
+        </div>
       </div>
     </>
   );

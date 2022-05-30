@@ -70,7 +70,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderCruza, setOrderCruza] = useState<number>(0);
   const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
@@ -113,6 +113,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       setCookies('filterBeforeEdit', parametersFilter);
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setGenotipo(response.response);
+        setTotalItems(response.total)
         setFilter(parametersFilter);
       });
     }
@@ -161,7 +162,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     const arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((_, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: '',
           field: 'id',
@@ -196,21 +197,21 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
         });
       }
 
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: 'Código',
           field: 'id',
           sorting: false
         });
       }
-      if (ObjetCampos[index] == 'genotipo') {
+      if (ObjetCampos[index] === 'genotipo') {
         arrOb.push({
           title: 'Genótipo',
           field: 'genotipo',
           sorting: false
         });
       }
-      if (ObjetCampos[index] == 'genealogy') {
+      if (ObjetCampos[index] === 'genealogy') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -224,7 +225,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
           sorting: false
         });
       }
-      if (ObjetCampos[index] == 'cruza') {
+      if (ObjetCampos[index] === 'cruza') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -238,14 +239,14 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
           sorting: false
         });
       }
-      if (ObjetCampos[index] == 'tecnologia') {
+      if (ObjetCampos[index] === 'tecnologia') {
         arrOb.push({
           title: 'Tecnologia',
           field: 'tecnologia.name',
           sorting: false
         });
       }
-      if (ObjetCampos[index] == 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: 'Status',
           field: 'status',
@@ -304,7 +305,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
           )
         });
       }
-      // if (ObjetCampos[index] == 'id_genotipo') {
+      // if (ObjetCampos[index] === 'id_genotipo') {
       //   arrOb.push({
       //     title: "Lote",
       //     field: "id_genotipo",
@@ -368,13 +369,13 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     }
 
     if (filter && typeof (filter) !== undefined) {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = filter + '&orderBy=' + column + '&typeOrder=' + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = 'orderBy=' + column + '&typeOrder=' + typeOrder;
       } else {
         parametersFilter = filter;
@@ -411,13 +412,13 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     }
 
     if (filter && typeof (filter) !== undefined) {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = filter + '&orderBy=' + column + '&typeOrder=' + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = 'orderBy=' + column + '&typeOrder=' + typeOrder;
       } else {
         parametersFilter = filter;
@@ -425,7 +426,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     }
 
     await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setOrderCruza(response.response);
       }
     });
@@ -510,7 +511,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       parametersFilter = parametersFilter + '&' + filter + '&' + cultureId;
     }
     await genotipoService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setGenotipo(response.response);
       }
     });
@@ -519,7 +520,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

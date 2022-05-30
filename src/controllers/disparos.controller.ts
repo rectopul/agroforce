@@ -6,40 +6,40 @@ export class DisparosController {
   disparoRepository = new DisparoRepository();
 
   async listAll(options: any) {
-    const parameters: object | any = new Object();
-    let take; 
+    const parameters: object | any = {};
+    let take;
     let skip;
     let orderBy: object | any;
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof(options.status) === 'string') {
+        if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         }
       } else {
         parameters.status = 1;
       }
 
       if (options.filterSearch) {
-        options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
+        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
 
       }
 
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] == 'tecnologia') {
+          if (objSelect[item] === 'tecnologia') {
             select[objSelect[item]] = true;
-          } else { 
+          } else {
             select[objSelect[item]] = true;
           }
         });
         select = Object.assign({}, select);
       } else {
-        select = {id: true, t4_i: true, t4_f: true, divisor: true, di: true, df: true, sem_metros:true, quadra:{select:{esquema:true}}, status: true};
+        select = { id: true, t4_i: true, t4_f: true, divisor: true, di: true, df: true, sem_metros: true, quadra: { select: { esquema: true } }, status: true };
       }
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
@@ -48,10 +48,10 @@ export class DisparosController {
       if (options.id_quadra) {
         parameters.id_quadra = parseInt(options.id_quadra);
       }
-    
+
 
       if (options.take) {
-        if (typeof(options.take) === 'string') {
+        if (typeof (options.take) === 'string') {
           take = parseInt(options.take);
         } else {
           take = options.take;
@@ -59,7 +59,7 @@ export class DisparosController {
       }
 
       if (options.skip) {
-        if (typeof(options.skip) === 'string') {
+        if (typeof (options.skip) === 'string') {
           skip = parseInt(options.skip);
         } else {
           skip = options.skip;
@@ -69,7 +69,7 @@ export class DisparosController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
-      
+
       let response: object | any = await this.disparoRepository.findAll(
         parameters,
         select,
@@ -78,15 +78,15 @@ export class DisparosController {
         orderBy
       );
 
-      if (!response && response.total <= 0) { 
-        return {status: 400, response:[], total: 0, message: 'nenhum resultado encontrado'};
+      if (!response && response.total <= 0) {
+        return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };
       } else {
-        return {status: 200, response, total: response.total}
-      }    
-    } catch(err) { 
+        return { status: 200, response, total: response.total }
+      }
+    } catch (err) {
       console.log(err)
       return { status: 400, response: [], total: 0 }
-    }   
+    }
   }
 
   async getOne(id: number) {
@@ -97,20 +97,19 @@ export class DisparosController {
 
       if (!response) throw new Error("Item não encontrado");
 
-      return {status: 200 , response};
+      return { status: 200, response };
     } catch (err) {
-      return {status: 400, message: err}
+      return { status: 400, message: err }
     }
   }
 
   async create(data: any) {
     try {
-      console.log(data)
       let response = await this.disparoRepository.create(data);
-      return {status: 201, message: "Disparo cadastrado"}
-    } catch(err) {
+      return { status: 201, message: "Disparo cadastrado" }
+    } catch (err) {
       console.log(err);
-      return {status: 400, message: "Erro no cadastrado"}
+      return { status: 400, message: "Erro no cadastrado" }
     }
   }
 
@@ -118,7 +117,7 @@ export class DisparosController {
     try {
 
       const quadra: any = await this.disparoRepository.findOne(data.id);
-      
+
       if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
 
       quadra.id_culture = data.id_culture;
@@ -129,7 +128,7 @@ export class DisparosController {
 
       await this.disparoRepository.update(quadra.id, quadra);
 
-      return {status: 200, message: "Genótipo atualizado"}
+      return { status: 200, message: "Genótipo atualizado" }
     } catch (err) {
       console.log(err);
       return { status: 404, message: 'Erro ao atualizar' }

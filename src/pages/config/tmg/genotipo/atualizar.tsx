@@ -21,7 +21,7 @@ import { ReactNode, useEffect } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt} from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
@@ -30,7 +30,7 @@ import { UserPreferenceController } from "src/controllers/user-preference.contro
 import { userPreferencesService, loteGenotipoService, loteService, } from "src/services";
 import * as XLSX from 'xlsx';
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
@@ -57,7 +57,7 @@ export interface LoteGenotipo {
 
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 
@@ -70,17 +70,17 @@ interface IData {
   genotipo: IUpdateGenotipo;
 }
 
-export default function Atualizargenotipo({allLote, totalItems, itensPerPage, filterAplication, id_genotipo, genotipo}: IData) {
+export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, filterAplication, id_genotipo, genotipo }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
@@ -89,7 +89,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
       id: genotipo.id,
       id_culture: genotipo.id_culture,
       genealogy: genotipo.genealogy,
-      genotipo: genotipo.genotipo,      
+      genotipo: genotipo.genotipo,
       cruza: genotipo.cruza,
       status: genotipo.status,
     },
@@ -114,7 +114,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.lote ||{id:0, table_preferences: "id,genealogy,name,volume,status"};
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,genealogy,name,volume,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
@@ -132,9 +132,9 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -178,9 +178,9 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
       copy[index].status = data.status;
       return copy;
     });
-    
+
     const { id, status } = lotes[index];
-    
+
     await loteGenotipoService.changeStatus({ id, status });
   };
 
@@ -189,7 +189,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -209,7 +209,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -221,30 +221,30 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
+
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "Código",
           field: "id",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'name') {
+      if (ObjetCampos[index] === 'name') {
         arrOb.push({
           title: "Nome",
           field: "name",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'volume') {
+      if (ObjetCampos[index] === 'volume') {
         arrOb.push({
           title: "Volume",
           field: "volume",
           sorting: false
-        },);
+        });
       }
-      // if (ObjetCampos[index] == 'status') {
+      // if (ObjetCampos[index] === 'status') {
       //   arrOb.push({
       //     title: "Status",
       //     field: "status",
@@ -302,24 +302,24 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 12 }).then((response) => {
-        userLogado.preferences.lote = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -328,7 +328,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
+    let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
       typeOrder = 'asc';
@@ -338,14 +338,14 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
       typeOrder = '';
     }
 
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
         parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
@@ -353,11 +353,11 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
     }
 
     await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setOrderName(response.response)
       }
     });
-    
+
     if (orderName === 2) {
       setOrderName(0);
       setArrowName(<AiOutlineArrowDown />);
@@ -373,8 +373,8 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -387,7 +387,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
     }
-    
+
     await loteService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
@@ -403,7 +403,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -443,80 +443,80 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   };
 
   useEffect(() => {
-    handlePagination();''
+    handlePagination(); ''
     handleTotalPages();
   }, [currentPage, pages]);
   return (
     <>
       <Head><title>Atualizar genótipo</title></Head>
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar genótipo</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Código
-            </label>
-            <Input
-              style={{ background: '#e5e7eb'}}
-              disabled
-              required
-              value={genotipo.id}
-            />
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Código
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                required
+                value={genotipo.id}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Genotipo
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
+                placeholder="Ex: Genotipo A1"
+                id="genotipo"
+                name="genotipo"
+                onChange={formik.handleChange}
+                value={formik.values.genotipo}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Genealogia
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                placeholder="Ex: Genealogia A1"
+                id="genealogy"
+                name="genealogy"
+                onChange={formik.handleChange}
+                value={formik.values.genealogy}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Cruza
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
+                placeholder="Ex: HIR + HFR"
+                id="cruza"
+                name="cruza"
+                onChange={formik.handleChange}
+                value={formik.values.cruza}
+              />
+            </div>
           </div>
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Genotipo
-            </label>
-            <Input
-              required
-              style={{ background: '#e5e7eb'}}
-              disabled
-              placeholder="Ex: Genotipo A1"
-              id="genotipo"
-              name="genotipo"
-              onChange={formik.handleChange}
-              value={formik.values.genotipo}
-            />
-          </div>
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Genealogia
-            </label>
-            <Input
-               style={{ background: '#e5e7eb'}}
-               disabled
-              placeholder="Ex: Genealogia A1"
-              id="genealogy"
-              name="genealogy"
-              onChange={formik.handleChange}
-              value={formik.values.genealogy}
-            />
-          </div>
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Cruza
-            </label>
-            <Input
-              required
-              style={{ background: '#e5e7eb'}}
-              disabled
-              placeholder="Ex: HIR + HFR"
-              id="cruza"
-              name="cruza"
-              onChange={formik.handleChange}
-              value={formik.values.cruza}
-            />
-          </div>
-        </div>
           <div className="h-10 w-full
             flex
             gap-3
@@ -524,7 +524,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -541,7 +541,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                 disabled
                 textColor="white"
                 icon={<SiMicrogenetics size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -552,8 +552,8 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
           gap-8
         ">
 
-          <div  style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
-            <MaterialTable 
+          <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+            <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={lotes}
@@ -569,7 +569,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                    className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -591,7 +591,7 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                       />
                     </div> */}
 
-                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -601,33 +601,33 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                               <Droppable droppableId='characters'>
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
-                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                          {(provided) => (
-                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
+                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         ))
                                       }
-                                      { provided.placeholder }
+                                      {provided.placeholder}
                                     </ul>
                                   )
                                 }
@@ -637,41 +637,41 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                         </div>
                       </div>
 
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                        </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
                   <>
-                  <div
-                    className="flex
+                    <div
+                      className="flex
                       h-20 
                       gap-2 
                       pr-2
                       py-5 
                       bg-gray-50
-                    " 
-                    {...props}
-                  >
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <>
+                    "
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <>
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
@@ -680,24 +680,24 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
                               textColor="white"
                               disabled={true}
                             />
-                        </>
-                      ))
-                    }
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1>= pages}
-                    />
-                  </div>
+                          </>
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   </>
                 ) as any
               }}
@@ -709,22 +709,22 @@ export default function Atualizargenotipo({allLote, totalItems, itensPerPage, fi
   );
 };
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
   const genotipo = await apiGenotipo.json();
-  
+
   const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
@@ -736,18 +736,17 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const api = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions);
 
   let allLote: any = await api.json();
-  console.log(allLote)
   const totalItems = allLote.total;
   allLote = allLote.response;
 
-  return { 
-      props: { 
-        genotipo,
-        allLote,
-        totalItems,
-        itensPerPage,
-        filterAplication,
-        id_genotipo
-      } 
+  return {
+    props: {
+      genotipo,
+      allLote,
+      totalItems,
+      itensPerPage,
+      filterAplication,
+      id_genotipo
     }
+  }
 }

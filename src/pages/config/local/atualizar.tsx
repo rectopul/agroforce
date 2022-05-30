@@ -53,22 +53,22 @@ export interface IData {
   localEdit: ILocalProps
 }
 
-export default function AtualizarLocal({ uf,localEdit }: IData) {
+export default function AtualizarLocal({ uf, localEdit }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'LOCAL'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
+  const [citys, setCitys] = useState<object | any>([{ id: '0', name: 'selecione' }]);
 
-  const ufs: object | any =  [];
-  const pais =  [{id: 'Brasil', name: "Brasil"}];
+  const ufs: object | any = [];
+  const pais = [{ id: 'Brasil', name: "Brasil" }];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
     initialValues: {
@@ -85,9 +85,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {   
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; } 
+      if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; }
 
       await localService.update({
         id: values.id,
@@ -102,7 +102,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
         altitude: values.altitude,
         created_by: values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Local atualizado com sucesso!')
           router.back()
         } else {
@@ -113,16 +113,16 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   });
 
   uf.map((value: string | object | any) => {
-    ufs.push({id: value.sigla, name: value.sigla, ufid: value.id});
+    ufs.push({ id: value.sigla, name: value.sigla, ufid: value.id });
   })
 
   async function showCitys(uf: any) {
     if (uf) {
-      let param = '?ufId=' + uf; 
+      let param = '?ufId=' + uf;
       let city: object | any = [];
       await localService.getCitys(param).then((response) => {
         response.map((value: string | object | any) => {
-          city.push({id: value.nome, name: value.nome});
+          city.push({ id: value.nome, name: value.nome });
         })
         setCitys(city)
       });
@@ -130,11 +130,11 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   }
 
   function validateInputs(values: any) {
-    if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= ''; }
-    if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= ''; }
-    if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= ''; }
-    if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= ''; }
-    if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= ''; }
+    if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = ''; }
+    if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = ''; }
+    if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = ''; }
+    if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = ''; }
+    if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = ''; }
   }
 
   return (
@@ -142,7 +142,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
       <Head><title>Novo Local</title></Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -161,8 +161,8 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 placeholder="11111"
                 style={{ background: '#e5e7eb' }}
                 max="40"
@@ -179,9 +179,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Local
               </label>
-              <Input 
-                type="text" 
-                placeholder="TMG-Agroforce" 
+              <Input
+                type="text"
+                placeholder="TMG-Agroforce"
                 id="cod_local"
                 maxLength={10}
                 name="cod_local"
@@ -194,9 +194,9 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código Reduzido
               </label>
-              <Input 
-                type="text" 
-                placeholder="TMG-Agroforce" 
+              <Input
+                type="text"
+                placeholder="TMG-Agroforce"
                 maxLength={5}
                 id="cod_red_local"
                 name="cod_red_local"
@@ -257,8 +257,8 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome Fazenda
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 placeholder="R: São Paulo"
                 id="name_farm"
                 name="name_farm"
@@ -278,8 +278,8 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Latitude
               </label>
-              <InputMask 
-                 className="shadow
+              <InputMask
+                className="shadow
                  appearance-none
                  bg-white bg-no-repeat
                  border border-solid border-gray-300
@@ -291,7 +291,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                "
                 mask={`99°99'99.99"`}
-                type="text" 
+                type="text"
                 placeholder={`99°99'99.99"`}
                 id="latitude"
                 name="latitude"
@@ -317,7 +317,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
                 mask={`99°99'99.99"`}
-                type="text" 
+                type="text"
                 placeholder={`99°99'99.99"`}
                 id="longitude"
                 name="longitude"
@@ -330,8 +330,8 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Altitude
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 placeholder="200"
                 id="altitude"
                 name="altitude"
@@ -340,7 +340,7 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
               />
             </div>
 
-         
+
           </div>
 
           <div className="
@@ -351,23 +351,23 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Atualizar"
                 icon={<MdDateRange size={18} />}
                 bgColor="bg-blue-600"
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -377,15 +377,15 @@ export default function AtualizarLocal({ uf,localEdit }: IData) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   // Fetch data from external API
   const requestOptions: object | any = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
@@ -393,6 +393,5 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
   const localEdit = await resU.json();
-  console.log(localEdit);
   return { props: { localEdit, uf } }
 }

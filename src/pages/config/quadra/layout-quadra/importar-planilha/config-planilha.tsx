@@ -19,7 +19,7 @@ const data: object = [
             { id: 'TipoParcela', name: '*Tipo_Parcela'},
           ];
 
-export default function ImportacaoPlanilha({config}: any) {
+export default function ImportacaoPlanilha({ config }: any) {
   return (
     <>
       <Head><title>Importação de planilha Layout Quadra</title></Head>
@@ -33,8 +33,8 @@ export default function ImportacaoPlanilha({config}: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
-  const  token  =  req.cookies.token;
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
@@ -44,14 +44,14 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
-  
-  let config: any = await fetch(urlParameters.toString(), requestOptions);
-  const Response =  await config.json();
 
-  config =  Response.response;
-  config =  config.length > 0 ? config : "";
+  let config: any = await fetch(urlParameters.toString(), requestOptions);
+  const Response = await config.json();
+
+  config = Response.response;
+  config = config.length > 0 ? config : "";
   return {
     props: {
       config
