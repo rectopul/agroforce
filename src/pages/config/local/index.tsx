@@ -26,7 +26,7 @@ import { getDegreesCelsius } from "../../../shared/utils/formatDegreesCelsius";
 
 interface ILocalProps {
   id: Number | any;
-  cod_local: String | any; Fazenda
+  cod_local: String | any;
   cod_red_local: String | any;
   pais: String | any;
   uf: String | any;
