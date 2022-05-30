@@ -856,8 +856,8 @@ export class ImportController {
 
             if (data != null && data != undefined) {
                 let larg_q: any, comp_p: any;
-                let df: any = 0, cod_quadra: any, cod_quadra_anterior: any, t4_i: any = 0;
-        
+                let df: any = 0, cod_quadra: any, cod_quadra_anterior: any, t4_i: any = 0,  t4_f: any = 0;
+                let divisor_anterior: any = 0;
                 let Line: number;
                 for (const [keySheet, lines] of data.spreadSheet.entries()) {
                     Line = Number(keySheet) + 1;
@@ -972,7 +972,10 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] == "") {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</span><br>`;
                                 } else {
-                                  
+                                    let layoutQuadra: any= this.layoutQuadraController.getAll({esquema: data.spreadSheet[keySheet][sheet]});
+                                    if (layoutQuadra.total > 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema ainda não cadastrado.</span><br>`;
+                                    }
                                 }
                             }
 
@@ -980,7 +983,33 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] == "") {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a divisor é obrigatorio.</span><br>`;
                                 } else {
-                                  
+                                    if (cod_quadra == cod_quadra_anterior) {
+                                        if (divisor_anterior == 0) {
+                                            if (data.spreadSheet[keySheet][sheet] <= 0) {
+                                                Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</span><br>`;
+                                            } else {
+                                                divisor_anterior = data.spreadSheet[keySheet][sheet];
+                                            }
+                                        } else {
+                                            if (data.spreadSheet[keySheet][sheet] > divisor_anterior) {
+                                                if ((divisor_anterior + 1) != data.spreadSheet[keySheet][sheet]) {
+                                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter tersecção de parcelas.</span><br>`;
+                                                } else {
+                                                    divisor_anterior = data.spreadSheet[keySheet][sheet];
+                                                }
+                                            } else {
+                                                Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna dos divisores precisa está em sequencia.</span><br>`;
+                                            }
+                                        }
+                                    } else {
+                                        if (divisor_anterior == 0) {
+                                            if (data.spreadSheet[keySheet][sheet] <= 0) {
+                                                Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</span><br>`;
+                                            } else {
+                                                divisor_anterior = data.spreadSheet[keySheet][sheet];
+                                            }
+                                        } 
+                                    }
                                 }
                             }
 
@@ -988,7 +1017,9 @@ export class ImportController {
                                 if (data.spreadSheet[keySheet][sheet] == "") {
                                     Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro é obrigatorio.</span><br>`;
                                 } else {
-                                  
+                                    if (data.spreadSheet[keySheet][sheet] <= 0) {
+                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro precisar ser maior que 0.</span><br>`;
+                                    }
                                 }
                             }
 
@@ -1002,6 +1033,9 @@ export class ImportController {
                                         }
                                         t4_i = data.spreadSheet[keySheet][sheet];
                                     } else {
+                                        if (data.spreadSheet[keySheet][sheet] <= t4_f) {
+                                            Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior`;
+                                        }
                                         t4_i = data.spreadSheet[keySheet][sheet];
                                     }
                                 }
@@ -1016,6 +1050,8 @@ export class ImportController {
                                   } else {
                                       if (t4_i > data.spreadSheet[keySheet][sheet]) {
                                           Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente`;
+                                      } else { 
+                                          t4_f = data.spreadSheet[keySheet][sheet];
                                       }
                                   }
                                 }
@@ -1041,7 +1077,6 @@ export class ImportController {
                                     df = data.spreadSheet[keySheet][sheet];
                                     if (cod_quadra == cod_quadra_anterior) {
                                         if (df != data.spreadSheet[keySheet][sheet]) {
-                                            console.log(df);
                                             Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna df deve ser igual para este pai`;
                                         }
                                     }
@@ -1172,7 +1207,7 @@ export class ImportController {
                                     this.aux.id_quadra = saveQuadra.response.id;
                                     count++;
                                 }  
-                                if (count == data.spreadSheet.length) {
+                                if (count == this.aux.divisor) {
                                     disparo_fixo = this.aux.t4_f;
                                 }
                                 await this.disparosController.create({
@@ -1186,7 +1221,6 @@ export class ImportController {
                                     status: this.aux.status,
                                     created_by: this.aux.created_by,
                                 });
-                                
                             }
                         }
                     }
