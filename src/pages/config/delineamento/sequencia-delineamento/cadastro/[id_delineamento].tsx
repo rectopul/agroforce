@@ -36,13 +36,13 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'DELINEAMENTO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<ISequenciaDelineamento>({
@@ -86,22 +86,22 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
 
   function validateInputs(values: ISequenciaDelineamento) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name"); 
-      inputName.style.borderColor= 'red'; 
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
     } else {
       let inputName: any = document.getElementById("name");
-      inputName.style.borderColor= '';
+      inputName.style.borderColor = '';
     }
   }
 
   return (
     <>
-     <Head>
+      <Head>
         <title>Nova sequencia de delineamento</title>
       </Head>
-      
+
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
           onSubmit={formik.handleSubmit}
@@ -136,7 +136,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
               <Input
                 id="repeticao"
                 name="repeticao"
-                type="number" 
+                type="number"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.repeticao}
@@ -218,7 +218,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -228,10 +228,10 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({ req, params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   const { id_delineamento } = params as any;
 
-  return { 
+  return {
     props: {
       id_delineamento
     },

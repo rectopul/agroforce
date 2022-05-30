@@ -41,7 +41,7 @@ interface ILayoultProps {
   status: Number;
 };
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterCodigo: string | any;
   filterEsquema: string | any;
@@ -54,7 +54,7 @@ interface IFilter{
 }
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 interface Idata {
@@ -66,19 +66,19 @@ interface Idata {
   local: object | any;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local}: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local }: Idata) {
   const { TabsDropDowns } = ITabs.default;
-  
+
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'QUADRAS'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.layout_quadra ||{id:0, table_preferences: "id,esquema,plantadeira,tiros,disparos,parcelas, status"};
+  const preferences = userLogado.preferences.layout_quadra || { id: 0, table_preferences: "id,esquema,plantadeira,tiros,disparos,parcelas, status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
@@ -101,7 +101,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -131,16 +131,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   });
 
   const filters = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
     var arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] == 'id') {
+      if (ObjetCampos[item] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -160,7 +160,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -172,15 +172,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           ),
         })
       }
-      
-      if (ObjetCampos[item] == 'id') {
+
+      if (ObjetCampos[item] === 'id') {
         arrOb.push({ title: "Código", field: "id", sorting: false })
       }
-      if (ObjetCampos[item] == 'esquema') {
+      if (ObjetCampos[item] === 'esquema') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowName }
+              {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('esquema', orderName)}>
                 Esquema
               </button>
@@ -188,10 +188,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           ),
           field: "esquema",
           sorting: false
-        },);
+        });
       }
-  
-      if (ObjetCampos[item] == 'local') {
+
+      if (ObjetCampos[item] === 'local') {
         arrOb.push({ title: "Local", field: "local", sorting: false })
       }
       
@@ -211,7 +211,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Parcelas", field: "parcelas", sorting: false })
       }
 
-      if (ObjetCampos[item] == 'status') {
+      if (ObjetCampos[item] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -224,16 +224,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div className="
                   h-10
                 ">
-                  <Button 
+                  <Button
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
                     href={`layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
@@ -246,16 +246,16 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div className="
                   h-10
                 ">
-                  <Button 
+                  <Button
                     icon={<BiEdit size={16} />}
-                    onClick={() =>{}}
+                    onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
                     href={`layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={() => handleStatus(
                       rowData.id, !rowData.status
@@ -274,24 +274,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 5 }).then((response) => {
-        userLogado.preferences.layout_quadra = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 5 }).then((response) => {
+        userLogado.preferences.layout_quadra = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.layout_quadra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.layout_quadra = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -320,7 +320,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
+    let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
       typeOrder = 'asc';
@@ -330,14 +330,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder = '';
     }
 
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
         parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
@@ -363,7 +363,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
+    let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
       typeOrder = 'asc';
@@ -373,14 +373,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder = '';
     }
 
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
         parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
@@ -392,7 +392,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         setQuadra(response.response)
       }
     });
-    
+
     if (orderName === 2) {
       setOrderName(0);
       setArrowName(<AiOutlineArrowDown />);
@@ -408,8 +408,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -438,7 +438,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "quadras");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -585,7 +585,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -607,7 +607,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 headerStyle: {
                   zIndex: 20
                 },
-                rowStyle: { background: '#f9fafb'},
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -615,7 +615,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-max		
+                    className='w-full max-h-max		
                     flex
                     items-center
                     justify-between
@@ -648,33 +648,33 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                               <Droppable droppableId='characters'>
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
-                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                          {(provided) => (
-                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox 
-                                                name={genarate.name} 
-                                                title={genarate.title?.toString()} 
-                                                value={genarate.value} 
-                                                defaultChecked={camposGerenciados.includes(genarate.value)}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
+                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         ))
                                       }
-                                      { provided.placeholder }
+                                      {provided.placeholder}
                                     </ul>
                                   )
                                 }
@@ -695,33 +695,33 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ),
                 Pagination: (props) => (
                   <>
-                  <div
-                    className="flex
+                    <div
+                      className="flex
                       h-20 
                       gap-2 
                       pr-2
                       py-5 
                       bg-gray-50
-                    " 
-                    {...props}
-                  >
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <>
+                    "
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <>
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
@@ -730,24 +730,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                               textColor="white"
                               disabled={true}
                             />
-                        </>
-                      ))
-                    }
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1>= pages}
-                    />
-                  </div>
+                          </>
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   </>
                 ) as any
               }}
@@ -759,10 +759,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
-  const  token  =  req.cookies.token;
+  const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
 
@@ -773,7 +773,7 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
   const layout = await fetch(urlParameters.toString(), requestOptions);

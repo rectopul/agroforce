@@ -28,10 +28,10 @@ export default function NovoLocal() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'DELINEAMENTO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
@@ -46,9 +46,9 @@ export default function NovoLocal() {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name || !values.repeticao || !values.trat_repeticao)  { return; } 
+      if (!values.name || !values.repeticao || !values.trat_repeticao) { return; }
 
       await delineamentoService.create({
         id_culture: parseInt(id_culture),
@@ -58,7 +58,7 @@ export default function NovoLocal() {
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Delineamento cadastrado com sucesso!')
           router.back();
         } else {
@@ -69,9 +69,9 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
-    if (!values.repeticao) { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor= 'red'; } else { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor= ''; }
-    if (!values.trat_repeticao) { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor= 'red'; } else { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.repeticao) { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor = 'red'; } else { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor = ''; }
+    if (!values.trat_repeticao) { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor = 'red'; } else { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor = ''; }
   }
 
   return (
@@ -81,7 +81,7 @@ export default function NovoLocal() {
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -100,9 +100,9 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome Delineamento" 
+              <Input
+                type="text"
+                placeholder="Nome Delineamento"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
@@ -113,9 +113,9 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Repetição
               </label>
-              <Input 
-                type="text" 
-                placeholder="4" 
+              <Input
+                type="text"
+                placeholder="4"
                 id="repeticao"
                 name="repeticao"
                 onChange={formik.handleChange}
@@ -126,15 +126,15 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Trat. Repetição
               </label>
-              <Input 
-                type="text" 
-                placeholder="14x08(p4)-PY" 
+              <Input
+                type="text"
+                placeholder="14x08(p4)-PY"
                 id="trat_repeticao"
                 name="trat_repeticao"
                 onChange={formik.handleChange}
                 value={Number(formik.values.trat_repeticao)}
               />
-            </div>        
+            </div>
           </div>
 
           <div className="
@@ -145,23 +145,23 @@ export default function NovoLocal() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
                 icon={<IoMdArrowBack size={18} />}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 icon={<FiUserPlus size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

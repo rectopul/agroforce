@@ -29,10 +29,10 @@ export default function NovoLocal() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
@@ -45,9 +45,9 @@ export default function NovoLocal() {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name)  { return; } 
+      if (!values.name) { return; }
 
       await typeAssayService.create({
         id_culture: parseInt(culture),
@@ -55,7 +55,7 @@ export default function NovoLocal() {
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Tipo de Ensaio cadastrado com sucesso!')
           router.push('/config/ensaio/tipo-ensaio');
         } else {
@@ -66,17 +66,17 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
   }
 
-    return (
+  return (
     <>
       <Head>
         <title>Novo Tipo Ensaio</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -94,15 +94,15 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome" 
+              <Input
+                type="text"
+                placeholder="Nome"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>       
+            </div>
           </div>
 
           <div className="
@@ -113,23 +113,23 @@ export default function NovoLocal() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 icon={<RiOrganizationChart size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

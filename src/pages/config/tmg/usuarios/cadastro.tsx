@@ -51,22 +51,22 @@ export interface IData {
 
 export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
   const { TabsDropDowns } = ITabs.default;
-  
+
   const tabsDropDowns = TabsDropDowns();
-  
+
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
-    ));
-    
-    const router = useRouter();
-    
-    const maskTel = '(99)99999-9999' || '(99)9999-9999';
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
-    const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
-    
-    const formik = useFormik<IUsers>({
+      ? tab.statusTab = true
+      : tab.statusTab = false
+  ));
+
+  const router = useRouter();
+
+  const maskTel = '(99)99999-9999' || '(99)9999-9999';
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const optionSorN = [{ id: 1, name: "Sim" }, { id: 0, name: "Não" }];
+
+  const formik = useFormik<IUsers>({
     initialValues: {
       name: '',
       avatar: '',
@@ -81,7 +81,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       status: 1,
       app_login: 0,
       created_by: userLogado.id,
-      cultures:[]
+      cultures: []
     },
     onSubmit: async (values) => {
       const inputsCheck = validateInputs(values);
@@ -89,18 +89,18 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         Swal.fire('As senhas devem ser iguais')
         return;
       }
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) { 
-        Swal.fire('Preencha todos os campos destacados em vermelho')  
+      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+        Swal.fire('Preencha todos os campos destacados em vermelho')
         return
       }
-      
+
       let ObjProfiles;
-      let input: any; 
+      let input: any;
       const auxObject: any = [];
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
+        input = document.querySelector('select[name="profiles_' + values.cultures[item] + '"]');
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i++) {
           if (input.options[i].selected) {
@@ -108,7 +108,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           }
         }
         ObjProfiles = {
-          cultureId: values.cultures[item], 
+          cultureId: values.cultures[item],
           profiles: auxObject2
         }
         auxObject.push(ObjProfiles);
@@ -129,7 +129,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         created_by: values.created_by,
         cultures: auxObject,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Usuário cadastrado com sucesso!')
           router.back();
         } else {
@@ -140,16 +140,16 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
-    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= ''; }
-    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= ''; }
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
+    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = ''; }
+    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = ''; }
     // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
-    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
-    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
-    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
-    
+    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = ''; }
+    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = ''; }
+    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = ''; }
+
     if (values.password !== values.confirmPassword) {
-        return false;      
+      return false;
     }
 
     return true;
@@ -167,7 +167,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
 
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
         >
@@ -186,7 +186,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome usuário
               </label>
-              <Input 
+              <Input
                 type="text"
                 // required
                 placeholder="José Oliveira"
@@ -202,10 +202,10 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Login
               </label>
-              <Input 
-                type="email" 
+              <Input
+                type="email"
                 // required
-                placeholder="usuario@tmg.agr.br" 
+                placeholder="usuario@tmg.agr.br"
                 id="email"
                 name="email"
                 onChange={formik.handleChange}
@@ -250,9 +250,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Matricula
               </label>
-              <Input 
+              <Input
                 // required
-                type="number" 
+                type="number"
                 placeholder="Campo númerico"
                 id="registration"
                 name="registration"
@@ -314,8 +314,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Senha
               </label>
-              <Input 
-                type="password" 
+              <Input
+                type="password"
                 // required
                 placeholder="*************"
                 id="password"
@@ -329,7 +329,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Confirmar senha
               </label>
-              <Input 
+              <Input
                 type="password"
                 // required
                 placeholder="*************"
@@ -367,7 +367,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <div className="h-10">
                 <Select
-                  values={optionSorN} 
+                  values={optionSorN}
                   // required
                   id="app_login"
                   name="app_login"
@@ -379,13 +379,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
           </div>
           <div className="w-full mt-6">
-              <h2 className="text-gray-900 text-2xl mb-4">
-                Permissões de Culturas
-              </h2>
-              <div className="w-full grid grid-cols-3 gap-6">
-                {
-                  Cultures.map((culture, index) => (
-                    <>
+            <h2 className="text-gray-900 text-2xl mb-4">
+              Permissões de Culturas
+            </h2>
+            <div className="w-full grid grid-cols-3 gap-6">
+              {
+                Cultures.map((culture, index) => (
+                  <>
                     <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
                       <div className="w-full text-xl">
                         <CheckBox
@@ -413,15 +413,15 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                               text: "name",
                               value: "id"
                             }}
-                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
+                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
                           />
                         </div>
                       </div>
                     </div>
-                    </>
-                  ))
-                }
-              </div>
+                  </>
+                ))
+              }
+            </div>
           </div>
 
           <div className="
@@ -432,7 +432,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -442,13 +442,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<FiUserPlus size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -458,14 +458,14 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const  token  =  req.cookies.token;
+  const token = req.cookies.token;
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);

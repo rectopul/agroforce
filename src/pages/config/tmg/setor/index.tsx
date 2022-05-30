@@ -20,7 +20,7 @@ import { departmentService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
@@ -35,7 +35,7 @@ interface IDepartment {
 
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
@@ -46,20 +46,20 @@ interface IData {
   pageBeforeEdit: string | any;
 }
 
-export default function Listagem({allDepartments, totalItems, itensPerPage, filterAplication, pageBeforeEdit}: IData) {
+export default function Listagem({ allDepartments, totalItems, itensPerPage, filterAplication, pageBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.department ||{id:0, table_preferences: "id,name,status"};
+  const preferences = userLogado.preferences.department || { id: 0, table_preferences: "id,name,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [items, setItems] = useState<IDepartment[]>(() => allDepartments);
@@ -69,17 +69,17 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id"},
-    { name: "CamposGerenciados[]", title: "Nome", value: "name"},
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -117,7 +117,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     if (index === -1) {
       return;
     }
-    
+
     setItems((oldItem) => {
       const copy = [...oldItem];
       copy[index].status = data.status;
@@ -134,7 +134,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -154,7 +154,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -166,19 +166,19 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
-        arrOb.push({ 
-          title: "Código", 
-          field: "id", 
-          sorting: false 
+
+      if (ObjetCampos[index] === 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
         })
       }
-      if (ObjetCampos[index] == 'name') {
+      if (ObjetCampos[index] === 'name') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowName }
+              {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', item)}>
                 Nome
               </button>
@@ -186,9 +186,9 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
           ),
           field: "name",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -198,26 +198,27 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
           render: (rowData: IDepartment) => (
             <div className='h-10 flex'>
               <div className="h-10">
-                <Button 
+                <Button
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  onClick={() =>{
+                  onClick={() => {
                     setCookies("pageBeforeEdit", currentPage?.toString())
-                    router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)}
+                    router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)
+                  }
                   }
 
                 />
               </div>
               {rowData.status === 1 ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={async () => await handleStatusItem(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -225,13 +226,13 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={async () => await handleStatusItem(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -247,24 +248,24 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 11 }).then((response) => {
-        userLogado.preferences.department = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 11 }).then((response) => {
+        userLogado.preferences.department = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.department = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.department = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -273,7 +274,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
+    let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
       typeOrder = 'asc';
@@ -283,14 +284,14 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
       typeOrder = '';
     }
 
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
         parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
@@ -298,11 +299,11 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     }
 
     await departmentService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setOrderName(response.response)
       }
     });
-    
+
     if (orderName === 2) {
       setOrderName(0);
       setArrowName(<AiOutlineArrowDown />);
@@ -318,8 +319,8 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -332,9 +333,9 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
-    
+
     await departmentService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         const newData = items.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
@@ -348,7 +349,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "setores");
-    
+
         // Buffer
         const buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -381,7 +382,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
       parametersFilter = parametersFilter + "&" + filter;
     }
     await departmentService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setItems(response.response);
       }
     });
@@ -391,7 +392,7 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-  
+
   return (
     <>
       <Head><title>Listagem de setores</title></Head>
@@ -403,73 +404,73 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
           gap-8
         ">
           <AccordionFilter title="Filtrar setores">
-              <div className='w-full flex gap-2'>
-                <form
-                  className="flex flex-col
+            <div className='w-full flex gap-2'>
+              <form
+                className="flex flex-col
                     w-full
                     items-center
                     px-4
                     bg-white
                   "
-                  onSubmit={formik.handleSubmit}
-                >
-                  <div className="w-full h-full
+                onSubmit={formik.handleSubmit}
+              >
+                <div className="w-full h-full
                     flex
                     justify-center
                     pb-2
                   ">
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Status
-                      </label>
-                      <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
-                    </div>
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Pesquisar
-                      </label>
-                      <Input 
-                        type="text" 
-                        placeholder="setor"
-                        max="40"
-                        id="filterSearch"
-                        name="filterSearch"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Status
+                    </label>
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
-
-                  <div className="h-16 w-32 mt-3">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Pesquisar
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="setor"
+                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
                     />
                   </div>
-                </form>
-              </div>
+                </div>
+
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
+              </form>
+            </div>
           </AccordionFilter>
 
-            <div className="w-full h-full overflow-y-scroll">
-              <MaterialTable 
-                style={{ background: '#f9fafb' }}
-                columns={columns}
-                data={items}
-                options={{
-                  showTitle: false,
-                  headerStyle: {
-                    zIndex: 20
-                  },
-                  search: false,
-                  filtering: false,
-                  pageSize: itensPerPage
-                }}
-                components={{
-                  Toolbar: () => (
-                    <div
+          <div className="w-full h-full overflow-y-scroll">
+            <MaterialTable
+              style={{ background: '#f9fafb' }}
+              columns={columns}
+              data={items}
+              options={{
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20
+                },
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage
+              }}
+              components={{
+                Toolbar: () => (
+                  <div
                     className='w-full max-h-96	
                       flex
                       items-center
@@ -481,39 +482,39 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                       border-solid border-b
                       border-gray-200
                     '>
-                      <div className='h-12'>
-                        <Button 
-                          title="Cadastrar setor"
-                          value="Cadastrar setor"
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {router.push('setor/cadastro')}}
-                          icon={<HiOutlineOfficeBuilding size={20} />}
-                        />
-                      </div>
+                    <div className='h-12'>
+                      <Button
+                        title="Cadastrar setor"
+                        value="Cadastrar setor"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { router.push('setor/cadastro') }}
+                        icon={<HiOutlineOfficeBuilding size={20} />}
+                      />
+                    </div>
 
-                      <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
-                      <div className='h-full flex items-center gap-2'>
-                        <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-72">
-                            <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
-                              <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId='characters'>
-                                  {
-                                    (provided) => (
-                                      <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                    <div className='h-full flex items-center gap-2'>
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId='characters'>
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-2">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
-                                        {
-                                          genaratesProps.map((genarate, index) => (
+                                      {
+                                        genaratesProps.map((genarate, index) => (
                                           <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                             {(provided) => (
                                               <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
@@ -526,25 +527,25 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                                               </li>
                                             )}
                                           </Draggable>
-                                          ))
-                                        }
-                                        { provided.placeholder }
-                                      </ul>
-                                    )
-                                  }
-                                </Droppable>
-                              </DragDropContext>
-                            </AccordionFilter>
-                          </div>
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Exportar planilha de setores" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
                         </div>
                       </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Exportar planilha de setores" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
                     </div>
-                  ),
-                  Pagination: (props) => (
-                    <>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <>
                     <div
                       className="flex
                         h-20 
@@ -552,17 +553,17 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                         pr-2
                         py-5 
                         bg-gray-50
-                      " 
+                      "
                       {...props}
                     >
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage - 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
                       />
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -572,57 +573,55 @@ export default function Listagem({allDepartments, totalItems, itensPerPage, filt
                       {
                         Array(1).fill('').map((value, index) => (
                           <>
-                              <Button
-                                key={index}
-                                onClick={() => setCurrentPage(index)}
-                                value={`${currentPage + 1}`}
-                                bgColor="bg-blue-600"
-                                textColor="white"
-                                disabled={true}
-                              />
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled={true}
+                            />
                           </>
                         ))
                       }
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage + 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1>= pages}
+                        disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    </>
-                  ) as any
-                }}
-              />
-            </div>
+                  </>
+                ) as any
+              }}
+            />
+          </div>
         </main>
       </Content>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
-  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
-  const  token  =  req.cookies.token;
+  const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
-
-  console.log(filterAplication)
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -633,12 +632,12 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
   const departments = await fetch(urlParameters.toString(), requestOptions);
   const Response = await departments.json();
-  
+
   const allDepartments = Response.response;
   const totalItems = Response.total;
 

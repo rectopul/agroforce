@@ -19,7 +19,7 @@ import { sequenciaDelineamentoService, userPreferencesService } from "src/servic
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
@@ -39,7 +39,7 @@ interface ISequenciaDelineamento {
 
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 
@@ -51,20 +51,20 @@ interface IData {
   id_delineamento: number;
 }
 
-export default function Listagem({allItems, totalItems, itensPerPage, filterAplication, id_delineamento}: IData) {
+export default function Listagem({ allItems, totalItems, itensPerPage, filterAplication, id_delineamento }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'DELINEAMENTO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.sequencia_delineamento ||{id:0, table_preferences: "id,delineamento,repeticao,sorteio,nt,bloco,status"};
+  const preferences = userLogado.preferences.sequencia_delineamento || { id: 0, table_preferences: "id,delineamento,repeticao,sorteio,nt,bloco,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
@@ -88,9 +88,9 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -107,10 +107,10 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_delineamento=" +  id_delineamento;
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_delineamento=" + id_delineamento;
       await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setItems(response.response);
-          setFilter(parametersFilter);
+        setItems(response.response);
+        setFilter(parametersFilter);
       })
     },
   });
@@ -121,7 +121,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     } else {
       data.status = 0;
     }
-    
+
     const index = items.findIndex((item) => item.id === idCulture);
 
     if (index === -1) {
@@ -144,7 +144,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -164,7 +164,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -176,50 +176,50 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
+
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "Código",
           field: "id",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'delineamento') {
+      if (ObjetCampos[index] === 'delineamento') {
         arrOb.push({
           title: "Delineamento",
           field: "delineamento.name",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'repeticao') {
+      if (ObjetCampos[index] === 'repeticao') {
         arrOb.push({
           title: "Repetição",
           field: "repeticao",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'sorteio') {
+      if (ObjetCampos[index] === 'sorteio') {
         arrOb.push({
           title: "Sorteio",
           field: "sorteio",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'nt') {
+      if (ObjetCampos[index] === 'nt') {
         arrOb.push({
           title: "NT",
           field: "nt",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'bloco') {
+      if (ObjetCampos[index] === 'bloco') {
         arrOb.push({
           title: "Bloco",
           field: "bloco",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -239,14 +239,14 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
               </div> */}
               {rowData.status ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
                     title="Ativo"
                     onClick={async () => await handleStatusCulture(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -254,14 +254,14 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
                     title="Inativo"
                     onClick={async () => await handleStatusCulture(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -277,24 +277,24 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 16 }).then((response) => {
-        userLogado.preferences.sequencia_delineamento = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 16 }).then((response) => {
+        userLogado.preferences.sequencia_delineamento = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.sequencia_delineamento = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.sequencia_delineamento = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -303,7 +303,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
-    let typeOrder: any; 
+    let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
       typeOrder = 'asc';
@@ -313,14 +313,14 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
       typeOrder = '';
     }
 
-    if (filter && typeof(filter) != undefined) {
-      if (typeOrder != '') {
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
         parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
       }
     } else {
-      if (typeOrder != '') {
+      if (typeOrder !== '') {
         parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
       } else {
         parametersFilter = filter;
@@ -328,11 +328,11 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     }
 
     await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setOrderName(response.response)
       }
     });
-    
+
     if (orderName === 2) {
       setOrderName(0);
       setArrowName(<AiOutlineArrowDown />);
@@ -348,8 +348,8 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -362,7 +362,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
     }
-    
+
     await sequenciaDelineamentoService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = items.map((row) => {
@@ -378,7 +378,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "Sequencia de delineamento");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -421,7 +421,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-  
+
   return (
     <>
       <Head><title>Listagem de sequência de delineamento</title></Head>
@@ -458,8 +458,8 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="name"
                       id="filterSearch"
                       name="filterSearch"
@@ -471,7 +471,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -483,7 +483,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
           </AccordionFilter>
 
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable 
+            <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={items}
@@ -499,7 +499,7 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                    className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -510,10 +510,10 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                     border-solid border-b
                     border-gray-200
                   '>
-            
-            
 
-                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+
+
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -523,33 +523,33 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                               <Droppable droppableId='characters'>
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
-                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                          {(provided) => (
-                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
+                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         ))
                                       }
-                                      { provided.placeholder }
+                                      {provided.placeholder}
                                     </ul>
                                   )
                                 }
@@ -558,41 +558,41 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                           </AccordionFilter>
                         </div>
                       </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Exportar planilha de delineamento" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                        </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Exportar planilha de delineamento" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
                   <>
-                  <div
-                    className="flex
+                    <div
+                      className="flex
                       h-20 
                       gap-2 
                       pr-2
                       py-5 
                       bg-gray-50
-                    " 
-                    {...props}
-                  >
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <>
+                    "
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <>
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
@@ -601,24 +601,24 @@ export default function Listagem({allItems, totalItems, itensPerPage, filterApli
                               textColor="white"
                               disabled={true}
                             />
-                        </>
-                      ))
-                    }
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1>= pages}
-                    />
-                  </div>
+                          </>
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   </>
                 ) as any
               }}
@@ -634,7 +634,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   const id_delineamento: number = Number(context.query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
@@ -648,12 +648,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
   const api = await fetch(`${baseUrl}/list?id_delineamento=${id_delineamento}`, requestOptions);
   const data = await api.json();
-  const allItems  = data.response;
+  const allItems = data.response;
   const totalItems = data.total;
 
   return {

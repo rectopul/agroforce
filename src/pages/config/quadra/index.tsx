@@ -20,7 +20,7 @@ import * as XLSX from 'xlsx';
 import ITabs from "../../../shared/utils/dropdown";
 import Swal from "sweetalert2";
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
@@ -42,7 +42,7 @@ export interface IQuadra {
 
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 
@@ -54,19 +54,19 @@ interface IData {
   cultureId: number;
 }
 
-export default function Listagem({allquadra, totalItems, itensPerPage, filterAplication, cultureId}: IData) {
+export default function Listagem({ allquadra, totalItems, itensPerPage, filterAplication, cultureId }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'QUADRAS'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.quadras ||{id:0, table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema, status"};
+  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema, status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => allquadra);
@@ -85,9 +85,9 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -105,9 +105,9 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {        
-          setQuadra(response.response);
-          setFilter(parametersFilter)
+      await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        setQuadra(response.response);
+        setFilter(parametersFilter)
       })
     },
   });
@@ -133,7 +133,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     } else {
       data.status = 0;
     }
-    
+
     const index = quadra.findIndex((quadra) => quadra.id === idQuadra);
 
     if (index === -1) {
@@ -158,7 +158,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((_, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -178,7 +178,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -190,66 +190,66 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
+
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "Código",
           field: "id",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'cod_quadra') {
+      if (ObjetCampos[index] === 'cod_quadra') {
         arrOb.push({
           title: 'Código Quadra',
           field: "cod_quadra",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'comp_p') {
+      if (ObjetCampos[index] === 'comp_p') {
         arrOb.push({
           title: 'Comp P',
           field: "comp_p",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'linha_p') {
+      if (ObjetCampos[index] === 'linha_p') {
         arrOb.push({
           title: 'Linha P',
           field: "linha_p",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'esquema') {
+      if (ObjetCampos[index] === 'esquema') {
         arrOb.push({
           title: 'Esquema',
           field: "esquema",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'divisor') {
+      if (ObjetCampos[index] === 'divisor') {
         arrOb.push({
           title: 'Divisor',
           field: "divisor",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'local_plantio') {
+      if (ObjetCampos[index] === 'local_plantio') {
         arrOb.push({
           title: 'Local Plantio',
           field: "local_plantio",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'local_preparo') {
+      if (ObjetCampos[index] === 'local_preparo') {
         arrOb.push({
           title: 'Local Preparo',
           field: "local_preparo",
           sorting: false
-        },);
+        });
       }
 
 
-      if (ObjetCampos[index] == 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -259,7 +259,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
           render: (rowData: IQuadra) => (
             <div className='h-10 flex'>
               <div className="h-10">
-                <Button 
+                <Button
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
@@ -269,13 +269,13 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
               </div>
               {rowData.status === 1 ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={async () => await handleStatus(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData,
-                      }
+                      status: rowData.status,
+                      ...rowData,
+                    }
                     )}
                     title={`Ativo`}
                     bgColor="bg-green-600"
@@ -284,13 +284,13 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={async () => await handleStatus(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData,
-                      }
+                      status: rowData.status,
+                      ...rowData,
+                    }
                     )}
                     title={`Inativo`}
                     bgColor="bg-red-800"
@@ -307,24 +307,24 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox']");
+    var els: any = document.querySelectorAll("input[type='checkbox']");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 17 }).then((response) => {
-        userLogado.preferences.quadras = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 17 }).then((response) => {
+        userLogado.preferences.quadras = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.quadras = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.quadras = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -334,8 +334,8 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -348,7 +348,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
-    
+
     await quadraService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = quadra.map((row) => {
@@ -364,7 +364,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -399,7 +399,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
       parametersFilter = parametersFilter + "&" + filter + "&" + cultureId;
     }
     await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response);
       }
     });
@@ -409,7 +409,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
     handlePagination();
     handleTotalPages();
   }, [currentPage, pages]);
-  
+
   return (
     <>
       <Head><title>Listagem de genótipos</title></Head>
@@ -446,8 +446,8 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Pesquisar
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="código quadra"
                       max="40"
                       id="filterSearch"
@@ -460,7 +460,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -472,7 +472,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
           </AccordionFilter>
 
           <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable 
+            <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={quadra}
@@ -488,7 +488,7 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                    className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -505,13 +505,13 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
 
-                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -521,33 +521,33 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                               <Droppable droppableId='characters'>
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
-                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                          {(provided) => (
-                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(String(genarate.value))}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
+                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
+                                                  defaultChecked={camposGerenciados.includes(String(genarate.value))}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         ))
                                       }
-                                      { provided.placeholder }
+                                      {provided.placeholder}
                                     </ul>
                                   )
                                 }
@@ -558,44 +558,44 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                          {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                          <Button title="Download lista de quadras" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="quadra/importar-planilha/config-planilha"  />
-                        </div>
+                        {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
+                        <Button title="Download lista de quadras" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="quadra/importar-planilha/config-planilha" />
+                      </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
                   <>
-                  <div
-                    className="flex
+                    <div
+                      className="flex
                       h-20 
                       gap-2 
                       pr-2
                       py-5 
                       bg-gray-50
-                    " 
-                    {...props}
-                  >
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <>
+                    "
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <>
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
@@ -604,26 +604,26 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
                               textColor="white"
                               disabled={true}
                             />
-                        </>
-                      ))
-                    }
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1>= pages}
-                    />
-                  </div>
+                          </>
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   </>
-                ) as any  
+                ) as any
               }}
             />
           </div>
@@ -633,13 +633,13 @@ export default function Listagem({allquadra, totalItems, itensPerPage, filterApl
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
 
-  const  token  =  req.cookies.token;
-  const  cultureId: number  = Number(req.cookies.cultureId);
-  
+  const token = req.cookies.token;
+  const cultureId: number = Number(req.cookies.cultureId);
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
 
@@ -647,22 +647,22 @@ export const getServerSideProps: GetServerSideProps = async ({req}) => {
   let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
   const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
   const data = await api.json();
 
-  const allquadra  = data.response;
+  const allquadra = data.response;
   const totalItems = data.total;
-  
+
   return {
     props: {
-      allquadra ,
+      allquadra,
       totalItems,
       itensPerPage,
       filterAplication,

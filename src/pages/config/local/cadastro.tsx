@@ -59,15 +59,15 @@ export default function NovoLocal({ uf }: IData) {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'LOCAL'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const ufs: object | any =  [];
-  const [citys, setCitys] =  useState<object | any>([{id: '0', name: 'selecione'}]);
 
-  const pais =  [{id: 'Brasil', name: "Brasil"}];
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const ufs: object | any = [];
+  const [citys, setCitys] = useState<object | any>([{ id: '0', name: 'selecione' }]);
+
+  const pais = [{ id: 'Brasil', name: "Brasil" }];
   const router = useRouter();
   const formik = useFormik<ILocalProps>({
     initialValues: {
@@ -86,8 +86,8 @@ export default function NovoLocal({ uf }: IData) {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; } 
-  
+      if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; }
+
       await localService.create({
         cod_local: capitalize(values.cod_local),
         cod_red_local: capitalize(values.cod_red_local),
@@ -100,7 +100,7 @@ export default function NovoLocal({ uf }: IData) {
         altitude: values.altitude,
         created_by: values.created_by,
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Local cadastrado com sucesso!')
           router.back()
         } else {
@@ -111,16 +111,16 @@ export default function NovoLocal({ uf }: IData) {
   });
 
   uf.map((value: string | object | any) => {
-    ufs.push({id: value.id, name: value.sigla, ufid: value.id});
+    ufs.push({ id: value.id, name: value.sigla, ufid: value.id });
   })
 
   async function showCitys(uf: any) {
     if (uf) {
-      let param = '?ufId=' + uf; 
+      let param = '?ufId=' + uf;
       let city: object | any = [];
       await localService.getCitys(param).then((response) => {
         response.map((value: string | object | any) => {
-          city.push({id: value.nome, name: value.nome});
+          city.push({ id: value.nome, name: value.nome });
         })
         setCitys(city)
       });
@@ -128,11 +128,11 @@ export default function NovoLocal({ uf }: IData) {
   }
 
   function validateInputs(values: any) {
-    if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor= ''; }
-    if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor= ''; }
-    if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor= ''; }
-    if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor= ''; }
-    if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor= ''; }
+    if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = ''; }
+    if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = ''; }
+    if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = ''; }
+    if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = ''; }
+    if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = ''; }
   }
 
   return (
@@ -143,7 +143,7 @@ export default function NovoLocal({ uf }: IData) {
 
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -162,9 +162,9 @@ export default function NovoLocal({ uf }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Local
               </label>
-              <Input 
-                type="text" 
-                placeholder="TMG-Agroforce" 
+              <Input
+                type="text"
+                placeholder="TMG-Agroforce"
                 id="cod_local"
                 name="cod_local"
                 maxLength={10}
@@ -177,9 +177,9 @@ export default function NovoLocal({ uf }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código Reduzido
               </label>
-              <Input 
-                type="text" 
-                placeholder="TMGGG" 
+              <Input
+                type="text"
+                placeholder="TMGGG"
                 maxLength={5}
                 id="cod_red_local"
                 name="cod_red_local"
@@ -226,7 +226,7 @@ export default function NovoLocal({ uf }: IData) {
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-               *Município
+                *Município
               </label>
               <Select
                 values={citys}
@@ -241,8 +241,8 @@ export default function NovoLocal({ uf }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome Fazenda
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 placeholder="Fazenda C"
                 id="name_farm"
                 name="name_farm"
@@ -262,8 +262,8 @@ export default function NovoLocal({ uf }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Latitude
               </label>
-              <InputMask 
-                 className="shadow
+              <InputMask
+                className="shadow
                  appearance-none
                  bg-white bg-no-repeat
                  border border-solid border-gray-300
@@ -275,7 +275,7 @@ export default function NovoLocal({ uf }: IData) {
                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                "
                 mask={`99°99'99.99"`}
-                type="text" 
+                type="text"
                 placeholder={`99°99'99.99"`}
                 id="latitude"
                 name="latitude"
@@ -301,7 +301,7 @@ export default function NovoLocal({ uf }: IData) {
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
                 mask={`99°99'99.99"`}
-                type="text" 
+                type="text"
                 placeholder={`99°99'99.99"`}
                 id="longitude"
                 name="longitude"
@@ -314,8 +314,8 @@ export default function NovoLocal({ uf }: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Altitude
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 placeholder="500"
                 id="altitude"
                 name="altitude"
@@ -324,7 +324,7 @@ export default function NovoLocal({ uf }: IData) {
               />
             </div>
 
-         
+
           </div>
 
           <div className="
@@ -335,23 +335,23 @@ export default function NovoLocal({ uf }: IData) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 icon={<FiUserPlus size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -361,15 +361,15 @@ export default function NovoLocal({ uf }: IData) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
-  const  token  =  req.cookies.token;
+  const token = req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);

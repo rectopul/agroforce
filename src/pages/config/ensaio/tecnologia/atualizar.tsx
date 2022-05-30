@@ -27,17 +27,17 @@ interface IData {
   tecnologia: ITecnologiaProps;
 }
 
-export default function NovoLocal({tecnologia}: IData) {
+export default function NovoLocal({ tecnologia }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<ITecnologiaProps>({
@@ -49,19 +49,19 @@ export default function NovoLocal({tecnologia}: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name)  { return; } 
+      if (!values.name) { return; }
 
       await tecnologiaService.update({
         id: values.id,
-        name:values.name,
-        desc:values.desc,
-        cod_tec:values.cod_tec,
+        name: values.name,
+        desc: values.desc,
+        cod_tec: values.cod_tec,
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Tecnologia atualizada com sucesso!');
           router.back();
         } else {
@@ -72,17 +72,17 @@ export default function NovoLocal({tecnologia}: IData) {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
   }
 
-    return (
+  return (
     <>
       <Head>
         <title>Atualizar tecnologia</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -101,8 +101,8 @@ export default function NovoLocal({tecnologia}: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código
               </label>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 id="id"
                 style={{ background: '#e5e7eb' }}
                 name="id"
@@ -110,14 +110,14 @@ export default function NovoLocal({tecnologia}: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.id}
               />
-            </div> 
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Tecnologia
               </label>
-              <Input 
-                type="text" 
-                placeholder="TA" 
+              <Input
+                type="text"
+                placeholder="TA"
                 required
                 style={{ background: '#e5e7eb' }}
                 id="cod_tec"
@@ -127,33 +127,33 @@ export default function NovoLocal({tecnologia}: IData) {
                 onChange={formik.handleChange}
                 value={formik.values.cod_tec}
               />
-            </div> 
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome" 
+              <Input
+                type="text"
+                placeholder="Nome"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>    
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Descrição
               </label>
-              <Input 
-                type="text" 
-                placeholder="Descrição" 
+              <Input
+                type="text"
+                placeholder="Descrição"
                 id="desc"
                 name="desc"
                 onChange={formik.handleChange}
                 value={formik.values.desc}
               />
-            </div>    
+            </div>
           </div>
 
           <div className="
@@ -164,23 +164,23 @@ export default function NovoLocal({tecnologia}: IData) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Atualizar"
                 bgColor="bg-blue-600"
                 icon={<MdDateRange size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -191,20 +191,20 @@ export default function NovoLocal({tecnologia}: IData) {
 }
 
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
-  const  token  =  context.req.cookies.token;
-  
+  const token = context.req.cookies.token;
+
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
 
   const tecnologia = await resU.json();
 
-  return { props: { tecnologia  } }
+  return { props: { tecnologia } }
 }

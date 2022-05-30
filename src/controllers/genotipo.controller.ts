@@ -36,13 +36,12 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log('Options: ', options);
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         }
       } else {
         parameters.status = 1;
@@ -69,7 +68,7 @@ export class GenotipoController {
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] == 'tecnologia') {
+          if (objSelect[item] === 'tecnologia') {
             select[objSelect[item]] = true;
           } else {
             select[objSelect[item]] = true;
@@ -185,7 +184,6 @@ export class GenotipoController {
 
   async updategenotipo(data: UpdateGenotipoLote) {
     try {
-      // console.log(data);
       const schema: SchemaOf<UpdateGenotipoLote> = object({
         id: number().integer().required(this.required),
         id_tecnologia: number().integer().required(this.required),
