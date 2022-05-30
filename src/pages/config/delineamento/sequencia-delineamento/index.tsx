@@ -69,7 +69,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 
   const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
@@ -109,8 +109,10 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_delineamento=" + id_delineamento;
       await sequenciaDelineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setItems(response.response);
         setFilter(parametersFilter);
+        setItems(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
@@ -420,7 +422,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

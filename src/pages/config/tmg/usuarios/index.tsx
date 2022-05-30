@@ -76,7 +76,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar') },
@@ -108,8 +108,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       setCookies("filterBeforeEdit", parametersFilter)
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setTotaItems(response.response.length);
         setData(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0)
       })
     },
   });
@@ -158,14 +159,6 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         })
       }
 
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false,
-          width: 0,
-        })
-      }
       if (ObjetCampos[item] === 'avatar') {
         arrOb.push({
           title: "Avatar",
@@ -531,7 +524,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

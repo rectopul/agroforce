@@ -21,7 +21,6 @@ import { ReactNode, useEffect } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
@@ -42,6 +41,7 @@ export interface IUpdateGenotipo {
   genealogy: string;
   genotipo: string;
   cruza: string;
+  id_tecnologia: string;
   status: number;
 }
 
@@ -74,6 +74,8 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+  console.log("Genotipo: ", genotipo)
+
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
@@ -91,6 +93,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
       genealogy: genotipo.genealogy,
       genotipo: genotipo.genotipo,
       cruza: genotipo.cruza,
+      id_tecnologia: genotipo.id_tecnologia,
       status: genotipo.status,
     },
     onSubmit: async (values) => {
@@ -221,15 +224,6 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
           ),
         })
       }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
-      }
-
       if (ObjetCampos[index] === 'name') {
         arrOb.push({
           title: "Nome",
@@ -460,18 +454,6 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Código
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                disabled
-                required
-                value={genotipo.id}
-              />
-            </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
                 Genotipo
               </label>
               <Input
@@ -514,6 +496,19 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 name="cruza"
                 onChange={formik.handleChange}
                 value={formik.values.cruza}
+              />
+            </div>
+
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Tecnologia
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                required
+                value={genotipo.id_tecnologia}
               />
             </div>
           </div>

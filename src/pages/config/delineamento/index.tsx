@@ -110,8 +110,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       setCookies("filterBeforeEdit", parametersFilter)
       await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setTotalItems(response.total)
         setDelineamento(response.response);
+        setTotalItems(response.total)
         setCurrentPage(0)
       })
     },
@@ -158,10 +158,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             )
           ),
         })
-      }
-
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
       }
       if (ObjetCampos[item] === 'name') {
         arrOb.push({

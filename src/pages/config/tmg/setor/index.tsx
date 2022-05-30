@@ -64,7 +64,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 
   const [items, setItems] = useState<IDepartment[]>(() => allDepartments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -101,6 +101,8 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setItems(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
@@ -167,13 +169,6 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
         })
       }
 
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        })
-      }
       if (ObjetCampos[index] === 'name') {
         arrOb.push({
           title: (
@@ -391,7 +386,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

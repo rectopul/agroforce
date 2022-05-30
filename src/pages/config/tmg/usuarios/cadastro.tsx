@@ -85,13 +85,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     },
     onSubmit: async (values) => {
       const inputsCheck = validateInputs(values);
+      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
       if (!inputsCheck) {
         Swal.fire('As senhas devem ser iguais')
         return;
-      }
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
-        Swal.fire('Preencha todos os campos destacados em vermelho')
-        return
       }
 
       let ObjProfiles;
@@ -248,7 +248,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Matricula
+                Matricula
               </label>
               <Input
                 // required
@@ -278,7 +278,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Telefone
+                Telefone
               </label>
               <InputMask
                 mask={maskTel}
@@ -349,7 +349,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Libera jivochat
+                Libera jivochat
               </label>
               <Select
                 values={optionSorN}
@@ -363,7 +363,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Login do App
+                Login do App
               </label>
               <div className="h-10">
                 <Select

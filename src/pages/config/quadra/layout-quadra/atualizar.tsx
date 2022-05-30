@@ -219,14 +219,6 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
         })
       }
 
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
-      }
-
       if (ObjetCampos[index] === 'sl') {
         arrOb.push({
           title: "sl",
@@ -485,20 +477,6 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
           <h1 className="text-2xl">Atualizar layout quadra</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Código
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                disabled
-                required
-                id="id"
-                name="id"
-                value={layout.id}
-              />
-            </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
