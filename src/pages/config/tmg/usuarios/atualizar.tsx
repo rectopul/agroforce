@@ -13,7 +13,7 @@ import { prisma } from 'src/pages/api/db/db';
 import { userService } from "src/services";
 import { functionsUtils } from "src/shared/utils/functionsUtils";
 import Swal from 'sweetalert2';
-import {  Button, CheckBox, Content, Input,  Select } from "../../../../components";
+import { Button, CheckBox, Content, Input, Select } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartment {
@@ -68,13 +68,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
-  
-  const optionSorN =  [{id: 1, name: "Sim"}, {id: 0, name: "Não"}];
+
+  const optionSorN = [{ id: 1, name: "Sim" }, { id: 0, name: "Não" }];
   const userCultures = new Array();
   const userPermissions: any = new Array();
 
@@ -83,11 +83,11 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       userCultures.push(data.users_permissions[item].id_cultures);
       if (userPermissions[data.users_permissions[item].id_cultures]) {
         userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, Number(userPermissions[data.users_permissions[item].id_cultures].join())]
-      } else {  
+      } else {
         userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles];
       }
     });
-  } 
+  }
   const [Permissions, setPermissions] = useState<any>(userPermissions);
 
   const formik = useFormik<IUserProps>({
@@ -105,30 +105,30 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       status: data.status,
       app_login: data.app_login,
       created_by: data.created_by,
-      cultures:[]
+      cultures: []
     },
     onSubmit: async (values) => {
       if (values.password !== values.confirmPassword) {
-        Swal.fire("erro de credenciais")     
+        Swal.fire("erro de credenciais")
         return
       }
       validateInputs(values);
-  
+
       if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) { return; }
-      let checkbox: any =  document.getElementsByName('cultures');
+      let checkbox: any = document.getElementsByName('cultures');
       values.cultures = [];
-      for (var i = 0; i < checkbox.length; i++){
-        if ( checkbox[i].checked ) {
-            values.cultures.push(checkbox[i].value);
+      for (var i = 0; i < checkbox.length; i++) {
+        if (checkbox[i].checked) {
+          values.cultures.push(checkbox[i].value);
         }
       }
       let ObjProfiles;
-      let input: any; 
+      let input: any;
       const auxObject: any = [];
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input =  document.querySelector('select[name="profiles_'+values.cultures[item]+'"]');
+        input = document.querySelector('select[name="profiles_' + values.cultures[item] + '"]');
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i++) {
           if (input.options[i].selected) {
@@ -136,7 +136,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           }
         }
         ObjProfiles = {
-          cultureId: values.cultures[item], 
+          cultureId: values.cultures[item],
           profiles: auxObject2
         }
         auxObject.push(ObjProfiles);
@@ -157,7 +157,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         cultures: auxObject,
         created_by: values.created_by
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Usuário atualizado com sucesso!')
           router.back();
         } else {
@@ -168,19 +168,19 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
-    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor= ''; }
-    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor= ''; }
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
+    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = ''; }
+    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = ''; }
     // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
-    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor= ''; }
-    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor= ''; }
-    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor= ''; }
+    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = ''; }
+    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = ''; }
+    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = ''; }
 
     if (values.password !== values.confirmPassword) {
-        Swal.fire("erro de credenciais")         
+      Swal.fire("erro de credenciais")
     }
   }
-  
+
   function defineProfiles(culturedId: number, profiles: any) {
     Permissions[culturedId] = profiles.value;
     setPermissions(Permissions)
@@ -191,7 +191,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         <title>Atualizar Usuário</title>
       </Head>
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -208,7 +208,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código
               </label>
-              <Input 
+              <Input
                 disabled
                 type="text"
                 value={data.id}
@@ -219,10 +219,10 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
+              <Input
                 id="name"
                 name="name"
-                type="text" 
+                type="text"
                 placeholder="José Oliveira"
                 required
                 max="40"
@@ -235,10 +235,10 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Login
               </label>
-              <Input 
+              <Input
                 type="email"
-                required 
-                placeholder="usuario@tmg.agr.br" 
+                required
+                placeholder="usuario@tmg.agr.br"
                 id="email"
                 name="email"
                 onChange={formik.handleChange}
@@ -334,8 +334,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Matricula
               </label>
-              <Input 
-                type="number" 
+              <Input
+                type="number"
                 // required
                 placeholder="Campo númerico"
                 id="registration"
@@ -349,8 +349,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Senha
               </label>
-              <Input 
-                type="password" 
+              <Input
+                type="password"
                 required
                 placeholder="*************"
                 id="password"
@@ -364,7 +364,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Confirmar senha
               </label>
-              <Input 
+              <Input
                 type="password"
                 required
                 placeholder="*************"
@@ -402,7 +402,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               </label>
               <div className="h-10">
                 <Select
-                  values={optionSorN} 
+                  values={optionSorN}
                   required
                   id="app_login"
                   name="app_login"
@@ -415,51 +415,51 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           </div>
 
           <div className="w-full mt-6">
-              <h2 className="text-gray-900 text-2xl mb-4">
-                Permissões de Culturas
-              </h2>
-              <div className="w-full grid grid-cols-3 gap-6">
-                {
-                    culturesData.map((culture: ICultureUser) => (
-                      <>
-                      <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                        <div className="w-full text-xl">
-                          <CheckBox
-                            key={culture.id}
-                            title={culture.name}
-                            id={`culture_${culture.id}`}
-                            name="cultures"
-                            onChange={formik.handleChange}
-                            value={culture.id}
-                            defaultChecked={userCultures.includes(culture.id)}
+            <h2 className="text-gray-900 text-2xl mb-4">
+              Permissões de Culturas
+            </h2>
+            <div className="w-full grid grid-cols-3 gap-6">
+              {
+                culturesData.map((culture: ICultureUser) => (
+                  <>
+                    <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
+                      <div className="w-full text-xl">
+                        <CheckBox
+                          key={culture.id}
+                          title={culture.name}
+                          id={`culture_${culture.id}`}
+                          name="cultures"
+                          onChange={formik.handleChange}
+                          value={culture.id}
+                          defaultChecked={userCultures.includes(culture.id)}
+                        />
+                      </div>
+
+                      <div className="w-full">
+                        <h4 className='block text-gray-900 text-sm font-bold mb-2'>
+                          Permissões
+                        </h4>
+                        <div>
+                          <MultiSelectComponent
+                            id={`profiles_${culture.id}`}
+                            name={`profiles_${culture.id}`}
+                            dataSource={profilesData as any}
+                            onChange={(e: any) => defineProfiles(culture.id, e)}
+                            mode="Box"
+                            fields={{
+                              text: "name",
+                              value: "id"
+                            }}
+                            value={Permissions[culture.id]}
+                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
                           />
                         </div>
-
-                        <div className="w-full">
-                          <h4 className='block text-gray-900 text-sm font-bold mb-2'>
-                            Permissões
-                          </h4>
-                          <div>
-                            <MultiSelectComponent
-                              id={`profiles_${culture.id}`}
-                              name={`profiles_${culture.id}`}
-                              dataSource={profilesData as any}
-                              onChange={(e: any) => defineProfiles(culture.id, e)}
-                              mode="Box"
-                              fields={{
-                                text: "name",
-                                value: "id"
-                              }}
-                              value={Permissions[culture.id]}
-                              placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário': formik.values.name}`}
-                            />
-                          </div>
-                        </div>
                       </div>
-                    </>
-                  ))
-                }
-              </div>
+                    </div>
+                  </>
+                ))
+              }
+            </div>
           </div>
           <div className="
             h-10 w-full
@@ -467,9 +467,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             gap-3
             justify-center
             mt-10
-          ">  
+          ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -479,13 +479,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Atualizar"
                 bgColor="bg-blue-600"
                 icon={<RiUserSettingsLine size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -495,15 +495,15 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   // Fetch data from external API
   const requestOptions: object | any = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const response = await prisma.user.findFirst({
@@ -596,10 +596,10 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     users_permissions: response.users_permissions.map(item => {
       return {
         id: item.id,
-        
+
         id_profiles: item.profile.id,
         name_profiles: item.profile.name,
-        
+
         id_cultures: item.culture.id,
         name_cultures: item.culture.name,
       }
@@ -627,7 +627,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     }
   });
 
-  return { 
+  return {
     props: {
       data,
       departmentsData,

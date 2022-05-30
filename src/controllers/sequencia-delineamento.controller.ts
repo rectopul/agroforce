@@ -32,9 +32,9 @@ export class SequenciaDelineamentoController {
 
       if (!response) throw new Error("Item não encontrado");
 
-      return {status: 200 , response};
+      return { status: 200, response };
     } catch (e) {
-      return {status: 400, message: 'Item não encontrado'};
+      return { status: 400, message: 'Item não encontrado' };
     }
   };
 
@@ -65,18 +65,18 @@ export class SequenciaDelineamentoController {
 
   async create(data: object | any) {
     try {
-        if (data != null && data != undefined) {
-           let response = await this.SequenciaDelineamentoRepository.create(data)
-            if(response) {
-                return {status: 200, message: "itens inseridos"}
-            } else {
-                return {status: 400, message: "erro"}
-            }
+      if (data !== null && data !== undefined) {
+        let response = await this.SequenciaDelineamentoRepository.create(data)
+        if (response) {
+          return { status: 200, message: "itens inseridos" }
+        } else {
+          return { status: 400, message: "erro" }
         }
+      }
     } catch (err) {
-        console.log(err)
+      console.log(err)
     }
-}
+  }
   async update(data: IUpdateSequenciaDelineamento) {
     try {
       const schema: SchemaOf<IUpdateSequenciaDelineamento> = object({
@@ -89,10 +89,10 @@ export class SequenciaDelineamentoController {
 
       const valid = schema.isValidSync(data);
 
-      if (!valid) return {status: 400, message: "Dados inválidos"};
+      if (!valid) return { status: 400, message: "Dados inválidos" };
 
       const sequenciaDelineamento = await this.SequenciaDelineamentoRepository.findById(data.id);
-      
+
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
 
       sequenciaDelineamento.repeticao = data.repeticao;
@@ -102,32 +102,32 @@ export class SequenciaDelineamentoController {
 
       await this.SequenciaDelineamentoRepository.update(sequenciaDelineamento.id, sequenciaDelineamento);
 
-      return {status: 200, message: "Sequência de delineamento atualizada!"};
+      return { status: 200, message: "Sequência de delineamento atualizada!" };
     } catch (err) {
       return { status: 404, message: 'Erro ao atualizar!' };
     }
   }
 
   async listAll(options: any) {
-    const parameters: object | any = new Object();
-    let take; 
+    const parameters: object | any = {};
+    let take;
     let skip;
     let orderBy: object | any;
     let select: any = [];
-    
+
     try {
       if (options.filterStatus) {
-        if (typeof(options.status) === 'string') {
+        if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         }
       }
 
       if (options.filterSearch) {
-        options.filterSearch=  '{"contains":"' + options.filterSearch + '"}';
-        parameters.volume  = JSON.parse(options.filterSearch);
+        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+        parameters.volume = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {
@@ -140,7 +140,7 @@ export class SequenciaDelineamentoController {
         select = {
           id: true,
           repeticao: true,
-          delineamento: {select: {name: true}},
+          delineamento: { select: { name: true } },
           sorteio: true,
           nt: true,
           bloco: true,
@@ -171,7 +171,7 @@ export class SequenciaDelineamentoController {
       }
 
       if (options.take) {
-        if (typeof(options.take) === 'string') {
+        if (typeof (options.take) === 'string') {
           take = parseInt(options.take);
         } else {
           take = options.take;
@@ -179,7 +179,7 @@ export class SequenciaDelineamentoController {
       }
 
       if (options.skip) {
-        if (typeof(options.skip) === 'string') {
+        if (typeof (options.skip) === 'string') {
           skip = parseInt(options.skip);
         } else {
           skip = options.skip;
@@ -189,7 +189,7 @@ export class SequenciaDelineamentoController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
-      
+
       let response: object | any = await this.SequenciaDelineamentoRepository.findAll(
         parameters,
         select,
@@ -198,15 +198,15 @@ export class SequenciaDelineamentoController {
         orderBy
       );
 
-      if (!response || response.total <= 0) { 
-        return {status: 400, response: [], total: 0}
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 }
 
       } else {
-        return {status: 200, response, total: response.total }
-      }    
-    } catch (err) { 
+        return { status: 200, response, total: response.total }
+      }
+    } catch (err) {
       console.log(err)
-      return {status: 400, response: [], total: 0}
+      return { status: 400, response: [], total: 0 }
     }
   };
 }

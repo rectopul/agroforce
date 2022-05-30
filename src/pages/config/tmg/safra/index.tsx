@@ -12,17 +12,18 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
-import InputMask from 'react-input-mask';
-import { AccordionFilter, Button, CheckBox, Content, Select } from "src/components";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../shared/utils/dropdown";
 import { removeCookies, setCookies } from "cookies-next";
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
-  filterSearch: string | any;
+  filterSafra: string | any;
+  filterStartDate: string | any;
+  filterEndDate: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -39,7 +40,7 @@ interface ISafra {
 
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
@@ -51,30 +52,30 @@ interface IData {
   pageBeforeEdit: string | any;
 }
 
-export default function Listagem({allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit}: IData) {
+export default function Listagem({ allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
-  
+
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.safra ||{id:0, table_preferences: "id,year,plantingStartTime,plantingEndTime,status"};
+  const preferences = userLogado.preferences.safra || { id: 0, table_preferences: "id,year,plantingStartTime,plantingEndTime,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
   const [arrowDescription, setArrowDescription] = useState<string>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id"},
-    { name: "CamposGerenciados[]", title: "Safra", value: "year"},
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Safra", value: "year" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
     { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
     // { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
@@ -84,9 +85,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -98,16 +99,21 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
-      filterSearch: '',
+      filterSafra: '',
+      filterStartDate: '',
+      filterEndDate: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSafra=${values.filterSafra}&filterStartDate=${values.filterStartDate}&filterEndDate=${values.filterEndDate}&id_culture=${cultureId}`
+      //const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       setCookies("filterBeforeEdit", parametersFilter)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
+        setTotalItems(response.total)
         setSafras(response.response);
+        setCurrentPage(0)
       })
     },
   });
@@ -153,7 +159,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -173,7 +179,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -185,43 +191,43 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
-        arrOb.push({ 
-          title: "Código", 
-          field: "id", 
-          sorting: false 
+
+      if (ObjetCampos[index] === 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
         })
       }
-      if (ObjetCampos[index] == 'year') {
+      if (ObjetCampos[index] === 'year') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              { arrowSafra }
-              <button className='font-medium text-gray-900' onClick={() => {} /*handleOrderName('value', item.value)*/}>
+              {arrowSafra}
+              <button className='font-medium text-gray-900' onClick={() => { } /*handleOrderName('value', item.value)*/}>
                 Safra
               </button>
             </div>
           ),
           field: "year",
           sorting: false
-        },);
+        });
       }
-      if (ObjetCampos[index] == 'plantingStartTime') {
-        arrOb.push({ 
-          title: "Período ideal de início de plantio", 
-          field: "plantingStartTime", 
+      if (ObjetCampos[index] === 'plantingStartTime') {
+        arrOb.push({
+          title: "Período ideal de início de plantio",
+          field: "plantingStartTime",
           sorting: false,
         })
       }
-      if (ObjetCampos[index] == 'plantingEndTime') {
-        arrOb.push({ 
-          title: "Período ideal do fim do plantio", 
-          field: "plantingEndTime", 
+      if (ObjetCampos[index] === 'plantingEndTime') {
+        arrOb.push({
+          title: "Período ideal do fim do plantio",
+          field: "plantingEndTime",
           sorting: false,
         })
       }
-      if (ObjetCampos[index] == 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -231,11 +237,11 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           render: (rowData: ISafra) => (
             <div className='h-10 flex'>
               <div className="h-10">
-                <Button 
+                <Button
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  onClick={() =>{
+                  onClick={() => {
                     setCookies("pageBeforeEdit", currentPage?.toString())
                     router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)
                   }}
@@ -244,13 +250,13 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
               </div>
               {rowData.status === 1 ? (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={async () => await handleStatusSafra(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -258,13 +264,13 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                 </div>
               ) : (
                 <div className="h-10">
-                  <Button 
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={async () => await handleStatusSafra(
                       rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -280,24 +286,24 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 3 }).then((response) => {
-        userLogado.preferences.safra = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 3 }).then((response) => {
+        userLogado.preferences.safra = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.safra = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.safra = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -307,8 +313,8 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -321,9 +327,9 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
-    
+
     await safraService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         const newData = safras.map((row) => {
           if (row.status === 0) {
             row.status = "Inativos" as any;
@@ -337,7 +343,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "safras");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -353,7 +359,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       }
     });
   };
-  
+
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -361,7 +367,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       setCurrentPage(pages - 1);
     }
   };
-  
+
   async function handlePagination(): Promise<void> {
     let skip = currentPage * Number(take);
     let parametersFilter = "skip=" + skip + "&take=" + take;
@@ -370,7 +376,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
       parametersFilter = parametersFilter + "&" + filter;
     }
     await safraService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setSafras(response.response);
       }
     });
@@ -379,7 +385,7 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
 
   return (
@@ -393,107 +399,128 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
           gap-8
         ">
           <AccordionFilter title="Filtrar safras">
-              <div className='w-full flex gap-2'>
-                <form
-                  className="flex flex-col
+            <div className='w-full flex gap-2'>
+              <form
+                className="flex flex-col
                     w-full
                     items-center
                     px-4
                     bg-white
                   "
-                  onSubmit={formik.handleSubmit}
-                >
-                  <div className="w-full h-full
+                onSubmit={formik.handleSubmit}
+              >
+                <div className="w-full h-full
                     flex
                     justify-center
                     pb-2
                   ">
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Status
-                      </label>
-                      <Select name="filterStatus" id="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
-                    </div>
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Safra
-                      </label>
-                      <InputMask
-                        mask={"9999a_9999a"}
-                        placeholder="__/__"
-                        id="filterSearch"
-                        name="filterSearch"
-                        onChange={formik.handleChange}
-                        className="shadow
-                          appearance-none
-                          bg-white bg-no-repeat
-                          border border-solid border-gray-300
-                          rounded
-                          w-full
-                          py-2 px-3
-                          text-gray-900
-                          leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                        "
-                      />
-                    </div>
-  
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Data do período de plantio
-                      </label>
-                      <InputMask 
-                        mask={"99/99/9999"} 
-                        placeholder="__/__/____"
-                        id="filterSearch"
-                        name="filterSearch"
-                        onChange={formik.handleChange}
-                        className="shadow
-                          appearance-none
-                          bg-white bg-no-repeat
-                          border border-solid border-gray-300
-                          rounded
-                          w-full
-                          py-2 px-3
-                          text-gray-900
-                          leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                        "
-                      />
-                    </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Status
+                    </label>
+                    <Select name="filterStatus" id="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
-
-                  <div className="h-16 w-32 mt-3">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Safra
+                    </label>
+                    <Input
+                      placeholder="Ano"
+                      id="filterSafra"
+                      name="filterSafra"
+                      onChange={formik.handleChange}
+                      className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
                     />
                   </div>
-                </form>
-              </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Data do início do plantio
+                    </label>
+                    <Input
+                      placeholder="____-__-__"
+                      id="filterStartDate"
+                      name="filterStartDate"
+                      onChange={formik.handleChange}
+                      className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                    />
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Data do fim do plantio
+                    </label>
+                    <Input
+                      placeholder="____-__-__"
+                      id="filterEndDate"
+                      name="filterEndDate"
+                      onChange={formik.handleChange}
+                      className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                    />
+                  </div>
+                </div>
+
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
+              </form>
+            </div>
           </AccordionFilter>
 
-            <div className="w-full h-full overflow-y-scroll">
-              <MaterialTable 
-                style={{ background: '#f9fafb' }}
-                columns={columns}
-                data={safras}
-                options={{
-                  showTitle: false,
-                  headerStyle: {
-                    zIndex: 20
-                  },
-                  search: false,
-                  filtering: false,
-                  pageSize: itensPerPage
-                }}
-                components={{
-                  Toolbar: () => (
-                    <div
+          <div className="w-full h-full overflow-y-scroll">
+            <MaterialTable
+              style={{ background: '#f9fafb' }}
+              columns={columns}
+              data={safras}
+              options={{
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20
+                },
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage
+              }}
+              components={{
+                Toolbar: () => (
+                  <div
                     className='w-full max-h-96	
                       flex
                       items-center
@@ -505,39 +532,39 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       border-solid border-b
                       border-gray-200
                     '>
-                      <div className='h-12'>
-                        <Button 
-                          title="Cadastrar safra"
-                          value="Cadastrar safra"
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {router.push('safra/cadastro')}}
-                          icon={<MdDateRange size={20} />}
-                        />
-                      </div>
+                    <div className='h-12'>
+                      <Button
+                        title="Cadastrar safra"
+                        value="Cadastrar safra"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { router.push('safra/cadastro') }}
+                        icon={<MdDateRange size={20} />}
+                      />
+                    </div>
 
-                      <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
-                      <div className='h-full flex items-center gap-2'>
-                        <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-72">
-                            <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
-                              <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId='characters'>
-                                  {
-                                    (provided) => (
-                                      <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                    <div className='h-full flex items-center gap-2'>
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId='characters'>
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-2">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
-                                        {
-                                          genaratesProps.map((genarate, index) => (
+                                      {
+                                        genaratesProps.map((genarate, index) => (
                                           <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                             {(provided) => (
                                               <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
@@ -550,25 +577,25 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                                               </li>
                                             )}
                                           </Draggable>
-                                          ))
-                                        }
-                                        { provided.placeholder }
-                                      </ul>
-                                    )
-                                  }
-                                </Droppable>
-                              </DragDropContext>
-                            </AccordionFilter>
-                          </div>
-                        </div>
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Exportar planilha de safras" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
                         </div>
                       </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Exportar planilha de safras" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
                     </div>
-                  ),
-                  Pagination: (props) => (
-                    <>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <>
                     <div
                       className="flex
                         h-20 
@@ -576,17 +603,17 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                         pr-2
                         py-5 
                         bg-gray-50
-                      " 
+                      "
                       {...props}
                     >
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage - 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
                       />
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -596,53 +623,53 @@ export default function Listagem({allSafras, totalItems, itensPerPage, filterApl
                       {
                         Array(1).fill('').map((value, index) => (
                           <>
-                              <Button
-                                key={index}
-                                onClick={() => setCurrentPage(index)}
-                                value={`${currentPage + 1}`}
-                                bgColor="bg-blue-600"
-                                textColor="white"
-                                disabled={true}
-                              />
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled={true}
+                            />
                           </>
                         ))
                       }
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
-                      <Button 
+                      <Button
                         onClick={() => setCurrentPage(currentPage + 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1>= pages}
+                        disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    </>
-                  ) as any
-                }}
-              />
-            </div>
+                  </>
+                ) as any
+              }}
+            />
+          </div>
         </main>
       </Content>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
-  const pageBeforeEdit =  req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const  token  =  req.cookies.token;
-  const  cultureId  =  req.cookies.cultureId;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const token = req.cookies.token;
+  const cultureId = req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
-  
+
   let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
 
@@ -655,12 +682,12 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
   const safra = await fetch(urlParameters.toString(), requestOptions);
   let Response = await safra.json();
-  
+
   let allSafras = Response.response;
   let totalItems = Response.total;
 

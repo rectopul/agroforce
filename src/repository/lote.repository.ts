@@ -1,18 +1,23 @@
 import { prisma } from "../pages/api/db/db";
+import { GenotipoRepository } from "./genotipo.repository";
 
-  interface CreateLoteDTO {
-    id_genotipo: number;
-    name: string;
-    volume: number;
-    created_by: number;
-  }
+interface CreateLoteDTO {
+  id_genotipo: number;
+  name: string;
+  volume: number;
+  created_by: number;
+}
 
-  interface UpdateLoteDTO {
-    id: number;
-    name: string;
-    volume: number;
-  }
+interface UpdateLoteDTO {
+  id: number;
+  name: string;
+  volume: number;
+}
+
 export class LoteRepository {
+
+  genotipoRepository = new GenotipoRepository()
+
   async create(data: CreateLoteDTO) {
     const lote = await prisma.lote.create({
       data: {
@@ -28,7 +33,7 @@ export class LoteRepository {
 
   async findById(id: number) {
     const lote = await prisma.lote.findUnique({
-        where: { id }
+      where: { id }
     });
 
     return lote;
@@ -58,23 +63,23 @@ export class LoteRepository {
     return lote;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
     const count = await prisma.lote.count({ where: where });
 
     const result: object | any = await prisma.lote.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
+      select: select,
+      skip: skip,
+      take: take,
       where: where,
       orderBy: order
     });
-    
+
     result.total = count;
     return result;
   }

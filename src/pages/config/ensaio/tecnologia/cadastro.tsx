@@ -29,8 +29,8 @@ export default function NovoLocal() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -48,9 +48,9 @@ export default function NovoLocal() {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name)  { return; } 
+      if (!values.name) { return; }
 
       await tecnologiaService.create({
         id_culture: parseInt(culture),
@@ -60,7 +60,7 @@ export default function NovoLocal() {
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Tecnologia cadastrada com sucesso!');
           router.back();
         } else {
@@ -71,17 +71,17 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
   }
 
-    return (
+  return (
     <>
       <Head>
         <title>Nova tecnologia</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -100,9 +100,9 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Tecnologia
               </label>
-              <Input 
-                type="text" 
-                placeholder="TA" 
+              <Input
+                type="text"
+                placeholder="TA"
                 required
                 id="cod_tec"
                 name="cod_tec"
@@ -110,34 +110,34 @@ export default function NovoLocal() {
                 onChange={formik.handleChange}
                 value={formik.values.cod_tec}
               />
-            </div> 
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome" 
+              <Input
+                type="text"
+                placeholder="Nome"
                 id="name"
                 required
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div> 
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Descrição
               </label>
-              <Input 
-                type="text" 
-                placeholder="Descrição" 
+              <Input
+                type="text"
+                placeholder="Descrição"
                 id="desc"
                 name="desc"
                 onChange={formik.handleChange}
                 value={formik.values.desc}
               />
-            </div>        
+            </div>
           </div>
 
           <div className="
@@ -148,23 +148,23 @@ export default function NovoLocal() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 icon={<FiUserPlus size={18} />}
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

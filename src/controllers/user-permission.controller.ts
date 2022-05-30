@@ -5,7 +5,7 @@ export class UserPermissionController {
 
     async getUserPermissions(userId: any) {
         try {
-            if (typeof(userId) === 'string') {
+            if (typeof (userId) === 'string') {
                 userId = parseInt(userId);
             }
 
@@ -22,94 +22,94 @@ export class UserPermissionController {
             // return arr2;       
         } catch (err) {
 
-        } 
+        }
     }
 
     async getAllPermissions() {
         try {
             let response = await this.userPermission.findAll('');
 
-            if (!response) 
+            if (!response)
                 throw "falha na requisição, tente novamente";
 
-            return response;        
+            return response;
         } catch (err) {
 
         }
     }
 
-    async getByUserID(userId: Number | any)  {
+    async getByUserID(userId: Number | any) {
         let newID = parseInt(userId);
         try {
-            if (userId && userId != '{id}') {
-                let response = await this.userPermission.findAllByUser(newID); 
-                if (!response || response.length == 0) {
-                    return {status: 400, response:[], message: 'usuario não tem cultura'};
+            if (userId && userId !== '{id}') {
+                let response = await this.userPermission.findAllByUser(newID);
+                if (!response || response.length === 0) {
+                    return { status: 400, response: [], message: 'usuario não tem cultura' };
                 } else {
-                    return {status:200 , response};
+                    return { status: 200, response };
                 }
             } else {
-                return {status:405, response:{error: 'id não informado'}};
+                return { status: 405, response: { error: 'id não informado' } };
             }
         } catch (err) {
-            return {status: 400, message: err}
-        }  
+            return { status: 400, message: err }
+        }
     }
 
     async post(data: object | any) {
         try {
-            if (data != null && data != undefined) {
+            if (data !== null && data !== undefined) {
                 await this.delete(parseInt(data.userId));
                 data.status = 0;
                 let response = await this.userPermission.create(data);
-                if(response.count > 0) {
-                    return {status: 200, message: {message: "permission criada"}}
+                if (response.count > 0) {
+                    return { status: 200, message: { message: "permission criada" } }
                 } else {
-                    return {status: 400, message: {message: "erro"}}
+                    return { status: 400, message: { message: "erro" } }
                 }
             }
         } catch (err) {
-            return {status: 400, message: {message: "erro"}}
+            return { status: 400, message: { message: "erro" } }
         }
     }
 
-    async updateCultures(data: object| any) {
+    async updateCultures(data: object | any) {
         try {
-            if (data != null && data != undefined) {
-                const parameters: object | any  = new Object();
+            if (data !== null && data !== undefined) {
+                const parameters: object | any = {};
 
-                if (typeof(data.status) === 'string') {
-                    parameters.status =  parseInt(data.status);
-                } else { 
-                    parameters.status =  data.status;
+                if (typeof (data.status) === 'string') {
+                    parameters.status = parseInt(data.status);
+                } else {
+                    parameters.status = data.status;
                 }
                 await this.userPermission.queryRaw(parseInt(data.idUser), parseInt(data.cultureId));
-                return {status: 200}
+                return { status: 200 }
             }
         } catch (err) {
-            return {status: 400, message: err}
-        }  
+            return { status: 400, message: err }
+        }
     }
 
     async updateAllStatusCultures(userId: any) {
         try {
             await this.userPermission.updateAllStatus(userId);
         } catch (err) {
-            return {status: 400, message: err}
-        }  
+            return { status: 400, message: err }
+        }
     }
 
     async delete(userId: number) {
         try {
-            if(userId) {
-                let response: object | any  = await this.userPermission.delete({userId: userId});
-                return {status: 200, response}
+            if (userId) {
+                let response: object | any = await this.userPermission.delete({ userId: userId });
+                return { status: 200, response }
 
             } else {
-                return {status: 400, message: "id não informado"}
+                return { status: 400, message: "id não informado" }
             }
         } catch (err) {
-            return {status: 400, message: err}
-        }  
+            return { status: 400, message: err }
+        }
     }
 }

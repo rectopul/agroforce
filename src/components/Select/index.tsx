@@ -8,7 +8,7 @@ type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
 export function Select({ selected, values, ...rest }: ITypeSelectProps) {
   return (
     <select
-      { ...rest }
+      {...rest}
       className="h-full w-full
       form-select form-select-sm
       shadow
@@ -23,14 +23,14 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" aria-label=".form-select-sm example
     ">
       <option value="">Selecione...</option>
-     {
-       values.map((value: string | object | any, index) => {
-         let itemSelected: any = selected == value.id ? 'selected' : '';
-         return (
-           <option selected={itemSelected} key={index} value={value.id}>{value.name.toString()}</option>
-         )
-       })
-     }
+      {
+        values.map((value: string | object | any, index) => {
+          let itemSelected: any = selected === value.id ? 'selected' : '';
+          return (
+            <option selected={itemSelected} key={index} value={value.id}>{value.name.toString()}</option>
+          )
+        })
+      }
     </select>
   );
 }

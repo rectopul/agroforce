@@ -1,17 +1,17 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
-export class ProfileRepository {   
+export class ProfileRepository {
     async findOne(id: number) {
         let Result = await prisma.profile.findUnique({
-               where: {
-                   id: id
-               }
-             }) 
+            where: {
+                id: id
+            }
+        })
         return Result;
     }
 
-    async findAll () {
-        let Result = await prisma.profile.findMany() 
+    async findAll() {
+        let Result = await prisma.profile.findMany()
         return Result;
     }
 
@@ -22,18 +22,19 @@ export class ProfileRepository {
 
     async update(id: number, Profile: Object) {
         let profile = await this.findOne(id);
-        if (profile != null) {
-            let Result = await prisma.profile.update({ 
+        if (profile !== null) {
+            let Result = await prisma.profile.update({
                 where: {
                     id: id
                 },
-                data: Profile })
-                
+                data: Profile
+            })
+
             return Result;
         } else {
             return false;
         }
     }
-    
+
 }
 

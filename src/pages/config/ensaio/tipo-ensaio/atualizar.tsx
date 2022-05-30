@@ -28,17 +28,17 @@ interface IData {
 }
 
 
-export default function NovoLocal({typeAssayEdit}: IData) {
+export default function NovoLocal({ typeAssayEdit }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const router = useRouter();
   const formik = useFormik<ITypeAssayProps>({
@@ -48,9 +48,9 @@ export default function NovoLocal({typeAssayEdit}: IData) {
       created_by: userLogado.id,
       status: 1
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name)  { return; } 
+      if (!values.name) { return; }
 
       await typeAssayService.update({
         id: values.id,
@@ -58,7 +58,7 @@ export default function NovoLocal({typeAssayEdit}: IData) {
         created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           Swal.fire('Tipo de Ensaio atualizado com sucesso!')
           router.push('/config/ensaio/tipo-ensaio');
         } else {
@@ -69,17 +69,17 @@ export default function NovoLocal({typeAssayEdit}: IData) {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
   }
 
-    return (
+  return (
     <>
       <Head>
         <title>Atualizar Tipo Ensaio</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -98,30 +98,30 @@ export default function NovoLocal({typeAssayEdit}: IData) {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código
               </label>
-              <Input 
+              <Input
                 disabled
-                type="text" 
-                placeholder="Nome" 
+                type="text"
+                placeholder="Nome"
                 style={{ background: '#e5e7eb' }}
                 id="id"
                 name="id"
                 onChange={formik.handleChange}
                 value={formik.values.id}
               />
-            </div>  
+            </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome" 
+              <Input
+                type="text"
+                placeholder="Nome"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>       
+            </div>
           </div>
 
           <div className="
@@ -132,23 +132,23 @@ export default function NovoLocal({typeAssayEdit}: IData) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                icon={<IoMdArrowBack size={18} />} 
-                onClick={() => {router.back();}}
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiOrganizationChart size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -159,20 +159,20 @@ export default function NovoLocal({typeAssayEdit}: IData) {
 }
 
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
-  const  token  =  context.req.cookies.token;
-  
+  const token = context.req.cookies.token;
+
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
 
   const typeAssayEdit = await resU.json();
 
-  return { props: { typeAssayEdit  } }
+  return { props: { typeAssayEdit } }
 }

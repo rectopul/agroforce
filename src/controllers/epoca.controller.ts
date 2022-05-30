@@ -18,25 +18,25 @@ export class EpocaController {
   epocaRepository = new EpocaRepository();
 
   async listAll(options: any) {
-    const parameters: object | any = new Object();
-    let take; 
+    const parameters: object | any = {};
+    let take;
     let skip;
     let orderBy: object | any;
     let select: any = [];
 
     try {
       if (options.filterStatus) {
-        if (typeof(options.status) === 'string') {
+        if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status =parseInt(options.filterStatus);
+          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
         }
       }
 
-      if (options.filterSearch) {    
-        options.filterSearch=  '{"contains":"' + String(options.filterSearch).trim() + '"}';
-        parameters.name  = JSON.parse(options.filterSearch);
+      if (options.filterSearch) {
+        options.filterSearch = '{"contains":"' + String(options.filterSearch).trim() + '"}';
+        parameters.name = JSON.parse(options.filterSearch);
       }
 
       if (options.id_culture) {
@@ -52,7 +52,7 @@ export class EpocaController {
       } else {
         select = {
           id: true,
-          name:true,
+          name: true,
           status: true
         };
       }
@@ -62,7 +62,7 @@ export class EpocaController {
       }
 
       if (options.take) {
-        if (typeof(options.take) === 'string') {
+        if (typeof (options.take) === 'string') {
           take = parseInt(options.take);
         } else {
           take = options.take;
@@ -70,7 +70,7 @@ export class EpocaController {
       }
 
       if (options.skip) {
-        if (typeof(options.skip) === 'string') {
+        if (typeof (options.skip) === 'string') {
           skip = parseInt(options.skip);
         } else {
           skip = options.skip;
@@ -80,7 +80,7 @@ export class EpocaController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
-      
+
       let response: object | any = await this.epocaRepository.findAll(
         parameters,
         select,
@@ -88,14 +88,14 @@ export class EpocaController {
         skip,
         orderBy
       );
-      if (!response || response.total <= 0) { 
-        return {status: 400, response: [], total: 0}
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 }
 
       } else {
-        return {status: 200, response, total: response.total}
-      }    
+        return { status: 200, response, total: response.total }
+      }
     } catch (err) {
-      return {status: 400, message: err}
+      return { status: 400, message: err }
     }
   };
 
@@ -107,9 +107,9 @@ export class EpocaController {
 
       if (!response) throw new Error("Época não encontrada");
 
-      return {status: 200 , response};
+      return { status: 200, response };
     } catch (e) {
-      return {status: 400, message: 'Época não encontrada'};
+      return { status: 400, message: 'Época não encontrada' };
     }
   };
 
@@ -123,41 +123,40 @@ export class EpocaController {
 
       const valid = schema.isValidSync(data);
 
-      if (!valid) return {status: 400, message: "Dados inválidos"};
+      if (!valid) return { status: 400, message: "Dados inválidos" };
 
       const epocaAlreadyExists = await this.epocaRepository.findByName(data.name);
 
-      if (epocaAlreadyExists) return {status: 400, message: "Época já existente"};
+      if (epocaAlreadyExists) return { status: 400, message: "Época já existente" };
 
       await this.epocaRepository.create(data);
 
-      return {status: 201, message: "Época cadastrada com sucesso!"}
-    } catch(err) {
-      return { status: 404, message: "Erro no cadastrado"}
+      return { status: 201, message: "Época cadastrada com sucesso!" }
+    } catch (err) {
+      return { status: 404, message: "Erro no cadastrado" }
     }
   };
 
   async update(data: IUpdateEpoca) {
     try {
-      console.log(data)
       const schema: SchemaOf<IUpdateEpoca> = object({
-        id: number().integer().required(this.required),     
+        id: number().integer().required(this.required),
         name: string().trim().required(this.required),
         status: number().integer().required(this.required)
       });
 
       const valid = schema.isValidSync(data);
 
-      if (!valid) return {status: 400, message: "Dados inválidos"};
+      if (!valid) return { status: 400, message: "Dados inválidos" };
 
       const epoca = await this.epocaRepository.findOne(data.id);
 
-      if (!epoca) return {status: 400, message: "Época não encontrada"};
+      if (!epoca) return { status: 400, message: "Época não encontrada" };
 
       const epocaAlreadyExists = await this.epocaRepository.findByName(data.name);
 
       if (epocaAlreadyExists && epocaAlreadyExists.id !== epoca.id) {
-        return {status: 400, message: "Época já existente"};
+        return { status: 400, message: "Época já existente" };
       }
 
       epoca.name = data.name;
@@ -165,7 +164,7 @@ export class EpocaController {
 
       await this.epocaRepository.update(data.id, epoca);
 
-      return {status: 200, message: "Época atualizada"}
+      return { status: 200, message: "Época atualizada" }
     } catch (err) {
       return { status: 404, message: "Erro ao atualizar" }
     }

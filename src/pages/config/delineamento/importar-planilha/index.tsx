@@ -21,7 +21,7 @@ export default function Importar() {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({spreadSheet: rows, moduleId: 7, delineamento: delineamento, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
-        if (response.message != '') {
+        if (response.message !== '') {
           Swal.fire({
             html: response.message,
             width: "800"});
