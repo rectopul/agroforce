@@ -1,8 +1,8 @@
 import Head from "next/head";
 import readXlsxFile from 'read-excel-file'
 import { importService } from "src/services/";
-import  * as ITabs from '../../../../../shared/utils/dropdown';
-import {  Button,  Content, Input, Select } from "../../../../../components";
+import * as ITabs from '../../../../../shared/utils/dropdown';
+import { Button, Content, Input, Select } from "../../../../../components";
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import { FiUserPlus } from "react-icons/fi";
@@ -26,8 +26,8 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 5,  id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
-        if (response.message != '') {
+      importService.validate({ spreadSheet: rows, moduleId: 5, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
+        if (response.message !== '') {
           Swal.fire({
             html: response.message,
             width: "800"
@@ -46,8 +46,8 @@ export default function Importar() {
       genotipo: ''
     },
     onSubmit: async (values) => {
-        var inputFile: any = document.getElementById("inputFile");
-        readExcel(inputFile.files);
+      var inputFile: any = document.getElementById("inputFile");
+      readExcel(inputFile.files);
     },
   });
   return (
@@ -67,19 +67,19 @@ export default function Importar() {
                 mt-4
                 mb-4
             ">
-                <div className="w-full h-10">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                        *Excel
-                    </label>
-                        <Input 
-                            type="file"
-                            required
-                            id="inputFile"
-                            name="inputFile"
-                        />
-                </div>
-              </div>
-            <div className="
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Excel
+              </label>
+              <Input
+                type="file"
+                required
+                id="inputFile"
+                name="inputFile"
+              />
+            </div>
+          </div>
+          <div className="
               h-10 w-full
               flex
               gap-3
