@@ -19,11 +19,40 @@ export class LayoutQuadraController {
                 }
             }
 
-            if (options.filterSearch) {
-                options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-                parameters.esquema = JSON.parse(options.filterSearch);
+            if (options.filterCodigo) {
+                parameters.id  = Number(options.filterCodigo);
             }
 
+            if (options.filterEsquema) {
+                options.filterEsquema=  '{"contains":"' + options.filterEsquema + '"}';
+                parameters.esquema  = JSON.parse(options.filterEsquema);
+            }
+
+            if (options.filterDisparos) {
+                parameters.disparos  = Number(options.filterDisparos);
+            }
+
+            if (options.filterTiros) {
+                parameters.tiros  = Number(options.filterTiros);
+            }
+
+            if (options.filterPlantadeira) {
+                options.filterPlantadeira=  '{"contains":"' + options.filterPlantadeira + '"}';
+                parameters.plantadeira  = JSON.parse(options.filterPlantadeira);
+            }
+
+            if (options.filterParcelas) {
+                parameters.parcelas  = Number(options.filterParcelas);
+            }
+
+            if (options.esquema) {
+                parameters.esquema = options.esquema;
+            }
+
+            if (options.id_culture) {
+                parameters.id_culture = Number(options.id_culture);
+            }
+    
             if (options.take) {
                 if (typeof (options.take) === 'string') {
                     take = parseInt(options.take);
@@ -51,13 +80,13 @@ export class LayoutQuadraController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = { id: true, esquema: true, semente_metros: true, disparos: true, divisor: true, largura: true, comp_fisico: true, comp_parcela: true, comp_corredor: true, t4_inicial: true, t4_final: true, df_inicial: true, df_final: true, status: true, local: { select: { name: true } } };
+                select = {id: true, esquema: true, plantadeira:true, disparos:true, tiros:true, parcelas:true, status: true};
             }
 
-            let response = await this.Repository.findAll(parameters, select, take, skip, orderBy);
-
-            if (!response || response.total <= 0) {
-                return { status: 400, response: [], total: 0 }
+            let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
+             
+            if (!response || response.total <= 0) { 
+                return {status: 400, response: [], total:0}
             } else {
                 return { status: 200, response, total: response.total }
             }
@@ -88,8 +117,8 @@ export class LayoutQuadraController {
         try {
             if (data !== null && data !== undefined) {
                 let response = await this.Repository.create(data);
-                if (response) {
-                    return { status: 200, message: "local inserido" }
+                if(response) {
+                    return {status: 200, message: "layout inserido", response}
                 } else {
                     return { status: 400, message: "erro" }
                 }

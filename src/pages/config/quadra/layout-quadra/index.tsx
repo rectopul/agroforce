@@ -13,9 +13,9 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { layoultQuadraService, userPreferencesService } from "src/services";
+import { layoutQuadraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
@@ -43,9 +43,12 @@ interface ILayoultProps {
 
 interface IFilter {
   filterStatus: object | any;
-  filterSearch: string | any;
-  filterUF: string | any;
-  filterCity: string | any;
+  filterCodigo: string | any;
+  filterEsquema: string | any;
+  filterTiros: string | any;
+  filterDisparos: string | any;
+  filterPlantadeira: string | any;
+  filterParcelas: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -108,17 +111,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
-      filterSearch: '',
-      filterUF: '',
-      filterCity: '',
+      filterCodigo: '',
+      filterEsquema: '',
+      filterDisparos: '',
+      filterTiros: '',
+      filterPlantadeira: '',
+      filterParcelas: '',
       orderBy: '',
       typeOrder: '',
-    },
+    },  
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setQuadra(response.response);
+      let parametersFilter = "&filterStatus=" + values.filterStatus + "&filterEsquema=" + values.filterEsquema + "&filterDisparos=" + values.filterDisparos + "&filterTiros=" + values.filterTiros + "&filterPlantadeira=" + values.filterPlantadeira + "&filterParcelas=" + values.filterParcelas;
+      await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+          setTotaItems(response.total);
+          setFilter(parametersFilter);
+          setQuadra(response.response);
       })
     },
   });
@@ -187,33 +194,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       if (ObjetCampos[item] === 'local') {
         arrOb.push({ title: "Local", field: "local", sorting: false })
       }
-
-      if (ObjetCampos[item] === 'semente_metros') {
-        arrOb.push({ title: "Sementes por Metros", field: "semente_metros", sorting: false })
+      
+      if (ObjetCampos[item] == 'plantadeira') {
+        arrOb.push({ title: "Plantadeira", field: "plantadeira", sorting: false })
       }
 
-      if (ObjetCampos[item] === 'disparos') {
+      if (ObjetCampos[item] == 'tiros') {
+        arrOb.push({ title: "Tiros", field: "tiros", sorting: false })
+      }
+
+      if (ObjetCampos[item] == 'disparos') {
         arrOb.push({ title: "Disparos", field: "disparos", sorting: false })
       }
 
-      if (ObjetCampos[item] === 'divisor') {
-        arrOb.push({ title: "Divisor", field: "divisor", sorting: false })
-      }
-
-      // if (ObjetCampos[item] === 'largura') {
-      //   arrOb.push({ title: "Largura", field: "largura", sorting: false })
-      // }
-
-      if (ObjetCampos[item] === 'comp_fisico') {
-        arrOb.push({ title: "Comp. Fisico", field: "comp_fisico", sorting: false })
-      }
-
-      if (ObjetCampos[item] === 'comp_parcela') {
-        arrOb.push({ title: "Comp. Parcel", field: "comp_parcela", sorting: false })
-      }
-
-      if (ObjetCampos[item] === 'comp_corredor') {
-        arrOb.push({ title: "Comp. Corretor", field: "comp_corredor", sorting: false })
+      if (ObjetCampos[item] == 'parcelas') {
+        arrOb.push({ title: "Parcelas", field: "parcelas", sorting: false })
       }
 
       if (ObjetCampos[item] === 'status') {
@@ -234,7 +229,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                    href={`layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -256,7 +251,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                    href={`layout-quadra/atualizar?id=${rowData.id}`}
                   />
                 </div>
                 <div>
@@ -310,7 +305,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    await layoultQuadraService.update({ id: id, status: status });
+    await layoutQuadraService.update({id: id, status: status});
     const index = quadras.findIndex((quadras) => quadras.id === id);
 
     if (index === -1) {
@@ -349,8 +344,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
+    await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
         setQuadra(response.response)
       }
     })
@@ -392,8 +387,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     }
 
-    await layoultQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
+    await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status == 200) {
         setQuadra(response.response)
       }
     });
@@ -427,9 +422,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
-
-    await layoultQuadraService.getAll(filterAplication).then((response) => {
-      if (response.status === 200) {
+    
+    await layoutQuadraService.getAll(filterAplication).then((response) => {
+      if (response.status == 200) {
         const newData = quadras.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
@@ -475,8 +470,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await layoultQuadraService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
+    await layoutQuadraService.getAll(parametersFilter).then((response) => {
+      if (response.status == 200) {
         setQuadra(response.response);
       }
     });
@@ -514,23 +509,75 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   justify-center
                   pb-2
                 ">
+            
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
                   </div>
-
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Esquema
                     </label>
-                    <Input
-                      type="text"
-                      placeholder="esquema"
+                    <Input 
+                      type="text" 
+                      placeholder="Esquema"
                       max="40"
-                      id="filterSearch"
-                      name="filterSearch"
+                      id="filterEsquema"
+                      name="filterEsquema"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  {/* <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Plantadeiras
+                    </label>
+                    <Input 
+                      type="text" 
+                      placeholder="Plantadeiras"
+                      max="40"
+                      id="filterPlantadeira"
+                      name="filterPlantadeira"
+                      onChange={formik.handleChange}
+                    />
+                  </div> */}
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Tiros
+                    </label>
+                    <Input 
+                      type="text" 
+                      placeholder="Tiros"
+                      max="40"
+                      id="filterTiros"
+                      name="filterTiros"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Disparos
+                    </label>
+                    <Input 
+                      type="text" 
+                      placeholder="Disparos"
+                      max="40"
+                      id="filterDisparos"
+                      name="filterDisparos"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Numero Parcelas
+                    </label>
+                    <Input 
+                      type="text" 
+                      placeholder="Parcelas"
+                      max="40"
+                      id="filterParcelas"
+                      name="filterParcelas"
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -579,19 +626,18 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
-                      <Button
-                        title="Cadastrar Layout"
-                        value="Cadastrar Layout"
+                              <div className='h-12'>
+                      <Button 
+                        title="Importar Planilha"
+                        value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="layout-quadra/cadastro"
-                        icon={<FiUserPlus size={20} />}
+                        onClick={() => {}}
+                        href="layout-quadra/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
-
-                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
+                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
 
                     <div className='h-full flex items-center gap-2
                     '>
@@ -639,11 +685,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { router.push('layout-quadra/importacao') }} />
+                        <Button title="Download lista de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de layout quadra" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
-                      </div>
+                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="layout-quadra/importar-planilha/config-planilha"  />
+                        </div>
                     </div>
                   </div>
                 ),
@@ -719,7 +765,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
-  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterAplication = "filterStatus=1";
@@ -731,10 +776,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const local = await fetch(urlParameters.toString(), requestOptions);
-  const apiUF = await fetch(`${baseUrlLocal}/uf`, requestOptions);
-  const uf = await apiUF.json();
-  const Response = await local.json();
+  const layout = await fetch(urlParameters.toString(), requestOptions);
+  const Response =  await layout.json();
   const allItems = Response.response;
   const totalItems = Response.total;
   return {
@@ -742,8 +785,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication,
-      uf
+      filterAplication
     },
   }
 }

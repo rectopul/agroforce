@@ -1,13 +1,13 @@
 import { prisma } from '../pages/api/db/db';
 
-export class DisparoRepository {
+export class LayoutChildrenRepository {
   async create(data: any) {
-    const disparos = await prisma.disparos.create({ data });
+    const disparos = await prisma.layout_children.create({ data });
     return disparos;
   }
 
   async findOne(id: number) {
-    const disparos = await prisma.disparos.findUnique({
+    const disparos = await prisma.layout_children.findUnique({
       where: { id }
     });
     return disparos;
@@ -17,7 +17,7 @@ export class DisparoRepository {
     const disparos = await this.findOne(id);
 
     if (disparos !== null) {
-      const result = await prisma.disparos.update({
+      const result = await prisma.layout_children.update({
         where: { id },
         data
       });
@@ -34,9 +34,9 @@ export class DisparoRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.disparos.count({ where: where });
+    const count = await prisma.layout_children.count({ where: where });
 
-    const result: object | any = await prisma.disparos.findMany({
+    const result: object | any = await prisma.layout_children.findMany({
       select: select, 
       skip: skip, 
       take: take, 

@@ -1,58 +1,57 @@
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
+import getConfig from "next/config";
 import Head from "next/head";
-import { useRouter } from 'next/router';
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import InputMask from "react-input-mask";
-import { layoultQuadraService } from "src/services";
-import Swal from 'sweetalert2';
+import MaterialTable from "material-table";
+import { SiMicrogenetics } from "react-icons/si";
 import {
-  Button, Content,
-  Input,
-  Select
-} from "../../../../components";
+  Button,
+  Content,
+  Input
+} from "src/components";
+import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
+import { ReactNode, useEffect } from "react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsDownload } from "react-icons/bs";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt} from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
+import { AccordionFilter, CheckBox, Select } from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { userPreferencesService, layoutChildrenService, quadraService, } from "src/services";
+import * as XLSX from 'xlsx';
 
-
-interface ILayoultProps {
-  id: Number | any;
-  esquema: String | any;
-  op: String | any;
-  semente_metros: Number | any;
-  disparos: Number | any;
-  divisor: Number | any;
-  largura: Number | any;
-  comp_fisico: Number | any;
-  comp_parcela: Number | any;
-  comp_corredor: Number | any;
-  t4_inicial: Number | any;
-  t4_final: Number | any;
-  df_inicial: Number | any;
-  df_final: Number | any;
-  localId: Number | any;
-  created_by: number | any;
-  status: Number;
-};
-
-interface ILocal {
-  id: number;
-  name: string;
-  latitude: string;
-  longitude: string;
-  status: number;
+interface IFilter{
+  filterStatus: object | any;
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
+}
+interface IGenarateProps {
+  name: string | undefined;
+  title:  string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 
-export interface IData {
-  local: object | any;
-  layoultEdit: ILayoultProps;
+interface IData {
+  allChildrens: any[];
+  totalItems: number;
+  itensPerPage: number;
+  filterAplication: object | any;
+  id_layout: number;
+  layout: any;
 }
 
-export default function NovoLocal({ local, layoultEdit }: IData) {
+export default function Atualizarquadra({allChildrens, totalItems, itensPerPage, filterAplication, id_layout, layout}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -62,451 +61,523 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
-
-  const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
-  const [idLocal, setIdLocal] = useState<number>(layoultEdit.localId);
-  const [lat, setLat] = useState<number>(0);
-  const [lng, setLng] = useState<number>(0);
-  const [titleLocal, setTitleLocal] = useState<string>('');
-
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
-  });
-
-  const position = {
-    lat,
-    lng,
-  };
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const locais: object | any = [];
+  
   const router = useRouter();
-  const formik = useFormik<ILayoultProps>({
+  const [checkInput, setCheckInput] = useState('text-black');
+
+  const formik = useFormik<any>({
     initialValues: {
-      id: layoultEdit.id,
-      esquema: layoultEdit.esquema,
-      op: layoultEdit.op,
-      semente_metros: layoultEdit.semente_metros,
-      disparos: layoultEdit.disparos,
-      divisor: layoultEdit.divisor,
-      largura: layoultEdit.largura,
-      comp_fisico: layoultEdit.comp_fisico,
-      comp_parcela: layoultEdit.comp_parcela,
-      comp_corredor: layoultEdit.comp_corredor,
-      t4_inicial: layoultEdit.t4_inicial,
-      t4_final: layoultEdit.t4_final,
-      df_inicial: layoultEdit.df_inicial,
-      df_final: layoultEdit.df_final,
-      localId: layoultEdit.localId,
-      created_by: userLogado.id,
-      status: 1
+      id: layout.id,
+      parcelas: layout.parcelas,
+      plantadeira: layout.plantadeira,
+      esquema: layout.esquema,
+      tiros: layout.tiros,
+      disparos: layout.disparos,
     },
     onSubmit: async (values) => {
-      validateInputs(values);
-      if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela || !values.comp_corredor || !values.t4_inicial || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal) { return; }
-
-      await layoultQuadraService.update({
-        id: values.id,
-        esquema: values.esquema,
-        op: values.op,
-        semente_metros: Number(values.semente_metros),
-        disparos: Number(values.disparos),
-        divisor: Number(values.divisor),
-        largura: values.largura,
-        comp_fisico: values.comp_fisico,
-        comp_parcela: values.comp_parcela,
-        comp_corredor: values.comp_corredor,
-        t4_inicial: Number(values.t4_inicial),
-        t4_final: Number(values.t4_final),
-        df_inicial: Number(values.df_inicial),
-        df_final: Number(values.df_final),
-        localId: idLocal,
-        created_by: Number(userLogado.id),
-        status: 1
+      await quadraService.update({
+        id: layout.id,
+        cod_quadra: values.cod_quadra,
+        id_culture: values.id_culture,
+        id_safra: values.id_safra,
+        local_preparo: values.local_preparo,
+        local_plantio: values.local_plantio,
+        larg_q: values.larg_.larg_q,
+        comp_p : values.larg_.comp_p,
+        linha_p: values.larg_.linha_p,
+        comp_c : values.larg_.comp_c,
+        esquema: values.larg_.esquema,
+        tiros: values.tiros,
+        disparos: values.larg_.disparos,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Layout quadra atualizado com sucesso!');
-          router.back()
+          Swal.fire('Genótipo atualizado com sucesso!');
+          router.back();
         } else {
+          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
+      });
+    },
+  });
+
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.layout_children ||{id:0, table_preferences: "id,sl,sc,s_aloc,tiro,cj,disparo,dist,st,spc,scolheita,tipo_parcela"};
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
+  const [disparos, setDisparos] = useState<any[]>(() => allChildrens);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "sl", value: "sl" },
+    { name: "CamposGerenciados[]", title: "sc", value: "sc" },
+    { name: "CamposGerenciados[]", title: "s_aloc", value: "s_aloc" },
+    { name: "CamposGerenciados[]", title: "tiro", value: "tiro" },
+    { name: "CamposGerenciados[]", title: "cj", value: "cj" },
+    { name: "CamposGerenciados[]", title: "disparo", value: "disparo" },
+    { name: "CamposGerenciados[]", title: "dist", value: "dist" },
+    { name: "CamposGerenciados[]", title: "st", value: "st" },
+    { name: "CamposGerenciados[]", title: "spc", value: "spc" },
+    { name: "CamposGerenciados[]", title: "scolheita", value: "scolheita" },
+    { name: "CamposGerenciados[]", title: "tipo parcela", value: "tipo_parcela" },
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
+  const [colorStar, setColorStar] = useState<string>('');
+
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos'},
+    { id: 1, name: 'Ativos'},
+    { id: 0, name: 'Inativos'},
+  ];
+
+  const take: number = itensPerPage;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const pages = Math.ceil(total / take);
+
+  const columns = columnsOrder(camposGerenciados);
+
+  const formikDisparo = useFormik<IFilter>({
+    initialValues: {
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async (values) => {
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_layout=" + id_layout;
+      await layoutChildrenService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: any[]) => {
+        setDisparos(response);
+        setTotaItems(response.length);
+        setFilter(parametersFilter);
       })
     },
   });
 
-  local.map((value: string | object | any) => {
-    locais.push({ id: value.id, name: value.name });
-  })
+  async function handleStatus(idItem: number, data: any): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
+    } else {
+      data.status = 1;
+    }
 
-  function validateInputs(values: any) {
-    if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor = 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor = ''; }
-    if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor = 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor = ''; }
-    if (!values.localId) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor = 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor = ''; }
-    if (!values.semente_metros) { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor = 'red'; } else { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor = ''; }
-    if (!values.disparos) { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor = 'red'; } else { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor = ''; }
-    if (!values.divisor) { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor = 'red'; } else { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor = ''; }
-    if (!values.largura) { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor = 'red'; } else { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor = ''; }
-    if (!values.comp_fisico) { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor = 'red'; } else { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor = ''; }
-    if (!values.comp_parcela) { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor = 'red'; } else { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor = ''; }
-    if (!values.comp_corredor) { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor = 'red'; } else { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor = ''; }
-    if (!values.t4_inicial) { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor = 'red'; } else { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor = ''; }
-    if (!values.t4_final) { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor = 'red'; } else { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor = ''; }
-    if (!values.df_inicial) { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor = 'red'; } else { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor = ''; }
-    if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor = 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor = ''; }
-  }
+    const index = disparos.findIndex((disparos) => disparos.id === idItem);
+
+    if (index === -1) {
+      return;
+    }
+
+    setDisparos((oldDisparos) => {
+      const copy = [...oldDisparos];
+      copy[index].status = data.status;
+      return copy;
+    });
+    
+    const { id, status } = disparos[index];
+    
+    await layoutChildrenService.update({id: id, status: status});1919www
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
+    var arrOb: any = [];
+
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "",
+          field: "id",
+          width: 0,
+          render: () => (
+            colorStar === '#eba417' ? (
+              <div className='h-10 flex'>
+                <div>
+                  <button
+                    className="w-full h-full flex items-center justify-center border-0"
+                    onClick={() => setColorStar('')}
+                  >
+                    <AiTwotoneStar size={25} color={'#eba417'} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div>
+                  <button 
+                    className="w-full h-full flex items-center justify-center border-0"
+                    onClick={() => setColorStar('#eba417')}
+                  >
+                    <AiTwotoneStar size={25} />
+                  </button>
+                </div>
+              </div>
+            )
+          ),
+        })
+      }
+      
+      if (ObjetCampos[index] == 'id') {
+        arrOb.push({
+          title: "Código",
+          field: "id",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'sl') {
+        arrOb.push({
+          title: "sl",
+          field: "sl",
+          sorting: false
+        },);
+      }
+
+      
+      if (ObjetCampos[index] == 'sc') {
+        arrOb.push({
+          title: "sc",
+          field: "sc",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 's_aloc') {
+        arrOb.push({
+          title: "saloc",
+          field: "s_aloc",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'tiro') {
+        arrOb.push({
+          title: "tiro",
+          field: "tiro",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'cj') {
+        arrOb.push({
+          title: "cj",
+          field: "cj",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'disparo') {
+        arrOb.push({
+          title: "disparo",
+          field: "disparo",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'dist') {
+        arrOb.push({
+          title: "dist",
+          field: "dist",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'st') {
+        arrOb.push({
+          title: "st",
+          field: "st",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'spc') {
+        arrOb.push({
+          title: "spc",
+          field: "spc",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'scolheita') {
+        arrOb.push({
+          title: "scolheita",
+          field: "scolheita",
+          sorting: false
+        },);
+      }
+
+      if (ObjetCampos[index] == 'tipo_parcela') {
+        arrOb.push({
+          title: "tipo parcela",
+          field: "tipo_parcela",
+          sorting: false
+        },);
+      }
+
+      // if (ObjetCampos[index] == 'status') {
+      //   arrOb.push({
+      //     title: "Status",
+      //     field: "status",
+      //     sorting: false,
+      //     searchable: false,
+      //     filterPlaceholder: "Filtrar por status",
+      //     render: (rowData: any) => (
+      //       <div className='h-10 flex'>
+      //         <div className="h-10">
+      //           <Button 
+      //             icon={<BiEdit size={16} />}
+      //             onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}} 
+      //             bgColor="bg-blue-600"
+      //             textColor="white"
+      //             // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+      //           />
+      //         </div>
+      //         {rowData.status === 1 ? (
+      //           <div className="h-10">
+      //             <Button
+      //               type="submit"
+      //               icon={<FaRegThumbsUp size={16} />}
+      //               onClick={async () => await handleStatusLote(
+      //                 rowData.id, {
+      //                   status: rowData.status,
+      //                   ...rowData
+      //                 }
+      //               )}
+      //               bgColor="bg-green-600"
+      //               textColor="white"
+      //             />
+      //           </div>
+      //         ) : (
+      //           <div className="h-10">
+      //             <Button
+      //               type="submit"
+      //               icon={<FaRegThumbsDown size={16} />}
+      //               onClick={async () => await handleStatusLote(
+      //                 rowData.id, {
+      //                   status: rowData.status,
+      //                   ...rowData
+      //                 }
+      //               )}
+      //               bgColor="bg-red-800"
+      //               textColor="white"
+      //             />
+      //           </div>
+      //         )}
+      //       </div>
+      //     ),
+      //   })
+      // }
+    });
+    return arrOb;
+  };
+
+  async function getValuesComluns(): Promise<void> {
+    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var selecionados = '';
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].checked) {
+        selecionados += els[i].value + ',';
+      }
+    } 
+    var totalString = selecionados.length;
+    let campos = selecionados.substr(0, totalString- 1)
+    if (preferences.id === 0) {
+      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 19 }).then((response) => {
+        userLogado.preferences.layout_children = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.layout_children = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
+
+    setStatusAccordion(false);
+    setCamposGerenciados(campos);
+  };
+
+  function handleOnDragEnd(result: DropResult): void {
+    setStatusAccordion(true);
+    if (!result)  return;
+    
+    const items = Array.from(genaratesProps);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
+
+    setGenaratesProps(items);
+  };
+
+  const downloadExcel = async (): Promise<void> => {
+    if (filterAplication) {
+      filterAplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
+    }
+    
+    await layoutChildrenService.getAll(filterAplication).then((response) => {
+      if (response.status === 200) {
+        const newData = response.response.map((row: { status: any }) => {
+          if (row.status === 0) {
+            row.status = "Inativo";
+          } else {
+            row.status = "Ativo";
+          }
+
+          return row;
+        });
+
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, "disparos");
+    
+        // Buffer
+        let buf = XLSX.write(workBook, {
+          bookType: "xlsx", //xlsx
+          type: "buffer",
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: "xlsx", //xlsx
+          type: "binary",
+        });
+        // Download
+        XLSX.writeFile(workBook, "disparos.xlsx");
+      }
+    });
+  };
+
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  };
+
+  async function handlePagination(): Promise<void> {
+    let skip = currentPage * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take + "&id_layout=" + id_layout;
+
+    if (filter) {
+      parametersFilter = parametersFilter + "&" + filter;
+    }
+    await layoutChildrenService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setDisparos(response.response);
+      }
+    });
+  };
 
   useEffect(() => {
-    localMap.map((item) => {
-      if (item.id === idLocal) {
-        setLat(Number(-item.latitude));
-        setLng(Number(-item.longitude));
-        setTitleLocal(item.name);
-      } else {
-        lat;
-        lng;
-      }
-    })
-  }, [idLocal]);
-
+    handlePagination();''
+    handleTotalPages();
+  }, [currentPage, pages]);
   return (
     <>
-      <Head>
-        <title>Atualizar Layout Quadra</title>
-      </Head>
-
+      <Head><title>Atualizar layout quadra</title></Head>
       <Content contentHeader={tabsDropDowns}>
-        <form
-          className="
-          w-full
-          h-full
-          bg-white 
-          shadow-md 
-          rounded 
-          px-8 
-          pt-6 
-          pb-8 
-          mt-2
-          overflow-y-scroll
-        "
+        <form 
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Novo Layout</h1>
-          </div>
+          <h1 className="text-2xl">Atualizar layout quadra</h1>
 
-          <div className="w-full
-            flex 
-            justify-around
-            gap-6
-            mt-4
-            mb-4
-          ">
-            <div className="w-full">
+          <div className="w-full flex justify-between items-start gap-5 mt-5">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Código
               </label>
               <Input
-                type="text"
-                placeholder="14x08(p4)-PY"
-                id="id"
-                style={{ background: '#e5e7eb' }}
-                name="id"
+                style={{ background: '#e5e7eb'}}
                 disabled
-                onChange={formik.handleChange}
-                value={formik.values.id}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Esquema
-              </label>
-              <Input
-                type="text"
-                placeholder="14x08(p4)-PY"
-                id="esquema"
-                name="esquema"
-                onChange={formik.handleChange}
-                value={formik.values.esquema}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *OP
-              </label>
-              <Input
-                type="text"
-                placeholder="QMCG-01"
-                id="op"
-                name="op"
-                onChange={formik.handleChange}
-                value={formik.values.op}
+                required   
+                id="id"
+                name="id"
+                value={layout.id}
               />
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Local
+                <strong className={checkInput}>*</strong>
+                Código esquema:
               </label>
-              <Select
-                values={locais}
-                id="localId"
-                name="localId"
-                onChange={(e) => setIdLocal(parseInt(e.target.value))}
-                value={idLocal}
-                selected={idLocal}
+              <Input
+                style={{ background: '#e5e7eb'}}
+                disabled
+                required   
+                id="esquema"
+                name="esquema"
+                value={layout.esquema}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Plantadeiras:
+              </label>
+              <Input
+                style={{ background: '#e5e7eb'}}
+                disabled
+                required 
+                id="plantadeira"
+                name="plantadeira"
+                value={layout.plantadeira}
               />
             </div>
           </div>
-
-          <div className="w-full
-            flex 
-            justify-around
-            gap-6
-            mb-4
-          ">
-            <div className="w-full">
+          <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Sementes por Metros
+                <strong className={checkInput}>*</strong>
+                Tiros:
               </label>
               <Input
-                type="number"
-                placeholder="10"
-                id="semente_metros"
-                name="semente_metros"
+                style={{ background: '#e5e7eb'}}
+                disabled
+                placeholder=""
+                id="tiros"
+                name="tiros"
                 onChange={formik.handleChange}
-                value={formik.values.semente_metros}
+                value={layout.tiros}
               />
             </div>
-            <div className="w-full">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Disparos
+                <strong className={checkInput}>*</strong>
+                Disparos
               </label>
               <Input
-                type="text"
-                placeholder="1"
+                required
+                style={{ background: '#e5e7eb'}}
+                disabled
+                placeholder=""
                 id="disparos"
                 name="disparos"
                 onChange={formik.handleChange}
                 value={formik.values.disparos}
               />
             </div>
-            <div className="w-full">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Divisor
+                <strong className={checkInput}>*</strong>
+                Parcelas
               </label>
               <Input
-                type="text"
-                placeholder="1"
-                id="divisor"
-                name="divisor"
+                required
+                style={{ background: '#e5e7eb'}}
+                disabled
+                placeholder=""
+                id="parcelas"
+                name="parcelas"
                 onChange={formik.handleChange}
-                value={formik.values.divisor}
+                value={formik.values.parcelas}
               />
             </div>
           </div>
 
-          <div className="w-full
-            flex
-            justify-between
-            gap-6
-            mb-4
-          ">
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Largura
-              </label>
-              <InputMask
-                className="shadow
-                 appearance-none
-                 bg-white bg-no-repeat
-                 border border-solid border-gray-300
-                 rounded
-                 w-full
-                 py-2 px-3
-                 text-gray-900
-                 leading-tight
-                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-               "
-                mask="99.99"
-                type="text"
-                placeholder="25.2"
-                id="largura"
-                name="largura"
-                onChange={formik.handleChange}
-                value={formik.values.largura}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Comp. Físico
-              </label>
-              <InputMask
-                className="shadow
-                 appearance-none
-                 bg-white bg-no-repeat
-                 border border-solid border-gray-300
-                 rounded
-                 w-full
-                 py-2 px-3
-                 text-gray-900
-                 leading-tight
-                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-               "
-                mask="99.99"
-                type="text"
-                placeholder="25.2"
-                id="comp_fisico"
-                name="comp_fisico"
-                onChange={formik.handleChange}
-                value={formik.values.comp_fisico}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Comp. da Parcela
-              </label>
-              <InputMask
-                className="shadow
-                 appearance-none
-                 bg-white bg-no-repeat
-                 border border-solid border-gray-300
-                 rounded
-                 w-full
-                 py-2 px-3
-                 text-gray-900
-                 leading-tight
-                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-               "
-                mask="99.99"
-                type="text"
-                placeholder="25.2"
-                id="comp_parcela"
-                name="comp_parcela"
-                onChange={formik.handleChange}
-                value={formik.values.comp_parcela}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Comp. Corredor
-              </label>
-              <InputMask
-                className="shadow
-                 appearance-none
-                 bg-white bg-no-repeat
-                 border border-solid border-gray-300
-                 rounded
-                 w-full
-                 py-2 px-3
-                 text-gray-900
-                 leading-tight
-                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-               "
-                mask="99.99"
-                type="text"
-                placeholder="25.2"
-                id="comp_corredor"
-                name="comp_corredor"
-                onChange={formik.handleChange}
-                value={formik.values.comp_corredor}
-              />
-            </div>
-          </div>
-
-          <div className="w-full
-            flex 
-            justify-around
-            gap-6
-            mb-4
-          ">
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *T4 Inicial
-              </label>
-              <Input
-                type="number"
-                placeholder="10"
-                id="t4_inicial"
-                name="t4_inicial"
-                onChange={formik.handleChange}
-                value={formik.values.t4_inicial}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *T4 Final
-              </label>
-              <Input
-                type="text"
-                placeholder="1"
-                id="t4_final"
-                name="t4_final"
-                onChange={formik.handleChange}
-                value={formik.values.t4_final}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *DF Inicial
-              </label>
-              <Input
-                type="text"
-                placeholder="1"
-                id="df_inicial"
-                name="df_inicial"
-                onChange={formik.handleChange}
-                value={formik.values.df_inicial}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *DF Final
-              </label>
-              <Input
-                type="text"
-                placeholder="1"
-                id="df_final"
-                name="df_final"
-                onChange={formik.handleChange}
-                value={formik.values.df_final}
-              />
-            </div>
-          </div>
-
-          <div className="
-            w-full
-            h-4/6
-            my-4
-            mt-10
-          ">
-            {isLoaded ? (
-              <GoogleMap
-                mapContainerStyle={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 7,
-                  color: '#fff',
-                }}
-                center={position}
-                zoom={17}
-              // onLoad={onLoad}
-              // onUnmount={onUnmount}
-              >
-                <Marker
-                  position={position}
-                  options={{
-                    label: {
-                      text: titleLocal,
-                      className: "mb-14 text-gray-50"
-                    },
-                  }}
-                />
-              </GoogleMap>
-            ) : <></>}
-          </div>
-
-          <div className="
-            h-10 w-full
+          <div className="h-10 w-full
             flex
             gap-3
             justify-center
@@ -519,32 +590,169 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => { router.back(); }}
-              />
-            </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                icon={<MdDateRange size={18} />}
-                textColor="white"
-                onClick={() => { }}
+                onClick={() => router.back()}
               />
             </div>
           </div>
         </form>
+        <main className="h-full w-full
+          flex flex-col
+          items-start
+          gap-8
+        ">
+
+          <div  style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+            <MaterialTable 
+              style={{ background: '#f9fafb' }}
+              columns={columns}
+              data={disparos}
+              options={{
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20
+                },
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage
+              }}
+              components={{
+                Toolbar: () => (
+                  <div
+                  className='w-full max-h-96	
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                    bg-gray-50
+                    py-2
+                    px-5
+                    border-solid border-b
+                    border-gray-200
+                  '>
+
+                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+
+                    <div className='h-full flex items-center gap-2'>
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId='characters'>
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button 
+                                          value="Atualizar" 
+                                          bgColor='bg-blue-600' 
+                                          textColor='white' 
+                                          onClick={getValuesComluns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        genaratesProps.map((genarate, index) => (
+                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                          {(provided) => (
+                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                              <CheckBox
+                                                name={genarate.name}
+                                                title={genarate.title?.toString()}
+                                                value={genarate.value}
+                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                              />
+                                            </li>
+                                          )}
+                                        </Draggable>
+                                        ))
+                                      }
+                                      { provided.placeholder }
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
+
+                        <div className='h-12 flex items-center justify-center w-full'>
+                          <Button title="Download lista de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        </div>
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <>
+                  <div
+                    className="flex
+                      h-20 
+                      gap-2 
+                      pr-2
+                      py-5 
+                      bg-gray-50
+                    " 
+                    {...props}
+                  >
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <>
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled={true}
+                            />
+                        </>
+                      ))
+                    }
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1>= pages}
+                    />
+                  </div>
+                  </>
+                ) as any
+              }}
+            />
+          </div>
+        </main>
       </Content>
     </>
   );
-}
+};
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps:GetServerSideProps = async (context) => {
+  const PreferencesControllers = new UserPreferenceController();
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const  token  =  context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
-  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
-
-  const token = context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
@@ -552,13 +760,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  const apiLocal = await fetch(baseUrlLocal, requestOptions);
-  const resU = await fetch(`${baseUrlLayoult}/` + context.query.id, requestOptions)
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
+  const apiQuadra = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+  const layout = await apiQuadra.json();
 
-  const layoultEdit = await resU.json();
-  let local = await apiLocal.json();
-  local = local.response
-  return { props: { local, layoultEdit } }
+  const baseUrlDisparos = `${publicRuntimeConfig.apiUrl}/layout-children`;
+
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
+  const urlParameters: any = new URL(baseUrlDisparos);
+  urlParameters.search = new URLSearchParams(param).toString();
+  const id_layout = Number(context.query.id);
+
+  const api = await fetch(`${baseUrlDisparos}?id_layout=${id_layout}`, requestOptions);
+
+  let allChildrens: any = await api.json();
+
+  const totalItems = allChildrens.total;
+  allChildrens = allChildrens.response;
+  
+  return { 
+      props: { 
+        layout,
+        allChildrens,
+        totalItems,
+        itensPerPage,
+        filterAplication,
+        id_layout
+      } 
+    }
 }
-
-

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2'
-import { layoultQuadraService } from "src/services";
+import { layoutQuadraService } from "src/services";
 import InputMask from "react-input-mask";
 
 import {
@@ -107,7 +107,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
       validateInputs(values);
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela || !values.comp_corredor || !values.t4_inicial || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal) { return; }
 
-      await layoultQuadraService.update({
+      await layoutQuadraService.update({
         id: values.id,
         esquema: values.esquema,
         op: values.op,

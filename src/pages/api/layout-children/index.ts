@@ -1,20 +1,20 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import {LayoutQuadraController} from '../../../controllers/layout-quadra.controller';
+import {LayoutChildrenController} from '../../../controllers/layout-children.controller';
 import { apiHandler } from '../../../helpers/api';
 
 
 export default  apiHandler(handler);
 
  async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const Controller =  new LayoutQuadraController();
+    const Controller =  new LayoutChildrenController();
     switch (req.method) {
         case 'GET':
-          let result = await Controller.getAll(req.query);
+          let result = await Controller.listAll(req.query);
           res.status(200).json(result);
           break
         case 'POST':
-          let resultPost = await Controller.post(req.body);  
+          let resultPost = await Controller.create(req.body);  
           res.status(200).json(resultPost);
           break
         case 'PUT':

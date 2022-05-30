@@ -38,6 +38,7 @@ model culture {
   delineamento      delineamento[]
   epoca             epoca[]
   quadra            quadra[]
+  layout_quadra     layout_quadra[]
 }
 
 model department {
@@ -168,32 +169,45 @@ model local {
   created_at     DateTime         @default(now())
   created_by     Int
   status         Int              @default(1)
-  layoult_quadra layoult_quadra[]
   npe            npe[]
   quadra         quadra[]
 }
 
-model layoult_quadra {
+model layout_quadra {
   id             Int      @id @default(autoincrement())
+  id_culture     Int
   esquema        String
-  op             String
-  semente_metros Int
-  disparos       Int
-  divisor        Int
-  largura        String
-  comp_fisico    String
-  comp_parcela   String
-  comp_corredor  String
-  t4_inicial     Int
-  t4_final       Int
-  df_inicial     Int
-  df_final       Int
-  localId        Int
+  plantadeira    String
+  tiros          Int?
+  disparos       Int?
+  parcelas       Int?
   status         Int      @default(1)
   created_by     Int
   created_at     DateTime @default(now())
-  local          local    @relation(fields: [localId], references: [id])
+  Culture        culture    @relation(fields: [id_culture], references: [id])
+  children layout_children[]
 }
+
+model layout_children {
+  id             Int      @id @default(autoincrement())
+  id_layout      Int
+  sl             Int
+  sc             Int
+  s_aloc         Int
+  tiro           Int
+  cj             String
+  disparo        Int
+  dist           Int  
+  st             String
+  spc            String
+  scolheita      Int
+  tipo_parcela   String
+  status         Int      @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
+  Layout         layout_quadra    @relation(fields: [id_layout], references: [id])
+} 
+
 
 model quadra {
   id            Int        @id @default(autoincrement())

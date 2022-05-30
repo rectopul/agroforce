@@ -26,7 +26,7 @@ export class LayoutQuadraRepository {
 
     async create(Local: object | any) {
         Local.created_at = new Date();
-        let Result = await prisma.layoult_quadra.create({ data: Local })
+        let Result = await prisma.layout_quadra.create({ data: Local })
         return Result;
     }
 
