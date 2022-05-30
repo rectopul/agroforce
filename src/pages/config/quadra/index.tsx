@@ -18,6 +18,7 @@ import { UserPreferenceController } from "src/controllers/user-preference.contro
 import { quadraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../shared/utils/dropdown";
+import Swal from "sweetalert2";
 
 interface IFilter {
   filterStatus: object | any;
@@ -112,6 +113,21 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
+    
+    let parametersFilter = "filterStatus=" + 1 + "&cod_quadra=" + data.cod_quadra;
+
+    await quadraService.getAll(parametersFilter).then((response) => {     
+      if (response.total > 0) {
+        Swal.fire('Quadra não pode ser atualizada pois já existe uma quadra com esse código local ativo!');
+        return;
+      } else {
+        quadraService.update({
+          id,
+          status
+        });
+      }  
+    })
+
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -135,10 +151,6 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
       status
     } = quadra[index];
 
-    await quadraService.update({
-      id,
-      status
-    });
   };
 
   function columnsOrder(camposGerenciados: any): any {
