@@ -21,7 +21,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt} from "react-icons/fa";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
@@ -30,7 +30,7 @@ import { UserPreferenceController } from "src/controllers/user-preference.contro
 import { userPreferencesService, layoutChildrenService, quadraService, } from "src/services";
 import * as XLSX from 'xlsx';
 
-interface IFilter{
+interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
   orderBy: object | any;
@@ -38,7 +38,7 @@ interface IFilter{
 }
 interface IGenarateProps {
   name: string | undefined;
-  title:  string | number | readonly string[] | undefined;
+  title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
 
@@ -51,7 +51,7 @@ interface IData {
   layout: any;
 }
 
-export default function Atualizarquadra({allChildrens, totalItems, itensPerPage, filterAplication, id_layout, layout}: IData) {
+export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage, filterAplication, id_layout, layout }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -61,7 +61,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
@@ -83,9 +83,9 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
         local_preparo: values.local_preparo,
         local_plantio: values.local_plantio,
         larg_q: values.larg_.larg_q,
-        comp_p : values.larg_.comp_p,
+        comp_p: values.larg_.comp_p,
         linha_p: values.larg_.linha_p,
-        comp_c : values.larg_.comp_c,
+        comp_c: values.larg_.comp_c,
         esquema: values.larg_.esquema,
         tiros: values.tiros,
         disparos: values.larg_.disparos,
@@ -102,7 +102,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
   });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.layout_children ||{id:0, table_preferences: "id,sl,sc,s_aloc,tiro,cj,disparo,dist,st,spc,scolheita,tipo_parcela"};
+  const preferences = userLogado.preferences.layout_children || { id: 0, table_preferences: "id,sl,sc,s_aloc,tiro,cj,disparo,dist,st,spc,scolheita,tipo_parcela" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [disparos, setDisparos] = useState<any[]>(() => allChildrens);
@@ -129,9 +129,9 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos'},
-    { id: 1, name: 'Ativos'},
-    { id: 0, name: 'Inativos'},
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
   const take: number = itensPerPage;
@@ -175,7 +175,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
       copy[index].status = data.status;
       return copy;
     });
-    
+
     const { id, status } = disparos[index];
     
     await layoutChildrenService.update({id: id, status: status});
@@ -186,7 +186,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
     var arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] == 'id') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -206,7 +206,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
             ) : (
               <div className='h-10 flex'>
                 <div>
-                  <button 
+                  <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('#eba417')}
                   >
@@ -218,105 +218,97 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
           ),
         })
       }
-      
-      if (ObjetCampos[index] == 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        },);
-      }
 
-      if (ObjetCampos[index] == 'sl') {
+      if (ObjetCampos[index] === 'sl') {
         arrOb.push({
           title: "sl",
           field: "sl",
           sorting: false
-        },);
+        });
       }
 
-      
-      if (ObjetCampos[index] == 'sc') {
+
+      if (ObjetCampos[index] === 'sc') {
         arrOb.push({
           title: "sc",
           field: "sc",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 's_aloc') {
+      if (ObjetCampos[index] === 's_aloc') {
         arrOb.push({
           title: "saloc",
           field: "s_aloc",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'tiro') {
+      if (ObjetCampos[index] === 'tiro') {
         arrOb.push({
           title: "tiro",
           field: "tiro",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'cj') {
+      if (ObjetCampos[index] === 'cj') {
         arrOb.push({
           title: "cj",
           field: "cj",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'disparo') {
+      if (ObjetCampos[index] === 'disparo') {
         arrOb.push({
           title: "disparo",
           field: "disparo",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'dist') {
+      if (ObjetCampos[index] === 'dist') {
         arrOb.push({
           title: "dist",
           field: "dist",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'st') {
+      if (ObjetCampos[index] === 'st') {
         arrOb.push({
           title: "st",
           field: "st",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'spc') {
+      if (ObjetCampos[index] === 'spc') {
         arrOb.push({
           title: "spc",
           field: "spc",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'scolheita') {
+      if (ObjetCampos[index] === 'scolheita') {
         arrOb.push({
           title: "scolheita",
           field: "scolheita",
           sorting: false
-        },);
+        });
       }
 
-      if (ObjetCampos[index] == 'tipo_parcela') {
+      if (ObjetCampos[index] === 'tipo_parcela') {
         arrOb.push({
           title: "tipo parcela",
           field: "tipo_parcela",
           sorting: false
-        },);
+        });
       }
 
-      // if (ObjetCampos[index] == 'status') {
+      // if (ObjetCampos[index] === 'status') {
       //   arrOb.push({
       //     title: "Status",
       //     field: "status",
@@ -374,24 +366,24 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els:any = document.querySelectorAll("input[type='checkbox'");
+    var els: any = document.querySelectorAll("input[type='checkbox'");
     var selecionados = '';
     for (var i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
-    } 
+    }
     var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString- 1)
+    let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({table_preferences: campos,  userId: userLogado.id, module_id: 19 }).then((response) => {
-        userLogado.preferences.layout_children = {id: response.response.id, userId: preferences.userId, table_preferences: campos};
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 19 }).then((response) => {
+        userLogado.preferences.layout_children = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.layout_children = {id: preferences.id, userId: preferences.userId, table_preferences: campos};
-      await userPreferencesService.update({table_preferences: campos, id: preferences.id});
+      userLogado.preferences.layout_children = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -401,8 +393,8 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
-    if (!result)  return;
-    
+    if (!result) return;
+
     const items = Array.from(genaratesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
@@ -415,7 +407,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
     }
-    
+
     await layoutChildrenService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
@@ -431,7 +423,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "disparos");
-    
+
         // Buffer
         let buf = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
@@ -471,14 +463,14 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
   };
 
   useEffect(() => {
-    handlePagination();''
+    handlePagination(); ''
     handleTotalPages();
   }, [currentPage, pages]);
   return (
     <>
       <Head><title>Atualizar layout quadra</title></Head>
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -488,26 +480,12 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Código
-              </label>
-              <Input
-                style={{ background: '#e5e7eb'}}
-                disabled
-                required   
-                id="id"
-                name="id"
-                value={layout.id}
-              />
-            </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
                 Código esquema:
               </label>
               <Input
-                style={{ background: '#e5e7eb'}}
+                style={{ background: '#e5e7eb' }}
                 disabled
-                required   
+                required
                 id="esquema"
                 name="esquema"
                 value={layout.esquema}
@@ -518,9 +496,9 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                 Plantadeiras:
               </label>
               <Input
-                style={{ background: '#e5e7eb'}}
+                style={{ background: '#e5e7eb' }}
                 disabled
-                required 
+                required
                 id="plantadeira"
                 name="plantadeira"
                 value={layout.plantadeira}
@@ -534,7 +512,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                 Tiros:
               </label>
               <Input
-                style={{ background: '#e5e7eb'}}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 placeholder=""
                 id="tiros"
@@ -550,7 +528,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
               </label>
               <Input
                 required
-                style={{ background: '#e5e7eb'}}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 placeholder=""
                 id="disparos"
@@ -566,7 +544,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
               </label>
               <Input
                 required
-                style={{ background: '#e5e7eb'}}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 placeholder=""
                 id="parcelas"
@@ -601,8 +579,8 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
           gap-8
         ">
 
-          <div  style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
-            <MaterialTable 
+          <div style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+            <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={disparos}
@@ -618,7 +596,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
               components={{
                 Toolbar: () => (
                   <div
-                  className='w-full max-h-96	
+                    className='w-full max-h-96	
                     flex
                     items-center
                     justify-between
@@ -630,7 +608,7 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                     border-gray-200
                   '>
 
-                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -640,33 +618,33 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                               <Droppable droppableId='characters'>
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" { ...provided.droppableProps } ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
-                                        <Button 
-                                          value="Atualizar" 
-                                          bgColor='bg-blue-600' 
-                                          textColor='white' 
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor='bg-blue-600'
+                                          textColor='white'
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
                                         genaratesProps.map((genarate, index) => (
-                                        <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                          {(provided) => (
-                                            <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(genarate.value as string)}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
+                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={genarate.name}
+                                                  title={genarate.title?.toString()}
+                                                  value={genarate.value}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         ))
                                       }
-                                      { provided.placeholder }
+                                      {provided.placeholder}
                                     </ul>
                                   )
                                 }
@@ -676,41 +654,41 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                         </div>
                       </div>
 
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Download lista de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
-                        </div>
+                      <div className='h-12 flex items-center justify-center w-full'>
+                        <Button title="Download lista de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
                   <>
-                  <div
-                    className="flex
+                    <div
+                      className="flex
                       h-20 
                       gap-2 
                       pr-2
                       py-5 
                       bg-gray-50
-                    " 
-                    {...props}
-                  >
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <>
+                    "
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <>
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
@@ -719,24 +697,24 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
                               textColor="white"
                               disabled={true}
                             />
-                        </>
-                      ))
-                    }
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button 
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1>= pages}
-                    />
-                  </div>
+                          </>
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   </>
                 ) as any
               }}
@@ -748,10 +726,10 @@ export default function Atualizarquadra({allChildrens, totalItems, itensPerPage,
   );
 };
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
 
   const requestOptions: RequestInit | undefined = {
@@ -778,15 +756,15 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const totalItems = allChildrens.total;
   allChildrens = allChildrens.response;
-  
-  return { 
-      props: { 
-        layout,
-        allChildrens,
-        totalItems,
-        itensPerPage,
-        filterAplication,
-        id_layout
-      } 
+
+  return {
+    props: {
+      layout,
+      allChildrens,
+      totalItems,
+      itensPerPage,
+      filterAplication,
+      id_layout
     }
+  }
 }

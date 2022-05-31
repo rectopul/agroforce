@@ -4,31 +4,31 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-            { id: 'Esquema', name: '*Código Esquema'}, 
-            { id: 'Plantadeiras', name: '*Plantadeiras'},
-            { id: 'SL', name: '*SL'},
-            { id: 'SC', name: '*SC'},
-            { id: 'SALOC', name: '*SALOC'},
-            { id: 'Tiro', name: '*Tiro'},
-            { id: 'Disparo', name: '*Disparo'},
-            { id: 'CJ', name: '*CJ'},
-            { id: 'Dist', name: '*Dist'},
-            { id: 'ST', name: '*ST'},
-            { id: 'SPC', name: '*SPC'},
-            { id: 'SColheita', name: '*SColheita'},
-            { id: 'TipoParcela', name: '*Tipo_Parcela'},
-          ];
+  { id: 'Esquema', name: '*Código Esquema' },
+  { id: 'Plantadeiras', name: '*Plantadeiras' },
+  { id: 'SL', name: '*SL' },
+  { id: 'SC', name: '*SC' },
+  { id: 'SALOC', name: '*SALOC' },
+  { id: 'Tiro', name: '*Tiro' },
+  { id: 'Disparo', name: '*Disparo' },
+  { id: 'CJ', name: '*CJ' },
+  { id: 'Dist', name: '*Dist' },
+  { id: 'ST', name: '*ST' },
+  { id: 'SPC', name: '*SPC' },
+  { id: 'SColheita', name: '*SColheita' },
+  { id: 'TipoParcela', name: '*Tipo_Parcela' },
+];
 
 export default function ImportacaoPlanilha({ config }: any) {
   return (
     <>
       <Head><title>Importação de planilha Layout Quadra</title></Head>
 
-        <ImportPlanilha
-          data={data}
-          configSalva ={(config != "") ? config[0].fields : []}
-          moduleId={5}
-        />
+      <ImportPlanilha
+        data={data}
+        configSalva={(config !== "") ? config[0].fields : []}
+        moduleId={5}
+      />
     </>
   );
 }

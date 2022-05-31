@@ -206,17 +206,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input
-                disabled
-                type="text"
-                value={data.id}
-                style={{ background: '#e5e7eb' }}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
               <Input

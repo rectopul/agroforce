@@ -16,9 +16,6 @@ import {
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
 export interface IUpdateCulture {
   id: number;
   name: string;
@@ -32,8 +29,8 @@ export default function Cultura(culture: IUpdateCulture) {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -47,8 +44,8 @@ export default function Cultura(culture: IUpdateCulture) {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) return; 
-      
+      if (!values.name) return;
+
       await cultureService.updateCulture({
         id: culture.id,
         name: capitalize(formik.values.name),
@@ -69,60 +66,53 @@ export default function Cultura(culture: IUpdateCulture) {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name"); 
-      inputName.style.borderColor= 'red'; 
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
     } else {
       let inputName: any = document.getElementById("name");
-      inputName.style.borderColor= '';
+      inputName.style.borderColor = '';
     }
   }
 
   return (
     <>
-     <Head>
+      <Head>
         <title>Atualizar cultura</title>
       </Head>
-      
+
       <Content contentHeader={tabsDropDowns}>
-      <form 
-        className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+        <form
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
-        onSubmit={formik.handleSubmit}
-      >
-        <h1 className="text-2xl">Nova cultura</h1>
+          onSubmit={formik.handleSubmit}
+        >
+          <h1 className="text-2xl">Nova cultura</h1>
 
-        <div className="w-full
+          <div className="w-full
           flex
           justify-around
           gap-2
           mt-4
           mb-4
         ">
-          <div className="w-full">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              *Código
-            </label>
-            <Input value={culture.id} disabled style={{ background: '#e5e7eb' }} />
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                max="50"
+                placeholder="ex: Soja"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
           </div>
 
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Nome
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text" 
-              max="50" 
-              placeholder="ex: Soja"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
-          </div>
-        </div>
-       
-        <div className="
+          <div className="
             h-10 w-full
             flex
             gap-3
@@ -130,7 +120,7 @@ export default function Cultura(culture: IUpdateCulture) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -146,25 +136,25 @@ export default function Cultura(culture: IUpdateCulture) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
-      </form>
+        </form>
       </Content>
     </>
   );
 }
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-  const  token  =  context.req.cookies.token;
-  
+  const token = context.req.cookies.token;
+
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiCulture = await fetch(`${baseUrl}/` + context.query.id, requestOptions);

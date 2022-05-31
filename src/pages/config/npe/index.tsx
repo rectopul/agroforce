@@ -123,8 +123,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       //let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_safra=" + userLogado.safras.safra_selecionada;
       await npeService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setTotalItems(response.total);
         setNPE(response.response);
+        setTotalItems(response.total);
         setCurrentPage(0)
       })
     },
@@ -171,10 +171,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             )
           ),
         })
-      }
-
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
       }
       if (ObjetCampos[item] === 'local') {
         arrOb.push({ title: "Local", field: "local.cod_local", sorting: false })

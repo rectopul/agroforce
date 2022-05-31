@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-import InputMask from 'react-input-mask';
 import { safraService } from 'src/services';
 import Swal from "sweetalert2";
 import {
@@ -14,10 +13,6 @@ import {
   Radio
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
-
-
-
-
 
 interface ISafraProps {
   id_culture: number;
@@ -42,10 +37,10 @@ export default function Safra() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
   const [checkeBox, setCheckeBox] = useState<boolean>();
@@ -67,14 +62,14 @@ export default function Safra() {
     onSubmit: async (values) => {
       const { main_safra, ...data } = values;
 
-      const { 
-        created_by, 
-        id_culture, 
-        status, 
+      const {
+        created_by,
+        id_culture,
+        status,
         ...inputs
       } = data;
 
-      validateInputs(inputs);
+      if (!validateInputs(inputs)) return;
       let plantingStartTime;
       let plantingEndTime;
 
@@ -85,7 +80,7 @@ export default function Safra() {
           new Date(formik.values.plantingStartTime)
         );
       }
-      
+
       if (values.plantingEndTime) {
         plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
           new Date(formik.values.plantingEndTime)
@@ -104,7 +99,6 @@ export default function Safra() {
           Swal.fire('Safra cadastrada com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       });
@@ -114,13 +108,16 @@ export default function Safra() {
   function validateInputs(values: Input) {
     if (!values.year) {
       let inputYear: any = document.getElementById("year");
-      inputYear.style.borderColor= 'red';
+      inputYear.style.borderColor = 'red';
+      Swal.fire("Preencha os campos obrigatórios")
+      return false
     } else {
       let inputYear: any = document.getElementById("year");
-      inputYear.style.borderColor= '';
+      inputYear.style.borderColor = '';
+      return true
     }
   };
-  
+
   return (
     <>
       <Head>
@@ -128,7 +125,7 @@ export default function Safra() {
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
           onSubmit={formik.handleSubmit}
         >
@@ -141,12 +138,10 @@ export default function Safra() {
                 Ano
               </label>
 
-              <InputMask
-                mask="9999a_9999a"
-                required
+              <Input
                 id="year"
                 name="year"
-                placeholder=""
+                placeholder="___________"
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="
@@ -167,24 +162,24 @@ export default function Safra() {
               />
             </div>
 
-    
+
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                
+
                 Período ideal de início de plantio
               </label>
               <Input
-                type="date" 
+                type="date"
                 id="plantingStartTime"
                 name="plantingStartTime"
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
             </div>
-            
+
             <div className="w-2/4">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                
+
                 Período ideal do fim do plantio
               </label>
               <Input
@@ -204,7 +199,7 @@ export default function Safra() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -220,7 +215,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<MdDateRange size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

@@ -112,9 +112,10 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       const parametersFilter = 'filterStatus=' + values.filterStatus + '&filterGenotipo=' + values.filterGenotipo + '&id_culture=' + cultureId + '&filterGenealogy=' + values.filterGenealogy + '&filterCruza=' + values.filterCruza;
       setCookies('filterBeforeEdit', parametersFilter);
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
         setGenotipo(response.response);
         setTotalItems(response.total)
-        setFilter(parametersFilter);
+        setCurrentPage(0)
       });
     }
   });
@@ -194,14 +195,6 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                 </div>
               )
           )
-        });
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: 'Código',
-          field: 'id',
-          sorting: false
         });
       }
       if (ObjetCampos[index] === 'genotipo') {

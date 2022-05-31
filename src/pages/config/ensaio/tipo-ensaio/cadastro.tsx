@@ -46,8 +46,8 @@ export default function NovoLocal() {
       status: 1
     },
     onSubmit: async (values) => {
-      validateInputs(values);
-      if (!values.name) { return; }
+
+      if (!validateInputs(values)) { return }
 
       await typeAssayService.create({
         id_culture: parseInt(culture),
@@ -66,7 +66,16 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.name) {
+      let inputname: any = document.getElementById("name");
+      inputname.style.borderColor = 'red';
+      Swal.fire("Preencha os campos obrigatórios")
+      return false
+    } else {
+      let inputname: any = document.getElementById("name");
+      inputname.style.borderColor = '';
+      return true
+    }
   }
 
   return (

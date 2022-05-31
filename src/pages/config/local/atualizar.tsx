@@ -159,24 +159,6 @@ export default function AtualizarLocal({ uf, localEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input
-                type="text"
-                placeholder="11111"
-                style={{ background: '#e5e7eb' }}
-                max="40"
-                id="id"
-                name="id"
-                disabled
-                readOnly
-                onChange={formik.handleChange}
-                value={formik.values.id}
-              />
-            </div>
-
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Local
               </label>
               <Input

@@ -26,10 +26,10 @@ export default function Safra() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
@@ -42,7 +42,7 @@ export default function Safra() {
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
-      if (formik.values.name === '') throw new Error('Dados inválidos');
+      if (!validateInputs(values)) return;
 
       await departmentService.create({
         name: capitalize(formik.values.name),
@@ -58,7 +58,20 @@ export default function Safra() {
       });
     },
   });
-  
+
+  function validateInputs(values: any) {
+    if (!values.name) {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
+      Swal.fire("Preencha os campos obrigatórios");
+      return false
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = '';
+      return true
+    }
+  }
+
   return (
     <>
       <Head>
@@ -66,21 +79,34 @@ export default function Safra() {
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
+        <form
+          className="
+            w-full 
+            bg-white 
+            shadow-md 
+            rounded 
+            px-8 
+            pt-6 
+            pb-8 
+            mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Novo setor</h1>
 
-          <div className="w-full flex justify-between items-start gap-5">
+          <div className="
+            w-full
+            flex
+            gap-2
+            mt-4
+            mb-4
+          ">
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
+                <strong className={checkInput}>* </strong>
                 Nome
               </label>
               <Input
                 type="text"
-                required
                 maxLength={50}
                 id="name"
                 name="name"
@@ -91,14 +117,16 @@ export default function Safra() {
             </div>
           </div>
 
-          <div className="h-10 w-full
+          <div className="
+            h-10 
+            w-full
             flex
             gap-3
             justify-center
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -114,7 +142,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

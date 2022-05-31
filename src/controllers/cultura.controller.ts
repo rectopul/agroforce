@@ -138,7 +138,7 @@ export class CulturaController {
       const loteAlreadyExists = await this.culturaRepository.findByName(data.name);
 
       if (loteAlreadyExists) {
-        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+        return { status: 400, message: "Cultura ja cadastrado" };
       }
 
       await this.culturaRepository.create(data);
@@ -168,7 +168,7 @@ export class CulturaController {
       const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
       if (cultureAlreadyExists && cultureAlreadyExists.id !== culture.id) {
-        return { status: 400, message: "Nome da cultura já existente. favor consultar os inativos" };
+        return { status: 400, message: "Cultura ja cadastrada" };
       }
 
       culture.name = data.name;
