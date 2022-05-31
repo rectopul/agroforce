@@ -85,7 +85,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
@@ -127,6 +127,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setQuadra(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0);
       })
     },
   });
@@ -360,7 +362,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    await layoutQuadraService.update({id: id, status: status});
+    await layoutQuadraService.update({ id: id, status: status });
     const index = quadras.findIndex((quadras) => quadras.id === id);
 
     if (index === -1) {
@@ -400,7 +402,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
 
     await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response)
       }
     })
@@ -443,7 +445,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
 
     await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response)
       }
     });
@@ -477,9 +479,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
-    
+
     await layoutQuadraService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         const newData = quadras.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
@@ -526,7 +528,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       parametersFilter = parametersFilter + "&" + filter;
     }
     await layoutQuadraService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response);
       }
     });
@@ -535,7 +537,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 import { ModelHeader } from './ModelHeader';
 
@@ -20,13 +22,11 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
         pr-2
         text-4xl
       ">
-        <div className='w-96 gap-2 flex justify-between items-center pr-3'>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="/">
-            <img src="/images/logo-tmg.png" alt="TMG" className='w-32 h-24
-            '/> 
-          </a>
-          { headerSelects }
+        <div className='w-96 gap-2 flex justify-between items-center pr-3 mr-5'>
+          <Link passHref href="/">
+            <Image src="/images/logo-tmg.png" alt="TMG" width={180} height={160} />
+          </Link>
+          {headerSelects}
         </div>
 
         <div className='h-20
@@ -34,7 +34,7 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
           w-content-main-header
           text-white
         '>
-          { children }
+          {children}
         </div>
 
         <ModelHeader

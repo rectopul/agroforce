@@ -119,13 +119,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       filterParcelas: '',
       orderBy: '',
       typeOrder: '',
-    },  
+    },
     onSubmit: async (values) => {
       let parametersFilter = "&filterStatus=" + values.filterStatus + "&filterEsquema=" + values.filterEsquema + "&filterDisparos=" + values.filterDisparos + "&filterTiros=" + values.filterTiros + "&filterPlantadeira=" + values.filterPlantadeira + "&filterParcelas=" + values.filterParcelas;
       await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setQuadra(response.response);
+        setTotaItems(response.total);
+        setFilter(parametersFilter);
+        setQuadra(response.response);
       })
     },
   });
@@ -172,10 +172,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           ),
         })
       }
-
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
-      }
       if (ObjetCampos[item] === 'esquema') {
         arrOb.push({
           title: (
@@ -194,20 +190,20 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       if (ObjetCampos[item] === 'local') {
         arrOb.push({ title: "Local", field: "local", sorting: false })
       }
-      
-      if (ObjetCampos[item] == 'plantadeira') {
+
+      if (ObjetCampos[item] === 'plantadeira') {
         arrOb.push({ title: "Plantadeira", field: "plantadeira", sorting: false })
       }
 
-      if (ObjetCampos[item] == 'tiros') {
+      if (ObjetCampos[item] === 'tiros') {
         arrOb.push({ title: "Tiros", field: "tiros", sorting: false })
       }
 
-      if (ObjetCampos[item] == 'disparos') {
+      if (ObjetCampos[item] === 'disparos') {
         arrOb.push({ title: "Disparos", field: "disparos", sorting: false })
       }
 
-      if (ObjetCampos[item] == 'parcelas') {
+      if (ObjetCampos[item] === 'parcelas') {
         arrOb.push({ title: "Parcelas", field: "parcelas", sorting: false })
       }
 
@@ -305,7 +301,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       status = 0;
     }
-    await layoutQuadraService.update({id: id, status: status});
+    await layoutQuadraService.update({ id: id, status: status });
     const index = quadras.findIndex((quadras) => quadras.id === id);
 
     if (index === -1) {
@@ -345,7 +341,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
 
     await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response)
       }
     })
@@ -388,7 +384,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
 
     await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response)
       }
     });
@@ -422,9 +418,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     if (filterAplication) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
-    
+
     await layoutQuadraService.getAll(filterAplication).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         const newData = quadras.map((row) => {
           if (row.status === 0) {
             row.status = "Inativo" as any;
@@ -471,7 +467,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       parametersFilter = parametersFilter + "&" + filter;
     }
     await layoutQuadraService.getAll(parametersFilter).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setQuadra(response.response);
       }
     });
@@ -509,7 +505,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   justify-center
                   pb-2
                 ">
-            
+
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
@@ -520,8 +516,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Esquema
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="Esquema"
                       max="40"
                       id="filterEsquema"
@@ -546,8 +542,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Tiros
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="Tiros"
                       max="40"
                       id="filterTiros"
@@ -559,8 +555,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Disparos
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="Disparos"
                       max="40"
                       id="filterDisparos"
@@ -572,8 +568,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Numero Parcelas
                     </label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="Parcelas"
                       max="40"
                       id="filterParcelas"
@@ -626,18 +622,18 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     border-solid border-b
                     border-gray-200
                   '>
-                              <div className='h-12'>
-                      <Button 
+                    <div className='h-12'>
+                      <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="layout-quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
-                    <strong className='text-blue-600'>Total registrado: { itemsTotal }</strong>
+                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2
                     '>
@@ -685,11 +681,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {downloadExcel()}} />
+                        <Button title="Download lista de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
-                          <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {}} href="layout-quadra/importar-planilha/config-planilha"  />
-                        </div>
+                        <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="layout-quadra/importar-planilha/config-planilha" />
+                      </div>
                     </div>
                   </div>
                 ),
@@ -777,7 +773,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   } as RequestInit | undefined;
 
   const layout = await fetch(urlParameters.toString(), requestOptions);
-  const Response =  await layout.json();
+  const Response = await layout.json();
   const allItems = Response.response;
   const totalItems = Response.total;
   return {

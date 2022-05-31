@@ -70,7 +70,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
@@ -93,11 +93,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       setCookies("filterBeforeEdit", parametersFilter)
       await typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setTypeAssay(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
@@ -145,9 +147,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         })
       }
 
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
-      }
       if (ObjetCampos[item] === 'name') {
         arrOb.push({
           title: (
@@ -394,7 +393,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

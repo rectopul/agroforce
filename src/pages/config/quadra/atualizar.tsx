@@ -222,15 +222,6 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
           ),
         })
       }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
-      }
-
       if (ObjetCampos[index] === 'divisor') {
         arrOb.push({
           title: "Divisor",

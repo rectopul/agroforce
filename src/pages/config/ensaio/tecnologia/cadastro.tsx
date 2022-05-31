@@ -49,8 +49,8 @@ export default function NovoLocal() {
       status: 1
     },
     onSubmit: async (values) => {
-      validateInputs(values);
-      if (!values.name) { return; }
+
+      if (!validateInputs(values)) return
 
       await tecnologiaService.create({
         id_culture: parseInt(culture),
@@ -71,7 +71,20 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.name || !values.cod_tec) {
+      let inputname: any = document.getElementById("name");
+      let inputcod_tec: any = document.getElementById("cod_tec");
+
+      inputname.style.borderColor = 'red';
+      inputcod_tec.style.borderColor = 'red';
+      Swal.fire("Preencha os campos obrigatórios")
+      return false;
+    }
+    else {
+      let inputname: any = document.getElementById("name");
+      inputname.style.borderColor = '';
+      return true;
+    }
   }
 
   return (
@@ -103,7 +116,6 @@ export default function NovoLocal() {
               <Input
                 type="text"
                 placeholder="TA"
-                required
                 id="cod_tec"
                 name="cod_tec"
                 maxLength={2}
@@ -119,7 +131,6 @@ export default function NovoLocal() {
                 type="text"
                 placeholder="Nome"
                 id="name"
-                required
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}

@@ -67,7 +67,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -102,10 +102,11 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     },
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_genotipo;
-      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LoteGenotipo[]) => {
-        setLotes(response);
-        setTotaItems(response.length);
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
+        setLotes(response);
+        setTotalItems(response.total);
+        setCurrentPage(0)
       })
     },
   });
@@ -408,7 +409,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

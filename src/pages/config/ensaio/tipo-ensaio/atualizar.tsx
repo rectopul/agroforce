@@ -96,21 +96,6 @@ export default function NovoLocal({ typeAssayEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input
-                disabled
-                type="text"
-                placeholder="Nome"
-                style={{ background: '#e5e7eb' }}
-                id="id"
-                name="id"
-                onChange={formik.handleChange}
-                value={formik.values.id}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
               <Input
