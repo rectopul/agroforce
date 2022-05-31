@@ -435,7 +435,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
                     />
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
+                  {/* <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Data do início do plantio
                     </label>
@@ -479,7 +479,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
                           focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                         "
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="h-16 w-32 mt-3">
