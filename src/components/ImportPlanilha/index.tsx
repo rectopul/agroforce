@@ -106,16 +106,16 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   }
 
   function validateColumns(value: any) {
-    let Terste = [];
+    let allLetters = [];
     let letra = "";
     setQuantityColumns(value);
     for (let i = 0; i <= value; i++) {
       letra = toLetter(i);
       if (letra !== "") {
-        Terste.push(letra)
+        allLetters.push(letra)
       }
     }
-    setLetras(Terste);
+    setLetras(allLetters);
   }
 
   return (
@@ -168,7 +168,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
             text-white
             px-2
           ">
-            <span className="h-full flex items-center">Coluna do Excel</span>
+            <span className="h-full w-1/12 flex items-center">Coluna do Excel</span>
           </div>
         </div>
 
@@ -194,8 +194,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 "
             onSubmit={formik.handleSubmit}
           >
-            <main style={{ height: '100%' }} className="relative bottom-32 w-importation-content mt-2.5 -mb-28 flex flex-col overflow-x-scroll">
-              <div className="absolute flex pl-2 justify-start items-center py-9 gap-3 text-white">
+            <main className="relative bottom-24 py-4 w-importation-content mb-2 flex flex-col overflow-x-scroll h-1/12">
+              <div className="absolute flex pl-2 justify-start items-center gap-3 text-white">
                 {Letras.map((item, index) => {
                   if (index < quantityColumns) {
                     {
@@ -212,8 +212,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                   }
                 })}
               </div>
-              <div className="flex pl-2 justify-start items-center py-9 gap-3">
-                <div className="flex pl-2 justify-start items-center py-7 gap-3 mt-28" >
+              <div className="flex  justify-start items-center py-8 gap-3">
+                <div className="flex pl-2 justify-start items-center gap-3 py-3 mt-16 ml-2" >
                   {(quantityColumns > 0)
                     ?
                     Array(quantityColumns).fill('').map((_, index) => (
