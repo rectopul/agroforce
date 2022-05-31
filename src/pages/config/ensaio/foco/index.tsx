@@ -65,7 +65,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -98,11 +98,13 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + userLogado.userCulture.cultura_selecionada;
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + userLogado.userCulture.cultura_selecionada;
       setCookies("filterBeforeEdit", parametersFilter)
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setFocos(response.response);
         setFilter(parametersFilter);
+        setFocos(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
@@ -167,14 +169,6 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
             )
           ),
         })
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false,
-        });
       }
       if (ObjetCampos[index] === 'name') {
         arrOb.push({
@@ -398,7 +392,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

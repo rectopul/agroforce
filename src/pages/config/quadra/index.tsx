@@ -71,7 +71,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => allquadra);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Código", value: "id" },
@@ -106,17 +106,19 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setQuadra(response.response);
         setFilter(parametersFilter)
+        setQuadra(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    
+
     let parametersFilter = "filterStatus=" + 1 + "&cod_quadra=" + data.cod_quadra;
 
-    await quadraService.getAll(parametersFilter).then((response) => {     
+    await quadraService.getAll(parametersFilter).then((response) => {
       if (response.total > 0) {
         Swal.fire('Quadra não pode ser atualizada pois já existe uma quadra com esse código local ativo!');
         return;
@@ -125,7 +127,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
           id,
           status
         });
-      }  
+      }
     })
 
     if (data.status === 0) {
@@ -189,14 +191,6 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
             )
           ),
         })
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
       }
       if (ObjetCampos[index] === 'cod_quadra') {
         arrOb.push({
@@ -264,7 +258,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
                   bgColor="bg-blue-600"
                   textColor="white"
                   title={`Editar`}
-                  onClick={() =>{router.push(`/config/quadra/atualizar?id=${rowData.id}`)}}
+                  onClick={() => { router.push(`/config/quadra/atualizar?id=${rowData.id}`) }}
                 />
               </div>
               {rowData.status === 1 ? (
@@ -408,7 +402,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>
@@ -500,7 +494,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
                     border-gray-200
                   '>
                     <div className='h-12'>
-                      <Button 
+                      <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"

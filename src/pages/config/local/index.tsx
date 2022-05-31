@@ -26,7 +26,7 @@ import { getDegreesCelsius } from "../../../shared/utils/formatDegreesCelsius";
 
 interface ILocalProps {
   id: Number | any;
-  cod_local: String | any; Fazenda
+  cod_local: String | any;
   cod_red_local: String | any;
   pais: String | any;
   uf: String | any;
@@ -176,10 +176,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             )
           ),
         })
-      }
-
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
       }
 
       if (ObjetCampos[item] === 'cod_local') {

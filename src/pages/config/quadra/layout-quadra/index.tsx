@@ -172,10 +172,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           ),
         })
       }
-
-      if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
-      }
       if (ObjetCampos[item] === 'esquema') {
         arrOb.push({
           title: (

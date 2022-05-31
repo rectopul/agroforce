@@ -29,8 +29,8 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
@@ -65,27 +65,13 @@ export default function AtualizarSafra(item: IDepartmentProps) {
     <>
       <Head><title>Atualizar setor</title></Head>
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar setor</h1>
 
           <div className="w-full flex gap-5 mt-4">
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                required
-                disabled
-                id="id"
-                name="id"
-                value={formik.values.id}
-              />
-            </div>
-
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
@@ -110,7 +96,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             mt-12
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -125,7 +111,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -135,20 +121,20 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   );
 };
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlList = `${publicRuntimeConfig.apiUrl}/department`;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiItem = await fetch(`${baseUrlList}/` + context.query.id, requestOptions);
 
   const item = await apiItem.json();
 
-  return { props: item  }
+  return { props: item }
 }

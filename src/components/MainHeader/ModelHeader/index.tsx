@@ -6,7 +6,7 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineExitToApp } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { userService } from "../../../services";
- 
+
 interface IModelProps {
   name: string;
   avatar: string;
@@ -21,8 +21,8 @@ export function ModelHeader({ name, avatar }: IModelProps) {
   const [user, setUser] = useState();
 
   useEffect(() => {
-      const subscription = userService.user.subscribe((x: any | undefined) => setUser(x));
-      return () => subscription.unsubscribe();
+    const subscription = userService.user.subscribe((x: any | undefined) => setUser(x));
+    return () => subscription.unsubscribe();
   }, []);
 
   function logout() {
@@ -31,47 +31,44 @@ export function ModelHeader({ name, avatar }: IModelProps) {
 
   // only show nav when logged in
   if (!user) return null;
-  
+
   return (
     <>
       <Menu as="div" className="relative inline-block text-left shadow z-50">
-        <div>
-          <Menu.Button
-            type='button'
-            className='h-20 w-72
-              flex items-center justify-around
+        <Menu.Button
+          type='button'
+          className='h-20 w-60
+              flex items-center justify-end 
             '
-            // rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500
-            id="menu-button"
-            aria-expanded="true"
-            aria-haspopup="true"
-          >
-            
-            {
-              !avatar || avatar === '' ? (
-                <div className='h-16 w-20
-                  flex items-center justify-center
+          // rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500
+          id="menu-button"
+          aria-expanded="true"
+          aria-haspopup="true"
+        >
+
+          {
+            !avatar || avatar === '' ? (
+              <div className='h-16 w-20
+                  flex items-center justify-center 
                   rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                 '>
-                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <img src='/images/logo-agro-branco.png' alt={name} className='h-14 w-14
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src='/images/logo-agro-branco.png' alt={name} className='h-14 w-14 ml-16
                       rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                     '/>
-                </div>
-              ) : (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={String(avatar)} alt={name} className='h-16 w-16
+              </div>
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={String(avatar)} alt={name} className='h-14 w-16 ml-16
                   rounded-bl-full	rounded-br-full	rounded-tr-full	rounded-tl-full border-2 border-white
                 '/>
-              )
-            }
-            <span style={{textAlign:'left', marginLeft: '10px'}} className='w-full text-white text-base'>
-              { name }
-            </span>
-          </Menu.Button>
-        </div>
-    
-      
+            )
+          }
+          <span className='w-full text-white text-base mr-auto'>
+            {name}
+          </span>
+        </Menu.Button>
+
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"

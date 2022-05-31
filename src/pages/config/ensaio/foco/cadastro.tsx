@@ -29,23 +29,23 @@ export default function Cadastro() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
-  const grupos =  [
-    {id: 1, name: "Grupo 1"},
-    {id: 2, name: "Grupo 2"},
-    {id: 3, name: "Grupo 3"},
-    {id: 4, name: "Grupo 4"},
-    {id: 5, name: "Grupo 5"},
-    {id: 6, name: "Grupo 6"},
-    {id: 7, name: "Grupo 7"}
+  const grupos = [
+    { id: 1, name: "Grupo 1" },
+    { id: 2, name: "Grupo 2" },
+    { id: 3, name: "Grupo 3" },
+    { id: 4, name: "Grupo 4" },
+    { id: 5, name: "Grupo 5" },
+    { id: 6, name: "Grupo 6" },
+    { id: 7, name: "Grupo 7" }
   ];
 
   const formik = useFormik<ICreateFoco>({
@@ -56,6 +56,9 @@ export default function Cadastro() {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+
+      if (!validateInputs(values)) return
+
       await focoService.create({
         name: capitalize(formik.values.name),
         id_culture: parseInt(culture),
@@ -66,7 +69,6 @@ export default function Cadastro() {
           Swal.fire('Foco cadastrado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
           Swal.fire(response.message)
         }
       }).finally(() => {
@@ -75,59 +77,77 @@ export default function Cadastro() {
     },
   });
 
+  function validateInputs(values: any) {
+    if (!values.name || values.group === 0) {
+      let inputname: any = document.getElementById("name");
+      let inputGroup: any = document.getElementById("group");
+
+      inputname.style.borderColor = 'red';
+      inputGroup.style.borderColor = 'red';
+
+      Swal.fire("Preencha os campos obrigatórios")
+      return false;
+    }
+    else {
+      let inputname: any = document.getElementById("name");
+      inputname.style.borderColor = '';
+      return true;
+    }
+  }
+
   return (
     <>
-     <Head>
+      <Head>
         <title>Novo foco</title>
       </Head>
-      
+
       <Content contentHeader={tabsDropDowns}>
-      <form 
-        className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+        <form
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
-        onSubmit={formik.handleSubmit}
-      >
-        <h1 className="text-2xl">Novo foco</h1>
+          onSubmit={formik.handleSubmit}
+        >
+          <h1 className="text-2xl">Novo foco</h1>
 
-        <div className="w-1/2
+          <div className="w-1/2
             flex 
             justify-around
             gap-6
             mt-4
             mb-4
         ">
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Nome
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text" 
-              max="50" 
-              placeholder="ex: Foco"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
-          </div>
-          <div className="w-full h-10">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                  *Grupos
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                max="50"
+                placeholder="ex: Foco"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Grupos
               </label>
               <Select
-                  values={grupos}
-                  id="group"
-                  name="group"
-                  // required
-                  onChange={formik.handleChange}
-                  value={formik.values.group}
-                  selected={false}
+                values={grupos}
+                id="group"
+                name="group"
+                // required
+                onChange={formik.handleChange}
+                value={formik.values.group}
+                selected={false}
               />
+            </div>
           </div>
-        </div>
 
-        <div className="
+          <div className="
             h-10 w-full
             flex
             gap-3
@@ -135,7 +155,7 @@ export default function Cadastro() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -151,11 +171,11 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
-      </form>
+        </form>
       </Content>
     </>
   );

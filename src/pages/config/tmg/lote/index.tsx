@@ -108,9 +108,9 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     onSubmit: async (values) => {
       const parametersFilter = 'filterStatus=' + values.filterStatus + '&filterGenotipo=' + values.filterGenotipo + '&filterName=' + values.filterName /* + "&filterVolume=" + values.filterVolume */ + '&id_portfolio=' + id_genotipo;
       await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
         setLotes(response.response);
         setTotalItems(response.total)
-        setFilter(parametersFilter);
         setCurrentPage(0)
       });
     }
@@ -177,14 +177,6 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                 </div>
               )
           )
-        });
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: 'Código',
-          field: 'id',
-          sorting: false
         });
       }
       if (ObjetCampos[index] === 'genotipo') {

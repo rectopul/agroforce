@@ -111,8 +111,8 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
       setCookies("filterBeforeEdit", parametersFilter)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setTotalItems(response.total)
         setSafras(response.response);
+        setTotalItems(response.total)
         setCurrentPage(0)
       })
     },
@@ -189,14 +189,6 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
               </div>
             )
           ),
-        })
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
         })
       }
       if (ObjetCampos[index] === 'year') {

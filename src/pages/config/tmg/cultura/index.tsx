@@ -65,7 +65,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
@@ -102,8 +102,10 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
       setCookies("filterBeforeEdit", parametersFilter)
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
-        setCultures(response.response);
         setFilter(parametersFilter);
+        setCultures(response.response);
+        setTotalItems(response.total)
+        setCurrentPage(0)
       })
     },
   });
@@ -168,14 +170,6 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
             )
           ),
         })
-      }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
       }
       if (ObjetCampos[index] === 'name') {
         arrOb.push({
@@ -393,7 +387,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>

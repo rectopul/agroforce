@@ -14,9 +14,6 @@ import {
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-
-
-
 interface ICreateCulture {
   name: string;
   status: number;
@@ -30,13 +27,12 @@ export default function Cadastro() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState('text-black');
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
 
@@ -48,7 +44,7 @@ export default function Cadastro() {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) return; 
+      if (!values.name) return;
 
       await cultureService.createCulture({
         name: capitalize(formik.values.name),
@@ -59,55 +55,63 @@ export default function Cadastro() {
           Swal.fire('Cultura cadastrada com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          let inputName: any = document.getElementById("name");
+          inputName.style.borderColor = 'red';
           Swal.fire(response.message);
         }
-      }).finally(() => {
-        formik.values.name = '';
-      });
+      })
     },
   });
 
   function validateInputs(values: any) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name"); 
-      inputName.style.borderColor= 'red'; 
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
+      Swal.fire("Preencha os campos obrigatórios");
     } else {
       let inputName: any = document.getElementById("name");
-      inputName.style.borderColor= '';
+      inputName.style.borderColor = '';
     }
   }
 
   return (
     <>
-     <Head>
-        <title>Nova cultura</title>
+      <Head>
+        <title>Cadastro de cultura</title>
       </Head>
-      
-      <Content contentHeader={tabsDropDowns}>
-        <form 
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
+      <Content contentHeader={tabsDropDowns}>
+        <form
+          className="
+            w-full 
+            bg-white 
+            shadow-md 
+            rounded 
+            px-8 
+            pt-6 
+            pb-8 
+            mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova cultura</h1>
 
-          <div className="w-full
+          <div className="
+            w-full
             flex
             gap-2
             mt-4
             mb-4
           ">
-            <div className="w-2/4 h-10">
+            <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
+                <strong>*</strong>
                 Nome
               </label>
               <Input
+                type="text"
+                maxLength={50}
                 id="name"
                 name="name"
-                type="text" 
-                max="50"
                 placeholder="ex: Soja"
                 onChange={formik.handleChange}
                 value={formik.values.name}
@@ -116,7 +120,8 @@ export default function Cadastro() {
           </div>
 
           <div className="
-            h-10 w-full
+            h-10 
+            w-full
             flex
             gap-3
             justify-center
@@ -139,7 +144,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

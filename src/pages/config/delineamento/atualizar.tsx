@@ -103,20 +103,6 @@ export default function NovoLocal({ delineamentoEdit }: IData) {
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                Código
-              </label>
-              <Input
-                type="text"
-                id="id"
-                style={{ background: '#e5e7eb' }}
-                name="id"
-                disabled
-                onChange={formik.handleChange}
-                value={formik.values.id}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
               <Input
