@@ -1,4 +1,3 @@
-import { capitalize } from "@mui/material";
 import { useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import getConfig from "next/config";
@@ -7,7 +6,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import MaterialTable from "material-table";
-import { SiMicrogenetics } from "react-icons/si";
 import {
   Button,
   Content,
@@ -18,10 +16,9 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 import { ReactNode, useEffect } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
+import { AiTwotoneStar } from "react-icons/ai";
+import { BiEdit, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
@@ -112,7 +109,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "sl", value: "sl" },
     { name: "CamposGerenciados[]", title: "sc", value: "sc" },
     { name: "CamposGerenciados[]", title: "s_aloc", value: "s_aloc" },
@@ -177,8 +174,8 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
     });
 
     const { id, status } = disparos[index];
-    
-    await layoutChildrenService.update({id: id, status: status});
+
+    await layoutChildrenService.update({ id: id, status: status });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -655,7 +652,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                     </div>
                   </div>

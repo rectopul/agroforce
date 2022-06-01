@@ -4,7 +4,8 @@ import { SafraRepository } from '../repository/safra.repository';
 interface Safra {
   id: number;
   id_culture: number;
-  year: string;
+  safraName: string;
+  year: number;
   plantingStartTime?: string;
   plantingEndTime?: string;
   main_safra?: number;
@@ -27,6 +28,7 @@ export class SafraController {
     let select: any = [];
     try {
       if (options.filterStatus) {
+        console.log("Options: ", options)
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
           if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
@@ -37,7 +39,11 @@ export class SafraController {
 
       if (options.filterSafra) {
         options.filterSafra = '{"contains":"' + options.filterSafra + '"}';
-        parameters.year = JSON.parse(options.filterSafra);
+        parameters.safraName = JSON.parse(options.filterSafra);
+      }
+
+      if (options.filterYear) {
+        parameters.year = Number(options.filterYear);
       }
 
       // if (options.filterStartDate) {
@@ -59,6 +65,7 @@ export class SafraController {
       } else {
         select = {
           id: true,
+          safraName: true,
           year: true,
           plantingStartTime: true,
           plantingEndTime: true,
@@ -69,6 +76,10 @@ export class SafraController {
 
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
+      }
+
+      if (options.safraName) {
+        parameters.safraName = options.safraName
       }
 
       if (options.year) {
@@ -130,15 +141,17 @@ export class SafraController {
 
       return { status: 200, response };
     } catch (e) {
-      return { status: 400, message: 'Item não encontrada' };
+      return { status: 400, message: 'Safra não encontrada' };
     }
   }
 
   async postSafra(data: CreateSafra) {
     try {
+      console.log("Options: ", data);
       const schema: SchemaOf<CreateSafra> = object({
         id_culture: number().integer().required(this.required),
-        year: string().required(this.required),
+        safraName: string().required(this.required),
+        year: number().integer().required(this.required),
         plantingStartTime: string().optional(),
         plantingEndTime: string().optional(),
         status: number().integer().required(this.required),
@@ -149,9 +162,8 @@ export class SafraController {
 
       if (!valid) return { status: 400, message: "Dados inválidos" };
 
-      const safraAlreadyExists = await this.safraRepository.findByYear({ year: data.year, id_culture: data.id_culture });
-
-      if (safraAlreadyExists) return { status: 400, message: "Ano da safra já existente" };
+      const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
+      if (safraAlreadyExists) return { status: 400, message: "Safra já cadastrada" };
 
       await this.safraRepository.create(data);
 
@@ -164,9 +176,11 @@ export class SafraController {
 
   async updateSafra(data: UpdateSafra) {
     try {
+      console.log("Date: ", data)
       const schema: SchemaOf<UpdateSafra> = object({
         id: number().integer().required(this.required),
-        year: string().required(this.required),
+        safraName: string().required(this.required),
+        year: number().required(this.required),
         plantingStartTime: string().optional(),
         plantingEndTime: string().optional(),
         status: number().integer().required(this.required),
@@ -180,12 +194,17 @@ export class SafraController {
 
       if (!safra) return { status: 400, message: 'Safra não existente' };
 
-      const safraAlreadyExists = await this.safraRepository.findByYear(data.year);
+      console.log("Date: ", data)
+
+
+      const safraAlreadyExists = await this.safraRepository.findBySafraName(data.safraName);
+      console.log("Safra: ", safraAlreadyExists)
 
       if (safraAlreadyExists && safraAlreadyExists.id !== safra.id) {
-        return { status: 400, message: 'Ano da safra já existente. favor consultar os inativos' };
+        return { status: 400, message: 'Safra já cadastrada.' };
       }
 
+      safra.safraName = data.safraName;
       safra.year = data.year;
       safra.plantingStartTime = data.plantingStartTime;
       safra.plantingEndTime = data.plantingEndTime;
@@ -195,7 +214,7 @@ export class SafraController {
 
       return { status: 200, message: "Item atualizado" }
     } catch (err) {
-      return { status: 404, message: "Erro ao atualizar" }
+      return { status: 404, message: "Erro ao atualizar safra" }
     }
   }
 }

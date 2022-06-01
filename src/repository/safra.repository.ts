@@ -26,11 +26,12 @@ export class SafraRepository {
     return safra;
   }
 
-  async findByYear(data: any) {
+  async findBySafraName(data: any) {
+    console.log("Data repository: ", data);
     const safra = await prisma.safra.findFirst({
       where: {
-        year: data.year,
-        id_culture: data.id_culture,
+        safraName: data.safraName,
+        //id_culture: data.id_culture,
       }
     });
 

@@ -17,6 +17,7 @@ import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from 'src/components';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { genotipoService, userPreferencesService } from 'src/services';
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../shared/utils/dropdown';
 
@@ -77,7 +78,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Código', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Genótipo', value: 'genotipo' },
     { name: 'CamposGerenciados[]', title: 'Genealogia', value: 'genealogy' },
     { name: 'CamposGerenciados[]', title: 'Cruza', value: 'cruza' },
@@ -483,7 +484,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
         // Download
         XLSX.writeFile(workBook, 'Genótipos.xlsx');
       } else {
-        alert(response);
+        Swal.fire(response);
       }
     });
   };

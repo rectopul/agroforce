@@ -72,7 +72,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Genealógia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
@@ -175,7 +175,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
       if (ObjetCampos[index] === 'id') {
         arrOb.push({
-          title: "Código",
+          title: "Favorito",
           field: "id",
           sorting: false
         });

@@ -22,6 +22,7 @@ import { removeCookies, setCookies } from "cookies-next";
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
+  filterYear: string | number
   filterStartDate: string | any;
   filterEndDate: string | any;
   orderBy: object | any;
@@ -31,7 +32,8 @@ interface IFilter {
 interface ISafra {
   id: number;
   id_culture: number;
-  year: string;
+  safraName: string;
+  year: number;
   plantingStartTime: string;
   plantingEndTime: string;
   main_safra: string;
@@ -65,20 +67,19 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.safra || { id: 0, table_preferences: "id,year,plantingStartTime,plantingEndTime,status" };
+  const preferences = userLogado.preferences.safra || { id: 0, table_preferences: "id,safraName,year,plantingStartTime,plantingEndTime,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
-  const [arrowDescription, setArrowDescription] = useState<string>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
-    { name: "CamposGerenciados[]", title: "Safra", value: "year" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    { name: "CamposGerenciados[]", title: "Safra", value: "safraName" },
+    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
     { name: "CamposGerenciados[]", title: "Período ideal de início de plantio", value: "plantingStartTime" },
     { name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
-    // { name: "CamposGerenciados[]", title: "Safra principal", value: "main_safra" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -100,13 +101,14 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
     initialValues: {
       filterStatus: '',
       filterSafra: '',
+      filterYear: '',
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSafra=${values.filterSafra}&filterStartDate=${values.filterStartDate}&filterEndDate=${values.filterEndDate}&id_culture=${cultureId}`
+    onSubmit: async ({ filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate }) => {
+      const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`
       //const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
       setCookies("filterBeforeEdit", parametersFilter)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -139,6 +141,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 
     const {
       id,
+      safraName,
       year,
       plantingStartTime,
       plantingEndTime,
@@ -147,6 +150,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 
     await safraService.updateSafras({
       id,
+      safraName,
       year,
       plantingStartTime,
       plantingEndTime,
@@ -191,7 +195,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
           ),
         })
       }
-      if (ObjetCampos[index] === 'year') {
+      if (ObjetCampos[index] === 'safraName') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -201,8 +205,15 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
               </button>
             </div>
           ),
-          field: "year",
+          field: "safraName",
           sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'year') {
+        arrOb.push({
+          title: "Ano ",
+          field: "year",
+          sorting: false,
         });
       }
       if (ObjetCampos[index] === 'plantingStartTime') {
@@ -417,9 +428,31 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
                       Safra
                     </label>
                     <Input
-                      placeholder="Ano"
+                      placeholder="Nome da Safra"
                       id="filterSafra"
                       name="filterSafra"
+                      onChange={formik.handleChange}
+                      className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Ano
+                    </label>
+                    <Input
+                      placeholder="Ano"
+                      id="filterYear"
+                      name="filterYear"
                       onChange={formik.handleChange}
                       className="shadow
                           appearance-none
