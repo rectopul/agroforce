@@ -70,7 +70,7 @@ model safra {
   id                Int       @id @default(autoincrement())
   id_culture        Int
   culture           culture   @relation(fields: [id_culture], references: [id])
-  safraName         String
+  safraName         String?
   year              Int
   plantingStartTime String?
   plantingEndTime   String?
