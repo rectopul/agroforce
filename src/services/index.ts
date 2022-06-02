@@ -18,6 +18,7 @@ export * from './user-permission';
 export * from './user-preferences.service';
 export * from './user.service';
 export * from './npe.service';
+export * from './grupo.service';
 export * from './quadra.service';
 export * from './disparos.service';
 export * from './layout-children.service';

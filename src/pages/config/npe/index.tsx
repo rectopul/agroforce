@@ -8,6 +8,8 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { useRouter } from 'next/router';
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
@@ -31,7 +33,7 @@ interface INpeProps {
   npei: Number;
   npef: Number;
   prox_npe: Number;
-  status: Number;
+  status?: Number;
   created_by: Number;
 };
 
@@ -64,6 +66,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+  const router = useRouter();
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'NPE'
@@ -219,7 +222,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, {status: rowData.status, ...rowData})}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -241,8 +244,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatus(
+                      rowData.id, {
+                      status: rowData.status,
+                      ...rowData,
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -283,24 +289,47 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setCamposGerenciados(campos);
   };
 
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
+  async function handleStatus(idNPE: number, data: any): Promise<void> {
+    console.log(data)
+    let parametersFilter = "filterStatus=" + 1 + "&id_safra=" + data.id_safra + "&id_foco=" + data.id_foco + "&id_ogm=" + data.id_ogm + "&id_type_assay=" + data.id_type_assay + "&epoca=" + String(data.epoca);
+    if (data.status == 0) {
+      await npeService.getAll(parametersFilter).then((response) => {     
+        if (response.total > 0) {
+          Swal.fire('NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações');
+          router.push('');
+          return;
+        } else {
+         
+        }  
+      })
+    } else { 
+      if (data.status === 0) {
+        data.status = 1;
+      } else {
+        data.status = 0;
+      }
+      await npeService.update({id: idNPE, status: data.status});  
+  
+      const index = npe.findIndex((npe: any) => npe.id === idNPE);
+  
+      if (index === -1) {
+        return;
+      }
+  
+      setNPE((oldSafra: any) => {
+        const copy = [...oldSafra];
+        copy[index].status = data.status;
+        return copy;
+      });
+  
+      const {
+        id,
+        status
+      } = npe[index];
+  
     }
-    await npeService.update({ id: id, status: status });
-    const index = npe.findIndex((npe: { id: number; }) => npe.id === id);
 
-    if (index === -1) {
-      return;
-    }
-
-    setNPE((oldUser: any) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
+  
   };
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {

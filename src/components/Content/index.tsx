@@ -1,7 +1,7 @@
 
 import { ReactNode, useState } from "react";
 import { BiUser } from "react-icons/bi";
-import { BsCheckLg, BsCheckLgCircle } from "react-icons/bs";
+import { BsCheckLg } from "react-icons/bs";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
