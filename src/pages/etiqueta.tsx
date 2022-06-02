@@ -6,7 +6,7 @@ import { useRef } from "react";
 
 export default function Etiqueta() {
 
-  const pdfExportComponent = useRef(null)
+  const pdfExportComponent: any = useRef(null)
   const exportPDF = () => {
     pdfExportComponent.current.save()
   }
