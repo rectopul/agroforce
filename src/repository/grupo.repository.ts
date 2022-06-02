@@ -18,7 +18,7 @@ export class GrupoRepository {
   async findById(id: number) {
     const foco_children = await prisma.foco_children.findUnique({
       where: { id },
-      select: {id:true, safra:{select:{year:true, id: true}}, foco:{select:{name:true, id: true}}, grupo: true, status: true}    
+      select: { id: true, safra: { select: { safraName: true, id: true } }, foco: { select: { name: true, id: true } }, grupo: true, status: true }
     });
 
     return foco_children;

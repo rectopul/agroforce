@@ -77,7 +77,7 @@ export function Content({ contentHeader, children }: IContentData) {
 
   if (userLogado.safras.safras[0]) {
     userLogado.safras.safras.map((value: string | object | any) => {
-      safras.push({ id: value.id, name: value.year });
+      safras.push({ id: value.id, name: value.safraName });
     })
   }
 

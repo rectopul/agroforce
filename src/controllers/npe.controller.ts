@@ -13,6 +13,7 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log("Options: ", options);
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -97,7 +98,7 @@ export class NpeController {
       }
 
       if (options.paramSelect) {
-        let objSelect = options.paramSelect[0].split(',');
+        let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
           if (objSelect[item] === 'ensaio') {
             select['type_assay'] = true;
@@ -143,7 +144,7 @@ export class NpeController {
   async validateNpeiDBA(data: any) {
     try {
       if (data.safra) {
-        let group: any =  await this.groupoController.listAll({id_safra: data.safra, id_foco: data.foco});
+        let group: any = await this.groupoController.listAll({ id_safra: data.safra, id_foco: data.foco });
         if (group.total > 0) {
           let safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
@@ -154,9 +155,9 @@ export class NpeController {
                                                   LIMIT 1`;
           if ((safra[0])) {
             return `<span>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, NPEI ja cadastrado dentro do grupo ${group.response[0].grupo}</span><br>`;
-          }   
+          }
         } else {
-          return  `<span>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, todos os focos precisam ter grupos cadastrados nessa safra</span><br>`;
+          return `<span>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, todos os focos precisam ter grupos cadastrados nessa safra</span><br>`;
         }
       }
       return "";

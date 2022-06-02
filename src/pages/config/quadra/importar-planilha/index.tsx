@@ -17,7 +17,7 @@ export default function Importar({ safra }: any) {
   const router = useRouter();
   const safras: object | any = [];
   safra.map((value: string | object | any) => {
-    safras.push({ id: value.year, name: value.year });
+    safras.push({ id: value.safraName, name: value.safraName });
   })
 
   const tabsDropDowns = TabsDropDowns();
