@@ -1,13 +1,13 @@
-import { BsCheckLgCircle } from "react-icons/bs";
+import { BsCheckLg } from "react-icons/bs";
 
 const tabs = [
-  { title: 'TMG', value: <BsCheckLgCircle />, status: true },
-  { title: 'ENSAIO', value: <BsCheckLgCircle />, status: false },
-  { title: 'LOCAL', value: <BsCheckLgCircle />, status: false },
-  { title: 'DELINEAMENTO', value: <BsCheckLgCircle />, status: false },
-  { title: 'NPE', value: <BsCheckLgCircle />, status: false },
-  { title: 'QUADRAS', value: <BsCheckLgCircle />, status: false },
-  { title: 'CONFIG. PLANILHAS', value: <BsCheckLgCircle />, status: false },
+  { title: 'TMG', value: <BsCheckLg />, status: true },
+  { title: 'ENSAIO', value: <BsCheckLg />, status: false },
+  { title: 'LOCAL', value: <BsCheckLg />, status: false },
+  { title: 'DELINEAMENTO', value: <BsCheckLg />, status: false },
+  { title: 'NPE', value: <BsCheckLg />, status: false },
+  { title: 'QUADRAS', value: <BsCheckLg />, status: false },
+  { title: 'CONFIG. PLANILHAS', value: <BsCheckLg />, status: false },
 ];
 
 const dropDowns = [
