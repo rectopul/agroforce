@@ -8,7 +8,6 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import Swal from "sweetalert2";
 import { useRouter } from 'next/router';
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -290,7 +289,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    console.log(data)
     let parametersFilter = "filterStatus=" + 1 + "&id_safra=" + data.id_safra + "&id_foco=" + data.id_foco + "&id_ogm=" + data.id_ogm + "&id_type_assay=" + data.id_type_assay + "&epoca=" + String(data.epoca);
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {     
