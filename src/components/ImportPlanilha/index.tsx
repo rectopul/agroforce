@@ -57,6 +57,9 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     },
   });
 
+  function hasDuplicates(array: any) {
+      return (new Set(array)).size !== array.length;
+  }
 
   function saveConfig() {
     let Teste;
@@ -76,14 +79,17 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
         }
       }
     }
-    // return;
-
-    importService.create({ moduleId: moduleId, fields: auxObject }).then((response) => {
-      if (response.status === 200) {
-        Swal.fire(response.message);
-        router.back();
-      }
-    });
+    if (!hasDuplicates(auxObject)) {
+      importService.create({ moduleId: moduleId, fields: auxObject }).then((response) => {
+        if (response.status === 200) {
+          Swal.fire(response.message);
+          router.back();
+        }
+      });
+    } else {
+      Swal.fire('Existe itens duplicados na configuração');
+    }
+ 
   }
   function toLetter(columnNumber: any) {
 

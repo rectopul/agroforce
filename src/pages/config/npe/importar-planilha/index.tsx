@@ -2,13 +2,11 @@ import Head from "next/head";
 import readXlsxFile from 'read-excel-file'
 import { importService } from "src/services/";
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { Button, Content, Input, Select } from "../../../../components";
+import { Button, Content, Input } from "../../../../components";
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import { FiUserPlus } from "react-icons/fi";
 import React from "react";
-import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
 import { IoMdArrowBack } from "react-icons/io";
 import { useRouter } from 'next/router';
 
@@ -16,40 +14,22 @@ interface Idata {
   safra: any;
   foco: any;
 }
-export default function Importar({ safra, foco }: Idata) {
+export default function Importar() {
   const { TabsDropDowns } = ITabs;
-  const safras: object | any = [];
-  const focos: object | any = [];
   const router = useRouter();
-  const grupos = [
-    { id: 1, name: "Grupo 1" },
-    { id: 2, name: "Grupo 2" },
-    { id: 3, name: "Grupo 3" },
-    { id: 4, name: "Grupo 4" },
-    { id: 5, name: "Grupo 5" },
-    { id: 6, name: "Grupo 6" },
-    { id: 7, name: "Grupo 7" }
-  ];
-  safra.map((value: string | object | any) => {
-    safras.push({ id: value.id, name: value.year });
-  })
 
-  foco.map((value: string | object | any) => {
-    focos.push({ id: value.id, name: value.name });
-  })
-
-  function readExcel(value: any, safra: any, foco: any) {
+  function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 14, safra: safra, foco: foco, created_by: userLogado.id }).then((response) => {
+      importService.validate({ spreadSheet: rows, moduleId: 14, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
             width: "800"
           });
           if (!response.erro) {
-            router.back();
+            // router.back();
           }
         }
       });
@@ -59,12 +39,10 @@ export default function Importar({ safra, foco }: Idata) {
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      safra: '',
-      foco: '',
     },
     onSubmit: async (values) => {
       var inputFile: any = document.getElementById("inputFile");
-      readExcel(inputFile.files, values.safra, values.foco);
+      readExcel(inputFile.files);
     },
   });
   return (
@@ -84,34 +62,7 @@ export default function Importar({ safra, foco }: Idata) {
                 mt-4
                 mb-4
             ">
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Safra
-              </label>
-              <Select
-                values={safras}
-                id="safra"
-                name="safra"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.name}
-                selected={0}
-              />
-            </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Grupo dos Focos
-              </label>
-              <Select
-                values={grupos}
-                id="foco"
-                name="foco"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.foco}
-                selected={0}
-              />
-            </div>
+    
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Excel
@@ -157,35 +108,4 @@ export default function Importar({ safra, foco }: Idata) {
       </Content>
     </>
   );
-}
-
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { publicRuntimeConfig } = getConfig();
-  const token = req.cookies.token;
-  const cultureId = req.cookies.cultureId;
-
-  let param = `filterStatus=1&id_culture=${cultureId}`;
-
-  const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
-  urlParametersSafra.search = new URLSearchParams(param).toString();
-
-  const urlParametersFoco: any = new URL(`${publicRuntimeConfig.apiUrl}/foco`);
-  urlParametersFoco.search = new URLSearchParams(param).toString();
-
-  const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
-  };
-
-  const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
-  const apiFoco = await fetch(urlParametersFoco.toString(), requestOptions);
-  let safra: any = await apiSafra.json();
-  let foco = await apiFoco.json();
-
-  safra = safra.response;
-  foco = foco.response;
-
-  return { props: { safra, foco } }
 }

@@ -6,7 +6,6 @@ interface LoteDTO {
   name: string;
   created_by: number;
   status: number;
-  group: number;
   id_culture: number;
 }
 
@@ -42,10 +41,6 @@ export class FocoController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
-      if (options.group) {
-        parameters.group = parseInt(options.group);
-      }
-
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
@@ -56,8 +51,7 @@ export class FocoController {
         select = {
           id: true,
           name: true,
-          status: true,
-          group: true
+          status: true
         };
       }
 
@@ -147,7 +141,6 @@ export class FocoController {
         id: number().integer().required(this.required),
         name: string().required(this.required),
         status: number().integer().required(this.required),
-        group: number().integer().required(this.required),
         id_culture: number().integer().required(this.required)
       });
 
@@ -167,7 +160,6 @@ export class FocoController {
 
       foco.name = data.name;
       foco.status = data.status;
-      foco.group = data.group;
 
       await this.focoRepository.update(data.id, foco);
 

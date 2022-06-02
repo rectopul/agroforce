@@ -79,8 +79,9 @@ model safra {
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe    npe[]
-  quadra quadra[]
+  npe           npe[]
+  quadra        quadra[]
+  foco_children foco_children[]
 }
 
 model uf {
@@ -281,13 +282,27 @@ model foco {
   id         Int       @id @default(autoincrement())
   id_culture Int
   name       String
-  group      Int?
   status     Int?      @default(1)
   created_by Int
   created_at DateTime? @default(now())
 
-  npe     npe[]
-  culture culture @relation(fields: [id_culture], references: [id])
+  npe           npe[]
+  foco_children foco_children[]
+  culture       culture         @relation(fields: [id_culture], references: [id])
+}
+
+model foco_children {
+  id       Int @id @default(autoincrement())
+  id_safra Int
+  id_foco  Int
+  grupo    Int
+  status     Int?      @default(1)
+  created_by Int
+  created_at DateTime? @default(now())
+
+
+  safra safra @relation(fields: [id_safra], references: [id])
+  foco  foco  @relation(fields: [id_foco], references: [id])
 }
 
 model type_assay {
@@ -356,6 +371,7 @@ model npe {
   npei          Int
   npef          Int?
   prox_npe      Int?
+  group         Int       @default(0)
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime? @default(now())

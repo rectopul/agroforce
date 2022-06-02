@@ -72,7 +72,6 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Name", value: "name" },
-    { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -182,13 +181,6 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
           ),
           field: "name",
           sorting: false
-        });
-      }
-      if (ObjetCampos[index] === 'group') {
-        arrOb.push({
-          title: "Grupo",
-          field: "group",
-          sorting: false,
         });
       }
       if (ObjetCampos[index] === 'status') {
