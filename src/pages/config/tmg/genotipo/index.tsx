@@ -82,8 +82,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { name: 'CamposGerenciados[]', title: 'Genótipo', value: 'genotipo' },
     { name: 'CamposGerenciados[]', title: 'Genealogia', value: 'genealogy' },
     { name: 'CamposGerenciados[]', title: 'Cruza', value: 'cruza' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' }
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
