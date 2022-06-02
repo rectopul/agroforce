@@ -70,7 +70,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Name", value: "name" },
     { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }

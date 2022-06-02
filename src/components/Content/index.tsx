@@ -1,7 +1,7 @@
 
 import { ReactNode, useState } from "react";
 import { BiUser } from "react-icons/bi";
-import { BsCheck, BsCheckLg } from "react-icons/bs";
+import { BsCheckLg, BsCheckLgCircle } from "react-icons/bs";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { MdDateRange } from "react-icons/md";
 import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
@@ -58,7 +58,7 @@ export function Content({ contentHeader, children }: IContentData) {
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
     !contentHeader ? [
       {
-        titleTab: 'TMG', valueTab: <BsCheck />, statusTab: true, hrefTab: '/config/tmg/usuarios',
+        titleTab: 'TMG', valueTab: <BsCheckLg />, statusTab: true, hrefTab: '/config/tmg/usuarios',
         data: [
           { labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine /> },
           { labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser /> },
@@ -132,9 +132,13 @@ export function Content({ contentHeader, children }: IContentData) {
         avatar={!userLogado.avatar ? avatarDefault : userLogado.avatar}
 
         headerSelects={
-          <div className="h-10 flex gap-2">
-            <Select values={cultures} onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
-            <Select values={safras} onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+          <div className="mb-4 flex gap-3">
+            <div className="h-10 ">
+              <Select values={cultures} onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
+            </div>
+            <div className="w-40">
+              <Select className="h-10" values={safras} onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+            </div>
           </div>
         }
       >
@@ -183,7 +187,6 @@ export function Content({ contentHeader, children }: IContentData) {
             w-container-all-main-contents
             h-content
             p-8
-
             border border-gray-700
             bg-gray-300
           ">

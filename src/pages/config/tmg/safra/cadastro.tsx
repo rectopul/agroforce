@@ -16,7 +16,8 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ISafraProps {
   id_culture: number;
-  year: string;
+  safraName: string;
+  year: number;
   plantingStartTime: string;
   plantingEndTime: string;
   main_safra: number;
@@ -25,7 +26,8 @@ interface ISafraProps {
 };
 
 interface Input {
-  year: string;
+  safraName: string;
+  year: number;
   plantingStartTime: string;
   plantingEndTime: string;
 };
@@ -52,7 +54,8 @@ export default function Safra() {
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id_culture: Number(culture),
-      year: '',
+      safraName: '',
+      year: 0,
       plantingStartTime: '',
       plantingEndTime: '',
       main_safra: 0,
@@ -89,7 +92,8 @@ export default function Safra() {
 
       await safraService.create({
         id_culture: Number(culture),
-        year: formik.values.year,
+        safraName: formik.values.safraName,
+        year: Number(formik.values.year),
         plantingStartTime: plantingStartTime,
         plantingEndTime: plantingEndTime,
         status: formik.values.status,
@@ -106,13 +110,17 @@ export default function Safra() {
   });
 
   function validateInputs(values: Input) {
-    if (!values.year) {
+    if (!values.safraName || !values.year) {
+      let inputSafraName: any = document.getElementById("safraName");
       let inputYear: any = document.getElementById("year");
+      inputSafraName.style.borderColor = 'red';
       inputYear.style.borderColor = 'red';
       Swal.fire("Preencha os campos obrigatórios")
       return false
     } else {
+      let inputSafraName: any = document.getElementById("safraName");
       let inputYear: any = document.getElementById("year");
+      inputSafraName.style.borderColor = '';
       inputYear.style.borderColor = '';
       return true
     }
@@ -135,13 +143,45 @@ export default function Safra() {
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
+                Safra
+              </label>
+
+              <Input
+                id="safraName"
+                name="safraName"
+                maxLength={10}
+                placeholder="___________"
+                onChange={formik.handleChange}
+                value={formik.values.safraName}
+                className="
+                  shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 
+                  focus:bg-white 
+                  focus:border-blue-600 
+                  focus:outline-none
+                "
+              />
+            </div>
+
+            <div className="w-2/4 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Ano
               </label>
 
               <Input
                 id="year"
                 name="year"
-                placeholder="___________"
+                maxLength={4}
+                placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="

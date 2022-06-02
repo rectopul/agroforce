@@ -70,7 +70,8 @@ model safra {
   id                Int       @id @default(autoincrement())
   id_culture        Int
   culture           culture   @relation(fields: [id_culture], references: [id])
-  year              String
+  safraName         String
+  year              Int
   plantingStartTime String?
   plantingEndTime   String?
   main_safra        Int?      @default(0)
@@ -156,58 +157,57 @@ model users_preferences {
 }
 
 model local {
-  id             Int              @id @default(autoincrement())
-  cod_local      String           @unique
-  cod_red_local  String?          @unique
-  pais           String
-  uf             String
-  city           String
-  name_farm      String
-  latitude       String?
-  longitude      String?
-  altitude       String?
-  created_at     DateTime         @default(now())
-  created_by     Int
-  status         Int              @default(1)
-  npe            npe[]
-  quadra         quadra[]
+  id            Int      @id @default(autoincrement())
+  cod_local     String   @unique
+  cod_red_local String?  @unique
+  pais          String
+  uf            String
+  city          String
+  name_farm     String
+  latitude      String?
+  longitude     String?
+  altitude      String?
+  created_at    DateTime @default(now())
+  created_by    Int
+  status        Int      @default(1)
+  npe           npe[]
+  quadra        quadra[]
 }
 
 model layout_quadra {
-  id             Int      @id @default(autoincrement())
-  id_culture     Int
-  esquema        String
-  plantadeira    String
-  tiros          Int?
-  disparos       Int?
-  parcelas       Int?
-  status         Int      @default(1)
-  created_by     Int
-  created_at     DateTime @default(now())
-  Culture        culture    @relation(fields: [id_culture], references: [id])
-  children layout_children[]
+  id          Int               @id @default(autoincrement())
+  id_culture  Int
+  esquema     String
+  plantadeira String
+  tiros       Int?
+  disparos    Int?
+  parcelas    Int?
+  status      Int               @default(1)
+  created_by  Int
+  created_at  DateTime          @default(now())
+  Culture     culture           @relation(fields: [id_culture], references: [id])
+  children    layout_children[]
 }
 
 model layout_children {
-  id             Int      @id @default(autoincrement())
-  id_layout      Int
-  sl             Int
-  sc             Int
-  s_aloc         Int
-  tiro           Int
-  cj             String
-  disparo        Int
-  dist           Int  
-  st             String
-  spc            String
-  scolheita      Int
-  tipo_parcela   String
-  status         Int      @default(1)
-  created_by     Int
-  created_at     DateTime @default(now())
-  Layout         layout_quadra    @relation(fields: [id_layout], references: [id])
-} 
-
+  id           Int           @id @default(autoincrement())
+  id_layout    Int
+  sl           Int
+  sc           Int
+  s_aloc       Int
+  tiro         Int
+  cj           String
+  disparo      Int
+  dist         Int
+  st           String
+  spc          String
+  scolheita    Int
+  tipo_parcela String
+  status       Int           @default(1)
+  created_by   Int
+  created_at   DateTime      @default(now())
+  Layout       layout_quadra @relation(fields: [id_layout], references: [id])
+}
 
 model quadra {
   id            Int        @id @default(autoincrement())
