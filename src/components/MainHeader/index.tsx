@@ -22,15 +22,15 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
         pr-2
         text-4xl
       ">
-        <div className='w-96 gap-2 flex justify-between items-center pr-3 mr-5'>
+        <div className='w-auto gap-1 flex justify-between items-center pr-3 mr-5'>
           <Link passHref href="/">
-            <Image src="/images/logo-tmg.png" alt="TMG" width={180} height={160} />
+            <Image src="/images/logo-tmg.png" alt="TMG" width={160} height={150} />
           </Link>
           {headerSelects}
         </div>
 
         <div className='h-20
-          flex gap-4
+          flex gap-8
           w-content-main-header
           text-white
         '>

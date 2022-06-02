@@ -3,15 +3,13 @@ import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdDateRange } from "react-icons/md";
-import InputMask from 'react-input-mask';
 import {
   Button,
   Content,
-  Input,
-  Radio
+  Input
 } from "src/components";
 import { safraService } from "src/services";
 import Swal from "sweetalert2";
@@ -22,7 +20,8 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 interface ISafraProps {
   id: number;
   // id_culture: number;
-  year: string;
+  safraName: string;
+  year: number;
   plantingStartTime: string;
   plantingEndTime: string;
   status: number;
@@ -58,6 +57,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
     initialValues: {
       id: safra.id,
       // id_culture: safra.id_culture,
+      safraName: safra.safraName,
       year: safra.year,
       plantingStartTime: safra.plantingStartTime,
       plantingEndTime: safra.plantingEndTime,
@@ -77,7 +77,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
       await safraService.updateSafras({
         id: safra.id,
         // id_culture: safra.id_culture,
-        year: formik.values.year,
+        safraName: formik.values.safraName,
+        year: Number(formik.values.year),
         plantingStartTime: plantingStartTime,
         plantingEndTime: plantingEndTime,
         status: formik.values.status,
@@ -86,7 +87,6 @@ export default function AtualizarSafra(safra: ISafraProps) {
           Swal.fire('Safra atualizada com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       });
@@ -102,17 +102,43 @@ export default function AtualizarSafra(safra: ISafraProps) {
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Nova safra</h1>
+          <h1 className="text-2xl">Atualizar safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-4">
             <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
+                Safra
+              </label>
+              <Input
+                id="safraName"
+                name="safraName"
+                onChange={formik.handleChange}
+                value={formik.values.safraName}
+                className="
+                  shadow
+                  appearance-none
+                  bg-white bg-no-repeat
+                  border border-solid border-gray-300
+                  rounded
+                  w-full
+                  py-2 px-3
+                  text-gray-900
+                  leading-tight
+                  focus:text-gray-700 
+                  focus:bg-white 
+                  focus:border-blue-600 
+                  focus:outline-none
+                "
+              />
+            </div>
+
+            <div className="w-4/12 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
                 Ano
               </label>
-              <InputMask
-                mask="9999a_9999a"
-                required
+              <Input
                 id="year"
                 name="year"
                 onChange={formik.handleChange}
@@ -137,30 +163,26 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
                 Período ideal de início de plantio
               </label>
               <Input
                 type="date"
-                required
                 id="plantingStartTime"
                 name="plantingStartTime"
-                onChange={formik.handleChange}
+                onChange={() => { }}
                 value={formik.values.plantingStartTime}
               />
             </div>
 
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
                 Período ideal do fim do plantio
               </label>
               <Input
                 type="date"
-                required
                 id="plantingEndTime"
                 name="plantingEndTime"
-                onChange={formik.handleChange}
+                onChange={() => { }}
                 value={formik.values.plantingEndTime}
               />
             </div>
@@ -189,7 +211,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<MdDateRange size={18} />}
-                onClick={() => { }}
+                onClick={() => { formik.submitForm }}
               />
             </div>
           </div>

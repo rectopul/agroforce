@@ -20,7 +20,6 @@ import { ReactNode, useEffect } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -121,7 +120,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Divisor", value: "divisor" },
     { name: "CamposGerenciados[]", title: "Sem metro", value: "sem_metros" },
     { name: "CamposGerenciados[]", title: "T4I", value: "t4_i" },
@@ -753,7 +752,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de disparos" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de disparos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                     </div>
                   </div>

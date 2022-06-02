@@ -13,6 +13,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { npeService, userPreferencesService } from "src/services";
+import Swal from "sweetalert2";
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
@@ -85,7 +86,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+    { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Local ", value: "local", defaultChecked: () => camposGerenciados.includes('local') },
     { name: "CamposGerenciados[]", title: "Safra ", value: "safra", defaultChecked: () => camposGerenciados.includes('safra') },
     { name: "CamposGerenciados[]", title: "Foco ", value: "foco", defaultChecked: () => camposGerenciados.includes('foco') },
@@ -406,11 +407,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
+    console.log("filterAplication: ", filterAplication)
     await npeService.getAll(filterAplication).then((response) => {
+      console.log("Row Npe: ", response)
       if (response.status === 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
-
           if (row.status === 0) {
             row.status = "Inativo";
           } else {
@@ -436,6 +438,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         });
         // Download
         XLSX.writeFile(workBook, "NPE.xlsx");
+      } else {
+        Swal.fire(response);
       }
     });
   };

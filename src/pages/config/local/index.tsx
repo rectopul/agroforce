@@ -87,7 +87,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+    { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Código Local ", value: "cod_local", defaultChecked: () => camposGerenciados.includes('cod_local') },
     { name: "CamposGerenciados[]", title: "Código Reduzido ", value: "cod_red_local", defaultChecked: () => camposGerenciados.includes('cod_red_local') },
     { name: "CamposGerenciados[]", title: "Pais", value: "pais", defaultChecked: () => camposGerenciados.includes('pais') },

@@ -4,11 +4,10 @@ import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
+import { AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
@@ -74,7 +73,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Local Preparo", value: "local_preparo" },
     { name: "CamposGerenciados[]", title: "Código Quadra", value: "cod_quadra" },
     { name: "CamposGerenciados[]", title: "Linha P", value: "linha_p" },
@@ -553,7 +552,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
 
                       <div className='h-12 flex items-center justify-center w-full'>
                         {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                        <Button title="Download lista de quadras" icon={<BsDownload size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de quadras" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="quadra/importar-planilha/config-planilha" />

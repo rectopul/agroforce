@@ -91,7 +91,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
 
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+    { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Esquema ", value: "esquema", defaultChecked: () => camposGerenciados.includes('esquema') },
     { name: "CamposGerenciados[]", title: "Plantadeira ", value: "plantadeira", defaultChecked: () => camposGerenciados.includes('local') },
     { name: "CamposGerenciados[]", title: "Tiros", value: "tiros", defaultChecked: () => camposGerenciados.includes('divisor') },
@@ -681,7 +681,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Download lista de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="layout-quadra/importar-planilha/config-planilha" />
