@@ -46,7 +46,7 @@ interface IData {
   filterAplication: object | any;
   id_foco: number;
   genotipo: any;
-  foco: IUpdateFoco, 
+  foco: IUpdateFoco,
 }
 
 interface IGenarateProps {
@@ -63,7 +63,7 @@ interface IFilter {
 }
 
 
-export default function Atualizar( { foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, genotipo }: IData) {
+export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, genotipo }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -115,7 +115,7 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Código", value: "id" },
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
     { name: "CamposGerenciados[]", title: "Grupo", value: "grupo" },
     { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
@@ -189,19 +189,10 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
           ),
         })
       }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
-      }
-
       if (ObjetCampos[index] === 'safra') {
         arrOb.push({
           title: "Safra",
-          field: "safra.year",
+          field: "safra.safraName",
           sorting: false
         });
       }
@@ -220,16 +211,16 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
           render: (rowData: any) => (
             <div className='h-10 flex'>
               <div className="h-10">
-                <Button 
+                <Button
                   icon={<BiEdit size={16} />}
-                  onClick={() => {router.push(`grupo/atualizar?id=${rowData.id}`)}} 
+                  onClick={() => { router.push(`grupo/atualizar?id=${rowData.id}`) }}
                   bgColor="bg-blue-600"
                   textColor="white"
                 />
               </div>
             </div>
           ),
-          
+
         });
       }
     });
@@ -389,7 +380,7 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
       </Head>
 
       <Content contentHeader={tabsDropDowns}>
-        <form 
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
           onSubmit={formik.handleSubmit}
@@ -403,13 +394,6 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
               mt-4
               mb-4
           ">
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Código
-              </label>
-              <Input value={foco.id} disabled style={{ background: '#e5e7eb' }} />
-            </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -419,15 +403,15 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
               <Input
                 id="name"
                 name="name"
-                type="text" 
-                max="50" 
+                type="text"
+                max="50"
                 placeholder="foco"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
             </div>
           </div>
-        
+
           <div className="
               h-10 w-full
               flex
@@ -435,29 +419,29 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
               justify-center
               mt-10
             ">
-              <div className="w-30">
-                <Button 
-                  type="button"
-                  value="Voltar"
-                  bgColor="bg-red-600"
-                  textColor="white"
-                  icon={<IoMdArrowBack size={18} />}
-                  onClick={() => router.back()}
-                />
-              </div>
-              <div className="w-40">
-                <Button
-                  type="submit"
-                  value="Atualizar"
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<AiOutlineFileSearch size={20} />}
-                  onClick={() => {}}
-                />
-              </div>
+            <div className="w-30">
+              <Button
+                type="button"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => router.back()}
+              />
             </div>
+            <div className="w-40">
+              <Button
+                type="submit"
+                value="Atualizar"
+                bgColor="bg-blue-600"
+                textColor="white"
+                icon={<AiOutlineFileSearch size={20} />}
+                onClick={() => { }}
+              />
+            </div>
+          </div>
         </form>
-         <main className="h-4/6 w-full
+        <main className="h-4/6 w-full
           flex flex-col
           items-start
           gap-8
@@ -497,7 +481,7 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
                         value="Cadastrar grupo"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {router.push(`grupo/cadastro?id_foco=${id_foco}`)}}
+                        onClick={() => { router.push(`grupo/cadastro?id_foco=${id_foco}`) }}
                         icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
@@ -623,7 +607,7 @@ export default function Atualizar( { foco, allItens, totalItems, itensPerPage, f
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
@@ -652,7 +636,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const foco = await apiFoco.json();
 
-  return { 
+  return {
     props: {
       allItens,
       totalItems,

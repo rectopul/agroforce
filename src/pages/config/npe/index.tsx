@@ -179,7 +179,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         arrOb.push({ title: "Local", field: "local.cod_local", sorting: false })
       }
       if (ObjetCampos[item] === 'safra') {
-        arrOb.push({ title: "Safra", field: "safra.year", sorting: false })
+        arrOb.push({ title: "Safra", field: "safra.safraName", sorting: false })
       }
       if (ObjetCampos[item] === 'foco') {
         arrOb.push({ title: "Foco", field: "foco.name", sorting: false })
@@ -221,7 +221,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, {status: rowData.status, ...rowData})}
+                    onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -291,43 +291,43 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     let parametersFilter = "filterStatus=" + 1 + "&id_safra=" + data.id_safra + "&id_foco=" + data.id_foco + "&id_ogm=" + data.id_ogm + "&id_type_assay=" + data.id_type_assay + "&epoca=" + String(data.epoca);
     if (data.status == 0) {
-      await npeService.getAll(parametersFilter).then((response) => {     
+      await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
           Swal.fire('NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações');
           router.push('');
           return;
         } else {
-         
-        }  
+
+        }
       })
-    } else { 
+    } else {
       if (data.status === 0) {
         data.status = 1;
       } else {
         data.status = 0;
       }
-      await npeService.update({id: idNPE, status: data.status});  
-  
+      await npeService.update({ id: idNPE, status: data.status });
+
       const index = npe.findIndex((npe: any) => npe.id === idNPE);
-  
+
       if (index === -1) {
         return;
       }
-  
+
       setNPE((oldSafra: any) => {
         const copy = [...oldSafra];
         copy[index].status = data.status;
         return copy;
       });
-  
+
       const {
         id,
         status
       } = npe[index];
-  
+
     }
 
-  
+
   };
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {
@@ -430,13 +430,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    console.log("Filter: ", filterAplication)
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
     console.log("filterAplication: ", filterAplication)
     await npeService.getAll(filterAplication).then((response) => {
-      console.log("Row Npe: ", response)
       if (response.status === 200) {
         const newData = response.response.map((row: { avatar: any; status: any }) => {
           delete row.avatar;

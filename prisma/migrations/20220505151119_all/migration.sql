@@ -67,7 +67,8 @@ CREATE TABLE `profile` (
 CREATE TABLE `safra` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `id_culture` INTEGER NOT NULL,
-    `year` VARCHAR(191) NOT NULL,
+    `safraName` VARCHAR(191) NOT NULL,
+    `year` INTEGER NOT NULL,
     `typeCrop` VARCHAR(191) NOT NULL,
     `plantingStartTime` VARCHAR(191) NOT NULL,
     `plantingEndTime` VARCHAR(191) NOT NULL,

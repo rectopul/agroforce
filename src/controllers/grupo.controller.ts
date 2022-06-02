@@ -108,7 +108,7 @@ export class GrupoController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, id_safra: true, id_foco: true, foco: { select: { name: true } }, safra: { select: { year: true } }, grupo:true, status: true };
+        select = { id: true, id_safra: true, id_foco: true, foco: { select: { name: true } }, safra: { select: { safraName: true } }, grupo: true, status: true };
       }
 
       if (options.id_safra) {
