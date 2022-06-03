@@ -6,7 +6,7 @@ interface LoteDTO {
   name: string;
   created_by: number;
   status: number;
-  id_culture: number;
+  id_culture?: number;
 }
 
 type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
@@ -26,9 +26,9 @@ export class FocoController {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         }
       }
 
@@ -137,11 +137,12 @@ export class FocoController {
 
   async updateFoco(data: UpdateLoteDTO) {
     try {
+      console.log(data);
       const schema: SchemaOf<UpdateLoteDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
         status: number().integer().required(this.required),
-        id_culture: number().integer().required(this.required)
+        id_culture: number().integer().optional()
       });
 
       const valid = schema.isValidSync(data);
@@ -165,6 +166,7 @@ export class FocoController {
 
       return { status: 200, message: "Foco atualizado" }
     } catch (err) {
+      console.log(err);
       return { status: 404, message: "Erro ao atualizar" }
     }
   };

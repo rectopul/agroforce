@@ -21,20 +21,20 @@ export class TypeAssayRepository {
         return Result;
     }
 
-    async create(Local: object | any) {
-        Local.created_at = new Date();
-        let Result = await prisma.type_assay.create({ data: Local })
+    async create(data: object | any) {
+        data.created_at = new Date();
+        let Result = await prisma.type_assay.create({ data: data })
         return Result;
     }
 
-    async update(id: number, Local: Object) {
-        let ExisLocal = await this.findOne(id);
-        if (ExisLocal !== null) {
+    async update(id: number, Data: Object) {
+        let Exist = await this.findOne(id);
+        if (Exist !== null) {
             let Result = await prisma.type_assay.update({
                 where: {
                     id: id
                 },
-                data: Local
+                data: Data
             })
 
             return Result;
