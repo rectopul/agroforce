@@ -625,11 +625,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
+  const safraId = req.cookies.safraId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId + "&id_safra=" + safraId;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -646,7 +647,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const Response = await local.json();
   const allItems = Response.response;
   const totalItems = Response.total;
-
+  console.log(allItems)
   return {
     props: {
       allItems,
