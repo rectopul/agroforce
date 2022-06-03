@@ -121,7 +121,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     }
   });
 
-  async function handleStatusPortfolio(idGenotipo: number, data: IGenotipos): Promise<void> {
+  async function handleStatus(idGenotipo: number, data: IGenotipos): Promise<void> {
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -142,19 +142,11 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 
     const {
       id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
       status
     } = genotipos[index];
 
     await genotipoService.update({
       id,
-      id_culture,
-      genealogy,
-      genotipo,
-      cruza,
       status
     });
   }
@@ -267,7 +259,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   <div className="h-10">
                     <Button
                       icon={<FaRegThumbsUp size={16} />}
-                      onClick={async () => await handleStatusPortfolio(
+                      onClick={async () => await handleStatus(
                         rowData.id, {
                         status: rowData.status,
                         ...rowData
@@ -283,7 +275,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   <div className="h-10">
                     <Button
                       icon={<FaRegThumbsDown size={16} />}
-                      onClick={async () => await handleStatusPortfolio(
+                      onClick={async () => await handleStatus(
                         rowData.id, {
                         status: rowData.status,
                         ...rowData
@@ -550,11 +542,11 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Genotipo
+                      Genótipo
                     </label>
                     <Input
                       type="text"
-                      placeholder="Genotipo"
+                      placeholder="Genótipo"
                       max="40"
                       id="filterGenotipo"
                       name="filterGenotipo"

@@ -25,7 +25,7 @@ async function create(data: any) {
   return genotipo;
 }
 
-async function update(data: IGenotipoUpdate) {
+async function update(data: any) {
   const genotipo = await fetchWrapper.put(baseUrl, data);
   return genotipo;
 }

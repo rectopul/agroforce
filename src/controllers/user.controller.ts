@@ -23,9 +23,9 @@ export class UserController {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         }
       }
 
