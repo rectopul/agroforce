@@ -1087,9 +1087,9 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</span><br>`;
                 } else {
-                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet] });
-                  if (layoutQuadra.total > 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema ainda não cadastrado.</span><br>`;
+                  let layoutQuadra: any = this.layoutQuadraController.getAll({esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
+                  if (layoutQuadra.total == 0) {
+                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</span><br>`;
                   }
                 }
               }
