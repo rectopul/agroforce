@@ -108,16 +108,19 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       cultures: []
     },
     onSubmit: async (values) => {
-      if (values.password !== values.confirmPassword) {
-        Swal.fire("erro de credenciais")
+      validateInputs(values);
+      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+        Swal.fire('Preencha todos os campos obrigatórios')
         return
       }
-      validateInputs(values);
+      if (values.password !== values.confirmPassword) {
+        Swal.fire("As senhas devem ser iguais")
+        return
+      }
 
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) { return; }
       let checkbox: any = document.getElementsByName('cultures');
       values.cultures = [];
-      for (var i = 0; i < checkbox.length; i++) {
+      for (let i = 0; i < checkbox.length; i++) {
         if (checkbox[i].checked) {
           values.cultures.push(checkbox[i].value);
         }
@@ -177,7 +180,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = ''; }
 
     if (values.password !== values.confirmPassword) {
-      Swal.fire("erro de credenciais")
+      return true
+    } else {
+      return false
     }
   }
 
@@ -213,7 +218,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                 name="name"
                 type="text"
                 placeholder="José Oliveira"
-                required
                 max="40"
                 onChange={formik.handleChange}
                 value={formik.values.name}
@@ -226,7 +230,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               </label>
               <Input
                 type="email"
-                required
                 placeholder="usuario@tmg.agr.br"
                 id="email"
                 name="email"
@@ -234,14 +237,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                 value={formik.values.email}
               />
             </div>
-          </div>
-
-          <div className="w-full
-            flex 
-            justify-around
-            gap-6
-            mb-4
-          ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *CPF
@@ -271,14 +266,48 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                 "
               />
             </div>
+          </div>
+
+
+          <div className="w-full
+            flex 
+            justify-around
+            gap-6
+            mb-4
+          ">
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Matricula
+              </label>
+              <Input
+                type="number"
+                placeholder="Campo númerico"
+                id="registration"
+                name="registration"
+                onChange={formik.handleChange}
+                value={formik.values.registration}
+              />
+            </div>
+
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                *Setor
+              </label>
+              <Select
+                id="departmentId"
+                name="departmentId"
+                onChange={formik.handleChange}
+                values={departmentsData}
+                selected={data.departmentId}
+              />
+            </div>
 
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Telefone
+                Telefone
               </label>
               <InputMask
                 mask=""
-                // required
                 placeholder="(11) 99999-9999"
                 id="tel"
                 name="tel"
@@ -298,19 +327,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               />
             </div>
 
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Setor
-              </label>
-              <Select
-                id="departmentId"
-                required
-                name="departmentId"
-                onChange={formik.handleChange}
-                values={departmentsData}
-                selected={data.departmentId}
-              />
-            </div>
           </div>
 
           <div className="w-full
@@ -321,26 +337,10 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Matricula
-              </label>
-              <Input
-                type="number"
-                // required
-                placeholder="Campo númerico"
-                id="registration"
-                name="registration"
-                onChange={formik.handleChange}
-                value={formik.values.registration}
-              />
-            </div>
-
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Senha
               </label>
               <Input
                 type="password"
-                required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -355,7 +355,6 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
               </label>
               <Input
                 type="password"
-                required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -373,11 +372,10 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Libera jivochat
+                Libera jivochat
               </label>
               <Select
                 values={optionSorN}
-                required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -387,12 +385,11 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             </div>
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Login do App
+                Login do App
               </label>
               <div className="h-10">
                 <Select
                   values={optionSorN}
-                  required
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}

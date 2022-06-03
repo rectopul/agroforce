@@ -52,9 +52,10 @@ interface IData {
   filterAplication: object | any;
   cultureId: number;
   pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit }: IData) {
+export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -71,6 +72,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderCruza, setOrderCruza] = useState<number>(0);
@@ -98,6 +100,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
+
   const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
@@ -111,7 +114,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     },
     onSubmit: async (values) => {
       const parametersFilter = 'filterStatus=' + values.filterStatus + '&filterGenotipo=' + values.filterGenotipo + '&id_culture=' + cultureId + '&filterGenealogy=' + values.filterGenealogy + '&filterCruza=' + values.filterCruza;
-      setCookies('filterBeforeEdit', parametersFilter);
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setGenotipo(response.response);
@@ -257,6 +261,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   title={`Editar ${rowData.genealogy}`}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
+                    setCookies("filterBeforeEdit", filtersParams)
                     router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
                   }
                   }
@@ -346,7 +351,6 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
-
     setStatusAccordion(false);
     setCamposGerenciados(campos);
   }
@@ -780,6 +784,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+
   const token = req.cookies.token;
   const cultureId = Number(req.cookies.cultureId);
 
@@ -814,7 +820,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       cultureId,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     }
   };
 };

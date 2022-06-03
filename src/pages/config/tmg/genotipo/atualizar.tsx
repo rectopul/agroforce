@@ -41,7 +41,7 @@ export interface IUpdateGenotipo {
   genealogy: string;
   genotipo: string;
   cruza: string;
-  id_tecnologia: string;
+  tecnologia: string;
   status: number;
 }
 
@@ -74,8 +74,6 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
-  console.log("Genotipo: ", genotipo)
-
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
@@ -189,7 +187,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -296,14 +294,14 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
@@ -508,7 +506,10 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 style={{ background: '#e5e7eb' }}
                 disabled
                 required
-                value={genotipo.id_tecnologia}
+                id="id_tecnologia"
+                name="id_tecnologia"
+                onChange={formik.handleChange}
+                value={formik.values.id_tecnologia}
               />
             </div>
           </div>
@@ -719,6 +720,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
   const genotipo = await apiGenotipo.json();
+
+  const baseTecUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
+  const apiTecnologia = await fetch(`${baseTecUrl}/` + genotipo.id_tecnologia, requestOptions);
+  const tecnologia = await apiTecnologia.json();
+
+  genotipo.id_tecnologia = tecnologia.name
 
   const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`;
 

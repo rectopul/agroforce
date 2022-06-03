@@ -41,7 +41,7 @@ export default function Importar() {
       input: [],
     },
     onSubmit: async (values) => {
-      var inputFile: any = document.getElementById("inputFile");
+      let inputFile: any = document.getElementById("inputFile");
       readExcel(inputFile.files);
     },
   });
@@ -62,7 +62,7 @@ export default function Importar() {
                 mt-4
                 mb-4
             ">
-    
+
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Excel

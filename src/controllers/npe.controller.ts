@@ -13,7 +13,6 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log("Options: ", options);
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);

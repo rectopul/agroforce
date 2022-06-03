@@ -44,7 +44,11 @@ export default function Cadastro() {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) return;
+      if (!values.name) {
+        Swal.fire("Preencha os campos obrigatórios");
+        return;
+      }
+
 
       await cultureService.createCulture({
         name: capitalize(formik.values.name),
@@ -67,7 +71,6 @@ export default function Cadastro() {
     if (!values.name) {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = 'red';
-      Swal.fire("Preencha os campos obrigatórios");
     } else {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = '';

@@ -46,9 +46,10 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   pageBeforeEdit: string | any
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allFocos, totalItems, itensPerPage, filterAplication, pageBeforeEdit }: IData) {
+export default function Listagem({ allFocos, totalItems, itensPerPage, filterAplication, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -65,13 +66,14 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Name", value: "name" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -98,7 +100,8 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
     },
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + userLogado.userCulture.cultura_selecionada;
-      setCookies("filterBeforeEdit", parametersFilter)
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setFocos(response.response);
@@ -134,7 +137,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -198,6 +201,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
                   title={`Atualizar ${rowData.name}`}
                   onClick={() => {
                     setCookies("pageBeforeEdit", currentPage?.toString())
+                    setCookies("filterBeforeEdit", filtersParams)
                     router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`)
                   }}
                   bgColor="bg-blue-600"
@@ -242,14 +246,14 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 6 }).then((response) => {
@@ -476,8 +480,8 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
                   '>
                     <div className='h-12'>
                       <Button
-                        title="Cadastrar um Foco"
-                        value="Cadastrar um Foco"
+                        title="Cadastrar Foco"
+                        value="Cadastrar Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => { }}
@@ -608,6 +612,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
 
@@ -640,7 +645,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

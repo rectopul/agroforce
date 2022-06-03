@@ -39,7 +39,7 @@ export default function Importar() {
       delineamento: ''
     },
     onSubmit: async (values) => {
-        var inputFile: any = document.getElementById("inputFile");
+        let inputFile: any = document.getElementById("inputFile");
         readExcel(inputFile.files, values.delineamento);
     },
   });

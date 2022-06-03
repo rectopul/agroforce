@@ -28,7 +28,6 @@ export class SafraController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        console.log("Options: ", options)
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
           if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
@@ -147,7 +146,6 @@ export class SafraController {
 
   async postSafra(data: CreateSafra) {
     try {
-      console.log("Options: ", data);
       const schema: SchemaOf<CreateSafra> = object({
         id_culture: number().integer().required(this.required),
         safraName: string().required(this.required),
@@ -176,7 +174,6 @@ export class SafraController {
 
   async updateSafra(data: UpdateSafra) {
     try {
-      console.log("Date: ", data)
       const schema: SchemaOf<UpdateSafra> = object({
         id: number().integer().required(this.required),
         safraName: string().required(this.required),
@@ -194,11 +191,7 @@ export class SafraController {
 
       if (!safra) return { status: 400, message: 'Safra não existente' };
 
-      console.log("Date: ", data)
-
-
-      const safraAlreadyExists = await this.safraRepository.findBySafraName(data.safraName);
-      console.log("Safra: ", safraAlreadyExists)
+      const safraAlreadyExists = await this.safraRepository.findBySafraName(data);
 
       if (safraAlreadyExists && safraAlreadyExists.id !== safra.id) {
         return { status: 400, message: 'Safra já cadastrada.' };
