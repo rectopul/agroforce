@@ -16,11 +16,11 @@ export default function Importar() {
   const { TabsDropDowns } = ITabs;
   const router = useRouter();
 
-  function readExcel(value: any, delineamento: any) {
+  function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({spreadSheet: rows, moduleId: 7, delineamento: delineamento, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
+      importService.validate({spreadSheet: rows, moduleId: 7, id_culture: userLogado.userCulture.cultura_selecionada ,created_by: userLogado.id}).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -36,11 +36,10 @@ export default function Importar() {
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      delineamento: ''
     },
     onSubmit: async (values) => {
         var inputFile: any = document.getElementById("inputFile");
-        readExcel(inputFile.files, values.delineamento);
+        readExcel(inputFile.files);
     },
   });
   return (
@@ -60,20 +59,6 @@ export default function Importar() {
                 mt-4
                 mb-4
             ">
-            
-              <div className="w-full h-10">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                        *Delineamento
-                    </label>
-                        <Input 
-                            type="text"
-                            required
-                            id="delineamento"
-                            name="delineamento"
-                            onChange={formik.handleChange}
-                            value={formik.values.delineamento}
-                        />
-                </div>
                 <div className="w-full h-10">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                         *Excel
