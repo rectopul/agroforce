@@ -65,8 +65,8 @@ export function TabsDropDowns() {
     {
       titleTab: 'QUADRAS', valueTab: <BsCheckLg />, statusTab: false, hrefTab: '/config/quadra',
       data: [
-        { labelDropDown: 'Quadra', hrefDropDown: '/config/quadra', iconDropDown: <FiMapPin /> },
         { labelDropDown: 'Layout', hrefDropDown: '/config/quadra/layout-quadra', iconDropDown: <FiMapPin /> },
+        { labelDropDown: 'Quadra', hrefDropDown: '/config/quadra', iconDropDown: <FiMapPin /> },
       ],
     },
   ];
