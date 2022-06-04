@@ -38,7 +38,7 @@ export default function Importar({ safra }: any) {
             width: "800"
           });
           if (!response.erro) {
-            // router.back();
+            router.back();
           }
         }
       });

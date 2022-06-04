@@ -36,16 +36,18 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log(options);
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         } else {
-          if (options.filterStatus !== 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
         }
       } else {
         parameters.status = 1;
       }
+      console.log(parameters);
 
       if (options.filterGenotipo) {
         options.filterGenotipo = '{"contains":"' + options.filterGenotipo + '"}';
@@ -182,21 +184,8 @@ export class GenotipoController {
     }
   }
 
-  async updategenotipo(data: UpdateGenotipoLote) {
+  async updategenotipo(data: any) {
     try {
-      const schema: SchemaOf<UpdateGenotipoLote> = object({
-        id: number().integer().required(this.required),
-        id_tecnologia: number().integer().required(this.required),
-        id_culture: number().integer().required(this.required),
-        genotipo: string().required(this.required),
-        genealogy: string().optional(),
-        cruza: string().required(this.required),
-        status: number().integer().required(this.required)
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
 
       const genotipo: any = await this.genotipoRepository.findOne(data.id);
 
@@ -208,13 +197,7 @@ export class GenotipoController {
         return { status: 400, message: 'Genealogia já cadastra. favor consultar os inativos' };
       }
 
-      genotipo.id_culture = data.id_culture;
-      genotipo.id_tecnologia = data.id_tecnologia;
-      genotipo.genotipo = data.genotipo;
-      genotipo.cruza = data.cruza;
-      genotipo.status = data.status;
-
-      await this.genotipoRepository.update(genotipo.id, genotipo);
+      await this.genotipoRepository.update(genotipo.id, data);
 
       return { status: 200, message: 'Genótipo atualizado' };
     } catch (err) {

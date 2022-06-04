@@ -111,7 +111,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
     },
   });
 
-  async function handleStatusPortfolio(idFoco: number, data: IFocos): Promise<void> {
+  async function handleStatus(idFoco: number, data: IFocos): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
     } else {
@@ -212,7 +212,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
                 <div className="h-10">
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
+                    onClick={async () => await handleStatus(
                       rowData.id, {
                       status: rowData.status,
                       ...rowData
@@ -226,7 +226,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
                 <div className="h-10">
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatusPortfolio(
+                    onClick={async () => await handleStatus(
                       rowData.id, {
                       status: rowData.status,
                       ...rowData

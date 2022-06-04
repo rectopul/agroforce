@@ -446,11 +446,11 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Genotipo
+                      Genótipo
                     </label>
                     <Input
                       type="text"
-                      placeholder="Genotipo"
+                      placeholder="Genótipo"
                       max="40"
                       id="filterGenotipo"
                       name="filterGenotipo"

@@ -17,9 +17,6 @@ export class LayoutQuadraRepository {
         }
         let count = await prisma.layout_quadra.count({ where: where })
         let Result: object | any = await prisma.layout_quadra.findMany({ select: select, skip: skip, take: take, where: where, orderBy: order })
-        Result.map((value: string | object | any, item: any) => {
-            Result[item].local = Result[item].local.name;
-        })
         Result.total = count;
         return Result;
     }

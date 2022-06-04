@@ -36,15 +36,15 @@ export class TypeAssayRepository {
     return Result;
   }
 
-  async update(id: number, Local: Object) {
-    let ExisLocal = await this.findOne(id);
-    if (ExisLocal !== null) {
-      let Result = await prisma.type_assay.update({
-        where: {
-          id: id
-        },
-        data: Local
-      })
+    async update(id: number, Data: Object) {
+        let Exist = await this.findOne(id);
+        if (Exist !== null) {
+            let Result = await prisma.type_assay.update({
+                where: {
+                    id: id
+                },
+                data: Data
+            })
 
       return Result;
     } else {
