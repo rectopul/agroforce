@@ -59,9 +59,10 @@ interface Idata {
   filterAplication: object | any;
   uf: object | any;
   pageBeforeEdit: string | any
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf, pageBeforeEdit }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf, pageBeforeEdit, filterBeforeEdit }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -80,6 +81,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [citys, setCitys] = useState<object | any>([{ id: '0', name: 'selecione' }]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
+
   const [orderName, setOrderName] = useState<number>(0);
   const [orderAddress, setOrderAddress] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
@@ -125,7 +128,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     onSubmit: async ({ filterStatus, filterUF, filterCity, filterName }) => {
       const parametersFilter = `filterStatus=${filterStatus}&filterUf=${filterUF}&filterCity=${filterCity}&filterName=${filterName}`
       //let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
-      setCookies("filterBeforeEdit", parametersFilter)
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setTotalItems(response.total)
@@ -143,7 +147,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
@@ -270,6 +274,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name_farm}`}
                     onClick={() => {
+                      setCookies("filterBeforeEdit", filtersParams)
                       setCookies("pageBeforeEdit", currentPage?.toString())
                       router.push(`/config/local/atualizar?id=${rowData.id}`)
                     }}
@@ -295,6 +300,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name_farm}`}
                     onClick={() => {
+                      setCookies("filterBeforeEdit", filtersParams)
                       setCookies("pageBeforeEdit", currentPage?.toString())
                       router.push(`/config/local/atualizar?id=${rowData.id}`)
                     }}
@@ -322,14 +328,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 4 }).then((response) => {
@@ -557,7 +563,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar locais">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -813,6 +819,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
@@ -846,7 +854,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       uf,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

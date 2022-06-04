@@ -44,7 +44,10 @@ export default function Cultura(culture: IUpdateCulture) {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) return;
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await cultureService.updateCulture({
         id: culture.id,

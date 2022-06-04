@@ -42,7 +42,11 @@ export default function Safra() {
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
-      if (!validateInputs(values)) return;
+      validateInputs(values)
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await departmentService.create({
         name: capitalize(formik.values.name),
@@ -63,12 +67,9 @@ export default function Safra() {
     if (!values.name) {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = 'red';
-      Swal.fire("Preencha os campos obrigatórios");
-      return false
     } else {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = '';
-      return true
     }
   }
 

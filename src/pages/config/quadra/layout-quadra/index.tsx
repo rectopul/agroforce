@@ -1,3 +1,4 @@
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
@@ -64,9 +65,11 @@ interface Idata {
   itensPerPage: number | any;
   filterAplication: object | any;
   local: object | any;
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, local, pageBeforeEdit, filterBeforeEdit }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -82,7 +85,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [orderName, setOrderName] = useState<number>(0);
   const [orderAddress, setOrderAddress] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
@@ -122,6 +126,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       let parametersFilter = "&filterStatus=" + values.filterStatus + "&filterEsquema=" + values.filterEsquema + "&filterDisparos=" + values.filterDisparos + "&filterTiros=" + values.filterTiros + "&filterPlantadeira=" + values.filterPlantadeira + "&filterParcelas=" + values.filterParcelas;
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await layoutQuadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setTotaItems(response.total);
         setFilter(parametersFilter);
@@ -138,7 +144,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
@@ -270,14 +276,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 5 }).then((response) => {
@@ -489,7 +495,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar layouts de quadra">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -755,12 +761,18 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
+
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterAplication = "filterStatus=1";
@@ -781,7 +793,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication
+      filterAplication,
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

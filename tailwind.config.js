@@ -7,28 +7,38 @@ module.exports = {
     "./src/components/**/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    colors: {      
+    screens: {
+      'sm': '1024px',
+      // => @media (min-width: 640px) { ... }
+
+      'md': '1439px',
+      // => @media (min-width: 768px) { ... }
+
+      'lg': '1919px',
+      // => @media (min-width: 1024px) { ... }
+    },
+    colors: {
       'white': '#FFFFFF',
 
       'green-600': '#16a34a',
 
-      'cyan-500':  '#61dafb',
+      'cyan-500': '#61dafb',
 
-      'yellow-500':  '#eba417',
+      'yellow-500': '#eba417',
 
-      'gray-450':  '#00567b',
+      'gray-450': '#00567b',
       'blue-480': '#0060b9',
       'blue-600': '#00a5b4',
       'blue-700': '#1d4ed8',
       'blue-900': '#133774',
-      
+
       'gray-50': '#f9fafb',
-      'gray-200':  '#e5e7eb',
-      'gray-300':  '#d1d5db',
+      'gray-200': '#e5e7eb',
+      'gray-300': '#d1d5db',
 
       'gray-400': '#9ca3af',
-      'gray-600':  '#4b5563',
-      'gray-700':  '#374151',
+      'gray-600': '#4b5563',
+      'gray-700': '#374151',
       'gray-900': '#121214',
 
       'red-600': '#dc2626',
@@ -59,6 +69,6 @@ module.exports = {
     },
   },
   plugins: [
-    
+
   ],
 }
