@@ -61,6 +61,13 @@ export default function Cadastro({ safra, id_foco }: any) {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+
+      validateInputs(values)
+      if (!values.group) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
+
       await grupoService.create({
         id_safra: Number(safra.id),
         id_foco: parseInt(id_foco),
@@ -79,6 +86,16 @@ export default function Cadastro({ safra, id_foco }: any) {
       });
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.roup) {
+      let inputGroup: any = document.getElementById("group");
+      inputGroup.style.borderColor = 'red';
+    } else {
+      let inputGroup: any = document.getElementById("group");
+      inputGroup.style.borderColor = '';
+    }
+  }
 
   return (
     <>

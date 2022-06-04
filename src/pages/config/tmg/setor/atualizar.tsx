@@ -43,7 +43,11 @@ export default function AtualizarSafra(item: IDepartmentProps) {
       status: item.status
     },
     onSubmit: async (values) => {
-      if (values.id !== item.id) throw new Error("Dados inválidos");
+      validateInputs(values)
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await departmentService.update({
         id: item.id,
@@ -60,6 +64,16 @@ export default function AtualizarSafra(item: IDepartmentProps) {
       });
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.name) {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = '';
+    }
+  }
 
   return (
     <>
@@ -79,7 +93,6 @@ export default function AtualizarSafra(item: IDepartmentProps) {
               </label>
               <Input
                 type="text"
-                required
                 id="name"
                 name="name"
                 maxLength={50}

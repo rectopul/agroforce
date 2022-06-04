@@ -178,7 +178,7 @@ export class ImportController {
   }
 
   async validateNPE(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let npeiAnterior: number = 0;
     let Column: number;
     try {
@@ -385,7 +385,7 @@ export class ImportController {
   }
 
   async validateDelineamento(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
 
     try {
@@ -606,7 +606,7 @@ export class ImportController {
   }
 
   async validateGenotipo(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -708,7 +708,7 @@ export class ImportController {
   }
 
   async validateLote(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -805,7 +805,7 @@ export class ImportController {
   }
 
   async validateLocal(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -963,7 +963,7 @@ export class ImportController {
   }
 
   async validateQuadra(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
 
     try {
@@ -1211,7 +1211,7 @@ export class ImportController {
         let count = 1;
         let tiro_fixo, disparo_fixo;
 
-        let safra = await this.safraController.getAllSafra({ safraName: data.safra });
+        let safra = await this.safraController.getAllSafra({ year: data.safra });
         this.aux.id_safra = Number(safra.response[0].id);
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
@@ -1349,7 +1349,7 @@ export class ImportController {
   }
 
   async validateLayoutQuadra(data: object | any) {
-    var Resposta: string = '';
+    let Resposta: string = '';
     let Column: number;
 
     try {

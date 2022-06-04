@@ -50,8 +50,11 @@ export default function NovoLocal({ tecnologia }: IData) {
       status: 1
     },
     onSubmit: async (values) => {
-      validateInputs(values);
-      if (!values.name) { return; }
+      validateInputs(values)
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await tecnologiaService.update({
         id: values.id,
@@ -72,7 +75,15 @@ export default function NovoLocal({ tecnologia }: IData) {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.name) {
+      let inputname: any = document.getElementById("name");
+
+      inputname.style.borderColor = 'red';
+    }
+    else {
+      let inputname: any = document.getElementById("name");
+      inputname.style.borderColor = '';
+    }
   }
 
   return (

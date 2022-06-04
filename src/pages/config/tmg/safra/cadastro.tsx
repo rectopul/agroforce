@@ -72,11 +72,13 @@ export default function Safra() {
         ...inputs
       } = data;
 
-      if (!validateInputs(inputs)) return;
+      validateInputs(inputs)
+      if (!values.safraName || !values.year) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
       let plantingStartTime;
       let plantingEndTime;
-
-      if (!inputs) return;
 
       if (values.plantingStartTime) {
         plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
@@ -115,14 +117,11 @@ export default function Safra() {
       let inputYear: any = document.getElementById("year");
       inputSafraName.style.borderColor = 'red';
       inputYear.style.borderColor = 'red';
-      Swal.fire("Preencha os campos obrigatórios")
-      return false
     } else {
       let inputSafraName: any = document.getElementById("safraName");
       let inputYear: any = document.getElementById("year");
       inputSafraName.style.borderColor = '';
       inputYear.style.borderColor = '';
-      return true
     }
   };
 
@@ -134,13 +133,13 @@ export default function Safra() {
 
       <Content contentHeader={tabsDropDowns}>
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8"
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova safra</h1>
 
-          <div className="w-full flex justify-between items-start gap-5">
-            <div className="w-2/4 h-10">
+          <div className="w-full flex justify-between items-start gap-5 mt-4">
+            <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
                 Safra
@@ -171,7 +170,7 @@ export default function Safra() {
               />
             </div>
 
-            <div className="w-2/4 h-10">
+            <div className="w-4/12 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
                 Ano
@@ -203,7 +202,7 @@ export default function Safra() {
             </div>
 
 
-            <div className="w-2/4 h-10">
+            <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
 
                 Período ideal de início de plantio
@@ -217,7 +216,7 @@ export default function Safra() {
               />
             </div>
 
-            <div className="w-2/4">
+            <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
 
                 Período ideal do fim do plantio
@@ -236,7 +235,7 @@ export default function Safra() {
             flex
             gap-3
             justify-center
-            mt-10
+            mt-12
           ">
             <div className="w-30">
               <Button

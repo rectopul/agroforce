@@ -27,6 +27,13 @@ interface ISafraProps {
   status: number;
 };
 
+interface Input {
+  safraName: string;
+  year: number;
+  plantingStartTime: string;
+  plantingEndTime: string;
+};
+
 export default function AtualizarSafra(safra: ISafraProps) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -59,20 +66,31 @@ export default function AtualizarSafra(safra: ISafraProps) {
       // id_culture: safra.id_culture,
       safraName: safra.safraName,
       year: safra.year,
-      plantingStartTime: safra.plantingStartTime,
-      plantingEndTime: safra.plantingEndTime,
+      plantingStartTime: "",
+      plantingEndTime: "",
       status: safra.status,
     },
     onSubmit: async (values) => {
-      if (values.id !== safra.id) throw new Error("Dados inválidos");
+      validateInputs(values)
+      if (!values.safraName || !values.year) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
-      const plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
-        new Date(formik.values.plantingStartTime)
-      );
+      let plantingStartTime;
+      let plantingEndTime;
 
-      const plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
-        new Date(formik.values.plantingEndTime)
-      );
+      if (values.plantingStartTime) {
+        plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingStartTime)
+        );
+      }
+
+      if (values.plantingEndTime) {
+        plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingEndTime)
+        );
+      }
 
       await safraService.updateSafras({
         id: safra.id,
@@ -93,6 +111,19 @@ export default function AtualizarSafra(safra: ISafraProps) {
     },
   });
 
+  function validateInputs(values: Input) {
+    if (!values.safraName || !values.year) {
+      let inputSafraName: any = document.getElementById("safraName");
+      let inputYear: any = document.getElementById("year");
+      inputSafraName.style.borderColor = 'red';
+      inputYear.style.borderColor = 'red';
+    } else {
+      let inputSafraName: any = document.getElementById("safraName");
+      let inputYear: any = document.getElementById("year");
+      inputSafraName.style.borderColor = '';
+      inputYear.style.borderColor = '';
+    }
+  };
 
   return (
     <>
@@ -113,6 +144,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 id="safraName"
                 name="safraName"
+                placeholder="___________"
+                maxLength={10}
                 onChange={formik.handleChange}
                 value={formik.values.safraName}
                 className="
@@ -141,6 +174,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 id="year"
                 name="year"
+                maxLength={4}
+                placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
                 className="
@@ -169,7 +204,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 type="date"
                 id="plantingStartTime"
                 name="plantingStartTime"
-                onChange={() => { }}
+                onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
               />
             </div>
@@ -182,7 +217,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 type="date"
                 id="plantingEndTime"
                 name="plantingEndTime"
-                onChange={() => { }}
+                onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}
               />
             </div>

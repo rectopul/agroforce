@@ -50,7 +50,10 @@ export default function NovoLocal({ typeAssayEdit }: IData) {
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) { return; }
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await typeAssayService.update({
         id: values.id,

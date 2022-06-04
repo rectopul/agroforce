@@ -52,9 +52,10 @@ interface IData {
   filterAplication: object | any;
   cultureId: number;
   pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit }: IData) {
+export default function Listagem({ allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -71,6 +72,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [arrowSafra, setArrowSafra] = useState<string>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -110,7 +112,8 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
     onSubmit: async ({ filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate }) => {
       const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`
       //const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      setCookies("filterBeforeEdit", parametersFilter)
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setSafras(response.response);
@@ -160,7 +163,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -246,6 +249,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
                   textColor="white"
                   onClick={() => {
                     setCookies("pageBeforeEdit", currentPage?.toString())
+                    setCookies("filterBeforeEdit", filtersParams)
                     router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)
                   }}
 
@@ -289,14 +293,14 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 3 }).then((response) => {
@@ -690,6 +694,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
   const { publicRuntimeConfig } = getConfig();
@@ -724,7 +730,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       cultureId,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

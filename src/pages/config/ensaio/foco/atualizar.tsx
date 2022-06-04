@@ -28,6 +28,7 @@ import {
   Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { removeCookies, setCookies } from 'cookies-next';
 
 
 
@@ -47,6 +48,7 @@ interface IData {
   id_foco: number;
   genotipo: any;
   foco: IUpdateFoco,
+  pageBeforeEdit: string | any
 }
 
 interface IGenarateProps {
@@ -63,7 +65,7 @@ interface IFilter {
 }
 
 
-export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, genotipo }: IData) {
+export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, genotipo, pageBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -88,6 +90,13 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+
+      validateInputs(values)
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
+
       await focoService.update({
         id: foco.id,
         name: capitalize(formik.values.name),
@@ -105,11 +114,21 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     },
   });
 
+  function validateInputs(values: any) {
+    if (!values.name) {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = '';
+    }
+  }
+
   const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id,,name,grupo,acao" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
@@ -154,7 +173,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -213,7 +232,10 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
               <div className="h-10">
                 <Button
                   icon={<BiEdit size={16} />}
-                  onClick={() => { router.push(`grupo/atualizar?id=${rowData.id}`) }}
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString())
+                    router.push(`grupo/atualizar?id=${rowData.id}`)
+                  }}
                   bgColor="bg-blue-600"
                   textColor="white"
                 />
@@ -228,15 +250,15 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    const els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString - 1)
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
         userLogado.preferences.grupo = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
@@ -310,10 +332,11 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_foco=${id_foco}`;
+    if (!filterAplication.includes("paramSelect")) {
+      filterAplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
     }
 
+    console.log("Filter: ", filterAplication)
     await grupoService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
@@ -325,6 +348,12 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
           return row;
         });
+
+        newData.map((item: any) => {
+          item.foco = item.foco.name
+          item.safra = item.safra.safraName
+          return item
+        })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
@@ -371,7 +400,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
   useEffect(() => {
     handlePagination(); ''
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
 
   return (
     <>
@@ -611,11 +640,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
+  const pageBeforeEdit = context.req.cookies.pageBeforeEdit ? context.req.cookies.pageBeforeEdit : 0;
+
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` }
   };
+  // removeCookies('filterBeforeEdit', { req, res });
+
+  // removeCookies('pageBeforeEdit', { req, res });
 
   const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
 
@@ -643,7 +677,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       itensPerPage,
       filterAplication,
       id_foco,
-      foco
+      foco,
+      pageBeforeEdit
     }
   }
 }

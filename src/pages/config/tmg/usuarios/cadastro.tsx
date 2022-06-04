@@ -84,14 +84,14 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       cultures: []
     },
     onSubmit: async (values) => {
-      const inputsCheck = validateInputs(values);
+      validateInputs(values);
       if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
         Swal.fire('Preencha todos os campos obrigatórios')
         return
       }
-      if (!inputsCheck) {
-        Swal.fire('As senhas devem ser iguais')
-        return;
+      if (values.password !== values.confirmPassword) {
+        Swal.fire("As senhas devem ser iguais")
+        return
       }
 
       let ObjProfiles;
@@ -140,19 +140,53 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
-    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = ''; }
-    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = ''; }
-    // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
-    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = ''; }
-    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = ''; }
-    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = ''; }
-
-    if (values.password !== values.confirmPassword) {
-      return false;
+    if (!values.name) {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = 'red';
+    } else {
+      let inputName: any = document.getElementById("name");
+      inputName.style.borderColor = '';
     }
 
-    return true;
+    if (!values.email) {
+      let inputEmail: any = document.getElementById("email");
+      inputEmail.style.borderColor = 'red';
+    } else {
+      let inputEmail: any = document.getElementById("email");
+      inputEmail.style.borderColor = '';
+    }
+
+    if (!values.cpf) {
+      let inputCpf: any = document.getElementById("cpf");
+      inputCpf.style.borderColor = 'red';
+    } else {
+      let inputCpf: any = document.getElementById("cpf");
+      inputCpf.style.borderColor = '';
+    }
+
+    if (!values.departmentId) {
+      let inputDepartmentId: any = document.getElementById("departmentId");
+      inputDepartmentId.style.borderColor = 'red';
+    } else {
+      let inputDepartmentId: any = document.getElementById("departmentId");
+      inputDepartmentId.style.borderColor = '';
+    }
+
+    if (!values.password) {
+      let inputPassword: any = document.getElementById("password");
+      inputPassword.style.borderColor = 'red';
+    } else {
+      let inputPassword: any = document.getElementById("password");
+      inputPassword.style.borderColor = '';
+    }
+
+    if (!values.confirmPassword) {
+      let inputconfirmPassword: any = document.getElementById("confirmPassword");
+      inputconfirmPassword.style.borderColor = 'red';
+    } else {
+      let inputconfirmPassword: any = document.getElementById("confirmPassword");
+      inputconfirmPassword.style.borderColor = '';
+    }
   }
 
   // useEffect(() => {
@@ -184,11 +218,10 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Nome usuário
+                *Nome
               </label>
               <Input
                 type="text"
-                // required
                 placeholder="José Oliveira"
                 max="40"
                 id="name"
@@ -204,7 +237,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <Input
                 type="email"
-                // required
                 placeholder="usuario@tmg.agr.br"
                 id="email"
                 name="email"
@@ -212,7 +244,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 value={formik.values.email}
               />
             </div>
-
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *CPF
@@ -251,7 +282,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 Matricula
               </label>
               <Input
-                // required
                 type="number"
                 placeholder="Campo númerico"
                 id="registration"
@@ -260,14 +290,12 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 value={formik.values.registration}
               />
             </div>
-
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Setor
               </label>
               <Select
                 values={departments}
-                // required
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}
@@ -276,13 +304,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               />
             </div>
 
+
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Telefone
               </label>
               <InputMask
                 mask={maskTel}
-                // required
                 type="tel"
                 placeholder="(11) 99999-9999"
                 id="tel"
@@ -316,7 +344,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <Input
                 type="password"
-                // required
                 placeholder="*************"
                 id="password"
                 name="password"
@@ -331,7 +358,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <Input
                 type="password"
-                // required
                 placeholder="*************"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -353,7 +379,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               </label>
               <Select
                 values={optionSorN}
-                // required
                 id="jivochat"
                 name="jivochat"
                 onChange={formik.handleChange}
@@ -368,7 +393,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               <div className="h-10">
                 <Select
                   values={optionSorN}
-                  // required
+
                   id="app_login"
                   name="app_login"
                   onChange={formik.handleChange}

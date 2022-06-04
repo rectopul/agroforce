@@ -46,7 +46,11 @@ export default function Cadastro() {
     },
     onSubmit: async (values) => {
 
-      if (!validateInputs(values)) return
+      validateInputs(values);
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await focoService.create({
         name: capitalize(formik.values.name),
@@ -68,18 +72,13 @@ export default function Cadastro() {
   function validateInputs(values: any) {
     if (!values.name || values.group === 0) {
       let inputname: any = document.getElementById("name");
-      let inputGroup: any = document.getElementById("group");
-
+      //let inputGroup: any = document.getElementById("group");
       inputname.style.borderColor = 'red';
-      inputGroup.style.borderColor = 'red';
-
-      Swal.fire("Preencha os campos obrigatórios")
-      return false;
+      //inputGroup.style.borderColor = 'red';
     }
     else {
       let inputname: any = document.getElementById("name");
       inputname.style.borderColor = '';
-      return true;
     }
   }
 
@@ -104,22 +103,22 @@ export default function Cadastro() {
             mt-4
             mb-4
         ">
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Nome
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text" 
-              max="50" 
-              placeholder="ex: Foco"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                max="50"
+                placeholder="ex: Foco"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
           </div>
-        </div>
 
           <div className="
             h-10 w-full

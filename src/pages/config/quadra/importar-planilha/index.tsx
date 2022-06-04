@@ -51,7 +51,7 @@ export default function Importar({ safra }: any) {
       genotipo: ''
     },
     onSubmit: async (values) => {
-      var inputFile: any = document.getElementById("inputFile");
+      let inputFile: any = document.getElementById("inputFile");
       readExcel(inputFile.files, values.safra);
     },
   });

@@ -41,7 +41,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
       const auxObject: any = [];
       let auxObject2: any = [];
 
-      for (var i = 0; i < quantityColumns; i++) {
+      for (let i = 0; i < quantityColumns; i++) {
         input = document.querySelector('select[name="fields_' + i + '"]');
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i++) {
@@ -58,7 +58,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   });
 
   function hasDuplicates(array: any) {
-      return (new Set(array)).size !== array.length;
+    return (new Set(array)).size !== array.length;
   }
 
   function saveConfig() {
@@ -66,7 +66,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     let input: any;
     const auxObject: any = [];
     let auxObject2: any = [];
-    for (var i = 0; i < quantityColumns; i++) {
+    for (let i = 0; i < quantityColumns; i++) {
       input = document.querySelector('select[name="fields_' + i + '"]');
       auxObject2 = [];
       for (let v = 0; v < input.options.length; v++) {
@@ -89,7 +89,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     } else {
       Swal.fire('Existe itens duplicados na configuração');
     }
- 
+
   }
   function toLetter(columnNumber: any) {
 
@@ -169,7 +169,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
           </div>
 
           <div className="
-            h-24
+            sm:h-14
+            lg:h-24
             bg-blue-900
             text-white
             px-2
@@ -200,15 +201,15 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 "
             onSubmit={formik.handleSubmit}
           >
-            <main className="relative bottom-24 py-4 w-importation-content mb-2 flex flex-col overflow-x-scroll h-1/12">
+            <main className="relative sm:bottom-12 md:bottom-16 lg:bottom-20  w-importation-content mb-2 flex flex-col overflow-x-scroll h-1/12">
               <div className="absolute flex pl-2 justify-start items-center gap-3 text-white">
                 {Letras.map((item, index) => {
                   if (index < quantityColumns) {
                     {
                       return (
                         <>
-                          <div key={index} className="h-16 w-32 flex items-center justify-center">
-                            <strong className="h-16 w-16 flex justify-center items-center border-2 rounded-full">
+                          <div key={index} className="sm:pb-2 md:pb-0 md:pb-0 h-16 w-32 flex items-center justify-center">
+                            <strong className="sm:h-10 sm:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 flex justify-center items-center border-2 rounded-full">
                               {Letras[index]}
                             </strong>
                           </div>

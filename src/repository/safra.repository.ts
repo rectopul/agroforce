@@ -27,7 +27,6 @@ export class SafraRepository {
   }
 
   async findBySafraName(data: any) {
-    console.log("Data repository: ", data);
     const safra = await prisma.safra.findFirst({
       where: {
         safraName: data.safraName,

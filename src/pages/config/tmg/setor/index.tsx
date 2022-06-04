@@ -44,9 +44,10 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any;
 }
 
-export default function Listagem({ allDepartments, totalItems, itensPerPage, filterAplication, pageBeforeEdit }: IData) {
+export default function Listagem({ allDepartments, totalItems, itensPerPage, filterAplication, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -64,6 +65,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 
   const [items, setItems] = useState<IDepartment[]>(() => allDepartments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
@@ -97,7 +99,8 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      setCookies("filterBeforeEdit", parametersFilter)
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setItems(response.response);
@@ -133,7 +136,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 
   function columnsOrder(camposGerenciados: string) {
     const ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -199,6 +202,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
                   textColor="white"
                   onClick={() => {
                     setCookies("pageBeforeEdit", currentPage?.toString())
+                    setCookies("filterBeforeEdit", filtersParams)
                     router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)
                   }
                   }
@@ -243,14 +247,14 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 11 }).then((response) => {
@@ -610,6 +614,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
 
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
@@ -642,7 +647,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

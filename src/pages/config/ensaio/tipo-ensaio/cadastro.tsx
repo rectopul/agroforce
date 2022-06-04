@@ -49,7 +49,11 @@ export default function NovoLocal() {
     },
     onSubmit: async (values) => {
 
-      if (!validateInputs(values)) { return }
+      validateInputs(values)
+      if (!values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await typeAssayService.create({
         id_culture: parseInt(culture),
@@ -60,7 +64,7 @@ export default function NovoLocal() {
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Tipo de Ensaio cadastrado com sucesso!')
-          router.push('/config/ensaio/tipo-ensaio');
+          router.back()
         } else {
           Swal.fire(response.message)
         }
@@ -72,12 +76,9 @@ export default function NovoLocal() {
     if (!values.name) {
       let inputname: any = document.getElementById("name");
       inputname.style.borderColor = 'red';
-      Swal.fire("Preencha os campos obrigatórios")
-      return false
     } else {
       let inputname: any = document.getElementById("name");
       inputname.style.borderColor = '';
-      return true
     }
   }
 

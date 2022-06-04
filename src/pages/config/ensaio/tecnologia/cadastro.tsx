@@ -50,7 +50,11 @@ export default function NovoLocal() {
     },
     onSubmit: async (values) => {
 
-      if (!validateInputs(values)) return
+      validateInputs(values)
+      if (!values.cod_tec || !values.name) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
 
       await tecnologiaService.create({
         id_culture: parseInt(culture),
@@ -77,13 +81,10 @@ export default function NovoLocal() {
 
       inputname.style.borderColor = 'red';
       inputcod_tec.style.borderColor = 'red';
-      Swal.fire("Preencha os campos obrigatórios")
-      return false;
     }
     else {
       let inputname: any = document.getElementById("name");
       inputname.style.borderColor = '';
-      return true;
     }
   }
 

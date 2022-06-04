@@ -70,7 +70,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -136,7 +136,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
@@ -180,7 +180,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             <div className='flex items-center'>
               {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Name
+                Nome
               </button>
             </div>
           ),
@@ -251,14 +251,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 15 }).then((response) => {
@@ -407,7 +407,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar época">
+          <AccordionFilter title="Filtrar épocas">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col

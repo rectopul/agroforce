@@ -137,7 +137,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
@@ -266,14 +266,14 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
@@ -421,7 +421,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar lote">
+          <AccordionFilter title="Filtrar lotes">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col

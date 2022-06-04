@@ -46,7 +46,7 @@ export default function Importar() {
       genotipo: ''
     },
     onSubmit: async (values) => {
-      var inputFile: any = document.getElementById("inputFile");
+      let inputFile: any = document.getElementById("inputFile");
       readExcel(inputFile.files);
     },
   });

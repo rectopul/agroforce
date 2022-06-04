@@ -47,9 +47,10 @@ interface Idata {
   filterAplication: object | any;
   cultureId: number;
   pageBeforeEdit: string | any
+  filterBeforeEdit: string | any;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId, pageBeforeEdit }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId, pageBeforeEdit, filterBeforeEdit }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -68,12 +69,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderName, setOrderName] = useState<number>(0);
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Name ", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -94,7 +96,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async (values) => {
       const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      setCookies("filterBeforeEdit", parametersFilter)
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setTypeAssay(response.response);
@@ -112,7 +115,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
-    var arrOb: any = [];
+    let arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
@@ -153,7 +156,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             <div className='flex items-center'>
               {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Name
+                Nome
               </button>
             </div>
           ),
@@ -180,6 +183,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     title={`Atualizar ${rowData.name}`}
                     onClick={() => {
                       setCookies("pageBeforeEdit", currentPage?.toString())
+                      setCookies("filterBeforeEdit", filtersParams)
                       router.push(`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`)
                     }}
                     bgColor="bg-blue-600"
@@ -228,14 +232,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox'");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    let els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
+    let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 9 }).then((response) => {
@@ -406,7 +410,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar">
+          <AccordionFilter title="Filtrar tipos de ensaio">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -623,6 +627,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
   const safraId = req.cookies.safraId;
@@ -655,7 +660,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       cultureId,
-      pageBeforeEdit
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }

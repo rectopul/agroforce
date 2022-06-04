@@ -60,6 +60,11 @@ export default function Cadastro({ grupo }: any) {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+      validateInputs(values)
+      if (!values.group) {
+        Swal.fire('Preencha todos os campos obrigatórios')
+        return
+      }
       await grupoService.update({
         id: Number(grupo.id),
         id_safra: Number(grupo.safra.id),
@@ -79,6 +84,16 @@ export default function Cadastro({ grupo }: any) {
       });
     },
   });
+
+  function validateInputs(values: any) {
+    if (!values.group) {
+      let inputGroup: any = document.getElementById("group");
+      inputGroup.style.borderColor = 'red';
+    } else {
+      let inputGroup: any = document.getElementById("group");
+      inputGroup.style.borderColor = '';
+    }
+  }
 
   return (
     <>
@@ -135,7 +150,6 @@ export default function Cadastro({ grupo }: any) {
                 mask={'99'}
                 id="group"
                 name="group"
-                required
                 onChange={formik.handleChange}
                 value={formik.values.group}
               />

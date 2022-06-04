@@ -18,6 +18,7 @@ import { quadraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../shared/utils/dropdown";
 import Swal from "sweetalert2";
+import { removeCookies, setCookies } from "cookies-next";
 
 interface IFilter {
   filterStatus: object | any;
@@ -51,9 +52,11 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   cultureId: number;
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allquadra, totalItems, itensPerPage, filterAplication, cultureId }: IData) {
+export default function Listagem({ allquadra, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -69,7 +72,8 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => allquadra);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -104,6 +108,8 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
     },
     onSubmit: async (values) => {
       let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      setFiltersParams(parametersFilter)
+      setCookies("filterBeforeEdit", filtersParams)
       await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter)
         setQuadra(response.response);
@@ -155,85 +161,88 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   };
 
   function columnsOrder(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
-    var arrOb: any = [];
+    const objetCampos: any = camposGerenciados.split(',');
+    const arrOb: any = [];
+    console.log("ObjetCampos:", objetCampos)
 
-    Object.keys(ObjetCampos).forEach((_, index) => {
-      if (ObjetCampos[index] === 'id') {
+    Object.keys(objetCampos).forEach((_, index) => {
+      if (objetCampos[index] === 'id') {
         arrOb.push({
-          title: "",
-          field: "id",
+          title: '',
+          field: 'id',
           width: 0,
           render: () => (
-            colorStar === '#eba417' ? (
-              <div className='h-10 flex'>
-                <div>
-                  <button
-                    className="w-full h-full flex items-center justify-center border-0"
-                    onClick={() => setColorStar('')}
-                  >
-                    <AiTwotoneStar size={25} color={'#eba417'} />
-                  </button>
+            colorStar === '#eba417'
+              ? (
+                <div className='h-10 flex'>
+                  <div>
+                    <button
+                      className="w-full h-full flex items-center justify-center border-0"
+                      onClick={() => setColorStar('')}
+                    >
+                      <AiTwotoneStar size={25} color={'#eba417'} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div>
-                  <button
-                    className="w-full h-full flex items-center justify-center border-0"
-                    onClick={() => setColorStar('#eba417')}
-                  >
-                    <AiTwotoneStar size={25} />
-                  </button>
+              )
+              : (
+                <div className='h-10 flex'>
+                  <div>
+                    <button
+                      className="w-full h-full flex items-center justify-center border-0"
+                      onClick={() => setColorStar('#eba417')}
+                    >
+                      <AiTwotoneStar size={25} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )
-          ),
-        })
+              )
+          )
+        });
       }
-      if (ObjetCampos[index] === 'cod_quadra') {
+      if (objetCampos[index] === 'cod_quadra') {
         arrOb.push({
           title: 'Código Quadra',
           field: "cod_quadra",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'comp_p') {
+      if (objetCampos[index] === 'comp_p') {
         arrOb.push({
           title: 'Comp P',
           field: "comp_p",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'linha_p') {
+      if (objetCampos[index] === 'linha_p') {
         arrOb.push({
           title: 'Linha P',
           field: "linha_p",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'esquema') {
+      if (objetCampos[index] === 'esquema') {
         arrOb.push({
           title: 'Esquema',
           field: "esquema",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'divisor') {
+      if (objetCampos[index] === 'divisor') {
         arrOb.push({
           title: 'Divisor',
           field: "divisor",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'local_plantio') {
+      if (objetCampos[index] === 'local_plantio') {
         arrOb.push({
           title: 'Local Plantio',
           field: "local_plantio",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'local_preparo') {
+      if (objetCampos[index] === 'local_preparo') {
         arrOb.push({
           title: 'Local Preparo',
           field: "local_preparo",
@@ -242,7 +251,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
       }
 
 
-      if (ObjetCampos[index] === 'status') {
+      if (objetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
@@ -256,8 +265,12 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
                   icon={<BiEdit size={16} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  title={`Editar`}
-                  onClick={() => { router.push(`/config/quadra/atualizar?id=${rowData.id}`) }}
+                  title={`Editar ${rowData.cod_quadra}`}
+                  onClick={() => {
+                    setCookies('pageBeforeEdit', currentPage?.toString());
+                    setCookies("filterBeforeEdit", filtersParams)
+                    router.push(`/config/quadra/atualizar?id=${rowData.id}`)
+                  }}
                 />
               </div>
               {rowData.status === 1 ? (
@@ -270,7 +283,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
                       ...rowData,
                     }
                     )}
-                    title={`Ativo`}
+                    title={'Ativo'}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -300,15 +313,15 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   };
 
   async function getValuesComluns(): Promise<void> {
-    var els: any = document.querySelectorAll("input[type='checkbox']");
-    var selecionados = '';
-    for (var i = 0; i < els.length; i++) {
+    const els: any = document.querySelectorAll("input[type='checkbox']");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
         selecionados += els[i].value + ',';
       }
     }
-    var totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString - 1)
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 17 }).then((response) => {
         userLogado.preferences.quadras = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
@@ -369,7 +382,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Genótipos.xlsx");
+        XLSX.writeFile(workBook, "Quadras.xlsx");
       } else {
         alert(response);
       }
@@ -413,7 +426,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar genótipos">
+          <AccordionFilter title="Filtrar quadras">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -626,13 +639,14 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
 
   const token = req.cookies.token;
   const cultureId: number = Number(req.cookies.cultureId);
-
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
 
@@ -640,7 +654,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   let filterAplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
+  removeCookies('filterBeforeEdit', { req, res });
 
+  removeCookies('pageBeforeEdit', { req, res });
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -659,7 +675,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      cultureId
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit
     },
   }
 }
