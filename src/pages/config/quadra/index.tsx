@@ -163,7 +163,6 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   function columnsOrder(camposGerenciados: any): any {
     const objetCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
-    console.log("ObjetCampos:", objetCampos)
 
     Object.keys(objetCampos).forEach((_, index) => {
       if (objetCampos[index] === 'id') {

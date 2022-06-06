@@ -335,8 +335,6 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
     }
-
-    console.log("Filter: ", filterAplication)
     await grupoService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {

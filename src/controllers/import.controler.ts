@@ -39,7 +39,7 @@ export class ImportController {
 
   async getAll(moduleId: number) {
     try {
-      let response = await this.importRepository.findAll({ moduleId: moduleId });
+      const response = await this.importRepository.findAll({ moduleId: moduleId });
       if (response) {
         return { response, status: 200 }
       } else {
@@ -57,7 +57,7 @@ export class ImportController {
         await this.delete(parseInt(data.moduleId));
         parameters.moduleId = parseInt(data.moduleId);
         parameters.fields = data.fields;
-        let response = await this.importRepository.create(parameters);
+        const response = await this.importRepository.create(parameters);
         if (response.count > 0) {
           return { status: 200, message: "Configuração da planilha foi salva" }
         } else {
@@ -72,7 +72,7 @@ export class ImportController {
   async delete(moduleId: number) {
     try {
       if (moduleId) {
-        let response: object | any = await this.importRepository.delete({ moduleId: moduleId });
+        const response: object | any = await this.importRepository.delete({ moduleId: moduleId });
         return { status: 200, response }
 
       } else {
@@ -89,7 +89,7 @@ export class ImportController {
 
         if (!data.moduleId) return { status: 400, message: "precisa ser informado o modulo que está sendo acessado!" };
 
-        let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+        const configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
         if (configModule.response == "") return { status: 200, message: "Primeiro é preciso configurar o modelo de planilha para esse modulo!" };
 
@@ -178,8 +178,7 @@ export class ImportController {
   }
 
   async validateNPE(data: object | any) {
-    let Resposta: string = '';
-    let npeiAnterior: number = 0;
+    const responseIfError: any = []
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -201,15 +200,15 @@ export class ImportController {
                     let local: any = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
                     if (local.total == 0) {
                       // console.log('aqui Local');
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_local = local.response[0].id;
                     }
                   } else {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, local deve ser um campo de texto.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, local deve ser um campo de texto.</li><br>`;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do local é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do local é obrigatorio.</li><br>`;
                 }
               }
 
@@ -223,15 +222,15 @@ export class ImportController {
                     let safras: any = await this.safraController.getAllSafra({ safraName: data.spreadSheet[keySheet][sheet] });
                     if (safras.total == 0) {
                       // console.log('aqui Safra');
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a safra não existe no sistema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a safra não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_safra = safras.response[0].id;
                     }
                   } else {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, safra deve ser um campo de texto.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra deve ser um campo de texto.</li><br>`;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome da safra é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome da safra é obrigatorio.</li><br>`;
                 }
               }
 
@@ -240,12 +239,12 @@ export class ImportController {
                   let ogm: any = await this.ogmController.getAll({ name: String(data.spreadSheet[keySheet][sheet]) });
                   if (ogm.total == 0) {
                     // console.log('aqui OGM');
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tecnologia informado não existe no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tecnologia informado não existe no sistema.</li><br>`;
                   } else {
                     this.aux.id_ogm = ogm.response[0].id;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tecnologia é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tecnologia é obrigatorio.</li><br>`;
                 }
               }
 
@@ -256,15 +255,15 @@ export class ImportController {
                     let foco: any = await this.focoController.listAllFocos({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                     if (foco.total == 0) {
                       // console.log('aqui Foco');
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_foco = foco.response[0].id;
                     }
                   } else {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, foco deve ser um campo de texto.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, foco deve ser um campo de texto.</li><br>`;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do foco é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do foco é obrigatorio.</li><br>`;
                 }
               }
 
@@ -274,15 +273,15 @@ export class ImportController {
                     let ensaio: any = await this.typeAssayController.getAll({ name: data.spreadSheet[keySheet][sheet] });
                     if (ensaio.total == 0) {
                       // console.log('aqui Ensaio');
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta,o tipo de ensaio não existe no sistema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,o tipo de ensaio não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_type_assay = ensaio.response[0].id;
                     }
                   } else {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, tipo de ensaio deve ser um campo de texto.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tipo de ensaio deve ser um campo de texto.</li><br>`;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tipo de ensaio é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tipo de ensaio é obrigatorio.</li><br>`;
                 }
               }
 
@@ -292,15 +291,15 @@ export class ImportController {
                     if (typeof (this.aux.id_foco) == 'undefined') {
                       return 'O foco precisa ser importado antes da npei';
                     }
-                    Resposta += await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
-                    if (Resposta == "") {
+                    responseIfError[Column - 1] += await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
+                    if (responseIfError == "") {
                       this.aux.npei = data.spreadSheet[keySheet][sheet];
                     }
                   } else {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto.</li><br>`;
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</li><br>`;
                 }
               }
 
@@ -313,7 +312,7 @@ export class ImportController {
                   epoca: this.aux.epoca
                 });
                 if (npe.total > 0) {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, dados já cadastrado no banco, para atualizar inative o que já está cadastrado`;
+                  responseIfError[Column - 1] = `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, dados já cadastrado no banco, para atualizar inative o que já está cadastrado`;
                 }
               }
             }
@@ -321,7 +320,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         // console.log('AQUI R');
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
@@ -378,14 +377,15 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
   }
 
   async validateDelineamento(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = []
     let Column: number;
 
     try {
@@ -411,7 +411,7 @@ export class ImportController {
                             if (data.spreadSheet[keySheet][sheet] != "") {
                                 let delineamento: any = await this.delineamentoController.getAll({name: data.spreadSheet[keySheet][sheet]});
                                 if (delineamento.total > 0) {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, nome do delineamento ja cadastrado.</span><br>`;
+                                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome do delineamento ja cadastrado.</li><br>`;
                                 } else {
                                     if (name_anterior == '' && name_atual == '') {
                                         name_anterior = data.spreadSheet[keySheet][sheet];
@@ -427,7 +427,7 @@ export class ImportController {
                         if (configModule.response[0].fields[sheet] == 'Repeticao') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
                                 if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a repetição tem que ser um numero.</span><br>`;
+                                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a repetição tem que ser um numero.</li><br>`;
                                 } else {
                                     if (repeticao_ini == 1) {
                                         repeticao_ini++;
@@ -447,7 +447,7 @@ export class ImportController {
                                     }
                                 
                                     if (data.spreadSheet[keySheet][sheet] < repeticao) {
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a repetição está incorreta.</span><br>`;
+                                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a repetição está incorreta.</li><br>`;
                                     }
                                 }
                             }
@@ -456,7 +456,7 @@ export class ImportController {
                         if (configModule.response[0].fields[sheet] == 'Sorteio') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
                                 if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</span><br>`;
+                                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</li><br>`;
                                 } else { 
                                     if (name_atual != name_anterior) {
                                         sorteio_anterior = 0;
@@ -473,7 +473,7 @@ export class ImportController {
                         if (configModule.response[0].fields[sheet] == 'Tratamento') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
                                 if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tratamento tem que ser um numero.</span><br>`;
+                                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tratamento tem que ser um numero.</li><br>`;
                                 } else {
                                
                                     if ((name_atual != name_anterior) || (repeticao != repeticao_anterior)) {
@@ -499,10 +499,10 @@ export class ImportController {
                         if (configModule.response[0].fields[sheet] == 'Bloco') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
                                 if (typeof(data.spreadSheet[keySheet][sheet]) != 'number') {
-                                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o bloco tem que ser um numero.</span><br>`;
+                                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o bloco tem que ser um numero.</li><br>`;
                                 } else {
                                     if (bloco_anterior != 0 && bloco_anterior != data.spreadSheet[keySheet][sheet]) {
-                                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, os blocos não podem ser diferentes.</span><br>`; 
+                                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, os blocos não podem ser diferentes.</li><br>`; 
                                     } else { 
                                         bloco_anterior = data.spreadSheet[keySheet][sheet];
                                     }
@@ -514,7 +514,7 @@ export class ImportController {
             }
           }
 
-          if (Resposta == "") {
+          if (responseIfError == "") {
 
             let name_anterior: string = '';
             let name_atual: string = '';
@@ -597,7 +597,8 @@ export class ImportController {
             }
             return "save";
         } else {
-            return Resposta;
+          const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+          return responseStringError;
         }
     } catch (err) {
         console.log(err)
@@ -606,7 +607,7 @@ export class ImportController {
   }
 
   async validateGenotipo(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = [];
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -622,24 +623,24 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Cruza') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cruza é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cruza é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</li><br>`;
                 } else {
                   let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
 
                   if (tec.total == 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</li><br>`;
                   }
                 }
               }
@@ -648,7 +649,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         // this.aux = "";
         this.aux.created_by = Number(data.created_by);
         this.aux.id_culture = Number(data.id_culture);
@@ -701,14 +702,15 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
   }
 
   async validateLote(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = [];
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -723,18 +725,18 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
                   let geno = await this.genotipoController.listAllGenotipos({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (geno.total == 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, genótipo não existe no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, genótipo não existe no sistema.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Lote') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo Lote é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo Lote é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -742,7 +744,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Volume') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo volume é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo volume é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -752,7 +754,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         this.aux.created_by = Number(data.created_by);
         this.aux.status = 1;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -798,14 +800,15 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
   }
 
   async validateLocal(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = [];
     let Column: number;
     try {
       let configModule: object | any = await this.getAll(parseInt(data.moduleId));
@@ -820,48 +823,48 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'CodLocal') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código local é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código local é obrigatorio.</li><br>`;
                 } else {
                   let local = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
                   if (local.total > 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, código local ja cadastrado no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código local ja cadastrado no sistema.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'CodRedLocal') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código reduzido do local é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código reduzido do local é obrigatorio.</li><br>`;
                 } else {
                   let local = await this.localController.getAllLocal({ cod_red_local: data.spreadSheet[keySheet][sheet] });
 
                   if (local.total > 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, código reduzido do local ja cadastrado no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código reduzido do local ja cadastrado no sistema.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'pais') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta,  pais é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,  pais é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'uf') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, estado é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, estado é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'city') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, cidade é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, cidade é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'NameFarm') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, nome da fazenda é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome da fazenda é obrigatorio.</li><br>`;
                 }
               }
             }
@@ -869,7 +872,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         this.aux.created_by = Number(data.created_by);
         this.aux.status = 1;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -921,7 +924,8 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
@@ -963,7 +967,7 @@ export class ImportController {
   }
 
   async validateQuadra(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = [];
     let Column: number;
 
     try {
@@ -982,7 +986,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Safra') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
                   if (data.spreadSheet[keySheet][sheet] != data.safra) {
                     return 'A safra importada precisa ser igual a safra selecionada';
@@ -992,7 +996,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Cultura') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</li><br>`;
                 } else {
                   let culture: any = await this.culturaController.getOneCulture(Number(data.id_culture));
 
@@ -1004,12 +1008,12 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'LocalPrep') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</li><br>`;
                 } else {
                   let local: any = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
                   if (local.total == 0) {
                     // console.log('aqui Local');
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                   } else {
                     this.aux.local_preparo = local.response[0].id;
                   }
@@ -1018,7 +1022,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'CodigoQuadra') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</li><br>`;
                 } else {
                   let quadra: any = this.quadraController.listAll({ cod_quadra: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
                   if (quadra.total > 0) {
@@ -1032,12 +1036,12 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'LargQ') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a largq é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a largq é obrigatorio.</li><br>`;
                 } else {
                   if (larg_q != '') {
                     if (cod_quadra == cod_quadra_anterior) {
                       if (data.spreadSheet[keySheet][sheet] != larg_q) {
-                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a largQ precisa ser igual na planilha inteira`;
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a largQ precisa ser igual na planilha inteira.</li><br>`;
                         larg_q = data.spreadSheet[keySheet][sheet];
                       } else {
                         larg_q = data.spreadSheet[keySheet][sheet];
@@ -1052,11 +1056,11 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'CompP') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a compp é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compp é obrigatorio.</li><br>`;
                 } else {
                   if (cod_quadra == cod_quadra_anterior) {
                     if (data.spreadSheet[keySheet][sheet] != comp_p) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o compP precisa ser igual na planilha inteira`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o compP precisa ser igual na planilha inteira.</li><br>`;
                       comp_p = data.spreadSheet[keySheet][sheet];
                     } else {
                       comp_p = data.spreadSheet[keySheet][sheet];
@@ -1069,7 +1073,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'LinhaP') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a linhap é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a linhap é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -1077,7 +1081,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'CompC') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a compc é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compc é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -1085,41 +1089,41 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
                   let layoutQuadra: any = this.layoutQuadraController.getAll({esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                   if (layoutQuadra.total == 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Divisor') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a divisor é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a divisor é obrigatorio.</li><br>`;
                 } else {
                   if (cod_quadra == cod_quadra_anterior) {
                     if (divisor_anterior == 0) {
                       if (data.spreadSheet[keySheet][sheet] <= 0) {
-                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</span><br>`;
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
                       } else {
                         divisor_anterior = data.spreadSheet[keySheet][sheet];
                       }
                     } else {
                       if (data.spreadSheet[keySheet][sheet] > divisor_anterior) {
                         if ((divisor_anterior + 1) != data.spreadSheet[keySheet][sheet]) {
-                          Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter tersecção de parcelas.</span><br>`;
+                          responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter tersecção de parcelas.</li><br>`;
                         } else {
                           divisor_anterior = data.spreadSheet[keySheet][sheet];
                         }
                       } else {
-                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna dos divisores precisa está em sequencia.</span><br>`;
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna dos divisores precisa está em sequencia.</li><br>`;
                       }
                     }
                   } else {
                     if (divisor_anterior == 0) {
                       if (data.spreadSheet[keySheet][sheet] <= 0) {
-                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</span><br>`;
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
                       } else {
                         divisor_anterior = data.spreadSheet[keySheet][sheet];
                       }
@@ -1130,26 +1134,26 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Semente') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro é obrigatorio.</li><br>`;
                 } else {
                   if (data.spreadSheet[keySheet][sheet] <= 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro precisar ser maior que 0.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro precisar ser maior que 0.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'T4I') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a t4i é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4i é obrigatorio.</li><br>`;
                 } else {
                   if (t4_i == 0) {
                     if (data.spreadSheet[keySheet][sheet] != 1) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1.</li><br>`;
                     }
                     t4_i = data.spreadSheet[keySheet][sheet];
                   } else {
                     if (data.spreadSheet[keySheet][sheet] <= t4_f) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior.</li><br>`;
                     }
                     t4_i = data.spreadSheet[keySheet][sheet];
                   }
@@ -1158,13 +1162,13 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'T4F') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a t4f é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4f é obrigatorio.</li><br>`;
                 } else {
                   if (t4_i == 0) {
                     return 'A coluna t4f precisa está depois da coluna t4i';
                   } else {
                     if (t4_i > data.spreadSheet[keySheet][sheet]) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
                     } else {
                       t4_f = data.spreadSheet[keySheet][sheet];
                     }
@@ -1174,17 +1178,17 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'DI') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a di é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a di é obrigatorio.</li><br>`;
                 } else {
                   if (data.spreadSheet[keySheet][sheet] != 1) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o di precisa ser 1. </span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o di precisa ser 1. </li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'DF') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a df é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a df é obrigatorio.</li><br>`;
                 } else {
                   if (df == 0) {
                     df = data.spreadSheet[keySheet][sheet];
@@ -1192,7 +1196,7 @@ export class ImportController {
                     df = data.spreadSheet[keySheet][sheet];
                     if (cod_quadra == cod_quadra_anterior) {
                       if (df != data.spreadSheet[keySheet][sheet]) {
-                        Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna df deve ser igual para este pai`;
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna df deve ser igual para este pai.</li><br>`;
                       }
                     }
                   }
@@ -1203,7 +1207,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         // this.aux = "";
         this.aux.created_by = Number(data.created_by);
         this.aux.id_culture = Number(data.id_culture);
@@ -1342,14 +1346,15 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
   }
 
   async validateLayoutQuadra(data: object | any) {
-    let Resposta: string = '';
+    const responseIfError: any = [];
     let Column: number;
 
     try {
@@ -1369,11 +1374,11 @@ export class ImportController {
             if (keySheet != '0') {
               if (configModule.response[0].fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
                   let esquema: any = await this.layoutQuadraController.getAll({ id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
                   if (esquema.total > 0) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, ja existe um esquema ativo com esse código.</span><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ja existe um esquema ativo com esse código.</li><br>`;
                   } else {
                     cod_esquema_anterior = cod_esquema;
                     cod_esquema = data.spreadSheet[keySheet][sheet];
@@ -1385,7 +1390,7 @@ export class ImportController {
                 console.log('Plantadeira');
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -1395,11 +1400,11 @@ export class ImportController {
                 console.log('Tiros');
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</li><br>`;
                 } else {
                   if (tiro == 0) {
                     if (data.spreadSheet[keySheet][sheet] != 1) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro precisa começar com 1`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro precisa começar com 1.</li><br>`;
                     }
                     tiro = data.spreadSheet[keySheet][sheet];
                   } else {
@@ -1411,7 +1416,7 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'Disparo') {
                 console.log('Disparos')
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo disparos é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo disparos é obrigatorio.</li><br>`;
                 } else {
                   if (tiro == 0) {
                     return 'O campo tiro precisa vir antes que a campo disparo';
@@ -1419,7 +1424,7 @@ export class ImportController {
                     combinacao_anterior = combinacao;
                     combinacao = tiro + 'x' + data.spreadSheet[keySheet][sheet];
                     if (combinacao == combinacao_anterior) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a combinacao de tiros e disparos deve ser unica dentro do esquema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a combinacao de tiros e disparos deve ser unica dentro do esquema.</li><br>`;
                     }
                   }
 
@@ -1431,11 +1436,11 @@ export class ImportController {
                 console.log('SL')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == sl) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o sl não pode se repetir no mesmo esquema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o sl não pode se repetir no mesmo esquema.</li><br>`;
                     }
                     count_linhas++;
                   } else {
@@ -1451,11 +1456,11 @@ export class ImportController {
                 console.log('SC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == sc) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o sc não pode se repetir no mesmo esquema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o sc não pode se repetir no mesmo esquema.</li><br>`;
                     }
                   }
                   sc = data.spreadSheet[keySheet][sheet];
@@ -1466,11 +1471,11 @@ export class ImportController {
                 console.log('SALOC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == s_aloc) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o saloc não pode se repetir no mesmo esquema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o saloc não pode se repetir no mesmo esquema.</li><br>`;
                     }
                   }
                   s_aloc = data.spreadSheet[keySheet][sheet];
@@ -1480,7 +1485,7 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'CJ') {
                 console.log('CJ')
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</li><br>`;
                 }
               }
 
@@ -1488,7 +1493,7 @@ export class ImportController {
                 console.log('Dist')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</li><br>`;
                 }
               }
 
@@ -1496,7 +1501,7 @@ export class ImportController {
                 console.log('ST')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -1506,7 +1511,7 @@ export class ImportController {
                 console.log('SPC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</li><br>`;
                 } else {
 
                 }
@@ -1517,11 +1522,11 @@ export class ImportController {
                 console.log(data.spreadSheet[keySheet][sheet])
 
                 if (String(data.spreadSheet[keySheet][sheet]) == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == scolheita) {
-                      Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, o scolheita não pode se repetir no mesmo esquema.</span><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o scolheita não pode se repetir no mesmo esquema.</li><br>`;
                     }
                   }
                   scolheita = data.spreadSheet[keySheet][sheet];
@@ -1531,10 +1536,10 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'TipoParcela') {
                 console.log('TipoParcela')
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</li><br>`;
                 } else {
                   if ((data.spreadSheet[keySheet][sheet] != "P" && data.spreadSheet[keySheet][sheet] != "p") && (data.spreadSheet[keySheet][sheet] != 'V' && data.spreadSheet[keySheet][sheet] != 'v')) {
-                    Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, no tipo de parcela só é aceitado p ou v`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, no tipo de parcela só é aceitado p ou v.</li><br>`;
                   }
                 }
               }
@@ -1543,7 +1548,7 @@ export class ImportController {
         }
       }
 
-      if (Resposta == "") {
+      if (responseIfError == "") {
         this.aux.created_by = Number(data.created_by);
         this.aux.id_culture = Number(data.id_culture);
         this.aux.status = 1;
@@ -1677,7 +1682,8 @@ export class ImportController {
         }
         return "save";
       }
-      return Resposta;
+      const responseStringError = responseIfError.join("").replace(/undefined/g, "")
+      return responseStringError;
     } catch (err) {
       console.log(err)
     }
