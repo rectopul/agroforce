@@ -28,7 +28,7 @@ async function create(data: any) {
   return fetchWrapper.post(baseUrl, data);
 }
 
-function updateSafras(data: UpdateSafra) {
+function updateSafras(data: any) {
   return fetchWrapper.put(baseUrl, data);
 }
 
