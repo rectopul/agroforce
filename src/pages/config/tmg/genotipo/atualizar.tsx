@@ -41,7 +41,7 @@ export interface IUpdateGenotipo {
   genealogy: string;
   genotipo: string;
   cruza: string;
-  tecnologia: string;
+  id_tecnologia: number;
   status: number;
 }
 
