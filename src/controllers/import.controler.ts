@@ -289,7 +289,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if (typeof (data.spreadSheet[keySheet][sheet]) == 'number') {
                     if (typeof (this.aux.id_foco) == 'undefined') {
-                      return 'O foco precisa ser importado antes da npei';
+                      return 'O foco precisa ser importado antes da NPEI';
                     }
                     responseIfError[Column - 1] += await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
                     if (responseIfError == "") {
@@ -300,6 +300,20 @@ export class ImportController {
                   }
                 } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</li><br>`;
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == "Epoca") {
+                if (data.spreadSheet[keySheet][sheet] != "") {
+                  if (typeof (data.spreadSheet[keySheet][sheet]) != 'number') {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, época deve ser um campo numerico.</li><br>`;
+                  } else { 
+                    if (data.spreadSheet[keySheet][sheet] <= 0) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, época deve ser um número positivo.</li><br>`;
+                    }
+                  }
+                } else {
+                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo a época é obrigatorio.</span><br>`;
                 }
               }
 
@@ -1508,7 +1522,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SPC') {
-                console.log('SPC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</li><br>`;
