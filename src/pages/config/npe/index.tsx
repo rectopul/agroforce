@@ -456,7 +456,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           item.type_assay = item.type_assay.name
           return
         })
-        console.log("New data: ", newData)
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
