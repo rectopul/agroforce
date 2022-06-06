@@ -140,8 +140,6 @@ export class GrupoController {
         orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log("Parameters: ", parameters)
-      console.log("Select: ", select)
       const response: object | any = await this.grupoRepository.findAll(
         parameters,
         select,
@@ -149,8 +147,6 @@ export class GrupoController {
         skip,
         orderBy
       );
-
-      console.log("Response: ", response)
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

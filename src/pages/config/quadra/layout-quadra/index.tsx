@@ -228,10 +228,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button
                     icon={<BiEdit size={16} />}
-                    onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`layout-quadra/atualizar?id=${rowData.id}`}
+                    onClick={() => {
+                      setCookies('pageBeforeEdit', currentPage?.toString());
+                      setCookies("filterBeforeEdit", filtersParams)
+                      router.push(`/config/layout-quadra/atualizar?id=${rowData.id}`)
+                    }}
                   />
                 </div>
                 <div>
@@ -250,10 +253,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button
                     icon={<BiEdit size={16} />}
-                    onClick={() => { }}
                     bgColor="bg-blue-600"
                     textColor="white"
-                    href={`layout-quadra/atualizar?id=${rowData.id}`}
+                    onClick={() => {
+                      setCookies('pageBeforeEdit', currentPage?.toString());
+                      setCookies("filterBeforeEdit", filtersParams)
+                      router.push(`/config/layout-quadra/atualizar?id=${rowData.id}`)
+                    }}
+
                   />
                 </div>
                 <div>

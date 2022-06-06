@@ -35,7 +35,7 @@ export default function Importar({ safra }: any) {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
-            width: "800"
+            width: "900"
           });
           if (!response.erro) {
             router.back();
