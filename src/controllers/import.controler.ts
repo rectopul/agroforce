@@ -412,6 +412,9 @@ export class ImportController {
         let repeticao_anterior: number = 0;
         let name_anterior: string = '';
         let name_atual: string = '';
+        let count_trat:number = 0;
+        let count_trat_ant:number = 0;
+        let count_linhas:number = 0;
 
         if (data != null && data != undefined) {
             let Line: number;
@@ -491,8 +494,26 @@ export class ImportController {
                                 } else {
                                
                                     if ((name_atual != name_anterior) || (repeticao != repeticao_anterior)) {
+                                      if (repeticao != repeticao_anterior) {
+                                        if (count_trat == 0) {
+                                          count_trat_ant = count_trat;
+                                          count_trat = tratamento_anterior;
+                                        } else {
+                                          count_trat_ant = count_trat;
+                                          count_trat = tratamento_anterior;
+                                          if (count_trat != count_trat_ant) {
+                                            return 'O número de tratamento deve ser igual para todas repetições'; 
+                                          }
+                                        }
+                                      }
                                         tratamento_anterior = 0;
                                     } 
+
+                                    if (data.spreadSheet.length == Line) {
+                                        if (data.spreadSheet[keySheet][sheet] != count_trat) {
+                                          return 'O número de tratamento deve ser igual para todas repetições'; 
+                                        }
+                                    }
                                     
                                     if (tratamento_anterior == 0) {
                                         tratamento_anterior = data.spreadSheet[keySheet][sheet];
@@ -1406,7 +1427,9 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else {
-
+                  if (data.spreadSheet[keySheet][sheet] != 4 && data.spreadSheet[keySheet][sheet] != 8 && data.spreadSheet[keySheet][sheet] != 12) {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira deve estar dentro desses numeros 4,8 e 12.</li><br>`;
+                  }
                 }
               }
 
