@@ -376,7 +376,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
     }
 
@@ -437,7 +437,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   useEffect(() => {
     handlePagination(); ''
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
   return (
     <>
       <Head><title>Atualizar genótipo</title></Head>
@@ -528,18 +528,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 icon={<IoMdArrowBack size={18} />}
                 onClick={() => router.back()}
               />
-            </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                disabled
-                textColor="white"
-                icon={<SiMicrogenetics size={18} />}
-                onClick={() => { }}
-              />
-            </div>
+            </div>            
           </div>
         </form>
         <main className="h-4/6 w-full

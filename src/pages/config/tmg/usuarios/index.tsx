@@ -105,8 +105,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterEmail }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterName=${filterName}&filterEmail=${filterEmail}`
-      //let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterName=${filterName}&filterEmail=${filterEmail}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -123,6 +122,8 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
+
+  const filterStatus = filterBeforeEdit.split('')
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
@@ -466,7 +467,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -562,7 +563,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -771,13 +772,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -792,14 +793,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   } as RequestInit | undefined;
 
   const user = await fetch(urlParameters.toString(), requestOptions);
-  let Response = await user.json();
+  const response = await user.json();
 
-  let alItems = Response.response;
-  let totalItems = Response.total;
-
+  const AllItems = response.response;
+  const totalItems = response.total;
+  
   return {
     props: {
-      alItems,
+      AllItems,
       totalItems,
       itensPerPage,
       filterAplication,
