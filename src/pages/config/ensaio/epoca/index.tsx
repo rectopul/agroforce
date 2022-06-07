@@ -333,7 +333,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 

@@ -86,8 +86,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Repetiçao ", value: "repeticao", defaultChecked: () => camposGerenciados.includes('repeticao') },
     { name: "CamposGerenciados[]", title: "Trat. Repetição", value: "trat_repeticao", defaultChecked: () => camposGerenciados.includes('trat_repeticao') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') },
     { name: "CamposGerenciados[]", title: "Sequência", value: "sequencia", defaultChecked: () => camposGerenciados.includes('sequencia') },
+    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
@@ -108,8 +108,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterRepeat, filterTreatment }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`
-      //let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -126,6 +125,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
+
+  const filterStatus = filterBeforeEdit.split('')
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
@@ -195,22 +196,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           filterPlaceholder: "Filtrar por status",
           render: (rowData: IDelineamentoProps) => (
             rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`delineamento/atualizar?id=${rowData.id}`)
-                    }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
+              <div className='h-10 flex'>               
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
@@ -222,22 +208,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`delineamento/atualizar?id=${rowData.id}`)
-                    }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
+              <div className='h-10 flex'>            
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
@@ -388,11 +359,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    console.log("Filter:", filterAplication)
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
     await delineamentoService.getAll(filterAplication).then((response) => {
+      console.log("Response: ", response);
       if (response.status === 200) {
         const newData = delineamento.map((row) => {
           if (row.status === 0) {
@@ -481,7 +454,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
                   </div>
 
                   <div className="h-10 w-1/2 ml-4">
@@ -716,7 +689,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;

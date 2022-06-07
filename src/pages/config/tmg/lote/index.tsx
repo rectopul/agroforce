@@ -90,6 +90,8 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     { id: 0, name: 'Inativos' }
   ];
 
+  const filterStatus = filterAplication.split('')
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -105,8 +107,8 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
       orderBy: '',
       typeOrder: ''
     },
-    onSubmit: async (values) => {
-      const parametersFilter = 'filterStatus=' + values.filterStatus + '&filterGenotipo=' + values.filterGenotipo + '&filterName=' + values.filterName /* + "&filterVolume=" + values.filterVolume */ + '&id_portfolio=' + id_genotipo;
+    onSubmit: async ({filterStatus, filterGenotipo, filterName, filterVolume}) => {
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterGenotipo=${filterGenotipo}&filterName=${filterName}&filterVolume=${filterVolume}&id_portfolio=${id_genotipo}`;
       await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setLotes(response.response);
@@ -349,7 +351,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
 
@@ -364,6 +366,11 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
           return row;
         });
+
+        newData.map((item: any) => {     
+          return item.genotipo = item.genotipo?.genotipo
+        })
+
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
@@ -442,7 +449,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">

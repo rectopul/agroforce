@@ -35,7 +35,9 @@ export class DelineamentoController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
+          if(objSelect[item] !== "sequencia"){
+            select[objSelect[item]] = true;
+          }
         });
         select = Object.assign({}, select);
       } else {
@@ -78,13 +80,14 @@ export class DelineamentoController {
         orderBy = `{"options.orderBy":"options.typeOrder"}`;
       }
 
-      let response = await this.Repository.findAll(parameters, select, take, skip, orderBy);
+      const response = await this.Repository.findAll(parameters, select, take, skip, orderBy);
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 }
       } else {
         return { status: 200, response, total: response.total }
       }
     } catch (err) {
+      console.log("Error: ", err)
       return { status: 400, message: err }
     }
   }

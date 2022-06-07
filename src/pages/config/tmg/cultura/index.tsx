@@ -87,6 +87,8 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
     { id: 0, name: 'Inativos' },
   ];
 
+  const filterStatus = filterBeforeEdit.split('')
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -100,8 +102,8 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
+    onSubmit: async ({filterStatus, filterSearch}) => {
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}.`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -331,7 +333,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -424,7 +426,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -617,7 +619,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

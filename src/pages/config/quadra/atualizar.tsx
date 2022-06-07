@@ -365,7 +365,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}&id_quadra=${id_quadra}`;
     }
 
@@ -426,7 +426,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
   useEffect(() => {
     handlePagination(); ''
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
   return (
     <>
       <Head><title>Atualizar quadra</title></Head>
@@ -670,7 +670,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
             </div>
           </div>
         </form>
-        <main className="h-4/6 w-full
+        <main className="h-3/6 w-full
           flex flex-col
           items-start
           gap-8
