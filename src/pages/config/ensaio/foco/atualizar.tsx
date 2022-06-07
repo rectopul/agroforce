@@ -348,8 +348,8 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
         });
 
         newData.map((item: any) => {
-          item.foco = item.foco.name
-          item.safra = item.safra.safraName
+          item.foco = item.foco?.name
+          item.safra = item.safra?.safraName
           return item
         })
 

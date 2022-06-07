@@ -126,8 +126,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterUF, filterCity, filterName }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterUf=${filterUF}&filterCity=${filterCity}&filterName=${filterName}`
-      //let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&filterUF=" + values.filterUF + "&filterCity=" + values.filterCity;
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterUf=${filterUF}&filterCity=${filterCity}&filterName=${filterName}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -144,6 +143,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
+
+  const filterStatus = filterBeforeEdit.split('')
 
   function colums(camposGerenciados: any): any {
     let ObjetCampos: any = camposGerenciados.split(',');
@@ -476,7 +477,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -583,7 +584,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -819,7 +820,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 
   const token = req.cookies.token;
   const { publicRuntimeConfig } = getConfig();

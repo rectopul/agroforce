@@ -44,7 +44,9 @@ export class FocoController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
+          if(objSelect[item] !== 'group'){
+            select[objSelect[item]] = true;
+          }
         });
         select = Object.assign({}, select);
       } else {
@@ -79,7 +81,9 @@ export class FocoController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      let response: object | any = await this.focoRepository.findAll(
+      console.log("Select: ", select)
+
+      const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
         take,

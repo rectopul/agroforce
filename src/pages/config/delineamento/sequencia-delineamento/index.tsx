@@ -177,14 +177,6 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
           ),
         })
       }
-
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: "Código",
-          field: "id",
-          sorting: false
-        });
-      }
       if (ObjetCampos[index] === 'delineamento') {
         arrOb.push({
           title: "Delineamento",
@@ -360,7 +352,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
     }
 
@@ -376,6 +368,9 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
           return row;
         });
 
+        newData.map((item: any) => {
+          return item.delineamento = item.delineamento?.name
+        })
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "Sequencia de delineamento");

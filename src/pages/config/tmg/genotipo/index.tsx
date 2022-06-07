@@ -95,6 +95,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' }
   ];
+  
+  const filterStatus = filterBeforeEdit.split('')
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -112,8 +114,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       orderBy: '',
       typeOrder: ''
     },
-    onSubmit: async (values) => {
-      const parametersFilter = 'filterStatus=' + values.filterStatus + '&filterGenotipo=' + values.filterGenotipo + '&id_culture=' + cultureId + '&filterGenealogy=' + values.filterGenealogy + '&filterCruza=' + values.filterCruza;
+    onSubmit: async ({filterStatus, filterGenotipo, filterGenealogy, filterCruza}) => {
+      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -447,7 +449,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -462,6 +464,10 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 
           return row;
         });
+
+        newData.map((item: any) => {
+          return item.tecnologia = item.tecnologia?.name      
+        })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
@@ -542,7 +548,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -776,7 +782,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 
   const token = req.cookies.token;
   const cultureId = Number(req.cookies.cultureId);

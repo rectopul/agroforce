@@ -197,7 +197,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       </Head>
       <Content contentHeader={tabsDropDowns}>
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar usuário</h1>

@@ -47,7 +47,7 @@ interface IGenarateProps {
 }
 
 interface IData {
-  allquadra: IQuadra[];
+  allQuadra: IQuadra[];
   totalItems: number;
   itensPerPage: number;
   filterAplication: object | any;
@@ -56,7 +56,7 @@ interface IData {
   filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allquadra, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -71,7 +71,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema, status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [quadra, setQuadra] = useState<IQuadra[]>(() => allquadra);
+  const [quadra, setQuadra] = useState<IQuadra[]>(() => allQuadra);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
@@ -93,6 +93,8 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
     { id: 0, name: 'Inativos' },
   ];
 
+  const filterStatus = filterBeforeEdit.split('')
+
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -106,8 +108,8 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async (values) => {
-      let parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
+    onSubmit: async ({ filterStatus, filterSearch}) => {
+      let parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -350,7 +352,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -445,7 +447,7 @@ export default function Listagem({ allquadra, totalItems, itensPerPage, filterAp
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -645,7 +647,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const token = req.cookies.token;
   const cultureId: number = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
 
@@ -665,12 +667,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
   const data = await api.json();
 
-  const allquadra = data.response;
+  const allQuadra = data.response;
   const totalItems = data.total;
 
   return {
     props: {
-      allquadra,
+      allQuadra,
       totalItems,
       itensPerPage,
       filterAplication,

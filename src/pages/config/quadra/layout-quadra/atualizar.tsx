@@ -401,7 +401,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
     }
 
@@ -462,7 +462,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
   useEffect(() => {
     handlePagination(); ''
     handleTotalPages();
-  }, [currentPage, pages]);
+  }, [currentPage]);
   return (
     <>
       <Head><title>Atualizar layout quadra</title></Head>
@@ -570,7 +570,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
             </div>
           </div>
         </form>
-        <main className="h-full w-full
+        <main className="h-3/5 w-full
           flex flex-col
           items-start
           gap-8

@@ -348,7 +348,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (filterAplication) {
+    if (!filterAplication.includes("paramSelect")){
       filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
 
