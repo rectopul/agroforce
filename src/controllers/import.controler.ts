@@ -313,7 +313,8 @@ export class ImportController {
                     }
                   }
                 } else {
-                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo a época é obrigatorio.</span><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo a época é obrigatorio.</li><br>`;
+
                 }
               }
 
