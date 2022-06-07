@@ -289,7 +289,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if (typeof (data.spreadSheet[keySheet][sheet]) == 'number') {
                     if (typeof (this.aux.id_foco) == 'undefined') {
-                      return 'O foco precisa ser importado antes da npei';
+                      return 'O foco precisa ser importado antes da NPEI';
                     }
                     responseIfError[Column - 1] += await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
                     if (responseIfError == "") {
@@ -300,6 +300,20 @@ export class ImportController {
                   }
                 } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</li><br>`;
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == "Epoca") {
+                if (data.spreadSheet[keySheet][sheet] != "") {
+                  if (typeof (data.spreadSheet[keySheet][sheet]) != 'number') {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, época deve ser um campo numerico.</li><br>`;
+                  } else { 
+                    if (data.spreadSheet[keySheet][sheet] <= 0) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, época deve ser um número positivo.</li><br>`;
+                    }
+                  }
+                } else {
+                  Resposta += `<span> A ${Column}º coluna da ${Line}º linha está incorreta, campo a época é obrigatorio.</span><br>`;
                 }
               }
 
@@ -398,6 +412,9 @@ export class ImportController {
         let repeticao_anterior: number = 0;
         let name_anterior: string = '';
         let name_atual: string = '';
+        let count_trat:number = 0;
+        let count_trat_ant:number = 0;
+        let count_linhas:number = 0;
 
         if (data != null && data != undefined) {
             let Line: number;
@@ -409,7 +426,7 @@ export class ImportController {
 
                         if (configModule.response[0].fields[sheet] == 'Nome') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
-                                let delineamento: any = await this.delineamentoController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                let delineamento: any = await this.delineamentoController.getAll({name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                                 if (delineamento.total > 0) {
                                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome do delineamento ja cadastrado.</li><br>`;
                                 } else {
@@ -477,8 +494,26 @@ export class ImportController {
                                 } else {
                                
                                     if ((name_atual != name_anterior) || (repeticao != repeticao_anterior)) {
+                                      if (repeticao != repeticao_anterior) {
+                                        if (count_trat == 0) {
+                                          count_trat_ant = count_trat;
+                                          count_trat = tratamento_anterior;
+                                        } else {
+                                          count_trat_ant = count_trat;
+                                          count_trat = tratamento_anterior;
+                                          if (count_trat != count_trat_ant) {
+                                            return 'O número de tratamento deve ser igual para todas repetições'; 
+                                          }
+                                        }
+                                      }
                                         tratamento_anterior = 0;
                                     } 
+
+                                    if (data.spreadSheet.length == Line) {
+                                        if (data.spreadSheet[keySheet][sheet] != count_trat) {
+                                          return 'O número de tratamento deve ser igual para todas repetições'; 
+                                        }
+                                    }
                                     
                                     if (tratamento_anterior == 0) {
                                         tratamento_anterior = data.spreadSheet[keySheet][sheet];
@@ -1392,7 +1427,9 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else {
-
+                  if (data.spreadSheet[keySheet][sheet] != 4 && data.spreadSheet[keySheet][sheet] != 8 && data.spreadSheet[keySheet][sheet] != 12) {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira deve estar dentro desses numeros 4,8 e 12.</li><br>`;
+                  }
                 }
               }
 
@@ -1508,7 +1545,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SPC') {
-                console.log('SPC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</li><br>`;
