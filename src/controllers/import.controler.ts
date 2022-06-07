@@ -426,7 +426,7 @@ export class ImportController {
 
                         if (configModule.response[0].fields[sheet] == 'Nome') {
                             if (data.spreadSheet[keySheet][sheet] != "") {
-                                let delineamento: any = await this.delineamentoController.getAll({name: data.spreadSheet[keySheet][sheet]});
+                                let delineamento: any = await this.delineamentoController.getAll({name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture});
                                 if (delineamento.total > 0) {
                                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome do delineamento ja cadastrado.</li><br>`;
                                 } else {
