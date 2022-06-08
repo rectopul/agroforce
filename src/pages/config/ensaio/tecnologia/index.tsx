@@ -13,7 +13,7 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { tecnologiaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
@@ -76,9 +76,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Descrição ", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
+    { name: "CamposGerenciados[]", title: "Rótulo ", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
     { name: "CamposGerenciados[]", title: "Código Tecnologia ", value: "cod_tec", defaultChecked: () => camposGerenciados.includes('cod_tec') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
@@ -97,8 +96,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
 
-    onSubmit: async ({filterStatus, filterSearch}) => {
-      let parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch="${filterSearch}&id_culture=${cultureId}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      let parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSearch="${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await tecnologiaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -170,74 +169,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         });
       }
       if (ObjetCampos[item] === 'desc') {
-        arrOb.push({ title: "Descrição", field: "desc", sorting: false })
+        arrOb.push({ title: "Rótulo", field: "desc", sorting: false })
       }
       if (ObjetCampos[item] === 'cod_tec') {
         arrOb.push({ title: "Código Tecnologia", field: "cod_tec", sorting: false })
-      }
-      if (ObjetCampos[item] === 'status') {
-        arrOb.push({
-          title: "Status",
-          field: "status",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: ITecnologiaProps) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`tecnologia/atualizar?id=${rowData.id}`)
-                    }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
-                  <Button
-                    icon={<FaRegThumbsUp size={16} />}
-                    title={`Ativo`}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
-                    bgColor="bg-green-600"
-                    textColor="white"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => { router.push(`tecnologia/atualizar?id=${rowData.id}`) }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
-                  <Button
-                    icon={<FaRegThumbsDown size={16} />}
-                    title={`Inativo`}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
-                    )}
-                    bgColor="bg-red-800"
-                    textColor="white"
-                  />
-                </div>
-              </div>
-            )
-          ),
-        })
       }
     });
     return arrOb;
@@ -348,7 +283,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
@@ -505,15 +440,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   '>
                     <div className='h-12'>
                       <Button
-                        title="Cadastrar Tecnologia"
-                        value="Cadastrar Tecnologia"
+                        title="Importar planilha"
+                        value="Importar planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push('tecnologia/cadastro') }}
-                        icon={<FiUserPlus size={20} />}
+                        onClick={() => { router.push('tecnologia/importar-planilha') }}
+                        icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
-
                     <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
                     <div className='h-full flex items-center gap-2
@@ -562,6 +496,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button title="Exportar planilha de tecnologias" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { router.push("tecnologia/importar-planilha/config-planilha") }} />
                       </div>
                     </div>
                   </div>

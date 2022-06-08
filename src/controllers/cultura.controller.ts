@@ -79,13 +79,14 @@ export class CulturaController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      let response: object | any = await this.culturaRepository.findAll(
+      const response: object | any = await this.culturaRepository.findAll(
         parameters,
         select,
         take,
         skip,
         orderBy
       );
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 }
       } else {

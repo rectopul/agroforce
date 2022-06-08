@@ -104,7 +104,7 @@ export class TecnologiaController {
         }
         let response = await this.tecnologiaRepository.create(data);
         if (response) {
-          return { status: 200, message: "tipo ensaio inserido" }
+          return { status: 200, message: "tipo tecnologia já inserido" }
         } else {
           return { status: 400, message: "erro" }
         }
