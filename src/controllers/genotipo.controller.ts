@@ -36,7 +36,6 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log(options);
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -47,7 +46,6 @@ export class GenotipoController {
       } else {
         parameters.status = 1;
       }
-      console.log(parameters);
 
       if (options.filterGenotipo) {
         options.filterGenotipo = '{"contains":"' + options.filterGenotipo + '"}';

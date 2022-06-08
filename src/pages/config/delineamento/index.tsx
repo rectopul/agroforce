@@ -365,7 +365,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     }
 
     await delineamentoService.getAll(filterAplication).then((response) => {
-      console.log("Response: ", response);
       if (response.status === 200) {
         const newData = delineamento.map((row) => {
           if (row.status === 0) {
