@@ -37,18 +37,8 @@ export class LoteController {
     }
   }
 
-  async create(data: CreateLoteDTO) {
+  async create(data: any) {
     try {
-      const schema: SchemaOf<CreateLoteDTO> = object({
-        id_genotipo: number().required(this.required),
-        name: string().required(this.required),
-        volume: number().required(this.required),
-        created_by: number().integer().required(this.required)
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
 
       const loteAlreadyExists = await this.loteRepository.findByName(data.name);
 
@@ -64,19 +54,9 @@ export class LoteController {
     }
   }
 
-  async update(data: UpdateLoteDTO) {
+  async update(data: any) {
     try {
-      const schema: SchemaOf<UpdateLoteDTO> = object({
-        id: number().integer().required(this.required),
-        name: string().required(this.required),
-        volume: number().required(this.required),
-        status: number().required(this.required)
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
-
+      
       const lote = await this.loteRepository.findById(data.id);
 
       if (!lote) return { status: 400, message: 'Lote não existente' };
@@ -145,9 +125,18 @@ export class LoteController {
         parameters.name = options.name;
       }
 
+      if (options.cod_lote) {
+        parameters.cod_lote = options.cod_lote;
+      }
+
       if (options.id_genotipo) {
         parameters.id_genotipo = Number(options.id_genotipo);
       }
+
+      if (options.id_dados) {
+        parameters.id_dados = Number(options.id_dados);
+      }
+
       if (options.take) {
         if (typeof (options.take) === 'string') {
           take = parseInt(options.take);
