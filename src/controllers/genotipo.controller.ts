@@ -158,22 +158,8 @@ export class GenotipoController {
     }
   }
 
-  async createGenotipo(data: Creategenotipo) {
+  async createGenotipo(data: any) {
     try {
-      const schema: SchemaOf<Creategenotipo> = object({
-        id_culture: number().integer().required(this.required),
-        id_tecnologia: number().integer().required(this.required),
-        genotipo: string().required(this.required),
-        genealogy: string().optional(),
-        cruza: string().required(this.required),
-        status: number().integer().required(this.required),
-        created_by: number().integer().required(this.required)
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
-
       const response = await this.genotipoRepository.create(data);
       return { status: 201, message: 'Genealogia cadastrada' };
     } catch (err) {

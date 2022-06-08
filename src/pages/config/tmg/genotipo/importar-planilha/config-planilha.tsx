@@ -4,10 +4,26 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-  { id: 'Genotipo', name: '*Genótipo' },
-  { id: 'Cruza', name: '*Cruza' },
+  { id: 'id_s1', name: '*ID_S1' },
+  { id: 'id_dados_geno', name: '*Identificador dados genótipo'},
+  { id: 'Genotipo', name: '*Nome genótipo' },
+  { id: 'NomePrincipal', name: 'Nome principal' },
+  { id: 'NomePublico', name: 'Nome publico' },
+  { id: 'NomeExperimental', name: 'Nome experimental' },
+  { id: 'NomeAlternativo', name: 'Nome alternativo' },
+  { id: 'EliteNome', name: 'Nome alternativo' },
   { id: 'Tecnologia', name: '*Tecnologia' },
-  { id: 'Genealogy', name: 'Genealogia' }
+  { id: 'gmr', name: 'GMR' },
+  { id: 'bgm', name: 'BGM' },
+  { id: 'Cruza', name: '*Tecnologia' },
+  { id: 'ProgenitorFdireito', name: 'Progenitor_f_direito' },
+  { id: 'ProgenitorMdireito', name: 'Progenitor_m_direito' },
+  { id: 'ProgenitorForigem', name: 'Progenitor_f_origem' },
+  { id: 'ProgenitorMorigem', name: 'Progenitor_m_origem' }, 
+  { id: 'ProgenitoresOrigem', name: 'Progenitores Origem' }, 
+  { id: 'id_s2', name: '*ID_S2' },
+  { id: 'id_dados_lote', name: '*Identificador dados lotes' },
+  { id: 'ProgenitorForigem', name: 'Progenitor_m_origem' }, 
 ];
 
 export default function ImportacaoPlanilha({ config }: any) {
