@@ -25,6 +25,7 @@ model config_gerais {
 model culture {
   id                Int                 @id @default(autoincrement())
   name              String?             @unique(map: "Culture_name_key")
+  desc              String
   created_at        DateTime            @default(now())
   created_by        Int
   status            Int                 @default(1)
@@ -293,10 +294,10 @@ model foco {
 }
 
 model foco_children {
-  id       Int @id @default(autoincrement())
-  id_safra Int
-  id_foco  Int
-  grupo    Int
+  id         Int       @id @default(autoincrement())
+  id_safra   Int
+  id_foco    Int
+  grupo      Int
   status     Int?      @default(1)
   created_by Int
   created_at DateTime? @default(now())
@@ -309,7 +310,7 @@ model foco_children {
 model type_assay {
   id         Int       @id @default(autoincrement())
   id_culture Int
-  id_safra   Int      
+  id_safra   Int
   name       String
   status     Int       @default(1)
   created_by Int
@@ -317,7 +318,7 @@ model type_assay {
 
   npe     npe[]
   culture culture @relation(fields: [id_culture], references: [id])
-  safra safra   @relation(fields: [id_safra], references: [id])
+  safra   safra   @relation(fields: [id_safra], references: [id])
 }
 
 model tecnologia {

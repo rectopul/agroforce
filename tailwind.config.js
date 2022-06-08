@@ -8,13 +8,15 @@ module.exports = {
   ],
   theme: {
     screens: {
-      'sm': '1024px',
+      'sm': '1100px',
       // => @media (min-width: 640px) { ... }
 
-      'md': '1439px',
+      'md': '1350px',
       // => @media (min-width: 768px) { ... }
 
-      'lg': '1919px',
+      'gg': '1550px',
+
+      'lg': '1900px',
       // => @media (min-width: 1024px) { ... }
     },
     colors: {

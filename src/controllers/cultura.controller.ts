@@ -4,6 +4,7 @@ import { CulturaRepository } from '../repository/culture.repository';
 interface CultureDTO {
   id: number;
   name: string;
+  desc: string;
   created_by: number;
   status: number;
 }
@@ -38,7 +39,7 @@ export class CulturaController {
 
       if (options.filterSearch) {
         options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-        parameters.name = JSON.parse(options.filterSearch);
+        parameters.desc = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {
@@ -51,12 +52,17 @@ export class CulturaController {
         select = {
           id: true,
           name: true,
+          desc: true,
           status: true
         };
       }
 
       if (options.name) {
         parameters.name = options.name;
+      }
+
+      if (options.desc) {
+        parameters.desc = options.desc;
       }
 
       if (options.take) {
@@ -129,6 +135,7 @@ export class CulturaController {
     try {
       const schema: SchemaOf<CreateCultureDTO> = object({
         name: string().required(this.required),
+        desc: string().required(this.required),
         created_by: number().integer().required(this.required),
       });
 
@@ -136,9 +143,9 @@ export class CulturaController {
 
       if (!valid) return { status: 400, message: "Dados inválidos" };
 
-      const loteAlreadyExists = await this.culturaRepository.findByName(data.name);
+      const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
-      if (loteAlreadyExists) {
+      if (cultureAlreadyExists) {
         return { status: 400, message: "Cultura ja cadastrado" };
       }
 
@@ -155,6 +162,7 @@ export class CulturaController {
       const schema: SchemaOf<UpdateCultureDTO> = object({
         id: number().integer().required(this.required),
         name: string().required(this.required),
+        desc: string().required(this.required),
         status: number().integer().required(this.required),
       });
 
@@ -173,6 +181,7 @@ export class CulturaController {
       }
 
       culture.name = data.name;
+      culture.desc = data.desc;
       culture.status = data.status;
 
       await this.culturaRepository.update(data.id, culture);

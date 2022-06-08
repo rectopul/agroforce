@@ -22,7 +22,7 @@ export function MainHeader({ children, name, avatar, headerSelects }: IMainHeade
         pr-2
         text-4xl
       ">
-        <div className='w-auto gap-1 flex justify-between items-center pr-3 mr-5'>
+        <div className='lg:w-2/6 md:w-5/12 gg:w-[580px] sm:w-[400px] gap-1 flex  items-center pr-3 mr-5'>
           <Link passHref href="/">
             <Image src="/images/logo-tmg.png" alt="TMG" width={160} height={150} />
           </Link>

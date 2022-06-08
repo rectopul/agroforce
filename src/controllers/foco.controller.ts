@@ -81,8 +81,6 @@ export class FocoController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      console.log("Select: ", select)
-
       const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
