@@ -30,6 +30,7 @@ interface IFilter {
 export interface ICulture {
   id: number;
   name: string;
+  desc: string;
   status?: number;
 }
 
@@ -70,12 +71,15 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
+  const [orderDesc, setOrderDesc] = useState<number>(0);
   // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowName, setArrowName] = useState<ReactNode>('');
+  const [arrowDesc, setArrowDesc] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Código Reduzido", value: "name" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "desc" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -102,8 +106,8 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({filterStatus, filterSearch}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}.`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSearch=${filterSearch}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await cultureService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -134,9 +138,9 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
       return copy;
     });
 
-    const { id, name, status } = cultures[index];
+    const { id, name, desc, status } = cultures[index];
 
-    await cultureService.updateCulture({ id, name, status });
+    await cultureService.updateCulture({ id, name, desc, status });
   };
 
   function columnsOrder(camposGerenciados: string) {
@@ -183,11 +187,25 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
             <div className='flex items-center'>
               {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
+                Código Reduzido
               </button>
             </div>
           ),
           field: "name",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'desc') {
+        arrOb.push({
+          title: (
+            <div className='flex items-center'>
+              {arrowDesc}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderDesc('desc', orderDesc)} >
+                Nome
+              </button>
+            </div>
+          ),
+          field: "desc",
           sorting: false
         });
       }
@@ -303,7 +321,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 
     await cultureService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response)
+        setCultures(response.response)
       }
     });
 
@@ -316,6 +334,49 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
         setArrowName(<AiOutlineArrowUp />);
       } else {
         setArrowName('');
+      }
+    }
+  };
+
+  async function handleOrderDesc(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await cultureService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setCultures(response.response)
+      }
+    })
+    if (orderDesc === 2) {
+      setOrderDesc(0);
+      setArrowDesc(<AiOutlineArrowDown />);
+    } else {
+      setOrderDesc(orderDesc + 1);
+      if (orderDesc === 1) {
+        setArrowDesc(<AiOutlineArrowUp />);
+      } else {
+        setArrowDesc('');
       }
     }
   };
@@ -333,7 +394,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 

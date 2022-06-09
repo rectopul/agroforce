@@ -74,6 +74,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -100,8 +101,8 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({filterStatus, filterSearch}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await focoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -185,6 +186,19 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
             </div>
           ),
           field: "name",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'group') {
+        arrOb.push({
+          title: (
+            <div className='flex items-center'>
+              <button className='font-medium text-gray-900'>
+                Grupo
+              </button>
+            </div>
+          ),
+          field: "group",
           sorting: false
         });
       }
@@ -329,7 +343,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -617,12 +631,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
+  const safraId = req.cookies.safraId;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + `&id_culture=${cultureId}&id_safra=${safraId}` : `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -639,6 +654,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const response = await focos.json();
 
   const allFocos = response.response;
+  //console.log("Focos: ", allFocos);
   const totalItems = response.total;
 
   return {

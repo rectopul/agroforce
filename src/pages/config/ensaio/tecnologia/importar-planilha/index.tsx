@@ -29,7 +29,6 @@ export default function Importar({ safra }: Idata) {
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({ spreadSheet: rows, moduleId: 18, safra: safra, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
-          console.log("response.message: ", response)
           Swal.fire({
             html: response.message,
             width: "900"

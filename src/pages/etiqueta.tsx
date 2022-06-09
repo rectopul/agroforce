@@ -14,9 +14,86 @@ export default function Etiqueta() {
   return (
     <>
       <Head>Etiqueta</Head>
-      <Content contentHeader={[]}  >
-        <PDFExport ref={pdfExportComponent} fileName="etiqueta_2_2016-06-01" paperSize="A4" >
-          {/* <table>
+      <PDFExport ref={pdfExportComponent} fileName="etiqueta_2" paperSize={'auto'}>
+        <div className="w-[3508px] h-[2480px] rotate-90">
+          <div className="w-full h-full text-[350px] p-4 ">
+            <span className="absolute mt-14">MT405SS02</span> <FaHandPointLeft className="flex ml-auto h-[865px] w-[865px]" />
+            <span>SEQ-P</span> <br />
+            <span>QM123_VG-2L</span> <strong className="pl-[180px] mb-16 text-[750px]">3B</strong>
+          </div>
+        </div>
+      </PDFExport>
+      <button onClick={exportPDF} className="bnt mt-52"> Teste </button>
+    </>
+  )
+}
+
+//A4 PAPER BY CALCULATOR
+{/* <div className="w-full h-full text-8xl p-4">
+            <span className="absolute mt-14">MT405SS02</span> <FaHandPointLeft className="flex ml-auto h-72 w-72" />
+            <span>SEQ-P</span> <br />
+            <span>QM123_VG-2L</span> <strong className="pl-32 mb-16 text-[250px]">3B</strong>
+          </div> */}
+
+
+
+
+{/* <div className="h-[1260px] w-[384px] flex item-align-left ">
+            <table className="w-96">
+              <tbody>
+                <tr>
+                  <td>
+                    <div className="w-[790px] h-[1120px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <div className=" w-[416px] h-[192px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div className="w-[416px] h-[192px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3C</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <div className=" w-[416px] h-[192px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3C</strong>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div className="w-[416px] h-[192px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3C</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <div className=" w-[416px] h-[192px] text-lg rotate-90">
+                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
+                      <span>SEQ-P</span> <br />
+                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3C</strong>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div> */}
+
+{/* <table>
             <tbody>
               <tr>
                 <td>
@@ -56,33 +133,3 @@ export default function Etiqueta() {
               </tr>
             </tbody>
           </table> */}
-          <div className="h-[420px] w-[384px] flex item-align-left ">
-            <table className="w-96">
-              <tbody>
-                <tr>
-                  <td>
-                    <div className="relative w-[416px] h-[192px] flex-wrap text-lg rotate-90">
-                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
-                      <span>SEQ-P</span> <br />
-                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
-                    </div>
-                  </td>
-                  <td>
-                    <div className=" w-[416px] h-[192px] flex-wrap text-lg rotate-90">
-                      <span className="absolute">MT405SS02</span> <FaHandPointLeft className="flex ml-72 h-16 w-16" />
-                      <span>SEQ-P</span> <br />
-                      <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-
-        </PDFExport>
-        <button onClick={exportPDF} className="bnt mt-52"> Teste </button>
-      </Content>
-    </>
-  )
-}

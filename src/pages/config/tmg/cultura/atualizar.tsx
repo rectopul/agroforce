@@ -19,6 +19,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 export interface IUpdateCulture {
   id: number;
   name: string;
+  desc: string;
   status: number;
 };
 
@@ -40,11 +41,12 @@ export default function Cultura(culture: IUpdateCulture) {
     initialValues: {
       id: culture.id,
       name: culture.name,
+      desc: culture.desc,
       status: culture.status
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) {
+      if (!values.name || !values.desc) {
         Swal.fire('Preencha todos os campos obrigatórios')
         return
       }
@@ -52,13 +54,13 @@ export default function Cultura(culture: IUpdateCulture) {
       await cultureService.updateCulture({
         id: culture.id,
         name: capitalize(formik.values.name),
+        desc: capitalize(formik.values.desc),
         status: formik.values.status,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Cultura atualizada com sucesso');
           router.back();
         } else {
-          setCheckInput("text-red-600");
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -68,12 +70,16 @@ export default function Cultura(culture: IUpdateCulture) {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) {
+    if (!values.name || !values.desc) {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = 'red';
+      let inputDesc: any = document.getElementById("desc");
+      inputDesc.style.borderColor = 'red';
     } else {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = '';
+      let inputDesc: any = document.getElementById("desc");
+      inputDesc.style.borderColor = '';
     }
   }
 
@@ -89,7 +95,7 @@ export default function Cultura(culture: IUpdateCulture) {
 
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Nova cultura</h1>
+          <h1 className="text-2xl">Atualizar cultura</h1>
 
           <div className="w-full
           flex
@@ -101,16 +107,31 @@ export default function Cultura(culture: IUpdateCulture) {
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
-                Nome
+                Código Reduzido
               </label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                max="50"
-                placeholder="ex: Soja"
+                maxLength={2}
+                placeholder="ex: AL"
                 onChange={formik.handleChange}
                 value={formik.values.name}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                id="desc"
+                name="desc"
+                type="text"
+                maxLength={10}
+                placeholder="ex: Algodão"
+                onChange={formik.handleChange}
+                value={formik.values.desc}
               />
             </div>
           </div>

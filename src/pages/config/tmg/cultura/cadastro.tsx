@@ -16,6 +16,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICreateCulture {
   name: string;
+  desc: string;
   status: number;
   created_by: number;
 }
@@ -39,19 +40,21 @@ export default function Cadastro() {
   const formik = useFormik<ICreateCulture>({
     initialValues: {
       name: '',
+      desc: '',
       status: 1,
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name) {
+      if (!values.name || !values.desc) {
         Swal.fire("Preencha os campos obrigatórios");
         return;
       }
 
 
       await cultureService.createCulture({
-        name: capitalize(formik.values.name),
+        name: (formik.values.name).toUpperCase(),
+        desc: capitalize(formik.values.desc),
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
@@ -59,8 +62,6 @@ export default function Cadastro() {
           Swal.fire('Cultura cadastrada com sucesso!');
           router.back();
         } else {
-          let inputName: any = document.getElementById("name");
-          inputName.style.borderColor = 'red';
           Swal.fire(response.message);
         }
       })
@@ -68,12 +69,16 @@ export default function Cadastro() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) {
+    if (!values.name || !values.desc) {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = 'red';
+      let inputDesc: any = document.getElementById("desc");
+      inputDesc.style.borderColor = 'red';
     } else {
       let inputName: any = document.getElementById("name");
       inputName.style.borderColor = '';
+      let inputDesc: any = document.getElementById("desc");
+      inputDesc.style.borderColor = '';
     }
   }
 
@@ -108,16 +113,31 @@ export default function Cadastro() {
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong>*</strong>
+                Código Reduzido
+              </label>
+              <Input
+                type="text"
+                maxLength={2}
+                id="name"
+                name="name"
+                placeholder="ex: AL"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
+            <div className="w-2/4 h-10 mt-2">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong>*</strong>
                 Nome
               </label>
               <Input
                 type="text"
-                maxLength={50}
-                id="name"
-                name="name"
-                placeholder="ex: Soja"
+                maxLength={10}
+                id="desc"
+                name="desc"
+                placeholder="ex: Algodão"
                 onChange={formik.handleChange}
-                value={formik.values.name}
+                value={formik.values.desc}
               />
             </div>
           </div>
