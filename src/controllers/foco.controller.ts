@@ -23,6 +23,7 @@ export class FocoController {
     let select: any = [];
 
     try {
+      //console.log(options)
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -44,7 +45,7 @@ export class FocoController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          if(objSelect[item] !== 'group'){
+          if (objSelect[item] !== 'group') {
             select[objSelect[item]] = true;
           }
         });
@@ -53,7 +54,8 @@ export class FocoController {
         select = {
           id: true,
           name: true,
-          status: true
+          status: true,
+          foco_children: true,
         };
       }
 
@@ -88,6 +90,27 @@ export class FocoController {
         skip,
         orderBy
       );
+
+      // response.map((item: any) => {
+      //   return item.foco_children.map((group: any) => {
+      //     //console.log(group.id_safra === Number(options.id_safra))
+      //     return (group.id_safra === Number(options.id_safra)) ? group.grupo : null
+      //   })
+      // })
+
+      response.map((item: any) => {
+        item.foco_children.map((group: any) => {
+          //console.log(group.id_safra === Number(options.id_safra))          
+          //item.foco_children = (group.id_safra === Number(options.id_safra)) ? group.grupo
+          if (group.id_safra === Number(options.id_safra)) {
+            item.group = group.grupo
+          }
+        })
+      })
+
+
+      console.log(response)
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 }
 
@@ -95,6 +118,7 @@ export class FocoController {
         return { status: 200, response, total: response.total }
       }
     } catch (err) {
+      console.log("Error: ", err)
       return { status: 400, message: err }
     }
   };

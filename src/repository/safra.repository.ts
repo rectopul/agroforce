@@ -30,7 +30,7 @@ export class SafraRepository {
     const safra = await prisma.safra.findFirst({
       where: {
         safraName: data.safraName,
-        //id_culture: data.id_culture,
+        id_culture: data.id_culture,
       }
     });
 

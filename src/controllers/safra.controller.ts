@@ -159,8 +159,9 @@ export class SafraController {
       const valid = schema.isValidSync(data);
 
       if (!valid) return { status: 400, message: "Dados inválidos" };
-
+      console.log("Data: ", data);
       const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
+      console.log("Safra already exists: ", safraAlreadyExists)
       if (safraAlreadyExists) return { status: 400, message: "Safra já cadastrada" };
 
       await this.safraRepository.create(data);

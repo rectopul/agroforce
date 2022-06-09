@@ -84,7 +84,7 @@ model safra {
   type_assay    type_assay[]
   quadra        quadra[]
   foco_children foco_children[]
-  lote lote[]
+  lote          lote[]
 }
 
 model uf {
@@ -256,9 +256,9 @@ model genotipo {
   id                  Int        @id @default(autoincrement())
   id_culture          Int
   id_tecnologia       Int
-  id_s1 Int
-  id_dados String @unique()
-  name_genotipo            String
+  id_s1               Int
+  id_dados            String     @unique()
+  name_genotipo       String
   name_main           String?
   name_public         String?
   name_experiment     String?
@@ -305,8 +305,8 @@ model foco {
   created_at DateTime? @default(now())
 
   npe           npe[]
-  foco_children foco_children[]
   culture       culture         @relation(fields: [id_culture], references: [id])
+  foco_children foco_children[]
 }
 
 model foco_children {
@@ -353,22 +353,22 @@ model tecnologia {
 }
 
 model lote {
-  id          Int      @id @default(autoincrement())
-  id_genotipo Int
-  id_safra Int
-  cod_lote String
-  id_s2 Int
-  id_dados Int @unique
-  year Int
-  ncc Int
-  fase String
-  peso Decimal
-  quant_sementes Int 
-  status      Int      @default(1)
-  created_by  Int
-  created_at  DateTime @default(now())
-  genotipo    genotipo @relation(fields: [id_genotipo], references: [id])
-  safra    safra @relation(fields: [id_safra], references: [id])
+  id             Int      @id @default(autoincrement())
+  id_genotipo    Int
+  id_safra       Int
+  cod_lote       String
+  id_s2          Int
+  id_dados       Int      @unique
+  year           Int
+  ncc            Int
+  fase           String
+  peso           Decimal
+  quant_sementes Int
+  status         Int      @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
+  genotipo       genotipo @relation(fields: [id_genotipo], references: [id])
+  safra          safra    @relation(fields: [id_safra], references: [id])
 }
 
 model epoca {
