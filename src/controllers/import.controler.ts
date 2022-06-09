@@ -184,7 +184,6 @@ export class ImportController {
   }
 
   async validateTechnology(data: object | any) {
-    //if ((data.spreadSheet.length) === 0) return "Arquivo invalido ou vazio"
     const responseIfError: any = [];
     const spreadSheet = data.spreadSheet
     try {

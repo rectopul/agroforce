@@ -54,6 +54,7 @@ export class FocoRepository {
       orderBy: order
     });
     
+
     result.total = count;
     return result;
   }
