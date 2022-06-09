@@ -9,9 +9,9 @@ export class UserPermissionController {
                 userId = parseInt(userId);
             }
 
-            // let response = await this.userPermission.getPermissionsByUser(userId);
-            // let arr2: any = [];
-            // let arr1: any = [];
+            // const response = await this.userPermission.getPermissionsByUser(userId);
+            // const arr2: any = [];
+            // const arr1: any = [];
             // for (const property in response) {
             // arr1 =response[property].profile.acess_permission.split(',');
             // arr2 = arr1.concat(arr2);
@@ -27,7 +27,7 @@ export class UserPermissionController {
 
     async getAllPermissions() {
         try {
-            let response = await this.userPermission.findAll('');
+            const response = await this.userPermission.findAll('');
 
             if (!response)
                 throw "falha na requisição, tente novamente";
@@ -39,10 +39,10 @@ export class UserPermissionController {
     }
 
     async getByUserID(userId: Number | any) {
-        let newID = parseInt(userId);
+        const newID = parseInt(userId);
         try {
             if (userId && userId !== '{id}') {
-                let response = await this.userPermission.findAllByUser(newID);
+                const response = await this.userPermission.findAllByUser(newID);
                 if (!response || response.length === 0) {
                     return { status: 400, response: [], message: 'usuario não tem cultura' };
                 } else {
@@ -61,7 +61,7 @@ export class UserPermissionController {
             if (data !== null && data !== undefined) {
                 await this.delete(parseInt(data.userId));
                 data.status = 0;
-                let response = await this.userPermission.create(data);
+                const response = await this.userPermission.create(data);
                 if (response.count > 0) {
                     return { status: 200, message: { message: "permission criada" } }
                 } else {
@@ -102,7 +102,7 @@ export class UserPermissionController {
     async delete(userId: number) {
         try {
             if (userId) {
-                let response: object | any = await this.userPermission.delete({ userId: userId });
+                const response: object | any = await this.userPermission.delete({ userId: userId });
                 return { status: 200, response }
 
             } else {

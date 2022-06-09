@@ -71,7 +71,7 @@ export function Content({ contentHeader, children }: IContentData) {
 
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
-      cultures.push({ id: value.cultureId, name: value.culture.name });
+      cultures.push({ id: value.cultureId, name: value.culture.name, desc: value.culture.desc });
     })
   }
 
@@ -133,11 +133,11 @@ export function Content({ contentHeader, children }: IContentData) {
 
         headerSelects={
           <div className="mb-4 flex gap-3">
-            <div className="h-10 ">
+            <div className="h-10 lg:w-40 md:w-32 sm:w-26">
               <Select values={cultures} onChange={e => validationCulture(e.target.value)} selected={culturaSelecionada} />
             </div>
-            <div className="w-40">
-              <Select className="h-10" values={safras} onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+            <div className="h-10 lg:w-40 md:w-32 sm:w-26">
+              <Select values={safras} onChange={e => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
             </div>
           </div>
         }
