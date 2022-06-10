@@ -256,7 +256,7 @@ export class ImportController {
 
     } catch (error) {
 
-      console.log("Error validação import tecnologia: ", error)
+      console.log("Error", error)
 
     }
   }
@@ -748,7 +748,7 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id_s1 é obrigatorio.</li><br>`;
                 }
               }
-            
+
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do genótipo é obrigatorio.</li><br>`;
@@ -806,7 +806,7 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do lote é obrigatorio.</li><br>`;
                 }
               }
-  
+
               if (configModule.response[0].fields[sheet] == 'Ano') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ano lote é obrigatorio.</li><br>`;
@@ -817,7 +817,7 @@ export class ImportController {
                       console.log(data.spreadSheet[keySheet][sheet]);
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
                     }
-                      year_safra = '';
+                    year_safra = '';
                   } else {
                     year_lote = data.spreadSheet[keySheet][sheet];
                   }
@@ -828,15 +828,15 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  let safra: any = await this.safraController.getAllSafra({id_culture: data.id_culture, safraName: data.spreadSheet[keySheet][sheet]});
+                  let safra: any = this.safraController.getAllSafra({ id_culture: data.id_culture });
                   if (safra.count == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
                     if (year_lote && year_lote != '') {
                       if (year_lote != safra.response[0].year) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
-                      } 
-                        year_lote = '';
+                      }
+                      year_lote = '';
                     } else {
                       year_safra = safra.response[0].year;
                     }
@@ -848,7 +848,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  let lote: any = await this.loteController.listAll({cod_lote: String(data.spreadSheet[keySheet][sheet])});
+                  let lote: any = this.loteController.listAll({ cod_lote: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -882,23 +882,20 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
               this.aux.genealogy = "";
-               // campos genotipo
+              // campos genotipo
               if (configModule.response[0].fields[sheet] == 'id_s1') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.id_s1 = data.spreadSheet[keySheet][sheet];
                 }
               }
-            
+
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                    console.log(data.spreadSheet[keySheet][sheet]);
-                    let geno: any = await this.genotipoController.listAllGenotipos({id_dados: data.spreadSheet[keySheet][sheet]});
-                    if (geno.total > 0) {
-                      this.aux.id_genotipo = geno.response[0].id;
-                      this.aux.id_dados_geno = data.spreadSheet[keySheet][sheet];
-                    } else {
-                      this.aux.id_dados_geno = data.spreadSheet[keySheet][sheet];
-                    }
+                  let geno: any = this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
+                  if (geno.total > 0) {
+                    this.aux.id_genotipo = geno.response[0].id;
+                    this.aux.id_dados = data.spreadSheet[keySheet][sheet];
+                  }
                 }
               }
 
@@ -953,8 +950,8 @@ export class ImportController {
                   this.aux.type = data.spreadSheet[keySheet][sheet];
                 }
               }
-            
-              if (configModule.response[0].fields[sheet] == 'gmr') {
+
+              if (configModule.response[0].fields[sheet] == 'GMR') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.gmr = data.spreadSheet[keySheet][sheet];
                 }
@@ -1017,7 +1014,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let lote: any = await this.loteController.listAll({id_dados: data.spreadSheet[keySheet][sheet]});
+                  let lote: any = this.loteController.listAll({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0].id;
                     this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
@@ -1068,10 +1065,10 @@ export class ImportController {
                   this.aux.quant_sementes = data.spreadSheet[keySheet][sheet];
                 }
               }
-            
+
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
-                  await this.genotipoController.updategenotipo({ 
+                  await this.genotipoController.updategenotipo({
                     id: this.aux.id_genotipo,
                     id_culture: Number(this.aux.id_culture),
                     id_tecnologia: Number(this.aux.id_tecnologia),
@@ -1096,9 +1093,10 @@ export class ImportController {
                     created_by: this.aux.created_by,
                   });
                 } else {
-                  let genotipo:any = await this.genotipoController.createGenotipo({ 
-                    id_culture: Number(this.aux.id_culture),
-                    id_tecnologia: Number(this.aux.id_tecnologia),
+                  delete this.aux.id_genotipo;
+                  let genotipo: any = await this.genotipoController.createGenotipo({
+                    id_culture: this.aux.id_culture,
+                    id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,

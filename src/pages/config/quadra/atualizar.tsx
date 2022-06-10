@@ -853,7 +853,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const totalItems = allDisparos.total;
   allDisparos = allDisparos.response;
-  console.log(allDisparos)
   return {
     props: {
       quadra,

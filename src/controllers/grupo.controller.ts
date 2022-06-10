@@ -47,7 +47,6 @@ export class GrupoController {
 
   async update(data: any) {
     try {
-      console.log(data);
       const schema: SchemaOf<any> = object({
         id: number().required(this.required),
         id_safra: number().required(this.required),

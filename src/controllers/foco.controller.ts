@@ -23,7 +23,6 @@ export class FocoController {
     let select: any = [];
 
     try {
-      //console.log(options)
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -107,9 +106,6 @@ export class FocoController {
           }
         })
       })
-
-
-      console.log(response)
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 }

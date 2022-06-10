@@ -46,11 +46,12 @@ interface Idata {
   itensPerPage: number | any;
   filterAplication: object | any;
   cultureId: number;
+  id_safra: string;
   pageBeforeEdit: string | any
   filterBeforeEdit: string | any;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId, id_safra, pageBeforeEdit, filterBeforeEdit }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -62,7 +63,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: "id,name,status" };
+  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: "id,name, seeds, status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
 
@@ -76,6 +77,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -94,8 +96,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({filterStatus, filterSearch}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSearch=${filterSearch}&id_culture=${cultureId}&id_safra=${id_safra}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await typeAssayService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -163,6 +165,19 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
             </div>
           ),
           field: "name",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[item] === 'seeds') {
+        arrOb.push({
+          title: (
+            <div className='flex items-center'>
+              <button className='font-medium text-gray-900'>
+                Envelope
+              </button>
+            </div>
+          ),
+          field: "seeds",
           sorting: false
         });
       }
@@ -338,7 +353,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
@@ -632,12 +647,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
   const token = req.cookies.token;
   const cultureId = req.cookies.cultureId;
-  const safraId = req.cookies.safraId;
+  const id_safra = req.cookies.safraId;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId + "&id_safra=" + safraId;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${id_safra}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId + "&id_safra=" + id_safra : "filterStatus=1&id_culture=" + cultureId + "&id_safra=" + id_safra;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -662,6 +677,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       cultureId,
+      id_safra,
       pageBeforeEdit,
       filterBeforeEdit
     },

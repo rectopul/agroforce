@@ -30,9 +30,6 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { removeCookies, setCookies } from 'cookies-next';
 
-
-
-
 export interface IUpdateFoco {
   id: number;
   name: string;
