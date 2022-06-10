@@ -38,7 +38,6 @@ export default function Importar() {
       input: [],
     },
     onSubmit: async (values) => {
-      console.log("Values:", values);
         var inputFile: any = document.getElementById("inputFile");
         readExcel(inputFile.files);
     },
