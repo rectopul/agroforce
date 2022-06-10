@@ -14,7 +14,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { loteGenotipoService, loteService, userPreferencesService } from "src/services";
+import { loteService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import ITabs from "../../../../../shared/utils/dropdown";
 

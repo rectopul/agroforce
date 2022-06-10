@@ -7,7 +7,7 @@ import { useState } from "react";
 import { FaSortAmountUpAlt } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { Button, Content, Input } from "src/components";
-import { loteGenotipoService } from "src/services";
+import { loteService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../../../shared/utils/dropdown';
 
@@ -48,7 +48,7 @@ export default function  Cadastro({ id_genotipo }: IIdGenotipo) {
     onSubmit: async (values) => {
       validateInputs(values);
 
-      await loteGenotipoService.create({
+      await loteService.create({
         id_genotipo: id_genotipo,
         name: capitalize(formik.values.name),
         volume: formik.values.volume,
