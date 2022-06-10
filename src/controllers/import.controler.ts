@@ -772,7 +772,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (String(data.spreadSheet[keySheet][sheet]) == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</li><br>`;
                 } else {
                   let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
@@ -813,6 +813,8 @@ export class ImportController {
                 } else {
                   if (year_safra && year_safra != '') {
                     if (year_safra != data.spreadSheet[keySheet][sheet]) {
+                      console.log(year_safra);
+                      console.log(data.spreadSheet[keySheet][sheet]);
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
                     }
                       year_safra = '';
@@ -826,12 +828,12 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  let safra: any = this.safraController.getAllSafra({id_culture: data.id_culture});
+                  let safra: any = await this.safraController.getAllSafra({id_culture: data.id_culture, safraName: data.spreadSheet[keySheet][sheet]});
                   if (safra.count == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
                     if (year_lote && year_lote != '') {
-                      if (year_lote != data.spreadSheet[keySheet][sheet]) {
+                      if (year_lote != safra.response[0].year) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
                       } 
                         year_lote = '';
@@ -842,11 +844,11 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CodigoLote') {
+              if (configModule.response[0].fields[sheet] == 'CodLote') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  let lote: any = this.loteController.listAll({cod_lote: data.spreadSheet[keySheet][sheet]});
+                  let lote: any = await this.loteController.listAll({cod_lote: String(data.spreadSheet[keySheet][sheet])});
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -864,7 +866,6 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id_s2 é obrigatorio.</li><br>`;
                 }
               }
-            
             }
           }
         }
@@ -890,17 +891,20 @@ export class ImportController {
             
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                    let geno: any = this.genotipoController.listAllGenotipos({id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet]});
+                    console.log(data.spreadSheet[keySheet][sheet]);
+                    let geno: any = await this.genotipoController.listAllGenotipos({id_dados: data.spreadSheet[keySheet][sheet]});
                     if (geno.total > 0) {
                       this.aux.id_genotipo = geno.response[0].id;
-                      this.aux.id_dados = data.spreadSheet[keySheet][sheet];
+                      this.aux.id_dados_geno = data.spreadSheet[keySheet][sheet];
+                    } else {
+                      this.aux.id_dados_geno = data.spreadSheet[keySheet][sheet];
                     }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  this.aux.genotipo = data.spreadSheet[keySheet][sheet];
+                  this.aux.name_genotipo = data.spreadSheet[keySheet][sheet];
                 }
               }
 
@@ -937,7 +941,10 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  this.aux.id_tecnologia = data.spreadSheet[keySheet][sheet];
+                  let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  if (tec.total > 0) {
+                    this.aux.id_tecnologia = tec.response[0].id;
+                  }
                 }
               }
 
@@ -947,13 +954,13 @@ export class ImportController {
                 }
               }
             
-              if (configModule.response[0].fields[sheet] == 'GMR') {
+              if (configModule.response[0].fields[sheet] == 'gmr') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.gmr = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'BGM') {
+              if (configModule.response[0].fields[sheet] == 'bgm') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.bgm = data.spreadSheet[keySheet][sheet];
                 }
@@ -1010,9 +1017,11 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let lote: any = this.loteController.listAll({id_dados: data.spreadSheet[keySheet][sheet]});
+                  let lote: any = await this.loteController.listAll({id_dados: data.spreadSheet[keySheet][sheet]});
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0].id;
+                    this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
+                  } else {
                     this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
                   }
                 }
@@ -1020,7 +1029,13 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Ano') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  this.aux.year_lote = data.spreadSheet[keySheet][sheet];
+                  this.aux.year = data.spreadSheet[keySheet][sheet];
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == 'NCC') {
+                if (data.spreadSheet[keySheet][sheet] != "") {
+                  this.aux.ncc = data.spreadSheet[keySheet][sheet];
                 }
               }
 
@@ -1030,7 +1045,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CodigoLote') {
+              if (configModule.response[0].fields[sheet] == 'CodLote') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.cod_lote = data.spreadSheet[keySheet][sheet];
                 }
@@ -1058,11 +1073,12 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.updategenotipo({ 
                     id: this.aux.id_genotipo,
-                    id_culture: this.aux.id_culture,
-                    id_tecnologia: this.aux.id_tecnologia,
+                    id_culture: Number(this.aux.id_culture),
+                    id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
-                    id_dados: this.aux.id_dados_geno,
+                    id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
+                    name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
                     name_experiment: this.aux.name_experiment,
                     name_alter: this.aux.name_alter,
@@ -1080,13 +1096,13 @@ export class ImportController {
                     created_by: this.aux.created_by,
                   });
                 } else {
-                  delete this.aux.id_genotipo;
                   let genotipo:any = await this.genotipoController.createGenotipo({ 
-                    id_culture: this.aux.id_culture,
-                    id_tecnologia: this.aux.id_tecnologia,
+                    id_culture: Number(this.aux.id_culture),
+                    id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
-                    id_dados: this.aux.id_dados_geno,
+                    id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
+                    name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
                     name_experiment: this.aux.name_experiment,
                     name_alter: this.aux.name_alter,
@@ -1103,17 +1119,20 @@ export class ImportController {
                     parentesco_completo: this.aux.parentesco_completo,
                     created_by: this.aux.created_by,
                   });
-                  this.aux.id_genotipo = genotipo.id;
+                  this.aux.id_genotipo = genotipo.response.id;
                 }
 
                 if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await this.loteController.update({
-                      id: this.aux.id_lote,
-                      id_genotipo: this.aux.id_genotipo,
-                      id_safra: this.aux.id_safra,
-                      cod_lote: this.aux.cod_lote,
-                      id_dados: this.aux.id_dados,
+                      id: Number(this.aux.id_lote),
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
+                      cod_lote: String(this.aux.cod_lote),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1121,12 +1140,16 @@ export class ImportController {
                       created_by: this.aux.created_by,
                     });
                     delete this.aux.id_lote;
+                    delete this.aux.id_genotipo;
                   } else {
                     await this.loteController.create({
-                      id_genotipo: this.aux.id_genotipo,
-                      id_safra: this.aux.id_safra,
-                      cod_lote: this.aux.cod_lote,
-                      id_dados: this.aux.id_dados,
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
+                      cod_lote: String(this.aux.cod_lote),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1135,6 +1158,8 @@ export class ImportController {
                     });
                     delete this.aux.id_genotipo;
                   }
+                } else {
+                  console.log('DROOOOOOGA');
                 }
               }
             }

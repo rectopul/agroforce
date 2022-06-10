@@ -264,10 +264,10 @@ model genotipo {
   name_experiment     String?
   name_alter          String?
   elit_name           String?
-  type                String
-  gmr                 String
-  bgm                 String
-  cruza               String
+  type                String?
+  gmr                 Decimal?  @db.Decimal(10,2)
+  bgm                 Decimal?  @db.Decimal(10,2)
+  cruza               String?
   progenitor_f_direto String?
   progenitor_m_direto String?
   progenitor_f_origem String?
@@ -318,7 +318,6 @@ model foco_children {
   created_by Int
   created_at DateTime? @default(now())
 
-
   safra safra @relation(fields: [id_safra], references: [id])
   foco  foco  @relation(fields: [id_foco], references: [id])
 }
@@ -353,22 +352,23 @@ model tecnologia {
 }
 
 model lote {
-  id             Int      @id @default(autoincrement())
-  id_genotipo    Int
-  id_safra       Int
-  cod_lote       String
-  id_s2          Int
-  id_dados       Int      @unique
-  year           Int
-  ncc            Int
-  fase           String
-  peso           Decimal
-  quant_sementes Int
-  status         Int      @default(1)
-  created_by     Int
-  created_at     DateTime @default(now())
-  genotipo       genotipo @relation(fields: [id_genotipo], references: [id])
-  safra          safra    @relation(fields: [id_safra], references: [id])
+  id          Int      @id @default(autoincrement())
+  id_genotipo Int
+  id_safra Int
+  cod_lote String
+  id_s2 Int
+  id_dados Int @unique
+  year Int?
+  ncc Int?
+  fase String?
+  peso Decimal?
+  quant_sementes Int? 
+  status      Int      @default(1)
+  created_by  Int
+  created_at  DateTime @default(now())
+
+  genotipo    genotipo @relation(fields: [id_genotipo], references: [id])
+  safra    safra @relation(fields: [id_safra], references: [id])
 }
 
 model epoca {

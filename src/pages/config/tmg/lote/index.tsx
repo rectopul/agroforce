@@ -65,21 +65,26 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,genealogy,name,volume,status' };
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id, year, cod_lote, ncc, fase,peso, quant_sementes, name_genotipo, name_main, gmr, bgm, tecnologia" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Genótipo', value: 'genotipo' },
-    { name: 'CamposGerenciados[]', title: 'Nome', value: 'name' },
-    { name: 'CamposGerenciados[]', title: 'Volume', value: 'volume' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    { name: "CamposGerenciados[]", title: "Ano lote", value: "year" },
+    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
+    { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
+    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
+    { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
+    { name: "CamposGerenciados[]", title: "Quant sementes", value: "quant_sementes" },
+    { name: "CamposGerenciados[]", title: "Nome do genotipo", value: "name_genotipo" },
+    { name: "CamposGerenciados[]", title: "Mome principal", value: "name_main" },
+    { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
+    { name: "CamposGerenciados[]", title: "BGM", value: "bgm" },
+    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -118,30 +123,6 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     }
   });
 
-  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
-
-    const index = lotes.findIndex((lote) => lote.id === idItem);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLotes((oldLote) => {
-      const copy = [...oldLote];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const { id, status } = lotes[index];
-
-    await loteGenotipoService.changeStatus({ id, status });
-  }
-
   function columnsOrder(camposGerenciados: string) {
     const ObjetCampos: string[] = camposGerenciados.split(',');
     const arrOb: any = [];
@@ -149,119 +130,111 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     Object.keys(ObjetCampos).forEach((item, index) => {
       if (ObjetCampos[index] === 'id') {
         arrOb.push({
-          title: '',
-          field: 'id',
+          title: "",
+          field: "id",
           width: 0,
           render: () => (
-            colorStar === '#eba417'
-              ? (
-                <div className='h-10 flex'>
-                  <div>
-                    <button
-                      className="w-full h-full flex items-center justify-center border-0"
-                      onClick={() => setColorStar('')}
-                    >
-                      <AiTwotoneStar size={25} color={'#eba417'} />
-                    </button>
-                  </div>
+            colorStar === '#eba417' ? (
+              <div className='h-10 flex'>
+                <div>
+                  <button
+                    className="w-full h-full flex items-center justify-center border-0"
+                    onClick={() => setColorStar('')}
+                  >
+                    <AiTwotoneStar size={25} color={'#eba417'} />
+                  </button>
                 </div>
-              )
-              : (
-                <div className='h-10 flex'>
-                  <div>
-                    <button
-                      className="w-full h-full flex items-center justify-center border-0"
-                      onClick={() => setColorStar('#eba417')}
-                    >
-                      <AiTwotoneStar size={25} />
-                    </button>
-                  </div>
+              </div>
+            ) : (
+              <div className='h-10 flex'>
+                <div>
+                  <button
+                    className="w-full h-full flex items-center justify-center border-0"
+                    onClick={() => setColorStar('#eba417')}
+                  >
+                    <AiTwotoneStar size={25} />
+                  </button>
                 </div>
-              )
-          )
-        });
-      }
-      if (ObjetCampos[index] === 'genotipo') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('genotipo', orderName)}>
-                Genótipo
-              </button>
-            </div>
+              </div>
+            )
           ),
-          field: 'genotipo.genotipo',
+        })
+      }
+      if (ObjetCampos[index] === 'year') {
+        arrOb.push({
+          title: "Ano lote",
+          field: "year",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'name') {
+      if (ObjetCampos[index] === 'cod_lote') {
         arrOb.push({
-          title: 'Nome',
-          field: 'name',
+          title: "Cód lote",
+          field: "cod_lote",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'volume') {
+      if (ObjetCampos[index] === 'ncc') {
         arrOb.push({
-          title: 'Volume',
-          field: 'volume',
+          title: "NCC",
+          field: "ncc",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'status') {
+      if (ObjetCampos[index] === 'fase') {
         arrOb.push({
-          title: 'Status',
-          field: 'status',
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: 'Filtrar por status',
-          render: (rowData: LoteGenotipo) => (
-            <div className='h-10 flex'>
-              {/* <div className="h-10">
-                <Button
-                  icon={<BiEdit size={16} />}
-                  onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  href={`/config/npe/lote/atualizar?id=${rowData.id}`}
-                />
-              </div> */}
-              {rowData.status === 1
-                ? (
-                  <div className="h-10">
-                    <Button
-                      type="submit"
-                      icon={<FaRegThumbsUp size={16} />}
-                      onClick={async () => await handleStatusLote(
-                        rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
-                      )}
-                      bgColor="bg-green-600"
-                      textColor="white"
-                    />
-                  </div>
-                )
-                : (
-                  <div className="h-10">
-                    <Button
-                      type="submit"
-                      icon={<FaRegThumbsDown size={16} />}
-                      onClick={async () => await handleStatusLote(
-                        rowData.id, {
-                        status: rowData.status,
-                        ...rowData
-                      }
-                      )}
-                      bgColor="bg-red-800"
-                      textColor="white"
-                    />
-                  </div>
-                )}
-            </div>
-          )
+          title: "Fase",
+          field: "fase",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'peso') {
+        arrOb.push({
+          title: "Peso",
+          field: "peso",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'quant_sementes') {
+        arrOb.push({
+          title: "Qtd sementes",
+          field: "quant_sementes",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name_genotipo') {
+        arrOb.push({
+          title: "Nome do genotipo",
+          field: "name_genotipo",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name_main') {
+        arrOb.push({
+          title: "Nome principal",
+          field: "name_main",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'gmr') {
+        arrOb.push({
+          title: "GMR",
+          field: "gmr",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'bgm') {
+        arrOb.push({
+          title: "BGM",
+          field: "bgm",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'tecnologia') {
+        arrOb.push({
+          title: "Tecnologia",
+          field: "tecnologia.cod_tec",
+          sorting: false
         });
       }
     });
@@ -292,50 +265,6 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  }
-
-  async function handleOrderName(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = filter + '&orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder !== '') {
-        parametersFilter = 'orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setOrderName(response.response);
-      }
-    });
-
-    if (orderName === 2) {
-      setOrderName(0);
-      setArrowName(<AiOutlineArrowDown />);
-    } else {
-      setOrderName(orderName + 1);
-      if (orderName === 1) {
-        setArrowName(<AiOutlineArrowUp />);
-      } else {
-        setArrowName('');
-      }
-    }
   }
 
   function handleOnDragEnd(result: DropResult): void {
@@ -698,7 +627,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const totalItems = allLote.total || 0;
 
   allLote = allLote.response;
-
+  console.log(allLote);
   return {
     props: {
       allLote,

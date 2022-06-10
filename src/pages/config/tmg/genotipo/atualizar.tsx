@@ -38,11 +38,26 @@ interface IFilter {
 export interface IUpdateGenotipo {
   id: number;
   id_culture: number;
-  genealogy: string;
-  genotipo: string;
+  id_s1: number;
+  id_dados: string;
+  name_genotipo:string;
+  name_main:string;
+  name_public:string;
+  name_experiment:string;
+  name_alter: string;
+  elit_name: string;
+  type: string;
   cruza: string;
-  id_tecnologia: number;
+  cod_tec: string;
   status: number;
+  gmr: number;
+  bgm: number;
+  progenitor_f_direto: string;
+  progenitor_m_direto: string;
+  progenitor_f_origem: string;
+  progenitor_m_origem: string;
+  progenitores_origem: string;
+  parentesco_completo: string;
 }
 
 export interface LoteGenotipo {
@@ -88,18 +103,31 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
     initialValues: {
       id: genotipo.id,
       id_culture: genotipo.id_culture,
-      genealogy: genotipo.genealogy,
-      genotipo: genotipo.genotipo,
       cruza: genotipo.cruza,
-      id_tecnologia: genotipo.id_tecnologia,
+      cod_tec: genotipo.cod_tec,
       status: genotipo.status,
+      id_s1: genotipo.id_s1,
+      id_dados: genotipo.id_dados,
+      name_genotipo:genotipo.name_genotipo,
+      name_main:genotipo.name_main,
+      name_public:genotipo.name_public,
+      name_experiment:genotipo.name_experiment,
+      name_alter: genotipo.name_alter,
+      elit_name: genotipo.elit_name,
+      type: genotipo.type,
+      gmr: genotipo.gmr,
+      bgm: genotipo.bgm,
+      progenitor_f_direto: genotipo.progenitor_f_direto,
+      progenitor_m_direto: genotipo.progenitor_m_direto,
+      progenitor_f_origem: genotipo.progenitor_f_origem,
+      progenitor_m_origem: genotipo.progenitor_m_origem,
+      progenitores_origem: genotipo.progenitores_origem,
+      parentesco_completo: genotipo.parentesco_completo,
     },
     onSubmit: async (values) => {
       await genotipoService.update({
         id: genotipo.id,
         id_culture: formik.values.id_culture,
-        genealogy: capitalize(formik.values.genealogy),
-        genotipo: capitalize(formik.values.genotipo),
         cruza: formik.values.cruza,
         status: genotipo.status,
       }).then((response) => {
@@ -115,7 +143,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,genealogy,name,volume,status" };
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "year, cod_lote, ncc, fase,peso, quant_sementes" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
@@ -126,8 +154,12 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
-    { name: "CamposGerenciados[]", title: "Volume", value: "volume" }
+    { name: "CamposGerenciados[]", title: "Ano lote", value: "year" },
+    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
+    { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
+    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
+    { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
+    { name: "CamposGerenciados[]", title: "Quant sementes", value: "quant_sementes" },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -161,29 +193,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
     },
   });
 
-  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
 
-    const index = lotes.findIndex((lote) => lote.id === idItem);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLotes((oldLote) => {
-      const copy = [...oldLote];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const { id, status } = lotes[index];
-
-    await loteGenotipoService.changeStatus({ id, status });
-  };
 
   function columnsOrder(camposGerenciados: string) {
     let ObjetCampos: string[] = camposGerenciados.split(',');
@@ -222,73 +232,48 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
           ),
         })
       }
-      if (ObjetCampos[index] === 'name') {
+      if (ObjetCampos[index] === 'year') {
         arrOb.push({
-          title: "Nome",
-          field: "name",
+          title: "Ano lote",
+          field: "year",
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'volume') {
+      if (ObjetCampos[index] === 'cod_lote') {
         arrOb.push({
-          title: "Volume",
-          field: "volume",
+          title: "Cód lote",
+          field: "cod_lote",
           sorting: false
         });
       }
-      // if (ObjetCampos[index] === 'status') {
-      //   arrOb.push({
-      //     title: "Status",
-      //     field: "status",
-      //     sorting: false,
-      //     searchable: false,
-      //     filterPlaceholder: "Filtrar por status",
-      //     render: (rowData: LoteGenotipo) => (
-      //       <div className='h-10 flex'>
-      //         <div className="h-10">
-      //           <Button 
-      //             icon={<BiEdit size={16} />}
-      //             onClick={() => {router.push(`lote/atualizar?id=${rowData.id}`)}} 
-      //             bgColor="bg-blue-600"
-      //             textColor="white"
-      //             // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
-      //           />
-      //         </div>
-      //         {rowData.status === 1 ? (
-      //           <div className="h-10">
-      //             <Button
-      //               type="submit"
-      //               icon={<FaRegThumbsUp size={16} />}
-      //               onClick={async () => await handleStatusLote(
-      //                 rowData.id, {
-      //                   status: rowData.status,
-      //                   ...rowData
-      //                 }
-      //               )}
-      //               bgColor="bg-green-600"
-      //               textColor="white"
-      //             />
-      //           </div>
-      //         ) : (
-      //           <div className="h-10">
-      //             <Button
-      //               type="submit"
-      //               icon={<FaRegThumbsDown size={16} />}
-      //               onClick={async () => await handleStatusLote(
-      //                 rowData.id, {
-      //                   status: rowData.status,
-      //                   ...rowData
-      //                 }
-      //               )}
-      //               bgColor="bg-red-800"
-      //               textColor="white"
-      //             />
-      //           </div>
-      //         )}
-      //       </div>
-      //     ),
-      //   })
-      // }
+      if (ObjetCampos[index] === 'ncc') {
+        arrOb.push({
+          title: "NCC",
+          field: "ncc",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'fase') {
+        arrOb.push({
+          title: "Fase",
+          field: "fase",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'peso') {
+        arrOb.push({
+          title: "Peso",
+          field: "peso",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'quant_sementes') {
+        arrOb.push({
+          title: "Qtd sementes",
+          field: "quant_sementes",
+          sorting: false
+        });
+      }
     });
     return arrOb;
   };
@@ -451,68 +436,254 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
           <div className="w-full flex justify-between items-start gap-5 mt-5">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Genotipo
+                Nome genótipo
               </label>
               <Input
                 required
                 style={{ background: '#e5e7eb' }}
                 disabled
-                placeholder="Ex: Genotipo A1"
-                id="genotipo"
-                name="genotipo"
+                id="name_genotipo"
+                name="name_genotipo"
                 onChange={formik.handleChange}
-                value={formik.values.genotipo}
+                value={formik.values.name_genotipo}
               />
             </div>
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Genealogia
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                disabled
-                placeholder="Ex: Genealogia A1"
-                id="genealogy"
-                name="genealogy"
-                onChange={formik.handleChange}
-                value={formik.values.genealogy}
-              />
-            </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Cruza
+                Nome principal
               </label>
               <Input
                 required
                 style={{ background: '#e5e7eb' }}
                 disabled
-                placeholder="Ex: HIR + HFR"
+                id="name_main"
+                name="name_main"
+                onChange={formik.handleChange}
+                value={formik.values.name_main}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Nome publico
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="name_public"
+                name="name_public"
+                onChange={formik.handleChange}
+                value={formik.values.name_public}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Cód tecnologia
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="cod_tec"
+                name="cod_tec"
+                onChange={formik.handleChange}
+                value={formik.values.cod_tec}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Tipo
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="type"
+                name="type"
+                onChange={formik.handleChange}
+                value={formik.values.type}
+              />
+            </div>
+          </div>
+
+          <div className="w-full flex justify-between items-start gap-5 mt-5">
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Nome experimental
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="name_experiment"
+                name="name_experiment"
+                onChange={formik.handleChange}
+                value={formik.values.name_experiment}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Nome alternativo
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="name_alter"
+                name="name_alter"
+                onChange={formik.handleChange}
+                value={formik.values.name_alter}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Elite nome
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="elit_name"
+                name="elit_name"
+                onChange={formik.handleChange}
+                value={formik.values.elit_name}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                GMR
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="gmr"
+                name="gmr"
+                onChange={formik.handleChange}
+                value={formik.values.gmr}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                BGM
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="bgm"
+                name="bgm"
+                onChange={formik.handleChange}
+                value={formik.values.bgm}
+              />
+            </div>
+          </div>
+
+          <div className="w-full flex justify-between items-start gap-5 mt-5">
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Cruza de origem
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
                 id="cruza"
                 name="cruza"
                 onChange={formik.handleChange}
                 value={formik.values.cruza}
               />
             </div>
-
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                <strong className={checkInput}>*</strong>
-                Tecnologia
+                Progenitor F direto
+              </label>
+              <Input
+                required
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="progenitor_f_direto"
+                name="progenitor_f_direto"
+                onChange={formik.handleChange}
+                value={formik.values.progenitor_f_direto}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Progenitor M direto
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}
                 disabled
-                required
-                id="id_tecnologia"
-                name="id_tecnologia"
+                id="progenitor_m_direto"
+                name="progenitor_m_direto"
                 onChange={formik.handleChange}
-                value={formik.values.id_tecnologia}
+                value={formik.values.progenitor_m_direto}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Progenitor F de origem
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="progenitor_f_origem"
+                name="progenitor_f_origem"
+                onChange={formik.handleChange}
+                value={formik.values.progenitor_f_origem}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Progenitor M de origem:
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="progenitor_m_origem"
+                name="progenitor_m_origem"
+                onChange={formik.handleChange}
+                value={formik.values.progenitor_m_origem}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Progenitores de origem:
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="progenitores_origem"
+                name="progenitores_origem"
+                onChange={formik.handleChange}
+                value={formik.values.progenitores_origem}
               />
             </div>
           </div>
+          <div className="w-full flex justify-between items-start gap-5 mt-5">
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Parentesco completo
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                id="parentesco_completo"
+                name="parentesco_completo"
+                onChange={formik.handleChange}
+                value={formik.values.parentesco_completo}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+              </label>
+              <Button
+                type="button"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                icon={<IoMdArrowBack size={18} />}
+                onClick={() => router.back()}
+              />
+            </div>
+             
+          </div>
+
           <div className="h-10 w-full
             flex
             gap-3
