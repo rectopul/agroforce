@@ -33,15 +33,6 @@ export class LoteRepository {
     }
   }
 
-  async findByName(name: string) {
-    const lote = await prisma.lote.findFirst({
-      where: {
-        name
-      }
-    });
-
-    return lote;
-  }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;

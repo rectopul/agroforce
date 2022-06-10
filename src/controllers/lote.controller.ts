@@ -47,12 +47,6 @@ export class LoteController {
 
       if (!lote) return { status: 400, message: 'Lote não existente' };
 
-      const loteAlreadyExists = await this.loteRepository.findByName(data.name);
-
-      if (loteAlreadyExists && loteAlreadyExists.id !== lote.id) {
-        return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
-      }
-
       await this.loteRepository.update(data.id, data);
 
       return { status: 200, message: 'Lote atualizado' };
