@@ -683,24 +683,6 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
             </div>
              
           </div>
-
-          <div className="h-10 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          ">
-            <div className="w-30">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
-            </div>            
-          </div>
         </form>
         <main className="h-4/6 w-full
           flex flex-col
