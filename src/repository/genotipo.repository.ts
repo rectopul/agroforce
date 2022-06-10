@@ -5,14 +5,6 @@ export class GenotipoRepository {
     const genotipo = await prisma.genotipo.create({ data });
     return genotipo;
   }
-
-  async findByGenotipo(genealogy: any) {
-    const genotipo = await prisma.genotipo.findFirst({
-      where: { genealogy }
-    });
-    return genotipo;
-  }
-
   async findOne(id: number) {
     const genotipo = await prisma.genotipo.findUnique({
       where: { id }
@@ -40,7 +32,6 @@ export class GenotipoRepository {
       select: {
         id: true,
         id_culture: true,
-        genealogy: true,
         cruza: true,
         status: true
       }

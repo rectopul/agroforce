@@ -198,12 +198,6 @@ export class GenotipoController {
 
       if (!genotipo) return { status: 400, message: 'Genótipo não encontrado' };
 
-      const loteAlreadyExists = await this.genotipoRepository.findByGenotipo(data.genotipo);
-
-      if (loteAlreadyExists && loteAlreadyExists.id !== genotipo.id) {
-        return { status: 400, message: 'Genealogia já cadastra. favor consultar os inativos' };
-      }
-
       await this.genotipoRepository.update(genotipo.id, data);
 
       return { status: 200, message: 'Genótipo atualizado' };
