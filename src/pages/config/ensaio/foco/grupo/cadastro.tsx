@@ -26,7 +26,6 @@ interface ICreateFoco {
 }
 
 export default function Cadastro({ safra, id_foco }: any) {
-  console.log(safra);
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();

@@ -654,7 +654,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const response = await focos.json();
 
   const allFocos = response.response;
-  //console.log("Focos: ", allFocos);
   const totalItems = response.total;
 
   return {

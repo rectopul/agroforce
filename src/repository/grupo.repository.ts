@@ -3,6 +3,7 @@ import { prisma } from "../pages/api/db/db";
 export class GrupoRepository {
 
   async create(data: any) {
+    //console.log(data)
     const foco_children = await prisma.foco_children.create({
       data: {
         id_foco: data.id_foco,

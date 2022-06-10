@@ -205,7 +205,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiGrupo = await fetch(`${baseUrlShow}/` + id_grupo, requestOptions);
 
   const grupo = await apiGrupo.json();
-  console.log(grupo);
   return {
     props: {
       grupo

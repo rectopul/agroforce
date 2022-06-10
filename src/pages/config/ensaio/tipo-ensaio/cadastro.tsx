@@ -16,7 +16,6 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
   id_culture: number;
-  id_safra: number;
   name: String | any;
   created_by: Number;
   status: Number;
@@ -42,13 +41,11 @@ export default function NovoLocal() {
   const formik = useFormik<ITypeAssayProps>({
     initialValues: {
       id_culture: parseInt(culture),
-      id_safra: parseInt(userLogado.safras.safra_selecionada),
       name: '',
       created_by: userLogado.id,
       status: 1
     },
     onSubmit: async (values) => {
-
       validateInputs(values)
       if (!values.name) {
         Swal.fire('Preencha todos os campos obrigatórios')
@@ -57,7 +54,6 @@ export default function NovoLocal() {
 
       await typeAssayService.create({
         id_culture: parseInt(culture),
-        id_safra: parseInt(userLogado.safras.safra_selecionada),
         name: capitalize(values.name),
         created_by: Number(userLogado.id),
         status: 1

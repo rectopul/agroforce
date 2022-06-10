@@ -80,11 +80,11 @@ model safra {
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe           npe[]
-  type_assay    type_assay[]
-  quadra        quadra[]
-  foco_children foco_children[]
-  lote          lote[]
+  npe                 npe[]
+  quadra              quadra[]
+  foco_children       foco_children[]
+  lote                lote[]
+  type_assay_children type_assay_children[]
 }
 
 model uf {
@@ -325,15 +325,27 @@ model foco_children {
 model type_assay {
   id         Int       @id @default(autoincrement())
   id_culture Int
-  id_safra   Int
   name       String
   status     Int       @default(1)
   created_by Int
   created_at DateTime? @default(now())
 
-  npe     npe[]
-  culture culture @relation(fields: [id_culture], references: [id])
-  safra   safra   @relation(fields: [id_safra], references: [id])
+  npe                 npe[]
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  type_assay_children type_assay_children[]
+}
+
+model type_assay_children {
+  id            Int       @id @default(autoincrement())
+  id_safra      Int
+  id_type_assay Int
+  seeds         Int
+  status        Int?      @default(1)
+  created_by    Int
+  created_at    DateTime? @default(now())
+
+  safra      safra      @relation(fields: [id_safra], references: [id])
+  type_assay type_assay @relation(fields: [id_type_assay], references: [id])
 }
 
 model tecnologia {
