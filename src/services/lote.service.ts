@@ -36,7 +36,7 @@ async function getAll(parameters: any) {
   return lote;
 }
 
-async function update(data: UpdateLoteDTO) {
+async function update(data: any) {
   const lote = await fetchWrapper.put(baseUrl, data);
   return lote;
 }

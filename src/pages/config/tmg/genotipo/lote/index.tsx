@@ -132,7 +132,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
     const { id, status } = lotes[index];
 
-    await loteGenotipoService.changeStatus({ id, status });
+    await loteService.update({ id: id, status: status });
   };
 
   function columnsOrder(camposGerenciados: string) {
