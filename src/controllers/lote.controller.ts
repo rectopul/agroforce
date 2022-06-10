@@ -9,8 +9,6 @@ interface LoteDTO {
   status: number;
 }
 
-type CreateLoteDTO = Omit<LoteDTO, 'id' | 'status'>;
-type UpdateLoteDTO = Omit<LoteDTO, 'created_by' | 'id_genotipo'>;
 type FindOne = Omit<LoteDTO, 'name' | 'id_genotipo' | 'volume' | 'created_by' | 'status'>;
 
 export class LoteController {
@@ -19,14 +17,8 @@ export class LoteController {
   loteRepository = new LoteRepository();
 
 
-  async getOne({ id }: FindOne) {
+  async getOne(id: number) {
     try {
-      const schema: SchemaOf<FindOne> = object({
-        id: number().integer().required(this.required)
-      });
-
-      if (!schema) throw new Error('Dados inválidos');
-
       const response = await this.loteRepository.findById(id);
 
       if (!response) throw new Error('Lote não encontrado');
@@ -39,17 +31,11 @@ export class LoteController {
 
   async create(data: any) {
     try {
+      let response = await this.loteRepository.create(data);
 
-      const loteAlreadyExists = await this.loteRepository.findByName(data.name);
-
-      if (loteAlreadyExists) {
-        return { status: 400, message: 'Nome do lote já cadastro. favor consultar os inativos' };
-      }
-
-      await this.loteRepository.create(data);
-
-      return { status: 201, message: 'Lote cadastrado' };
+      return { status: 201, message: 'Lote cadastrado', response };
     } catch (err) {
+      console.log(err);
       return { status: 404, message: 'Erro de cadastro' };
     }
   }
@@ -67,11 +53,7 @@ export class LoteController {
         return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
       }
 
-      lote.name = data.name;
-      lote.volume = data.volume;
-      lote.status = data.status;
-
-      await this.loteRepository.update(data.id, lote);
+      await this.loteRepository.update(data.id, data);
 
       return { status: 200, message: 'Lote atualizado' };
     } catch (err) {
@@ -114,7 +96,21 @@ export class LoteController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, genotipo: { select: { genotipo: true } }, volume: true, name: true, status: true };
+        select = { 
+          id: true,
+          id_genotipo: true,
+          id_safra: true,
+          cod_lote: true,
+          id_s2: true,
+          id_dados: true,
+          year: true,
+          ncc: true,
+          fase: true,
+          peso: true,
+          quant_sementes: true, 
+          status: true, 
+          genotipo: { select: { name_genotipo: true, name_main: true, gmr: true, bgm: true, tecnologia:true } } 
+        };
       }
 
       if (options.genotipo) {

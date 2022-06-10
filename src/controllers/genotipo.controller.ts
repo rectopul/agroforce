@@ -5,7 +5,7 @@ interface Genotipo {
   id: number;
   id_culture: number;
   id_tecnologia: number;
-  genotipo: string;
+  name_genotipo: string;
   genealogy?: string;
   cruza: string;
   status: number;
@@ -16,7 +16,7 @@ interface UpdateGenotipoLote {
   id: number;
   id_tecnologia: number;
   id_culture: number;
-  genotipo: string;
+  name_genotipo: string;
   genealogy?: string;
   cruza: string;
   status: number;
@@ -49,12 +49,7 @@ export class GenotipoController {
 
       if (options.filterGenotipo) {
         options.filterGenotipo = '{"contains":"' + options.filterGenotipo + '"}';
-        parameters.genotipo = JSON.parse(options.filterGenotipo);
-      }
-
-      if (options.filterGenealogy) {
-        options.filterGenealogy = '{"contains":"' + options.filterGenealogy + '"}';
-        parameters.genealogy = JSON.parse(options.filterGenealogy);
+        parameters.name_genotipo = JSON.parse(options.filterGenotipo);
       }
 
       if (options.filterCruza) {
@@ -76,14 +71,41 @@ export class GenotipoController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, genotipo: true, genealogy: true, cruza: true, tecnologia: { select: { name: true } }, status: true };
+        select = { 
+             id: true,
+             id_s1: true,
+             id_dados: true,
+             id_tecnologia: true,
+             name_genotipo: true,
+             name_main: true,
+             name_public: true,
+             name_experiment: true,
+             name_alter : true,
+             elit_name  : true,
+             type: true,
+             gmr : true,
+             bgm : true,
+             cruza: true,
+             progenitor_f_direto: true,
+             progenitor_m_direto: true,
+             progenitor_f_origem: true,
+             progenitor_m_origem: true,
+             progenitores_origem: true,
+             parentesco_completo: true,
+             status: true,
+             tecnologia: { select: { name: true, cod_tec: true} } };
       }
+      
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
-      if (options.genotipo) {
-        parameters.genotipo = options.genotipo;
+      if (options.id_dados) {
+        parameters.id_dados = String(options.id_dados);
+      }
+
+      if (options.name_genotipo) {
+        parameters.name_genotipo = options.genotipo;
       }
 
       if (options.cruza) {
@@ -159,9 +181,10 @@ export class GenotipoController {
   }
 
   async createGenotipo(data: any) {
+    console.log("Create Genotipo", data);
     try {
       const response = await this.genotipoRepository.create(data);
-      return { status: 201, message: 'Genealogia cadastrada' };
+      return { status: 201, message: 'Genealogia cadastrada', response };
     } catch (err) {
       console.log(err);
       return { status: 400, message: 'Erro no cadastrado' };

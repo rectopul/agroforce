@@ -67,7 +67,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,genealogy,cruza,status,genotipo, tecnologia' };
+  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main, tecnologia,cruza,gmr, bgm' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
@@ -81,12 +81,27 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Genótipo', value: 'genotipo' },
-    { name: 'CamposGerenciados[]', title: 'Genealogia', value: 'genealogy' },
+    { name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
+    { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
+    { name: 'CamposGerenciados[]', title: 'Cód tec', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruza', value: 'cruza' },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'ID_S1', value: 'id_s1' },
+    { name: 'CamposGerenciados[]', title: 'Nome publico', value: 'name_public' },
+    { name: 'CamposGerenciados[]', title: 'Nome experimental', value: 'name_experiment' },
+    { name: 'CamposGerenciados[]', title: 'Nome alternativo', value: 'name_alter' },
+    { name: 'CamposGerenciados[]', title: 'Elite nome', value: 'elit_name' },
+    { name: 'CamposGerenciados[]', title: 'Tipo', value: 'type' },
+    { name: 'CamposGerenciados[]', title: 'Progenitor f direto', value: 'progenitor_f_direto' },
+    { name: 'CamposGerenciados[]', title: 'Progenitor m direto', value: 'progenitor_m_direto' },
+    { name: 'CamposGerenciados[]', title: 'Progenitor f origem', value: 'progenitor_f_origem' },
+    { name: 'CamposGerenciados[]', title: 'Progenitor m origem', value: 'progenitor_m_origem' },
+    { name: 'CamposGerenciados[]', title: 'Progenitores origem', value: 'progenitores_origem' },
+    { name: 'CamposGerenciados[]', title: 'Parentesco', value: 'parentesco_completo' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
   ]);
+
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
 
@@ -196,45 +211,129 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
           )
         });
       }
-      if (ObjetCampos[index] === 'genotipo') {
+      if (ObjetCampos[index] === 'name_genotipo') {
         arrOb.push({
-          title: 'Genótipo',
-          field: 'genotipo',
+          title: 'Nome genótipo',
+          field: 'name_genotipo',
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'genealogy') {
+      if (ObjetCampos[index] === 'name_main') {
         arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              {arrowGenealogy}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderGenealogy('genealogy', orderGenealogy)}>
-                Genealogia
-              </button>
-            </div>
-          ),
-          field: 'genealogy',
-          sorting: false
-        });
-      }
-      if (ObjetCampos[index] === 'cruza') {
-        arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              {arrowCruza}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderCruza('cruza', orderCruza)}>
-                Cruza
-              </button>
-            </div>
-          ),
-          field: 'cruza',
+          title: 'Nome principal',
+          field: 'name_main',
           sorting: false
         });
       }
       if (ObjetCampos[index] === 'tecnologia') {
         arrOb.push({
-          title: 'Tecnologia',
-          field: 'tecnologia.name',
+          title: 'Cód tec',
+          field: 'tecnologia.cod_tec',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'cruza') {
+        arrOb.push({
+          title: 'Cruza',
+          field: 'cruza',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'gmr') {
+        arrOb.push({
+          title: 'GMR',
+          field: 'gmr',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'bgm') {
+        arrOb.push({
+          title: 'Nº Lotes',
+          field: 'bgm',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'id_s1') {
+        arrOb.push({
+          title: 'ID_S1',
+          field: 'id_s1',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name_public') {
+        arrOb.push({
+          title: 'Nome publico',
+          field: 'name_public',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name_experiment') {
+        arrOb.push({
+          title: 'Nome experimental',
+          field: 'name_experiment',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name_alter') {
+        arrOb.push({
+          title: 'Nome alternativo',
+          field: 'name_alter',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'elit_name') {
+        arrOb.push({
+          title: 'Elite nome',
+          field: 'elit_name',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'type') {
+        arrOb.push({
+          title: 'Tipo',
+          field: 'type',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'progenitor_f_direto') {
+        arrOb.push({
+          title: 'Progenitor f direto',
+          field: 'progenitor_f_direto',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'progenitor_m_direto') {
+        arrOb.push({
+          title: 'Progenitor m direto',
+          field: 'progenitor_m_direto',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'progenitor_f_origem') {
+        arrOb.push({
+          title: 'Progenitor f origem',
+          field: 'progenitor_f_origem',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'progenitor_m_origem') {
+        arrOb.push({
+          title: 'Progenitor m origem',
+          field: 'progenitor_m_origem',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'progenitores_origem') {
+        arrOb.push({
+          title: 'Progenitores origem',
+          field: 'progenitores_origem',
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'parentesco_completo') {
+        arrOb.push({
+          title: 'Parentesco',
+          field: 'parentesco_completo',
           sorting: false
         });
       }
@@ -349,92 +448,6 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     setCamposGerenciados(campos);
   }
 
-  async function handleOrderGenealogy(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = filter + '&orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder !== '') {
-        parametersFilter = 'orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setOrderGenealogy(response.response);
-      }
-    });
-    if (orderGenealogy === 2) {
-      setOrderGenealogy(0);
-      setArrowGenealogy(<AiOutlineArrowDown />);
-    } else {
-      setOrderGenealogy(orderGenealogy + 1);
-      if (orderGenealogy === 1) {
-        setArrowGenealogy(<AiOutlineArrowUp />);
-      } else {
-        setArrowGenealogy('');
-      }
-    }
-  }
-
-  async function handleOrderCruza(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = filter + '&orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder !== '') {
-        parametersFilter = 'orderBy=' + column + '&typeOrder=' + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setOrderCruza(response.response);
-      }
-    });
-
-    if (orderCruza === 2) {
-      setOrderCruza(0);
-      setArrowCruza(<AiOutlineArrowDown />);
-    } else {
-      setOrderCruza(orderCruza + 1);
-      if (orderCruza === 1) {
-        setArrowCruza(<AiOutlineArrowUp />);
-      } else {
-        setArrowCruza('');
-      }
-    }
-  }
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
@@ -466,7 +479,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
         });
 
         newData.map((item: any) => {
-          return item.tecnologia = item.tecnologia?.name      
+          return item.tecnologia = item.tecnologia?.tecnologia      
         })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -552,7 +565,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Genótipo
+                      Nome genótipo
                     </label>
                     <Input
                       type="text"
@@ -563,19 +576,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Genealogia
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Genealogia"
-                      max="40"
-                      id="filterGenealogy"
-                      name="filterGenealogy"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
+
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Cruza
@@ -809,6 +810,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const data = await api.json();
 
   const allGenotipos = data.response;
+  console.log(allGenotipos);
   const totalItems = data.total;
 
   return {

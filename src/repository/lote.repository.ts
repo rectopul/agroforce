@@ -1,32 +1,12 @@
 import { prisma } from "../pages/api/db/db";
 import { GenotipoRepository } from "./genotipo.repository";
 
-interface CreateLoteDTO {
-  id_genotipo: number;
-  name: string;
-  volume: number;
-  created_by: number;
-}
-
-interface UpdateLoteDTO {
-  id: number;
-  name: string;
-  volume: number;
-}
-
 export class LoteRepository {
 
   genotipoRepository = new GenotipoRepository()
 
-  async create(data: CreateLoteDTO) {
-    const lote = await prisma.lote.create({
-      data: {
-        id_genotipo: data.id_genotipo,
-        name: data.name,
-        volume: data.volume,
-        created_by: data.created_by,
-      }
-    });
+  async create(data: any) {
+    const lote = await prisma.lote.create({ data });
 
     return lote;
   }
@@ -39,7 +19,7 @@ export class LoteRepository {
     return lote;
   }
 
-  async update(id: number, data: UpdateLoteDTO) {
+  async update(id: number, data: any) {
     const lote = await this.findById(id);
 
     if (lote !== null) {
