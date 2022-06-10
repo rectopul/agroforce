@@ -26,7 +26,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
 import { AccordionFilter, CheckBox, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, loteGenotipoService, loteService, } from "src/services";
+import { userPreferencesService, loteService } from "src/services";
 import * as XLSX from 'xlsx';
 
 interface IFilter {
