@@ -12,7 +12,7 @@ import {
   Content,
   Input
 } from "src/components";
-import { loteGenotipoService } from "src/services";
+import { loteService } from "src/services";
 import Swal from "sweetalert2";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -49,7 +49,7 @@ export default function Atualizar(lote: IUpdateLote) {
         throw new Error();
       }
 
-      await loteGenotipoService.update({
+      await loteService.update({
         id: lote.id,
         name: capitalize(values.name),
         volume: values.volume,

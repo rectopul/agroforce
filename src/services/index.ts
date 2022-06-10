@@ -6,7 +6,6 @@ export * from './genotipo.service';
 export * from './import.service';
 export * from './layoult-quadra.service';
 export * from './local.service';
-export * from './lote-genotipo.service';
 export * from './lote.service';
 export * from './not-auth/forgot-password.service';
 export * from './profile.service';
