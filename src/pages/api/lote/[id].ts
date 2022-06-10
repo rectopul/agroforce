@@ -10,7 +10,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET':
-      const result = await loteController.getOne({ id: Number(id) });
+      const result = await loteController.getOne(Number(id));
       res.status(result.status).json(result.response);
       break
     case 'PUT':
