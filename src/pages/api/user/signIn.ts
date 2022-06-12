@@ -41,7 +41,6 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       if (validateLogin.total <= 0 || validateLogin.status === 400) throw 'Você não tem acesso a essa pagina, entre em contato com seu líder!';
 
       userCulture.culturas = await PermissionController.getByUserID(user.id);
-      console.log(userCulture);
       userCulture.culturas = userCulture.culturas.response;
 
       if (!userCulture.culturas || userCulture.culturas.status === 400 || userCulture.culturas.length === 0) throw 'Você está sem acesso as culturas, contate o seu lider!';

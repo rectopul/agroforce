@@ -1850,19 +1850,18 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
-                console.log('Plantadeira');
+                console.log(data.spreadSheet[keySheet][sheet])
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else {
-                  if (data.spreadSheet[keySheet][sheet] != 4 && data.spreadSheet[keySheet][sheet] != 8 && data.spreadSheet[keySheet][sheet] != 12) {
+                  if (Number(data.spreadSheet[keySheet][sheet]) != 4 && Number(data.spreadSheet[keySheet][sheet]) != 8 && Number(data.spreadSheet[keySheet][sheet] != 12)) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira deve estar dentro desses numeros 4,8 e 12.</li><br>`;
                   }
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Tiro') {
-                console.log('Tiros');
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</li><br>`;
@@ -1879,7 +1878,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'Disparo') {
-                console.log('Disparos')
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo disparos é obrigatorio.</li><br>`;
                 } else {
@@ -1898,7 +1896,6 @@ export class ImportController {
 
 
               if (configModule.response[0].fields[sheet] == 'SL') {
-                console.log('SL')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
@@ -1918,7 +1915,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SC') {
-                console.log('SC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</li><br>`;
@@ -1933,7 +1929,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SALOC') {
-                console.log('SALOC')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</li><br>`;
@@ -1948,14 +1943,12 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'CJ') {
-                console.log('CJ')
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Dist') {
-                console.log('Dist')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</li><br>`;
@@ -1963,7 +1956,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'ST') {
-                console.log('ST')
 
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</li><br>`;
@@ -1982,8 +1974,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SColheita') {
-                console.log('Scolheita')
-                console.log(data.spreadSheet[keySheet][sheet])
 
                 if (String(data.spreadSheet[keySheet][sheet]) == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</li><br>`;
@@ -1998,7 +1988,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'TipoParcela') {
-                console.log('TipoParcela')
+                console.log(data.spreadSheet[keySheet][sheet])
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</li><br>`;
                 } else {
