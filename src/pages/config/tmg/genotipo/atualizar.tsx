@@ -207,7 +207,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
           width: 0,
           render: () => (
             colorStar === '#eba417' ? (
-              <div className='h-10 flex'>
+              <div className=' flex'>
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
@@ -218,7 +218,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>
+              <div className=' flex'>
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
@@ -431,10 +431,12 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar genótipo</h1>
-
+          <div className="rounded border-inherit">
+            <span>Informações do material</span>
+            <hr></hr>
+          </div>
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome genótipo
               </label>
@@ -448,7 +450,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.name_genotipo}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome principal
               </label>
@@ -462,7 +464,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.name_main}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome publico
               </label>
@@ -475,7 +477,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.name_public}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Cód tecnologia
               </label>
@@ -488,7 +490,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.cod_tec}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Tipo
               </label>
@@ -502,9 +504,8 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
               />
             </div>
           </div>
-
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome experimental
               </label>
@@ -518,7 +519,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.name_experiment}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Nome alternativo
               </label>
@@ -532,7 +533,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.name_alter}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Elite nome
               </label>
@@ -545,7 +546,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.elit_name}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 GMR
               </label>
@@ -558,7 +559,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.gmr}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 BGM
               </label>
@@ -572,9 +573,12 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
               />
             </div>
           </div>
-
+          <div className="rounded border-inherit" style={{marginTop: "3%"}}>
+            <span>Informações dos progenitores</span>
+            <hr></hr>
+          </div>
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Cruza de origem
               </label>
@@ -588,7 +592,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.cruza}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Progenitor F direto
               </label>
@@ -602,7 +606,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.progenitor_f_direto}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Progenitor M direto
               </label>
@@ -615,7 +619,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.progenitor_m_direto}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Progenitor F de origem
               </label>
@@ -628,7 +632,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.progenitor_f_origem}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Progenitor M de origem:
               </label>
@@ -641,7 +645,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.progenitor_m_origem}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Progenitores de origem:
               </label>
@@ -656,7 +660,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
             </div>
           </div>
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-            <div className="w-full h-10">
+            <div className="w-96 ">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Parentesco completo
               </label>
@@ -669,9 +673,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.parentesco_completo}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-              </label>
+            <div className="w-40 h-10" style={{marginTop: "2%"}}>
               <Button
                 type="button"
                 value="Voltar"

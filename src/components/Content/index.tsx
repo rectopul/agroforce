@@ -181,11 +181,11 @@ export function Content({ contentHeader, children }: IContentData) {
         }
       </MainHeader>
 
-      <div className='flex flex-row'>
+      <div className='flex flex-row w-screen'>
         <Aside />
         <div className="flex flex-col
             w-container-all-main-contents
-            h-content
+            h-full
             p-8
             border border-gray-700
             bg-gray-300
