@@ -2103,13 +2103,14 @@ export class ImportController {
                   let saveLayout: any = await this.layoutQuadraController.post({
                     id_culture: Number(this.aux.id_culture),
                     esquema: this.aux.esquema,
-                    plantadeira: this.aux.plantadeira,
+                    plantadeira: String(this.aux.plantadeira),
                     parcelas: this.aux.parcelas,
                     tiros: Number(this.aux.tiroFixo),
                     disparos: Number(this.aux.disparoFixo),
                     status: this.aux.status,
                     created_by: this.aux.created_by,
                   });
+
                   this.aux.id_layout = saveLayout.response.id;
                   count++;
                 }
