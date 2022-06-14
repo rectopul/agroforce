@@ -79,6 +79,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.quadras = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 17 }); preferences.quadras = preferences.quadras.response[0];
       preferences.disparos = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 18 }); preferences.disparos = preferences.disparos.response[0];
       preferences.layout_children = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 19 }); preferences.layout_children = preferences.layout_children.response[0];
+      preferences.grupo = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 20 }); preferences.grupo = preferences.grupo.response[0];
+      preferences.unidadeCultura = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 21 }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
     }
 
     if (!user) throw 'Email ou senha é invalida!';

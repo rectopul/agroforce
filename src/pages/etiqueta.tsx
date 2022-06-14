@@ -14,12 +14,82 @@ export default function Etiqueta() {
   return (
     <>
       <Head>Etiqueta</Head>
-      <PDFExport ref={pdfExportComponent} fileName="etiqueta_2" paperSize={'auto'}>
-        <div className="w-[3508px] h-[2480px] rotate-90">
-          <div className="w-full h-full text-[350px] p-4 ">
-            <span className="absolute mt-14">MT405SS02</span> <FaHandPointLeft className="flex ml-auto h-[865px] w-[865px]" />
-            <span>SEQ-P</span> <br />
-            <span>QM123_VG-2L</span> <strong className="pl-[180px] mb-16 text-[750px]">3B</strong>
+      <PDFExport ref={pdfExportComponent} fileName="etiqueta1_600x260" paperSize={'A4'}>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">1B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT325SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">4B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">5B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">5B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">5B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">5B</strong>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-16 mt-24">
+          <div className="w-[600px] h-[260px]">
+            <div className="w-full h-full text-4xl">
+              <span className="absolute mt-10">MT405SS02</span>
+              <FaHandPointLeft className="flex ml-auto h-32 w-32" />
+              <span>SEQ-P</span> <br />
+              <span> QM123_VG-2L</span>
+              <strong className="pl-60 mb-16 text-8xl">5B</strong>
+            </div>
           </div>
         </div>
       </PDFExport>

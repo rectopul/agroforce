@@ -16,6 +16,7 @@ import { CulturaController } from '../controllers/cultura.controller';
 import { LayoutQuadraController } from '../controllers/layout-quadra.controller';
 import { LayoutChildrenController } from '../controllers/layout-children.controller';
 import { GrupoController } from '../controllers/grupo.controller';
+import { UnidadeCulturaController } from './unidade-cultura.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -36,6 +37,7 @@ export class ImportController {
   layoutChildrenController = new LayoutChildrenController();
   groupoController = new GrupoController();
   tecnologiaController = new TecnologiaController();
+  unidadeCulturaController = new UnidadeCulturaController();
   aux: object | any = {};
 
   async getAll(moduleId: number) {
@@ -99,6 +101,7 @@ export class ImportController {
 
         // Validação do modulo Local
         if (data.moduleId == 4) {
+          console.log("Data: ", data)
           response = await this.validateLocal(data);
           if (response == 'save') {
             response = "Itens cadastrados com sucesso!";
@@ -167,6 +170,7 @@ export class ImportController {
           }
         }
 
+        // Validação do modulo tecnologia
         if (data.moduleId === 18) {
           response = await this.validateTechnology(data);
           if (response === 'save') {
@@ -1270,127 +1274,229 @@ export class ImportController {
     }
   }
 
-  async validateLocal(data: object | any) {
+  async validateLocal({ spreadSheet, moduleId, id_safra, created_by }: object | any) {
     const responseIfError: any = [];
-    let Column: number;
     try {
-      let configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(parseInt(moduleId));
+      for (let row in spreadSheet) {
+        for (let column in spreadSheet[row]) {
+          if (row === '0') {
+            if (!(spreadSheet[row][column].toUpperCase()).includes(configModule.response[0].fields[column].toUpperCase())) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a sequencia de colunas da planilha esta incorreta. </li> <br>`;
+            }
+          }
+          else if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
 
-      if (data != null && data != undefined) {
-        let Line: number;
-        for (const [keySheet, lines] of data.spreadSheet.entries()) {
-          Line = Number(keySheet) + 1;
-          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
-            Column = Number(sheet) + 1;
-            if (keySheet != '0') {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID da unidade de cultura é obrigatório. </li> <br>`;
+            } else {
+              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ id_culture_unity: spreadSheet[row][column] })
+              if (unidadeCulturaAlreadyExist.response.length > 0) responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID da unidade de cultura já esta cadastrado. </li> <br>`;
+            }
+          }
 
-              if (configModule.response[0].fields[sheet] == 'CodLocal') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código local é obrigatorio.</li><br>`;
-                } else {
-                  let local = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
-                  if (local.total > 0) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código local ja cadastrado no sistema.</li><br>`;
-                  }
-                }
+          else if (spreadSheet[0][column].includes('Ano')) {
+
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano é obrigatório. </li> <br>`;
+            } else {
+              const safraYearValidate = await this.safraController.getOneSafra((id_safra).toString())
+              if (safraYearValidate.response?.year !== spreadSheet[row][column]) {
+                responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano não corresponde ao ano da safra selecionada. </li> <br>`;
               }
+            }
 
-              if (configModule.response[0].fields[sheet] == 'CodRedLocal') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código reduzido do local é obrigatorio.</li><br>`;
-                } else {
-                  let local = await this.localController.getAllLocal({ cod_red_local: data.spreadSheet[keySheet][sheet] });
+          }
 
-                  if (local.total > 0) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código reduzido do local ja cadastrado no sistema.</li><br>`;
-                  }
-                }
-              }
+          else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura é obrigatório. </li> <br>`;
+            }
+          }
 
-              if (configModule.response[0].fields[sheet] == 'pais') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,  pais é obrigatorio.</li><br>`;
-                }
-              }
+          else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do Lugar da cultura é obrigatório. </li> <br>`;
+            }
+          }
 
-              if (configModule.response[0].fields[sheet] == 'uf') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, estado é obrigatorio.</li><br>`;
-                }
-              }
+          else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome do lugar de cultura é obrigatório. </li> <br>`;
+            }
+          }
 
-              if (configModule.response[0].fields[sheet] == 'city') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, cidade é obrigatorio.</li><br>`;
-                }
-              }
+          else if (spreadSheet[0][column].includes('Rótulo')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Rótulo é obrigatório. </li> <br>`;
+            }
+          }
 
-              if (configModule.response[0].fields[sheet] == 'NameFarm') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome da fazenda é obrigatorio.</li><br>`;
-                }
-              }
+          else if (spreadSheet[0][column].includes('MLOC')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo MLOC é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Endereço')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Endereço é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de localidade é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Nome da localidade')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da localidade é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Identificador de região')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de região é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Nome da região')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da região é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Rótulo é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('ID do País')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do País é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('Nome do país')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome do páis é obrigatório. </li> <br>`;
+            }
+          }
+
+          else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Rótulo é obrigatório. </li> <br>`;
             }
           }
         }
       }
 
-      if (responseIfError == "") {
-        this.aux.created_by = Number(data.created_by);
-        this.aux.status = 1;
-        for (const [keySheet, lines] of data.spreadSheet.entries()) {
-          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
-            Column = Number(sheet) + 1;
-            if (keySheet != '0') {
+      if (responseIfError.length === 0) {
+        try {
+          const localCultureDTO: object | any = {}
+          const unityCultureDTO: object | any = {}
+          for (let row in spreadSheet) {
+            if (row !== '0') {
+              for (let column in spreadSheet[row]) {
+                if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
+                  unityCultureDTO.id_culture_unity = spreadSheet[row][column]
+                }
+                else if (spreadSheet[0][column].includes('Ano')) {
+                  unityCultureDTO.year = spreadSheet[row][column]
+                }
 
-              if (configModule.response[0].fields[sheet] == 'CodLocal') {
-                this.aux.cod_local = data.spreadSheet[keySheet][sheet];
+                else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+                  unityCultureDTO.culture_unity_name = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+                  localCultureDTO.id_local_culture = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+                  localCultureDTO.name_local_culture = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
+                  localCultureDTO.label = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('MLOC')) {
+                  localCultureDTO.mloc = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Endereço')) {
+                  localCultureDTO.adress = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+                  localCultureDTO.id_locality = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Nome da localidade')) {
+                  localCultureDTO.name_locality = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Identificador de região')) {
+                  localCultureDTO.id_region = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Nome da região')) {
+                  localCultureDTO.name_region = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
+                  localCultureDTO.label_region = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('ID do País')) {
+                  localCultureDTO.id_country = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('Nome do país')) {
+                  localCultureDTO.name_country = spreadSheet[row][column]
+                }
+
+                else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+                  localCultureDTO.label_country = spreadSheet[row][column]
+                }
+              }
+              localCultureDTO.created_by = created_by
+              unityCultureDTO.created_by = created_by
+              const localAlreadyExists = await this.localController.getAllLocal({ id_local_culture: localCultureDTO.id_local_culture })
+              if (localAlreadyExists.response?.length > 0) {
+                // const unityCultureResponse = await this.unidadeCulturaController.listAll({ id_local: localAlreadyExists.response[0].id })
+                // unityCultureDTO.id = unityCultureResponse.response[0].id
+                localCultureDTO.id = localAlreadyExists.response[0].id
+                unityCultureDTO.id_local = localAlreadyExists.response[0].id
+                await this.localController.updateLocal(localCultureDTO)
+                const response = await this.unidadeCulturaController.create(unityCultureDTO)
+                console.log("Response")
+                console.log(response)
+              } else {
+                const response = await this.localController.postLocal(localCultureDTO)
+                unityCultureDTO.id_local = response?.response?.id
+                await this.unidadeCulturaController.create(unityCultureDTO)
               }
 
-              if (configModule.response[0].fields[sheet] == 'CodRedLocal') {
-                this.aux.cod_red_local = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'pais') {
-                this.aux.pais = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'uf') {
-                this.aux.uf = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'city') {
-                this.aux.city = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'NameFarm') {
-                this.aux.name_farm = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'Altitude') {
-                this.aux.altitude = data.spreadSheet[keySheet][sheet];
-              }
-
-              if (configModule.response[0].fields[sheet] == 'Latitude') {
-                this.aux.latitude = saveDegreesCelsius(data.spreadSheet[keySheet][sheet]);
-              }
-
-              if (configModule.response[0].fields[sheet] == 'Longitude') {
-                this.aux.longitude = saveDegreesCelsius(data.spreadSheet[keySheet][sheet]);
-              }
-
-              if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                await this.localController.postLocal(this.aux);
-              }
             }
           }
+          return "save"
+        } catch (err) {
+          console.log(err)
         }
-        return "save";
       }
+
       const responseStringError = responseIfError.join("").replace(/undefined/g, "")
       return responseStringError;
-    } catch (err) {
-      console.log(err)
+
+    } catch (error) {
+
+      console.log("Error", error)
+
     }
   }
 

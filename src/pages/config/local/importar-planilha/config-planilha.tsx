@@ -4,12 +4,22 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-  { id: 'CodLocal', name: '*Código Local' },
-  { id: 'CodRedLocal', name: '*Código Reduzido' },
-  { id: 'NameFarm', name: '*Nome Fazenda' },
-  { id: 'pais', name: 'País' },
-  { id: 'uf', name: 'Estado' },
-  { id: 'city', name: 'Municipio' }
+  { id: 'ID da unidade de cultura', name: '*ID da unidade de cultura' },
+  { id: 'Ano', name: '*Ano' },
+  { id: 'Nome da unidade de cultura', name: '*Nome da unidade de cultura' },
+  { id: 'ID do lugar de cultura', name: '*ID do lugar de cultura' },
+  { id: 'Nome do lugar de cultura', name: '*Nome do lugar de cultura' },
+  { id: 'CP_LIBELLE', name: '*Rótulo' },
+  { id: 'mloc', name: '*MLOC' },
+  { id: 'Endereço', name: '*Endereço' },
+  { id: 'Identificador de localidade', name: '*Identificador de localidade' },
+  { id: 'Nome da localidade', name: '*Nome da localidade' },
+  { id: 'Identificador de região', name: '*Identificador de região' },
+  { id: 'Nome da região', name: '*Nome da região' },
+  { id: 'REG_LIBELLE', name: '*Rótulo' },
+  { id: 'ID do país', name: '*ID do país' },
+  { id: 'Nome do país', name: '*Nome do país' },
+  { id: 'CNTR_LIBELLE', name: '*Rótulo' },
 ];
 
 export default function ImportacaoPlanilha({ config }: any) {
