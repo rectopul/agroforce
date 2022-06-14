@@ -33,7 +33,7 @@ export default function Importar() {
             width: "900"
           });
           if (!response.erro) {
-            // router.back();
+            router.back();
           }
         }
       });

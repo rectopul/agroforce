@@ -40,6 +40,7 @@ model culture {
   epoca             epoca[]
   quadra            quadra[]
   layout_quadra     layout_quadra[]
+  experimento experimento[]
 }
 
 model department {
@@ -85,6 +86,7 @@ model safra {
   foco_children       foco_children[]
   lote                lote[]
   type_assay_children type_assay_children[]
+  experimento experimento[]
 }
 
 model uf {
@@ -225,8 +227,8 @@ model quadra {
   linha_p       Int
   comp_c        Int
   esquema       String?
-  tiro_fixo     String?
-  disparo_fixo  String?
+  tiro_fixo     Int?
+  disparo_fixo  Int?
   q             String?
   status        Int        @default(1)
   created_by    Int
@@ -307,6 +309,7 @@ model foco {
   npe           npe[]
   culture       culture         @relation(fields: [id_culture], references: [id])
   foco_children foco_children[]
+  experimento experimento[]
 }
 
 model foco_children {
@@ -333,6 +336,7 @@ model type_assay {
   npe                 npe[]
   culture             culture               @relation(fields: [id_culture], references: [id])
   type_assay_children type_assay_children[]
+  experimento experimento[]
 }
 
 model type_assay_children {
@@ -361,6 +365,7 @@ model tecnologia {
   npe      npe[]
   genotipo genotipo[]
   culture  culture    @relation(fields: [id_culture], references: [id])
+  experimento experimento[]
 }
 
 model lote {
@@ -435,4 +440,32 @@ model sequencia_delineamento {
   created_at      DateTime @default(now())
 
   delineamento delineamento @relation(fields: [id_delineamento], references: [id])
+}
+
+model experimento {
+    id              Int      @id @default(autoincrement())
+    protocolo_name String
+    id_experimento Int 
+    experimento_name String
+    id_safra Int
+    id_culture Int
+    id_foco Int
+    id_ensaio Int
+    id_tecnologia Int
+    epoca Int
+    pjr String  
+    id_un_cultura Int
+    unidade_cultura_name String
+
+    safra safra @relation(fields: [id_safra], references: [id])
+    foco foco @relation(fields: [id_foco], references: [id])
+    ensaio type_assay @relation(fields: [id_ensaio], references: [id])
+    tecnologia tecnologia @relation(fields: [id_tecnologia], references: [id])
+    culture culture @relation(fields: [id_culture], references: [id])
+
+}
+
+model materiais {
+    id              Int      @id @default(autoincrement())
+
 }
