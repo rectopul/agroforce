@@ -11,7 +11,7 @@ export function Aside() {
   const router = useRouter();
 
   return (
-    <aside className="w-32
+    <aside className="h-screen w-32
       bg-gray-450 
     ">
       <nav className="flex flex-col gap-6

@@ -120,13 +120,7 @@ export class QuadraController {
 
       if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
 
-      quadra.id_culture = data.id_culture;
-      quadra.id_tecnologia = data.id_tecnologia;
-      quadra.quadra = data.quadra;
-      quadra.cruza = data.cruza;
-      quadra.status = data.status;
-
-      await this.quadraRepository.update(quadra.id, quadra);
+      await this.quadraRepository.update(quadra.id, data);
 
       return { status: 200, message: "Genótipo atualizado" }
     } catch (err) {

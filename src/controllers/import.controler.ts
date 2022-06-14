@@ -1554,7 +1554,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
-                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture:data.id_culture, filterStatus: 1});
                   if (layoutQuadra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</li><br>`;
                   }
@@ -1575,11 +1575,11 @@ export class ImportController {
                     } else {
                       if (data.spreadSheet[keySheet][sheet] > divisor_anterior) {
                         if ((divisor_anterior + 1) != data.spreadSheet[keySheet][sheet]) {
-                          responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter tersecção de parcelas.</li><br>`;
-                        } else {
-                          divisor_anterior = data.spreadSheet[keySheet][sheet];
-                        }
+                          responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter intersecção de parcelas.</li><br>`;
+                        } 
+                        divisor_anterior = data.spreadSheet[keySheet][sheet];
                       } else {
+                        divisor_anterior = data.spreadSheet[keySheet][sheet];
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna dos divisores precisa está em sequencia.</li><br>`;
                       }
                     }
@@ -1587,9 +1587,10 @@ export class ImportController {
                     if (divisor_anterior == 0) {
                       if (data.spreadSheet[keySheet][sheet] <= 0) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
-                      } else {
-                        divisor_anterior = data.spreadSheet[keySheet][sheet];
                       }
+                        divisor_anterior = data.spreadSheet[keySheet][sheet];
+                    } else {
+                      divisor_anterior = data.spreadSheet[keySheet][sheet];
                     }
                   }
                 }
@@ -1609,14 +1610,21 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4i é obrigatorio.</li><br>`;
                 } else {
-                  if (t4_i == 0) {
+                  if (cod_quadra == cod_quadra_anterior) {
+                    if (t4_i == 0) {
+                      if (data.spreadSheet[keySheet][sheet] != 1) {
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1.</li><br>`;
+                      }
+                      t4_i = data.spreadSheet[keySheet][sheet];
+                    } else {
+                      if (data.spreadSheet[keySheet][sheet] <= t4_f) {
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior.</li><br>`;
+                      }
+                      t4_i = data.spreadSheet[keySheet][sheet];
+                    }
+                  } else {
                     if (data.spreadSheet[keySheet][sheet] != 1) {
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1.</li><br>`;
-                    }
-                    t4_i = data.spreadSheet[keySheet][sheet];
-                  } else {
-                    if (data.spreadSheet[keySheet][sheet] <= t4_f) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior.</li><br>`;
                     }
                     t4_i = data.spreadSheet[keySheet][sheet];
                   }
@@ -1627,13 +1635,25 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4f é obrigatorio.</li><br>`;
                 } else {
-                  if (t4_i == 0) {
-                    return 'A coluna t4f precisa está depois da coluna t4i';
-                  } else {
-                    if (t4_i > data.spreadSheet[keySheet][sheet]) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
+                  if (cod_quadra == cod_quadra_anterior) {
+                    if (t4_i == 0) {
+                      return 'A coluna t4f precisa está depois da coluna t4i';
                     } else {
-                      t4_f = data.spreadSheet[keySheet][sheet];
+                      if (t4_i > data.spreadSheet[keySheet][sheet]) {
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
+                      } else {
+                        t4_f = data.spreadSheet[keySheet][sheet];
+                      }
+                    }
+                  } else {
+                    if (t4_i == 0) {
+                      return 'A coluna t4f precisa está depois da coluna t4i';
+                    } else {
+                      if (t4_i > data.spreadSheet[keySheet][sheet]) {
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
+                      } else {
+                        t4_f = data.spreadSheet[keySheet][sheet];
+                      }
                     }
                   }
                 }
@@ -1678,7 +1698,7 @@ export class ImportController {
         let count = 1;
         let tiro_fixo, disparo_fixo;
 
-        let safra = await this.safraController.getAllSafra({ year: data.safra });
+        let safra = await this.safraController.getAllSafra({ safraName: data.safra });
         this.aux.id_safra = Number(safra.response[0].id);
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
@@ -1694,6 +1714,7 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'CodigoQuadra') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if ((this.aux.cod_quadra) && this.aux.cod_quadra != data.spreadSheet[keySheet][sheet]) {
+                    this.aux.disparo_fixo = this.aux.t4_f;
                     count = 1;
                   }
                   this.aux.cod_quadra = data.spreadSheet[keySheet][sheet];
@@ -1771,7 +1792,11 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 if (count == 1) {
-                  tiro_fixo = this.aux.t4_i;
+                  this.aux.tiro_fixo = this.aux.t4_i;
+
+                  if (this.aux.id_quadra) {
+                   let update =  await this.quadraController.update({id: this.aux.id_quadra, tiro_fixo: this.aux.tiro_fixo, disparo_fixo: this.aux.disparo_fixo});
+                  }
 
                   let saveQuadra: any = await this.quadraController.create({
                     cod_quadra: this.aux.cod_quadra,
@@ -1789,9 +1814,7 @@ export class ImportController {
                   this.aux.id_quadra = saveQuadra.response.id;
                   count++;
                 }
-                if (count == this.aux.divisor) {
-                  disparo_fixo = this.aux.t4_f;
-                }
+               
                 await this.disparosController.create({
                   id_quadra: this.aux.id_quadra,
                   t4_i: this.aux.t4_i,
@@ -1850,8 +1873,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
-                console.log(data.spreadSheet[keySheet][sheet])
-
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else {
@@ -1862,7 +1883,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'Tiro') {
-
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</li><br>`;
                 } else {
@@ -1929,8 +1949,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SALOC') {
-
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
@@ -1943,21 +1962,22 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'CJ') {
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                console.log(data.spreadSheet[keySheet][sheet])
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Dist') {
+                console.log(data.spreadSheet[keySheet][sheet])
 
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'ST') {
-
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</li><br>`;
                 } else {
 
@@ -1965,8 +1985,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SPC') {
-
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</li><br>`;
                 } else {
 
@@ -1974,8 +1993,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SColheita') {
-
-                if (String(data.spreadSheet[keySheet][sheet]) == "") {
+                if (String(data.spreadSheet[keySheet][sheet]) == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
@@ -1988,8 +2006,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'TipoParcela') {
-                console.log(data.spreadSheet[keySheet][sheet])
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</li><br>`;
                 } else {
                   if ((data.spreadSheet[keySheet][sheet] != "P" && data.spreadSheet[keySheet][sheet] != "p") && (data.spreadSheet[keySheet][sheet] != 'V' && data.spreadSheet[keySheet][sheet] != 'v')) {
@@ -2121,11 +2138,11 @@ export class ImportController {
                   sc: this.aux.sc,
                   s_aloc: this.aux.s_aloc,
                   tiro: this.aux.tiro,
-                  cj: this.aux.cj,
+                  cj: String(this.aux.cj),
                   disparo: this.aux.disparo,
                   dist: this.aux.dist,
-                  st: this.aux.st,
-                  spc: this.aux.spc,
+                  st: String(this.aux.st),
+                  spc: String(this.aux.spc),
                   scolheita: this.aux.scolheita,
                   tipo_parcela: this.aux.tipo_parcela,
                   status: this.aux.status,

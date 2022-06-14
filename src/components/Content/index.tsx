@@ -185,7 +185,7 @@ export function Content({ contentHeader, children }: IContentData) {
         <Aside />
         <div className="flex flex-col
             w-container-all-main-contents
-            h-full
+            h-screen
             p-8
             border border-gray-700
             bg-gray-300
