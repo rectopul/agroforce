@@ -121,7 +121,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     }
   }
 
-  const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id,,name,grupo,acao" };
+  const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id, safra,name,grupo,acao" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
@@ -257,7 +257,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 20 }).then((response) => {
         userLogado.preferences.grupo = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
@@ -660,6 +660,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let allItens: any = await api.json();
   const totalItems = allItens.total;
   allItens = allItens.response;
+
+  console.log("context.query.id: ", context.query.id)
+  console.log("baseUrlShow: ", baseUrlShow)
 
   const apiFoco = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
 

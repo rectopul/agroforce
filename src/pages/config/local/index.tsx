@@ -26,12 +26,12 @@ import { getDegreesCelsius } from "../../../shared/utils/formatDegreesCelsius";
 
 interface ILocalProps {
   id: Number | any;
-  cod_local: String | any;
+  name_local_culture: String | any;
   cod_red_local: String | any;
-  pais: String | any;
-  uf: String | any;
-  city: String | any;
-  name_farm: String | any;
+  label_country: String | any;
+  label_region: String | any;
+  name_locality: String | any;
+  adress: String | any;
   latitude: string;
   longitude: string;
   altitude: String | any;
@@ -40,9 +40,12 @@ interface ILocalProps {
 };
 interface IFilter {
   filterStatus: object | any;
-  filterName: string | any;
-  filterUF: string | any;
-  filterCity: string | any;
+  filterName_local_culture: string | any;
+  filterLabel: string | any;
+  filterAdress: string | any;
+  filterLabel_country: string | any;
+  filterLabel_region: string | any;
+  filterName_locality: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -57,12 +60,11 @@ interface Idata {
   filter: string | any;
   itensPerPage: number | any;
   filterAplication: object | any;
-  uf: object | any;
   pageBeforeEdit: string | any
   filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, uf, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -74,11 +76,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id, cod_local, cod_red_local, pais,uf,city,name_farm,latitude,longitude,altitude,status" };
+  const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id, name_local_culture, label, mloc, adress, label_country, label_region, name_locality, status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const ufs: object | any = [];
-  const [citys, setCitys] = useState<object | any>([{ id: '0', name: 'selecione' }]);
+  const label_regions: object | any = [];
+  const [name_locality, setname_locality] = useState<object | any>([{ id: '0', name: 'selecione' }]);
   const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
@@ -91,15 +93,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Código Local ", value: "cod_local", defaultChecked: () => camposGerenciados.includes('cod_local') },
-    { name: "CamposGerenciados[]", title: "Código Reduzido ", value: "cod_red_local", defaultChecked: () => camposGerenciados.includes('cod_red_local') },
-    { name: "CamposGerenciados[]", title: "Pais", value: "pais", defaultChecked: () => camposGerenciados.includes('pais') },
-    { name: "CamposGerenciados[]", title: "Estado", value: "uf", defaultChecked: () => camposGerenciados.includes('uf') },
-    { name: "CamposGerenciados[]", title: "Município", value: "city", defaultChecked: () => camposGerenciados.includes('city') },
-    { name: "CamposGerenciados[]", title: "Nome Fazenda", value: "name_farm", defaultChecked: () => camposGerenciados.includes('name_farm') },
-    { name: "CamposGerenciados[]", title: "Latitude", value: "latitude", defaultChecked: () => camposGerenciados.includes('latitude') },
-    { name: "CamposGerenciados[]", title: "Longitude", value: "longitude", defaultChecked: () => camposGerenciados.includes('longitude') },
-    { name: "CamposGerenciados[]", title: "Altitude", value: "altitude", defaultChecked: () => camposGerenciados.includes('altitude') },
+    { name: "CamposGerenciados[]", title: "Nome do L. de Cult.", value: "name_local_culture", defaultChecked: () => camposGerenciados.includes('name_local_culture') },
+    { name: "CamposGerenciados[]", title: "Rótulo", value: "label", defaultChecked: () => camposGerenciados.includes('label') },
+    { name: "CamposGerenciados[]", title: "MLOC", value: "mloc", defaultChecked: () => camposGerenciados.includes('mloc') },
+    { name: "CamposGerenciados[]", title: "Nome Fazenda", value: "adress", defaultChecked: () => camposGerenciados.includes('adress') },
+    { name: "CamposGerenciados[]", title: "País", value: "label_country", defaultChecked: () => camposGerenciados.includes('label_country') },
+    { name: "CamposGerenciados[]", title: "Região", value: "label_region", defaultChecked: () => camposGerenciados.includes('label_region') },
+    { name: "CamposGerenciados[]", title: "Localidade", value: "name_locality", defaultChecked: () => camposGerenciados.includes('name_locality') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -112,24 +112,33 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const columns = colums(camposGerenciados);
 
-  uf.map((value: string | object | any) => {
-    ufs.push({ id: value.id, name: value.sigla, ufid: value.id });
-  })
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
-      filterName: '',
-      filterUF: '',
-      filterCity: '',
+      filterName_local_culture: '',
+      filterLabel: '',
+      filterAdress: '',
+      filterLabel_country: '',
+      filterLabel_region: '',
+      filterName_locality: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterUF, filterCity, filterName }) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterUf=${filterUF}&filterCity=${filterCity}&filterName=${filterName}`
+    onSubmit: async ({
+      filterStatus,
+      filterName_local_culture,
+      filterLabel,
+      filterAdress,
+      filterLabel_country,
+      filterLabel_region,
+      filterName_locality
+    }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName_local_culture=${filterName_local_culture}&filterLabel=${filterLabel}&filterAdress=${filterAdress}&filterLabel_country=${filterLabel_country}&filterLabel_region=${filterLabel_region}&filterName_locality=${filterName_locality}`
+
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
-      await localService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      await localService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setTotalItems(response.total)
         setLocal(response.response);
@@ -183,79 +192,55 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         })
       }
 
-      if (ObjetCampos[item] === 'cod_local') {
+      if (ObjetCampos[item] === 'name_local_culture') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('cod_local', orderName)}>
-                Código Local
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name_local_culture', orderName)}>
+                Nome do L. de Cult.
               </button>
             </div>
           ),
-          field: "cod_local",
+          field: "name_local_culture",
           sorting: false,
         });
       }
 
-      if (ObjetCampos[item] === 'cod_red_local') {
-        arrOb.push({ title: "Código Reduzido", field: "cod_red_local", sorting: false })
+      if (ObjetCampos[item] === 'label') {
+        arrOb.push({ title: "Rótulo", field: "label", sorting: false })
       }
 
-      if (ObjetCampos[item] === 'pais') {
-        arrOb.push({ title: "País", field: "pais", sorting: false })
-      }
-
-      if (ObjetCampos[item] === 'uf') {
-        arrOb.push({ title: "Estado", field: "uf", sorting: false })
-      }
-
-      if (ObjetCampos[item] === 'city') {
-        arrOb.push({ title: "Município", field: "city", sorting: false })
-      }
-
-      if (ObjetCampos[item] === 'name_farm') {
+      if (ObjetCampos[item] === 'adress') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               {arrowAddress}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderAddress('name_farm', orderAddress)}>
+              <button className='font-medium text-gray-900' onClick={() => handleOrderAddress('adress', orderAddress)}>
                 Nome Fazenda
               </button>
             </div>
           ),
-          field: "name_farm",
+          field: "adress",
           sorting: false
         });
       }
 
-      if (ObjetCampos[item] === 'latitude') {
-        arrOb.push({
-          title: "Latitude",
-          field: "latitude",
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            (rowData.latitude)
-              ?
-              getDegreesCelsius(rowData.latitude)
-              : ''
-          )
-        })
+
+      if (ObjetCampos[item] === 'mloc') {
+        arrOb.push({ title: "MLOC", field: "mloc", sorting: false })
       }
 
-      if (ObjetCampos[item] === 'longitude') {
-        arrOb.push({
-          title: "Longitude",
-          field: "longitude",
-          sorting: false,
-          render: (rowData: ILocalProps) => (
-            (rowData.longitude) ? getDegreesCelsius(rowData.longitude) : ''
-          )
-        })
+      if (ObjetCampos[item] === 'label_country') {
+        arrOb.push({ title: "País", field: "label_country", sorting: false })
       }
 
-      if (ObjetCampos[item] === 'altitude') {
-        arrOb.push({ title: "Altitude", field: "altitude", sorting: false })
+      if (ObjetCampos[item] === 'label_region') {
+        arrOb.push({ title: "Região", field: "label_region", sorting: false })
+      }
+
+      if (ObjetCampos[item] === 'name_locality') {
+        arrOb.push({ title: "Localidade", field: "name_locality", sorting: false })
       }
 
       if (ObjetCampos[item] === 'status') {
@@ -273,7 +258,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button
                     icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name_farm}`}
+                    title={`Atualizar ${rowData.adress}`}
                     onClick={() => {
                       setCookies("filterBeforeEdit", filtersParams)
                       setCookies("pageBeforeEdit", currentPage?.toString())
@@ -299,7 +284,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 ">
                   <Button
                     icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name_farm}`}
+                    title={`Atualizar ${rowData.adress}`}
                     onClick={() => {
                       setCookies("filterBeforeEdit", filtersParams)
                       setCookies("pageBeforeEdit", currentPage?.toString())
@@ -477,7 +462,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -497,8 +482,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "locais");
 
-        // Buffer
-        let buf = XLSX.write(workBook, {
+        // buffer
+        let blabel_region = XLSX.write(workBook, {
           bookType: "xlsx", //xlsx
           type: "buffer",
         });
@@ -534,19 +519,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       }
     });
   };
-
-  async function showCitys(uf: any): Promise<void> {
-    if (uf) {
-      const param = '?ufId=' + uf;
-      const city: object | any = [];
-      await localService.getCitys(param).then((response) => {
-        response.map((value: string | object | any) => {
-          city.push({ id: value.nome, name: value.nome });
-        })
-        setCitys(city)
-      });
-    }
-  }
 
   useEffect(() => {
     handlePagination();
@@ -588,39 +560,73 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      UF
-                    </label>
-                    <Select
-                      values={ufs}
-                      id="filterUF"
-                      name="filterUF"
-                      onChange={formik.handleChange}
-                      onBlur={e => showCitys(e.target.value)}
-                      selected={false}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Município
-                    </label>
-                    <Select
-                      values={citys}
-                      id="filterCity"
-                      name="filterCity"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Fazenda
+                      Nome do L. de Cult.
                     </label>
                     <Input
                       type="text"
-                      placeholder="nome"
-                      max="40"
-                      id="filterName"
-                      name="filterName"
+                      placeholder="Nome"
+                      id="filterName_local_culture"
+                      name="filterName_local_culture"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Rótulo
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Rótulo"
+                      id="filterLabel"
+                      name="filterLabel"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Nome da Fazenda
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Fazenda"
+                      id="filterAdress"
+                      name="filterAdress"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      País
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="País"
+                      id="filterLabel_country"
+                      name="filterLabel_country"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Região
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Região"
+                      id="filterLabel_region"
+                      name="filterLabel_region"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Localidade
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Localidade"
+                      id="filterName_locality"
+                      name="filterName_locality"
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -832,6 +838,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   removeCookies('filterBeforeEdit', { req, res });
 
   removeCookies('pageBeforeEdit', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
@@ -842,11 +849,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   } as RequestInit | undefined;
 
   const local = await fetch(urlParameters.toString(), requestOptions);
-  const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
-  const uf = await apiUF.json();
-  const Response = await local.json();
-  const allItems = Response.response;
-  const totalItems = Response.total;
+  const response = await local.json();
+  const allItems = response.response;
+  const totalItems = response.total;
 
   return {
     props: {
@@ -854,7 +859,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterAplication,
-      uf,
       pageBeforeEdit,
       filterBeforeEdit
     },

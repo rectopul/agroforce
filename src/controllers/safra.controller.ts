@@ -131,15 +131,16 @@ export class SafraController {
   }
 
   async getOneSafra(id: number) {
-    try {
+    try {      
       if (!id) throw new Error("ID inválido");
 
-      const response = await this.safraRepository.findOne(id);
+      const response = await this.safraRepository.findOne(Number(id));
 
       if (!response) throw new Error("Dados inválidos");
 
       return { status: 200, response };
     } catch (e) {
+      console.log(e)
       return { status: 400, message: 'Safra não encontrada' };
     }
   }

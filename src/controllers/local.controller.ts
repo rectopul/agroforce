@@ -1,6 +1,8 @@
+import { number, object, SchemaOf, string } from 'yup';
 import { LocalRepository } from '../repository/local.repository';
 export class LocalController {
   localRepository = new LocalRepository();
+  public readonly required = 'Campo obrigatório';
 
   async getUFs() {
     try {
@@ -64,29 +66,43 @@ export class LocalController {
         }
       }
 
-
-      if (options.cod_local) {
-        parameters.cod_local = options.cod_local;
+      if (options.filterName_local_culture) {
+        options.filterName_local_culture = `{ "contains":"${options.filterName_local_culture}" }`;
+        parameters.name_local_culture = JSON.parse(options.filterName_local_culture);
       }
 
-      if (options.cod_red_local) {
-        parameters.cod_red_local = options.cod_red_local;
+      if (options.filterLabel) {
+        options.filterLabel = `{ "contains":"${options.filterLabel}" }`;
+        parameters.label = JSON.parse(options.filterLabel);
       }
 
-      if (options.filterUf) {
-        const idUf = Number(options.filterUf)
-        const uf = await this.getOnUFs(idUf);
-        parameters.uf = uf?.sigla;
+      if (options.filterAdress) {
+        options.filterAdress = `{ "contains":"${options.filterAdress}" }`;
+        parameters.adress = JSON.parse(options.filterAdress);
       }
 
-      if (options.filterCity) {
-        options.filterCity = `{"contains":"${options.filterCity}"}`
-        parameters.city = JSON.parse(options.filterCity);
+      if (options.filterLabel_country) {
+        options.filterLabel_country = `{ "contains":"${options.filterLabel_country}" }`;
+        parameters.label_country = JSON.parse(options.filterLabel_country);
       }
 
-      if (options.filterName) {
-        options.filterName = `{"contains":"${options.filterName}"}`;
-        parameters.name_farm = JSON.parse(options.filterName);
+      if (options.filterLabel_region) {
+        options.filterLabel_region = `{ "contains":"${options.filterLabel_region}" }`;
+        parameters.label_region = JSON.parse(options.filterLabel_region);
+      }
+
+      if (options.filterName_locality) {
+        options.filterName_locality = `{ "contains":"${options.filterName_locality}" }`;
+        parameters.name_locality = JSON.parse(options.filterName_locality);
+      }
+
+
+      if (options.id_local_culture) {
+        parameters.id_local_culture = Number(options.id_local_culture);
+      }
+
+      if (options.name_local_culture) {
+        parameters.name_local_culture = options.name_local_culture;
       }
 
       if (options.take) {
@@ -116,7 +132,7 @@ export class LocalController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, cod_local: true, cod_red_local: true, pais: true, uf: true, city: true, name_farm: true, latitude: true, longitude: true, altitude: true, status: true };
+        select = { id: true, name_local_culture: true, label: true, mloc: true, label_country: true, label_region: true, name_locality: true, adress: true, status: true };
       }
 
       const response = await this.localRepository.findAll(parameters, select, take, skip, orderBy);
@@ -132,11 +148,11 @@ export class LocalController {
   }
 
 
-  async getOneLocal(id: string) {
-    let newID = parseInt(id);
+  async getOneLocal({ id }: any) {
+    const newID = parseInt(id);
     try {
-      if (id && id !== '{id}') {
-        let response = await this.localRepository.findOne(newID);
+      if (id) {
+        const response = await this.localRepository.findOne(newID);
         if (!response) {
           return { status: 400, response: [], message: 'local não existe' };
         } else {
@@ -157,9 +173,9 @@ export class LocalController {
         //     let uf = await this.getOnUFs(parseInt(data.uf));
         //     data.uf = uf?.sigla;
         // }
-        let response = await this.localRepository.create(data);
+        const response = await this.localRepository.create(data);
         if (response) {
-          return { status: 200, message: "local inserido" }
+          return { status: 200, response: response, message: "local inserido" }
         } else {
           return { status: 400, message: "erro" }
 
@@ -172,34 +188,39 @@ export class LocalController {
   }
 
   async updateLocal(data: any) {
-    const parameters: object | any = {};
-
     try {
-      if (typeof (data.status) === 'string') {
-        parameters.status = parseInt(data.status);
-      } else {
-        parameters.status = data.status;
-      }
+      const schema: SchemaOf<any> = object({
+        id: number().required(this.required),
+        id_local_culture: number().required(this.required),
+        name_local_culture: string().required(this.required),
+        label: string().required(this.required),
+        mloc: string().required(this.required),
+        adress: string().required(this.required),
+        id_locality: number().required(this.required),
+        name_locality: string().required(this.required),
+        id_region: number().required(this.required),
+        name_region: string().required(this.required),
+        label_region: string().required(this.required),
+        id_country: number().required(this.required),
+        name_country: string().required(this.required),
+        label_country: string().required(this.required),
+        created_by: number().integer().required(this.required)
+      });
 
-      if (data.cod_local) parameters.cod_local = data.cod_local;
-      if (data.cod_red_local) parameters.cod_red_local = data.cod_red_local;
-      if (data.uf) parameters.uf = data.uf;
-      if (data.name_farm) parameters.name_farm = data.name_farm;
-      if (data.city) parameters.city = data.city;
-      if (data.pais) parameters.pais = data.pais;
-      if (data.latitude) parameters.latitude = data.latitude;
-      if (data.longitude) parameters.longitude = data.longitude;
-      if (data.altitude) parameters.altitude = data.altitude;
-      if (data !== null && data !== undefined) {
-        let response = await this.localRepository.update(data.id, parameters);
-        if (response) {
-          return { status: 200, message: { message: "local atualizado" } }
-        } else {
-          return { status: 400, message: { message: "erro ao tentar fazer o update" } }
-        }
-      }
+      const valid = schema.isValidSync(data);
+
+      if (!valid) return { status: 400, message: 'Dados inválidos' };
+
+      const localCultura: any = await this.localRepository.findOne(data.id);
+
+      if (!localCultura) return { status: 400, message: 'Local de cultura não existente' };
+
+      await this.localRepository.update(data.id, data);
+
+      return { status: 200, message: 'Local de cultura atualizado' };
     } catch (err) {
-      return { status: 400, message: err }
+      console.log(err)
+      return { status: 404, message: 'Erro ao atualizar' };
     }
   }
 }

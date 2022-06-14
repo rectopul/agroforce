@@ -199,6 +199,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
+
   const resU = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
 
   const tecnologia = await resU.json();
