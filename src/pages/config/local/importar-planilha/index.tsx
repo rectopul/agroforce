@@ -18,7 +18,7 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 4, created_by: userLogado.id }).then((response) => {
+      importService.validate({ spreadSheet: rows, moduleId: 4, id_safra: userLogado.safras.safra_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -34,11 +34,10 @@ export default function Importar() {
 
   const formik = useFormik<any>({
     initialValues: {
-      input: [],
-      genotipo: ''
+      input: []
     },
     onSubmit: async (values) => {
-      let inputFile: any = document.getElementById("inputFile");
+      const inputFile: any = document.getElementById("inputFile");
       readExcel(inputFile.files);
     },
   });

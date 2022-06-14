@@ -54,20 +54,13 @@ export class LocalRepository {
     return result;
   }
 
-  async update(id: number, Local: Object) {
-    let ExisLocal = await this.findOne(id);
-    if (ExisLocal !== null) {
-      let result = await prisma.local.update({
-        where: {
-          id: id
-        },
-        data: Local
-      })
+  async update(id: number, data: Object) {
+    const result = await prisma.local.update({
+      where: { id: id },
+      data: data
+    })
 
-      return result;
-    } else {
-      return false;
-    }
+    return result;
   }
 }
 

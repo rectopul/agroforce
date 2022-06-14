@@ -163,21 +163,42 @@ model users_preferences {
 }
 
 model local {
-  id            Int      @id @default(autoincrement())
-  cod_local     String   @unique
-  cod_red_local String?  @unique
-  pais          String
-  uf            String
-  city          String
-  name_farm     String
-  latitude      String?
-  longitude     String?
-  altitude      String?
-  created_at    DateTime @default(now())
-  created_by    Int
-  status        Int      @default(1)
-  npe           npe[]
-  quadra        quadra[]
+  id                 Int      @id @default(autoincrement())
+  id_local_culture   Int      @unique
+  name_local_culture String
+  label              String
+  mloc               String
+  adress             String
+  id_locality        Int
+  name_locality      String
+  id_region          Int
+  name_region        String
+  label_region       String
+  id_country         Int
+  name_country       String
+  label_country      String
+  latitude           String?
+  longitude          String?
+  altitude           String?
+  created_at         DateTime @default(now())
+  created_by         Int
+  status             Int      @default(1)
+
+  npe            npe[]
+  quadra         quadra[]
+  local_children local_children[]
+}
+
+model local_children {
+  id                 Int       @id @default(autoincrement())
+  id_local           Int
+  id_culture_unity   Int       @unique
+  year               Int
+  culture_unity_name String
+  local              local     @relation(fields: [id_local], references: [id])
+  status             Int?      @default(1)
+  created_by         Int
+  created_at         DateTime? @default(now())
 }
 
 model layout_quadra {
@@ -267,8 +288,8 @@ model genotipo {
   name_alter          String?
   elit_name           String?
   type                String?
-  gmr                 Decimal?  @db.Decimal(10,2)
-  bgm                 Decimal?  @db.Decimal(10,2)
+  gmr                 Decimal?   @db.Decimal(10, 2)
+  bgm                 Decimal?   @db.Decimal(10, 2)
   cruza               String?
   progenitor_f_direto String?
   progenitor_m_direto String?
@@ -369,23 +390,23 @@ model tecnologia {
 }
 
 model lote {
-  id          Int      @id @default(autoincrement())
-  id_genotipo Int
-  id_safra Int
-  cod_lote String
-  id_s2 Int
-  id_dados Int @unique
-  year Int?
-  ncc Int?
-  fase String?
-  peso Decimal?
-  quant_sementes Int? 
-  status      Int      @default(1)
-  created_by  Int
-  created_at  DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  id_genotipo    Int
+  id_safra       Int
+  cod_lote       String
+  id_s2          Int
+  id_dados       Int      @unique
+  year           Int?
+  ncc            Int?
+  fase           String?
+  peso           Decimal?
+  quant_sementes Int?
+  status         Int      @default(1)
+  created_by     Int
+  created_at     DateTime @default(now())
 
-  genotipo    genotipo @relation(fields: [id_genotipo], references: [id])
-  safra    safra @relation(fields: [id_safra], references: [id])
+  genotipo genotipo @relation(fields: [id_genotipo], references: [id])
+  safra    safra    @relation(fields: [id_safra], references: [id])
 }
 
 model epoca {
