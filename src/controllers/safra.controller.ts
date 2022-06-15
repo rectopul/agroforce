@@ -6,8 +6,8 @@ interface Safra {
   id_culture: number;
   safraName: string;
   year: number;
-  plantingStartTime?: string;
-  plantingEndTime?: string;
+  plantingStartTime?: string | null;
+  plantingEndTime?: string | null;
   main_safra?: number;
   status: number;
   created_by: number;
@@ -131,7 +131,7 @@ export class SafraController {
   }
 
   async getOneSafra(id: number) {
-    try {      
+    try {
       if (!id) throw new Error("ID inválido");
 
       const response = await this.safraRepository.findOne(Number(id));
@@ -178,8 +178,8 @@ export class SafraController {
         id: number().integer().required(this.required),
         safraName: string().required(this.required),
         year: number().required(this.required),
-        plantingStartTime: string().optional(),
-        plantingEndTime: string().optional(),
+        plantingStartTime: string().nullable(),
+        plantingEndTime: string().nullable(),
         status: number().integer().required(this.required),
       });
 

@@ -63,7 +63,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: "id,name,desc,status" };
+  const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: "id, name, desc, cod_tec,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);

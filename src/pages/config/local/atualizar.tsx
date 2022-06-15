@@ -272,12 +272,6 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
-
-    console.log('Items')
-    console.log(items)
-
-    console.log('genaratesProps')
-    console.log(genaratesProps)
     setGenaratesProps(items);
   };
 
