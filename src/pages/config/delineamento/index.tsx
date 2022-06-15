@@ -68,7 +68,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.delineamento || { id: 0, table_preferences: "id,name,repeticao,trat_repeticao,status,sequencia" };
+  const preferences = userLogado.preferences.delineamento || { id: 0, table_preferences: "id,name,repeticao,trat_repeticao,sequencia,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [delineamento, setDelineamento] = useState<IDelineamentoProps[]>(() => allItems);
@@ -108,7 +108,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterRepeat, filterTreatment }) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await delineamentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -196,7 +196,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           filterPlaceholder: "Filtrar por status",
           render: (rowData: IDelineamentoProps) => (
             rowData.status ? (
-              <div className='h-10 flex'>               
+              <div className='h-10 flex'>
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
@@ -208,7 +208,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>            
+              <div className='h-10 flex'>
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}

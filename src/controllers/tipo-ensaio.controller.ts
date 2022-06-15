@@ -114,8 +114,8 @@ export class TypeAssayController {
 
   async post(data: object | any) {
     try {
-      const assayTypeAlreadyExist = await this.getAssayTypeByName(data.name)
-      if (assayTypeAlreadyExist) return { status: 400, message: "Tipo de ensaio já existe" }
+      const assayTypeAlreadyExist = await this.getAll({ name: data.name, id_culture: data.id_culture })
+      if (assayTypeAlreadyExist.response?.length > 0) return { status: 400, message: "Tipo de ensaio já existe" }
       if (data !== null && data !== undefined) {
         const response = await this.typeAssayRepository.create(data);
         if (response) {

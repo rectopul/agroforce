@@ -661,9 +661,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const totalItems = allItens.total;
   allItens = allItens.response;
 
-  console.log("context.query.id: ", context.query.id)
-  console.log("baseUrlShow: ", baseUrlShow)
-
   const apiFoco = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
 
   const foco = await apiFoco.json();
