@@ -18,7 +18,7 @@ export class UsersPermissionsRepository {
     }
 
     async findAll(where: any) {
-        const select = { id: true, name: true, cpf: true, email: true, telefone: true, avatar: true, status: true };
+        const select = { id: true, name: true, cpf: true, login: true, telefone: true, avatar: true, status: true };
         let Result = await prisma.users_permissions.findMany({ where: where, select: select })
         return Result;
     }

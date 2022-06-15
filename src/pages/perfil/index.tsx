@@ -30,7 +30,7 @@ interface IProfileProps {
   id: number;
   avatar: string;
   name: string;
-  email: string;
+  login: string;
   cpf: string;
   tel: string;
   registration: number;
@@ -50,16 +50,16 @@ interface IUpdateAvatar {
   avatar: string;
 }
 
-export default function Perfil({user}: User) {
+export default function Perfil({ user }: User) {
   const [avatar, setAvatar] = useState<string>(user.avatar);
   const [visibleTag, setVisibleTag] = useState<string>('hidden');
 
   const uploadAvatar = async (event: FormEvent | any) => {
     setVisibleTag('flex');
-    
+
     const file = event.target.files[0];
     const base64 = await convertBase64(file) as string;
-    
+
     setAvatar(base64);
   }
 
@@ -101,7 +101,7 @@ export default function Perfil({user}: User) {
       });
     }
   });
-  
+
   return (
     <>
       <Head>
@@ -144,8 +144,8 @@ export default function Perfil({user}: User) {
                       type="submit"
                       className={
                         visibleTag === 'flex' ?
-                        visibleTag + "w-full h-full px-2 flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
-                        : visibleTag + "w-full h-full flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
+                          visibleTag + "w-full h-full px-2 flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
+                          : visibleTag + "w-full h-full flex items-center justify-center gap-2 text-white bg-blue-600 rounded border border-t-white shadow-md"
                       }
                     >
                       <MdOutlineAddAPhoto className={visibleTag} />
@@ -165,8 +165,8 @@ export default function Perfil({user}: User) {
               <h2 className={commonStyles.titlePage}>Dados pessoais</h2>
               <div className={styles.content}>
                 <div>
-                  <label>E-mail: </label>
-                  <span>{user.email}</span>
+                  <label>Login: </label>
+                  <span>{user.login}</span>
                 </div>
 
                 <div>
@@ -220,21 +220,21 @@ export default function Perfil({user}: User) {
             </div>
 
             <div className={styles.buttonFooter}>
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
-              />
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => { router.back(); }}
+                />
+              </div>
             </div>
-          </div>
           </div>
         </div>
       </Content>
-   </>
+    </>
   );
 }
 
@@ -242,15 +242,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/profile-user`;
 
-  const { token } =  context.req.cookies;
+  const { token } = context.req.cookies;
   const { id } = context.query;
 
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
-  
+
   const reponse = await fetch(`${baseUrl}/` + Number(id), requestOptions);
 
   const user = await reponse.json();

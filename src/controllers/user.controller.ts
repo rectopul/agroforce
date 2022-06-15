@@ -34,9 +34,9 @@ export class UserController {
         parameters.name = JSON.parse(options.filterName);
       }
 
-      if (options.filterEmail) {
-        options.filterEmail = `{"contains":"${options.filterEmail}"}`;
-        parameters.email = JSON.parse(options.filterEmail);
+      if (options.filterLogin) {
+        options.filterLogin = `{"contains":"${options.filterLogin}"}`;
+        parameters.login = JSON.parse(options.filterLogin);
       }
 
 
@@ -47,17 +47,20 @@ export class UserController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, name: true, cpf: true, email: true, tel: true, avatar: true, status: true };
+        select = { id: true, name: true, cpf: true, email: true, login: true, tel: true, avatar: true, status: true };
       }
 
       if (options.cpf) {
         parameters.cpf = options.cpf;
       }
 
+      if (options.login) {
+        parameters.login = options.login;
+      }
+
       if (options.email) {
         parameters.email = options.email;
       }
-
 
       if (options.tel) {
         parameters.tel = options.tel;
@@ -167,14 +170,14 @@ export class UserController {
         }
 
         if (!data.name) return { status: 400, message: 'Informe o nome do usuário' };
-        if (!data.email) return { status: 400, message: 'Informe o email do usuário' };
+        if (!data.login) return { status: 400, message: 'Informe o login do usuário' };
         if (!data.cpf) return { status: 400, message: 'Informe o cpf do usuário' };
         if (!data.departmentId) return { status: 400, message: 'Informe o departamento do usuário' };
         if (!data.password) return { status: 400, message: 'Informe a senha do usuário' };
 
-        // Validação de email existente. 
-        let validateEmail: object | any = await this.getAllUser({ email: data.email });
-        if (validateEmail.total > 0) return { status: 400, message: 'Email ja cadastrado' };
+        // Validação de login existente. 
+        let validateLogin: object | any = await this.getAllUser({ login: data.login });
+        if (validateLogin.total > 0) return { status: 400, message: 'Login ja cadastrado' };
 
         // Validação de cpf existente. 
         let validateCPF: object | any = await this.getAllUser({ cpf: data.cpf });
@@ -184,8 +187,9 @@ export class UserController {
         if (!functionsUtils.validationCPF(data.cpf)) return { status: 400, message: 'CPF invalído' };
 
         parameters.name = data.name;
-        parameters.email = data.email;
+        parameters.login = data.login;
         parameters.cpf = data.cpf;
+        parameters.email = data.email;
         parameters.tel = data.tel;
         parameters.password = data.password;
         parameters.created_by = data.created_by;
@@ -311,13 +315,17 @@ export class UserController {
           parameters.name = data.name;
         }
 
-        if (data.email) {
-          parameters.email = data.email;
+        if (data.login) {
+          parameters.login = data.login;
         }
 
         if (data.cpf) {
           if (!functionsUtils.validationCPF(data.cpf)) return { message: 'CPF invalído' };
           parameters.cpf = data.cpf;
+        }
+
+        if (data.email) {
+          parameters.email = data.email;
         }
 
         if (data.tel) {

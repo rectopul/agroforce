@@ -28,7 +28,7 @@ interface IUsers {
   id: number,
   name: string,
   cpf: string,
-  email: string,
+  login: string,
   tel: string,
   avatar: string,
   status: boolean,
@@ -36,7 +36,7 @@ interface IUsers {
 interface IFilter {
   filterStatus: object | any;
   filterName: string | any;
-  filterEmail: string | any;
+  filterLogin: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -67,23 +67,23 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: "id,avatar,name,tel,email,status" };
+  const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: "id,avatar,name,tel,login,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [users, setData] = useState<IUsers[]>(() => alItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [orderName, setOrderName] = useState<number>(1);
-  const [orderEmail, setOrderEmail] = useState<number>(1);
+  const [orderLogin, setOrderLogin] = useState<number>(1);
   const [arrowName, setArrowName] = useState<any>('');
-  const [arrowEmail, setArrowEmail] = useState<any>('');
+  const [arrowLogin, setArrowLogin] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "E-mail", value: "email", defaultChecked: () => camposGerenciados.includes('email') },
+    { name: "CamposGerenciados[]", title: "Login", value: "login", defaultChecked: () => camposGerenciados.includes('login') },
     { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
@@ -100,12 +100,12 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     initialValues: {
       filterStatus: '',
       filterName: '',
-      filterEmail: '',
+      filterLogin: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterName, filterEmail }) => {
-      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterEmail=${filterEmail}`
+    onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterLogin=${filterLogin}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -200,17 +200,17 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         });
       }
 
-      if (ObjetCampos[item] === 'email') {
+      if (ObjetCampos[item] === 'login') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
-              {arrowEmail}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderEmail('email', orderEmail)}>
-                E-mail
+              {arrowLogin}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderLogin('login', orderLogin)}>
+                Login
               </button>
             </div>
           ),
-          field: "email",
+          field: "login",
           sorting: false
         });
       }
@@ -367,7 +367,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     });
   };
 
-  async function handleOrderEmail(column: string, order: string | any): Promise<void> {
+  async function handleOrderLogin(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -377,6 +377,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     } else {
       typeOrder = '';
     }
+
+    console.log('filter')
+    console.log(filter)
 
     if (filter && typeof (filter) !== undefined) {
       if (typeOrder !== '') {
@@ -392,20 +395,24 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       }
     }
 
+
+    console.log('parametersFilter')
+    console.log(parametersFilter)
+
     await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
         setData(response.response)
       }
     })
-    if (orderEmail === 2) {
-      setOrderEmail(0);
-      setArrowEmail(<AiOutlineArrowDown />);
+    if (orderLogin === 2) {
+      setOrderLogin(0);
+      setArrowLogin(<AiOutlineArrowDown />);
     } else {
-      setOrderEmail(orderEmail + 1);
-      if (orderEmail === 1) {
-        setArrowEmail(<AiOutlineArrowUp />);
+      setOrderLogin(orderLogin + 1);
+      if (orderLogin === 1) {
+        setArrowLogin(<AiOutlineArrowUp />);
       } else {
-        setArrowEmail('');
+        setArrowLogin('');
       }
     }
   };
@@ -581,14 +588,14 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Email
+                      Login
                     </label>
                     <Input
                       type="text"
-                      placeholder="email"
+                      placeholder="login"
                       max="40"
-                      id="filterEmail"
-                      name="filterEmail"
+                      id="filterLogin"
+                      name="filterLogin"
                       onChange={formik.handleChange}
                     />
                   </div>

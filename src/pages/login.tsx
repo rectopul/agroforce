@@ -26,7 +26,7 @@ function Login() {
 
   // form validation rules 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required('Email is required'),
+    login: Yup.string().required('Login is required'),
     password: Yup.string().required('Password is required')
   });
   const formOptions = { resolver: yupResolver(validationSchema) };
@@ -35,9 +35,9 @@ function Login() {
   const { register, handleSubmit, setError, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  async function onSubmit({ email, password }: any) {
+  async function onSubmit({ login, password }: any) {
 
-    await userService.login(email, password).then(() => {
+    await userService.login(login, password).then(() => {
       // get return url from query parameters or default to '/'
       const returnUrl = router.query.returnUrl || '/';
       router.push(returnUrl as string);
@@ -78,10 +78,10 @@ function Login() {
                 <div className='h-10'>
                   <span className="block text-sm font-medium text-blue-600">Usuário</span>
                   <input
-                    {...register('email')}
+                    {...register('login')}
                     placeholder='Usuário'
-                    type="email"
-                    name="email"
+                    type="login"
+                    name="login"
                     required
                     className="h-full w-full
                           px-2

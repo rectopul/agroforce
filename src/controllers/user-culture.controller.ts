@@ -23,7 +23,7 @@ export class UserCultureController {
             if (options.filterSearch) {
                 options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
                 parameters.name = JSON.parse(options.filterSearch);
-                parameters.email = JSON.parse(options.filterSearch);
+                parameters.login = JSON.parse(options.filterSearch);
             }
 
             if (options.paramSelect) {

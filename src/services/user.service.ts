@@ -12,7 +12,7 @@ const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStora
 
 export const userService = {
     user: userSubject.asObservable(),
-    get userValue () { return userSubject.value },
+    get userValue() { return userSubject.value },
     login,
     logout,
     getAll,
@@ -25,8 +25,8 @@ export const userService = {
     updatePassword
 };
 
-async function login(email: any, password: any) {
-    return fetchWrapper.post(`${baseUrl}/signIn`, { email, password })
+async function login(login: any, password: any) {
+    return fetchWrapper.post(`${baseUrl}/signIn`, { login, password })
         .then(user => {
             // publish user to subscribers and store in local storage to stay logged in between page refreshes
             userSubject.next(user);
@@ -51,16 +51,16 @@ function logout() {
     Router.push('/login');
 }
 
-async function logoutSign(email: any, cultures: object | any) {
-   let user = await userService.getAll({email: email, paramSelect: ['password', 'id']});
-   userPermissionService.update({userId:user.response[0].id});
-   userPermissionService.update({cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id});
-   localStorage.removeItem('user');
-   userSubject.next(null);
-   let login =  await userService.login(email, functionsUtils.Crypto(user.response[0].password, 'decipher')) 
-   if (login) {
-       Router.push('/');
-   }
+async function logoutSign(login: any, cultures: object | any) {
+    let user = await userService.getAll({ login: login, paramSelect: ['password', 'id'] });
+    userPermissionService.update({ userId: user.response[0].id });
+    userPermissionService.update({ cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id });
+    localStorage.removeItem('user');
+    userSubject.next(null);
+    let singIn = await userService.login(login, functionsUtils.Crypto(user.response[0].password, 'decipher'))
+    if (singIn) {
+        Router.push('/');
+    }
 }
 
 function getAll(parameters: any) {
