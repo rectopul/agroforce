@@ -83,7 +83,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.unidadeCultura = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 21 }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
     }
 
-    if (!user) throw 'Email ou senha é invalida!';
+    if (!user) throw 'Login ou senha é invalida!';
 
     // fazer a busca de permissoes 
 
@@ -93,7 +93,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     // return basic user details and token
     return res.status(200).json({
       id: user.id,
-      email: user.email,
+      login: user.login,
       name: user.name,
       avatar: user.avatar,
       token: token,

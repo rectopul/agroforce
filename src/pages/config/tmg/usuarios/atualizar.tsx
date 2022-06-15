@@ -41,8 +41,9 @@ interface IUserPermissions {
 interface IUserProps {
   id: number;
   name: string;
-  email: string;
+  login: string;
   cpf: string;
+  email: string;
   tel: string;
   password: string;
   registration: number;
@@ -94,8 +95,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     initialValues: {
       id: data.id,
       name: data.name,
-      email: data.email,
+      login: data.login,
       cpf: data.cpf,
+      email: data.email,
       tel: data.tel,
       password: functionsUtils.Crypto(data.password, 'decipher'),
       confirmPassword: functionsUtils.Crypto(data.password, 'decipher'),
@@ -109,7 +111,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+      if (!values.name || !values.login || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
         Swal.fire('Preencha todos os campos obrigatórios')
         return
       }
@@ -148,8 +150,9 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       await userService.update({
         id: values.id,
         name: capitalize(values.name),
-        email: values.email,
+        login: values.login,
         cpf: values.cpf,
+        email: values.email,
         tel: values.tel,
         password: values.password,
         registration: values.registration,
@@ -172,7 +175,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
 
   function validateInputs(values: any) {
     if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
-    if (!values.email) { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = 'red'; } else { let inputEmail: any = document.getElementById("email"); inputEmail.style.borderColor = ''; }
+    if (!values.login) { let inputLogin: any = document.getElementById("login"); inputLogin.style.borderColor = 'red'; } else { let inputLogin: any = document.getElementById("login"); inputLogin.style.borderColor = ''; }
     if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = ''; }
     // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
     if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = ''; }
@@ -229,12 +232,12 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
                 *Login
               </label>
               <Input
-                type="email"
+                type="login"
                 placeholder="usuario@tmg.agr.br"
-                id="email"
-                name="email"
+                id="login"
+                name="login"
                 onChange={formik.handleChange}
-                value={formik.values.email}
+                value={formik.values.login}
               />
             </div>
             <div className="w-full">
@@ -275,6 +278,20 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             gap-6
             mb-4
           ">
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Email
+              </label>
+              <Input
+                type="text"
+                placeholder="usuario@tmg.agr.br"
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                value={formik.values.email}
+              />
+            </div>
+
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Matricula
@@ -568,8 +585,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const data = {
     id: response.id,
     name: response.name,
-    email: response.email,
+    login: response.login,
     cpf: response.cpf,
+    email: response.email,
     tel: response.tel,
     password: response.password,
     avatar: response.avatar,

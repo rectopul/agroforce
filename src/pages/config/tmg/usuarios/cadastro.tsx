@@ -28,9 +28,10 @@ interface IProfile {
 interface IUsers {
   id?: number;
   name: string;
-  email: string;
+  login: string;
   cpf: string;
   tel: string;
+  email: string;
   password: string;
   avatar: string;
   registration: number;
@@ -70,8 +71,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     initialValues: {
       name: '',
       avatar: '',
-      email: '',
+      login: '',
       cpf: '',
+      email: '',
       tel: '',
       password: '',
       confirmPassword: '',
@@ -85,7 +87,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name || !values.email || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+      if (!values.name || !values.login || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
         Swal.fire('Preencha todos os campos obrigatórios')
         return
       }
@@ -117,8 +119,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       await userService.create({
         avatar: 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
         name: capitalize(values.name),
-        email: values.email,
+        login: values.login,
         cpf: values.cpf,
+        email: values.email,
         tel: values.tel,
         password: values.password,
         registration: values.registration,
@@ -148,12 +151,12 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       inputName.style.borderColor = '';
     }
 
-    if (!values.email) {
-      let inputEmail: any = document.getElementById("email");
-      inputEmail.style.borderColor = 'red';
+    if (!values.login) {
+      let inputLogin: any = document.getElementById("login");
+      inputLogin.style.borderColor = 'red';
     } else {
-      let inputEmail: any = document.getElementById("email");
-      inputEmail.style.borderColor = '';
+      let inputLogin: any = document.getElementById("login");
+      inputLogin.style.borderColor = '';
     }
 
     if (!values.cpf) {
@@ -236,12 +239,12 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 *Login
               </label>
               <Input
-                type="email"
+                type="login"
                 placeholder="usuario@tmg.agr.br"
-                id="email"
-                name="email"
+                id="login"
+                name="login"
                 onChange={formik.handleChange}
-                value={formik.values.email}
+                value={formik.values.login}
               />
             </div>
             <div className="w-full">
@@ -277,6 +280,20 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             gap-6
             mb-4
           ">
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Email
+              </label>
+              <Input
+                type="email"
+                placeholder="usuario@tmg.agr.br"
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                value={formik.values.email}
+              />
+            </div>
+
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Matricula
