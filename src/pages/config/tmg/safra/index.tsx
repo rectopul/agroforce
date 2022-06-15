@@ -112,7 +112,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate }) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await safraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -332,7 +332,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 

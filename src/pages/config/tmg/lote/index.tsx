@@ -112,8 +112,8 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
       orderBy: '',
       typeOrder: ''
     },
-    onSubmit: async ({filterStatus, filterGenotipo, filterName, filterVolume}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterGenotipo=${filterGenotipo}&filterName=${filterName}&filterVolume=${filterVolume}&id_portfolio=${id_genotipo}`;
+    onSubmit: async ({ filterStatus, filterGenotipo, filterName, filterVolume }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterGenotipo=${filterGenotipo}&filterName=${filterName}&filterVolume=${filterVolume}&id_portfolio=${id_genotipo}`;
       await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setLotes(response.response);
@@ -296,7 +296,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
           return row;
         });
 
-        newData.map((item: any) => {     
+        newData.map((item: any) => {
           return item.genotipo = item.genotipo?.genotipo
         })
 
@@ -463,7 +463,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                     border-solid border-b
                     border-gray-200
                   '>
-                    <div className='h-12'>
+                    {/* <div className='h-12'>
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -473,7 +473,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                         href="lote/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
@@ -520,10 +520,9 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                           </AccordionFilter>
                         </div>
                       </div>
-
-                      <div className='h-12 flex items-center justify-center w-full'>
+                      {/* <div className='h-12 flex items-center justify-center w-full'>
                         <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel(); }} />
-                      </div>
+                      </div> */}
                       <div className='h-12 flex items-center justify-center w-full'>
                         <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="lote/importar-planilha/config-planilha" />
                       </div>
@@ -627,7 +626,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const totalItems = allLote.total || 0;
 
   allLote = allLote.response;
-  console.log(allLote);
   return {
     props: {
       allLote,

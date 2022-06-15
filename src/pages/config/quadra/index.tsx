@@ -108,8 +108,8 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch}) => {
-      let parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      let parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await quadraService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -352,7 +352,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -419,7 +419,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
 
   return (
     <>
-      <Head><title>Listagem de genótipos</title></Head>
+      <Head><title>Listagem de quadras</title></Head>
 
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full

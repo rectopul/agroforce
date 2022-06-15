@@ -18,7 +18,7 @@ export default function ImportacaoPlanilha({ config }: any) {
       <ImportPlanilha
         data={data}
         configSalva={config[0].fields}
-        moduleId={18}
+        moduleId={8}
       />
     </>
   );
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
-  const param = `moduleId=18`;
+  const param = `moduleId=8`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

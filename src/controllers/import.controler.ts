@@ -101,7 +101,6 @@ export class ImportController {
 
         // Validação do modulo Local
         if (data.moduleId == 4) {
-          console.log("Data: ", data)
           response = await this.validateLocal(data);
           if (response == 'save') {
             response = "Itens cadastrados com sucesso!";
@@ -1654,7 +1653,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
-                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture:data.id_culture, filterStatus: 1});
+                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture, filterStatus: 1 });
                   if (layoutQuadra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</li><br>`;
                   }
@@ -1676,7 +1675,7 @@ export class ImportController {
                       if (data.spreadSheet[keySheet][sheet] > divisor_anterior) {
                         if ((divisor_anterior + 1) != data.spreadSheet[keySheet][sheet]) {
                           responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter intersecção de parcelas.</li><br>`;
-                        } 
+                        }
                         divisor_anterior = data.spreadSheet[keySheet][sheet];
                       } else {
                         divisor_anterior = data.spreadSheet[keySheet][sheet];
@@ -1688,7 +1687,7 @@ export class ImportController {
                       if (data.spreadSheet[keySheet][sheet] <= 0) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
                       }
-                        divisor_anterior = data.spreadSheet[keySheet][sheet];
+                      divisor_anterior = data.spreadSheet[keySheet][sheet];
                     } else {
                       divisor_anterior = data.spreadSheet[keySheet][sheet];
                     }
@@ -1895,7 +1894,7 @@ export class ImportController {
                   this.aux.tiro_fixo = this.aux.t4_i;
 
                   if (this.aux.id_quadra) {
-                   let update =  await this.quadraController.update({id: this.aux.id_quadra, tiro_fixo: this.aux.tiro_fixo, disparo_fixo: this.aux.disparo_fixo});
+                    let update = await this.quadraController.update({ id: this.aux.id_quadra, tiro_fixo: this.aux.tiro_fixo, disparo_fixo: this.aux.disparo_fixo });
                   }
 
                   let saveQuadra: any = await this.quadraController.create({
@@ -1914,7 +1913,7 @@ export class ImportController {
                   this.aux.id_quadra = saveQuadra.response.id;
                   count++;
                 }
-               
+
                 await this.disparosController.create({
                   id_quadra: this.aux.id_quadra,
                   t4_i: this.aux.t4_i,
