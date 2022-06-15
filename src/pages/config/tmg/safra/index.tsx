@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiTwotoneStar } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
@@ -74,7 +74,10 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-  const [arrowSafra, setArrowSafra] = useState<string>('');
+  const [arrowSafra, setArrowSafra] = useState<any>('');
+  const [arrowYear, setArrowYear] = useState<any>('');
+  const [orderSafra, setOrderSafra] = useState<number>(1);
+  const [orderYear, setOrderYear] = useState<number>(1);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
@@ -204,7 +207,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
           title: (
             <div className='flex items-center'>
               {arrowSafra}
-              <button className='font-medium text-gray-900' onClick={() => { } /*handleOrderName('value', item.value)*/}>
+              <button className='font-medium text-gray-900' onClick={() => handleOrderSafra('safraName', orderYear)}>
                 Safra
               </button>
             </div>
@@ -215,7 +218,14 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
       }
       if (ObjetCampos[index] === 'year') {
         arrOb.push({
-          title: "Ano ",
+          title: (
+            <div className='flex items-center'>
+              {arrowYear}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderYear('year', orderYear)}>
+                Ano
+              </button>
+            </div>
+          ),
           field: "year",
           sorting: false,
         });
@@ -291,6 +301,94 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
       }
     });
     return arrOb;
+  };
+
+  async function handleOrderSafra(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await safraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setSafras(response.response)
+      }
+    });
+
+    if (orderSafra === 2) {
+      setOrderSafra(0);
+      setArrowSafra(<AiOutlineArrowDown />);
+    } else {
+      setOrderSafra(orderSafra + 1);
+      if (orderSafra === 1) {
+        setArrowSafra(<AiOutlineArrowUp />);
+      } else {
+        setArrowSafra('');
+      }
+    }
+  };
+
+  async function handleOrderYear(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await safraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setSafras(response.response)
+      }
+    });
+
+    if (orderYear === 2) {
+      setOrderYear(0);
+      setArrowYear(<AiOutlineArrowDown />);
+    } else {
+      setOrderYear(orderYear + 1);
+      if (orderYear === 1) {
+        setArrowYear(<AiOutlineArrowUp />);
+      } else {
+        setArrowYear('');
+      }
+    }
   };
 
   async function getValuesComluns(): Promise<void> {

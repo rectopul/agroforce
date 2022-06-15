@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiTwotoneStar } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
@@ -76,6 +76,8 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [orderQuadra, setOrderQuadra] = useState<number>(1);
+  const [arrowQuadra, setArrowQuadra] = useState<any>('');
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Local Preparo", value: "local_preparo" },
@@ -203,7 +205,14 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
       }
       if (objetCampos[index] === 'cod_quadra') {
         arrOb.push({
-          title: 'Código Quadra',
+          title: (
+            <div className='flex items-center'>
+              {arrowQuadra}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderQuadra('esquema', orderQuadra)}>
+                Esquema
+              </button>
+            </div>
+          ),
           field: "cod_quadra",
           sorting: false
         });
@@ -311,6 +320,50 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
       }
     });
     return arrOb;
+  };
+
+  async function handleOrderQuadra(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await quadraService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setQuadra(response.response)
+      }
+    });
+
+    if (orderQuadra === 2) {
+      setOrderQuadra(0);
+      setArrowQuadra(<AiOutlineArrowDown />);
+    } else {
+      setOrderQuadra(orderQuadra + 1);
+      if (orderQuadra === 1) {
+        setArrowQuadra(<AiOutlineArrowUp />);
+      } else {
+        setArrowQuadra('');
+      }
+    }
   };
 
   async function getValuesComluns(): Promise<void> {

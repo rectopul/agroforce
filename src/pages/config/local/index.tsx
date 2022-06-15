@@ -85,8 +85,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderAddress, setOrderAddress] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
+  const [orderAddress, setOrderAddress] = useState<number>(1);
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
