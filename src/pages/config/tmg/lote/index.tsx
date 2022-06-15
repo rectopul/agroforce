@@ -70,6 +70,8 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [arrowYear, setArrowYear] = useState<any>('');
+  const [orderYear, setOrderYear] = useState<number>(1);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -162,7 +164,14 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
       }
       if (ObjetCampos[index] === 'year') {
         arrOb.push({
-          title: "Ano lote",
+          title: (
+            <div className='flex items-center'>
+              {arrowYear}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderYear('year', orderYear)}>
+                Ano
+              </button>
+            </div>
+          ),
           field: "year",
           sorting: false
         });
@@ -240,6 +249,50 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     });
     return arrOb;
   }
+
+  async function handleOrderYear(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setLotes(response.response)
+      }
+    });
+
+    if (orderYear === 2) {
+      setOrderYear(0);
+      setArrowYear(<AiOutlineArrowDown />);
+    } else {
+      setOrderYear(orderYear + 1);
+      if (orderYear === 1) {
+        setArrowYear(<AiOutlineArrowUp />);
+      } else {
+        setArrowYear('');
+      }
+    }
+  };
 
   async function getValuesComluns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");

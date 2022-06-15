@@ -74,10 +74,10 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
-  const [orderCruza, setOrderCruza] = useState<number>(0);
-  const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
+  const [orderCruza, setOrderCruza] = useState<number>(1);
+  const [orderName, setOrderName] = useState<number>(1);
   const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -110,7 +110,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' }
   ];
-  
+
   const filterStatus = filterBeforeEdit.split('')
 
   const take: number = itensPerPage;
@@ -129,8 +129,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       orderBy: '',
       typeOrder: ''
     },
-    onSubmit: async ({filterStatus, filterGenotipo, filterGenealogy, filterCruza}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+    onSubmit: async ({ filterStatus, filterGenotipo, filterGenealogy, filterCruza }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -213,7 +213,14 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       }
       if (ObjetCampos[index] === 'name_genotipo') {
         arrOb.push({
-          title: 'Nome genótipo',
+          title: (
+            <div className='flex items-center'>
+              {arrowName}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name_genotipo', orderName)}>
+                Nome
+              </button>
+            </div>
+          ),
           field: 'name_genotipo',
           sorting: false
         });
@@ -234,7 +241,14 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       }
       if (ObjetCampos[index] === 'cruza') {
         arrOb.push({
-          title: 'Cruza',
+          title: (
+            <div className='flex items-center'>
+              {arrowCruza}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderCruza('cruza', orderCruza)}>
+                Cruza
+              </button>
+            </div>
+          ),
           field: 'cruza',
           sorting: false
         });
@@ -423,6 +437,94 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     return arrOb;
   }
 
+  async function handleOrderName(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setGenotipo(response.response)
+      }
+    });
+
+    if (orderName === 2) {
+      setOrderName(0);
+      setArrowName(<AiOutlineArrowDown />);
+    } else {
+      setOrderName(orderName + 1);
+      if (orderName === 1) {
+        setArrowName(<AiOutlineArrowUp />);
+      } else {
+        setArrowName('');
+      }
+    }
+  };
+
+  async function handleOrderCruza(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    } else {
+      if (typeOrder !== '') {
+        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+      } else {
+        parametersFilter = filter;
+      }
+    }
+
+    await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setGenotipo(response.response)
+      }
+    });
+
+    if (orderCruza === 2) {
+      setOrderCruza(0);
+      setArrowCruza(<AiOutlineArrowDown />);
+    } else {
+      setOrderCruza(orderCruza + 1);
+      if (orderCruza === 1) {
+        setArrowCruza(<AiOutlineArrowUp />);
+      } else {
+        setArrowCruza('');
+      }
+    }
+  };
+
   async function getValuesComluns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
@@ -462,7 +564,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -479,7 +581,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
         });
 
         newData.map((item: any) => {
-          return item.tecnologia = item.tecnologia?.tecnologia      
+          return item.tecnologia = item.tecnologia?.tecnologia
         })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);

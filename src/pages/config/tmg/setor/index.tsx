@@ -67,7 +67,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-  const [orderName, setOrderName] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -99,8 +99,8 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({filterStatus, filterSearch}) => {
-      let parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterSearch=${filterSearch}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      let parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterSearch=${filterSearch}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await departmentService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -179,7 +179,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
           title: (
             <div className='flex items-center'>
               {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', item)}>
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
                 Nome
               </button>
             </div>
@@ -301,7 +301,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 
     await departmentService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response)
+        setItems(response.response)
       }
     });
 
@@ -318,6 +318,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
     }
   };
 
+
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result) return;
@@ -331,7 +332,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -424,7 +425,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange}defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">

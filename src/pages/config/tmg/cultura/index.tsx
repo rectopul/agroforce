@@ -70,8 +70,8 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderDesc, setOrderDesc] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
+  const [orderDesc, setOrderDesc] = useState<number>(1);
   // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [arrowDesc, setArrowDesc] = useState<ReactNode>('');
@@ -295,6 +295,10 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
+    console.log('column')
+    console.log(column)
+    console.log('order')
+    console.log(order)
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {

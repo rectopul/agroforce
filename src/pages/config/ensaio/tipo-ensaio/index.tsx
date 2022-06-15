@@ -69,7 +69,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [orderName, setOrderName] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
