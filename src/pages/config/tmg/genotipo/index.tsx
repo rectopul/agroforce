@@ -84,7 +84,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
     { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
     { name: 'CamposGerenciados[]', title: 'Cód tec', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'Cruza', value: 'cruza' },
+    { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'ID_S1', value: 'id_s1' },
@@ -234,7 +234,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       }
       if (ObjetCampos[index] === 'cruza') {
         arrOb.push({
-          title: 'Cruza',
+          title: 'Cruzamento origem',
           field: 'cruza',
           sorting: false
         });
@@ -579,7 +579,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Cruza
+                      Cruzamento de Origem
                     </label>
                     <Input
                       type="text"
@@ -810,7 +810,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const data = await api.json();
 
   const allGenotipos = data.response;
-  console.log(allGenotipos);
   const totalItems = data.total;
 
   return {
