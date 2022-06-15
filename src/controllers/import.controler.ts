@@ -779,7 +779,6 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</li><br>`;
                 } else {
                   let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
-
                   if (tec.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</li><br>`;
                   }
@@ -803,7 +802,6 @@ export class ImportController {
               }
 
               //Campos lote
-
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do lote é obrigatorio.</li><br>`;
@@ -831,7 +829,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  let safra: any = this.safraController.getAllSafra({ id_culture: data.id_culture });
+                  let safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture });
                   if (safra.count == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
@@ -851,7 +849,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  let lote: any = this.loteController.listAll({ cod_lote: data.spreadSheet[keySheet][sheet] });
+                  let lote: any = this.loteController.listAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -894,11 +892,11 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let geno: any = this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
+                  let geno: any = await this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
                   if (geno.total > 0) {
                     this.aux.id_genotipo = geno.response[0].id;
-                    this.aux.id_dados = data.spreadSheet[keySheet][sheet];
                   }
+                  this.aux.id_dados_geno = data.spreadSheet[keySheet][sheet];
                 }
               }
 
@@ -933,7 +931,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'NomeElite') {
+              if (configModule.response[0].fields[sheet] == 'EliteNome') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.elite_name = data.spreadSheet[keySheet][sheet];
                 }
@@ -954,7 +952,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'GMR') {
+              if (configModule.response[0].fields[sheet] == 'gmr') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   this.aux.gmr = data.spreadSheet[keySheet][sheet];
                 }
@@ -1017,13 +1015,11 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let lote: any = this.loteController.listAll({ id_dados: data.spreadSheet[keySheet][sheet] });
+                  let lote: any = await this.loteController.listAll({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0].id;
-                    this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
-                  } else {
-                    this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
                   }
+                  this.aux.id_dados_lote = data.spreadSheet[keySheet][sheet];
                 }
               }
 
@@ -1159,8 +1155,6 @@ export class ImportController {
                     });
                     delete this.aux.id_genotipo;
                   }
-                } else {
-                  console.log('DROOOOOOGA');
                 }
               }
             }

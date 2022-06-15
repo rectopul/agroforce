@@ -192,7 +192,6 @@ export class GenotipoController {
 
   async updategenotipo(data: any) {
     try {
-
       const genotipo: any = await this.genotipoRepository.findOne(data.id);
 
       if (!genotipo) return { status: 400, message: 'Genótipo não encontrado' };
