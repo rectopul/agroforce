@@ -123,7 +123,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     },
     onSubmit: async ({ filterStatus, filterLocal, filterSafra, filterFoco, filterEnsaio, filterTecnologia, filterEpoca, filterNPE }) => {
 
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada}`
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada}`
       await npeService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setNPE(response.response);
@@ -178,7 +178,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
         })
       }
       if (ObjetCampos[item] === 'local') {
-        arrOb.push({ title: "Local", field: "local.cod_local", sorting: false })
+        arrOb.push({ title: "Local", field: "local.name_local_culture", sorting: false })
       }
       if (ObjetCampos[item] === 'safra') {
         arrOb.push({ title: "Safra", field: "safra.safraName", sorting: false })
@@ -451,7 +451,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
         newData.map((item: any) => {
           item.foco = item.foco?.name
-          item.local = item.local?.cod_local
+          item.local = item.local?.name_local_culture
           item.safra = item.safra?.safraName
           item.tecnologia = item.tecnologia?.name
           item.type_assay = item.type_assay?.name
