@@ -68,7 +68,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderName, setOrderName] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -314,7 +314,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
     await focoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response)
+        setFocos(response.response)
       }
     })
     if (orderName === 2) {

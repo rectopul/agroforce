@@ -73,8 +73,8 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [users, setData] = useState<IUsers[]>(() => alItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
-  const [orderName, setOrderName] = useState<number>(0);
-  const [orderEmail, setOrderEmail] = useState<number>(0);
+  const [orderName, setOrderName] = useState<number>(1);
+  const [orderEmail, setOrderEmail] = useState<number>(1);
   const [arrowName, setArrowName] = useState<any>('');
   const [arrowEmail, setArrowEmail] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -105,7 +105,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterEmail }) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterName=${filterName}&filterEmail=${filterEmail}`
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterEmail=${filterEmail}`
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -467,7 +467,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -797,7 +797,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const AllItems = response.response;
   const totalItems = response.total;
-  
+
   return {
     props: {
       AllItems,
