@@ -6,7 +6,6 @@ import { apiHandler } from '../../../helpers/api';
 export default  apiHandler(handler);
 
  async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { id_culture } = req.query;
   const experimentoController =  new ExperimentoController();
 
   switch (req.method) {

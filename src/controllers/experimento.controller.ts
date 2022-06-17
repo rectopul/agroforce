@@ -4,7 +4,7 @@ import { ExperimentoRepository } from 'src/repository/experimento.repository';
 export class ExperimentoController {
   public readonly required = 'Campo obrigatório';
 
-  repository = new ExperimentoRepository();
+  experimentoRepository = new ExperimentoRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -13,6 +13,8 @@ export class ExperimentoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log('options')
+      console.log(options)
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -29,14 +31,6 @@ export class ExperimentoController {
         parameters.name_genotipo = JSON.parse(options.filterGenotipo);
       }
 
-      if (options.filterCruza) {
-        let temp = options.filterCruza.split(' ');
-        temp = temp[1] ? `${temp[0]}+${temp[1]}` : temp[0];
-        options.filterCruza = temp;
-        options.filterCruza = '{"contains":"' + options.filterCruza + '"}';
-        parameters.cruza = JSON.parse(options.filterCruza);
-      }
-
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
@@ -48,45 +42,61 @@ export class ExperimentoController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { 
-             id: true,
-             id_s1: true,
-             id_dados: true,
-             id_tecnologia: true,
-             name_main: true,
-             name_public: true,
-             name_experiment: true,
-             name_alter : true,
-             elit_name  : true,
-             type: true,
-             gmr : true,
-             bgm : true,
-             cruza: true,
-             progenitor_f_direto: true,
-             progenitor_m_direto: true,
-             progenitor_f_origem: true,
-             progenitor_m_origem: true,
-             progenitores_origem: true,
-             parentesco_completo: true,
-             status: true,
-             tecnologia: { select: { name: true, cod_tec: true} } };
+        select = {
+          id: true,
+          protocolo_name: true,
+          id_experimento: true,
+          experimento_name: true,
+          safra: { select: { safraName: true } },
+          culture: { select: { name: true } },
+          foco: { select: { name: true } },
+          tecnologia: { select: { cod_tec: true } },
+          ensaio: { select: { name: true } },
+          epoca: true,
+          pjr: true,
+          id_un_cultura: true,
+          unidade_cultura_name: true,
+          name_uni_cultura: true,
+          rotulo: true,
+          year: true,
+          status: true,
+        };
       }
-      
+
+      if (options.protocolo_name) {
+        parameters.protocolo_name = parseInt(options.protocolo_name);
+      }
+      if (options.id_experimento) {
+        parameters.id_experimento = parseInt(options.id_experimento);
+      }
+      if (options.experimento_name) {
+        parameters.experimento_name = parseInt(options.experimento_name);
+      }
+      if (options.epoca) {
+        parameters.epoca = parseInt(options.epoca);
+      }
+      if (options.pjr) {
+        parameters.pjr = parseInt(options.pjr);
+      }
+      if (options.id_un_cultura) {
+        parameters.id_un_cultura = parseInt(options.id_un_cultura);
+      }
+      if (options.unidade_cultura_name) {
+        parameters.unidade_cultura_name = parseInt(options.unidade_cultura_name);
+      }
+      if (options.name_uni_cultura) {
+        parameters.name_uni_cultura = parseInt(options.name_uni_cultura);
+      }
+      if (options.rotulo) {
+        parameters.rotulo = parseInt(options.rotulo);
+      }
+      if (options.year) {
+        parameters.year = parseInt(options.year);
+      }
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
-      if (options.id_dados) {
-        parameters.id_dados = String(options.id_dados);
-      }
-
-      if (options.cruza) {
-        parameters.cruza = options.cruza;
-      }
-
-      if (options.genealogy) {
-        parameters.genealogy = options.genealogy;
-      }
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
@@ -108,13 +118,16 @@ export class ExperimentoController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      const response: object | any = await this.repository.findAll(
+      const response: object | any = await this.experimentoRepository.findAll(
         parameters,
         select,
         take,
         skip,
         orderBy
       );
+
+      console.log('response');
+      console.log(response);
 
       if (!response && response.total <= 0) {
         return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };
@@ -131,7 +144,7 @@ export class ExperimentoController {
     try {
       if (!id) throw new Error('Dados inválidos');
 
-      const response = await this.repository.findOne(id);
+      const response = await this.experimentoRepository.findOne(id);
 
       if (!response) throw new Error('Item não encontrado');
 
@@ -143,8 +156,8 @@ export class ExperimentoController {
 
   async create(data: any) {
     try {
-      const response = await this.repository.create(data);
-      return { status: 201, message: 'Genealogia cadastrada', response };
+      const response = await this.experimentoRepository.create(data);
+      return { status: 201, message: 'Experimento cadastrado', response };
     } catch (err) {
       console.log(err);
       return { status: 400, message: 'Erro no cadastrado' };
@@ -154,13 +167,13 @@ export class ExperimentoController {
   async update(data: any) {
     try {
 
-      const experimento: any = await this.repository.findOne(data.id);
+      const experimento: any = await this.experimentoRepository.findOne(data.id);
 
-      if (!experimento) return { status: 400, message: 'Genótipo não encontrado' };
+      if (!experimento) return { status: 400, message: 'Experimento não encontrado' };
 
-      await this.repository.update(experimento.id, data);
+      await this.experimentoRepository.update(experimento.id, data);
 
-      return { status: 200, message: 'Genótipo atualizado' };
+      return { status: 200, message: 'Experimento atualizado' };
     } catch (err) {
       console.log(err);
       return { status: 404, message: 'Erro ao atualizar' };
