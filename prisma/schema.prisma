@@ -193,9 +193,9 @@ model local {
 model local_children {
   id                 Int       @id @default(autoincrement())
   id_local           Int
-  id_culture_unity   Int       @unique
+  id_culture_unity   Int
   year               Int
-  culture_unity_name String
+  culture_unity_name String    @unique
   local              local     @relation(fields: [id_local], references: [id])
   status             Int?      @default(1)
   created_by         Int
@@ -470,8 +470,8 @@ model experimento {
   protocolo_name       String
   id_experimento       Int
   experimento_name     String
-  year Int
-  rotulo String
+  year                 Int
+  rotulo               String
   id_safra             Int
   id_foco              Int
   id_ensaio            Int
@@ -479,7 +479,7 @@ model experimento {
   epoca                Int
   pjr                  String
   id_un_cultura        Int
-  name_uni_cultura String
+  name_uni_cultura     String
   unidade_cultura_name String
 
   safra      safra      @relation(fields: [id_safra], references: [id])
@@ -493,18 +493,18 @@ model experimento {
 }
 
 model materiais {
-  id Int @id @default(autoincrement())
+  id             Int    @id @default(autoincrement())
   id_experimento Int
-  id_l1 Int
-  id_dados Int
-  tratamentos         Int
-  status String 
-  prox_nivel Int  
-  id_d1 Int
-  name_main         String
-  name_genotipo String
+  id_l1          Int
+  id_dados       Int
+  tratamentos    Int
+  status         String
+  prox_nivel     Int
+  id_d1          Int
+  name_main      String
+  name_genotipo  String
 
-  experimento    experimento    @relation(fields: [id_experimento], references: [id])
+  experimento experimento @relation(fields: [id_experimento], references: [id])
 
 
 }
