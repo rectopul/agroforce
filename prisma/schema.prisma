@@ -466,17 +466,20 @@ model sequencia_delineamento {
 
 model experimento {
   id                   Int    @id @default(autoincrement())
+  id_culture           Int
   protocolo_name       String
   id_experimento       Int
   experimento_name     String
+  year Int
+  rotulo String
   id_safra             Int
-  id_culture           Int
   id_foco              Int
   id_ensaio            Int
   id_tecnologia        Int
   epoca                Int
   pjr                  String
   id_un_cultura        Int
+  name_uni_cultura String
   unidade_cultura_name String
 
   safra      safra      @relation(fields: [id_safra], references: [id])
@@ -485,9 +488,23 @@ model experimento {
   tecnologia tecnologia @relation(fields: [id_tecnologia], references: [id])
   culture    culture    @relation(fields: [id_culture], references: [id])
 
+  materiais materiais[]
+
 }
 
 model materiais {
   id Int @id @default(autoincrement())
+  id_experimento Int
+  id_l1 Int
+  id_dados Int
+  tratamentos         Int
+  status String 
+  prox_nivel Int  
+  id_d1 Int
+  name_main         String
+  name_genotipo String
+
+  experimento    experimento    @relation(fields: [id_experimento], references: [id])
+
 
 }
