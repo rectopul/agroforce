@@ -7,7 +7,26 @@ export class ExperimentoRepository {
   }
   async findOne(id: number) {
     const experimento = await prisma.experimento.findUnique({
-      where: { id }
+      where: { id },
+      select: {
+        id: true,
+        protocolo_name: true,
+        id_experimento: true,
+        experimento_name: true,
+        safra: { select: { safraName: true } },
+        culture: { select: { name: true } },
+        foco: { select: { name: true } },
+        tecnologia: { select: { cod_tec: true } },
+        ensaio: { select: { name: true } },
+        epoca: true,
+        pjr: true,
+        id_un_cultura: true,
+        unidade_cultura_name: true,
+        name_uni_cultura: true,
+        rotulo: true,
+        year: true,
+        status: true,
+      }
     });
     return experimento;
   }
@@ -31,9 +50,22 @@ export class ExperimentoRepository {
       where: { id_culture },
       select: {
         id: true,
+        protocolo_name: true,
+        id_experimento: true,
+        experimento_name: true,
+        id_safra: true,
         id_culture: true,
-        cruza: true,
-        status: true
+        id_foco: true,
+        id_ensaio: true,
+        id_tecnologia: true,
+        epoca: true,
+        pjr: true,
+        id_un_cultura: true,
+        unidade_cultura_name: true,
+        name_uni_cultura: true,
+        rotulo: true,
+        year: true,
+        status: true,
       }
     });
 

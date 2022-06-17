@@ -465,7 +465,7 @@ model sequencia_delineamento {
 }
 
 model experimento {
-  id                   Int    @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   id_culture           Int
   protocolo_name       String
   id_experimento       Int
@@ -481,6 +481,9 @@ model experimento {
   id_un_cultura        Int
   name_uni_cultura     String
   unidade_cultura_name String
+  status               Int       @default(1)
+  created_by           Int
+  created_at           DateTime? @default(now())
 
   safra      safra      @relation(fields: [id_safra], references: [id])
   foco       foco       @relation(fields: [id_foco], references: [id])
@@ -493,16 +496,18 @@ model experimento {
 }
 
 model materiais {
-  id             Int    @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   id_experimento Int
   id_l1          Int
   id_dados       Int
   tratamentos    Int
-  status         String
   prox_nivel     Int
   id_d1          Int
   name_main      String
   name_genotipo  String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
 
   experimento experimento @relation(fields: [id_experimento], references: [id])
 
