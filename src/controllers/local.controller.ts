@@ -168,6 +168,8 @@ export class LocalController {
 
   async postLocal(data: object | any) {
     try {
+      console.log("Create")
+      console.log(data);
       if (data !== null && data !== undefined) {
         // if (data.uf) {
         //     let uf = await this.getOnUFs(parseInt(data.uf));
@@ -189,6 +191,8 @@ export class LocalController {
 
   async updateLocal(data: any) {
     try {
+      console.log("Update")
+      console.log(data);
       const schema: SchemaOf<any> = object({
         id: number().required(this.required),
         id_local_culture: number().required(this.required),
