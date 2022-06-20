@@ -32,9 +32,6 @@ interface ILocalProps {
   label_region: String | any;
   name_locality: String | any;
   adress: String | any;
-  latitude: string;
-  longitude: string;
-  altitude: String | any;
   created_by: Number;
   status: Number;
 };
@@ -271,7 +268,12 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={async () => await handleStatus(
+                      rowData.id, {
+                      status: rowData.status,
+                      ...rowData
+                    }
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -297,8 +299,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatus(
+                      rowData.id, {
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -340,27 +345,43 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
 
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatus(idLocal: number, data: ILocalProps): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
     } else {
-      status = 0;
+      data.status = 0;
     }
 
-    await localService.update({ id: id, status: status });
+    console.log('idLocal');
+    console.log(idLocal);
+    console.log('data');
+    console.log(data);
 
-    const index = local.findIndex((local) => local.id === id);
+    const index = local.findIndex((local) => local.id === idLocal);
 
     if (index === -1) {
       return;
     }
 
-    setLocal((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
+    setLocal((oldLocal) => {
+      const copy = [...oldLocal];
+      copy[index].status = data.status;
       return copy;
     });
-  };
+
+    const {
+      id,
+      status
+    } = local[index];
+
+    const response = await localService.update({
+      id,
+      status
+    });
+
+    console.log(response);
+
+  }
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
