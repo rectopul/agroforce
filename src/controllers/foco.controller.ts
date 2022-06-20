@@ -44,7 +44,9 @@ export class FocoController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] !== 'group') {
+          if (objSelect[item] === 'group') {
+            select['foco_children'] = true;
+          } else {
             select[objSelect[item]] = true;
           }
         });
@@ -102,7 +104,7 @@ export class FocoController {
           //console.log(group.id_safra === Number(options.id_safra))          
           //item.foco_children = (group.id_safra === Number(options.id_safra)) ? group.grupo
           if (group.id_safra === Number(options.id_safra)) {
-            item.group = group.grupo
+            item.group = (group.grupo.toString()).length > 1 ? group.grupo : '0' + group.grupo.toString()
           }
         })
       })

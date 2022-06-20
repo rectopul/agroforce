@@ -147,6 +147,16 @@ export class GrupoController {
         orderBy
       );
 
+
+      response.map((item: any) => {
+        item.grupo = (item.grupo.toString()).length > 1 ? item.grupo : '0' + item.grupo.toString()
+      })
+
+
+
+      console.log('response')
+      console.log(response)
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       } else {
