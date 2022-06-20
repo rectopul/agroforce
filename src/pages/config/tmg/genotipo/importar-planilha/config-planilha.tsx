@@ -7,6 +7,7 @@ const data: object = [
   { id: 'id_s1', name: '*ID_S1' },
   { id: 'id_dados_geno', name: '*Identificador dados genótipo'},
   { id: 'Genotipo', name: '*Nome genótipo' },
+  { id: 'Cultura', name: '*Cultura' },
   { id: 'NomePrincipal', name: 'Nome principal' },
   { id: 'NomePublico', name: 'Nome publico' },
   { id: 'NomeExperimental', name: 'Nome experimental' },
