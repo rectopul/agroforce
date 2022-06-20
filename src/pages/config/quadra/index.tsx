@@ -209,7 +209,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
             <div className='flex items-center'>
               {arrowQuadra}
               <button className='font-medium text-gray-900' onClick={() => handleOrderQuadra('esquema', orderQuadra)}>
-                Esquema
+                Código quadra
               </button>
             </div>
           ),
