@@ -26,21 +26,14 @@ import { getDegreesCelsius } from "../../../shared/utils/formatDegreesCelsius";
 
 interface ILocalProps {
   id: Number | any;
-  id_local_culture: Number | any;
   name_local_culture: String | any;
-  label: String | any;
-  mloc: Number | any;
-  adress: String | any;
-  id_locality: Number | any;
-  name_locality: String | any;
-  id_region: Number | any;
-  name_region: String | any;
-  label_region: String | any;
-  id_country: Number | any;
-  name_country: String | any;
+  cod_red_local: String | any;
   label_country: String | any;
+  label_region: String | any;
+  name_locality: String | any;
+  adress: String | any;
+  created_by: Number;
   status: Number;
-  created_by: Number | any;
 };
 
 
@@ -360,11 +353,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     } else {
       data.status = 0;
     }
-
-    console.log('idLocal')
-    console.log(idLocal)
-    console.log('data')
-    console.log(data)
 
     const index = local.findIndex((local) => local.id === idLocal);
 

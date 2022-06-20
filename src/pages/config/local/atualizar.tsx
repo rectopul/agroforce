@@ -122,7 +122,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
         name_locality: formik.values.name_locality,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Foco atualizado com sucesso!');
+          Swal.fire('atualizado com sucesso!');
           router.back();
         } else {
           Swal.fire(response.message);
