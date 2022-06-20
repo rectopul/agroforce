@@ -72,7 +72,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
   const router = useRouter();
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id, id_culture_unity, year, culture_unity_name, acao" };
+  const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id, year, culture_unity_name" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [unidadeCultura, setUnidadeCultura] = useState<any>(() => allItens);
@@ -85,10 +85,8 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
   const [colorStar, setColorStar] = useState<string>('');
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "ID Unidade de Cultura", value: "id_culture_unity" },
-    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
     { name: "CamposGerenciados[]", title: "Nome de Unidade de Cultura", value: "culture_unity_name" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
+    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
   ]);
 
   const take: number = itensPerPage;
@@ -169,10 +167,10 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
           ),
         })
       }
-      if (ObjetCampos[index] === 'id_culture_unity') {
+      if (ObjetCampos[index] === 'culture_unity_name') {
         arrOb.push({
-          title: "ID Unidade de Cultura",
-          field: "id_culture_unity",
+          title: "Nome da Unidade de Cultura",
+          field: "culture_unity_name",
           sorting: false
         });
       }
@@ -183,13 +181,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'culture_unity_name') {
-        arrOb.push({
-          title: "Nome da Unidade de Cultura",
-          field: "culture_unity_name",
-          sorting: false
-        });
-      }
+
     });
     return arrOb;
   };
@@ -366,7 +358,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
           ">
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *ID do Lugar de Cultura
+                *Nome do lugar de cultura
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}
@@ -415,7 +407,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
           ">
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
-                *Nome da Fazendo
+                *Nome da Fazenda
               </label>
               <Input
                 style={{ background: '#e5e7eb' }}

@@ -24,6 +24,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 interface ITypeAssayProps {
   id: Number | any;
   name: String | any;
+  type_assay_children?: []
   created_by: Number;
   status: Number;
 };
@@ -153,7 +154,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           ),
         })
       }
-
       if (ObjetCampos[item] === 'name') {
         arrOb.push({
           title: (
@@ -281,7 +281,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       status = 0;
     }
 
-    typeAssayService.update({ id: id, status: status });
+    const response = await typeAssayService.update({ id: id, status: status });
+
+    console.log('response');
+    console.log(response);
 
     const index = typeAssay.findIndex((typeAssay) => typeAssay.id === id);
 
@@ -368,6 +371,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
           return row;
         });
+
+        newData.map(item => {
+          delete item.type_assay_children
+          return item
+        })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
@@ -669,6 +677,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const Response = await local.json();
   const allItems = Response.response;
   const totalItems = Response.total;
+
+  console.log('allItems')
+  console.log(allItems)
 
   return {
     props: {

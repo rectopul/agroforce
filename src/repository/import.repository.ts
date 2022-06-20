@@ -1,31 +1,32 @@
-import {prisma} from '../pages/api/db/db';
+import { prisma } from '../pages/api/db/db';
 
-export class ImportRepository {   
+export class ImportRepository {
     async create(Data: object | any) {
-        let Result = await prisma.import_spreadsheet.createMany({ data: Data})
-        return Result;
+        const result = await prisma.import_spreadsheet.createMany({ data: Data })
+        return result;
     }
 
     async update(id: number, Data: Object) {
-        let Result = await prisma.import_spreadsheet.update({ 
+        const result = await prisma.import_spreadsheet.update({
             where: {
                 id: id
             },
-            data: Data })
-            
-        return Result;
+            data: Data
+        })
+
+        return result;
     }
 
-    async findAll (where: any) {
-        let Result = await prisma.import_spreadsheet.findMany({ where: where }) 
-        return Result;
+    async findAll(where: any) {
+        const result = await prisma.import_spreadsheet.findMany({ where: where })
+        return result;
     }
-    
-    async delete(where: object ) {
-        let Result = await prisma.import_spreadsheet.deleteMany({
+
+    async delete(where: object) {
+        const result = await prisma.import_spreadsheet.deleteMany({
             where: where
-          }) 
-        return Result;
+        })
+        return result;
     }
 
     async updateAllStatus(userId: any) {

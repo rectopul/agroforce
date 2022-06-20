@@ -120,7 +120,7 @@ export default function Cadastro({ envelope }: any) {
                         </div>
                         <div className="w-full h-10">
                             <label className="block text-gray-900 text-sm font-bold mb-2">
-                                *Sementes
+                                *Envelope
                             </label>
                             <Input
                                 className="shadow
