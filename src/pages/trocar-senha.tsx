@@ -23,7 +23,7 @@ export default function TrocarSenha() {
       return;
     }
 
-    await forgotPasswordService.sendlogin({
+    await forgotPasswordService.sendLogin({
       login,
       confirmLogin,
     }).then(() => {
