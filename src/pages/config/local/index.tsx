@@ -271,10 +271,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
                     onClick={async () => await handleStatus(
-                      rowData.id, {
-                      status: rowData.status,
-                      ...rowData
-                    }
+                      rowData.id,
+                      rowData.status
                     )}
                     bgColor="bg-green-600"
                     textColor="white"
@@ -302,10 +300,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
                     onClick={async () => await handleStatus(
-                      rowData.id, {
-                      status: rowData.status,
-                      ...rowData
-                    }
+                      rowData.id,
+                      rowData.status
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
@@ -347,11 +343,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   };
 
 
-  async function handleStatus(idLocal: number, data: ILocalProps): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
+  async function handleStatus(idLocal: number, rowStatus: any): Promise<void> {
+    if (rowStatus === 0) {
+      rowStatus = 1;
     } else {
-      data.status = 0;
+      rowStatus = 0;
     }
 
     const index = local.findIndex((local) => local.id === idLocal);
@@ -362,7 +358,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
     setLocal((oldLocal) => {
       const copy = [...oldLocal];
-      copy[index].status = data.status;
+      copy[index].status = rowStatus;
       return copy;
     });
 
