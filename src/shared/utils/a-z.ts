@@ -18,6 +18,7 @@ export const AZ = [
   "Q",
   "R",
   "S",
+  "T",
   "U",
   "V",
   "W",

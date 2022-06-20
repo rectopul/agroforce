@@ -778,8 +778,13 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</li><br>`;
                 } else {
-                  if (data.spreadSheet[keySheet][sheet] != data.id_culture) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura tem que ser igual a cultura filtrada no software.</li><br>`;
+                  let cultura = await this.culturaController.getAllCulture({name: data.spreadSheet[keySheet][sheet]});
+                  if (cultura.total > 0) {
+                    if (data.spreadSheet[keySheet][sheet] != cultura.response[0].name) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura tem que ser igual a cultura filtrada no software.</li><br>`;
+                    }
+                  } else {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, cultura não existe.</li><br>`;
                   }
                 }
               }
