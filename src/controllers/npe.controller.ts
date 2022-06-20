@@ -23,7 +23,7 @@ export class NpeController {
       }
 
       if (options.filterLocal) {
-        options.filterLocal = `{ "cod_local": { "contains": "${options.filterLocal}" } }`
+        options.filterLocal = `{ "name_local_culture": { "contains": "${options.filterLocal}" } }`
         parameters.local = JSON.parse(options.filterLocal);
       }
 
@@ -107,7 +107,7 @@ export class NpeController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, local: { select: { cod_local: true } }, safra: { select: { safraName: true } }, foco: { select: { name: true } }, epoca: true, tecnologia: { select: { name: true } }, type_assay: { select: { name: true } }, npei: true, npef: true, status: true };
+        select = { id: true, local: { select: { name_local_culture: true } }, safra: { select: { safraName: true } }, foco: { select: { name: true } }, epoca: true, tecnologia: { select: { name: true } }, type_assay: { select: { name: true } }, npei: true, npef: true, status: true };
       }
 
       let response = await this.Repository.findAll(parameters, select, take, skip, orderBy);

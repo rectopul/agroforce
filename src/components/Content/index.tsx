@@ -21,6 +21,7 @@ interface IUsers {
   id: number,
   name: string,
   cpf: string,
+  login: string
   email: string,
   tel: string,
   avatar: string,
@@ -108,7 +109,7 @@ export function Content({ contentHeader, children }: IContentData) {
   function validationCulture(value: any) {
     if (value !== culturaSelecionada) {
       setCulturaSelecionada(value);
-      userService.logoutSign(userLogado.email, { anterior: culturaSelecionada, selecionada: value });
+      userService.logoutSign(userLogado.login, { anterior: culturaSelecionada, selecionada: value });
     }
   }
 

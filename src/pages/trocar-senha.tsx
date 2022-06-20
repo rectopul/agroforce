@@ -8,35 +8,35 @@ import Swal from "sweetalert2";
 import { forgotPasswordService } from '../services';
 
 export default function TrocarSenha() {
-  const [email, setEmail] = useState<string>('');
-  const [confirmEmail, setConfirmEmail] = useState<string>('');
+  const [login, setLogin] = useState<string>('');
+  const [confirmLogin, setConfirmLogin] = useState<string>('');
 
-  async function handleSendEmail(event: FormEvent) {
+  async function handleSendLogin(event: FormEvent) {
     event.preventDefault();
 
-    if (email !== confirmEmail) {
+    if (login !== confirmLogin) {
       Swal.fire({
         title: "Campos inválidos!",
-        text: "E-mails não iguais.",
+        text: "Login não iguais.",
       });
 
       return;
     }
 
-    await forgotPasswordService.sendEmail({
-      email,
-      confirmEmail,
+    await forgotPasswordService.sendlogin({
+      login,
+      confirmLogin,
     }).then(() => {
-        Swal.fire({
-          title: "E-mail de recuperação de senha enviado com sucesso!",
-          text: `Verifique seu e-mail para concluir sua troca de senha.`,
-        });
-      }
+      Swal.fire({
+        title: "Login de recuperação de senha enviado com sucesso!",
+        text: `Verifique seu Login para concluir sua troca de senha.`,
+      });
+    }
     ).finally(() => {
       router.back();
     })
   };
-  
+
   return (
     <>
       <Head>
@@ -49,7 +49,7 @@ export default function TrocarSenha() {
           '>
             <div className="flex flex-col items-center justify-center text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo.png" alt="Nuseed" className='w-80 h-44 self-center'/>
+              <img src="/images/logo.png" alt="Nuseed" className='w-80 h-44 self-center' />
               <h1 className="text-xl">Alterar senha do usuário</h1>
               <small className="text-sm">Esqueci minha senha</small>
             </div>
@@ -60,7 +60,7 @@ export default function TrocarSenha() {
               justify-between
               gap-4 
               mt-10'
-              onSubmit={handleSendEmail}
+              onSubmit={handleSendLogin}
             >
               <div className='
                 h-40
@@ -70,24 +70,24 @@ export default function TrocarSenha() {
                 gap-10
               '>
                 <div className='h-10'>
-                  <span className="block text-sm font-medium text-blue-600">E-mail</span>
+                  <span className="block text-sm font-medium text-blue-600">Login</span>
                   <Input
-                    type="email"
+                    type="login"
                     required
-                    placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Login"
+                    value={login}
+                    onChange={(e) => setLogin(e.target.value)}
                   />
                 </div>
 
                 <div className='h-10'>
-                  <span className="block text-sm font-medium text-blue-600">Confirmar e-mail</span>
+                  <span className="block text-sm font-medium text-blue-600">Confirmar Login</span>
                   <Input
-                    type="email"
+                    type="login"
                     required
-                    placeholder="Confirmar e-mail"
-                    value={confirmEmail}
-                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    placeholder="Confirmar Login"
+                    value={confirmLogin}
+                    onChange={(e) => setConfirmLogin(e.target.value)}
                   />
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default function TrocarSenha() {
                 justify-center
               ">
                 <div className="w-30">
-                  <Button 
+                  <Button
                     type="button"
                     value="Voltar"
                     bgColor="bg-red-600"
@@ -109,13 +109,13 @@ export default function TrocarSenha() {
                   />
                 </div>
                 <div className="w-40">
-                  <Button 
+                  <Button
                     type="submit"
                     value="Confirmar"
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<GiConfirmed size={18} />}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 </div>
               </div>

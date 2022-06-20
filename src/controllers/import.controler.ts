@@ -284,7 +284,7 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'Local') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if (typeof (data.spreadSheet[keySheet][sheet]) == 'string') {
-                    let local: any = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
+                    let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                     if (local.total == 0) {
                       // console.log('aqui Local');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
@@ -434,7 +434,7 @@ export class ImportController {
               this.aux.prox_npe = 0;
               if (configModule.response[0].fields[sheet] == 'Local') {
                 // console.log("Local R");
-                let local: any = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
+                let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                 this.aux.id_local = local.response[0].id;
               }
 
@@ -1282,9 +1282,6 @@ export class ImportController {
 
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID da unidade de cultura é obrigatório. </li> <br>`;
-            } else {
-              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ id_culture_unity: spreadSheet[row][column] })
-              if (unidadeCulturaAlreadyExist.response.length > 0) responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID da unidade de cultura já esta cadastrado. </li> <br>`;
             }
           }
 
@@ -1304,6 +1301,9 @@ export class ImportController {
           else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura é obrigatório. </li> <br>`;
+            } else {
+              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ culture_unity_name: spreadSheet[row][column] })
+              if (unidadeCulturaAlreadyExist.response.length > 0) responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura já esta cadastrado. </li> <br>`;
             }
           }
 
@@ -1461,14 +1461,10 @@ export class ImportController {
               unityCultureDTO.created_by = created_by
               const localAlreadyExists = await this.localController.getAllLocal({ id_local_culture: localCultureDTO.id_local_culture })
               if (localAlreadyExists.response?.length > 0) {
-                // const unityCultureResponse = await this.unidadeCulturaController.listAll({ id_local: localAlreadyExists.response[0].id })
-                // unityCultureDTO.id = unityCultureResponse.response[0].id
                 localCultureDTO.id = localAlreadyExists.response[0].id
                 unityCultureDTO.id_local = localAlreadyExists.response[0].id
                 await this.localController.updateLocal(localCultureDTO)
-                const response = await this.unidadeCulturaController.create(unityCultureDTO)
-                console.log("Response")
-                console.log(response)
+                await this.unidadeCulturaController.create(unityCultureDTO)
               } else {
                 const response = await this.localController.postLocal(localCultureDTO)
                 unityCultureDTO.id_local = response?.response?.id
@@ -1572,7 +1568,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</li><br>`;
                 } else {
-                  let local: any = await this.localController.getAllLocal({ cod_local: data.spreadSheet[keySheet][sheet] });
+                  let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                   if (local.total == 0) {
                     // console.log('aqui Local');
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;

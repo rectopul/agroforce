@@ -81,9 +81,11 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.layout_children = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 19 }); preferences.layout_children = preferences.layout_children.response[0];
       preferences.grupo = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 20 }); preferences.grupo = preferences.grupo.response[0];
       preferences.unidadeCultura = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 21 }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
+      preferences.experimento = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 22 }); preferences.experimento = preferences.experimento.response[0];
+      preferences.materiais = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 23 }); preferences.materiais = preferences.materiais.response[0];
     }
 
-    if (!user) throw 'Email ou senha é invalida!';
+    if (!user) throw 'Login ou senha é invalida!';
 
     // fazer a busca de permissoes 
 
@@ -93,7 +95,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
     // return basic user details and token
     return res.status(200).json({
       id: user.id,
-      email: user.email,
+      login: user.login,
       name: user.name,
       avatar: user.avatar,
       token: token,

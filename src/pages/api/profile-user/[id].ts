@@ -5,8 +5,8 @@ import { prisma } from "../db/db";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  switch(req.method) {
-    case('GET') :
+  switch (req.method) {
+    case ('GET'):
       const response = await prisma.user.findFirst({
         where: {
           id: Number(id),
@@ -40,15 +40,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           },
         }
       });
-    
+
       if (!response) {
-        res.status(400).json({message: 'Usuário não encontrado.'});
+        res.status(400).json({ message: 'Usuário não encontrado.' });
       }
-    
+
       const user = {
         id: response?.id,
         name: response?.name,
-        email: response?.email,
+        login: response?.login,
         cpf: response?.cpf,
         tel: response?.tel,
         password: response?.password,
@@ -71,11 +71,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           }
         })
       }
-    
+
       res.status(200).json(user);
-    break;
-  
-    default: 
+      break;
+
+    default:
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

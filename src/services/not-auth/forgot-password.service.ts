@@ -5,15 +5,15 @@ const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/not-auth/forgot-password`;
 
 interface IForgotPassword {
-  email: string;
-  confirmEmail: string;
+  login: string;
+  confirmLogin: string;
 };
 
 export const forgotPasswordService = {
-  sendEmail,
+  sendLogin,
 };
 
-async function sendEmail(data: IForgotPassword) {
+async function sendLogin(data: IForgotPassword) {
   const send = await fetchWrapper.post(baseUrl, data);
   return send;
 }

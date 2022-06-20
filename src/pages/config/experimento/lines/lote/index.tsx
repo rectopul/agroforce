@@ -1,136 +1,146 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
-import getConfig from 'next/config';
+import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
+import { AccordionFilter, Button, CheckBox, Content, Input, Select } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, userService } from "src/services";
-import { handleFormatTel } from "src/shared/utils/tel";
+import { loteService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../../components";
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { removeCookies, setCookies } from 'cookies-next';
+import ITabs from "../../../../../shared/utils/dropdown";
 
-
-interface IUsers {
-  id: number,
-  name: string,
-  cpf: string,
-  login: string,
-  tel: string,
-  avatar: string,
-  status: boolean,
-}
 interface IFilter {
   filterStatus: object | any;
-  filterName: string | any;
-  filterLogin: string | any;
+  filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
+
+export interface LoteGenotipo {
+  id: number;
+  id_culture: number;
+  id_genotipo: number;
+  genealogy: string;
+  name: string;
+  volume: number;
+  status?: number;
+}
+
 interface IGenarateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
+
 interface IData {
-  alItems: IUsers[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
+  allLote: LoteGenotipo[];
+  totalItems: number;
+  itensPerPage: number;
   filterAplication: object | any;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any;
+  id_genotipo: number;
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: IData) {
-  const { TabsDropDowns } = ITabs.default;
+export default function Listagem({ allLote, totalItems, itensPerPage, filterAplication, id_genotipo }: IData) {
+  const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    tab.titleTab === 'TMG'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: "id,avatar,name,tel,login,status" };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [users, setData] = useState<IUsers[]>(() => alItems);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
-  const [orderName, setOrderName] = useState<number>(1);
-  const [orderLogin, setOrderLogin] = useState<number>(1);
-  const [arrowName, setArrowName] = useState<any>('');
-  const [arrowLogin, setArrowLogin] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,genealogy,name,volume,status" };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
+  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar') },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Login", value: "login", defaultChecked: () => camposGerenciados.includes('login') },
-    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
-  ]);
+  const [orderName, setOrderName] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    { name: "CamposGerenciados[]", title: "Genealógia", value: "genealogy" },
+    { name: "CamposGerenciados[]", title: "Nome", value: "name" },
+    { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+  ]);
+  const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
+
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = colums(camposGerenciados);
+  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
-      filterName: '',
-      filterLogin: '',
+      filterSearch: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterLogin=${filterLogin}`
-      setFiltersParams(parametersFilter)
-      setCookies("filterBeforeEdit", filtersParams)
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+    onSubmit: async (values) => {
+      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_portfolio=" + id_genotipo;
+      await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setData(response.response);
+        setLotes(response);
         setTotalItems(response.total);
         setCurrentPage(0)
       })
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
+    if (data.status === 1) {
+      data.status = 0;
+    } else {
+      data.status = 1;
+    }
 
-  const filterStatus = filterBeforeEdit.split('')
+    const index = lotes.findIndex((lote) => lote.id === idItem);
 
-  function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
+    if (index === -1) {
+      return;
+    }
+
+    setLotes((oldLote) => {
+      const copy = [...oldLote];
+      copy[index].status = data.status;
+      return copy;
+    });
+
+    const { id, status } = lotes[index];
+
+    await loteService.update({ id: id, status: status });
+  };
+
+  function columnsOrder(camposGerenciados: string) {
+    let ObjetCampos: string[] = camposGerenciados.split(',');
     let arrOb: any = [];
 
-    Object.keys(ObjetCampos).forEach((item) => {
-      if (ObjetCampos[item] === 'id') {
+    Object.keys(ObjetCampos).forEach((item, index) => {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
           title: "",
           field: "id",
@@ -163,156 +173,91 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         })
       }
 
-      if (ObjetCampos[item] === 'avatar') {
+      if (ObjetCampos[index] === 'id') {
         arrOb.push({
-          title: "Avatar",
-          field: "avatar",
-          sorting: false,
-          width: 0,
-          exports: false,
-          render: (rowData: IUsers) => (
-            !rowData.avatar || rowData.avatar === '' ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
-                alt={rowData.name}
-                style={{ width: 45, height: 43, borderRadius: 99999 }}
-              />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={rowData.avatar} alt={rowData.name} style={{ width: 45, height: 43, borderRadius: 99999 }} />
-            )
-          )
+          title: "Favorito",
+          field: "id",
+          sorting: false
         });
       }
-      if (ObjetCampos[item] === 'name') {
+      if (ObjetCampos[index] === 'genealogy') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
               {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-                Nome
+              <button className='font-medium text-gray-900' onClick={() => handleOrderName('genealogy', orderName)}>
+                Genealógia
               </button>
             </div>
           ),
+          field: "genealogy",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'name') {
+        arrOb.push({
+          title: "Nome",
           field: "name",
           sorting: false
         });
       }
-
-      if (ObjetCampos[item] === 'login') {
+      if (ObjetCampos[index] === 'volume') {
         arrOb.push({
-          title: (
-            <div className='flex items-center'>
-              {arrowLogin}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderLogin('login', orderLogin)}>
-                Login
-              </button>
-            </div>
-          ),
-          field: "login",
+          title: "Volume",
+          field: "volume",
           sorting: false
         });
       }
-      if (ObjetCampos[item] === 'tel') {
-        arrOb.push({
-          title: "Telefone",
-          field: "tel",
-          sorting: false,
-          render: (rowData: IUsers) => (
-            handleFormatTel(rowData.tel)
-          )
-        })
-      }
-      if (ObjetCampos[item] === 'status') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
           field: "status",
           sorting: false,
           searchable: false,
           filterPlaceholder: "Filtrar por status",
-          render: (rowData: IUsers) => (
-            rowData.status ? (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  {/* <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    title={`Perfil de ${rowData.name}`}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  /> */}
-                </div>
-                <div className="
-                  h-10
-                ">
+          render: (rowData: LoteGenotipo) => (
+            <div className='h-10 flex'>
+              <div className="h-10">
+                <Button
+                  icon={<BiEdit size={16} />}
+                  onClick={() => { router.push(`lote/atualizar?id=${rowData.id}`) }}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+                />
+              </div>
+              {rowData.status === 1 ? (
+                <div className="h-10">
                   <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
-                    }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
-                  <Button
+                    type="submit"
                     icon={<FaRegThumbsUp size={16} />}
-                    title="Ativo"
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={async () => await handleStatusLote(
+                      rowData.id, {
+                      status: rowData.status,
+                      ...rowData
+                    }
+                    )}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              </div>
-            ) : (
-              <div className='h-10 flex'>
-                <div className="
-                  h-10
-                ">
-                  {/* <Button 
-                    icon={<FaRegUserCircle size={16} />}
-                    title={`Perfil de ${rowData.name}`}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  /> */}
-                </div>
-                <div className="
-                  h-10
-                ">
+              ) : (
+                <div className="h-10">
                   <Button
-                    icon={<BiEdit size={16} />}
-                    title={`Atualizar ${rowData.name}`}
-                    onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
-                    }}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                  />
-                </div>
-                <div>
-                  <Button
+                    type="submit"
                     icon={<FaRegThumbsDown size={16} />}
-                    title="Inativo"
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
+                    onClick={async () => await handleStatusLote(
+                      rowData.id, {
+                      status: rowData.status,
+                      ...rowData
+                    }
                     )}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              </div>
-            )
+              )}
+            </div>
           ),
         })
       }
@@ -331,90 +276,19 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 1 }).then((response) => {
-        userLogado.preferences.usuario = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
+        userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.usuario = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await userService.update({ id: id, status: status });
-    const index = users.findIndex((user) => user.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setData((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  };
-
-  async function handleOrderLogin(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    console.log('filter')
-    console.log(filter)
-
-    if (filter && typeof (filter) !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    } else {
-      if (typeOrder !== '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
-    }
-
-
-    console.log('parametersFilter')
-    console.log(parametersFilter)
-
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setData(response.response)
-      }
-    })
-    if (orderLogin === 2) {
-      setOrderLogin(0);
-      setArrowLogin(<AiOutlineArrowDown />);
-    } else {
-      setOrderLogin(orderLogin + 1);
-      if (orderLogin === 1) {
-        setArrowLogin(<AiOutlineArrowUp />);
-      } else {
-        setArrowLogin('');
-      }
-    }
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -442,9 +316,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       }
     }
 
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setData(response.response)
+        setOrderName(response.response)
       }
     });
 
@@ -474,15 +348,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+    if (!filterAplication.includes("paramSelect")){
+      filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
 
-    await userService.getAll(filterAplication).then((response) => {
+    await loteService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
-        const newData = users.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
             row.status = "Inativo";
           } else {
@@ -494,20 +366,20 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
 
         // Buffer
         let buf = XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
+          bookType: "xlsx", //xlsx
           type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
+          bookType: "xlsx", //xlsx
           type: "binary",
         });
-        // Download xlsx || csv
-        XLSX.writeFile(workBook, "Usuários.xlsx");
+        // Download
+        XLSX.writeFile(workBook, "Lotes.xlsx");
       }
     });
   };
@@ -521,15 +393,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   };
 
   async function handlePagination(): Promise<void> {
-    let skip = Number(currentPage) * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    let skip = currentPage * Number(take);
+    let parametersFilter = "skip=" + skip + "&take=" + take + "&id_portfolio=" + id_genotipo;
 
     if (filter) {
       parametersFilter = parametersFilter + "&" + filter;
     }
-    await userService.getAll(parametersFilter).then((response) => {
+    await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        setData(response.response);
+        setLotes(response.response);
       }
     });
   };
@@ -541,16 +413,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
   return (
     <>
-      <Head>
-        <title>Listagem de usuários</title>
-      </Head>
+      <Head><title>Listagem de Lotes</title></Head>
+
       <Content contentHeader={tabsDropDowns}>
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         ">
-          <AccordionFilter title="Filtrar usuários">
+          <AccordionFilter title="Filtrar lotes">
             <div className='w-full flex gap-2'>
               <form
                 className="flex flex-col
@@ -570,32 +441,18 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map(id => id)} selected={'1'} />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Nome
+                      Pesquisar
                     </label>
                     <Input
                       type="text"
-                      placeholder="nome"
+                      placeholder="Nome"
                       max="40"
-                      id="filterName"
-                      name="filterName"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Login
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="login"
-                      max="40"
-                      id="filterLogin"
-                      name="filterLogin"
+                      id="filterSearch"
+                      name="filterSearch"
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -604,7 +461,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => formik.handleChange}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -615,18 +472,16 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
             </div>
           </AccordionFilter>
 
-          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={users}
+              data={lotes}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20
                 },
-                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -647,21 +502,20 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   '>
                     <div className='h-12'>
                       <Button
-                        title="Cadastrar usuário"
-                        value="Cadastrar usuário"
+                        title="Cadastrar lote"
+                        value="Cadastrar lote"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push('usuarios/cadastro') }}
-                        icon={<FiUserPlus size={20} />}
+                        onClick={() => { router.push(`lote/cadastro/${id_genotipo}`) }}
+                        icon={<FaSortAmountUpAlt size={20} />}
                       />
                     </div>
 
                     <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className='h-full flex items-center gap-2'>
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
+                        <div className="w-72">
                           <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId='characters'>
@@ -686,7 +540,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                                                   name={genarate.name}
                                                   title={genarate.title?.toString()}
                                                   value={genarate.value}
-                                                  defaultChecked={camposGerenciados.includes(genarate.value)}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
                                                 />
                                               </li>
                                             )}
@@ -703,7 +557,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                         </div>
                       </div>
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Exportar planilha de usuários" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                     </div>
                   </div>
@@ -774,45 +628,41 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-  const token = req.cookies.token;
+  const token = context.req.cookies.token;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
-
-  removeCookies('filterBeforeEdit', { req, res });
-
-  removeCookies('pageBeforeEdit', { req, res });
-
+  let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  let filterAplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
+
   urlParameters.search = new URLSearchParams(param).toString();
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const user = await fetch(urlParameters.toString(), requestOptions);
-  const response = await user.json();
+  const id_genotipo = Number(context.query.id_genotipo);
 
-  const AllItems = response.response;
-  const totalItems = response.total;
+  const api = await fetch(`${baseUrl}?id_genotipo=${id_genotipo}`, requestOptions);
+
+  const allLote: LoteGenotipo[] = await api.json();
+
+  const totalItems = allLote.length || 0;
 
   return {
     props: {
-      AllItems,
+      allLote,
       totalItems,
       itensPerPage,
       filterAplication,
-      pageBeforeEdit,
-      filterBeforeEdit
+      id_genotipo
     },
   }
 }

@@ -48,7 +48,7 @@ export class UnidadeCulturaRepository {
     async findByData(data: any) {
         const local_children = await prisma.local_children.findFirst({
             where: {
-                id_culture_unity: data.id_culture_unity
+                culture_unity_name: data.culture_unity_name
             }
         });
 

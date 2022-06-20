@@ -40,7 +40,7 @@ model culture {
   epoca             epoca[]
   quadra            quadra[]
   layout_quadra     layout_quadra[]
-  experimento experimento[]
+  experimento       experimento[]
 }
 
 model department {
@@ -86,7 +86,7 @@ model safra {
   foco_children       foco_children[]
   lote                lote[]
   type_assay_children type_assay_children[]
-  experimento experimento[]
+  experimento         experimento[]
 }
 
 model uf {
@@ -98,7 +98,8 @@ model uf {
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
-  email             String              @unique(map: "User_email_key")
+  login             String              @unique(map: "User_email_key")
+  email             String?
   cpf               String              @unique(map: "User_cpf_key")
   tel               String?
   password          String
@@ -192,9 +193,9 @@ model local {
 model local_children {
   id                 Int       @id @default(autoincrement())
   id_local           Int
-  id_culture_unity   Int       @unique
+  id_culture_unity   Int
   year               Int
-  culture_unity_name String
+  culture_unity_name String    @unique
   local              local     @relation(fields: [id_local], references: [id])
   status             Int?      @default(1)
   created_by         Int
@@ -330,7 +331,7 @@ model foco {
   npe           npe[]
   culture       culture         @relation(fields: [id_culture], references: [id])
   foco_children foco_children[]
-  experimento experimento[]
+  experimento   experimento[]
 }
 
 model foco_children {
@@ -357,7 +358,7 @@ model type_assay {
   npe                 npe[]
   culture             culture               @relation(fields: [id_culture], references: [id])
   type_assay_children type_assay_children[]
-  experimento experimento[]
+  experimento         experimento[]
 }
 
 model type_assay_children {
@@ -383,9 +384,9 @@ model tecnologia {
   created_by Int
   created_at DateTime? @default(now())
 
-  npe      npe[]
-  genotipo genotipo[]
-  culture  culture    @relation(fields: [id_culture], references: [id])
+  npe         npe[]
+  genotipo    genotipo[]
+  culture     culture       @relation(fields: [id_culture], references: [id])
   experimento experimento[]
 }
 
@@ -464,29 +465,51 @@ model sequencia_delineamento {
 }
 
 model experimento {
-    id              Int      @id @default(autoincrement())
-    protocolo_name String
-    id_experimento Int 
-    experimento_name String
-    id_safra Int
-    id_culture Int
-    id_foco Int
-    id_ensaio Int
-    id_tecnologia Int
-    epoca Int
-    pjr String  
-    id_un_cultura Int
-    unidade_cultura_name String
+  id                   Int       @id @default(autoincrement())
+  id_culture           Int
+  protocolo_name       String
+  id_experimento       Int
+  experimento_name     String
+  year                 Int
+  rotulo               String
+  id_safra             Int
+  id_foco              Int
+  id_ensaio            Int
+  id_tecnologia        Int
+  epoca                Int
+  pjr                  String
+  id_un_cultura        Int
+  name_uni_cultura     String
+  unidade_cultura_name String
+  status               Int       @default(1)
+  created_by           Int
+  created_at           DateTime? @default(now())
 
-    safra safra @relation(fields: [id_safra], references: [id])
-    foco foco @relation(fields: [id_foco], references: [id])
-    ensaio type_assay @relation(fields: [id_ensaio], references: [id])
-    tecnologia tecnologia @relation(fields: [id_tecnologia], references: [id])
-    culture culture @relation(fields: [id_culture], references: [id])
+  safra      safra      @relation(fields: [id_safra], references: [id])
+  foco       foco       @relation(fields: [id_foco], references: [id])
+  ensaio     type_assay @relation(fields: [id_ensaio], references: [id])
+  tecnologia tecnologia @relation(fields: [id_tecnologia], references: [id])
+  culture    culture    @relation(fields: [id_culture], references: [id])
+
+  materiais materiais[]
 
 }
 
 model materiais {
-    id              Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
+  id_experimento Int
+  id_l1          Int
+  id_dados       Int
+  tratamentos    Int
+  prox_nivel     Int
+  id_d1          Int
+  name_main      String
+  name_genotipo  String
+  status         Int       @default(1)
+  created_by     Int
+  created_at     DateTime? @default(now())
+
+  experimento experimento @relation(fields: [id_experimento], references: [id])
+
 
 }

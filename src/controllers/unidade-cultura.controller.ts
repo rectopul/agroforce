@@ -115,13 +115,14 @@ export class UnidadeCulturaController {
                 parameters.id_culture_unity = options.id_culture_unity;
             }
 
-            if (options.id_safra) {
-                parameters.id_safra = options.id_safra;
+            if (options.culture_unity_name) {
+                parameters.culture_unity_name = options.culture_unity_name;
             }
 
             if (options.id_local) {
                 parameters.id_local = Number(options.id_local);
             }
+
             if (options.take) {
                 if (typeof (options.take) === 'string') {
                     take = parseInt(options.take);

@@ -22,4 +22,6 @@ export * from './quadra.service';
 export * from './disparos.service';
 export * from './layout-children.service';
 export * from './envelope.service'
-export * from './unidade-cultura.services'
+export * from './unidade-cultura.service'
+export * from './experimento.service';
+export * from './materiais.service'
