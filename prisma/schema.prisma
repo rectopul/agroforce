@@ -98,7 +98,7 @@ model uf {
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
-  login             String              @unique(map: "User_email_key")
+  login             String?              @unique(map: "User_email_key")
   email             String?
   cpf               String              @unique(map: "User_cpf_key")
   tel               String?
