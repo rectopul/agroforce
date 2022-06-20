@@ -37,8 +37,8 @@ interface ITypeAssayProps {
 };
 
 interface IData {
-  allItens: any;
-  totalItems: number;
+  response: any;
+  totalItens: number;
   itensPerPage: number;
   filterAplication: object | any;
   typeAssay: object | any;
@@ -53,7 +53,7 @@ interface IGenarateProps {
 }
 
 
-export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalItems, itensPerPage, filterAplication, pageBeforeEdit }: IData) {
+export default function NovoLocal({ typeAssay, id_type_assay, response, totalItens, itensPerPage, filterAplication, pageBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -67,18 +67,19 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string
 
-  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: "id,name,seeds,acao" };
+  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: "id,seeds, safra, acao" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [seeds, setSeeds] = useState<any>(() => allItens);
+  const [seeds, setSeeds] = useState<any>(() => response);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItens);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Sementes", value: "seeds" },
+    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds" },
+    { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
     { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -129,7 +130,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
   }
 
   function columnsOrder(camposGerenciados: string) {
@@ -171,8 +172,15 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
       }
       if (ObjetCampos[index] === 'seeds') {
         arrOb.push({
-          title: "Sementes",
+          title: "Envelope",
           field: "seeds",
+          sorting: false
+        });
+      }
+      if (ObjetCampos[index] === 'safra') {
+        arrOb.push({
+          title: "Safra",
+          field: "safra.safraName",
           sorting: false
         });
       }
@@ -214,7 +222,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 24 }).then((response) => {
         userLogado.preferences.seeds = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
@@ -287,9 +295,9 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados},type_assay&id_type_assay=${id_type_assay}`;
+      filterAplication += `&paramSelect=${camposGerenciados}&id_type_assay=${id_type_assay}`;
     }
-    await typeAssayService.getAll(filterAplication).then((response) => {
+    await envelopeService.getAll(filterAplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
@@ -304,6 +312,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
         newData.map((item: any) => {
           item.foco = item.foco?.name
           item.safra = item.safra?.safraName
+          delete item.type_assay
           return item
         })
 
@@ -322,7 +331,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Sementes.xlsx");
+        XLSX.writeFile(workBook, "Envelope.xlsx");
       }
     });
   };
@@ -598,6 +607,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` }
   };
+
   // removeCookies('filterBeforeEdit', { req, res });
 
   // removeCookies('pageBeforeEdit', { req, res });
@@ -613,19 +623,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const id_type_assay = Number(context.query.id);
   const api = await fetch(`${baseUrlEnvelope}?id_type_assay=${id_type_assay}`, requestOptions);
 
-  let allItens: any = await api.json();
-  allItens = allItens.response;
-  //const totalItems = allItens.total;
+  const { response, total: totalItens }: any = await api.json();
 
   const apiTypeAssay = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
 
   const typeAssay = await apiTypeAssay.json();
 
 
+
   return {
     props: {
-      allItens,
-      //totalItems,
+      response,
+      totalItens,
       itensPerPage,
       filterAplication,
       id_type_assay,

@@ -75,6 +75,8 @@ export class EnvelopeController {
     }
 
     async listAll(options: any) {
+        console.log('options')
+        console.log(options)
         const parameters: object | any = {};
         let take;
         let skip;
@@ -138,6 +140,8 @@ export class EnvelopeController {
                 skip,
                 orderBy
             );
+            console.log('response')
+            console.log(response)
             if (!response || response.total <= 0) {
                 return { status: 400, response: [], total: 0 };
             } else {

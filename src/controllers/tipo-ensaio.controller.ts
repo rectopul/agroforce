@@ -27,7 +27,11 @@ export class TypeAssayController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
+          if (objSelect[item] === "seeds") {
+            select["type_assay_children"] = true
+          } else {
+            select[objSelect[item]] = true;
+          }
         });
         select = Object.assign({}, select);
       } else {
@@ -61,6 +65,8 @@ export class TypeAssayController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
+
+
 
       const response = await this.typeAssayRepository.findAll(parameters, select, take, skip, orderBy);
 
@@ -131,28 +137,34 @@ export class TypeAssayController {
 
   async update(data: any) {
     const parameters: object | any = {};
-
     try {
-      const assayTypeAlreadyExist = await this.getAssayTypeByName(data.name)
-      if (assayTypeAlreadyExist) return { status: 400, message: "Tipo de ensaio já existe" }
-      if (typeof (data.status) === 'string') {
-        parameters.status = parseInt(data.status);
-      } else {
-        parameters.status = data.status;
-      }
-
-      if (data.name) parameters.name = data.name;
-      if (data.status) parameters.status = data.status;
-      if (data !== null && data !== undefined) {
-        const response = await this.typeAssayRepository.update(data.id, parameters);
+      if (data.name) {
+        const assayTypeAlreadyExist = await this.getAssayTypeByName(data.name)
+        if (assayTypeAlreadyExist) return { status: 400, message: "Tipo de ensaio já existe" }
+        const response = await this.typeAssayRepository.update(data.id, data);
         if (response) {
-          return { status: 200, message: { message: "layoult atualizado" } }
+          return { status: 200, message: { message: "Tipo de ensaio atualizado" } }
         } else {
           return { status: 400, message: { message: "erro ao tentar fazer o update" } }
         }
+      } else {
+        this.setStatus(data.id, data.status)
       }
     } catch (err) {
+      console.log(err)
+    }
+  }
 
+  async setStatus(id: number, status: number) {
+    try {
+      const response = await this.typeAssayRepository.updateStatus(id, status)
+      if (response) {
+        return { status: 200, response: response, message: "Status Atualizado" }
+      } else {
+        return { status: 400, response: response, message: "Erro ao atualizar o status" }
+      }
+    } catch (err) {
+      console.log(err)
     }
   }
 }

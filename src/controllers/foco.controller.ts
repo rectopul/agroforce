@@ -104,7 +104,7 @@ export class FocoController {
           //console.log(group.id_safra === Number(options.id_safra))          
           //item.foco_children = (group.id_safra === Number(options.id_safra)) ? group.grupo
           if (group.id_safra === Number(options.id_safra)) {
-            item.group = (group.grupo.toString()).length > 1 ? group.grupo : '0' + group.grupo.toString()
+            item.grupo = (group.grupo.toString()).length > 1 ? group.grupo : '0' + group.grupo.toString()
           }
         })
       })

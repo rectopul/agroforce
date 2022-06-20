@@ -218,7 +218,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
             <div className='flex items-center'>
               {arrowName}
               <button className='font-medium text-gray-900' onClick={() => handleOrderGroup('grupo', orderGroup)}>
-                Teste
+                Grupo
               </button>
             </div>
           ),
