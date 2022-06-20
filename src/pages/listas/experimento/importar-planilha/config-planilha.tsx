@@ -4,7 +4,6 @@ import { GetServerSideProps } from "next";
 import getConfig from 'next/config';
 
 const data: object = [
-    { id: 'protocol_level', name: 'Protocol_level' },
     { id: 'network_name', name: 'Nome da rede' },
     { id: 'protocolo_name', name: 'Nome do protocolo' },
     { id: 'id_experimento', name: 'ID do experimento' },
@@ -17,6 +16,8 @@ const data: object = [
     { id: 'cod_tec', name: 'Tecnologia' },
     { id: 'epoca', name: 'EP' },
     { id: 'prj', name: 'PRJ' },
+    { id: 'id_un_cultura', name: 'ID da unidade de cultura' },
+    { id: 'unidade_cultura_name', name: 'Nome da unidade de cultura' },
     { id: 'id_l1', name: 'ID_L1' },
     { id: 'id_dados_materiais', name: 'Identificador de dados' },
     { id: 'tratamentos', name: 'Numero de tratamento' },
@@ -31,9 +32,6 @@ const data: object = [
     { id: 'id_dados_lote', name: 'Identificador de dados' },
     { id: 'cod_lote', name: 'Código do lote' },
     { id: 'ncc', name: 'NCC' },
-    { id: 'id_un_cultura', name: 'ID da unidade de cultura' },
-    { id: 'unidade_cultura_name', name: 'Nome da unidade de cultura' },
-
 ];
 
 export default function ImportacaoPlanilha({ config }: any) {
