@@ -191,24 +191,9 @@ export class LocalController {
 
   async updateLocal(data: any) {
     try {
-      console.log("Update")
-      console.log(data);
       const schema: SchemaOf<any> = object({
         id: number().required(this.required),
-        id_local_culture: number().required(this.required),
-        name_local_culture: string().required(this.required),
-        label: string().required(this.required),
-        mloc: string().required(this.required),
-        adress: string().required(this.required),
-        id_locality: number().required(this.required),
-        name_locality: string().required(this.required),
-        id_region: number().required(this.required),
-        name_region: string().required(this.required),
-        label_region: string().required(this.required),
-        id_country: number().required(this.required),
-        name_country: string().required(this.required),
-        label_country: string().required(this.required),
-        created_by: number().integer().required(this.required)
+        status: number().required(this.required),
       });
 
       const valid = schema.isValidSync(data);

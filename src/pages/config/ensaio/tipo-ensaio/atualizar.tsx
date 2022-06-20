@@ -71,7 +71,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, allItens, totalIte
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [seeds, setSeeds] = useState<any>(() => allItens);
-  const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');

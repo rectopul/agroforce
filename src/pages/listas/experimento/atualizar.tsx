@@ -78,7 +78,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
     const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
     const [materiais, setMateriais] = useState<any>(() => allItens);
-    const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
+    const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
     const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
     const [orderName, setOrderName] = useState<number>(0);
     const [arrowName, setArrowName] = useState<ReactNode>('');
