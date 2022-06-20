@@ -125,9 +125,9 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
-  const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderName, setOrderName] = useState<number>(0);
+  const [orderGroup, setOrderGroup] = useState<number>(1);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -214,7 +214,14 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
       }
       if (ObjetCampos[index] === 'grupo') {
         arrOb.push({
-          title: "Grupo",
+          title: (
+            <div className='flex items-center'>
+              {arrowName}
+              <button className='font-medium text-gray-900' onClick={() => handleOrderGroup('grupo', orderGroup)}>
+                Teste
+              </button>
+            </div>
+          ),
           field: "grupo",
           sorting: false
         });
@@ -272,7 +279,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     setCamposGerenciados(campos);
   };
 
-  async function handleOrderName(column: string, order: string | any): Promise<void> {
+  async function handleOrderGroup(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -299,16 +306,16 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
     await grupoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response)
+        setGrupos(response.response)
       }
     });
 
-    if (orderName === 2) {
-      setOrderName(0);
+    if (orderGroup === 2) {
+      setOrderGroup(0);
       setArrowName(<AiOutlineArrowDown />);
     } else {
-      setOrderName(orderName + 1);
-      if (orderName === 1) {
+      setOrderGroup(orderGroup + 1);
+      if (orderGroup === 1) {
         setArrowName(<AiOutlineArrowUp />);
       } else {
         setArrowName('');

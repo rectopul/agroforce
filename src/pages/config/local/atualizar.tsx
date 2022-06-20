@@ -76,7 +76,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [unidadeCultura, setUnidadeCultura] = useState<any>(() => allItens);
-  const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');

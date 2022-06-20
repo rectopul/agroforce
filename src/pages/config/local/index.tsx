@@ -35,6 +35,8 @@ interface ILocalProps {
   created_by: Number;
   status: Number;
 };
+
+
 interface IFilter {
   filterStatus: object | any;
   filterName_local_culture: string | any;
@@ -352,11 +354,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       data.status = 0;
     }
 
-    console.log('idLocal');
-    console.log(idLocal);
-    console.log('data');
-    console.log(data);
-
     const index = local.findIndex((local) => local.id === idLocal);
 
     if (index === -1) {
@@ -374,14 +371,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       status
     } = local[index];
 
-    const response = await localService.update({
+    await localService.update({
       id,
       status
     });
-
-    console.log(response);
-
-  }
+  };
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
