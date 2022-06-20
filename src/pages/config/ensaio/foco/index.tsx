@@ -31,6 +31,7 @@ export interface IFocos {
   id: number;
   name: string;
   group: number;
+  foco_children?: [];
   status?: number;
 }
 
@@ -358,6 +359,17 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
           return row;
         });
+
+        console.log('newData');
+        console.log(newData);
+
+        newData.map(item => {
+          delete item.foco_children
+          return item
+        })
+
+        console.log('newData');
+        console.log(newData);
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();

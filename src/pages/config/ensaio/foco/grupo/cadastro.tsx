@@ -152,7 +152,6 @@ export default function Cadastro({ safra, id_foco }: any) {
                 id="group"
                 mask={'99'}
                 name="group"
-                required
                 onChange={formik.handleChange}
                 value={formik.values.group}
               />
