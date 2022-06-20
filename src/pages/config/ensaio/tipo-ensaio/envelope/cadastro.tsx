@@ -119,7 +119,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                         <div className="w-full h-10">
                             <label className="block text-gray-900 text-sm font-bold mb-2">
                                 <strong className={checkInput}>*</strong>
-                                Sementes
+                                Envelope
                             </label>
                             <Input
                                 className="shadow

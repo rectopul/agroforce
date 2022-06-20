@@ -360,9 +360,6 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
           return row;
         });
 
-        console.log('newData');
-        console.log(newData);
-
         newData.map(item => {
           delete item.foco_children
           return item

@@ -175,7 +175,7 @@ export class ImportController {
         }
 
         // Validação do modulo tecnologia
-        if (data.moduleId === 18) {
+        if (data.moduleId === 8) {
           response = await this.validateTechnology(data);
           if (response === 'save') {
             response = "Itens cadastrados com sucesso!";
@@ -196,6 +196,8 @@ export class ImportController {
   async validateTechnology(data: object | any) {
     const responseIfError: any = [];
     const spreadSheet = data.spreadSheet
+    console.log('spreadSheet')
+    console.log(spreadSheet)
     try {
       const configModule: object | any = await this.getAll(parseInt(data.moduleId));
       for (let row in spreadSheet) {
@@ -246,6 +248,9 @@ export class ImportController {
           }
         }
       }
+
+      console.log('responseIfError')
+      console.log(responseIfError)
 
       if (responseIfError.length === 0) {
         try {
@@ -2293,7 +2298,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo nome da rede é obrigatorio.</li><br>`;
                 } else {
-                  let culture = await this.culturaController.getAllCulture({name: data.spreadSheet[keySheet][sheet]});
+                  let culture = await this.culturaController.getAllCulture({ name: data.spreadSheet[keySheet][sheet] });
                   if (culture.total > 0) {
                     if (culture.response[0].id != data.id_culture) {
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o nome da rede precisa ser igual a rede selecionada.</li><br>`;
@@ -2303,7 +2308,7 @@ export class ImportController {
                   }
                 }
               }
-  
+
               if (configModule.response[0].fields[sheet] == 'protocol_name') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo nome do protocolo é obrigatorio.</li><br>`;
@@ -2322,7 +2327,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do genótipo é obrigatorio.</li><br>`;
                 } else {
-                  let experimento = await this.experimentoController.getAll({experimento_name: data.spreadSheet[keySheet][sheet]});
+                  let experimento = await this.experimentoController.getAll({ experimento_name: data.spreadSheet[keySheet][sheet] });
                   if (experimento.total > 0) {
                     return "Nome do experimento já cadastrado";
                   }
@@ -2333,7 +2338,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ano é obrigatorio.</li><br>`;
                 } else {
-                  let safra = await this.safraController.getAllSafra({id: data.id_safra});
+                  let safra = await this.safraController.getAllSafra({ id: data.id_safra });
                   if (safra.total > 0) {
                     year_safra = data.spreadSheet[keySheet][sheet];
                     if (safra.response[0].year != data.spreadSheet[keySheet][sheet]) {
@@ -2346,7 +2351,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'rotulo') {
-  
+
               }
 
               if (configModule.response[0].fields[sheet] == 'safra') {
@@ -2357,7 +2362,7 @@ export class ImportController {
                     return "A safra precisa está depois do ano";
                   } else {
                     year_safra = 0;
-                    let safra = await this.safraController.getAllSafra({safraName: data.spreadSheet[keySheet][sheet]});
+                    let safra = await this.safraController.getAllSafra({ safraName: data.spreadSheet[keySheet][sheet] });
                     if (safra.total > 0) {
                       if (safra.response[0].year != year_safra) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a safra informada tem o ano diferente do informado nesta linha</li><br>`;
@@ -2403,16 +2408,16 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'epoca') {
-                
+
               }
 
               if (configModule.response[0].fields[sheet] == 'prj') {
-                
+
               }
 
               if (configModule.response[0].fields[sheet] == 'id_un_cultura') {
                 if (data.spreadSheet[keySheet][sheet] == "") {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id un cultura é obrigatorio.</li><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id un cultura é obrigatorio.</li><br>`;
                 }
               }
 
@@ -2441,7 +2446,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'status') {
-  
+
               }
 
               if (configModule.response[0].fields[sheet] == 'prox_nivel') {
@@ -2453,11 +2458,11 @@ export class ImportController {
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo próximo nivel deve ser positivo maior que 0.</li><br>`;
                     }
                   }
-                }  else {
+                } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo próximo nivel é obrigatorio.</li><br>`;
                 }
-              }   
-              
+              }
+
               if (configModule.response[0].fields[sheet] == 'id_s1') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if (typeof (data.spreadSheet[keySheet][sheet]) != 'number') {
@@ -2472,7 +2477,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do material é obrigatorio.</li><br>`;
                 } else {
-                  let geno = await this.genotipoController.listAllGenotipos({ id_dados: data.spreadSheet[keySheet][sheet]});
+                  let geno = await this.genotipoController.listAllGenotipos({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (geno.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do material é obrigatorio.</li><br>`;
                   }
