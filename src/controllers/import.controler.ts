@@ -222,7 +222,7 @@ export class ImportController {
                 console.log(responseCulture)
                 const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
                 console.log('technology')
-                console.log(technology)
+                console.log(technology)                
                 if (technology.total > 0) {
                   responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada. </li> <br>`
                 }
@@ -252,9 +252,6 @@ export class ImportController {
         }
       }
 
-      console.log('responseIfError')
-      console.log(responseIfError)
-
       if (responseIfError.length === 0) {
         try {
           for (let row in spreadSheet) {
@@ -265,8 +262,9 @@ export class ImportController {
           }
           return "save"
         } catch (err) {
+          console.log("Erro save import tecnologia: ")
           console.log(err)
-          return "Houve um erro, tente novamente mais tarde!";
+          return "Erro ao gravar no banco";
         }
       }
 
@@ -274,9 +272,9 @@ export class ImportController {
       return responseStringError;
 
     } catch (error) {
-
-      console.log("Error", error)
-
+      console.log("Erro geral import tecnologia: ")
+      console.log(error)
+      return "Erro ao validar";
     }
   }
 

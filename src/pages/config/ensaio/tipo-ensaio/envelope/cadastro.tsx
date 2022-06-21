@@ -61,7 +61,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 created_by: formik.values.created_by,
             }).then((response) => {
                 if (response.status === 201) {
-                    Swal.fire('Grupo cadastrado com sucesso!');
+                    Swal.fire('Envelope cadastrado com sucesso!');
                     router.back();
                 } else {
                     Swal.fire(response.message)
