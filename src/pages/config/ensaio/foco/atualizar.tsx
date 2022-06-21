@@ -121,7 +121,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     }
   }
 
-  const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id, safra,name,grupo,acao" };
+  const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id,safra,name,grupo,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
@@ -134,7 +134,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
     { name: "CamposGerenciados[]", title: "Grupo", value: "grupo" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
+    { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -226,9 +226,9 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'acao') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
-          title: "Ação",
+          title: "Status",
           field: "grupo",
           sorting: false,
           render: (rowData: any) => (

@@ -68,7 +68,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema, status" };
+  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => allQuadra);

@@ -74,7 +74,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
     const router = useRouter();
 
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
-    const preferences = userLogado.preferences.materiais || { id: 0, table_preferences: "id, tratamentos, prox_nivel, name_main, name_genotipo, id_culture, cod_lote, ncc, acao" };
+    const preferences = userLogado.preferences.materiais || { id: 0, table_preferences: "id,tratamentos,prox_nivel,name_main,name_genotipo,id_culture,cod_lote,ncc,acao" };
     const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
     const [materiais, setMateriais] = useState<any>(() => allItens);

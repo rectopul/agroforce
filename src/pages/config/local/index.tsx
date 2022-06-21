@@ -75,8 +75,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id, name_local_culture, label, mloc, adress, label_country, label_region, name_locality, status" };
+  const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
 
   const label_regions: object | any = [];
   const [name_locality, setname_locality] = useState<object | any>([{ id: '0', name: 'selecione' }]);

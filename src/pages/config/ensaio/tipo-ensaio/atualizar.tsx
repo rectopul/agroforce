@@ -67,7 +67,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string
 
-  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: "id,seeds, safra, acao" };
+  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: "id,seeds,safra,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [seeds, setSeeds] = useState<any>(() => response);
@@ -80,7 +80,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Envelope", value: "seeds" },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
+    { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -184,9 +184,9 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'acao') {
+      if (ObjetCampos[index] === 'status') {
         arrOb.push({
-          title: "Ação",
+          title: "Status",
           field: "envelope",
           sorting: false,
           render: (rowData: any) => (
