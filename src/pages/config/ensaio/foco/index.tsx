@@ -32,6 +32,7 @@ export interface IFocos {
   name: string;
   grupo: number;
   foco_children?: [];
+  tableData?: []
   status?: number;
 }
 
@@ -360,8 +361,18 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
           return row;
         });
 
+        console.log('focos');
+        console.log(focos);
+
+        console.log('newData');
+        console.log(newData);
+
         newData.map(item => {
+          const statusTemp = item.status
           delete item.foco_children
+          delete item.status
+          delete item.tableData
+          item.status = statusTemp
           return item
         })
 
@@ -664,6 +675,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const allFocos = response.response;
   const totalItems = response.total;
+
+  console.log('allFocos')
+  console.log(allFocos)
 
   return {
     props: {
