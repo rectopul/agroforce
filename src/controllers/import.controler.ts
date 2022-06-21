@@ -1575,9 +1575,14 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  if (data.spreadSheet[keySheet][sheet] != data.safra) {
+                  let safra = await this.safraController.getAllSafra({ id_safra: Number(data.safra) });
+                  if (safra.total > 0) {
+                    if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0].safraName) {
+                      return 'A safra importada precisa ser igual a safra selecionada';
+                    }
+                  } else {
                     return 'A safra importada precisa ser igual a safra selecionada';
-                  }
+                  }                  
                 }
               }
 
@@ -1611,7 +1616,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</li><br>`;
                 } else {
-                  let quadra: any = this.quadraController.listAll({ cod_quadra: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
+                  let quadra: any = await this.quadraController.listAll({ cod_quadra: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
                   if (quadra.total > 0) {
                     return 'Código quadra já existe, para poder atualiza-lo você precisa inativar o existente';
                   } else {
@@ -1822,8 +1827,7 @@ export class ImportController {
         let count = 1;
         let tiro_fixo, disparo_fixo;
 
-        let safra = await this.safraController.getAllSafra({ safraName: data.safra });
-        this.aux.id_safra = Number(safra.response[0].id);
+        this.aux.id_safra = Number(data.safra);
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
