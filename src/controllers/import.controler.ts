@@ -222,7 +222,7 @@ export class ImportController {
                 console.log(responseCulture)
                 const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
                 console.log('technology')
-                console.log(technology)                
+                console.log(technology)
                 if (technology.total > 0) {
                   responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada. </li> <br>`
                 }
@@ -1411,75 +1411,76 @@ export class ImportController {
       }
 
       if (responseIfError.length === 0) {
-        try {
-          const localCultureDTO: object | any = {}
-          const unityCultureDTO: object | any = {}
-          for (let row in spreadSheet) {
-            if (row !== '0') {
-              for (let column in spreadSheet[row]) {
-                if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
-                  unityCultureDTO.id_culture_unity = spreadSheet[row][column]
-                }
-                else if (spreadSheet[0][column].includes('Ano')) {
-                  unityCultureDTO.year = spreadSheet[row][column]
-                }
 
-                else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
-                  unityCultureDTO.culture_unity_name = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
-                  localCultureDTO.id_local_culture = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
-                  localCultureDTO.name_local_culture = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
-                  localCultureDTO.label = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('MLOC')) {
-                  localCultureDTO.mloc = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Endereço')) {
-                  localCultureDTO.adress = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Identificador de localidade')) {
-                  localCultureDTO.id_locality = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Nome da localidade')) {
-                  localCultureDTO.name_locality = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Identificador de região')) {
-                  localCultureDTO.id_region = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Nome da região')) {
-                  localCultureDTO.name_region = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
-                  localCultureDTO.label_region = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('ID do País')) {
-                  localCultureDTO.id_country = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('Nome do país')) {
-                  localCultureDTO.name_country = spreadSheet[row][column]
-                }
-
-                else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
-                  localCultureDTO.label_country = spreadSheet[row][column]
-                }
+        const localCultureDTO: object | any = {}
+        const unityCultureDTO: object | any = {}
+        for (let row in spreadSheet) {
+          if (row !== '0') {
+            for (let column in spreadSheet[row]) {
+              if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
+                unityCultureDTO.id_culture_unity = spreadSheet[row][column]
               }
+              else if (spreadSheet[0][column].includes('Ano')) {
+                unityCultureDTO.year = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+                unityCultureDTO.culture_unity_name = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+                localCultureDTO.id_local_culture = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+                localCultureDTO.name_local_culture = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
+                localCultureDTO.label = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('MLOC')) {
+                localCultureDTO.mloc = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Endereço')) {
+                localCultureDTO.adress = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+                localCultureDTO.id_locality = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Nome da localidade')) {
+                localCultureDTO.name_locality = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Identificador de região')) {
+                localCultureDTO.id_region = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Nome da região')) {
+                localCultureDTO.name_region = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
+                localCultureDTO.label_region = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('ID do País')) {
+                localCultureDTO.id_country = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('Nome do país')) {
+                localCultureDTO.name_country = spreadSheet[row][column]
+              }
+
+              else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+                localCultureDTO.label_country = spreadSheet[row][column]
+              }
+            }
+            try {
               localCultureDTO.created_by = created_by
               unityCultureDTO.created_by = created_by
               const localAlreadyExists = await this.localController.getAllLocal({ id_local_culture: localCultureDTO.id_local_culture })
@@ -1489,26 +1490,30 @@ export class ImportController {
                 await this.localController.updateLocal(localCultureDTO)
                 await this.unidadeCulturaController.create(unityCultureDTO)
               } else {
+                delete localCultureDTO.id
                 const response = await this.localController.postLocal(localCultureDTO)
                 unityCultureDTO.id_local = response?.response?.id
                 await this.unidadeCulturaController.create(unityCultureDTO)
               }
 
+            } catch (err) {
+              console.log("Error save import local")
+              console.log(err)
+              return "Erro ao salvar no banco";
             }
           }
-          return "save"
-        } catch (err) {
-          console.log(err)
-          return "Houve um erro, tente novamente mais tarde!";
         }
+        return "save"
       }
+
 
       const responseStringError = responseIfError.join("").replace(/undefined/g, "")
       return responseStringError;
 
     } catch (error) {
 
-      console.log("Error", error)
+      console.log("Error validação import local")
+      console.log(error)
 
     }
   }
