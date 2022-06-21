@@ -214,14 +214,17 @@ export class ImportController {
             } else {
               if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o limite de caracteres para o Código da tecnologia e 2. </li> <br>`;
-              }
-              if ((spreadSheet[row][column]).toString().length == 1) {
-                spreadSheet[row][column] = '0' + (spreadSheet[row][column].toString())
               } else {
+                console.log('spreadSheet[row][0]')
+                console.log(spreadSheet[row][0])
                 const { response: responseCulture } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
+                console.log('responseCulture')
+                console.log(responseCulture)
                 const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
+                console.log('technology')
+                console.log(technology)                
                 if (technology.total > 0) {
-                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada nessa cultura. </li> <br>`
+                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada. </li> <br>`
                 }
               }
 

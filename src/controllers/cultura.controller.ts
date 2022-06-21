@@ -85,6 +85,7 @@ export class CulturaController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
+
       const response: object | any = await this.culturaRepository.findAll(
         parameters,
         select,

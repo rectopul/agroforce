@@ -4,6 +4,8 @@ export class TecnologiaController {
   tecnologiaRepository = new TecnologiaRepository();
 
   async getAll(options: object | any) {
+    console.log('options')
+    console.log(options)
     const parameters: object | any = {};
     let take;
     let skip;
@@ -65,6 +67,10 @@ export class TecnologiaController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
+
+
+      console.log('parameters')
+      console.log(parameters)
 
       let response = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
       if (!response || response.total <= 0) {
