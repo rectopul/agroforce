@@ -142,8 +142,9 @@ export class LocalController {
         return { status: 200, response, total: response.total };
       }
     } catch (err) {
+      console.log("[Controller] - GetAll local erro");
       console.log(err);
-      return { status: 400, message: err };
+      throw new Error("[Controller] - GetAll local erro")
     }
   }
 
@@ -162,7 +163,9 @@ export class LocalController {
         return { status: 405, response: { error: 'id não informado' } };
       }
     } catch (err) {
-      return { status: 400, message: err }
+      console.log("[Controller] - GetOne local erro");
+      console.log(err);
+      throw new Error("[Controller] - GetOne local erro")
     }
   }
 
@@ -171,10 +174,6 @@ export class LocalController {
       console.log("Create")
       console.log(data);
       if (data !== null && data !== undefined) {
-        // if (data.uf) {
-        //     let uf = await this.getOnUFs(parseInt(data.uf));
-        //     data.uf = uf?.sigla;
-        // }
         const response = await this.localRepository.create(data);
         if (response) {
           return { status: 200, response: response, message: "local inserido" }
@@ -184,15 +183,14 @@ export class LocalController {
         }
       }
     } catch (err) {
-      console.log(err)
-      return { status: 400, message: "Erro no cadastro" }
+      console.log("[Controller] - Create local erro");
+      console.log(err);
+      throw new Error("[Controller] - Create local erro")
     }
   }
 
   async updateLocal(data: any) {
     try {
-      console.log('data')
-      console.log(data)
       // const schema: SchemaOf<any> = object({
       //   id: number().required(this.required),
       //   status: number().required(this.required),
@@ -210,8 +208,9 @@ export class LocalController {
 
       return { status: 200, message: 'Local de cultura atualizado' };
     } catch (err) {
-      console.log(err)
-      return { status: 404, message: 'Erro ao atualizar' };
+      console.log("[Controller] - Update local erro");
+      console.log(err);
+      throw new Error("[Controller] - Update local erro")
     }
   }
 }
