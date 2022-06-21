@@ -30,7 +30,7 @@ interface IFilter {
 export interface IFocos {
   id: number;
   name: string;
-  group: number;
+  grupo: number;
   foco_children?: [];
   status?: number;
 }
@@ -62,7 +62,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.foco || { id: 0, table_preferences: "id,name,group,status" };
+  const preferences = userLogado.preferences.foco || { id: 0, table_preferences: "id,name,grupo,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
@@ -75,7 +75,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
-    { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
+    { name: "CamposGerenciados[]", title: "Grupo", value: "grupo" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
@@ -190,7 +190,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'group') {
+      if (ObjetCampos[index] === 'grupo') {
         arrOb.push({
           title: (
             <div className='flex items-center'>
@@ -199,7 +199,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
               </button>
             </div>
           ),
-          field: "group",
+          field: "grupo",
           sorting: false
         });
       }
