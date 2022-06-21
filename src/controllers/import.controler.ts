@@ -1313,7 +1313,7 @@ export class ImportController {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano é obrigatório. </li> <br>`;
             } else {
-              const safraYearValidate = await this.safraController.getOneSafra((id_safra).toString())
+              const safraYearValidate = await this.safraController.getOneSafra(id_safra)
               if (safraYearValidate.response?.year !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano não corresponde ao ano da safra selecionada. </li> <br>`;
               }
@@ -1325,7 +1325,7 @@ export class ImportController {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura é obrigatório. </li> <br>`;
             } else {
-              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ culture_unity_name: spreadSheet[row][column] })
+              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ culture_unity_name: (spreadSheet[row][column].toString()) })
               if (unidadeCulturaAlreadyExist.response.length > 0) responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura já esta cadastrado. </li> <br>`;
             }
           }
@@ -1418,71 +1418,71 @@ export class ImportController {
           if (row !== '0') {
             for (let column in spreadSheet[row]) {
               if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
-                unityCultureDTO.id_culture_unity = spreadSheet[row][column]
+                unityCultureDTO.id_culture_unity = Number(spreadSheet[row][column])
               }
               else if (spreadSheet[0][column].includes('Ano')) {
-                unityCultureDTO.year = spreadSheet[row][column]
+                unityCultureDTO.year = Number(spreadSheet[row][column])
               }
 
               else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
-                unityCultureDTO.culture_unity_name = spreadSheet[row][column]
+                unityCultureDTO.culture_unity_name = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
-                localCultureDTO.id_local_culture = spreadSheet[row][column]
+                localCultureDTO.id_local_culture = Number(spreadSheet[row][column])
               }
 
               else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
-                localCultureDTO.name_local_culture = spreadSheet[row][column]
+                localCultureDTO.name_local_culture = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
-                localCultureDTO.label = spreadSheet[row][column]
+                localCultureDTO.label = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('MLOC')) {
-                localCultureDTO.mloc = spreadSheet[row][column]
+                localCultureDTO.mloc = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('Endereço')) {
-                localCultureDTO.adress = spreadSheet[row][column]
+                localCultureDTO.adress = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('Identificador de localidade')) {
-                localCultureDTO.id_locality = spreadSheet[row][column]
+                localCultureDTO.id_locality = Number(spreadSheet[row][column])
               }
 
               else if (spreadSheet[0][column].includes('Nome da localidade')) {
-                localCultureDTO.name_locality = spreadSheet[row][column]
+                localCultureDTO.name_locality = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('Identificador de região')) {
-                localCultureDTO.id_region = spreadSheet[row][column]
+                localCultureDTO.id_region = Number(spreadSheet[row][column])
               }
 
               else if (spreadSheet[0][column].includes('Nome da região')) {
-                localCultureDTO.name_region = spreadSheet[row][column]
+                localCultureDTO.name_region = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
-                localCultureDTO.label_region = spreadSheet[row][column]
+                localCultureDTO.label_region = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('ID do País')) {
-                localCultureDTO.id_country = spreadSheet[row][column]
+                localCultureDTO.id_country = Number(spreadSheet[row][column])
               }
 
               else if (spreadSheet[0][column].includes('Nome do país')) {
-                localCultureDTO.name_country = spreadSheet[row][column]
+                localCultureDTO.name_country = (spreadSheet[row][column].toString())
               }
 
               else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
-                localCultureDTO.label_country = spreadSheet[row][column]
+                localCultureDTO.label_country = (spreadSheet[row][column].toString())
               }
             }
             try {
-              localCultureDTO.created_by = created_by
-              unityCultureDTO.created_by = created_by
+              localCultureDTO.created_by = Number(created_by)
+              unityCultureDTO.created_by = Number(created_by)
               const localAlreadyExists = await this.localController.getAllLocal({ id_local_culture: localCultureDTO.id_local_culture })
               if (localAlreadyExists.response?.length > 0) {
                 localCultureDTO.id = localAlreadyExists.response[0].id
@@ -1512,8 +1512,9 @@ export class ImportController {
 
     } catch (error) {
 
-      console.log("Error validação import local")
+      console.log("Erro na validação do local")
       console.log(error)
+      return "Erro na validação do local"
 
     }
   }
@@ -1582,7 +1583,7 @@ export class ImportController {
                     }
                   } else {
                     return 'A safra importada precisa ser igual a safra selecionada';
-                  }                  
+                  }
                 }
               }
 
