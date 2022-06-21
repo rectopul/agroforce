@@ -14,8 +14,10 @@ export class UnidadeCulturaController {
             if (!response) throw new Error('unidade de cultura não encontrada');
 
             return { status: 200, response };
-        } catch (e) {
-            return { status: 400, message: 'unidade de cultura não encontrada' };
+        } catch (err) {
+            console.log("[Controller] - GetOne Unidade Cultura erro");
+            console.log(err);
+            throw new Error("[Controller] - GetOne Unidade Cultura erro")
         }
     }
 
@@ -41,8 +43,9 @@ export class UnidadeCulturaController {
 
             return { status: 201, message: 'unidade de cultura cadastrada' };
         } catch (err) {
-            console.log(err)
-            return { status: 404, message: 'Erro de cadastro' };
+            console.log("[Controller] - Create Unidade Cultura erro");
+            console.log(err);
+            throw new Error("[Controller] - Create Unidade Cultura erro")
         }
     }
 
@@ -69,8 +72,9 @@ export class UnidadeCulturaController {
 
             return { status: 200, message: 'unidade de cultura atualizado' };
         } catch (err) {
-            console.log(err)
-            return { status: 404, message: 'Erro ao atualizar' };
+            console.log("[Controller] - Update Unidade Cultura erro");
+            console.log(err);
+            throw new Error("[Controller] - Update Unidade Cultura erro")
         }
     }
 
@@ -157,8 +161,9 @@ export class UnidadeCulturaController {
                 return { status: 200, response, total: response.total };
             }
         } catch (err) {
+            console.log("[Controller] - GetAll Unidade Cultura erro");
             console.log(err);
-            return { status: 400, response: [], total: 0 };
+            throw new Error("[Controller] - GetAll Unidade Cultura erro")
         }
     }
 }
