@@ -67,7 +67,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main, tecnologia,cruza,gmr, bgm' };
+  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main,tecnologia,cruza,gmr,bgm' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
@@ -110,7 +110,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' }
   ];
-  
+
   const filterStatus = filterBeforeEdit.split('')
 
   const take: number = itensPerPage;
@@ -129,8 +129,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       orderBy: '',
       typeOrder: ''
     },
-    onSubmit: async ({filterStatus, filterGenotipo, filterGenealogy, filterCruza}) => {
-      const parametersFilter = `filterStatus=${filterStatus?filterStatus:1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+    onSubmit: async ({ filterStatus, filterGenotipo, filterGenealogy, filterCruza }) => {
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -462,7 +462,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -479,7 +479,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
         });
 
         newData.map((item: any) => {
-          return item.tecnologia = item.tecnologia?.tecnologia      
+          return item.tecnologia = item.tecnologia?.tecnologia
         })
 
         const workSheet = XLSX.utils.json_to_sheet(newData);

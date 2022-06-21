@@ -67,7 +67,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main, tecnologia,cruza,gmr, bgm' };
+  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main,tecnologia,cruza,gmr,bgm' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);

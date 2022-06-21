@@ -373,7 +373,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
     let totalString = selecionados.length;
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 19 }).then((response) => {
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, sle_id: 19 }).then((response) => {
         userLogado.preferences.layout_children = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });

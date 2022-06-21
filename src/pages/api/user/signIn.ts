@@ -83,7 +83,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.unidadeCultura = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 21 }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
       preferences.experimento = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 22 }); preferences.experimento = preferences.experimento.response[0];
       preferences.materiais = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 23 }); preferences.materiais = preferences.materiais.response[0];
-      preferences.type_assay_children = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 24 }); preferences.type_assay_children = preferences.type_assay_children.response[0];
+      preferences.envelope = await PreferencesControllers.getAllPreferences({ userId: user.id, module_id: 24 }); preferences.envelope = preferences.envelope.response[0];
     }
 
     if (!user) throw 'Login ou senha é invalida!';

@@ -40,10 +40,10 @@ export interface IUpdateGenotipo {
   id_culture: number;
   id_s1: number;
   id_dados: string;
-  name_genotipo:string;
-  name_main:string;
-  name_public:string;
-  name_experiment:string;
+  name_genotipo: string;
+  name_main: string;
+  name_public: string;
+  name_experiment: string;
   name_alter: string;
   elit_name: string;
   type: string;
@@ -108,10 +108,10 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
       status: genotipo.status,
       id_s1: genotipo.id_s1,
       id_dados: genotipo.id_dados,
-      name_genotipo:genotipo.name_genotipo,
-      name_main:genotipo.name_main,
-      name_public:genotipo.name_public,
-      name_experiment:genotipo.name_experiment,
+      name_genotipo: genotipo.name_genotipo,
+      name_main: genotipo.name_main,
+      name_public: genotipo.name_public,
+      name_experiment: genotipo.name_experiment,
       name_alter: genotipo.name_alter,
       elit_name: genotipo.elit_name,
       type: genotipo.type,
@@ -143,7 +143,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "year, cod_lote, ncc, fase,peso, quant_sementes" };
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,year,cod_lote,ncc,fase,peso,quant_sementes" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
@@ -361,7 +361,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
     }
 
@@ -573,7 +573,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
               />
             </div>
           </div>
-          <div className="rounded border-inherit" style={{marginTop: "3%"}}>
+          <div className="rounded border-inherit" style={{ marginTop: "3%" }}>
             <span>Informações dos progenitores</span>
             <hr></hr>
           </div>
@@ -673,7 +673,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 value={formik.values.parentesco_completo}
               />
             </div>
-            <div className="w-40 h-10" style={{marginTop: "2%"}}>
+            <div className="w-40 h-10" style={{ marginTop: "2%" }}>
               <Button
                 type="button"
                 value="Voltar"
@@ -683,7 +683,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                 onClick={() => router.back()}
               />
             </div>
-             
+
           </div>
         </form>
         <main className="h-4/6 w-full
