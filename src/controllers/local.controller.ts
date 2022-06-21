@@ -191,14 +191,16 @@ export class LocalController {
 
   async updateLocal(data: any) {
     try {
-      const schema: SchemaOf<any> = object({
-        id: number().required(this.required),
-        status: number().required(this.required),
-      });
+      console.log('data')
+      console.log(data)
+      // const schema: SchemaOf<any> = object({
+      //   id: number().required(this.required),
+      //   status: number().required(this.required),
+      // });
 
-      const valid = schema.isValidSync(data);
+      // const valid = schema.isValidSync(data);
 
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
+      // if (!valid) return { status: 400, message: 'Dados inválidos' };
 
       const localCultura: any = await this.localRepository.findOne(data.id);
 
