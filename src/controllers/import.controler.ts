@@ -1410,6 +1410,10 @@ export class ImportController {
         }
       }
 
+      console.log('responseIfError')
+      console.log(responseIfError)
+
+
       if (responseIfError.length === 0) {
 
         const localCultureDTO: object | any = {}
@@ -1488,7 +1492,9 @@ export class ImportController {
                 localCultureDTO.id = localAlreadyExists.response[0].id
                 unityCultureDTO.id_local = localAlreadyExists.response[0].id
                 await this.localController.updateLocal(localCultureDTO)
-                await this.unidadeCulturaController.create(unityCultureDTO)
+                const response = await this.unidadeCulturaController.create(unityCultureDTO)
+                console.log('response')
+                console.log(response)
               } else {
                 delete localCultureDTO.id
                 const response = await this.localController.postLocal(localCultureDTO)
@@ -1499,7 +1505,7 @@ export class ImportController {
             } catch (err) {
               console.log("Error save import local")
               console.log(err)
-              return "Erro ao salvar no banco";
+              return `${err}`;
             }
           }
         }

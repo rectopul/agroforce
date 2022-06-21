@@ -33,7 +33,7 @@ export class UnidadeCulturaController {
 
             const valid = schema.isValidSync(data);
 
-            if (!valid) return { status: 400, message: 'Dados inválidos' };
+            if (!valid) throw new Error("[Controller] - Dados inválidos")
 
             const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByData(data);
 
@@ -42,10 +42,10 @@ export class UnidadeCulturaController {
             await this.unidadeCulturaRepository.create(data);
 
             return { status: 201, message: 'unidade de cultura cadastrada' };
-        } catch (err) {
+        } catch (err: any) {
             console.log("[Controller] - Create Unidade Cultura erro");
-            console.log(err);
-            throw new Error("[Controller] - Create Unidade Cultura erro")
+            console.log(err.message);
+            throw new Error(err.message)
         }
     }
 
