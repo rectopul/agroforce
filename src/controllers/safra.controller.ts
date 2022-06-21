@@ -77,6 +77,10 @@ export class SafraController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
+      if (options.id_safra) {
+        parameters.id = parseInt(options.id_safra);
+      }
+
       if (options.safraName) {
         parameters.safraName = options.safraName
       }
