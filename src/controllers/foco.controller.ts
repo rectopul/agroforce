@@ -44,7 +44,7 @@ export class FocoController {
       if (options.paramSelect) {
         let objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] === 'group') {
+          if (objSelect[item] === 'grupo') {
             select['foco_children'] = true;
           } else {
             select[objSelect[item]] = true;
@@ -55,8 +55,8 @@ export class FocoController {
         select = {
           id: true,
           name: true,
-          status: true,
           foco_children: true,
+          status: true,
         };
       }
 
