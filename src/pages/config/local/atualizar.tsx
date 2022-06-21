@@ -72,7 +72,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
   const router = useRouter();
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id, year, culture_unity_name" };
+  const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id,culture_unity_name,year" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [unidadeCultura, setUnidadeCultura] = useState<any>(() => allItens);

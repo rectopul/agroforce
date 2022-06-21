@@ -64,7 +64,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: "id,name, seeds, status" };
+  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: "id,name,seeds,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
 
@@ -78,7 +78,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds", defaultChecked: () => camposGerenciados.includes('seeds') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);

@@ -62,28 +62,31 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.culture || { id: 0, table_preferences: "id,name,status" };
+  const preferences = userLogado.preferences.cultura || { id: 0, table_preferences: "id,name,desc,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
-  // const [orderGenealogy, setOrderGenealogy] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(1);
   const [orderDesc, setOrderDesc] = useState<number>(1);
-  // const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [arrowDesc, setArrowDesc] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Código Reduzido", value: "name" },
-    { name: "CamposGerenciados[]", title: "Nome", value: "desc" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" }
+    { name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+    { name: "CamposGerenciados[]", title: "Código Reduzido", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
+    { name: "CamposGerenciados[]", title: "Nome", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
+    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
+
+  console.log('camposGerenciados')
+  console.log(camposGerenciados)
+  console.log('genaratesProps')
+  console.log(genaratesProps)
 
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
@@ -280,12 +283,12 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
     let campos = selecionados.substr(0, totalString - 1)
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 2 }).then((response) => {
-        userLogado.preferences.culture = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+        userLogado.preferences.cultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.culture = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.cultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -295,10 +298,6 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
   };
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
-    console.log('column')
-    console.log(column)
-    console.log('order')
-    console.log(order)
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -532,6 +531,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
                 headerStyle: {
                   zIndex: 20
                 },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage
@@ -591,7 +591,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
                                                   name={genarate.name}
                                                   title={genarate.title?.toString()}
                                                   value={genarate.value}
-                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                  defaultChecked={camposGerenciados.includes(genarate.value)}
                                                 />
                                               </li>
                                             )}

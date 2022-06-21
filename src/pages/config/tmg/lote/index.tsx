@@ -65,7 +65,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
 
   const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id, year, cod_lote, ncc, fase,peso, quant_sementes, name_genotipo, name_main, gmr, bgm, tecnologia" };
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);

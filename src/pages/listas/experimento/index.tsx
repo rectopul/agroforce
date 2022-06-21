@@ -73,7 +73,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
     ));
 
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocol_name,experimento_name, year,rotulo,id_foco, id_ensaio, id_tecnologia, epoca' };
+    const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocol_name,experimento_name,year,rotulo,id_foco,id_ensaio,id_tecnologia,epoca' };
     const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
     const router = useRouter();
     const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperimentos);

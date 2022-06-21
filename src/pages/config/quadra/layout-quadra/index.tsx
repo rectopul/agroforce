@@ -81,7 +81,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   ));
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.layout_quadra || { id: 0, table_preferences: "id,esquema,plantadeira,tiros,disparos,parcelas, status" };
+  const preferences = userLogado.preferences.layout_quadra || { id: 0, table_preferences: "id,esquema,plantadeira,tiros,disparos,parcelas,status" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
