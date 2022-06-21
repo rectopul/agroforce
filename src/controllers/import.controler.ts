@@ -219,7 +219,7 @@ export class ImportController {
                 spreadSheet[row][column] = '0' + (spreadSheet[row][column].toString())
               } else {
                 const { response: responseCulture } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
-                const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0].id, cod_tec: (spreadSheet[row][0].toString()) })
+                const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
                 if (technology.total > 0) {
                   responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada nessa cultura. </li> <br>`
                 }
@@ -249,21 +249,19 @@ export class ImportController {
         }
       }
 
-      console.log('responseIfError')
-      console.log(responseIfError)
-
       if (responseIfError.length === 0) {
         try {
           for (let row in spreadSheet) {
             if (row !== "0") {
               const { response } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
-              await this.tecnologiaController.post({ id_culture: response[0].id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23 })
+              await this.tecnologiaController.post({ id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23 })
             }
           }
           return "save"
         } catch (err) {
+          console.log("Erro save import tecnologia: ")
           console.log(err)
-          return "Houve um erro, tente novamente mais tarde!";
+          return "Erro ao gravar no banco";
         }
       }
 
@@ -271,9 +269,9 @@ export class ImportController {
       return responseStringError;
 
     } catch (error) {
-
-      console.log("Error", error)
-
+      console.log("Erro geral import tecnologia: ")
+      console.log(error)
+      return "Erro ao validar";
     }
   }
 
@@ -783,7 +781,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</li><br>`;
                 } else {
-                  let cultura = await this.culturaController.getAllCulture({name: data.spreadSheet[keySheet][sheet]});
+                  let cultura = await this.culturaController.getAllCulture({ name: data.spreadSheet[keySheet][sheet] });
                   if (cultura.total > 0) {
                     if (data.spreadSheet[keySheet][sheet] != cultura.response[0].name) {
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura tem que ser igual a cultura filtrada no software.</li><br>`;
