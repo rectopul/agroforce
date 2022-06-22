@@ -376,7 +376,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   }
                 />
               </div>
-              {rowData.status === 1
+              {/* {rowData.status === 1
                 ? (
                   <div className="h-10">
                     <Button
@@ -408,7 +408,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                       textColor="white"
                     />
                   </div>
-                )}
+                )} */}
             </div>
           )
         });
