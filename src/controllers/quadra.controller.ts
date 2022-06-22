@@ -46,6 +46,10 @@ export class QuadraController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
+      if (options.local_preparo) {
+        parameters.local_preparo = parseInt(options.local_preparo);
+      }
+
       if (options.cod_quadra) {
         parameters.cod_quadra = options.cod_quadra;
       }

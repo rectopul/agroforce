@@ -661,12 +661,12 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   justify-center
                   pb-2
                 ">
-                  <div className="h-10 w-1/2 ml-4">
+                  {/* <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
                     <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
-                  </div>
+                  </div> */}
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Nome genótipo

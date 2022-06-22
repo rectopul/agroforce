@@ -1579,6 +1579,7 @@ export class ImportController {
         let df: any = 0, cod_quadra: any, cod_quadra_anterior: any, t4_i: any = 0, t4_f: any = 0;
         let divisor_anterior: any = 0;
         let Line: number;
+        let local_preparo: any = 0;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           Line = Number(keySheet) + 1;
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
@@ -1618,9 +1619,10 @@ export class ImportController {
                 } else {
                   let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                   if (local.total == 0) {
-                    // console.log('aqui Local');
+                    local_preparo = 2;
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                   } else {
+                    local_preparo = 1;
                     this.aux.local_preparo = local.response[0].id;
                   }
                 }
@@ -1630,12 +1632,18 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</li><br>`;
                 } else {
-                  let quadra: any = await this.quadraController.listAll({ cod_quadra: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
-                  if (quadra.total > 0) {
-                    return 'Código quadra já existe, para poder atualiza-lo você precisa inativar o existente';
-                  } else {
-                    cod_quadra_anterior = cod_quadra;
-                    cod_quadra = data.spreadSheet[keySheet][sheet];
+                  if (local_preparo == 0) {
+                    return 'Local preparo precisa ser importado antes do código da quadra';
+                  } 
+                  if (local_preparo == 1) {
+                    local_preparo = 0;
+                    let quadra: any = await this.quadraController.listAll({ cod_quadra: data.spreadSheet[keySheet][sheet], local_preparo: this.aux.local_preparo, filterStatus: 1 });
+                    if (quadra.total > 0) {
+                      return 'Código quadra já existe neste local, para poder atualiza-lo você precisa inativar o existente';
+                    } else {
+                      cod_quadra_anterior = cod_quadra;
+                      cod_quadra = data.spreadSheet[keySheet][sheet];
+                    }
                   }
                 }
               }
