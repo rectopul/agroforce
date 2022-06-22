@@ -1,8 +1,8 @@
 import Head from "next/head";
 import readXlsxFile from 'read-excel-file'
 import { importService } from "src/services/";
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { Button, Content, Input, Select } from "../../../../components";
+import * as ITabs from '../../../../../shared/utils/dropdown';
+import { Button, Content, Input, Select } from "../../../../../components";
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import { FiUserPlus } from "react-icons/fi";

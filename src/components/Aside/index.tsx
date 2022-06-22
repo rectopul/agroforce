@@ -17,11 +17,20 @@ export function Aside() {
       <nav className="flex flex-col gap-6
         pt-4
       ">
-        {/* <ButtonAside 
+
+        <ButtonAside
+          title='Configurações'
+          icon={<BsGear size={32} />}
+          href='/config/tmg/usuarios'
+          active
+        />
+        <ButtonAside
           title='Lista'
           icon={<HiOutlineClipboardList size={32} />}
-          href='config/'
+          href='listas/experimentos/experimento'
+          active
         />
+        {/* 
 
         <ButtonAside 
           title='Ensaio'
@@ -63,12 +72,6 @@ export function Aside() {
           href='relatorios'
         /> */}
 
-        <ButtonAside
-          title='Configurações'
-          icon={<BsGear size={32} />}
-          href='/config/tmg/usuarios'
-          active
-        />
       </nav>
     </aside>
   );

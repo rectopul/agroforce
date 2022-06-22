@@ -896,8 +896,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId + '&id_safra=' +safraId: `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
 
