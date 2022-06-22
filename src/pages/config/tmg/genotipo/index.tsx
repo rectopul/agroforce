@@ -85,7 +85,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
     { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
-    { name: 'CamposGerenciados[]', title: 'Cód tec', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'bgm' },
@@ -236,8 +236,8 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       }
       if (ObjetCampos[index] === 'tecnologia') {
         arrOb.push({
-          title: 'Cód tec',
-          field: 'tecnologia.cod_tec',
+          title: 'Tecnologia',
+          field: 'tecnologia.name',
           sorting: false
         });
       }
