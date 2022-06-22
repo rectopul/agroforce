@@ -804,7 +804,7 @@ export class ImportController {
                 if (String(data.spreadSheet[keySheet][sheet]) == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo tecnologia é obrigatorio.</li><br>`;
                 } else {
-                  let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: String(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</li><br>`;
                   }
@@ -966,7 +966,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  let tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: String(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total > 0) {
                     this.aux.id_tecnologia = tec.response[0].id;
                   }
