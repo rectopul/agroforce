@@ -72,7 +72,7 @@ export class TecnologiaController {
       } else {
         return { status: 200, response, total: response.total }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log("[Controller] - GetAll Tecnologia erro");
       console.log(err.message);
       throw new Error("[Controller] - GetAll Tecnologia erro")
@@ -92,7 +92,7 @@ export class TecnologiaController {
       } else {
         return { status: 405, response: { error: 'id não informado' } };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log("[Controller] - GetOne Tecnologia erro");
       console.log(err.message);
       throw new Error("[Controller] - GetOne Tecnologia erro")
@@ -113,7 +113,7 @@ export class TecnologiaController {
           return { status: 400, message: "erro" }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
       console.log("[Controller] - Create Tecnologia erro");
       console.log(err.message);
@@ -141,7 +141,7 @@ export class TecnologiaController {
           return { status: 400, message: { message: "erro ao tentar fazer o update" } }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log("[Controller] - Update Tecnologia erro");
       console.log(err.message);
       throw new Error("[Controller] - Update Tecnologia erro")
