@@ -28,10 +28,8 @@ export default function Importar() {
             html: response.message,
             width: "900"
           });
-          if (response.erro) {
-            Swal.fire(
-              response.erro
-            )
+          if (!response.erro) {
+            router.back();
           }
         }
       });

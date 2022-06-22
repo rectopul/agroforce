@@ -33,6 +33,7 @@ interface IFilter {
 export interface IGenotipos {
   id: number;
   id_culture: number;
+  id_safra: number;
   genealogy: string;
   genotipo: string;
   cruza: string;
@@ -51,11 +52,12 @@ interface IData {
   itensPerPage: number;
   filterAplication: object | any;
   cultureId: number;
+  safraId: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, safraId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -130,7 +132,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
       typeOrder: ''
     },
     onSubmit: async ({ filterStatus, filterGenotipo, filterGenealogy, filterCruza }) => {
-      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterGenotipo=${filterGenotipo}&id_culture=${cultureId}&id_safra=${safraId}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
       setFiltersParams(parametersFilter)
       setCookies("filterBeforeEdit", filtersParams)
       await genotipoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
@@ -889,12 +891,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const token = req.cookies.token;
   const cultureId = Number(req.cookies.cultureId);
+  const safraId = Number(req.cookies.safraId);
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId : 'filterStatus=1';
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId + '&id_safra=' +safraId: `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -908,7 +911,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` }
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
+  const api = await fetch(urlParameters.toString(), requestOptions);
   const data = await api.json();
 
   const allGenotipos = data.response;
@@ -921,6 +924,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       cultureId,
+      safraId,
       pageBeforeEdit,
       filterBeforeEdit
     }

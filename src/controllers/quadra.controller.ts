@@ -40,7 +40,7 @@ export class QuadraController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { id: true, cod_quadra: true, local_preparo: true, local_plantio: true, larg_q: true, comp_p: true, linha_p: true, comp_c: true, esquema: true, tiro_fixo: true, disparo_fixo: true, q: true, Safra: { select: { safraName: true } }, status: true };
+        select = { id: true, cod_quadra: true,  local_preparo: true, local_plantio: true, larg_q: true, comp_p: true, linha_p: true, comp_c: true, esquema: true, tiro_fixo: true, disparo_fixo: true, q: true, localPreparo: {select: {name_local_culture: true}}, Safra: { select: { safraName: true } }, status: true };
       }
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);

@@ -18,6 +18,7 @@ import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { layoutQuadraService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
@@ -25,6 +26,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ILayoultProps {
   id: Number | any;
+  id_culture: Number | any;
   esquema: String | any;
   semente_metros: Number | any;
   disparos: Number | any;
@@ -242,7 +244,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, !rowData.status)}
+                    onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -268,9 +270,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
-                    )}
+                    onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -310,24 +310,67 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     setCamposGerenciados(campos);
   };
 
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
+  async function handleStatus(idLayoutQuadra: number, data: any): Promise<void> {
+    let parametersFilter = "filterStatus=" + 1 + "&id_culture=" + userLogado.userCulture.cultura_selecionada + "&esquema=" + data.esquema + "&status=" + 1;
+    if (data.status == 0) {
+      await layoutQuadraService.getAll(parametersFilter).then((response) => {
+        if (response.total > 0) {
+          Swal.fire('Layout não pode ser atualizada pois já existe um layout cadastrada com essas informações ativo');
+          router.push('');
+          return;
+        } else {
+          data.status = 1;
+
+          layoutQuadraService.update({ id: idLayoutQuadra, status: data.status });
+
+          const index = quadras.findIndex((layout: any) => layout.id === idLayoutQuadra);
+    
+          if (index === -1) {
+            return;
+          }
+    
+          setQuadra((oldSafra: any) => {
+            const copy = [...oldSafra];
+            copy[index].status = data.status;
+            return copy;
+          });
+    
+          const {
+            id,
+            status
+          } = quadras[index];
+    
+
+        }
+      })
     } else {
-      status = 0;
-    }
-    await layoutQuadraService.update({ id: id, status: status });
-    const index = quadras.findIndex((quadras) => quadras.id === id);
+      if (data.status === 0) {
+        data.status = 1;
+      } else {
+        data.status = 0;
+      }
+      await layoutQuadraService.update({ id: idLayoutQuadra, status: data.status });
 
-    if (index === -1) {
-      return;
+      const index = quadras.findIndex((layout: any) => layout.id === idLayoutQuadra);
+
+      if (index === -1) {
+        return;
+      }
+
+      setQuadra((oldSafra: any) => {
+        const copy = [...oldSafra];
+        copy[index].status = data.status;
+        return copy;
+      });
+
+      const {
+        id,
+        status
+      } = quadras[index];
+
     }
 
-    setQuadra((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
+
   };
 
   async function handleOrderAddress(column: string, order: string | any): Promise<void> {

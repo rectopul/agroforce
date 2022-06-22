@@ -255,7 +255,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
       if (objetCampos[index] === 'local_preparo') {
         arrOb.push({
           title: 'Local Preparo',
-          field: "local_preparo",
+          field: "localPreparo.name_local_culture",
           sorting: false
         });
       }
