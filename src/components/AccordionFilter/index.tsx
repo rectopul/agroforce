@@ -26,7 +26,7 @@ export function AccordionFilter({ title, children, grid = false }: IAccordionFil
         >
           <Typography>{ title }</Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className="max-h-72 overflow-y-scroll">
           <Typography className='flex flex-col'>
             { children }
           </Typography>
