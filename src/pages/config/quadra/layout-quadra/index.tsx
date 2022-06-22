@@ -244,7 +244,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
+                    onClick={() => handleStatus(rowData.id, { ...rowData })}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -270,7 +270,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
+                    onClick={() => handleStatus(rowData.id, { ...rowData })}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
