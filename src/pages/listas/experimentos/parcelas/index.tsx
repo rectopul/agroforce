@@ -1,3 +1,4 @@
+import { Checkbox as Checkbox1 } from '@mui/material';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -5,22 +6,19 @@ import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
 import { ReactNode, useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import { AccordionFilter, Button, CheckBox, Content, Input, Select } from 'src/components';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { AccordionFilter, Button, CheckBox, Content, Input } from 'src/components';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { userPreferencesService } from 'src/services';
 import { experimentoService } from 'src/services/experimento.service';
-import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import ITabs from '../../../shared/utils/dropdown';
+import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
     filterStatus: object | any;
@@ -31,17 +29,16 @@ interface IFilter {
     typeOrder: object | any;
 }
 
-export interface IExperimento {
+export interface IParcela {
     id: number;
-    protocol_name: string;
     experimento_name: string;
-    year: number;
-    rotulo: string;
     foco: string;
     ensaio: string;
-    cod_tec: number;
-    epoca: number;
-    materiais: number;
+    tecnologia: string;
+    cultura_unity_name: string;
+    main_name: string;
+    genotipo_name: string;
+    lote: string;
     status?: number;
 }
 
@@ -52,7 +49,7 @@ interface IGenarateProps {
 }
 
 interface IData {
-    allExperimentos: IExperimento[];
+    allExperimentos: IParcela[];
     totalItems: number;
     itensPerPage: number;
     filterAplication: object | any;
@@ -67,16 +64,18 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
     const tabsDropDowns = TabsDropDowns();
 
     tabsDropDowns.map((tab) => (
-        tab.titleTab === 'TMG'
+        tab.titleTab === 'Parcela'
             ? tab.statusTab = true
             : tab.statusTab = false
     ));
 
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocol_name,experimento_name,year,rotulo,id_foco,id_ensaio,id_tecnologia,epoca' };
+    const preferences = userLogado.preferences.experimento || {
+        id: 0, table_preferences: 'id,experimento_name,foco,ensaio,tecnologia,cultura_unity_name,main_name,genotipo_name,lote'
+    };
     const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
     const router = useRouter();
-    const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperimentos);
+    const [parcelas, setParcela] = useState<IParcela[]>(() => allExperimentos);
     const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
     const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
     const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
@@ -87,28 +86,17 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
     const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
     const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
         { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-        { name: 'CamposGerenciados[]', title: 'Nome protocolo', value: 'protocolo_name' },
         { name: 'CamposGerenciados[]', title: 'Nome experimento', value: 'experimento_name' },
-        { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
-        { name: 'CamposGerenciados[]', title: 'Rótulo', value: 'rotulo' },
         { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
         { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'ensaio' },
-        { name: 'CamposGerenciados[]', title: 'Cód. Tec.', value: 'tecnologia' },
-        { name: 'CamposGerenciados[]', title: 'EP', value: 'epoca' },
-        { name: 'CamposGerenciados[]', title: 'N de materiais', value: 'materiais' },
-        { name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
+        { name: 'CamposGerenciados[]', title: 'Cód. tec.', value: 'tecnologia' },
+        { name: 'CamposGerenciados[]', title: 'Nome un. cultura', value: 'cultura_unity_name' },
+        { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'main_name' },
+        { name: 'CamposGerenciados[]', title: 'Nome genotipo', value: 'genotipo_name' },
+        { name: 'CamposGerenciados[]', title: 'Cód. Lote', value: 'lote' },
     ]);
 
     const [filter, setFilter] = useState<any>(filterAplication);
-    const [colorStar, setColorStar] = useState<string>('');
-
-    const filtersStatusItem = [
-        { id: 2, name: 'Todos' },
-        { id: 1, name: 'Ativos' },
-        { id: 0, name: 'Inativos' }
-    ];
-
-    const filterStatus = filterBeforeEdit.split('')
 
     const take: number = itensPerPage;
     const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -132,42 +120,12 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
             setCookies("filterBeforeEdit", filtersParams)
             await experimentoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
                 setFilter(parametersFilter);
-                setExperimento(response.response);
+                setParcela(response.response);
                 setTotalItems(response.total)
                 setCurrentPage(0)
             });
         }
     });
-
-    async function handleStatus(idExperimento: number, data: IExperimento): Promise<void> {
-        if (data.status === 0) {
-            data.status = 1;
-        } else {
-            data.status = 0;
-        }
-
-        const index = experimentos.findIndex((experimento) => experimento.id === idExperimento);
-
-        if (index === -1) {
-            return;
-        }
-
-        setExperimento((oldExperimento) => {
-            const copy = [...oldExperimento];
-            copy[index].status = data.status;
-            return copy;
-        });
-
-        const {
-            id,
-            status
-        } = experimentos[index];
-
-        await experimentoService.update({
-            id,
-            status
-        });
-    }
 
     function columnsOrder(camposGerenciados: any): any {
         const ObjetCampos: any = camposGerenciados.split(',');
@@ -176,70 +134,35 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
         Object.keys(ObjetCampos).forEach((_, index) => {
             if (ObjetCampos[index] === 'id') {
                 arrOb.push({
-                    title: '',
+                    title: <button
+                        className="w-full h-full flex items-center justify-left border-0"
+                        onClick={() => { }}
+                    >
+                        <Checkbox1 sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }} />
+                    </button>,
                     field: 'id',
+                    sorting: false,
                     width: 0,
                     render: () => (
-                        colorStar === '#eba417'
-                            ? (
-                                <div className='h-10 flex'>
-                                    <div>
-                                        <button
-                                            className="w-full h-full flex items-center justify-center border-0"
-                                            onClick={() => setColorStar('')}
-                                        >
-                                            <AiTwotoneStar size={25} color={'#eba417'} />
-                                        </button>
-                                    </div>
+                        (
+                            <div className='h-10 flex'>
+                                <div>
+                                    <button
+                                        className="w-full h-full flex items-center justify-center border-0"
+                                        onClick={() => { }}
+                                    >
+                                        <Checkbox1 sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }} />
+                                    </button>
                                 </div>
-                            )
-                            : (
-                                <div className='h-10 flex'>
-                                    <div>
-                                        <button
-                                            className="w-full h-full flex items-center justify-center border-0"
-                                            onClick={() => setColorStar('#eba417')}
-                                        >
-                                            <AiTwotoneStar size={25} />
-                                        </button>
-                                    </div>
-                                </div>
-                            )
+                            </div>
+                        )
                     )
-                });
-            }
-            if (ObjetCampos[index] === 'protocolo_name') {
-                arrOb.push({
-                    title: (
-                        <div className='flex items-center'>
-                            {arrowName}
-                            <button className='font-medium text-gray-900' onClick={() => handleOrderName('protocolo_name', orderName)}>
-                                Nome protocolo
-                            </button>
-                        </div>
-                    ),
-                    field: 'protocolo_name',
-                    sorting: false
                 });
             }
             if (ObjetCampos[index] === 'experimento_name') {
                 arrOb.push({
                     title: 'Nome experimento',
                     field: 'experimento_name',
-                    sorting: false
-                });
-            }
-            if (ObjetCampos[index] === 'year') {
-                arrOb.push({
-                    title: 'Ano',
-                    field: 'year',
-                    sorting: false
-                });
-            }
-            if (ObjetCampos[index] === 'rotulo') {
-                arrOb.push({
-                    title: 'Rótulo',
-                    field: 'rotulo',
                     sorting: false
                 });
             }
@@ -264,78 +187,49 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                     sorting: false
                 });
             }
-            if (ObjetCampos[index] === 'epoca') {
+            if (ObjetCampos[index] === 'cultura_unity_name') {
                 arrOb.push({
-                    title: 'EP',
-                    field: 'epoca',
+                    title: 'Nome un. cultura',
+                    field: 'cultura_unity_name',
                     sorting: false
                 });
             }
-            if (ObjetCampos[index] === 'materiais') {
+            if (ObjetCampos[index] === 'main_name') {
                 arrOb.push({
-                    title: 'N de materiais',
-                    field: 'materiais',
+                    title: 'Nome principal',
+                    field: 'main_name',
                     sorting: false
                 });
             }
-            if (ObjetCampos[index] === 'status') {
+            if (ObjetCampos[index] === 'genotipo_name') {
                 arrOb.push({
-                    title: 'Status',
-                    field: 'status',
+                    title: 'Nome genotipo',
+                    field: 'genotipo_name',
+                    sorting: false
+                });
+            }
+            if (ObjetCampos[index] === 'lote') {
+                arrOb.push({
+                    title: 'Cód. Lote',
+                    field: 'lote',
                     sorting: false,
-                    searchable: false,
-                    filterPlaceholder: 'Filtrar por status',
-                    render: (rowData: IExperimento) => (
-                        <div className='h-10 flex'>
-                            <div className="h-10">
-                                <Button
-                                    icon={<BiEdit size={16} />}
-                                    bgColor="bg-blue-600"
-                                    textColor="white"
-                                    title={`Editar ${rowData.experimento_name}`}
-                                    onClick={() => {
-                                        setCookies('pageBeforeEdit', currentPage?.toString());
-                                        setCookies("filterBeforeEdit", filtersParams)
-                                        router.push(`/listas/experimento/atualizar?id=${rowData.id}`);
-                                    }
-                                    }
-                                />
+                    render: (rowData: any) => (
+                        (
+                            <div className='h-10 flex'>
+                                <div className="
+                                            h-10
+                                            ">
+                                    <Button
+                                        icon={<BiEdit size={32} />}
+                                        title={`Atualizar ${rowData.name}`}
+                                        onClick={() => { }}
+                                        bgColor="bg-red-600"
+                                        textColor="white"
+                                    />
+                                </div>
                             </div>
-                            {rowData.status === 1
-                                ? (
-                                    <div className="h-10">
-                                        <Button
-                                            icon={<FaRegThumbsUp size={16} />}
-                                            onClick={async () => await handleStatus(
-                                                rowData.id, {
-                                                status: rowData.status,
-                                                ...rowData
-                                            }
-                                            )}
-                                            title={'Ativo'}
-                                            bgColor="bg-green-600"
-                                            textColor="white"
-                                        />
-                                    </div>
-                                )
-                                : (
-                                    <div className="h-10">
-                                        <Button
-                                            icon={<FaRegThumbsDown size={16} />}
-                                            onClick={async () => await handleStatus(
-                                                rowData.id, {
-                                                status: rowData.status,
-                                                ...rowData
-                                            }
-                                            )}
-                                            title={'Inativo'}
-                                            bgColor="bg-red-800"
-                                            textColor="white"
-                                        />
-                                    </div>
-                                )}
-                        </div>
-                    )
+                        )
+                    ),
                 });
             }
         });
@@ -369,7 +263,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
 
         await experimentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
             if (response.status === 200) {
-                setExperimento(response.response)
+                setParcela(response.response)
             }
         });
 
@@ -413,7 +307,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
 
         await experimentoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
             if (response.status === 200) {
-                setExperimento(response.response)
+                setParcela(response.response)
             }
         });
 
@@ -441,13 +335,13 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
         const totalString = selecionados.length;
         const campos = selecionados.substr(0, totalString - 1);
         if (preferences.id === 0) {
-            await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 22 }).then((response) => {
-                userLogado.preferences.experimento = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+            await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 23 }).then((response) => {
+                userLogado.preferences.parcelas = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
                 preferences.id = response.response.id;
             });
             localStorage.setItem('user', JSON.stringify(userLogado));
         } else {
-            userLogado.preferences.experimento = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+            userLogado.preferences.parcelas = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
             await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
             localStorage.setItem('user', JSON.stringify(userLogado));
         }
@@ -473,42 +367,23 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
             filterAplication += `&paramSelect=${camposGerenciados}`;
         }
 
-        await experimentoService.getAll(filterAplication).then((response) => {
-            if (response.status === 200) {
-                const newData = experimentos.map((row) => {
-                    if (row.status === 0) {
-                        row.status = 'Inativo' as any;
-                    } else {
-                        row.status = 'Ativo' as any;
-                    }
+        const workSheet = XLSX.utils.json_to_sheet(parcelas);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'parcelas');
 
-                    return row;
-                });
-
-                // newData.map((item: any) => {
-                //     return item.tecnologia = item.tecnologia?.tecnologia
-                // })
-
-                const workSheet = XLSX.utils.json_to_sheet(newData);
-                const workBook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
-
-                // Buffer
-                const buf = XLSX.write(workBook, {
-                    bookType: 'xlsx', // xlsx
-                    type: 'buffer'
-                });
-                // Binary
-                XLSX.write(workBook, {
-                    bookType: 'xlsx', // xlsx
-                    type: 'binary'
-                });
-                // Download
-                XLSX.writeFile(workBook, 'Experimentos.xlsx');
-            } else {
-                Swal.fire(response);
-            }
+        // Buffer
+        const buf = XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer'
         });
+        // Binary
+        XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary'
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Parcelas.xlsx');
+
     };
 
     function handleTotalPages(): void {
@@ -526,11 +401,11 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
         if (filter) {
             parametersFilter = parametersFilter + '&' + filter + '&' + cultureId;
         }
-        await experimentoService.getAll(parametersFilter).then((response) => {
-            if (response.status === 200) {
-                setExperimento(response.response);
-            }
-        });
+        // await parcelasService.getAll(parametersFilter).then((response) => {
+        //     if (response.status === 200) {
+        //         setParcela(response.response);
+        //     }
+        // });
     }
 
     useEffect(() => {
@@ -540,7 +415,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
 
     return (
         <>
-            <Head><title>Listagem de experimentos</title></Head>
+            <Head><title>Listagem de parcelas</title></Head>
 
             <Content contentHeader={tabsDropDowns}>
                 <main className="h-full w-full
@@ -548,11 +423,12 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                         items-start
                         gap-8
                         ">
-                    <AccordionFilter title="Filtrar experimentos">
+                    <AccordionFilter title="Filtrar parcelas">
                         <div className='w-full flex gap-2'>
                             <form
                                 className="flex flex-col
                                     w-full
+                                    h-full
                                     items-center
                                     px-4
                                     bg-white
@@ -563,13 +439,8 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                                         flex
                                         justify-center
                                         pb-2
+                                        mb-6
                                         ">
-                                    <div className="h-10 w-1/2 ml-4">
-                                        <label className="block text-gray-900 text-sm font-bold mb-2">
-                                            Status
-                                        </label>
-                                        <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
-                                    </div>
                                     <div className="h-10 w-1/2 ml-4">
                                         <label className="block text-gray-900 text-sm font-bold mb-2">
                                             Nome Protocolo
@@ -583,7 +454,6 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                                             onChange={formik.handleChange}
                                         />
                                     </div>
-
                                     <div className="h-10 w-1/2 ml-4">
                                         <label className="block text-gray-900 text-sm font-bold mb-2">
                                             Nome Experimento
@@ -597,23 +467,120 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                                             onChange={formik.handleChange}
                                         />
                                     </div>
-
                                     <div className="h-10 w-1/2 ml-4">
                                         <label className="block text-gray-900 text-sm font-bold mb-2">
-                                            Rótulo
+                                            Foco
                                         </label>
                                         <Input
                                             type="text"
-                                            placeholder="Rótulo"
+                                            placeholder="Foco"
                                             max="40"
-                                            id="filterRotulo"
-                                            name="filterRotulo"
+                                            id="filterFoco"
+                                            name="filterFoco"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Ensaio
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Ensaio"
+                                            max="40"
+                                            id="filterEnsaio"
+                                            name="filterEnsaio"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Cód tec.
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Cód tec."
+                                            max="40"
+                                            id="filterTecnologia"
+                                            name="filterTecnologia"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-2
+                                        ">
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            NCC
+                                        </label>
+                                        <Input
+                                            type="number"
+                                            placeholder="NCC"
+                                            max="40"
+                                            id="filterNcc"
+                                            name="filterNcc"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Nome un. cultura
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Nome un. cultura"
+                                            max="40"
+                                            id="filterCultureUnityName"
+                                            name="filterCultureUnityName"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Nome principal
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Nome principal"
+                                            max="40"
+                                            id="filterMainName"
+                                            name="filterMainName"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Nome do genótipo
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Nome do genótipo"
+                                            max="40"
+                                            id="filterGenotipoName"
+                                            name="filterGenotipoName"
+                                            onChange={formik.handleChange}
+                                        />
+                                    </div>
+                                    <div className="h-10 w-1/2 ml-4">
+                                        <label className="block text-gray-900 text-sm font-bold mb-2">
+                                            Cód lote
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Cód lote"
+                                            max="40"
+                                            id="filterLote"
+                                            name="filterLote"
                                             onChange={formik.handleChange}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="h-16 w-32 mt-3">
+
+                                <div className="h-12 w-32 mt-10">
                                     <Button
                                         type="submit"
                                         onClick={() => { }}
@@ -631,7 +598,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                         <MaterialTable
                             style={{ background: '#f9fafb' }}
                             columns={columns}
-                            data={experimentos}
+                            data={parcelas}
                             options={{
                                 showTitle: false,
                                 headerStyle: {
@@ -658,13 +625,11 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
 
                                         <div className='h-12'>
                                             <Button
-                                                title="Importar Planilha"
-                                                value="Importar Planilha"
+                                                title="Ação em massa"
+                                                value="Ação em massa"
                                                 bgColor="bg-blue-600"
                                                 textColor="white"
                                                 onClick={() => { }}
-                                                href="experimento/importar-planilha"
-                                                icon={<RiFileExcel2Line size={20} />}
                                             />
                                         </div>
 
@@ -715,8 +680,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                                             </div>
 
                                             <div className='h-12 flex items-center justify-center w-full'>
-                                                {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
-                                                <Button title="Exportar planilha de experimentos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel(); }} />
+                                                <Button title="Exportar planilha de parcelas" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel(); }} />
                                             </div>
                                             <div className='h-12 flex items-center justify-center w-full'>
                                                 <Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="experimento/importar-planilha/config-planilha" />

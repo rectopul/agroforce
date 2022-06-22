@@ -71,31 +71,32 @@ export class GenotipoController {
         });
         select = Object.assign({}, select);
       } else {
-        select = { 
-             id: true,
-             id_s1: true,
-             id_dados: true,
-             id_tecnologia: true,
-             name_genotipo: true,
-             name_main: true,
-             name_public: true,
-             name_experiment: true,
-             name_alter : true,
-             elit_name  : true,
-             type: true,
-             gmr : true,
-             bgm : true,
-             cruza: true,
-             progenitor_f_direto: true,
-             progenitor_m_direto: true,
-             progenitor_f_origem: true,
-             progenitor_m_origem: true,
-             progenitores_origem: true,
-             parentesco_completo: true,
-             status: true,
-             tecnologia: { select: { name: true, cod_tec: true} } };
+        select = {
+          id: true,
+          id_s1: true,
+          id_dados: true,
+          id_tecnologia: true,
+          name_genotipo: true,
+          name_main: true,
+          name_public: true,
+          name_experiment: true,
+          name_alter: true,
+          elit_name: true,
+          type: true,
+          gmr: true,
+          bgm: true,
+          cruza: true,
+          progenitor_f_direto: true,
+          progenitor_m_direto: true,
+          progenitor_f_origem: true,
+          progenitor_m_origem: true,
+          progenitores_origem: true,
+          parentesco_completo: true,
+          status: true,
+          tecnologia: { select: { name: true, cod_tec: true } }
+        };
       }
-      
+
       if (options.id_culture) {
         parameters.id_culture = parseInt(options.id_culture);
       }
@@ -139,6 +140,9 @@ export class GenotipoController {
       if (options.orderBy) {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
+
+      console.log('parameters')
+      console.log(parameters)
 
       const response: object | any = await this.genotipoRepository.findAll(
         parameters,
