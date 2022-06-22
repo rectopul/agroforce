@@ -13,21 +13,17 @@ import { IoMdArrowBack } from "react-icons/io";
 import { useRouter } from 'next/router';
 
 interface Idata {
-  safra: any;
+  idCulture: any;
 }
-export default function Importar({ safra }: Idata) {
+export default function Importar({ idCulture }: Idata) {
   const { TabsDropDowns } = ITabs;
-  const safras: object | any = [];
   const router = useRouter();
-  safra.map((value: string | object | any) => {
-    safras.push({ id: value.id, name: value.year });
-  })
 
-  function readExcel(value: any, safra: any,) {
+  function readExcel(value: any, idCulture: any,) {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 8, safra: safra, created_by: userLogado.id }).then((response) => {
+      importService.validate({ spreadSheet: rows, moduleId: 8, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -48,12 +44,12 @@ export default function Importar({ safra }: Idata) {
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      safra: '',
+      idCulture: 0,
       foco: '',
     },
     onSubmit: async (values) => {
       var inputFile: any = document.getElementById("inputFile");
-      readExcel(inputFile.files, values.safra);
+      readExcel(inputFile.files, values.idCulture);
     },
   });
   return (
@@ -121,26 +117,29 @@ export default function Importar({ safra }: Idata) {
 }
 
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { publicRuntimeConfig } = getConfig();
-  const token = req.cookies.token;
-  const cultureId = req.cookies.cultureId;
+// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+//   const { publicRuntimeConfig } = getConfig();
+//   const token = req.cookies.token;
+//   const idCulture = req.cookies.cultureId;
 
-  let param = `filterStatus=1&id_culture=${cultureId}`;
+//   let param = `filterStatus=1&id_culture=${idCulture}`;
 
-  const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
-  urlParametersSafra.search = new URLSearchParams(param).toString();
+//   const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
+//   urlParametersSafra.search = new URLSearchParams(param).toString();
 
-  const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
-  };
+//   const requestOptions: RequestInit | undefined = {
+//     method: 'GET',
+//     credentials: 'include',
+//     headers: { Authorization: `Bearer ${token}` }
+//   };
 
-  const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
-  let safra: any = await apiSafra.json();
+//   console.log('idCulture')
+//   console.log(idCulture)
 
-  safra = safra.response;
+//   const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
+//   let safra: any = await apiSafra.json();
 
-  return { props: { safra } }
-}
+//   safra = safra.response;
+
+//   return { props: { idCulture } }
+// }

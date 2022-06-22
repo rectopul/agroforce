@@ -4,8 +4,6 @@ export class TecnologiaController {
   tecnologiaRepository = new TecnologiaRepository();
 
   async getAll(options: object | any) {
-    console.log('options')
-    console.log(options)
     const parameters: object | any = {};
     let take;
     let skip;
@@ -68,18 +66,16 @@ export class TecnologiaController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-
-      console.log('parameters')
-      console.log(parameters)
-
       let response = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 }
       } else {
         return { status: 200, response, total: response.total }
       }
-    } catch (err) {
-      return { status: 400, response: [], total: 0 }
+    } catch (err: any) {
+      console.log("[Controller] - GetAll Tecnologia erro");
+      console.log(err.message);
+      throw new Error("[Controller] - GetAll Tecnologia erro")
     }
   }
 
@@ -96,8 +92,10 @@ export class TecnologiaController {
       } else {
         return { status: 405, response: { error: 'id não informado' } };
       }
-    } catch (err) {
-      return { status: 400, message: err }
+    } catch (err: any) {
+      console.log("[Controller] - GetOne Tecnologia erro");
+      console.log(err.message);
+      throw new Error("[Controller] - GetOne Tecnologia erro")
     }
   }
 
@@ -115,9 +113,11 @@ export class TecnologiaController {
           return { status: 400, message: "erro" }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
-      return { status: 400, message: err }
+      console.log("[Controller] - Create Tecnologia erro");
+      console.log(err.message);
+      throw new Error("[Controller] - Create Tecnologia erro")
     }
   }
 
@@ -141,8 +141,10 @@ export class TecnologiaController {
           return { status: 400, message: { message: "erro ao tentar fazer o update" } }
         }
       }
-    } catch (err) {
-      return { status: 400, message: err }
+    } catch (err: any) {
+      console.log("[Controller] - Update Tecnologia erro");
+      console.log(err.message);
+      throw new Error("[Controller] - Update Tecnologia erro")
     }
   }
 }
