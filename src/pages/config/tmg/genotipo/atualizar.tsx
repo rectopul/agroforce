@@ -686,11 +686,13 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 
           </div>
         </form>
-        <main className="h-4/6 w-full
+        <main className="w-full
           flex flex-col
           items-start
           gap-8
-        ">
+        "
+        style={{ height: '45%' }}
+        >
 
           <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable
