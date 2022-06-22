@@ -82,6 +82,7 @@ model safra {
   created_at        DateTime? @default(now())
 
   npe                 npe[]
+  genotipo            genotipo[]
   quadra              quadra[]
   foco_children       foco_children[]
   lote                lote[]
@@ -98,7 +99,7 @@ model uf {
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
-  login             String?              @unique(map: "User_email_key")
+  login             String?             @unique(map: "User_email_key")
   email             String?
   cpf               String              @unique(map: "User_cpf_key")
   tel               String?
@@ -280,6 +281,7 @@ model genotipo {
   id                  Int        @id @default(autoincrement())
   id_culture          Int
   id_tecnologia       Int
+  id_safra            Int
   id_s1               Int
   id_dados            String     @unique()
   name_genotipo       String
@@ -301,6 +303,7 @@ model genotipo {
   status              Int        @default(1)
   created_by          Int
   created_at          DateTime   @default(now())
+  safra               safra      @relation(fields: [id_safra], references: [id])
   culture             culture    @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia @relation(fields: [id_tecnologia], references: [id])
   lote                lote[]

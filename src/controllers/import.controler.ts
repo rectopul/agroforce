@@ -337,7 +337,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let ogm: any = await this.ogmController.getAll({ name: String(data.spreadSheet[keySheet][sheet]) });
+                  let ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
                   if (ogm.total == 0) {
                     // console.log('aqui OGM');
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tecnologia informado não existe no sistema.</li><br>`;
@@ -392,8 +392,11 @@ export class ImportController {
                     if (typeof (this.aux.id_foco) == 'undefined') {
                       return 'O foco precisa ser importado antes da NPEI';
                     }
-                    responseIfError[Column - 1] += await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
-                    if (responseIfError == "") {
+                    let resp: any = await this.npeController.validateNpeiDBA({ Column: Column, Line: Line, safra: data.safra, foco: this.aux.id_foco, npei: data.spreadSheet[keySheet][sheet] });
+                    if (resp.erro == 1) {
+                      responseIfError[Column - 1] += resp.message;
+                    }
+                    if (responseIfError.length === 0) {
                       this.aux.npei = data.spreadSheet[keySheet][sheet];
                     }
                   } else {
@@ -420,6 +423,7 @@ export class ImportController {
               }
 
               if (Column == configModule.lenght) {
+                // console.log('chogu aqui');
                 let npe: any = await this.npeController.getAll({
                   id_safra: data.safra,
                   id_foco: this.aux.id_foco,
@@ -427,6 +431,7 @@ export class ImportController {
                   id_ogm: this.aux.id_ogm,
                   epoca: this.aux.epoca
                 });
+                // console.log(npe);
                 if (npe.total > 0) {
                   responseIfError[Column - 1] = `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, dados já cadastrado no banco, para atualizar inative o que já está cadastrado`;
                 }
@@ -485,7 +490,7 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 let group: any = await this.groupoController.listAll({ id_safra: data.safra, id_foco: this.aux.id_foco });
-                this.aux.group = group.response[0].grupo;
+                this.aux.group = Number(group.response[0].grupo);
                 this.npeController.post(this.aux);
               }
             }
@@ -786,8 +791,8 @@ export class ImportController {
                 } else {
                   let cultura = await this.culturaController.getAllCulture({ name: data.spreadSheet[keySheet][sheet] });
                   if (cultura.total > 0) {
-                    if (data.spreadSheet[keySheet][sheet] != cultura.response[0].name) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura tem que ser igual a cultura filtrada no software.</li><br>`;
+                    if (data.id_culture != cultura.response[0].id) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura tem que ser igual a cultura selecionada.</li><br>`;
                     }
                   } else {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, cultura não existe.</li><br>`;
@@ -835,8 +840,6 @@ export class ImportController {
                 } else {
                   if (year_safra && year_safra != '') {
                     if (year_safra != data.spreadSheet[keySheet][sheet]) {
-                      console.log(year_safra);
-                      console.log(data.spreadSheet[keySheet][sheet]);
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
                     }
                     year_safra = '';
@@ -850,10 +853,13 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  let safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture });
-                  if (safra.count == 0) {
+                  let safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: String(data.spreadSheet[keySheet][sheet])});
+                  if (safra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
+                    if (safra.response[0].id != data.id_safra) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra informada diferente da safra selecionada.</li><br>`;
+                    }
                     if (year_lote && year_lote != '') {
                       if (year_lote != safra.response[0].year) {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
@@ -913,7 +919,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
-                  let geno: any = await this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
+                  let geno: any = await this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet], id_safra: data.id_safra });
                   if (geno.total > 0) {
                     this.aux.id_genotipo = geno.response[0].id;
                   }
@@ -1090,7 +1096,7 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.updategenotipo({
                     id: this.aux.id_genotipo,
-                    id_culture: Number(this.aux.id_culture),
+                    id_safra: Number(this.aux.id_safra),
                     id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
@@ -1116,6 +1122,7 @@ export class ImportController {
                   delete this.aux.id_genotipo;
                   let genotipo: any = await this.genotipoController.createGenotipo({
                     id_culture: this.aux.id_culture,
+                    id_safra: this.aux.id_safra,
                     id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
@@ -1690,7 +1697,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
-                  let layoutQuadra: any = this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture, filterStatus: 1 });
+                  let layoutQuadra: any = await this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture, status: 1 });
                   if (layoutQuadra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</li><br>`;
                   }
@@ -1998,7 +2005,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
-                  let esquema: any = await this.layoutQuadraController.getAll({ id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet], filterStatus: 1 });
+                  let esquema: any = await this.layoutQuadraController.getAll({ id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet], status: 1 });
                   if (esquema.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ja existe um esquema ativo com esse código.</li><br>`;
                   } else {
@@ -2051,7 +2058,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SL') {
-
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
                 } else {
@@ -2070,7 +2076,6 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'SC') {
-
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</li><br>`;
                 } else {
@@ -2097,15 +2102,12 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'CJ') {
-                console.log(data.spreadSheet[keySheet][sheet])
                 if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</li><br>`;
                 }
               }
 
               if (configModule.response[0].fields[sheet] == 'Dist') {
-                console.log(data.spreadSheet[keySheet][sheet])
-
                 if (data.spreadSheet[keySheet][sheet] == "" || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</li><br>`;
                 }
@@ -2167,7 +2169,15 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if ((this.aux.esquema) && this.aux.esquema != data.spreadSheet[keySheet][sheet]) {
+                    let layoutQuadra: any = await this.layoutQuadraController.getAll({ status: 1, id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet] });
+                    if (layoutQuadra.total > 0) {
+                      this.aux.id_layout_bd = layoutQuadra.response[0].id;
+                    } else {
+                      delete this.aux.id_layout_bd;
+                    }
                     count = 1;
+                  } else {
+                    delete this.aux.id_layout_bd;
                   }
                   let teste = data.spreadSheet[keySheet][sheet].split('');
                   this.aux.tiroFixo = teste[0] + teste[1];
@@ -2252,18 +2262,33 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 if (count == 1) {
-                  let saveLayout: any = await this.layoutQuadraController.post({
-                    id_culture: Number(this.aux.id_culture),
-                    esquema: this.aux.esquema,
-                    plantadeira: String(this.aux.plantadeira),
-                    parcelas: this.aux.parcelas,
-                    tiros: Number(this.aux.tiroFixo),
-                    disparos: Number(this.aux.disparoFixo),
-                    status: this.aux.status,
-                    created_by: this.aux.created_by,
-                  });
+                  if (this.aux.id_layout_bd) {
+                    let upLayout: any = await this.layoutQuadraController.update({
+                      id: Number(this.aux.id_layout_bd),
+                      id_culture: Number(this.aux.id_culture),
+                      esquema: this.aux.esquema,
+                      plantadeira: String(this.aux.plantadeira),
+                      parcelas: this.aux.parcelas,
+                      tiros: Number(this.aux.tiroFixo),
+                      disparos: Number(this.aux.disparoFixo),
+                      status: this.aux.status,
+                      created_by: this.aux.created_by,
+                    });
+                    this.aux.id_layout = this.aux.id_layout_bd;
+                  } else {
+                    let saveLayout: any = await this.layoutQuadraController.post({
+                      id_culture: Number(this.aux.id_culture),
+                      esquema: this.aux.esquema,
+                      plantadeira: String(this.aux.plantadeira),
+                      parcelas: this.aux.parcelas,
+                      tiros: Number(this.aux.tiroFixo),
+                      disparos: Number(this.aux.disparoFixo),
+                      status: this.aux.status,
+                      created_by: this.aux.created_by,
+                    });
+                    this.aux.id_layout = saveLayout.response.id;
+                  }
 
-                  this.aux.id_layout = saveLayout.response.id;
                   count++;
                 }
 

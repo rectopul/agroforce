@@ -100,6 +100,10 @@ export class GenotipoController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
+      if (options.id_safra) {
+        parameters.id_safra = parseInt(options.id_safra);
+      }
+
       if (options.id_dados) {
         parameters.id_dados = String(options.id_dados);
       }

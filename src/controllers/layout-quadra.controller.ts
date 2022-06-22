@@ -4,6 +4,7 @@ export class LayoutQuadraController {
     Repository = new LayoutQuadraRepository();
 
     async getAll(options: object | any) {
+        console.log(options)
         const parameters: object | any = {};
         let take;
         let skip;
@@ -49,6 +50,10 @@ export class LayoutQuadraController {
                 parameters.esquema = options.esquema;
             }
 
+            if (options.status) {
+                parameters.status = Number(options.status);
+            }
+
             if (options.id_culture) {
                 parameters.id_culture = Number(options.id_culture);
             }
@@ -80,7 +85,7 @@ export class LayoutQuadraController {
                 });
                 select = Object.assign({}, select);
             } else {
-                select = {id: true, esquema: true, plantadeira:true, disparos:true, tiros:true, parcelas:true, status: true};
+                select = {id: true, esquema: true, plantadeira:true, disparos:true, tiros:true, parcelas:true, status: true, id_culture: true};
             }
 
             let response =  await this.Repository.findAll(parameters, select, take, skip, orderBy);
