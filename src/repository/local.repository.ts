@@ -2,35 +2,25 @@ import { prisma } from '../pages/api/db/db';
 
 export class LocalRepository {
   async findOne(id: number) {
-    try {
-      const result = await prisma.local.findUnique({
-        where: {
-          id: id
-        }
-      })
-      return result;
-    } catch (error) {
-      console.log("[Repository] - FindOne local error");
-      console.log(error);
-      throw new Error("[Repository] - FindOne local error")
-    }
+    const result = await prisma.local.findUnique({
+      where: {
+        id: id
+      }
+    })
+    return result;
+
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-    try {
-      let order: object | any;
-      if (orderBy) {
-        order = JSON.parse(orderBy);
-      }
-      const count = await prisma.local.count({ where: where })
-      const result: object | any = await prisma.local.findMany({ select: select, skip: skip, take: take, where: where, orderBy: order })
-      result.total = count;
-      return result;
-    } catch (error) {
-      console.log("[Repository] - FindAll local erro");
-      console.log(error);
-      throw new Error("[Repository] - FindAll local erro")
+    let order: object | any;
+    if (orderBy) {
+      order = JSON.parse(orderBy);
     }
+    const count = await prisma.local.count({ where: where })
+    const result: object | any = await prisma.local.findMany({ select: select, skip: skip, take: take, where: where, orderBy: order })
+    result.total = count;
+    return result;
+
   }
 
   async findUFs(where: any, select: any, take: any, skip: any, orderBy: string | any) {
@@ -61,30 +51,18 @@ export class LocalRepository {
   }
 
   async create(local: object | any) {
-    try {
-      local.created_at = new Date();
-      const result = await prisma.local.create({ data: local })
-      return result;
-    } catch (error) {
-      console.log("[Repository] - Create local erro");
-      console.log(error);
-      throw new Error("[Repository] - Create local erro")
-    }
+    local.created_at = new Date();
+    const result = await prisma.local.create({ data: local })
+    return result;
   }
 
   async update(id: number, data: Object) {
-    try {
-      const result = await prisma.local.update({
-        where: { id: id },
-        data: data
-      })
+    const result = await prisma.local.update({
+      where: { id: id },
+      data: data
+    })
 
-      return result;
-    } catch (error) {
-      console.log("[Repository] - Update local erro");
-      console.log(error);
-      throw new Error("[Repository] - Update local erro")
-    }
+    return result;
   }
 }
 

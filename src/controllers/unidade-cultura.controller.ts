@@ -45,7 +45,7 @@ export class UnidadeCulturaController {
         } catch (err: any) {
             console.log("[Controller] - Create Unidade Cultura erro");
             console.log(err.message);
-            throw new Error(err.message)
+            throw new Error("[Controller] - Create Unidade Cultura erro")
         }
     }
 

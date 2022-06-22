@@ -193,13 +193,10 @@ export class ImportController {
     }
   }
 
-  async validateTechnology(data: object | any) {
+  async validateTechnology({ spreadSheet, moduleId, id_culture, created_by }: object | any) {
     const responseIfError: any = [];
-    const spreadSheet = data.spreadSheet
-    console.log('spreadSheet')
-    console.log(spreadSheet)
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(parseInt(moduleId));
       for (let row in spreadSheet) {
         for (let column in spreadSheet[row]) {
           if (row === '0') {
@@ -214,17 +211,12 @@ export class ImportController {
             } else {
               if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o limite de caracteres para o Código da tecnologia e 2. </li> <br>`;
+              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                spreadSheet[row][column] = "0" + spreadSheet[row][column].toString()
               } else {
-                console.log('spreadSheet[row][0]')
-                console.log(spreadSheet[row][0])
-                const { response: responseCulture } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
-                console.log('responseCulture')
-                console.log(responseCulture)
-                const technology = await this.tecnologiaController.getAll({ id_culture: responseCulture[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
-                console.log('technology')
-                console.log(technology)
-                if (technology.total > 0) {
-                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada. </li> <br>`
+                const technology = await this.tecnologiaController.getAll({ id_culture: id_culture, cod_tec: (spreadSheet[row][0].toString()) })
+                if (technology.response?.length > 0) {
+                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada nessa cultura. </li> <br>`
                 }
               }
 
@@ -243,8 +235,13 @@ export class ImportController {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Cultura é obrigatório. </li> <br>`;
             } else {
               const cultureExist = await this.culturaController.getAllCulture({ name: spreadSheet[row][column] })
-              if (cultureExist.status !== 200) {
+              if (cultureExist.response?.length === 0) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura não esta cadastrada. </li> <br>`;
+              } else {
+                const cultureSeleciona = await this.culturaController.getOneCulture(id_culture);
+                if (cultureSeleciona.response?.name !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura e diferente da cultura selecionada. </li> <br>`;
+                }
               }
             }
 
@@ -853,7 +850,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  let safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: String(data.spreadSheet[keySheet][sheet])});
+                  let safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: String(data.spreadSheet[keySheet][sheet]) });
                   if (safra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
@@ -1299,6 +1296,7 @@ export class ImportController {
 
   async validateLocal({ spreadSheet, moduleId, id_safra, created_by }: object | any) {
     const responseIfError: any = [];
+    console.log(spreadSheet)
     try {
       const configModule: object | any = await this.getAll(parseInt(moduleId));
       for (let row in spreadSheet) {
@@ -1310,12 +1308,16 @@ export class ImportController {
           }
           else if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
 
+
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID da unidade de cultura é obrigatório. </li> <br>`;
+            } else if (typeof (spreadSheet[row][column]) !== "number") {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do unidade de cultura deve ser numérico. </li> <br>`;
             }
           }
 
           else if (spreadSheet[0][column].includes('Ano')) {
+
 
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano é obrigatório. </li> <br>`;
@@ -1323,6 +1325,8 @@ export class ImportController {
               const safraYearValidate = await this.safraController.getOneSafra(id_safra)
               if (safraYearValidate.response?.year !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano não corresponde ao ano da safra selecionada. </li> <br>`;
+              } else if (typeof (spreadSheet[row][column]) !== "number") {
+                responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano deve ser numérico. </li> <br>`;
               }
             }
 
@@ -1338,8 +1342,11 @@ export class ImportController {
           }
 
           else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do Lugar da cultura é obrigatório. </li> <br>`;
+            } else if (typeof (spreadSheet[row][column]) !== "number") {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do Lugar da cultura deve ser numérico. </li> <br>`;
             }
           }
 
@@ -1370,6 +1377,8 @@ export class ImportController {
           else if (spreadSheet[0][column].includes('Identificador de localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de localidade é obrigatório. </li> <br>`;
+            } else if (typeof (spreadSheet[row][column]) !== "number") {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de localidade deve ser numérico. </li> <br>`;
             }
           }
 
@@ -1382,6 +1391,8 @@ export class ImportController {
           else if (spreadSheet[0][column].includes('Identificador de região')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de região é obrigatório. </li> <br>`;
+            } else if (typeof (spreadSheet[row][column]) !== "number") {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Identificador de região deve ser numérico. </li> <br>`;
             }
           }
 
@@ -1400,6 +1411,8 @@ export class ImportController {
           else if (spreadSheet[0][column].includes('ID do País')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do País é obrigatório. </li> <br>`;
+            } else if (typeof (spreadSheet[row][column]) !== "number") {
+              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo ID do País deve ser numérico. </li> <br>`;
             }
           }
 
@@ -1416,9 +1429,6 @@ export class ImportController {
           }
         }
       }
-
-      console.log('responseIfError')
-      console.log(responseIfError)
 
 
       if (responseIfError.length === 0) {
@@ -1512,7 +1522,7 @@ export class ImportController {
             } catch (err) {
               console.log("Error save import local")
               console.log(err)
-              return `${err}`;
+              return "Erro ao salvar local no banco";
             }
           }
         }
