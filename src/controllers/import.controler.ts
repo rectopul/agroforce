@@ -609,7 +609,7 @@ export class ImportController {
                           count_trat_ant = count_trat;
                           count_trat = tratamento_anterior;
                           if (count_trat != count_trat_ant) {
-                            return 'O número de tratamento deve ser igual para todas repetições';
+                            responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                           }
                         }
                       }
@@ -618,8 +618,7 @@ export class ImportController {
 
                     if (data.spreadSheet.length == Line) {
                       if (data.spreadSheet[keySheet][sheet] != count_trat) {
-                        console.log('entrou 2')
-                        return 'O número de tratamento deve ser igual para todas repetições';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                       }
                     }
 
