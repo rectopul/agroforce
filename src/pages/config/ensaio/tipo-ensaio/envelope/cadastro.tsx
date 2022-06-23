@@ -95,12 +95,12 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                     <h1 className="text-2xl">Novo Envelope</h1>
 
                     <div className="w-1/2
-            flex 
-            justify-around
-            gap-6
-            mt-4
-            mb-4
-        ">
+                                flex 
+                                justify-around
+                                gap-6
+                                mt-4
+                                mb-4
+                            ">
                         <div className="w-full h-10">
                             <label className="block text-gray-900 text-sm font-bold mb-2">
                                 Safra

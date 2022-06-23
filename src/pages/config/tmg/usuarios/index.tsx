@@ -1,28 +1,31 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, userService } from "src/services";
-import { handleFormatTel } from "src/shared/utils/tel";
-import * as XLSX from 'xlsx';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../../components";
-import * as ITabs from '../../../../shared/utils/dropdown';
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { FiUserPlus } from 'react-icons/fi';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { userPreferencesService, userService } from 'src/services';
+import { handleFormatTel } from 'src/shared/utils/tel';
+import * as XLSX from 'xlsx';
 import { removeCookies, setCookies } from 'cookies-next';
-
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select,
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IUsers {
   id: number,
@@ -55,24 +58,26 @@ interface IData {
   filterBeforeEdit: string | any;
 }
 
-export default function Listagem({ alItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({
+  alItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    tab.titleTab === 'TMG' && tab.data.map((i) => i.labelDropDown === 'Usuários')
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: "id,avatar,name,tel,login,status" };
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: 'id,avatar,name,tel,login,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [users, setData] = useState<IUsers[]>(() => alItems);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderName, setOrderName] = useState<number>(1);
   const [orderLogin, setOrderLogin] = useState<number>(1);
   const [arrowName, setArrowName] = useState<any>('');
@@ -80,12 +85,24 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
   const [filter, setFilter] = useState<any>(filterAplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Avatar", value: "avatar", defaultChecked: () => camposGerenciados.includes('avatar') },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Login", value: "login", defaultChecked: () => camposGerenciados.includes('login') },
-    { name: "CamposGerenciados[]", title: "Telefone", value: "tel", defaultChecked: () => camposGerenciados.includes('tel') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
+    {
+      name: 'CamposGerenciados[]', title: 'Favorito', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Avatar', value: 'avatar', defaultChecked: () => camposGerenciados.includes('avatar'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Login', value: 'login', defaultChecked: () => camposGerenciados.includes('login'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Telefone', value: 'tel', defaultChecked: () => camposGerenciados.includes('tel'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
@@ -105,15 +122,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&filterLogin=${filterLogin}`
-      setFiltersParams(parametersFilter)
-      setCookies("filterBeforeEdit", filtersParams)
-      await userService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterName=${filterName}&filterLogin=${filterLogin}`;
+      setFiltersParams(parametersFilter);
+      setCookies('filterBeforeEdit', filtersParams);
+      await userService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setData(response.response);
         setTotalItems(response.total);
-        setCurrentPage(0)
-      })
+        setCurrentPage(0);
+      });
     },
   });
 
@@ -123,32 +140,32 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('')
+  const filterStatus = filterBeforeEdit.split('');
 
   function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
-    let arrOb: any = [];
+    const ObjetCampos: any = camposGerenciados.split(',');
+    const arrOb: any = [];
 
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
-          title: "",
-          field: "id",
+          title: '',
+          field: 'id',
           width: 0,
           render: () => (
             colorStar === '#eba417' ? (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('')}
                   >
-                    <AiTwotoneStar size={25} color={'#eba417'} />
+                    <AiTwotoneStar size={25} color="#eba417" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
@@ -160,13 +177,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
               </div>
             )
           ),
-        })
+        });
       }
 
       if (ObjetCampos[item] === 'avatar') {
         arrOb.push({
-          title: "Avatar",
-          field: "avatar",
+          title: 'Avatar',
+          field: 'avatar',
           sorting: false,
           width: 0,
           exports: false,
@@ -182,62 +199,63 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
               // eslint-disable-next-line @next/next/no-img-element
               <img src={rowData.avatar} alt={rowData.name} style={{ width: 45, height: 43, borderRadius: 99999 }} />
             )
-          )
+          ),
         });
       }
       if (ObjetCampos[item] === 'name') {
         arrOb.push({
           title: (
-            <div className='flex items-center'>
+            <div className="flex items-center">
               {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
+              <button className="font-medium text-gray-900" onClick={() => handleOrderName('name', orderName)}>
                 Nome
               </button>
             </div>
           ),
-          field: "name",
-          sorting: false
+          field: 'name',
+          sorting: false,
         });
       }
 
       if (ObjetCampos[item] === 'login') {
         arrOb.push({
           title: (
-            <div className='flex items-center'>
+            <div className="flex items-center">
               {arrowLogin}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderLogin('login', orderLogin)}>
+              <button className="font-medium text-gray-900" onClick={() => handleOrderLogin('login', orderLogin)}>
                 Login
               </button>
             </div>
           ),
-          field: "login",
-          sorting: false
+          field: 'login',
+          sorting: false,
         });
       }
       if (ObjetCampos[item] === 'tel') {
         arrOb.push({
-          title: "Telefone",
-          field: "tel",
+          title: 'Telefone',
+          field: 'tel',
           sorting: false,
           render: (rowData: IUsers) => (
             handleFormatTel(rowData.tel)
-          )
-        })
+          ),
+        });
       }
       if (ObjetCampos[item] === 'status') {
         arrOb.push({
-          title: "Status",
-          field: "status",
+          title: 'Status',
+          field: 'status',
           sorting: false,
           searchable: false,
-          filterPlaceholder: "Filtrar por status",
+          filterPlaceholder: 'Filtrar por status',
           render: (rowData: IUsers) => (
             rowData.status ? (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div className="
                   h-10
-                ">
-                  {/* <Button 
+                "
+                >
+                  {/* <Button
                     icon={<FaRegUserCircle size={16} />}
                     onClick={() =>{}}
                     title={`Perfil de ${rowData.name}`}
@@ -248,14 +266,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 </div>
                 <div className="
                   h-10
-                ">
+                "
+                >
                   <Button
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
+                      setCookies('pageBeforeEdit', currentPage?.toString());
+                      setCookies('filterBeforeEdit', filtersParams);
+                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
                     }}
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -272,11 +291,12 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div className="
                   h-10
-                ">
-                  {/* <Button 
+                "
+                >
+                  {/* <Button
                     icon={<FaRegUserCircle size={16} />}
                     title={`Perfil de ${rowData.name}`}
                     onClick={() =>{}}
@@ -287,14 +307,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                 </div>
                 <div className="
                   h-10
-                ">
+                "
+                >
                   <Button
                     icon={<BiEdit size={16} />}
                     title={`Atualizar ${rowData.name}`}
                     onClick={() => {
-                      setCookies("pageBeforeEdit", currentPage?.toString())
-                      setCookies("filterBeforeEdit", filtersParams)
-                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`)
+                      setCookies('pageBeforeEdit', currentPage?.toString());
+                      setCookies('filterBeforeEdit', filtersParams);
+                      router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
                     }}
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -304,9 +325,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
                     title="Inativo"
-                    onClick={() => handleStatus(
-                      rowData.id, !rowData.status
-                    )}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -314,22 +333,22 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
               </div>
             )
           ),
-        })
+        });
       }
     });
     return arrOb;
-  };
+  }
 
   async function getValuesComluns(): Promise<void> {
-    let els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
-        selecionados += els[i].value + ',';
+        selecionados += `${els[i].value},`;
       }
     }
-    let totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString - 1)
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 1 }).then((response) => {
         userLogado.preferences.usuario = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
@@ -344,7 +363,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
+  }
 
   async function handleStatus(id: number, status: any): Promise<void> {
     if (status) {
@@ -353,7 +372,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       status = 0;
     }
 
-    await userService.update({ id: id, status: status });
+    await userService.update({ id, status });
     const index = users.findIndex((user) => user.id === id);
 
     if (index === -1) {
@@ -365,7 +384,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       copy[index].status = status;
       return copy;
     });
-  };
+  }
 
   async function handleOrderLogin(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -378,32 +397,29 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       typeOrder = '';
     }
 
-    console.log('filter')
-    console.log(filter)
+    console.log('filter');
+    console.log(filter);
 
     if (filter && typeof (filter) !== undefined) {
       if (typeOrder !== '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
-      if (typeOrder !== '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
+      parametersFilter = filter;
     }
 
+    console.log('parametersFilter');
+    console.log(parametersFilter);
 
-    console.log('parametersFilter')
-    console.log(parametersFilter)
-
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await userService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setData(response.response)
+        setData(response.response);
       }
-    })
+    });
     if (orderLogin === 2) {
       setOrderLogin(0);
       setArrowLogin(<AiOutlineArrowDown />);
@@ -415,7 +431,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         setArrowLogin('');
       }
     }
-  };
+  }
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -430,21 +446,19 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
     if (filter && typeof (filter) !== undefined) {
       if (typeOrder !== '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
-      if (typeOrder !== '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
+      parametersFilter = filter;
     }
 
-    await userService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await userService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setData(response.response)
+        setData(response.response);
       }
     });
 
@@ -459,7 +473,7 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
         setArrowName('');
       }
     }
-  };
+  }
 
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
@@ -471,10 +485,10 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     items.splice(index, 0, reorderedItem);
 
     setGenaratesProps(items);
-  };
+  }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
+    if (!filterAplication.includes('paramSelect')) {
       filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -484,9 +498,9 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
           delete row.avatar;
 
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = 'Inativo';
           } else {
-            row.status = "Ativo";
+            row.status = 'Ativo';
           }
 
           return row;
@@ -494,20 +508,20 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'usuarios');
 
         // Buffer
-        let buf = XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
-          type: "buffer",
+        const buf = XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx || csv
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx || csv
-          type: "binary",
+          bookType: 'xlsx', // xlsx || csv
+          type: 'binary',
         });
         // Download xlsx || csv
-        XLSX.writeFile(workBook, "Usuários.xlsx");
+        XLSX.writeFile(workBook, 'Usuários.xlsx');
       }
     });
   };
@@ -518,21 +532,21 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
     }
-  };
+  }
 
   async function handlePagination(): Promise<void> {
-    let skip = Number(currentPage) * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    const skip = Number(currentPage) * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter;
+      parametersFilter = `${parametersFilter}&${filter}`;
     }
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setData(response.response);
       }
     });
-  };
+  }
 
   useEffect(() => {
     handlePagination();
@@ -544,14 +558,15 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
       <Head>
         <title>Listagem de usuários</title>
       </Head>
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
-        ">
+        "
+        >
           <AccordionFilter title="Filtrar usuários">
-            <div className='w-full flex gap-2'>
+            <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
                   w-full
@@ -565,12 +580,13 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                   flex
                   justify-center
                   pb-2
-                ">
+                "
+                >
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -624,17 +640,17 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20
+                  zIndex: 20,
                 },
                 rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage
+                pageSize: itensPerPage,
               }}
               components={{
                 Toolbar: () => (
                   <div
-                    className='w-full max-h-96	
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -644,35 +660,41 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                     px-5
                     border-solid border-b
                     border-gray-200
-                  '>
-                    <div className='h-12'>
+                  "
+                  >
+                    <div className="h-12">
                       <Button
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push('usuarios/cadastro') }}
+                        onClick={() => { router.push('usuarios/cadastro'); }}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
-                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className="h-full flex items-center gap-2
+                    "
+                    >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId='characters'>
+                              <Droppable droppableId="characters">
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
                                         <Button
                                           value="Atualizar"
-                                          bgColor='bg-blue-600'
-                                          textColor='white'
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
                                           onClick={getValuesComluns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
@@ -702,69 +724,65 @@ export default function Listagem({ alItems, itensPerPage, filterAplication, tota
                           </AccordionFilter>
                         </div>
                       </div>
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Exportar planilha de usuários" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de usuários" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
-                  <>
-                    <div
-                      className="flex
-                      h-20 
-                      gap-2 
+                  <div
+                    className="flex
+                      h-20
+                      gap-2
                       pr-2
-                      py-5 
+                      py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
                         Array(1).fill('').map((value, index) => (
-                          <>
-                            <Button
-                              key={index}
-                              onClick={() => setCurrentPage(index)}
-                              value={`${currentPage + 1}`}
-                              bgColor="bg-blue-600"
-                              textColor="white"
-                              disabled={true}
-                            />
-                          </>
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
                         ))
                       }
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
-                  </>
-                ) as any
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>
@@ -779,13 +797,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-  const token = req.cookies.token;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const { token } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -796,7 +814,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const user = await fetch(urlParameters.toString(), requestOptions);
@@ -812,7 +830,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       itensPerPage,
       filterAplication,
       pageBeforeEdit,
-      filterBeforeEdit
+      filterBeforeEdit,
     },
-  }
-}
+  };
+};
