@@ -597,8 +597,10 @@ export class ImportController {
                   if (typeof (data.spreadSheet[keySheet][sheet]) != 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tratamento tem que ser um numero.</li><br>`;
                   } else {
-
-                    if ((name_atual != name_anterior) || (repeticao != repeticao_anterior)) {
+                    if ((name_atual != name_anterior)) {
+                      count_trat = 0;
+                      tratamento_anterior = 0;
+                    } else if ((repeticao != repeticao_anterior)) {
                       if (repeticao != repeticao_anterior) {
                         if (count_trat == 0) {
                           count_trat_ant = count_trat;
@@ -616,6 +618,7 @@ export class ImportController {
 
                     if (data.spreadSheet.length == Line) {
                       if (data.spreadSheet[keySheet][sheet] != count_trat) {
+                        console.log('entrou 2')
                         return 'O número de tratamento deve ser igual para todas repetições';
                       }
                     }
@@ -674,7 +677,6 @@ export class ImportController {
             if (keySheet != '0') {
               if (configModule.response[0].fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
-                  console.log('entrou name1')
                   name_anterior = data.spreadSheet[keySheet][sheet];
                   name_atual = data.spreadSheet[keySheet][sheet];
                 } else {

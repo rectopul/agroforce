@@ -25,8 +25,8 @@ import {
     AccordionFilter,
     Button, CheckBox, Content,
     Input,
-} from "../../../components";
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IData {
     allItens: any;
@@ -74,7 +74,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
     const router = useRouter();
 
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
-    const preferences = userLogado.preferences.materiais || { id: 0, table_preferences: "id,tratamentos,prox_nivel,name_main,name_genotipo,id_culture,cod_lote,ncc,acao" };
+    const preferences = userLogado.preferences.materiais || { id: 0, table_preferences: "status,tratamentos,prox_nivel,name_main,name_genotipo,id_culture,cod_lote,ncc,acao" };
     const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
     const [materiais, setMateriais] = useState<any>(() => allItens);
@@ -86,7 +86,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
     const [filter, setFilter] = useState<any>(filterAplication);
     const [colorStar, setColorStar] = useState<string>('');
     const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-        { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+        { name: "CamposGerenciados[]", title: "Status", value: "status" },
         { name: "CamposGerenciados[]", title: "N tratamento", value: "tratamentos" },
         { name: "CamposGerenciados[]", title: "N linhas de próx. nível", value: "prox_nivel" },
         { name: "CamposGerenciados[]", title: "Nome principal", value: "name_main" },
@@ -94,7 +94,6 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
         { name: "CamposGerenciados[]", title: "Cultura", value: "id_culture" },
         { name: "CamposGerenciados[]", title: "Cód. Lote", value: "cod_lote" },
         { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
-        { name: "CamposGerenciados[]", title: "Ação", value: "acao" }
     ]);
 
     const take: number = itensPerPage;
@@ -148,37 +147,12 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
         let arrOb: any = [];
 
         Object.keys(ObjetCampos).forEach((item, index) => {
-            if (ObjetCampos[index] === 'id') {
+            if (ObjetCampos[index] === 'status') {
                 arrOb.push({
-                    title: "",
-                    field: "id",
-                    width: 0,
-                    render: () => (
-                        colorStar === '#eba417' ? (
-                            <div className='h-10 flex'>
-                                <div>
-                                    <button
-                                        className="w-full h-full flex items-center justify-center border-0"
-                                        onClick={() => setColorStar('')}
-                                    >
-                                        <AiTwotoneStar size={25} color={'#eba417'} />
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className='h-10 flex'>
-                                <div>
-                                    <button
-                                        className="w-full h-full flex items-center justify-center border-0"
-                                        onClick={() => setColorStar('#eba417')}
-                                    >
-                                        <AiTwotoneStar size={25} />
-                                    </button>
-                                </div>
-                            </div>
-                        )
-                    ),
-                })
+                    title: "Status",
+                    field: "status",
+                    sorting: false
+                });
             }
             if (ObjetCampos[index] === 'tratamentos') {
                 arrOb.push({
@@ -385,7 +359,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 
     return (
         <>
-            <Head><title>Atualizar Experimento</title></Head>
+            <Head><title>Dados do experimento</title></Head>
 
             <Content contentHeader={tabsDropDowns}>
                 <form
@@ -393,7 +367,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
                     onSubmit={formik.handleSubmit}
                 >
                     <div className="w-full flex justify-between items-start">
-                        <h1 className="text-2xl">Atualizar Experimento</h1>
+                        <h1 className="text-2xl">Dados do experimento</h1>
                     </div>
 
                     <div className="w-full
@@ -446,11 +420,12 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
                     </div>
 
                     <div className="w-full
-            flex 
-            justify-around
-            gap-6
-            mb-4
-          ">
+                            flex 
+                            justify-around
+                            gap-6
+                            mt-6
+                            mb-4
+                        ">
                         <div className="w-full h-10">
                             <label className="block text-gray-900 text-sm font-bold mb-2">
                                 Foco
@@ -517,6 +492,33 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
                             />
                         </div>
                     </div>
+                    <div className="rounded border-inherit mt-16 mb-6 text-xl">
+                        <hr></hr>
+                        <h1 className="text-2xl mt-4">Dados do local</h1>
+                    </div>
+                    <div className="w-full
+                            flex 
+                            justify-around
+                            gap-6
+                            mb-4
+                        ">
+                        <div className="w-full">
+                            <label className="block text-gray-900 text-sm font-bold mb-2">
+                                Nome un. cultura
+                            </label>
+                            <Input
+                                style={{ background: '#e5e7eb' }}
+                                id="unidade_cultura_name"
+                                name="unidade_cultura_name"
+                                disabled
+                                onChange={formik.handleChange}
+                                value={formik.values.unidade_cultura_name}
+                            />
+                        </div>
+                    </div>
+
+
+
                     <div className="
             h-10 w-full
             flex

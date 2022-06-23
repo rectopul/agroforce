@@ -398,7 +398,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   useEffect(() => {
     async function handlePagination(): Promise<void> {
       let skip = currentPage * Number(take);
-      let parametersFilter = `skip="${skip}&take=${take}`;
+      let parametersFilter = `skip=${skip}&take=${take}`;
 
       if (filter) {
         parametersFilter = parametersFilter + "&" + filter;
