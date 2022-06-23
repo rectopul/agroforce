@@ -609,7 +609,7 @@ export class ImportController {
                           count_trat_ant = count_trat;
                           count_trat = tratamento_anterior;
                           if (count_trat != count_trat_ant) {
-                            return 'O número de tratamento deve ser igual para todas repetições';
+                            responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                           }
                         }
                       }
@@ -618,19 +618,18 @@ export class ImportController {
 
                     if (data.spreadSheet.length == Line) {
                       if (data.spreadSheet[keySheet][sheet] != count_trat) {
-                        console.log('entrou 2')
-                        return 'O número de tratamento deve ser igual para todas repetições';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                       }
                     }
 
                     if (tratamento_anterior == 0) {
                       tratamento_anterior = data.spreadSheet[keySheet][sheet];
                       if (data.spreadSheet[keySheet][sheet] != 1) {
-                        return 'O número de tratamento deve iniciar com 1';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve iniciar com 1.</li><br>`;
                       }
                     } else {
                       if (tratamento_anterior >= data.spreadSheet[keySheet][sheet]) {
-                        return 'A coluna de tratamento deve está em ordem crescente para cada repetição.';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,A coluna de tratamento deve está em ordem crescente para cada repetição..</li><br>`;
                       } else {
                         tratamento_anterior = data.spreadSheet[keySheet][sheet];
                       }
