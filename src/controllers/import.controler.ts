@@ -625,11 +625,11 @@ export class ImportController {
                     if (tratamento_anterior == 0) {
                       tratamento_anterior = data.spreadSheet[keySheet][sheet];
                       if (data.spreadSheet[keySheet][sheet] != 1) {
-                        return 'O número de tratamento deve iniciar com 1';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve iniciar com 1.</li><br>`;
                       }
                     } else {
                       if (tratamento_anterior >= data.spreadSheet[keySheet][sheet]) {
-                        return 'A coluna de tratamento deve está em ordem crescente para cada repetição.';
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,A coluna de tratamento deve está em ordem crescente para cada repetição..</li><br>`;
                       } else {
                         tratamento_anterior = data.spreadSheet[keySheet][sheet];
                       }
