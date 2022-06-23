@@ -49,6 +49,7 @@ interface IUpdateExperimento {
     id: Number | any;
     protocolo_name: String | any;
     experimento_name: String | any;
+    unidade_cultura_name: String | any;
     rotulo: String | any;
     foco: String | any;
     ensaio: String | any;
@@ -107,6 +108,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
             id: experimento.id,
             protocolo_name: experimento.protocolo_name,
             experimento_name: experimento.experimento_name,
+            unidade_cultura_name: experimento.unidade_cultura_name,
             rotulo: experimento.rotulo,
             foco: experimento.foco.name,
             ensaio: experimento.ensaio.name,
