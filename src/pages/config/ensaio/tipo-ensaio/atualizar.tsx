@@ -78,7 +78,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds" },
+    { name: "CamposGerenciados[]", title: "Quant. de sementes por envelope", value: "seeds" },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" }
   ]);
@@ -172,7 +172,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
       }
       if (ObjetCampos[index] === 'seeds') {
         arrOb.push({
-          title: "Envelope",
+          title: "Quant. de sementes por envelope",
           field: "seeds",
           sorting: false
         });
@@ -187,7 +187,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
       if (ObjetCampos[index] === 'status') {
         arrOb.push({
           title: "Status",
-          field: "envelope",
+          field: "status",
           sorting: false,
           render: (rowData: any) => (
             <div className='h-10 flex'>
@@ -331,7 +331,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Envelope.xlsx");
+        XLSX.writeFile(workBook, "Envelopes.xlsx");
       }
     });
   };
@@ -465,8 +465,8 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
                   '>
                     <div className='h-12'>
                       <Button
-                        title="Cadastrar envelope"
-                        value="Cadastrar envelope"
+                        title="Cadastrar Quant. de sementes por envelope"
+                        value="Cadastrar Quant. de sementes por envelope"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => { router.push(`envelope/cadastro?id_type_assay=${id_type_assay}`) }}
@@ -521,7 +521,7 @@ export default function NovoLocal({ typeAssay, id_type_assay, response, totalIte
                       </div>
 
                       <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Exportar planilha de envelopes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <Button title="Exportar planilha de quant. de sementes por envelope" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
                       </div>
                     </div>
                   </div>

@@ -75,8 +75,6 @@ export class EnvelopeController {
     }
 
     async listAll(options: any) {
-        console.log('options')
-        console.log(options)
         const parameters: object | any = {};
         let take;
         let skip;
