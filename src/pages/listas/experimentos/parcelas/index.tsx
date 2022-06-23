@@ -61,10 +61,10 @@ interface IData {
 export default function Listagem({ allExperimentos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
     const { TabsDropDowns } = ITabs;
 
-    const tabsDropDowns = TabsDropDowns();
+    const tabsDropDowns = TabsDropDowns('listas');
 
     tabsDropDowns.map((tab) => (
-        tab.titleTab === 'Parcela'
+        tab.titleTab === 'EXPERIMENTOS'
             ? tab.statusTab = true
             : tab.statusTab = false
     ));
@@ -130,6 +130,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
     function columnsOrder(camposGerenciados: any): any {
         const ObjetCampos: any = camposGerenciados.split(',');
         const arrOb: any = [];
+				
 
         Object.keys(ObjetCampos).forEach((_, index) => {
             if (ObjetCampos[index] === 'id') {
@@ -144,7 +145,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                     sorting: false,
                     width: 0,
                     render: () => (
-                        (
+                        ( 	
                             <div className='h-10 flex'>
                                 <div>
                                     <button
@@ -162,8 +163,9 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
             if (ObjetCampos[index] === 'experimento_name') {
                 arrOb.push({
                     title: 'Nome experimento',
-                    field: 'experimento_name',
-                    sorting: false
+                    field: 'experimento_name',										
+                    sorting: false,
+										
                 });
             }
             if (ObjetCampos[index] === 'foco') {
@@ -198,13 +200,19 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
                 arrOb.push({
                     title: 'Nome principal',
                     field: 'main_name',
-                    sorting: false
+										cellStyle: {
+											backgroundColor: '#c7da5e'
+										},
+                    sorting: false,										
                 });
             }
             if (ObjetCampos[index] === 'genotipo_name') {
                 arrOb.push({
                     title: 'Nome genotipo',
                     field: 'genotipo_name',
+										cellStyle: {
+											backgroundColor: '#c7da5e'
+										},
                     sorting: false
                 });
             }
@@ -417,7 +425,7 @@ export default function Listagem({ allExperimentos, totalItems, itensPerPage, fi
         <>
             <Head><title>Listagem de parcelas</title></Head>
 
-            <Content contentHeader={tabsDropDowns}>
+            <Content contentHeader={tabsDropDowns} moduloActive={'listas'}>
                 <main className="h-full w-full
                         flex flex-col
                         items-start
@@ -785,7 +793,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
     const data = await api.json();
 
-    const allExperimentos = data.response;
+    const allExperimentos = data.response
     const totalItems = data.total;
 
     return {
