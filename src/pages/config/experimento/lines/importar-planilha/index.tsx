@@ -18,7 +18,7 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 10, id_culture: userLogado.userCulture.cultura_selecionada,  id_safra: userLogado.safras.safra_selecionada, created_by: userLogado.id }).then((response) => {
+      importService.validate({ spreadSheet: rows, moduleId: 10, id_culture: userLogado.userCulture.cultura_selecionada, id_safra: userLogado.safras.safra_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -47,7 +47,7 @@ export default function Importar() {
       <Head>
         <title>Importação Genótipo</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()}>
+      <Content contentHeader={TabsDropDowns()} moduloActive={'config'}>
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}

@@ -39,7 +39,7 @@ export default function Teste() {
       <Head>
         <title>Nova NPE</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()}>
+      <Content contentHeader={TabsDropDowns()} moduloActive={'config'}>
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
