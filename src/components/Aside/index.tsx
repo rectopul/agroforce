@@ -8,32 +8,30 @@ import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
 export function Aside(moduloActive: any) {
-  const router = useRouter();
-  console.log('moduloActive');
-  console.log(moduloActive);
-  return (
-    <aside className="h-screen w-32
+	const router = useRouter();
+	return (
+		<aside className="h-screen w-32
       bg-gray-450
     "
-    >
-      <nav className="flex flex-col gap-6
+		>
+			<nav className="flex flex-col gap-6
         pt-4
       "
-      >
+			>
 
-        <ButtonAside
-          title="Configurações"
-          icon={<BsGear size={32} />}
-          href="/config/tmg/usuarios"
-          active={moduloActive.moduloActive === 'config'}
-        />
-        <ButtonAside
-          title="Lista"
-          icon={<HiOutlineClipboardList size={32} />}
-          href="/listas/experimentos/experimento"
-          active={moduloActive.moduloActive === 'listas'}
-        />
-        {/*
+				<ButtonAside
+					title="Configurações"
+					icon={<BsGear size={32} />}
+					href="/config/tmg/usuarios"
+					active={moduloActive.moduloActive === 'config'}
+				/>
+				<ButtonAside
+					title="Lista"
+					icon={<HiOutlineClipboardList size={32} />}
+					href="/listas/experimentos/experimento"
+					active={moduloActive.moduloActive === 'listas'}
+				/>
+				{/*
 
         <ButtonAside
           title='Ensaio'
@@ -75,7 +73,7 @@ export function Aside(moduloActive: any) {
           href='relatorios'
         /> */}
 
-      </nav>
-    </aside>
-  );
+			</nav>
+		</aside>
+	);
 }

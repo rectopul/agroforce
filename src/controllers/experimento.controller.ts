@@ -13,8 +13,6 @@ export class ExperimentoController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log('options')
-      console.log(options)
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -125,9 +123,6 @@ export class ExperimentoController {
         skip,
         orderBy
       );
-
-      console.log('response');
-      console.log(response);
 
       if (!response && response.total <= 0) {
         return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };

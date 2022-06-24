@@ -43,34 +43,7 @@ export class ExperimentoRepository {
     } else {
       return false;
     }
-  }
-
-  async list(id_culture: number) {
-    const experimento = await prisma.experimento.findMany({
-      where: { id_culture },
-      select: {
-        id: true,
-        protocolo_name: true,
-        id_experimento: true,
-        experimento_name: true,
-        id_safra: true,
-        id_culture: true,
-        id_foco: true,
-        id_ensaio: true,
-        id_tecnologia: true,
-        epoca: true,
-        pjr: true,
-        id_un_cultura: true,
-        unidade_cultura_name: true,
-        name_uni_cultura: true,
-        rotulo: true,
-        year: true,
-        status: true,
-      }
-    });
-
-    return experimento;
-  }
+  }  
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;

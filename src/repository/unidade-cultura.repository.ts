@@ -2,77 +2,58 @@ import { prisma } from "../pages/api/db/db";
 
 export class UnidadeCulturaRepository {
 
-    async create(data: any) {
-        const local_children = await prisma.local_children.create({
-            data: {
-                id_local: data.id_local,
-                id_culture_unity: data.id_culture_unity,
-                culture_unity_name: data.culture_unity_name,
-                year: data.year,
-                created_by: data.created_by,
-            }
-        });
+	async create(data: any) {
+		const result = await prisma.local_children.create({
+			data: data
+		});
 
-        return local_children;
-    }
+		return result
+	}
 
-    async findById(id: number) {
-        const local_children = await prisma.local_children.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                id_culture_unity: true,
-                year: true,
-                culture_unity_name: true,
-                status: true,
-            }
-        });
+	async findById(id: number) {
+		const result = await prisma.local_children.findUnique({
+			where: { id }
+		});
 
-        return local_children;
-    }
+		return result
+	}
 
-    async update(id: number, data: any) {
-        const local_children = await this.findById(id);
+	async update(id: number, data: any) {
+		const result = await prisma.local_children.update({
+			where: { id },
+			data: data
+		});
+		return result;
+	}
 
-        if (local_children !== null) {
-            const result = await prisma.local_children.update({
-                where: { id },
-                data
-            });
-            return result;
-        } else {
-            return false;
-        }
-    }
+	async findByName({ culture_unity_name }: any) {
+		const result = await prisma.local_children.findFirst({
+			where: {
+				culture_unity_name: culture_unity_name
+			}
+		});
 
-    async findByData(data: any) {
-        const local_children = await prisma.local_children.findFirst({
-            where: {
-                culture_unity_name: data.culture_unity_name
-            }
-        });
+		return result
+	}
 
-        return local_children;
-    }
+	async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+		let order: object | any;
 
-    async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-        let order: object | any;
+		if (orderBy) {
+			order = JSON.parse(orderBy);
+		}
 
-        if (orderBy) {
-            order = JSON.parse(orderBy);
-        }
+		const count = await prisma.local_children.count({ where: where });
 
-        const count = await prisma.local_children.count({ where: where });
+		const result: object | any = await prisma.local_children.findMany({
+			select: select,
+			skip: skip,
+			take: take,
+			where: where,
+			orderBy: order
+		});
 
-        const result: object | any = await prisma.local_children.findMany({
-            select: select,
-            skip: skip,
-            take: take,
-            where: where,
-            orderBy: order
-        });
-
-        result.total = count;
-        return result;
-    }
+		result.total = count;
+		return result;
+	}
 }
