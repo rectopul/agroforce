@@ -218,13 +218,7 @@ export class ImportController {
 								responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o limite de caracteres para o Código da tecnologia e 2. </li> <br>`;
 							} else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
 								spreadSheet[row][column] = "0" + spreadSheet[row][column].toString()
-							} else {
-								const technology = await this.tecnologiaController.getAll({ id_culture: id_culture, cod_tec: (spreadSheet[row][0].toString()) })
-								if (technology.response?.length > 0) {
-									responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada nessa cultura. </li> <br>`
-								}
 							}
-
 						}
 
 					}
@@ -259,13 +253,17 @@ export class ImportController {
 					for (let row in spreadSheet) {
 						if (row !== "0") {
 							const { response } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
-							await this.tecnologiaController.post({ id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23 })
+							const { response: tecnologiaAlreadyExists } = await this.tecnologiaController.getAll({ id_culture: response[0]?.id, cod_tec: (spreadSheet[row][0].toString()) })
+							if (tecnologiaAlreadyExists.length > 0) {
+								await this.tecnologiaController.update({ id: tecnologiaAlreadyExists[0]?.id, id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: created_by })
+							} else {
+								await this.tecnologiaController.create({ id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: created_by })
+							}
 						}
 					}
 					return "save"
-				} catch (err) {
-					console.log("Erro save import tecnologia: ")
-					console.log(err)
+				} catch (error: any) {
+					handleError('ImportController', 'Tecnologia save', error.message)
 					return "Erro ao gravar no banco";
 				}
 			}
@@ -273,9 +271,8 @@ export class ImportController {
 			const responseStringError = responseIfError.join("").replace(/undefined/g, "")
 			return responseStringError;
 
-		} catch (error) {
-			console.log("Erro geral import tecnologia: ")
-			console.log(error)
+		} catch (error: any) {
+			handleError('ImportController', 'Tecnologia validate', error.message)
 			return "Erro ao validar";
 		}
 	}

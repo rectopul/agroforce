@@ -83,7 +83,7 @@ export default function Listagem({
 	));
 
 	const userLogado = JSON.parse(localStorage.getItem('user') as string);
-	const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocol_name,experimento_name,year,rotulo,id_foco,id_ensaio,id_tecnologia,epoca' };
+	const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocolo_name,experimento_name,year,rotulo,foco,ensaio,tecnologia,epoca,materiais,status' };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 	const router = useRouter();
 	const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperimentos);
@@ -307,7 +307,7 @@ export default function Listagem({
 									onClick={() => {
 										setCookies('pageBeforeEdit', currentPage?.toString());
 										setCookies('filterBeforeEdit', filtersParams);
-										router.push(`/listas/experimento/atualizar?id=${rowData.id}`);
+										router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
 									}}
 								/>
 							</div>
