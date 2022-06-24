@@ -86,7 +86,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 <title>Novo Envelope</title>
             </Head>
 
-            <Content contentHeader={tabsDropDowns}>
+            <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
                 <form
                     className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 

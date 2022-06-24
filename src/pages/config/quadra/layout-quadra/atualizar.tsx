@@ -401,7 +401,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")){
+    if (!filterAplication.includes("paramSelect")) {
       filterAplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
     }
 
@@ -466,7 +466,7 @@ export default function Atualizarquadra({ allChildrens, totalItems, itensPerPage
   return (
     <>
       <Head><title>Atualizar layout quadra</title></Head>
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}

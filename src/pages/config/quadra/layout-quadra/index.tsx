@@ -324,22 +324,22 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           layoutQuadraService.update({ id: idLayoutQuadra, status: data.status });
 
           const index = quadras.findIndex((layout: any) => layout.id === idLayoutQuadra);
-    
+
           if (index === -1) {
             return;
           }
-    
+
           setQuadra((oldSafra: any) => {
             const copy = [...oldSafra];
             copy[index].status = data.status;
             return copy;
           });
-    
+
           const {
             id,
             status
           } = quadras[index];
-    
+
 
         }
       })
@@ -541,7 +541,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       <Head>
         <title>Listagem dos Layout</title>
       </Head>
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

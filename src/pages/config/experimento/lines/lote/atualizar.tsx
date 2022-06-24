@@ -29,10 +29,10 @@ export default function Atualizar(lote: IUpdateLote) {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
@@ -48,7 +48,7 @@ export default function Atualizar(lote: IUpdateLote) {
       if (!values.name || values.volume === 0 || values.volume === null) {
         throw new Error();
       }
-      
+
       await loteService.update({
         id: lote.id,
         name: capitalize(values.name),
@@ -66,59 +66,59 @@ export default function Atualizar(lote: IUpdateLote) {
   });
 
   function validateInputs(values: IUpdateLote) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor= 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor= ''; }
-    if (!values.volume) { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor= 'red'; } else { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor= '' }
+    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
+    if (!values.volume) { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = 'red'; } else { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = '' }
   }
 
   return (
     <>
       <Head><title>Atualizar lote</title></Head>
-      <Content contentHeader={tabsDropDowns}>
-        <form 
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar lote</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-5">
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              Código
-            </label>
-            <Input
-              style={{ background: '#e5e7eb'}}
-              required
-              disabled
-              value={lote.id}
-            />
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Código
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                required
+                disabled
+                value={lote.id}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Nome
+              </label>
+              <Input
+                placeholder="coleção de soja"
+                id="name"
+                name="name"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                <strong className={checkInput}>*</strong>
+                Volume
+              </label>
+              <Input
+                placeholder="80"
+                id="volume"
+                name="volume"
+                onChange={formik.handleChange}
+                value={formik.values.volume}
+              />
+            </div>
           </div>
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Nome
-            </label>
-            <Input
-              placeholder="coleção de soja"
-              id="name"
-              name="name"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
-          </div>
-          <div className="w-full h-10">
-            <label className="block text-gray-900 text-sm font-bold mb-2">
-              <strong className={checkInput}>*</strong>
-              Volume
-            </label>
-            <Input
-              placeholder="80"
-              id="volume"
-              name="volume"
-              onChange={formik.handleChange}
-              value={formik.values.volume}
-            />
-          </div>
-        </div>
           <div className="h-10 w-full
             flex
             gap-3
@@ -126,7 +126,7 @@ export default function Atualizar(lote: IUpdateLote) {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
@@ -142,7 +142,7 @@ export default function Atualizar(lote: IUpdateLote) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<FaSortAmountUpAlt size={18} />}
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -152,15 +152,15 @@ export default function Atualizar(lote: IUpdateLote) {
   );
 };
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
-  const  token  =  context.req.cookies.token;
+  const token = context.req.cookies.token;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers:  { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   };
 
   const apiLote = await fetch(`${baseUrl}/find-one?id=` + context.query.id, requestOptions);

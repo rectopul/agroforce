@@ -422,7 +422,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
     <>
       <Head><title>Listagem de sequência de delineamento</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

@@ -535,7 +535,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     <>
       <Head><title>Listagem de genótipos</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

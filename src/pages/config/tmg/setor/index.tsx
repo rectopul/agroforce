@@ -399,7 +399,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
     <>
       <Head><title>Listagem de setores</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

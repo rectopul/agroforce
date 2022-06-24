@@ -79,7 +79,7 @@ export default function Safra() {
         <title>Cadastro de setor</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="
             w-full 

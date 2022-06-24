@@ -430,7 +430,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
     <>
       <Head><title>Listagem de focos</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start
