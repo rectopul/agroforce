@@ -498,7 +498,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
     <>
       <Head><title>Listagem de safras</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

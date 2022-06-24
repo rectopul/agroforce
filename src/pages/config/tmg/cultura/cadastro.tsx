@@ -88,7 +88,7 @@ export default function Cadastro() {
         <title>Cadastro de cultura</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="
             w-full 

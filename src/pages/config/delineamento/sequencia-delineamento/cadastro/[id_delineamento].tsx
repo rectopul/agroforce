@@ -100,7 +100,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
         <title>Nova sequencia de delineamento</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 

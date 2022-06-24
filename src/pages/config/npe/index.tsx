@@ -512,7 +512,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
       <Head>
         <title>Listagem dos NPEs</title>
       </Head>
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

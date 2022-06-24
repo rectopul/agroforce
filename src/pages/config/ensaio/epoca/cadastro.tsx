@@ -25,10 +25,10 @@ export default function NovoLocal() {
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
-    ? tab.statusTab = true
-    : tab.statusTab = false
+      ? tab.statusTab = true
+      : tab.statusTab = false
   ));
-  
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
@@ -40,9 +40,9 @@ export default function NovoLocal() {
       name: '',
       created_by: userLogado.id,
     },
-    onSubmit: async (values) => {      
+    onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name)  { return; } 
+      if (!values.name) { return; }
 
       await epocaService.create({
         id_culture: parseInt(culture),
@@ -60,17 +60,17 @@ export default function NovoLocal() {
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor= 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor= ''; }
+    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
   }
 
-    return (
+  return (
     <>
       <Head>
         <title>Nova época</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns}>
-        <form 
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+        <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -88,15 +88,15 @@ export default function NovoLocal() {
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
               </label>
-              <Input 
-                type="text" 
-                placeholder="Nome" 
+              <Input
+                type="text"
+                placeholder="Nome"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
-            </div>       
+            </div>
           </div>
 
           <div className="
@@ -107,23 +107,23 @@ export default function NovoLocal() {
             mt-10
           ">
             <div className="w-30">
-              <Button 
+              <Button
                 type="button"
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => {router.back();}}
+                onClick={() => { router.back(); }}
               />
             </div>
             <div className="w-40">
-              <Button 
+              <Button
                 type="submit"
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 icon={<MdUpdate size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>

@@ -474,7 +474,7 @@ export default function Listagem({ allQuadra, totalItems, itensPerPage, filterAp
     <>
       <Head><title>Listagem de quadras</title></Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <main className="h-full w-full
           flex flex-col
           items-start

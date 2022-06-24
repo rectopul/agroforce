@@ -203,7 +203,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       </Head>
 
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}

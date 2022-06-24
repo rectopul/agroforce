@@ -107,8 +107,8 @@ export default function NovoNPE({ local }: IData) {
       if (!values.esquema || !values.op || !values.semente_metros || !values.disparos || !values.divisor || !values.largura || !values.comp_fisico || !values.comp_parcela || !values.comp_corredor || !values.t4_inicial || !values.t4_final || !values.df_inicial || !values.df_final || !idLocal) { return; }
 
       await layoutQuadraService.create({
-        esquema:values.esquema,
-        op:values.op,
+        esquema: values.esquema,
+        op: values.op,
         semente_metros: Number(values.semente_metros),
         disparos: Number(values.disparos),
         divisor: Number(values.divisor),
@@ -173,7 +173,7 @@ export default function NovoNPE({ local }: IData) {
         <title>Novo NPE</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
         <form
           className="
             w-full
