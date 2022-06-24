@@ -1,216 +1,129 @@
-import { number, object, SchemaOf, string } from 'yup';
+import handleError from 'src/shared/utils/handleError';
 import { LocalRepository } from '../repository/local.repository';
 export class LocalController {
-  localRepository = new LocalRepository();
-  public readonly required = 'Campo obrigatório';
+	localRepository = new LocalRepository();
 
-  async getUFs() {
-    try {
-      const parameters: object | any = {};
-      let take;
-      let skip;
-      let orderBy: object | any;
-      let select: any = { nome: true, id: true, sigla: true };
-      return this.localRepository.findUFs(parameters, select, take, skip, orderBy);
-    } catch (e) {
-      return { status: 400, message: "estado não encontrada" }
-    }
-  }
+	async getAll(options: object | any) {
+		const parameters: object | any = {};
+		let select: any = [];
+		try {
+			if (options.filterStatus) {
+				if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+			}
 
+			if (options.filterName_local_culture) {
+				parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterName_local_culture}" }`);
+			}
 
-  async getOnUFs(id: Number | any) {
-    try {
-      const response = await this.localRepository.findOneUFs(id);
-      if (response) {
-        return response;
-      }
-    } catch (err) {
-      console.log(err);
-      throw new Error('Não encontrado');
-    }
-  }
+			if (options.filterLabel) {
+				parameters.label = JSON.parse(`{ "contains":"${options.filterLabel}" }`);
+			}
 
+			if (options.filterAdress) {
+				parameters.adress = JSON.parse(`{ "contains":"${options.filterAdress}" }`);
+			}
 
-  async getCitys(ufId: number | any) {
-    const parameters: object | any = {};
-    let take;
-    let skip;
-    let orderBy: object | any;
-    let select: any = { nome: true, id: true, ufid: true };
+			if (options.filterLabel_country) {
+				parameters.label_country = JSON.parse(`{ "contains":"${options.filterLabel_country}" }`);
+			}
 
-    try {
-      if (ufId) {
-        parameters.ufid = parseInt(ufId);
-      }
-      return this.localRepository.findCitys(parameters, select, take, skip, orderBy);
-    } catch (err) {
-      throw new Error('Cidade não encontrada')
-    }
-  }
+			if (options.filterLabel_region) {
+				parameters.label_region = JSON.parse(`{ "contains":"${options.filterLabel_region}" }`);
+			}
+
+			if (options.filterName_locality) {
+				parameters.name_locality = JSON.parse(`{ "contains":"${options.filterName_locality}" }`);
+			}
 
 
-  async getAllLocal(options: object | any) {
-    const parameters: object | any = {};
-    let take;
-    let skip;
-    let orderBy: object | any;
-    let select: any = [];
+			if (options.id_local_culture) {
+				parameters.id_local_culture = Number(options.id_local_culture);
+			}
 
-    try {
-      if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        }
-      }
+			if (options.name_local_culture) {
+				parameters.name_local_culture = options.name_local_culture;
+			}
 
-      if (options.filterName_local_culture) {
-        options.filterName_local_culture = `{ "contains":"${options.filterName_local_culture}" }`;
-        parameters.name_local_culture = JSON.parse(options.filterName_local_culture);
-      }
+			const take = (options.take) ? Number(options.take) : undefined;
 
-      if (options.filterLabel) {
-        options.filterLabel = `{ "contains":"${options.filterLabel}" }`;
-        parameters.label = JSON.parse(options.filterLabel);
-      }
+			const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.filterAdress) {
-        options.filterAdress = `{ "contains":"${options.filterAdress}" }`;
-        parameters.adress = JSON.parse(options.filterAdress);
-      }
+			const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      if (options.filterLabel_country) {
-        options.filterLabel_country = `{ "contains":"${options.filterLabel_country}" }`;
-        parameters.label_country = JSON.parse(options.filterLabel_country);
-      }
+			if (options.paramSelect) {
+				let objSelect = options.paramSelect.split(',');
+				Object.keys(objSelect).forEach((item) => {
+					select[objSelect[item]] = true;
+				});
+				select = Object.assign({}, select);
+			} else {
+				select = { id: true, name_local_culture: true, label: true, mloc: true, label_country: true, label_region: true, name_locality: true, adress: true, status: true };
+			}
 
-      if (options.filterLabel_region) {
-        options.filterLabel_region = `{ "contains":"${options.filterLabel_region}" }`;
-        parameters.label_region = JSON.parse(options.filterLabel_region);
-      }
+			const response = await this.localRepository.findAll(parameters, select, take, skip, orderBy);
+			if (!response || response.total <= 0) {
+				return { status: 400, response: [], total: 0 };
+			} else {
+				return { status: 200, response: response, total: response.total };
+			}
+		} catch (error: any) {
+			handleError('Local Controller', 'GetAll', error.message)
+			throw new Error("[Controller] - GetAll Unidade Cultura erro")
+		}
+	}
 
-      if (options.filterName_locality) {
-        options.filterName_locality = `{ "contains":"${options.filterName_locality}" }`;
-        parameters.name_locality = JSON.parse(options.filterName_locality);
-      }
+	async getOne({ id }: any) {
+		try {
+			if (id) {
+				const response = await this.localRepository.findOne(Number(id));
+				if (response) {
+					return { status: 200, response: response };
+				} else {
+					return { status: 404, response: [], message: 'Local não existe' };
+				}
+			} else {
+				return { status: 405, response: [], message: 'ID não recebido' };
+			}
+		} catch (error: any) {
+			handleError('Local Controller', 'GetOne', error.message)
+			throw new Error("[Controller] - GetOne Unidade Cultura erro")
+		}
+	}
 
+	async create(data: object | any) {
+		try {
 
-      if (options.id_local_culture) {
-        parameters.id_local_culture = Number(options.id_local_culture);
-      }
+			const response = await this.localRepository.create(data);
+			if (response) {
+				return { status: 201, response: response, message: "Local criado" }
+			} else {
+				return { status: 400, message: "Erro ao criar local" }
+			}
 
-      if (options.name_local_culture) {
-        parameters.name_local_culture = options.name_local_culture;
-      }
+		} catch (error: any) {
+			handleError('Local Controller', 'Create', error.message)
+			throw new Error("[Controller] - Create Unidade Cultura erro")
+		}
+	}
 
-      if (options.take) {
-        if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
-        } else {
-          take = options.take;
-        }
-      }
+	async update(data: any) {
+		try {
 
-      if (options.skip) {
-        if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
-        } else {
-          skip = options.skip;
-        }
-      }
+			const localCultura: any = await this.localRepository.findOne(data.id);
 
-      if (options.orderBy) {
-        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
-      }
+			if (!localCultura) return { status: 404, message: 'Local de cultura não existente' };
 
-      if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = Object.assign({}, select);
-      } else {
-        select = { id: true, name_local_culture: true, label: true, mloc: true, label_country: true, label_region: true, name_locality: true, adress: true, status: true };
-      }
+			const response = await this.localRepository.update(data.id, data);
 
-      const response = await this.localRepository.findAll(parameters, select, take, skip, orderBy);
-      if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 };
-      } else {
-        return { status: 200, response, total: response.total };
-      }
-    } catch (err) {
-      console.log("[Controller] - GetAll local erro");
-      console.log(err);
-      throw new Error("[Controller] - GetAll local erro")
-    }
-  }
+			if (response) {
+				return { status: 200, message: 'Local de cultura atualizado' };
+			} else {
+				return { status: 400, message: 'Não foi possível atualizar' };
+			}
 
-
-  async getOneLocal({ id }: any) {
-    const newID = parseInt(id);
-    try {
-      if (id) {
-        const response = await this.localRepository.findOne(newID);
-        if (!response) {
-          return { status: 400, response: [], message: 'local não existe' };
-        } else {
-          return { status: 200, response: response };
-        }
-      } else {
-        return { status: 405, response: { error: 'id não informado' } };
-      }
-    } catch (err) {
-      console.log("[Controller] - GetOne local erro");
-      console.log(err);
-      throw new Error("[Controller] - GetOne local erro")
-    }
-  }
-
-  async postLocal(data: object | any) {
-    try {
-      console.log("Create")
-      console.log(data);
-      if (data !== null && data !== undefined) {
-        const response = await this.localRepository.create(data);
-        if (response) {
-          return { status: 200, response: response, message: "local inserido" }
-        } else {
-          return { status: 400, message: "erro" }
-
-        }
-      }
-    } catch (err) {
-      console.log("[Controller] - Create local erro");
-      console.log(err);
-      throw new Error("[Controller] - Create local erro")
-    }
-  }
-
-  async updateLocal(data: any) {
-    try {
-      // const schema: SchemaOf<any> = object({
-      //   id: number().required(this.required),
-      //   status: number().required(this.required),
-      // });
-
-      // const valid = schema.isValidSync(data);
-
-      // if (!valid) return { status: 400, message: 'Dados inválidos' };
-
-      const localCultura: any = await this.localRepository.findOne(data.id);
-
-      if (!localCultura) return { status: 400, message: 'Local de cultura não existente' };
-
-      await this.localRepository.update(data.id, data);
-
-      return { status: 200, message: 'Local de cultura atualizado' };
-    } catch (err) {
-      console.log("[Controller] - Update local erro");
-      console.log(err);
-      throw new Error("[Controller] - Update local erro")
-    }
-  }
+		} catch (error: any) {
+			handleError('Local Controller', 'Update', error.message)
+			throw new Error("[Controller] - Update Unidade Cultura erro")
+		}
+	}
 }

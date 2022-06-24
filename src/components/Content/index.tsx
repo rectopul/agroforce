@@ -45,9 +45,10 @@ interface IContentProps {
 interface IContentData {
   contentHeader: IContentProps[];
   children: ReactNode;
+  moduloActive: string;
 };
 
-export function Content({ contentHeader, children }: IContentData) {
+export function Content({ contentHeader, children, moduloActive }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
   const cultures: object | any = [];
   const safras: object | any = [];
@@ -183,7 +184,7 @@ export function Content({ contentHeader, children }: IContentData) {
       </MainHeader>
 
       <div className='h-screen flex flex-row w-screen'>
-        <Aside />
+        <Aside moduloActive={moduloActive} />
         <div className="flex flex-col
             w-container-all-main-contents
             h-screen

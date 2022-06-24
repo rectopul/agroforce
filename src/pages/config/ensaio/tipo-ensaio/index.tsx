@@ -78,7 +78,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Envelope", value: "seeds", defaultChecked: () => camposGerenciados.includes('seeds') },
+    { name: "CamposGerenciados[]", title: "Quant. de sementes por envelope", value: "seeds", defaultChecked: () => camposGerenciados.includes('seeds') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -173,7 +173,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           title: (
             <div className='flex items-center'>
               <button className='font-medium text-gray-900'>
-                Envelope
+                Quant. de sementes por envelope
               </button>
             </div>
           ),

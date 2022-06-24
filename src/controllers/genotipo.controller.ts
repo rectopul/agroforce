@@ -141,9 +141,6 @@ export class GenotipoController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      console.log('parameters')
-      console.log(parameters)
-
       const response: object | any = await this.genotipoRepository.findAll(
         parameters,
         select,
