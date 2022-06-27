@@ -69,10 +69,9 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
-	const [orderName, setOrderName] = useState<number>(1);
-	const [orderDesc, setOrderDesc] = useState<number>(1);
-	const [arrowName, setArrowName] = useState<ReactNode>('');
-	const [arrowDesc, setArrowDesc] = useState<ReactNode>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowName, setArrowName] = useState<any>('');
+	const [arrowDesc, setArrowDesc] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
@@ -189,7 +188,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 					title: (
 						<div className='flex items-center'>
 							{arrowName}
-							<button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
+							<button className='font-medium text-gray-900' onClick={() => handleOrder('name', orderList)}>
 								Código Reduzido
 							</button>
 						</div>
@@ -203,7 +202,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 					title: (
 						<div className='flex items-center'>
 							{arrowDesc}
-							<button className='font-medium text-gray-900' onClick={() => handleOrderDesc('desc', orderDesc)} >
+							<button className='font-medium text-gray-900' onClick={() => handleOrder('desc', orderList)} >
 								Nome
 							</button>
 						</div>
@@ -297,7 +296,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 		setCamposGerenciados(campos);
 	};
 
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
+	async function handleOrder(column: string, order: string | any): Promise<void> {
 		let typeOrder: any;
 		let parametersFilter: any;
 		if (order === 1) {
@@ -308,7 +307,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 			typeOrder = '';
 		}
 
-		if (filter && typeof (filter) !== undefined) {
+		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
 				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
 			} else {
@@ -328,58 +327,18 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 			}
 		});
 
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
+		if (orderList === 2) {
+			setOrder(0);
+			if (column === 'name') setArrowName(<AiOutlineArrowDown />);
+			if (column === 'desc') setArrowDesc(<AiOutlineArrowDown />);
 		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				if (column === 'name') setArrowName(<AiOutlineArrowUp />);
+				if (column === 'desc') setArrowDesc(<AiOutlineArrowUp />);
 			} else {
-				setArrowName('');
-			}
-		}
-	};
-
-	async function handleOrderDesc(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await cultureService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setCultures(response.response)
-			}
-		})
-		if (orderDesc === 2) {
-			setOrderDesc(0);
-			setArrowDesc(<AiOutlineArrowDown />);
-		} else {
-			setOrderDesc(orderDesc + 1);
-			if (orderDesc === 1) {
-				setArrowDesc(<AiOutlineArrowUp />);
-			} else {
-				setArrowDesc('');
+				if (column === 'name') setArrowName('');
+				if (column === 'desc') setArrowDesc('');
 			}
 		}
 	};
