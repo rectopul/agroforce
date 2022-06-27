@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ExperimentoController } from '../../../controllers/experimento.controller';
+import { ExperimentController } from '../../../controllers/experiment.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const experimentoController = new ExperimentoController();
+  const experimentoController = new ExperimentController();
   const { id } = req.query;
 
   switch (req.method) {
