@@ -254,7 +254,7 @@ export class ImportController {
           for (let row in spreadSheet) {
             if (row !== "0") {
               const { response } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] })
-              await this.tecnologiaController.post({ id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23 })
+              await this.tecnologiaController.create({ id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23 })
             }
           }
           return "save"
@@ -295,7 +295,7 @@ export class ImportController {
               if (configModule.response[0].fields[sheet] == 'Local') {
                 if (data.spreadSheet[keySheet][sheet] != "") {
                   if (typeof (data.spreadSheet[keySheet][sheet]) == 'string') {
-                    let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
+                    let local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                     if (local.total == 0) {
                       // console.log('aqui Local');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
@@ -450,7 +450,7 @@ export class ImportController {
               this.aux.prox_npe = 0;
               if (configModule.response[0].fields[sheet] == 'Local') {
                 // console.log("Local R");
-                let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
+                let local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                 this.aux.id_local = local.response[0].id;
               }
 
@@ -1345,7 +1345,7 @@ export class ImportController {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura é obrigatório. </li> <br>`;
             } else {
-              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.listAll({ culture_unity_name: (spreadSheet[row][column].toString()) })
+              const unidadeCulturaAlreadyExist = await this.unidadeCulturaController.getAll({ culture_unity_name: (spreadSheet[row][column].toString()) })
               if (unidadeCulturaAlreadyExist.response.length > 0) responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da unidade de cultura já esta cadastrado. </li> <br>`;
             }
           }
@@ -1513,17 +1513,17 @@ export class ImportController {
             try {
               localCultureDTO.created_by = Number(created_by)
               unityCultureDTO.created_by = Number(created_by)
-              const localAlreadyExists = await this.localController.getAllLocal({ id_local_culture: localCultureDTO.id_local_culture })
+              const localAlreadyExists = await this.localController.getAll({ id_local_culture: localCultureDTO.id_local_culture })
               if (localAlreadyExists.response?.length > 0) {
                 localCultureDTO.id = localAlreadyExists.response[0].id
                 unityCultureDTO.id_local = localAlreadyExists.response[0].id
-                await this.localController.updateLocal(localCultureDTO)
+                await this.localController.update(localCultureDTO)
                 const response = await this.unidadeCulturaController.create(unityCultureDTO)
                 console.log('response')
                 console.log(response)
               } else {
                 delete localCultureDTO.id
-                const response = await this.localController.postLocal(localCultureDTO)
+                const response = await this.localController.create(localCultureDTO)
                 unityCultureDTO.id_local = response?.response?.id
                 await this.unidadeCulturaController.create(unityCultureDTO)
               }
@@ -1636,7 +1636,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</li><br>`;
                 } else {
-                  let local: any = await this.localController.getAllLocal({ name_local_culture: data.spreadSheet[keySheet][sheet] });
+                  let local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                   if (local.total == 0) {
                     local_preparo = 2;
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
@@ -2494,7 +2494,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id un cultura é obrigatorio.</li><br>`;
                 } else {
-									let unity_culture = await this.unidadeCulturaController.listAll({id_culture_unity: data.spreadSheet[keySheet][sheet]});
+									let unity_culture = await this.unidadeCulturaController.getAll({id_culture_unity: data.spreadSheet[keySheet][sheet]});
 									if (unity_culture.total === 0) {
 										responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, id unidade de cultura não existe no software.</li><br>`;
 									}
@@ -2505,7 +2505,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo id un cultura é obrigatorio.</li><br>`;
                 } else {
-									let unity_culture = await this.unidadeCulturaController.listAll({culture_unity_name: data.spreadSheet[keySheet][sheet]});
+									let unity_culture = await this.unidadeCulturaController.getAll({culture_unity_name: data.spreadSheet[keySheet][sheet]});
 									if (unity_culture.total === 0) {
 										responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome unidade de cultura não existe no software.</li><br>`;
 									}
