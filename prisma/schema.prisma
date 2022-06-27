@@ -506,7 +506,7 @@ model materiais {
   prox_nivel       Int
   id_d1            Int
   name_main        String
-  genotipo_name    String
+  name_genotipo    String
   status           Int       @default(1)
   created_by       Int
   created_at       DateTime? @default(now())
