@@ -7,7 +7,32 @@ export class GenotipoRepository {
   }
   async findOne(id: number) {
     const genotipo = await prisma.genotipo.findUnique({
-      where: { id }
+      where: { id },
+			select: { 
+				id: true,
+				id_s1: true,
+				id_dados: true,
+				id_tecnologia: true,
+				name_genotipo: true,
+				name_main: true,
+				name_public: true,
+				name_experiment: true,
+				name_alter: true,
+				elit_name: true,
+				type: true,
+				gmr: true,
+				bgm: true,
+				cruza: true,
+				progenitor_f_direto: true,
+				progenitor_m_direto: true,
+				progenitor_f_origem: true,
+				progenitor_m_origem: true,
+				progenitores_origem: true,
+				parentesco_completo: true,
+				status: true,
+				tecnologia: { select: { name: true, cod_tec: true } },
+				lote: true
+			}
     });
     return genotipo;
   }

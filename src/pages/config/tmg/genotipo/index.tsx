@@ -69,7 +69,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main,tecnologia,cruza,gmr,bgm' };
+  const preferences = userLogado.preferences.genotipo || { id: 0, table_preferences: 'id,name_genotipo,name_main,tecnologia,cruza,gmr,number_lotes' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
@@ -88,7 +88,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
     { name: 'CamposGerenciados[]', title: 'ID_S1', value: 'id_s1' },
     { name: 'CamposGerenciados[]', title: 'Nome publico', value: 'name_public' },
     { name: 'CamposGerenciados[]', title: 'Nome experimental', value: 'name_experiment' },
@@ -262,10 +262,10 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
           sorting: false
         });
       }
-      if (ObjetCampos[index] === 'bgm') {
+      if (ObjetCampos[index] === 'number_lotes') {
         arrOb.push({
           title: 'Nº Lotes',
-          field: 'bgm',
+          field: 'countChildren',
           sorting: false
         });
       }
@@ -896,8 +896,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId : `filterStatus=1&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
+  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + `&id_culture=${cultureId}&id_safra=${safraId}` : `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -916,6 +916,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const allGenotipos = data.response;
   const totalItems = data.total;
+
+	// console.log(allGenotipos);
 
   return {
     props: {

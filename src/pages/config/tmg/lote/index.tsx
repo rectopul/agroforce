@@ -214,35 +214,35 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
       if (ObjetCampos[index] === 'name_genotipo') {
         arrOb.push({
           title: "Nome do genotipo",
-          field: "name_genotipo",
+          field: "genotipo.name_genotipo",
           sorting: false
         });
       }
       if (ObjetCampos[index] === 'name_main') {
         arrOb.push({
           title: "Nome principal",
-          field: "name_main",
+          field: "genotipo.name_main",
           sorting: false
         });
       }
       if (ObjetCampos[index] === 'gmr') {
         arrOb.push({
           title: "GMR",
-          field: "gmr",
+          field: "genotipo.gmr",
           sorting: false
         });
       }
       if (ObjetCampos[index] === 'bgm') {
         arrOb.push({
           title: "BGM",
-          field: "bgm",
+          field: "genotipo.bgm",
           sorting: false
         });
       }
       if (ObjetCampos[index] === 'tecnologia') {
         arrOb.push({
           title: "Tecnologia",
-          field: "tecnologia.cod_tec",
+          field: "genotipo.tecnologia.name",
           sorting: false
         });
       }

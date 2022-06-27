@@ -1,5 +1,6 @@
 import { GenotipoRepository } from 'src/repository/genotipo.repository';
 import { number, object, SchemaOf, string } from 'yup';
+import {functionsUtils} from 'src/shared/utils/functionsUtils';
 
 interface Genotipo {
   id: number;
@@ -93,7 +94,8 @@ export class GenotipoController {
           progenitores_origem: true,
           parentesco_completo: true,
           status: true,
-          tecnologia: { select: { name: true, cod_tec: true } }
+          tecnologia: { select: { name: true, cod_tec: true } },
+					lote: true
         };
       }
 
@@ -101,9 +103,9 @@ export class GenotipoController {
         parameters.id_culture = parseInt(options.id_culture);
       }
 
-      if (options.id_safra) {
-        parameters.id_safra = parseInt(options.id_safra);
-      }
+      // if (options.id_safra) {
+      //   parameters.id_safra = parseInt(options.id_safra);
+      // }
 
       if (options.id_dados) {
         parameters.id_dados = String(options.id_dados);
@@ -152,6 +154,11 @@ export class GenotipoController {
       if (!response && response.total <= 0) {
         return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };
       } else {
+				response.map((item: any) => {
+					item.countChildren = functionsUtils.countChildrenForSafra(item.lote, Number(options.id_safra));
+				});
+				// response.countchildren = functionsUtils.countChildrenForSafra(response.lote);
+				// console.log(response);
         return { status: 200, response, total: response.total };
       }
     } catch (err) {

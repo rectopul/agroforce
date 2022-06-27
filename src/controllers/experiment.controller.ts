@@ -1,10 +1,10 @@
-import { ExperimentoRepository } from 'src/repository/experimento.repository';
+import { ExperimentRepository } from 'src/repository/experiment.repository';
 
 // type Updategenotipo = Omit<genotipo, 'created_by'>;
-export class ExperimentoController {
+export class ExperimentController {
   public readonly required = 'Campo obrigatório';
 
-  experimentoRepository = new ExperimentoRepository();
+  experimentRepository = new ExperimentRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -13,6 +13,8 @@ export class ExperimentoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log('options')
+      console.log(options)
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
@@ -116,13 +118,16 @@ export class ExperimentoController {
         orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
       }
 
-      const response: object | any = await this.experimentoRepository.findAll(
+      const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
         take,
         skip,
         orderBy
       );
+
+      console.log('response');
+      console.log(response);
 
       if (!response && response.total <= 0) {
         return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };
@@ -139,7 +144,7 @@ export class ExperimentoController {
     try {
       if (!id) throw new Error('Dados inválidos');
 
-      const response = await this.experimentoRepository.findOne(id);
+      const response = await this.experimentRepository.findOne(id);
 
       if (!response) throw new Error('Item não encontrado');
 
@@ -151,7 +156,7 @@ export class ExperimentoController {
 
   async create(data: any) {
     try {
-      const response = await this.experimentoRepository.create(data);
+      const response = await this.experimentRepository.create(data);
       return { status: 201, message: 'Experimento cadastrado', response };
     } catch (err) {
       console.log(err);
@@ -162,11 +167,11 @@ export class ExperimentoController {
   async update(data: any) {
     try {
 
-      const experimento: any = await this.experimentoRepository.findOne(data.id);
+      const experimento: any = await this.experimentRepository.findOne(data.id);
 
       if (!experimento) return { status: 400, message: 'Experimento não encontrado' };
 
-      await this.experimentoRepository.update(experimento.id, data);
+      await this.experimentRepository.update(experimento.id, data);
 
       return { status: 200, message: 'Experimento atualizado' };
     } catch (err) {
