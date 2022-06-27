@@ -26,19 +26,19 @@ export class MateriaisRepository {
         }
     }
 
-    async list(id_experimento: number) {
+    async list(id_experiment_bd: number) {
         const materiais = await prisma.materiais.findMany({
-            where: { id_experimento },
+            where: { id_experiment_bd },
             select: {
                 id: true,
                 id_d1: true,
                 id_dados: true,
-                id_experimento: true,
+                id_experiment_bd: true,
                 id_l1: true,
                 name_genotipo: true,
                 name_main: true,
                 prox_nivel: true,
-                tratamentos: true,
+                trat: true,
                 status: true
             }
         });
