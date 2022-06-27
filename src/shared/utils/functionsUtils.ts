@@ -4,7 +4,8 @@ const pwd = 'TMG2022';
 
 export const functionsUtils = {
 	validationCPF,
-	Crypto
+	Crypto,
+	countChildrenForSafra
 };
 
 function validationCPF(cpf: any) {
@@ -54,5 +55,15 @@ function Crypto(data: any, type: any) {
 	}
 
 	return data;
+}
+
+function countChildrenForSafra(dataChildren: [], safraId: number = 0) {
+	let countChildren: number = 0;
+	if (safraId != 0) {
+		dataChildren.map((item: any) => {
+			(Number(item.id_safra)  === safraId) ? countChildren += 1 : '';		
+		})
+	}
+	return countChildren;
 }
 

@@ -49,6 +49,7 @@ export interface IUpdateGenotipo {
   type: string;
   cruza: string;
   cod_tec: string;
+  tecnologia?: object | any;
   status: number;
   gmr: number;
   bgm: number;
@@ -104,7 +105,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
       id: genotipo.id,
       id_culture: genotipo.id_culture,
       cruza: genotipo.cruza,
-      cod_tec: genotipo.cod_tec,
+      cod_tec: genotipo.tecnologia.cod_tec,
       status: genotipo.status,
       id_s1: genotipo.id_s1,
       id_dados: genotipo.id_dados,
@@ -867,11 +868,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
   const genotipo = await apiGenotipo.json();
 
-  const baseTecUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
-  const apiTecnologia = await fetch(`${baseTecUrl}/` + genotipo.id_tecnologia, requestOptions);
-  const tecnologia = await apiTecnologia.json();
+  // const baseTecUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
+  // const apiTecnologia = await fetch(`${baseTecUrl}/` + genotipo.id_tecnologia, requestOptions);
+  // const tecnologia = await apiTecnologia.json();
 
-  genotipo.id_tecnologia = tecnologia.name
+  // genotipo.id_tecnologia = tecnologia.name
 
   const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`;
 
@@ -881,6 +882,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   urlParameters.search = new URLSearchParams(param).toString();
   const id_genotipo = Number(context.query.id);
 
+	console.log(genotipo)
   const api = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions);
 
   let allLote: any = await api.json();

@@ -103,7 +103,7 @@ export class LoteController {
           peso: true,
           quant_sementes: true, 
           status: true, 
-          genotipo: { select: { name_genotipo: true, name_main: true, gmr: true, bgm: true, tecnologia:true } } 
+          genotipo: { select: { name_genotipo: true, name_main: true, gmr: true, bgm: true, tecnologia:{ select: { name: true}} } } 
         };
       }
 
