@@ -302,10 +302,11 @@ model genotipo {
   status              Int        @default(1)
   created_by          Int
   created_at          DateTime   @default(now())
-  safra               safra      @relation(fields: [id_safra], references: [id])
   culture             culture    @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia @relation(fields: [id_tecnologia], references: [id])
   lote                lote[]
+  safra               safra?     @relation(fields: [safraId], references: [id])
+  safraId             Int?
 }
 
 model delineamento {
