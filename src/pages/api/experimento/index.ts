@@ -1,24 +1,24 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ExperimentoController } from '../../../controllers/experimento.controller';
+import { ExperimentController } from '../../../controllers/experiment.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default  apiHandler(handler);
 
  async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const experimentoController =  new ExperimentoController();
+  const experimentController =  new ExperimentController();
 
   switch (req.method) {
     case 'GET':
-      const resultGet = await experimentoController.getAll(req.query);
+      const resultGet = await experimentController.getAll(req.query);
       res.status(200).json(resultGet);
       break
     case 'POST':
-      const resultPost = await experimentoController.create(req.body);
+      const resultPost = await experimentController.create(req.body);
       res.status(201).json(resultPost);
       break
     case 'PUT':
-      let resultPut = await experimentoController.update(req.body);
+      let resultPut = await experimentController.update(req.body);
       res.status(200).json(resultPut);
       break
     default:
