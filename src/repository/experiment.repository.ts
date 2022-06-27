@@ -10,8 +10,8 @@ export class ExperimentRepository {
       where: { id },
       select: {
         id: true,
-        protocolo_name: true,
-        id_experiment: true,
+        protocol_name: true,
+        experiment_id: true,
         experiment_name: true,
         safra: { select: { safraName: true } },
         culture: { select: { name: true } },
@@ -22,7 +22,7 @@ export class ExperimentRepository {
         pjr: true,
         id_local_culture: true,
         name_local_culture: true,
-        rotulo: true,
+        label: true,
         year: true,
         status: true,
       }
@@ -49,7 +49,7 @@ export class ExperimentRepository {
       where: { id_culture },
       select: {
         id: true,
-        protocolo_name: true,
+        protocol_name: true,
         experiment_id: true,
         experiment_name: true,
         id_safra: true,
@@ -61,7 +61,7 @@ export class ExperimentRepository {
         pjr: true,
         id_local_culture: true,
         name_local_culture: true,
-        rotulo: true,
+        label: true,
         year: true,
         status: true,
       }
