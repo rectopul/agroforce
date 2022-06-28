@@ -593,12 +593,10 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const { publicRuntimeConfig } = getConfig();
-	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experimento`;
-	const token = context.req.cookies.token;
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
+	const token = context.req.cookies.token;
 	const pageBeforeEdit = context.req.cookies.pageBeforeEdit ? context.req.cookies.pageBeforeEdit : 0;
 
 	const requestOptions: RequestInit | undefined = {
@@ -607,19 +605,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		headers: { Authorization: `Bearer ${token}` }
 	};
 
+	const id_experimento = Number(context.query.id);
+
+	const { publicRuntimeConfig } = getConfig();
 	const baseUrlMateriais = `${publicRuntimeConfig.apiUrl}/materiais`;
 
-	let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	let filterAplication = `filterStatus=1&$id_experimento=${id_experimento}`;
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+	const filterAplication = `filterStatus=1&$id_experimento=${id_experimento}`;
 
 	const urlParameters: any = new URL(baseUrlMateriais);
 	urlParameters.search = new URLSearchParams(param).toString();
 
-	const id_experimento = Number(context.query.id);
 	const parcelas = await fetch(`${baseUrlMateriais}?id_experimento=${id_experimento}`, requestOptions);
 
 	const { response: allItens, total: totalItems } = await parcelas.json();
 
+	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experimento`;
 	const experimentos = await fetch(`${baseUrlShow}/` + id_experimento, requestOptions);
 	const experimento = await experimentos.json();
 
