@@ -81,15 +81,15 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 	const [materiais, setMateriais] = useState<any>(() => allItens);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-	const [orderName, setOrderName] = useState<number>(0);
-	const [arrowName, setArrowName] = useState<ReactNode>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [colorStar, setColorStar] = useState<string>('');
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" },
-		{ name: "CamposGerenciados[]", title: "N tratamento", value: "tratamentos" },
-		{ name: "CamposGerenciados[]", title: "N linhas de próx. nível", value: "prox_nivel" },
+		{ name: "CamposGerenciados[]", title: "Nº tratamento", value: "tratamentos" },
+		{ name: "CamposGerenciados[]", title: "Nº linhas de próx. nível", value: "prox_nivel" },
 		{ name: "CamposGerenciados[]", title: "Nome principal", value: "name_main" },
 		{ name: "CamposGerenciados[]", title: "Nome genótipo", value: "name_genotipo" },
 		{ name: "CamposGerenciados[]", title: "Cultura", value: "id_culture" },
@@ -143,70 +143,95 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 		},
 	});
 
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
 	function columnsOrder(camposGerenciados: string) {
-		let ObjetCampos: string[] = camposGerenciados.split(',');
-		let arrOb: any = [];
+		const columnCampos: string[] = camposGerenciados.split(',');
+		const tableFields: any = [];
 
-		Object.keys(ObjetCampos).forEach((item, index) => {
-			if (ObjetCampos[index] === 'status') {
-				arrOb.push({
-					title: "Status",
-					field: "status",
-					sorting: false
-				});
+		Object.keys(columnCampos).forEach((item, index) => {
+			if (columnCampos[index] === 'status') {
+				tableFields.push(headerTableFactory('Status', 'status'));
 			}
-			if (ObjetCampos[index] === 'tratamentos') {
-				arrOb.push({
-					title: "N tratamento",
-					field: "tratamentos",
-					sorting: false
-				});
+			if (columnCampos[index] === 'tratamentos') {
+				tableFields.push(headerTableFactory('Nº tratamento', 'tratamentos'));
 			}
-			if (ObjetCampos[index] === 'prox_nivel') {
-				arrOb.push({
-					title: "N linhas de próx. nível",
-					field: "prox_nivel",
-					sorting: false
-				});
+			if (columnCampos[index] === 'prox_nivel') {
+				tableFields.push(headerTableFactory('Nº linhas de próx. nível', 'prox_nivel'));
 			}
-			if (ObjetCampos[index] === 'name_main') {
-				arrOb.push({
-					title: "Nome principal",
-					field: "name_main",
-					sorting: false
-				});
+			if (columnCampos[index] === 'name_main') {
+				tableFields.push(headerTableFactory('Nome principal', 'name_main'));
 			}
-			if (ObjetCampos[index] === 'name_genotipo') {
-				arrOb.push({
-					title: "Nome genótipo",
-					field: "name_genotipo",
-					sorting: false
-				});
+			if (columnCampos[index] === 'name_genotipo') {
+				tableFields.push(headerTableFactory('Nome genótipo', 'name_genotipo'));
 			}
-			if (ObjetCampos[index] === 'id_culture') {
-				arrOb.push({
-					title: "Cultura",
-					field: "id_culture",
-					sorting: false
-				});
+			if (columnCampos[index] === 'id_culture') {
+				tableFields.push(headerTableFactory('Cultura', 'id_culture'));
 			}
-			if (ObjetCampos[index] === 'cod_lote') {
-				arrOb.push({
-					title: "Cód. Lote",
-					field: "cod_lote",
-					sorting: false
-				});
+			if (columnCampos[index] === 'cod_lote') {
+				tableFields.push(headerTableFactory('Cód. Lote', 'cod_lote'));
 			}
-			if (ObjetCampos[index] === 'ncc') {
-				arrOb.push({
-					title: "NCC",
-					field: "ncc",
-					sorting: false
-				});
+			if (columnCampos[index] === 'ncc') {
+				tableFields.push(headerTableFactory('NCC', 'ncc'));
 			}
 		});
-		return arrOb;
+		return tableFields;
+	};
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+
+		if (filter && typeof (filter) !== 'undefined') {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
+			} else {
+				parametersFilter = filter;
+			}
+		} else {
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		}
+
+		await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setMateriais(response.response)
+			}
+		});
+
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -233,50 +258,6 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
-	};
-
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await materiaisService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setOrderName(response.response)
-			}
-		});
-
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
-		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
-			} else {
-				setArrowName('');
-			}
-		}
 	};
 
 	function handleOnDragEnd(result: DropResult): void {
@@ -342,7 +323,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 
 	async function handlePagination(): Promise<void> {
 		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take + "&id_experimento=" + id_experimento;
+		let parametersFilter = `skip=${skip}&take=${take}`
 
 		if (filter) {
 			parametersFilter = parametersFilter + "&" + filter;
@@ -358,6 +339,24 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 		handlePagination(); ''
 		handleTotalPages();
 	}, [currentPage]);
+
+	function updateFieldFactory(title: any, name: any) {
+		return (
+			<div className="w-full h-10">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					*{name}
+				</label>
+				<Input
+					style={{ background: '#e5e7eb' }}
+					disabled
+					required
+					id={title}
+					name={title}
+					value={experimento[title]}
+				/>
+			</div>
+		)
+	}
 
 	return (
 		<>
@@ -379,48 +378,15 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
             mt-4
             mb-4
           ">
-						<div className="w-full">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome do protocolo
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="protocolo_name"
-								name="protocolo_name"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.protocolo_name}
-							/>
-						</div>
+						{updateFieldFactory('protocolo_name', 'Nome do protocolo')}
 
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome do experimento
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="experimento_name"
-								name="experimento_name"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.experimento_name}
-							/>
-						</div>
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Rótulo
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="rotulo"
-								name="rotulo"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.rotulo}
-							/>
-						</div>
+						{updateFieldFactory('experimento_name', 'Nome do experimento')}
+
+						{updateFieldFactory('rotulo', 'Rótulo')}
+
+						{updateFieldFactory('plantadeira', 'Plantadeiras')}
+
 					</div>
-
 					<div className="w-full
                             flex 
                             justify-around
@@ -428,71 +394,17 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
                             mt-6
                             mb-4
                         ">
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Foco
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="foco"
-								name="foco"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.foco}
-							/>
-						</div>
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Ensaio
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="ensaio"
-								name="ensaio"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.ensaio}
-							/>
-						</div>
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Cód. Tec
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="cod_tec"
-								name="cod_tec"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.cod_tec}
-							/>
-						</div>
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Epoca
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="epoca"
-								name="epoca"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.epoca}
-							/>
-						</div>
-						<div className="w-full h-10">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								PJR
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="pjr"
-								name="pjr"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.pjr}
-							/>
-						</div>
+
+						{updateFieldFactory('foco', 'Foco')}
+
+						{updateFieldFactory('ensaio', 'Ensaio')}
+
+						{updateFieldFactory('cod_tec', 'Cód. Tec')}
+
+						{updateFieldFactory('epoca', 'Época')}
+
+						{updateFieldFactory('pjr', 'PJR')}
+
 					</div>
 					<div className="rounded border-inherit mt-16 mb-6 text-xl">
 						<hr></hr>
@@ -504,22 +416,10 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
                             gap-6
                             mb-4
                         ">
-						<div className="w-full">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome un. cultura
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								id="unidade_cultura_name"
-								name="unidade_cultura_name"
-								disabled
-								onChange={formik.handleChange}
-								value={formik.values.unidade_cultura_name}
-							/>
-						</div>
+
+						{updateFieldFactory('unidade_cultura_name', 'Nome un. cultura')}
+
 					</div>
-
-
 
 					<div className="
             h-10 w-full
@@ -710,21 +610,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const baseUrlMateriais = `${publicRuntimeConfig.apiUrl}/materiais`;
 
 	let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	let filterAplication = "filterStatus=1";
+	let filterAplication = `filterStatus=1&$id_experimento=${id_experimento}`;
 
 	const urlParameters: any = new URL(baseUrlMateriais);
 	urlParameters.search = new URLSearchParams(param).toString();
 
 	const id_experimento = Number(context.query.id);
-	const api = await fetch(`${baseUrlMateriais}?id_experimento=${id_experimento}`, requestOptions);
+	const parcelas = await fetch(`${baseUrlMateriais}?id_experimento=${id_experimento}`, requestOptions);
 
-	let allItens: any = await api.json();
-	const totalItems = allItens.total;
-	allItens = allItens.response;
+	const { response: allItens, total: totalItems } = await parcelas.json();
 
-	const apiExperimento = await fetch(`${baseUrlShow}/` + id_experimento, requestOptions);
-
-	const experimento = await apiExperimento.json();
+	const experimentos = await fetch(`${baseUrlShow}/` + id_experimento, requestOptions);
+	const experimento = await experimentos.json();
 
 	return {
 		props: {

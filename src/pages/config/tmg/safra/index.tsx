@@ -74,10 +74,8 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [arrowEndTime, setArrowEndTime] = useState<any>('');
-	const [arrowStartTime, setArrowStartTime] = useState<any>('');
 	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
@@ -165,157 +163,141 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 		});
 	};
 
-	function columnsOrder(camposGerenciados: string) {
-		let ObjetCampos: string[] = camposGerenciados.split(',');
-		let arrOb: any = [];
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-		Object.keys(ObjetCampos).forEach((item, index) => {
-			if (ObjetCampos[index] === 'id') {
-				arrOb.push({
-					title: (
-						<div className="flex items-center">
-							{arrowOrder}
-						</div>
-					),
-					field: "id",
-					width: 0,
-					sorting: false,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
-			}
-			if (ObjetCampos[index] === 'safraName') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('safraName', orderList)}>
-								Safra
-							</button>
-						</div>
-					),
-					field: "safraName",
-					sorting: false
-				});
-			}
-			if (ObjetCampos[index] === 'year') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('year', orderList)}>
-								Ano
-							</button>
-						</div>
-					),
-					field: "year",
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'plantingStartTime') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('plantingStartTime', orderList)}>
-								Período ideal de início de plantio
-							</button>
-						</div>
-					),
-					field: "plantingStartTime",
-					sorting: false,
-				})
-			}
-			if (ObjetCampos[index] === 'plantingEndTime') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('plantingEndTime', orderList)}>
-								Período ideal do fim do plantio
-							</button>
-						</div>
-					),
-					field: "plantingEndTime",
-					sorting: false,
-				})
-			}
-			if (ObjetCampos[index] === 'status') {
-				arrOb.push({
-					title: "Status",
-					field: "status",
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: "Filtrar por status",
-					render: (rowData: ISafra) => (
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
 						<div className='h-10 flex'>
-							<div className="h-10">
-								<Button
-									icon={<BiEdit size={16} />}
-									bgColor="bg-blue-600"
-									textColor="white"
-									onClick={() => {
-										setCookies("pageBeforeEdit", currentPage?.toString())
-										setCookies("filterBeforeEdit", filtersParams)
-										router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)
-									}}
-
-								/>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
 							</div>
-							{rowData.status === 1 ? (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsUp size={16} />}
-										onClick={async () => await handleStatusSafra(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-green-600"
-										textColor="white"
-									/>
-								</div>
-							) : (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsDown size={16} />}
-										onClick={async () => await handleStatusSafra(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-red-800"
-										textColor="white"
-									/>
-								</div>
-							)}
 						</div>
-					),
-				})
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: "Status",
+			field: "status",
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: "Filtrar por status",
+			render: (rowData: ISafra) => (
+				<div className='h-10 flex'>
+					<div className="h-10">
+						<Button
+							icon={<BiEdit size={16} />}
+							bgColor="bg-blue-600"
+							textColor="white"
+							onClick={() => {
+								setCookies("pageBeforeEdit", currentPage?.toString())
+								setCookies("filterBeforeEdit", filtersParams)
+								router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`)
+							}}
+
+						/>
+					</div>
+					{rowData.status === 1 ? (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsUp size={16} />}
+								onClick={async () => await handleStatusSafra(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-green-600"
+								textColor="white"
+							/>
+						</div>
+					) : (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsDown size={16} />}
+								onClick={async () => await handleStatusSafra(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-red-800"
+								textColor="white"
+							/>
+						</div>
+					)}
+				</div>
+			),
+		}
+	}
+
+	function columnsOrder(camposGerenciados: string) {
+		const columnCampos: string[] = camposGerenciados.split(',');
+		const tableFields: any = [];
+
+		Object.keys(columnCampos).forEach((item, index) => {
+			if (columnCampos[index] === 'id') {
+				tableFields.push(idHeaderFactory())
+			}
+			if (columnCampos[index] === 'safraName') {
+				tableFields.push(headerTableFactory('Nome', 'safraName'));
+			}
+			if (columnCampos[index] === 'year') {
+				tableFields.push(headerTableFactory('Ano', 'year'));
+			}
+			if (columnCampos[index] === 'plantingStartTime') {
+				tableFields.push(headerTableFactory('Período ideal de início de plantio', 'plantingStartTime'));
+			}
+			if (columnCampos[index] === 'plantingEndTime') {
+				tableFields.push(headerTableFactory('Período ideal do fim do plantio', 'plantingEndTime'));
+			}
+			if (columnCampos[index] === 'status') {
+				tableFields.push(statusHeaderFactory())
 			}
 		});
-		return arrOb;
+		return tableFields;
 	};
 
 	async function handleOrder(column: string, order: string | any): Promise<void> {

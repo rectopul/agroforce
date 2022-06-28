@@ -66,8 +66,8 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 	const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-	const [orderName, setOrderName] = useState<number>(1);
-	const [arrowName, setArrowName] = useState<any>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -115,65 +115,122 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 	const filterStatus = filterBeforeEdit.split('')
 
-	function colums(camposGerenciados: any): any {
-		let ObjetCampos: any = camposGerenciados.split(',');
-		let arrOb: any = [];
-		Object.keys(ObjetCampos).forEach((item) => {
-			if (ObjetCampos[item] === 'id') {
-				arrOb.push({
-					title: "",
-					field: "id",
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
-			}
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-			if (ObjetCampos[item] === 'name') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowName}
-							<button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
-								Nome
-							</button>
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
+							</div>
 						</div>
-					),
-					field: "name",
-					sorting: false
-				});
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function colums(camposGerenciados: any): any {
+		const columnCampos: any = camposGerenciados.split(',');
+		const tableFields: any = [];
+		Object.keys(columnCampos).forEach((item) => {
+			if (columnCampos[item] === 'id') {
+				tableFields.push(idHeaderFactory())
 			}
-			if (ObjetCampos[item] === 'desc') {
-				arrOb.push({ title: "Rótulo", field: "desc", sorting: false })
+			if (columnCampos[item] === 'name') {
+				tableFields.push(headerTableFactory('Nome', 'name'))
 			}
-			if (ObjetCampos[item] === 'cod_tec') {
-				arrOb.push({ title: "Código Tecnologia", field: "cod_tec", sorting: false })
+			if (columnCampos[item] === 'desc') {
+				tableFields.push(headerTableFactory('Descrição', 'desc'))
+			}
+			if (columnCampos[item] === 'cod_tec') {
+				tableFields.push(headerTableFactory('Código tecnologia', 'cod_tec'))
 			}
 		});
-		return arrOb;
+		return tableFields;
+	};
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+
+		if (filter && typeof (filter) !== undefined) {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		} else {
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		}
+
+		await tecnologiaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setTecnologias(response.response)
+			}
+		});
+
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -200,50 +257,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
-	};
-
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await tecnologiaService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setTecnologias(response.response)
-			}
-		});
-
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
-		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
-			} else {
-				setArrowName('');
-			}
-		}
 	};
 
 	function handleOnDragEnd(result: DropResult) {
@@ -566,8 +579,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	} as RequestInit | undefined;
 
-	const tecnologia = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allItems, total: totalItems } = await tecnologia.json();
+	const response = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allItems, total: totalItems } = await response.json();
 
 	return {
 		props: {

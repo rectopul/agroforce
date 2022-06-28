@@ -19,6 +19,10 @@ export class LocalController {
 				parameters.label = JSON.parse(`{ "contains":"${options.filterLabel}" }`);
 			}
 
+			if (options.filterMloc) {
+				parameters.mloc = JSON.parse(`{ "contains":"${options.filterMloc}" }`);
+			}
+
 			if (options.filterAdress) {
 				parameters.adress = JSON.parse(`{ "contains":"${options.filterAdress}" }`);
 			}
