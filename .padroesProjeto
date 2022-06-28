@@ -22,21 +22,21 @@ Tabela bancos para refatorar:
 
 
 Links:
-	- Melhores praticas de programação segundo padrão AIRBNB
-			https://github.com/airbnb/javascript
-
-	- Usando ESLINT no código e explicando para que server
-			https://www.youtube.com/watch?v=9UJYaAt7v2o&t=1534s
-
-	- Boas praticas javascript
-			https://code.tutsplus.com/pt/tutorials/24-javascript-best-practices-for-beginners--net-5399
-			http://opensource.locaweb.com.br/locawebstyle-v2/manual/praticas-padroes/javascript/
-
 	- Resumo do SOLID guia de princípios para programação
 			https://medium.com/desenvolvendo-com-paixao/o-que-%C3%A9-solid-o-guia-completo-para-voc%C3%AA-entender-os-5-princ%C3%ADpios-da-poo-2b937b3fc530
 
 	- Resumo do clean code e suas melhores praticas de programação e manutenibilidade
 			https://medium.com/desenvolvendo-com-paixao/2-clean-code-boas-pr%C3%A1ticas-para-escrever-c%C3%B3digos-impec%C3%A1veis-361997b3c8b5
+
+	- Boas praticas javascript
+			https://code.tutsplus.com/pt/tutorials/24-javascript-best-practices-for-beginners--net-5399
+			http://opensource.locaweb.com.br/locawebstyle-v2/manual/praticas-padroes/javascript/
+
+	- Convenções de boas praticas de JavaScript segundo padrão AIRBNB
+			https://github.com/airbnb/javascript
+
+	- Usando ESLINT no código e explicando para que server
+			https://www.youtube.com/watch?v=9UJYaAt7v2o&t=1534s
 		
 	- Clean code melhores praticas de programação
 		https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
