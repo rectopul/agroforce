@@ -8,3 +8,14 @@
 8 - tratar os erros do catch, para ficar mais facil encontrar onde esta o erro
 9 - fazer comparação com tipo certo (string com string, objeto com null ou tamanho)
 10 - todas variaveis e funções em ingles
+11 - especificar o nome da funcao ou variavel bem definido no proprio nome 
+			ex: (array que gera as coluans da tabela ruim: arrOrb | campos  bom: camposTabela (tableFields))
+			PS: tentar não abreviar muito ex: ruim: nome_un_cultura bom: nome_unidade_cultura
+12 - não repetir codigo( se ver que algo se repete, criar uma função generica para faze-lo)
+
+Tabela bancos para refatorar:
+	quadra
+	npe
+	lote
+	genotipo
+	experimento
