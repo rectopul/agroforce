@@ -64,13 +64,13 @@ interface IData {
 	totalItems: number;
 	itensPerPage: number;
 	filterAplication: object | any;
-	cultureId: number;
+	id_culture: number;
 	pageBeforeEdit: string | any;
 	filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-	allExperimentos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit,
+	allExperimentos, totalItems, itensPerPage, filterAplication, id_culture, pageBeforeEdit, filterBeforeEdit,
 }: IData) {
 	const { TabsDropDowns } = ITabs;
 
@@ -90,10 +90,8 @@ export default function Listagem({
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-	const [orderCruza, setOrderCruza] = useState<number>(1);
-	const [orderName, setOrderName] = useState<number>(1);
-	const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
-	const [arrowName, setArrowName] = useState<ReactNode>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -138,7 +136,7 @@ export default function Listagem({
 		onSubmit: async ({
 			filterStatus, filterProtocolName, filterExperimentoName, filterRotulo,
 		}) => {
-			const parametersFilter = `filterStatus=${filterStatus || 1}&filterProtocolName=${filterProtocolName}&id_culture=${cultureId}&filterExperimentoName=${filterExperimentoName}&filterRotulo=${filterRotulo}`;
+			const parametersFilter = `filterStatus=${filterStatus || 1}&filterProtocolName=${filterProtocolName}&id_culture=${id_culture}&filterExperimentoName=${filterExperimentoName}&filterRotulo=${filterRotulo}`;
 			setFiltersParams(parametersFilter);
 			setCookies('filterBeforeEdit', filtersParams);
 			await experimentoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -180,175 +178,159 @@ export default function Listagem({
 		});
 	}
 
-	function columnsOrder(camposGerenciados: any): any {
-		const ObjetCampos: any = camposGerenciados.split(',');
-		const arrOb: any = [];
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-		Object.keys(ObjetCampos).forEach((_, index) => {
-			if (ObjetCampos[index] === 'id') {
-				arrOb.push({
-					title: '',
-					field: 'id',
-					width: 0,
-					render: () => (
-						colorStar === '#eba417'
-							? (
-								<div className="h-10 flex">
-									<div>
-										<button
-											className="w-full h-full flex items-center justify-center border-0"
-											onClick={() => setColorStar('')}
-										>
-											<AiTwotoneStar size={25} color="#eba417" />
-										</button>
-									</div>
-								</div>
-							)
-							: (
-								<div className="h-10 flex">
-									<div>
-										<button
-											className="w-full h-full flex items-center justify-center border-0"
-											onClick={() => setColorStar('#eba417')}
-										>
-											<AiTwotoneStar size={25} />
-										</button>
-									</div>
-								</div>
-							)
-					),
-				});
-			}
-			if (ObjetCampos[index] === 'protocolo_name') {
-				arrOb.push({
-					title: (
-						<div className="flex items-center">
-							{arrowName}
-							<button className="font-medium text-gray-900" onClick={() => handleOrderName('protocolo_name', orderName)}>
-								Nome protocolo
-							</button>
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
+							</div>
 						</div>
-					),
-					field: 'protocolo_name',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'experimento_name') {
-				arrOb.push({
-					title: 'Nome experimento',
-					field: 'experimento_name',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'year') {
-				arrOb.push({
-					title: 'Ano',
-					field: 'year',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'rotulo') {
-				arrOb.push({
-					title: 'Rótulo',
-					field: 'rotulo',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'foco') {
-				arrOb.push({
-					title: 'Foco',
-					field: 'foco.name',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'ensaio') {
-				arrOb.push({
-					title: 'Ensaio',
-					field: 'ensaio.name',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'tecnologia') {
-				arrOb.push({
-					title: 'Cód tec',
-					field: 'tecnologia.cod_tec',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'epoca') {
-				arrOb.push({
-					title: 'EP',
-					field: 'epoca',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'materiais') {
-				arrOb.push({
-					title: 'N de materiais',
-					field: 'materiais',
-					sorting: false,
-				});
-			}
-			if (ObjetCampos[index] === 'status') {
-				arrOb.push({
-					title: 'Status',
-					field: 'status',
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: 'Filtrar por status',
-					render: (rowData: IExperimento) => (
-						<div className="h-10 flex">
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: 'Status',
+			field: 'status',
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: 'Filtrar por status',
+			render: (rowData: IExperimento) => (
+				<div className="h-10 flex">
+					<div className="h-10">
+						<Button
+							icon={<BiEdit size={16} />}
+							bgColor="bg-blue-600"
+							textColor="white"
+							title={`Editar ${rowData.experimento_name}`}
+							onClick={() => {
+								setCookies('pageBeforeEdit', currentPage?.toString());
+								setCookies('filterBeforeEdit', filtersParams);
+								router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
+							}}
+						/>
+					</div>
+					{rowData.status === 1
+						? (
 							<div className="h-10">
 								<Button
-									icon={<BiEdit size={16} />}
-									bgColor="bg-blue-600"
+									icon={<FaRegThumbsUp size={16} />}
+									onClick={async () => await handleStatus(rowData.id, {
+										status: rowData.status,
+										...rowData,
+									})}
+									title="Ativo"
+									bgColor="bg-green-600"
 									textColor="white"
-									title={`Editar ${rowData.experimento_name}`}
-									onClick={() => {
-										setCookies('pageBeforeEdit', currentPage?.toString());
-										setCookies('filterBeforeEdit', filtersParams);
-										router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
-									}}
 								/>
 							</div>
-							{rowData.status === 1
-								? (
-									<div className="h-10">
-										<Button
-											icon={<FaRegThumbsUp size={16} />}
-											onClick={async () => await handleStatus(rowData.id, {
-												status: rowData.status,
-												...rowData,
-											})}
-											title="Ativo"
-											bgColor="bg-green-600"
-											textColor="white"
-										/>
-									</div>
-								)
-								: (
-									<div className="h-10">
-										<Button
-											icon={<FaRegThumbsDown size={16} />}
-											onClick={async () => await handleStatus(rowData.id, {
-												status: rowData.status,
-												...rowData,
-											})}
-											title="Inativo"
-											bgColor="bg-red-800"
-											textColor="white"
-										/>
-									</div>
-								)}
-						</div>
-					),
-				});
-			}
-		});
-		return arrOb;
+						)
+						: (
+							<div className="h-10">
+								<Button
+									icon={<FaRegThumbsDown size={16} />}
+									onClick={async () => await handleStatus(rowData.id, {
+										status: rowData.status,
+										...rowData,
+									})}
+									title="Inativo"
+									bgColor="bg-red-800"
+									textColor="white"
+								/>
+							</div>
+						)}
+				</div>
+			),
+		}
 	}
 
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
+	function columnsOrder(camposGerenciados: any): any {
+		const columnCampos: any = camposGerenciados.split(',');
+		const tableFields: any = [];
+
+		Object.keys(columnCampos).forEach((_, index) => {
+			if (columnCampos[index] === 'id') {
+				tableFields.push(idHeaderFactory());
+			}
+			if (columnCampos[index] === 'protocolo_name') {
+				tableFields.push(headerTableFactory('Nome protocolo', 'protocolo_name'));
+			}
+			if (columnCampos[index] === 'experimento_name') {
+				tableFields.push(headerTableFactory('Nome experimento', 'experimento_name'));
+			}
+			if (columnCampos[index] === 'year') {
+				tableFields.push(headerTableFactory('Ano', 'year'));
+			}
+			if (columnCampos[index] === 'rotulo') {
+				tableFields.push(headerTableFactory('Ano', 'year'));
+			}
+			if (columnCampos[index] === 'foco') {
+				tableFields.push(headerTableFactory('Foco', 'foco.name'));
+			}
+			if (columnCampos[index] === 'ensaio') {
+				tableFields.push(headerTableFactory('Ensaio', 'ensaio.name'));
+			}
+			if (columnCampos[index] === 'tecnologia') {
+				tableFields.push(headerTableFactory('Cód tec', 'tecnologia.cod_tec'));
+			}
+			if (columnCampos[index] === 'epoca') {
+				tableFields.push(headerTableFactory('Época', 'epoca'));
+			}
+			if (columnCampos[index] === 'materiais') {
+				tableFields.push(headerTableFactory('Nº Materiais', 'materiais'));
+			}
+			if (columnCampos[index] === 'status') {
+				tableFields.push(statusHeaderFactory());
+			}
+		});
+		return tableFields;
+	}
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
 		let typeOrder: any;
 		let parametersFilter: any;
 		if (order === 1) {
@@ -359,78 +341,38 @@ export default function Listagem({
 			typeOrder = '';
 		}
 
-		if (filter && typeof (filter) !== undefined) {
+		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
 			} else {
 				parametersFilter = filter;
 			}
-		} else if (typeOrder !== '') {
-			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
 		} else {
-			parametersFilter = filter;
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
 		}
 
 		await experimentoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
 			if (response.status === 200) {
-				setExperimento(response.response);
+				setExperimento(response.response)
 			}
 		});
 
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
 		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
 			} else {
-				setArrowName('');
+				setArrowOrder('');
 			}
 		}
-	}
-
-	async function handleOrderCruza(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-			} else {
-				parametersFilter = filter;
-			}
-		} else if (typeOrder !== '') {
-			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-		} else {
-			parametersFilter = filter;
-		}
-
-		await experimentoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setExperimento(response.response);
-			}
-		});
-
-		if (orderCruza === 2) {
-			setOrderCruza(0);
-			setArrowCruza(<AiOutlineArrowDown />);
-		} else {
-			setOrderCruza(orderCruza + 1);
-			if (orderCruza === 1) {
-				setArrowCruza(<AiOutlineArrowUp />);
-			} else {
-				setArrowCruza('');
-			}
-		}
-	}
+	};
 
 	async function getValuesComluns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox']");
@@ -525,7 +467,7 @@ export default function Listagem({
 		let parametersFilter = `skip=${skip}&take=${take}`;
 
 		if (filter) {
-			parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
+			parametersFilter = `${parametersFilter}&${filter}&${id_culture}`;
 		}
 		await experimentoService.getAll(parametersFilter).then((response) => {
 			if (response.status === 200) {
@@ -538,6 +480,24 @@ export default function Listagem({
 		handlePagination();
 		handleTotalPages();
 	}, [currentPage]);
+
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					max="40"
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
 
 	return (
 		<>
@@ -573,47 +533,13 @@ export default function Listagem({
 										</label>
 										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
 									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome Protocolo
-										</label>
-										<Input
-											type="text"
-											placeholder="Protocolo"
-											max="40"
-											id="filterProtocolName"
-											name="filterProtocolName"
-											onChange={formik.handleChange}
-										/>
-									</div>
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome Experimento
-										</label>
-										<Input
-											type="text"
-											placeholder="Experimento"
-											max="40"
-											id="filterExperimentoName"
-											name="filterExperimentoName"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterProtocolName', 'Nome Protocolo')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Rótulo
-										</label>
-										<Input
-											type="text"
-											placeholder="Rótulo"
-											max="40"
-											id="filterRotulo"
-											name="filterRotulo"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterExperimentoName', 'Nome Experimento')}
+
+									{filterFieldFactory('filterRotulo', 'Rótulo')}
+
 								</div>
 
 								<div className="h-16 w-32 mt-3">
@@ -798,40 +724,41 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+	const token = req.cookies.token;
+	const id_culture = Number(req.cookies.cultureId);
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-	const { token } = req.cookies;
-	const cultureId = Number(req.cookies.cultureId);
+	removeCookies('filterBeforeEdit', { req, res });
+	removeCookies('pageBeforeEdit', { req, res });
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/experimento`;
 
-	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : 'filterStatus=1';
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}`;
+	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : 'filterStatus=1';
 
-	removeCookies('filterBeforeEdit', { req, res });
-
-	removeCookies('pageBeforeEdit', { req, res });
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
-
 	const requestOptions = {
 		method: 'GET',
 		credentials: 'include',
 		headers: { Authorization: `Bearer ${token}` },
 	} as RequestInit | undefined;
 
-	const api = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
-	const { response: allExperimento, total: totalItems } = await api.json();
+	const experimento = await fetch(`${baseUrl}?id_culture=${id_culture}`, requestOptions);
+	const { response: allExperimentos, total: totalItems } = await experimento.json();
+
+	console.log('allExperimentos')
+	console.log(allExperimentos)
 
 	return {
 		props: {
-			allExperimento,
+			allExperimentos,
 			totalItems,
 			itensPerPage,
 			filterAplication,
-			cultureId,
+			id_culture,
 			pageBeforeEdit,
 			filterBeforeEdit,
 		},

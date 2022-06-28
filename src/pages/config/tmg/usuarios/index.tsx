@@ -49,7 +49,7 @@ interface IGenarateProps {
 	value: string | number | readonly string[] | undefined;
 }
 interface IData {
-	alItems: IUsers[];
+	allUsers: IUsers[];
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
@@ -59,7 +59,7 @@ interface IData {
 }
 
 export default function Listagem({
-	alItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+	allUsers, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit,
 }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
@@ -75,7 +75,7 @@ export default function Listagem({
 	const preferences = userLogado.preferences.usuario || { id: 0, table_preferences: 'id,avatar,name,tel,login,status' };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 	const router = useRouter();
-	const [users, setUsers] = useState<IUsers[]>(() => alItems);
+	const [users, setUsers] = useState<IUsers[]>(() => allUsers);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 	const [orderList, setOrder] = useState<number>(1);
@@ -140,50 +140,150 @@ export default function Listagem({
 
 	const filterStatus = filterBeforeEdit.split('');
 
-	function colums(camposGerenciados: any): any {
-		const ObjetCampos: any = camposGerenciados.split(',');
-		const arrOb: any = [];
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-		Object.keys(ObjetCampos).forEach((item) => {
-			if (ObjetCampos[item] === 'id') {
-				arrOb.push({
-					title: (
-						<div className="flex items-center">
-							{arrowOrder}
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
+							</div>
 						</div>
-					),
-					field: 'id',
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className="h-10 flex">
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color="#eba417" />
-									</button>
-								</div>
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
 							</div>
-						) : (
-							<div className="h-10 flex">
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				});
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: 'Status',
+			field: 'status',
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: 'Filtrar por status',
+			render: (rowData: IUsers) => (
+				rowData.status ? (
+					<div className="h-10 flex">
+						<div className="
+							h-10
+						"
+						>
+						</div>
+						<div className="
+							h-10
+						"
+						>
+							<Button
+								icon={<BiEdit size={16} />}
+								title={`Atualizar ${rowData.name}`}
+								onClick={() => {
+									setCookies('pageBeforeEdit', currentPage?.toString());
+									setCookies('filterBeforeEdit', filtersParams);
+									router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
+								}}
+								bgColor="bg-blue-600"
+								textColor="white"
+							/>
+						</div>
+						<div>
+							<Button
+								icon={<FaRegThumbsUp size={16} />}
+								title="Ativo"
+								onClick={() => handleStatus(rowData.id, !rowData.status)}
+								bgColor="bg-green-600"
+								textColor="white"
+							/>
+						</div>
+					</div>
+				) : (
+					<div className="h-10 flex">
+						<div className="
+							h-10
+						"
+						>
+						</div>
+						<div className="
+							h-10
+						"
+						>
+							<Button
+								icon={<BiEdit size={16} />}
+								title={`Atualizar ${rowData.name}`}
+								onClick={() => {
+									setCookies('pageBeforeEdit', currentPage?.toString());
+									setCookies('filterBeforeEdit', filtersParams);
+									router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
+								}}
+								bgColor="bg-blue-600"
+								textColor="white"
+							/>
+						</div>
+						<div>
+							<Button
+								icon={<FaRegThumbsDown size={16} />}
+								title="Inativo"
+								onClick={() => handleStatus(rowData.id, !rowData.status)}
+								bgColor="bg-red-800"
+								textColor="white"
+							/>
+						</div>
+					</div>
+				)
+			),
+		}
+	}
+
+	function colums(camposGerenciados: any): any {
+		const columnCampos: any = camposGerenciados.split(',');
+		const tableFields: any = [];
+
+		Object.keys(columnCampos).forEach((item) => {
+			if (columnCampos[item] === 'id') {
+				tableFields.push(idHeaderFactory());
 			}
 
-			if (ObjetCampos[item] === 'avatar') {
-				arrOb.push({
+			if (columnCampos[item] === 'avatar') {
+				tableFields.push({
 					title: 'Avatar',
 					field: 'avatar',
 					sorting: false,
@@ -204,35 +304,15 @@ export default function Listagem({
 					),
 				});
 			}
-			if (ObjetCampos[item] === 'name') {
-				arrOb.push({
-					title: (
-						<div className="flex items-center">
-							<button className="font-medium text-gray-900" onClick={() => handleOrder('name', orderList)}>
-								Nome
-							</button>
-						</div>
-					),
-					field: 'name',
-					sorting: false,
-				});
+			if (columnCampos[item] === 'name') {
+				tableFields.push(headerTableFactory('Nome', 'name'));
 			}
 
-			if (ObjetCampos[item] === 'login') {
-				arrOb.push({
-					title: (
-						<div className="flex items-center">
-							<button className="font-medium text-gray-900" onClick={() => handleOrder('login', orderList)}>
-								Login
-							</button>
-						</div>
-					),
-					field: 'login',
-					sorting: false,
-				});
+			if (columnCampos[item] === 'login') {
+				tableFields.push(headerTableFactory('Login', 'login'));
 			}
-			if (ObjetCampos[item] === 'tel') {
-				arrOb.push({
+			if (columnCampos[item] === 'tel') {
+				tableFields.push({
 					title: 'Telefone',
 					field: 'tel',
 					sorting: false,
@@ -241,102 +321,50 @@ export default function Listagem({
 					),
 				});
 			}
-			if (ObjetCampos[item] === 'status') {
-				arrOb.push({
-					title: 'Status',
-					field: 'status',
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: 'Filtrar por status',
-					render: (rowData: IUsers) => (
-						rowData.status ? (
-							<div className="h-10 flex">
-								<div className="
-                  h-10
-                "
-								>
-									{/* <Button
-                    icon={<FaRegUserCircle size={16} />}
-                    onClick={() =>{}}
-                    title={`Perfil de ${rowData.name}`}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  /> */}
-								</div>
-								<div className="
-                  h-10
-                "
-								>
-									<Button
-										icon={<BiEdit size={16} />}
-										title={`Atualizar ${rowData.name}`}
-										onClick={() => {
-											setCookies('pageBeforeEdit', currentPage?.toString());
-											setCookies('filterBeforeEdit', filtersParams);
-											router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
-										}}
-										bgColor="bg-blue-600"
-										textColor="white"
-									/>
-								</div>
-								<div>
-									<Button
-										icon={<FaRegThumbsUp size={16} />}
-										title="Ativo"
-										onClick={() => handleStatus(rowData.id, !rowData.status)}
-										bgColor="bg-green-600"
-										textColor="white"
-									/>
-								</div>
-							</div>
-						) : (
-							<div className="h-10 flex">
-								<div className="
-                  h-10
-                "
-								>
-									{/* <Button
-                    icon={<FaRegUserCircle size={16} />}
-                    title={`Perfil de ${rowData.name}`}
-                    onClick={() =>{}}
-                    bgColor="bg-yellow-500"
-                    textColor="white"
-                    href="perfil"
-                  /> */}
-								</div>
-								<div className="
-                  h-10
-                "
-								>
-									<Button
-										icon={<BiEdit size={16} />}
-										title={`Atualizar ${rowData.name}`}
-										onClick={() => {
-											setCookies('pageBeforeEdit', currentPage?.toString());
-											setCookies('filterBeforeEdit', filtersParams);
-											router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
-										}}
-										bgColor="bg-blue-600"
-										textColor="white"
-									/>
-								</div>
-								<div>
-									<Button
-										icon={<FaRegThumbsDown size={16} />}
-										title="Inativo"
-										onClick={() => handleStatus(rowData.id, !rowData.status)}
-										bgColor="bg-red-800"
-										textColor="white"
-									/>
-								</div>
-							</div>
-						)
-					),
-				});
+			if (columnCampos[item] === 'status') {
+				tableFields.push(statusHeaderFactory());
 			}
 		});
-		return arrOb;
+		return tableFields;
+	}
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+		if (filter && typeof (filter) !== 'undefined') {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		} else if (typeOrder !== '') {
+			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+		} else {
+			parametersFilter = filter;
+		}
+		await userService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setUsers(response.response);
+			}
+		});
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	}
 
 	async function getValuesComluns(): Promise<void> {
@@ -384,45 +412,6 @@ export default function Listagem({
 			copy[index].status = status;
 			return copy;
 		});
-	}
-
-	async function handleOrder(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-		if (filter && typeof (filter) !== 'undefined') {
-			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-			} else {
-				parametersFilter = filter;
-			}
-		} else if (typeOrder !== '') {
-			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-		} else {
-			parametersFilter = filter;
-		}
-		await userService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setUsers(response.response);
-			}
-		});
-		if (orderList === 2) {
-			setOrder(0);
-			setArrowOrder(<AiOutlineArrowDown />);
-		} else {
-			setOrder(orderList + 1);
-			if (orderList === 1) {
-				setArrowOrder(<AiOutlineArrowUp />);
-			} else {
-				setArrowOrder('');
-			}
-		}
 	}
 
 	function handleOnDragEnd(result: DropResult): void {
@@ -498,6 +487,23 @@ export default function Listagem({
 		});
 	}
 
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
+
 	useEffect(() => {
 		handlePagination();
 		handleTotalPages();
@@ -538,33 +544,8 @@ export default function Listagem({
 										</label>
 										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
 									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome
-										</label>
-										<Input
-											type="text"
-											placeholder="nome"
-											max="40"
-											id="filterName"
-											name="filterName"
-											onChange={formik.handleChange}
-										/>
-									</div>
-
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Login
-										</label>
-										<Input
-											type="text"
-											placeholder="login"
-											max="40"
-											id="filterLogin"
-											name="filterLogin"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterName', 'Nome')}
+									{filterFieldFactory('filterLogin', 'login')}
 								</div>
 
 								<div className="h-16 w-32 mt-3">
@@ -746,18 +727,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+	const { token } = req.cookies;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-	const { token } = req.cookies;
-	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-
-	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
 	removeCookies('filterBeforeEdit', { req, res });
-
 	removeCookies('pageBeforeEdit', { req, res });
+
+	const { publicRuntimeConfig } = getConfig();
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
@@ -767,15 +747,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` },
 	} as RequestInit | undefined;
 
-	const user = await fetch(urlParameters.toString(), requestOptions);
-	const response = await user.json();
-
-	const AllItems = response.response;
-	const totalItems = response.total;
+	const users = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allUsers, total: totalItems } = await users.json();;
 
 	return {
 		props: {
-			AllItems,
+			allUsers,
 			totalItems,
 			itensPerPage,
 			filterAplication,
