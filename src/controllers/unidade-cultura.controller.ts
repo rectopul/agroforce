@@ -57,7 +57,6 @@ export class UnidadeCulturaController {
 		const parameters: object | any = {};
 		let select: any = [];
 		try {
-
 			if (options.paramSelect) {
 				const objSelect = options.paramSelect.split(',');
 				Object.keys(objSelect).forEach((item) => {

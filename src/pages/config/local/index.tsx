@@ -40,6 +40,7 @@ interface IFilter {
 	filterStatus: object | any;
 	filterName_local_culture: string | any;
 	filterLabel: string | any;
+	filterMloc: string | any;
 	filterAdress: string | any;
 	filterLabel_country: string | any;
 	filterLabel_region: string | any;
@@ -53,7 +54,7 @@ interface IGenarateProps {
 	value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	allItems: ILocalProps[];
+	locais: ILocalProps[];
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
@@ -62,7 +63,7 @@ interface Idata {
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ locais, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 	const tabsDropDowns = TabsDropDowns('config');
 	tabsDropDowns.map((tab) => (
@@ -75,13 +76,11 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,status" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-	const [local, setLocal] = useState<ILocalProps[]>(() => allItems);
+	const [local, setLocal] = useState<ILocalProps[]>(() => locais);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
-	const [orderName, setOrderName] = useState<number>(1);
-	const [orderAddress, setOrderAddress] = useState<number>(1);
-	const [arrowName, setArrowName] = useState<any>('');
-	const [arrowAddress, setArrowAddress] = useState<any>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
@@ -103,7 +102,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
 	const pages = Math.ceil(total / take);
 
-	const columns = colums(camposGerenciados);
+	const columns = columnsOrder(camposGerenciados);
 
 
 	const formik = useFormik<IFilter>({
@@ -111,6 +110,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 			filterStatus: '',
 			filterName_local_culture: '',
 			filterLabel: '',
+			filterMloc: '',
 			filterAdress: '',
 			filterLabel_country: '',
 			filterLabel_region: '',
@@ -122,12 +122,13 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 			filterStatus,
 			filterName_local_culture,
 			filterLabel,
+			filterMloc,
 			filterAdress,
 			filterLabel_country,
 			filterLabel_region,
 			filterName_locality
 		}) => {
-			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName_local_culture=${filterName_local_culture}&filterLabel=${filterLabel}&filterAdress=${filterAdress}&filterLabel_country=${filterLabel_country}&filterLabel_region=${filterLabel_region}&filterName_locality=${filterName_locality}`
+			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName_local_culture=${filterName_local_culture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabel_country=${filterLabel_country}&filterLabel_region=${filterLabel_region}&filterName_locality=${filterName_locality}`
 
 			setFiltersParams(parametersFilter)
 			setCookies("filterBeforeEdit", filtersParams)
@@ -148,157 +149,208 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 	const filterStatus = filterBeforeEdit.split('')
 
-	function colums(camposGerenciados: any): any {
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
+
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
+							</div>
+						</div>
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: "Status",
+			field: "status",
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: "Filtrar por status",
+			render: (rowData: ILocalProps) => (
+				rowData.status ? (
+					<div className='h-10 flex'>
+						<div className="
+							h-10
+						">
+							<Button
+								icon={<BiEdit size={16} />}
+								title={`Atualizar ${rowData.adress}`}
+								onClick={() => {
+									setCookies("filterBeforeEdit", filtersParams)
+									setCookies("pageBeforeEdit", currentPage?.toString())
+									router.push(`/config/local/atualizar?id=${rowData.id}`)
+								}}
+								bgColor="bg-blue-600"
+								textColor="white"
+							/>
+						</div>
+						<div>
+							<Button
+								icon={<FaRegThumbsUp size={16} />}
+								onClick={async () => await handleStatus(
+									rowData.id,
+									rowData.status
+								)}
+								bgColor="bg-green-600"
+								textColor="white"
+							/>
+						</div>
+					</div>
+				) : (
+					<div className='h-10 flex'>
+						<div className="
+							h-10
+						">
+							<Button
+								icon={<BiEdit size={16} />}
+								title={`Atualizar ${rowData.adress}`}
+								onClick={() => {
+									setCookies("filterBeforeEdit", filtersParams)
+									setCookies("pageBeforeEdit", currentPage?.toString())
+									router.push(`/config/local/atualizar?id=${rowData.id}`)
+								}}
+								bgColor="bg-blue-600"
+								textColor="white"
+							/>
+						</div>
+						<div>
+							<Button
+								icon={<FaRegThumbsDown size={16} />}
+								onClick={async () => await handleStatus(
+									rowData.id,
+									rowData.status
+								)}
+								bgColor="bg-red-800"
+								textColor="white"
+							/>
+						</div>
+					</div>
+				)
+			),
+		}
+	}
+
+	function columnsOrder(camposGerenciados: any): any {
 		const objectCampos: any = camposGerenciados.split(',');
 		const arrOb: any = [];
 		Object.keys(objectCampos).forEach((item) => {
 			if (objectCampos[item] === 'id') {
-				arrOb.push({
-					title: "",
-					field: "id",
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
+				arrOb.push(idHeaderFactory())
 			}
 			if (objectCampos[item] === 'name_local_culture') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowName}
-							<button className='font-medium text-gray-900' onClick={() => handleOrderName('name_local_culture', orderName)}>
-								Nome do L. de Cult.
-							</button>
-						</div>
-					),
-					field: "name_local_culture",
-					sorting: false,
-				});
+				arrOb.push(headerTableFactory('Nome do L. de cult.', 'name_local_culture'))
 			}
 			if (objectCampos[item] === 'label') {
-				arrOb.push({ title: "Rótulo", field: "label", sorting: false })
+				arrOb.push(headerTableFactory('Rótulo', 'label'))
 			}
 			if (objectCampos[item] === 'adress') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowAddress}
-							<button className='font-medium text-gray-900' onClick={() => handleOrderAddress('adress', orderAddress)}>
-								Nome Fazenda
-							</button>
-						</div>
-					),
-					field: "adress",
-					sorting: false
-				});
+				arrOb.push(headerTableFactory('Nome da fazenda', 'adress'))
 			}
 			if (objectCampos[item] === 'mloc') {
-				arrOb.push({ title: "MLOC", field: "mloc", sorting: false })
+				arrOb.push(headerTableFactory('MLOC', 'mloc'))
 			}
 			if (objectCampos[item] === 'label_country') {
-				arrOb.push({ title: "País", field: "label_country", sorting: false })
+				arrOb.push(headerTableFactory('País', 'label_country'))
 			}
 			if (objectCampos[item] === 'label_region') {
-				arrOb.push({ title: "Região", field: "label_region", sorting: false })
+				arrOb.push(headerTableFactory('Região', 'label_region'))
 			}
 			if (objectCampos[item] === 'name_locality') {
-				arrOb.push({ title: "Localidade", field: "name_locality", sorting: false })
+				arrOb.push(headerTableFactory('Localidade', 'name_locality'))
 			}
 			if (objectCampos[item] === 'status') {
-				arrOb.push({
-					title: "Status",
-					field: "status",
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: "Filtrar por status",
-					render: (rowData: ILocalProps) => (
-						rowData.status ? (
-							<div className='h-10 flex'>
-								<div className="
-                  h-10
-                ">
-									<Button
-										icon={<BiEdit size={16} />}
-										title={`Atualizar ${rowData.adress}`}
-										onClick={() => {
-											setCookies("filterBeforeEdit", filtersParams)
-											setCookies("pageBeforeEdit", currentPage?.toString())
-											router.push(`/config/local/atualizar?id=${rowData.id}`)
-										}}
-										bgColor="bg-blue-600"
-										textColor="white"
-									/>
-								</div>
-								<div>
-									<Button
-										icon={<FaRegThumbsUp size={16} />}
-										onClick={async () => await handleStatus(
-											rowData.id,
-											rowData.status
-										)}
-										bgColor="bg-green-600"
-										textColor="white"
-									/>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div className="
-                  h-10
-                ">
-									<Button
-										icon={<BiEdit size={16} />}
-										title={`Atualizar ${rowData.adress}`}
-										onClick={() => {
-											setCookies("filterBeforeEdit", filtersParams)
-											setCookies("pageBeforeEdit", currentPage?.toString())
-											router.push(`/config/local/atualizar?id=${rowData.id}`)
-										}}
-										bgColor="bg-blue-600"
-										textColor="white"
-									/>
-								</div>
-								<div>
-									<Button
-										icon={<FaRegThumbsDown size={16} />}
-										onClick={async () => await handleStatus(
-											rowData.id,
-											rowData.status
-										)}
-										bgColor="bg-red-800"
-										textColor="white"
-									/>
-								</div>
-							</div>
-						)
-					),
-				})
+				arrOb.push(statusHeaderFactory())
 			}
 		});
 		return arrOb;
+	};
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+
+		if (filter && typeof (filter) !== 'undefined') {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
+			} else {
+				parametersFilter = filter;
+			}
+		} else {
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		}
+
+		await localService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setLocal(response.response)
+			}
+		});
+
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -326,7 +378,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
 	};
-
 
 	async function handleStatus(idLocal: number, rowStatus: any): Promise<void> {
 		if (rowStatus === 0) {
@@ -356,93 +407,6 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 			id,
 			status
 		});
-	};
-
-	async function handleOrderAddress(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setLocal(response.response)
-			}
-		})
-		if (orderAddress === 2) {
-			setOrderAddress(0);
-			setArrowAddress(<AiOutlineArrowDown />);
-		} else {
-			setOrderAddress(orderAddress + 1);
-			if (orderAddress === 1) {
-				setArrowAddress(<AiOutlineArrowUp />);
-			} else {
-				setArrowAddress('');
-			}
-		}
-	};
-
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await localService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setLocal(response.response)
-			}
-		});
-
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
-		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
-			} else {
-				setArrowName('');
-			}
-		}
 	};
 
 	function handleOnDragEnd(result: DropResult) {
@@ -511,6 +475,23 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		});
 	};
 
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
+
 	useEffect(() => {
 		handlePagination();
 		handleTotalPages();
@@ -549,78 +530,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 										</label>
 										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
 									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome do L. de Cult.
-										</label>
-										<Input
-											type="text"
-											placeholder="Nome"
-											id="filterName_local_culture"
-											name="filterName_local_culture"
-											onChange={formik.handleChange}
-										/>
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Rótulo
-										</label>
-										<Input
-											type="text"
-											placeholder="Rótulo"
-											id="filterLabel"
-											name="filterLabel"
-											onChange={formik.handleChange}
-										/>
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome da Fazenda
-										</label>
-										<Input
-											type="text"
-											placeholder="Fazenda"
-											id="filterAdress"
-											name="filterAdress"
-											onChange={formik.handleChange}
-										/>
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											País
-										</label>
-										<Input
-											type="text"
-											placeholder="País"
-											id="filterLabel_country"
-											name="filterLabel_country"
-											onChange={formik.handleChange}
-										/>
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Região
-										</label>
-										<Input
-											type="text"
-											placeholder="Região"
-											id="filterLabel_region"
-											name="filterLabel_region"
-											onChange={formik.handleChange}
-										/>
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Localidade
-										</label>
-										<Input
-											type="text"
-											placeholder="Localidade"
-											id="filterName_locality"
-											name="filterName_locality"
-											onChange={formik.handleChange}
-										/>
-									</div>
+
+									{filterFieldFactory('filterName_local_culture', 'Nome do L. de Cult.')}
+
+									{filterFieldFactory('filterLabel', 'Rótulo')}
+
+									{filterFieldFactory('filterMloc', 'MLOC')}
+
+									{filterFieldFactory('filterAdress', 'Nome da Fazenda')}
+
+									{filterFieldFactory('filterLabel_country', 'País')}
+
+									{filterFieldFactory('filterLabel_region', 'Região')}
+
+									{filterFieldFactory('filterName_locality', 'Localidade')}
+
 								</div>
 
 								<div className="h-16 w-32 mt-3">
@@ -827,11 +751,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	} as RequestInit | undefined;
 
 	const local = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allItems, total: totalItems } = await local.json();
+	const { response: locais, total: totalItems } = await local.json();
 
 	return {
 		props: {
-			allItems,
+			locais,
 			totalItems,
 			itensPerPage,
 			filterAplication,

@@ -24,11 +24,12 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 
 export interface IData {
-	allItens: any;
+	unidadesCultura: any;
 	totalItems: number;
 	itensPerPage: number;
 	filterAplication: object | any;
 	id_local: number;
+	id_safra: number;
 	local: object | any,
 	pageBeforeEdit: string | any
 }
@@ -52,7 +53,7 @@ interface IUpdateLocal {
 	status: Number;
 };
 
-export default function AtualizarLocal({ local, allItens, totalItems, itensPerPage, filterAplication, id_local, pageBeforeEdit }: IData) {
+export default function AtualizarLocal({ local, unidadesCultura, totalItems, itensPerPage, filterAplication, id_local, id_safra, pageBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns('config');
@@ -70,11 +71,11 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
 	const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id,culture_unity_name,year" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-	const [unidadeCultura, setUnidadeCultura] = useState<any>(() => allItens);
+	const [unidadeCultura, setUnidadeCultura] = useState<any>(() => unidadesCultura);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-	const [orderName, setOrderName] = useState<number>(0);
-	const [arrowName, setArrowName] = useState<ReactNode>('');
+	const [orderList, setOrder] = useState<number>(1);
+	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [colorStar, setColorStar] = useState<string>('');
@@ -124,61 +125,120 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
 		},
 	});
 
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
+
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
+							</div>
+						</div>
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
 
 	function columnsOrder(camposGerenciados: string) {
-		const objectCampos: string[] = camposGerenciados.split(',');
-		const arrOb: any = [];
+		const columnCampos: string[] = camposGerenciados.split(',');
+		const tableFields: any = [];
 
-		Object.keys(objectCampos).forEach((item, index) => {
-			if (objectCampos[index] === 'id') {
-				arrOb.push({
-					title: "",
-					field: "id",
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
+		Object.keys(columnCampos).forEach((item, index) => {
+			if (columnCampos[index] === 'id') {
+				tableFields.push(idHeaderFactory())
 			}
-			if (objectCampos[index] === 'culture_unity_name') {
-				arrOb.push({
-					title: "Nome da Unidade de Cultura",
-					field: "culture_unity_name",
-					sorting: false
-				});
+			if (columnCampos[index] === 'culture_unity_name') {
+				tableFields.push(headerTableFactory('Nome da Unidade de Cultura', 'culture_unity_name'));
 			}
-			if (objectCampos[index] === 'year') {
-				arrOb.push({
-					title: "Ano",
-					field: "year",
-					sorting: false
-				});
+			if (columnCampos[index] === 'year') {
+				tableFields.push(headerTableFactory('Ano', 'year'));
 			}
-
 		});
-		return arrOb;
+		return tableFields;
+	};
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+
+		if (filter && typeof (filter) !== 'undefined') {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
+			} else {
+				parametersFilter = filter;
+			}
+		} else {
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${id_safra}&id_local=${id_local}`;
+			} else {
+				parametersFilter = filter;
+			}
+		}
+
+		await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setUnidadeCultura(response.response)
+			}
+		});
+
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -207,49 +267,6 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
 		setCamposGerenciados(campos);
 	};
 
-	async function handleOrderName(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await unidadeCulturaService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setOrderName(response.response)
-			}
-		});
-
-		if (orderName === 2) {
-			setOrderName(0);
-			setArrowName(<AiOutlineArrowDown />);
-		} else {
-			setOrderName(orderName + 1);
-			if (orderName === 1) {
-				setArrowName(<AiOutlineArrowUp />);
-			} else {
-				setArrowName('');
-			}
-		}
-	};
 
 	function handleOnDragEnd(result: DropResult): void {
 		setStatusAccordion(true);
@@ -314,7 +331,7 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
 
 	async function handlePagination(): Promise<void> {
 		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take + "&id_local=" + id_local;
+		let parametersFilter = `skip=${skip}&take=${take}`
 
 		if (filter) {
 			parametersFilter = parametersFilter + "&" + filter;
@@ -624,13 +641,14 @@ export default function AtualizarLocal({ local, allItens, totalItems, itensPerPa
 	);
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
-	const pageBeforeEdit = context.req.cookies.pageBeforeEdit ? context.req.cookies.pageBeforeEdit : 0;
-	const token = context.req.cookies.token;
-	const id_local = Number(context.query.id);
+	const token = req.cookies.token;
+	const id_local = query.id;
+	const id_safra = req.cookies.safraId
+	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
 	const { publicRuntimeConfig } = getConfig();
 
@@ -645,22 +663,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/local`;
-	const responseLocal = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
+	const responseLocal = await fetch(`${baseUrlShow}/` + query.id, requestOptions);
 
-	const filterAplication = "filterStatus=1";
+	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_local=${id_local}`;
 
 
-	const { response: allItens, total: totalItems }: any = await responseUnidadeCultura.json();
+	const { response: unidadesCultura, total: totalItems }: any = await responseUnidadeCultura.json();
 
 	const { response: local } = await responseLocal.json();
 
 	return {
 		props: {
-			allItens,
+			unidadesCultura,
 			totalItems,
 			itensPerPage,
 			filterAplication,
 			id_local,
+			id_safra,
 			local,
 			pageBeforeEdit
 		}

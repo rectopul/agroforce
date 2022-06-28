@@ -70,8 +70,7 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [orderList, setOrder] = useState<number>(1);
-	const [arrowName, setArrowName] = useState<any>('');
-	const [arrowDesc, setArrowDesc] = useState<any>('');
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
@@ -145,129 +144,135 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 		await cultureService.updateCulture({ id, name, desc, status });
 	};
 
-	function columnsOrder(camposGerenciados: string) {
-		let ObjetCampos: string[] = camposGerenciados.split(',');
-		let arrOb: any = [];
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-		Object.keys(ObjetCampos).forEach((item, index) => {
-			if (ObjetCampos[index] === 'id') {
-				arrOb.push({
-					title: "",
-					field: "id",
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
-			}
-
-			if (ObjetCampos[index] === 'name') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowName}
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('name', orderList)}>
-								Código Reduzido
-							</button>
-						</div>
-					),
-					field: "name",
-					sorting: false
-				});
-			}
-			if (ObjetCampos[index] === 'desc') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowDesc}
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('desc', orderList)} >
-								Nome
-							</button>
-						</div>
-					),
-					field: "desc",
-					sorting: false
-				});
-			}
-			if (ObjetCampos[index] === 'status') {
-				arrOb.push({
-					title: "Status",
-					field: "status",
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: "Filtrar por status",
-					render: (rowData: ICulture) => (
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
 						<div className='h-10 flex'>
-							<div className="h-10">
-								<Button
-									icon={<BiEdit size={16} />}
-									title={`Atualizar ${rowData.name}`}
-									onClick={() => {
-										setCookies("pageBeforeEdit", currentPage?.toString())
-										setCookies("filterBeforeEdit", filtersParams)
-										router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`)
-									}}
-									bgColor="bg-blue-600"
-									textColor="white"
-								/>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
 							</div>
-							{rowData.status ? (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsUp size={16} />}
-										onClick={async () => await handleStatusCulture(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-green-600"
-										textColor="white"
-									/>
-								</div>
-							) : (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsDown size={16} />}
-										onClick={async () => await handleStatusCulture(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-red-800"
-										textColor="white"
-									/>
-								</div>
-							)}
 						</div>
-					),
-				})
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: "Status",
+			field: "status",
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: "Filtrar por status",
+			render: (rowData: ICulture) => (
+				<div className='h-10 flex'>
+					<div className="h-10">
+						<Button
+							icon={<BiEdit size={16} />}
+							title={`Atualizar ${rowData.name}`}
+							onClick={() => {
+								setCookies("pageBeforeEdit", currentPage?.toString())
+								setCookies("filterBeforeEdit", filtersParams)
+								router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`)
+							}}
+							bgColor="bg-blue-600"
+							textColor="white"
+						/>
+					</div>
+					{rowData.status ? (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsUp size={16} />}
+								onClick={async () => await handleStatusCulture(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-green-600"
+								textColor="white"
+							/>
+						</div>
+					) : (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsDown size={16} />}
+								onClick={async () => await handleStatusCulture(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-red-800"
+								textColor="white"
+							/>
+						</div>
+					)}
+				</div>
+			),
+		}
+	}
+
+	function columnsOrder(camposGerenciados: string) {
+		const columnCampos: string[] = camposGerenciados.split(',');
+		const tableFields: any = [];
+
+		Object.keys(columnCampos).forEach((item, index) => {
+			if (columnCampos[index] === 'id') {
+				tableFields.push(idHeaderFactory())
+			}
+			if (columnCampos[index] === 'name') {
+				tableFields.push(headerTableFactory('Código reduzido', 'name'));
+			}
+			if (columnCampos[index] === 'desc') {
+				tableFields.push(headerTableFactory('Nome', 'desc'));
+			}
+			if (columnCampos[index] === 'status') {
+				tableFields.push(statusHeaderFactory())
 			}
 		});
-		return arrOb;
+		return tableFields;
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -309,13 +314,13 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 
 		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
 			} else {
 				parametersFilter = filter;
 			}
 		} else {
 			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
 			} else {
 				parametersFilter = filter;
 			}
@@ -329,16 +334,13 @@ export default function Listagem({ allCultures, totalItems, itensPerPage, filter
 
 		if (orderList === 2) {
 			setOrder(0);
-			if (column === 'name') setArrowName(<AiOutlineArrowDown />);
-			if (column === 'desc') setArrowDesc(<AiOutlineArrowDown />);
+			setArrowOrder(<AiOutlineArrowDown />);
 		} else {
 			setOrder(orderList + 1);
 			if (orderList === 1) {
-				if (column === 'name') setArrowName(<AiOutlineArrowUp />);
-				if (column === 'desc') setArrowDesc(<AiOutlineArrowUp />);
+				setArrowOrder(<AiOutlineArrowUp />);
 			} else {
-				if (column === 'name') setArrowName('');
-				if (column === 'desc') setArrowDesc('');
+				setArrowOrder('');
 			}
 		}
 	};
@@ -642,20 +644,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+	const token = req.cookies.token;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-
-	const token = req.cookies.token;
-	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-
-	let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
-
-	removeCookies('filterBeforeEdit', { req, res });
+	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 
 	removeCookies('pageBeforeEdit', { req, res });
+	removeCookies('filterBeforeEdit', { req, res });
 
+	const { publicRuntimeConfig } = getConfig();
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
 	const requestOptions = {
@@ -665,10 +664,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	} as RequestInit | undefined;
 
 	const cultures = await fetch(urlParameters.toString(), requestOptions);
-	const response = await cultures.json();
-
-	const allCultures = response.response;
-	const totalItems = response.total;
+	const { response: allCultures, total: totalItems } = await cultures.json();
 
 	return {
 		props: {

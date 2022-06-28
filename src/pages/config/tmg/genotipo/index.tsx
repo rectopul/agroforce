@@ -84,7 +84,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		{ name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
 		{ name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
 		{ name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
-		{ name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia.name' },
+		{ name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
 		{ name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
 		{ name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
 		{ name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
@@ -143,36 +143,6 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		}
 	});
 
-	async function handleStatus(idGenotipo: number, data: IGenotipos): Promise<void> {
-		if (data.status === 0) {
-			data.status = 1;
-		} else {
-			data.status = 0;
-		}
-
-		const index = genotipos.findIndex((genotipo) => genotipo.id === idGenotipo);
-
-		if (index === -1) {
-			return;
-		}
-
-		setGenotipo((oldSafra) => {
-			const copy = [...oldSafra];
-			copy[index].status = data.status;
-			return copy;
-		});
-
-		const {
-			id,
-			status
-		} = genotipos[index];
-
-		await genotipoService.update({
-			id,
-			status
-		});
-	}
-
 	function headerTableFactory(name: any, title: string) {
 		return {
 			title: (
@@ -196,6 +166,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 			),
 			field: 'id',
 			width: 0,
+			sorting: false,
 			render: () => (
 				colorStar === '#eba417'
 					? (
@@ -252,14 +223,13 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 				</div>
 			)
 		}
-
 	}
 
-	function columnsOrder(columnOrder: any): any {
-		let columnCampos: string[] = columnOrder.split(',');
+	function columnsOrder(camposGerenciados: any): any {
+		let columnCampos: string[] = camposGerenciados.split(',');
 		const tableFields: any = [];
 
-		// columnOrder.map((field: any) => {
+		// camposGerenciados.map((field: any) => {
 		// 	if (field.value === 'id') {
 		// 		tableFields.push(idHeaderFactory())
 		// 	} else if (field.value === 'status') {
@@ -345,21 +315,21 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 			typeOrder = '';
 		}
 
-		if (filter && typeof (filter) !== undefined) {
+		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
 			} else {
 				parametersFilter = filter;
 			}
 		} else {
 			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
 			} else {
 				parametersFilter = filter;
 			}
 		}
 
-		await genotipoService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+		await genotipoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
 			if (response.status === 200) {
 				setGenotipo(response.response)
 			}
@@ -486,6 +456,24 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		handleTotalPages();
 	}, [currentPage]);
 
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					max="40"
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
+
 	return (
 		<>
 			<Head><title>Listagem de genótipos</title></Head>
@@ -512,25 +500,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                   justify-center
                   pb-2
                 ">
-									{/* <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Status
-                    </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map(id => id)} selected={'1'} />
-                  </div> */}
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Nome genótipo
-										</label>
-										<Input
-											type="text"
-											placeholder="Genótipo"
-											max="40"
-											id="filterGenotipo"
-											name="filterGenotipo"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterGenotipo', 'Nome genotipo')}
 
 									<div className="h-10 w-1/2 ml-4">
 										<label className="block text-gray-900 text-sm font-bold mb-2">
@@ -588,17 +558,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                     px-5
                     border-solid border-b
                     border-gray-200
-                  '>
-										{/* <div className='h-12'>
-                      <Button
-                        title="Cadastrar genótipo"
-                        value="Cadastrar genótipo"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => {router.push('genotipo/cadastro')}}
-                        icon={<RiPlantLine size={20} />}
-                      />
-                    </div> */}
+                  '>										
 										<div className='h-12'>
 											<Button
 												title="Importar Planilha"
@@ -759,8 +719,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	} as RequestInit | undefined;
 
-	const response = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allGenotipos, total: totalItems } = await response.json();;
+	const genotipos = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allGenotipos, total: totalItems } = await genotipos.json();
 
 	return {
 		props: {

@@ -68,7 +68,7 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [itemsTotal, setTotalItems] = useState<number>(totalItems);
 	const [orderList, setOrder] = useState<number>(1);
-	const [arrowName, setArrowName] = useState<ReactNode>('');
+	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
@@ -136,116 +136,177 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 		await departmentService.update({ id, name, status });
 	};
 
-	function columnsOrder(camposGerenciados: string) {
-		const ObjetCampos: string[] = camposGerenciados.split(',');
-		let arrOb: any = [];
+	function headerTableFactory(name: any, title: string) {
+		return {
+			title: (
+				<div className='flex items-center'>
+					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+						{name}
+					</button>
+				</div>
+			),
+			field: title,
+			sorting: false
+		}
+	}
 
-		Object.keys(ObjetCampos).forEach((item, index) => {
-			if (ObjetCampos[index] === 'id') {
-				arrOb.push({
-					title: "",
-					field: "id",
-					width: 0,
-					render: () => (
-						colorStar === '#eba417' ? (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('')}
-									>
-										<AiTwotoneStar size={25} color={'#eba417'} />
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className='h-10 flex'>
-								<div>
-									<button
-										className="w-full h-full flex items-center justify-center border-0"
-										onClick={() => setColorStar('#eba417')}
-									>
-										<AiTwotoneStar size={25} />
-									</button>
-								</div>
-							</div>
-						)
-					),
-				})
-			}
-
-			if (ObjetCampos[index] === 'name') {
-				arrOb.push({
-					title: (
-						<div className='flex items-center'>
-							{arrowName}
-							<button className='font-medium text-gray-900' onClick={() => handleOrder('name', orderList)}>
-								Nome
-							</button>
-						</div>
-					),
-					field: "name",
-					sorting: false
-				});
-			}
-			if (ObjetCampos[index] === 'status') {
-				arrOb.push({
-					title: "Status",
-					field: "status",
-					sorting: false,
-					searchable: false,
-					filterPlaceholder: "Filtrar por status",
-					render: (rowData: IDepartment) => (
+	function idHeaderFactory() {
+		return {
+			title: (
+				<div className="flex items-center">
+					{arrowOrder}
+				</div>
+			),
+			field: 'id',
+			width: 0,
+			sorting: false,
+			render: () => (
+				colorStar === '#eba417'
+					? (
 						<div className='h-10 flex'>
-							<div className="h-10">
-								<Button
-									icon={<BiEdit size={16} />}
-									bgColor="bg-blue-600"
-									textColor="white"
-									onClick={() => {
-										setCookies("pageBeforeEdit", currentPage?.toString())
-										setCookies("filterBeforeEdit", filtersParams)
-										router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)
-									}
-									}
-
-								/>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('')}
+								>
+									<AiTwotoneStar size={25} color={'#eba417'} />
+								</button>
 							</div>
-							{rowData.status === 1 ? (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsUp size={16} />}
-										onClick={async () => await handleStatusItem(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-green-600"
-										textColor="white"
-									/>
-								</div>
-							) : (
-								<div className="h-10">
-									<Button
-										icon={<FaRegThumbsDown size={16} />}
-										onClick={async () => await handleStatusItem(
-											rowData.id, {
-											status: rowData.status,
-											...rowData
-										}
-										)}
-										bgColor="bg-red-800"
-										textColor="white"
-									/>
-								</div>
-							)}
 						</div>
-					),
-				})
+					)
+					: (
+						<div className='h-10 flex'>
+							<div>
+								<button
+									className="w-full h-full flex items-center justify-center border-0"
+									onClick={() => setColorStar('#eba417')}
+								>
+									<AiTwotoneStar size={25} />
+								</button>
+							</div>
+						</div>
+					)
+			)
+		};
+	}
+
+	function statusHeaderFactory() {
+		return {
+			title: "Status",
+			field: "status",
+			sorting: false,
+			searchable: false,
+			filterPlaceholder: "Filtrar por status",
+			render: (rowData: IDepartment) => (
+				<div className='h-10 flex'>
+					<div className="h-10">
+						<Button
+							icon={<BiEdit size={16} />}
+							bgColor="bg-blue-600"
+							textColor="white"
+							onClick={() => {
+								setCookies("pageBeforeEdit", currentPage?.toString())
+								setCookies("filterBeforeEdit", filtersParams)
+								router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`)
+							}
+							}
+
+						/>
+					</div>
+					{rowData.status === 1 ? (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsUp size={16} />}
+								onClick={async () => await handleStatusItem(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-green-600"
+								textColor="white"
+							/>
+						</div>
+					) : (
+						<div className="h-10">
+							<Button
+								icon={<FaRegThumbsDown size={16} />}
+								onClick={async () => await handleStatusItem(
+									rowData.id, {
+									status: rowData.status,
+									...rowData
+								}
+								)}
+								bgColor="bg-red-800"
+								textColor="white"
+							/>
+						</div>
+					)}
+				</div>
+			),
+		}
+	}
+
+	function columnsOrder(camposGerenciados: string) {
+		const columnCampos: string[] = camposGerenciados.split(',');
+		const tableFields: any = [];
+
+		Object.keys(columnCampos).forEach((item, index) => {
+			if (columnCampos[index] === 'id') {
+				tableFields.push(idHeaderFactory())
+			}
+			if (columnCampos[index] === 'name') {
+				tableFields.push(headerTableFactory('Nome', 'name'));
+			}
+			if (columnCampos[index] === 'status') {
+				tableFields.push(statusHeaderFactory())
 			}
 		});
-		return arrOb;
+		return tableFields;
+	};
+
+	async function handleOrder(column: string, order: string | any): Promise<void> {
+		let typeOrder: any;
+		let parametersFilter: any;
+		if (order === 1) {
+			typeOrder = 'asc';
+		} else if (order === 2) {
+			typeOrder = 'desc';
+		} else {
+			typeOrder = '';
+		}
+
+		if (filter && typeof (filter) !== 'undefined') {
+			if (typeOrder !== '') {
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
+			} else {
+				parametersFilter = filter;
+			}
+		} else {
+			if (typeOrder !== '') {
+				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+			} else {
+				parametersFilter = filter;
+			}
+		}
+
+		await departmentService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+			if (response.status === 200) {
+				setItems(response.response)
+			}
+		});
+
+		if (orderList === 2) {
+			setOrder(0);
+			setArrowOrder(<AiOutlineArrowDown />);
+		} else {
+			setOrder(orderList + 1);
+			if (orderList === 1) {
+				setArrowOrder(<AiOutlineArrowUp />);
+			} else {
+				setArrowOrder('');
+			}
+		}
 	};
 
 	async function getValuesComluns(): Promise<void> {
@@ -272,50 +333,6 @@ export default function Listagem({ allDepartments, totalItems, itensPerPage, fil
 
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
-	};
-
-	async function handleOrder(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
-
-		if (filter && typeof (filter) !== undefined) {
-			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		} else {
-			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-			} else {
-				parametersFilter = filter;
-			}
-		}
-
-		await departmentService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setItems(response.response)
-			}
-		});
-
-		if (orderList === 2) {
-			setOrder(0);
-			setArrowName(<AiOutlineArrowDown />);
-		} else {
-			setOrder(orderList + 1);
-			if (orderList === 1) {
-				setArrowName(<AiOutlineArrowUp />);
-			} else {
-				setArrowName('');
-			}
-		}
 	};
 
 
@@ -616,20 +633,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
+	const token = req.cookies.token;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 
-	const token = req.cookies.token;
-	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;
-
-	let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	let filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
-
 	removeCookies('filterBeforeEdit', { req, res });
-
 	removeCookies('pageBeforeEdit', { req, res });
 
+	const { publicRuntimeConfig } = getConfig();
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
 	const requestOptions = {
@@ -639,10 +653,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	} as RequestInit | undefined;
 
 	const departments = await fetch(urlParameters.toString(), requestOptions);
-	const Response = await departments.json();
-
-	const allDepartments = Response.response;
-	const totalItems = Response.total;
+	const { response: allDepartments, total: totalItems } = await departments.json();
 
 	return {
 		props: {
