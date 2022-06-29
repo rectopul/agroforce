@@ -72,7 +72,7 @@ export class LocalController {
 			}
 		} catch (error: any) {
 			handleError('Local Controller', 'GetAll', error.message)
-			throw new Error("[Controller] - GetAll Unidade Cultura erro")
+			throw new Error("[Controller] - GetAll Local erro")
 		}
 	}
 
@@ -90,7 +90,7 @@ export class LocalController {
 			}
 		} catch (error: any) {
 			handleError('Local Controller', 'GetOne', error.message)
-			throw new Error("[Controller] - GetOne Unidade Cultura erro")
+			throw new Error("[Controller] - GetOne Local erro")
 		}
 	}
 
@@ -106,7 +106,7 @@ export class LocalController {
 
 		} catch (error: any) {
 			handleError('Local Controller', 'Create', error.message)
-			throw new Error("[Controller] - Create Unidade Cultura erro")
+			throw new Error("[Controller] - Create Local erro")
 		}
 	}
 
@@ -127,7 +127,7 @@ export class LocalController {
 
 		} catch (error: any) {
 			handleError('Local Controller', 'Update', error.message)
-			throw new Error("[Controller] - Update Unidade Cultura erro")
+			throw new Error("[Controller] - Update Local erro")
 		}
 	}
 }

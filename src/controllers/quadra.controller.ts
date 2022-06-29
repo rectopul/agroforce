@@ -13,8 +13,6 @@ export class QuadraController {
 		let orderBy: object | any;
 		let select: any = [];
 		try {
-			console.log('options')
-			console.log(options)
 			if (options.filterStatus) {
 				if (typeof (options.status) === 'string') {
 					options.filterStatus = parseInt(options.filterStatus);
@@ -78,8 +76,6 @@ export class QuadraController {
 				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
 			}
 
-			console.log('orderBy')
-			console.log(orderBy)
 
 			let response: object | any = await this.quadraRepository.findAll(
 				parameters,

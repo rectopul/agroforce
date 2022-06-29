@@ -30,8 +30,8 @@ interface IFilter {
 export interface IFocos {
 	id: number;
 	name: string;
-	grupo: number;
-	foco_children?: [];
+	group: number;
+	group?: [];
 	tableData?: []
 	status?: number;
 }
@@ -63,7 +63,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 	));
 
 	const userLogado = JSON.parse(localStorage.getItem("user") as string);
-	const preferences = userLogado.preferences.foco || { id: 0, table_preferences: "id,name,grupo,status" };
+	const preferences = userLogado.preferences.foco || { id: 0, table_preferences: "id,name,group,status" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
 	const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
@@ -76,7 +76,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Nome", value: "name" },
-		{ name: "CamposGerenciados[]", title: "Grupo", value: "grupo" },
+		{ name: "CamposGerenciados[]", title: "Grupo", value: "group" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
 	]);
 	const [filter, setFilter] = useState<any>(filterAplication);
@@ -261,8 +261,8 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 			if (columnOrder[index] === 'name') {
 				tableFields.push(headerTableFactory('Nome', 'name'));
 			}
-			if (columnOrder[index] === 'grupo') {
-				tableFields.push(headerTableFactory('Grupo', 'grupo'));
+			if (columnOrder[index] === 'group') {
+				tableFields.push(headerTableFactory('Grupo', 'group'));
 			}
 			if (columnOrder[index] === 'status') {
 				tableFields.push(statusHeaderFactory())
@@ -371,7 +371,6 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 
 				newData.map(item => {
 					const statusTemp = item.status
-					delete item.foco_children
 					delete item.status
 					delete item.tableData
 					item.status = statusTemp

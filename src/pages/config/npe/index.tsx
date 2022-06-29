@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { useRouter } from 'next/router';
 import { IoReloadSharp } from "react-icons/io5";
@@ -21,7 +21,6 @@ import {
 } from "../../../components";
 import * as ITabs from '../../../shared/utils/dropdown';
 import { removeCookies } from "cookies-next";
-import handleOrderForeigin from "src/shared/utils/handleOrderForeigin";
 
 interface INpeProps {
 	id: Number | any;
@@ -56,14 +55,14 @@ interface IGenarateProps {
 	value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	allItems: any;
+	allNpe: any;
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterAplication: object | any;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems }: Idata) {
+export default function Listagem({ allNpe, itensPerPage, filterAplication, totalItems }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -78,15 +77,14 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	const userLogado = JSON.parse(localStorage.getItem("user") as string);
 	const preferences = userLogado.preferences.npe || { id: 0, table_preferences: "id,local,safra,foco,ensaio,tecnologia,epoca,npei,status" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-
-	const [npe, setNPE] = useState(allItems);
-
+	const [npe, setNPE] = useState(allNpe);
 	const [currentPage, setCurrentPage] = useState<number>(0);
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-
+	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+	const [colorStar, setColorStar] = useState<string>('');
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
 		{ name: "CamposGerenciados[]", title: "Local ", value: "local", defaultChecked: () => camposGerenciados.includes('local') },
@@ -98,14 +96,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		{ name: "CamposGerenciados[]", title: "NPE Inicial ", value: "npei", defaultChecked: () => camposGerenciados.includes('npei') },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
 	]);
-	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [colorStar, setColorStar] = useState<string>('');
 
 	const take: number = itensPerPage;
 	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
 	const pages = Math.ceil(total / take);
-
-	const columns = colums(camposGerenciados);
 
 	const formik = useFormik<IFilter>({
 		initialValues: {
@@ -274,6 +268,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		});
 		return tableFields;
 	};
+
+	const columns = colums(camposGerenciados);
+
 
 	async function handleOrder(column: string, order: string | any): Promise<void> {
 		let typeOrder: any;
@@ -470,6 +467,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		});
 	};
 
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					max="40"
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
+
 	useEffect(() => {
 		handlePagination();
 		handleTotalPages();
@@ -509,103 +524,20 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
 									</div>
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Local
-										</label>
-										<Input
-											type="text"
-											placeholder="local"
-											max="40"
-											id="filterLocal"
-											name="filterLocal"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterLocal', 'Local')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Safra
-										</label>
-										<Input
-											type="text"
-											placeholder="safra"
-											max="40"
-											id="filterSafra"
-											name="filterSafra"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterSafra', 'Safra')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Foco
-										</label>
-										<Input
-											type="text"
-											placeholder="foco"
-											max="40"
-											id="filterFoco"
-											name="filterFoco"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterFoco', 'Foco')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Ensaio
-										</label>
-										<Input
-											type="text"
-											placeholder="ensaio"
-											max="40"
-											id="filterEnsaio"
-											name="filterEnsaio"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Tecnologia
-										</label>
-										<Input
-											type="text"
-											placeholder="tecnologia"
-											max="40"
-											id="filterTecnologia"
-											name="filterTecnologia"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Epoca
-										</label>
-										<Input
-											type="text"
-											placeholder="epoca"
-											max="40"
-											id="filterEpoca"
-											name="filterEpoca"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterEpoca', 'Epoca')}
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											NPE Inicial
-										</label>
-										<Input
-											type="text"
-											placeholder="NPE"
-											max="40"
-											id="filterNPE"
-											name="filterNPE"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterNPE', 'NPE Inicial')}
+
 								</div>
 
 								<div className="h-16 w-32 mt-3">
@@ -807,12 +739,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	} as RequestInit | undefined;
 
-	const response = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allItems, total: totalItems } = await response.json();
+	const npes = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allNpe, total: totalItems } = await npes.json();
 
 	return {
 		props: {
-			allItems,
+			allNpe,
 			totalItems,
 			itensPerPage,
 			filterAplication

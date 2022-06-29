@@ -14,8 +14,6 @@ export class ExperimentController {
 		let orderBy: object | any;
 		let select: any = [];
 		try {
-			console.log('options')
-			console.log(options)
 			if (options.filterStatus) {
 				if (typeof (options.status) === 'string') {
 					options.filterStatus = parseInt(options.filterStatus);

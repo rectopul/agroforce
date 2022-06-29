@@ -84,7 +84,7 @@ model safra {
   npe                 npe[]
   genotipo            genotipo[]
   quadra              quadra[]
-  foco_children       foco_children[]
+  group               group[]
   lote                lote[]
   type_assay_children type_assay_children[]
   experiment          experiment[]
@@ -331,13 +331,13 @@ model foco {
   created_by Int
   created_at DateTime? @default(now())
 
-  npe           npe[]
-  culture       culture         @relation(fields: [id_culture], references: [id])
-  foco_children foco_children[]
-  experiment    experiment[]
+  npe        npe[]
+  culture    culture      @relation(fields: [id_culture], references: [id])
+  group      group[]
+  experiment experiment[]
 }
 
-model foco_children {
+model group {
   id         Int       @id @default(autoincrement())
   id_safra   Int
   id_foco    Int
@@ -348,6 +348,7 @@ model foco_children {
 
   safra safra @relation(fields: [id_safra], references: [id])
   foco  foco  @relation(fields: [id_foco], references: [id])
+  npe   npe[]
 }
 
 model type_assay {
@@ -441,7 +442,7 @@ model npe {
   npei          Int
   npef          Int?
   prox_npe      Int?
-  group         Int       @default(0)
+  id_group      Int
   status        Int       @default(1)
   created_by    Int
   created_at    DateTime? @default(now())
@@ -449,6 +450,7 @@ model npe {
   local      local      @relation(fields: [id_local], references: [id])
   safra      safra      @relation(fields: [id_safra], references: [id])
   foco       foco       @relation(fields: [id_foco], references: [id])
+  group      group      @relation(fields: [id_group], references: [id])
   type_assay type_assay @relation(fields: [id_type_assay], references: [id])
   tecnologia tecnologia @relation(fields: [id_ogm], references: [id])
 }
