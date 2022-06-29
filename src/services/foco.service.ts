@@ -5,30 +5,27 @@ const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
 interface UpdateLoteDTO {
-  id: number;
-  name: string;
-  status?: number;
-  group?: number;
-  id_culture?: number;
+	id: number;
+	name: string;
+	status?: number;
+	group?: number;
+	id_culture?: number;
 }
 
 export const focoService = {
-  update,
-  getAll,
-  create,
+	update,
+	getAll,
+	create,
 };
 
 async function create(data: any) {
-  const foco = await fetchWrapper.post(baseUrl, data);
-  return foco;
+	return fetchWrapper.post(baseUrl, data);
 }
 
 async function update(data: UpdateLoteDTO) {
-  const foco = await fetchWrapper.put(baseUrl, data);
-  return foco;
+	return fetchWrapper.put(baseUrl, data);
 }
 
 async function getAll(parameters: any) {
-  const portfolio = await fetchWrapper.get(baseUrl, parameters);
-  return portfolio;
+	return fetchWrapper.get(baseUrl, parameters);
 }

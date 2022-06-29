@@ -4,7 +4,6 @@ export class LayoutQuadraController {
     Repository = new LayoutQuadraRepository();
 
     async getAll(options: object | any) {
-        console.log(options)
         const parameters: object | any = {};
         let take;
         let skip;
