@@ -7,7 +7,7 @@ export default apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const npeController = new NpeController();
-	const id = req.query.id.toString();
+	const id = Number(req.query.id)
 	switch (req.method) {
 		case 'PUT':
 			const resultPut = await npeController.update(req.body);
