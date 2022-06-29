@@ -37,10 +37,8 @@ export class UnidadeCulturaRepository {
 	}
 
 	async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-		let order: object | any;
-
 		if (orderBy) {
-			order = JSON.parse(orderBy);
+			orderBy = JSON.parse(orderBy);
 		}
 
 		const count = await prisma.local_children.count({ where: where });
@@ -50,7 +48,7 @@ export class UnidadeCulturaRepository {
 			skip: skip,
 			take: take,
 			where: where,
-			orderBy: order
+			orderBy: orderBy
 		});
 
 		result.total = count;

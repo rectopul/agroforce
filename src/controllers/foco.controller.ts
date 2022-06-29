@@ -1,196 +1,163 @@
+import handleError from 'src/shared/utils/handleError';
 import { number, object, SchemaOf, string } from 'yup';
 import { FocoRepository } from '../repository/foco.repository';
 
 interface LoteDTO {
-  id: number;
-  name: string;
-  created_by: number;
-  status: number;
-  id_culture?: number;
+	id: number;
+	name: string;
+	created_by: number;
+	status: number;
+	id_culture?: number;
 }
 
 type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
 export class FocoController {
-  public readonly required = 'Campo obrigatório';
+	public readonly required = 'Campo obrigatório';
 
-  focoRepository = new FocoRepository();
+	focoRepository = new FocoRepository();
 
-  async listAllFocos(options: any) {
-    const parameters: object | any = {};
-    let take;
-    let skip;
-    let orderBy: object | any;
-    let select: any = [];
+	async getAll(options: any) {
+		const parameters: object | any = {};
+		let select: any = [];
+		try {
+			if (options.filterStatus) {
+				if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+			}
 
-    try {
-      if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        }
-      }
+			if (options.filterSearch) {
+				parameters.name = JSON.parse(`{ "contains": "${options.filterSearch}" }`);
+			}
 
-      if (options.filterSearch) {
-        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-        parameters.name = JSON.parse(options.filterSearch);
-      }
+			if (options.id_culture) {
+				parameters.id_culture = Number(options.id_culture);
+			}
 
-      if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
-      }
+			if (options.paramSelect) {
+				let objSelect = options.paramSelect.split(',');
+				Object.keys(objSelect).forEach((item) => {
+					select[objSelect[item]] = true;
+				});
+				select = Object.assign({}, select);
+			} else {
+				select = {
+					id: true,
+					name: true,
+					group: true,
+					status: true,
+				};
+			}
 
-      if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] === 'grupo') {
-            select['foco_children'] = true;
-          } else {
-            select[objSelect[item]] = true;
-          }
-        });
-        select = Object.assign({}, select);
-      } else {
-        select = {
-          id: true,
-          name: true,
-          foco_children: true,
-          status: true,
-        };
-      }
+			if (options.name) {
+				parameters.name = options.name;
+			}
 
-      if (options.name) {
-        parameters.name = options.name;
-      }
+			const take = (options.take) ? Number(options.take) : undefined;
 
-      if (options.take) {
-        if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
-        } else {
-          take = options.take;
-        }
-      }
+			const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.skip) {
-        if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
-        } else {
-          skip = options.skip;
-        }
-      }
+			const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
-      }
+			const response: object | any = await this.focoRepository.findAll(
+				parameters,
+				select,
+				take,
+				skip,
+				orderBy
+			);
 
-      const response: object | any = await this.focoRepository.findAll(
-        parameters,
-        select,
-        take,
-        skip,
-        orderBy
-      );
+			response.map((item: any) => {
+				item.group.map((group: any) => {
 
-      // response.map((item: any) => {
-      //   return item.foco_children.map((group: any) => {
-      //     //console.log(group.id_safra === Number(options.id_safra))
-      //     return (group.id_safra === Number(options.id_safra)) ? group.grupo : null
-      //   })
-      // })
+					if (group.id_safra === Number(options.id_safra)) {
+						item.group = (group.group.toString()).length > 1 ? group.group : '0' + group.group.toString()
+					}
+				})
+			})
 
-      response.map((item: any) => {
-        item.foco_children.map((group: any) => {
-          //console.log(group.id_safra === Number(options.id_safra))          
-          //item.foco_children = (group.id_safra === Number(options.id_safra)) ? group.grupo
-          if (group.id_safra === Number(options.id_safra)) {
-            item.grupo = (group.grupo.toString()).length > 1 ? group.grupo : '0' + group.grupo.toString()
-          }
-        })
-      })
+			if (!response || response.total <= 0) {
+				return { status: 404, response: [], total: 0 }
+			} else {
+				return { status: 200, response, total: response.total }
+			}
+		} catch (error: any) {
+			handleError('Foco Controller', 'GetAll', error.message)
+			throw new Error("[Controller] - GetAll foco erro")
+		}
+	};
 
-      if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 }
+	async getOne(id: number) {
+		try {
+			if (!id) return { status: 400, response: [], message: { message: "Id não informado" } }
 
-      } else {
-        return { status: 200, response, total: response.total }
-      }
-    } catch (err) {
-      console.log("Error: ", err)
-      return { status: 400, message: err }
-    }
-  };
+			const response = await this.focoRepository.findOne(id);
 
-  async getOneFoco(id: number) {
-    try {
-      if (!id) throw new Error("Dados inválidos");
+			if (response) {
+				return { status: 200, response: response, message: { message: "Foco encontrado" } }
+			} else {
+				return { status: 404, response: [], message: { message: "Foco não existe" } }
+			}
 
-      const response = await this.focoRepository.findOne(id);
+		} catch (error: any) {
+			handleError('Foco Controller', 'getOne', error.message)
+			throw new Error("[Controller] - getOne foco erro")
+		}
+	};
 
-      if (!response) throw new Error("Item não encontrado");
+	async create(data: any) {
+		try {
+			const schema: SchemaOf<any> = object({
+				name: string().required(this.required),
+				created_by: number().integer().required(this.required),
+			});
 
-      return { status: 200, response };
-    } catch (e) {
-      return { status: 400, message: 'Item não encontrado' };
-    }
-  };
+			const valid = schema.isValidSync(data);
+			if (!valid) return { status: 400, message: "Dados inválidos" };
 
-  async createFoco(data: any) {
-    try {
-      const schema: SchemaOf<any> = object({
-        name: string().required(this.required),
-        created_by: number().integer().required(this.required),
-      });
+			const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
 
-      const valid = schema.isValidSync(data);
+			if (focoAlreadyExists) return { status: 409, message: "Foco já existente" };
 
-      if (!valid) return { status: 400, message: "Dados inválidos" };
+			const response = await this.focoRepository.create(data);
+			if (response) {
+				return { status: 200, response: response, message: { message: "Foco criado" } }
+			} else {
+				return { status: 400, response: [], message: { message: "Foco não foi criado" } }
+			}
 
-      const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
+		} catch (error: any) {
+			handleError('Foco Controller', 'Create', error.message)
+			throw new Error("[Controller] - Create foco erro")
+		}
+	};
 
-      if (focoAlreadyExists) return { status: 400, message: "Foco já existente" };
+	async update(data: UpdateLoteDTO) {
+		try {
+			const schema: SchemaOf<UpdateLoteDTO> = object({
+				id: number().integer().required(this.required),
+				name: string().required(this.required),
+				status: number().integer().required(this.required),
+				id_culture: number().integer().optional()
+			});
 
-      await this.focoRepository.create(data);
+			const valid = schema.isValidSync(data);
+			if (!valid) return { status: 400, message: "Dados inválidos" };
 
-      return { status: 201, message: "Foco cadastrado" }
-    } catch (err) {
-      console.log(err)
-      return { status: 404, message: "Erro no cadastrado" }
-    }
-  };
+			const focoExist: any = await this.focoRepository.findOne(data.id);
+			if (!focoExist) return { status: 404, message: "Foco não encontrado" };
 
-  async updateFoco(data: UpdateLoteDTO) {
-    try {
-      const schema: SchemaOf<UpdateLoteDTO> = object({
-        id: number().integer().required(this.required),
-        name: string().required(this.required),
-        status: number().integer().required(this.required),
-        id_culture: number().integer().optional()
-      });
+			const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
+			if (focoAlreadyExists) return { status: 409, message: "Foco já existente" };
 
-      const valid = schema.isValidSync(data);
 
-      if (!valid) return { status: 400, message: "Dados inválidos" };
-
-      const foco: any = await this.focoRepository.findOne(data.id);
-
-      if (!foco) return { status: 400, message: "Foco não encontrado" };
-
-      const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
-
-      if ((focoAlreadyExists) && focoAlreadyExists.id !== foco.id) {
-        return { status: 400, message: "Foco já existente" };
-      }
-
-      foco.name = data.name;
-      foco.status = data.status;
-
-      await this.focoRepository.update(data.id, foco);
-
-      return { status: 200, message: "Foco atualizado" }
-    } catch (err) {
-      console.log(err);
-      return { status: 404, message: "Erro ao atualizar" }
-    }
-  };
+			const response = await this.focoRepository.update(data.id, data);
+			if (response) {
+				return { status: 200, response: response, message: { message: "Foco atualizado" } }
+			} else {
+				return { status: 400, response: [], message: { message: "Foco não foi atualizada" } }
+			}
+		} catch (error: any) {
+			handleError('Foco Controller', 'Update', error.message)
+			throw new Error("[Controller] - Update foco erro")
+		}
+	};
 };

@@ -14,7 +14,7 @@ import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { AccordionFilter, CheckBox } from "src/components";
-import { userPreferencesService, grupoService, } from "src/services";
+import { userPreferencesService, groupService, } from "src/services";
 import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
 import { ReactNode, useEffect } from "react";
@@ -44,7 +44,6 @@ interface IData {
 	filterAplication: object | any;
 	id_foco: number;
 	id_safra: number;
-	genotipo: any;
 	foco: IUpdateFoco,
 	pageBeforeEdit: string | any
 }
@@ -63,7 +62,7 @@ interface IFilter {
 }
 
 
-export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, id_safra, genotipo, pageBeforeEdit }: IData) {
+export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, id_safra, pageBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -122,7 +121,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		}
 	}
 
-	const preferences = userLogado.preferences.grupo || { id: 0, table_preferences: "id,safra,name,grupo,status" };
+	const preferences = userLogado.preferences.group || { id: 0, table_preferences: "id,safra,name,group,status" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
 	const [grupos, setGrupos] = useState<any>(() => allItens);
@@ -134,40 +133,16 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Safra", value: "safra" },
-		{ name: "CamposGerenciados[]", title: "Grupo", value: "grupo" },
+		{ name: "CamposGerenciados[]", title: "Grupo", value: "group" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
 	]);
 	const [filter, setFilter] = useState<any>(filterAplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
-	const filtersStatusItem = [
-		{ id: 2, name: 'Todos' },
-		{ id: 1, name: 'Ativos' },
-		{ id: 0, name: 'Inativos' },
-	];
-
 	const take: number = itensPerPage;
 	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
 	const pages = Math.ceil(total / take);
 
-	const columns = columnsOrder(camposGerenciados);
-
-	const formikGrupo = useFormik<IFilter>({
-		initialValues: {
-			filterStatus: '',
-			filterSearch: '',
-			orderBy: '',
-			typeOrder: '',
-		},
-		onSubmit: async (values) => {
-			const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_foco=" + id_foco;
-			await grupoService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: any) => {
-				setGrupos(response);
-				setTotaItems(response.length);
-				setFilter(parametersFilter);
-			})
-		},
-	});
 
 	function headerTableFactory(name: any, title: string) {
 		return {
@@ -224,24 +199,38 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	function statusHeaderFactory() {
 		return {
 			title: "Status",
-			field: "grupo",
+			field: "group",
 			sorting: false,
 			render: (rowData: any) => (
-				<div className='h-10 flex'>
-					<div className="h-10">
-						<Button
-							icon={<BiEdit size={16} />}
-							onClick={() => {
-								setCookies("pageBeforeEdit", currentPage?.toString())
-								router.push(`grupo/atualizar?id=${rowData.id}`)
-							}}
-							bgColor="bg-blue-600"
-							textColor="white"
-						/>
+				!rowData.npe.length ? (
+					<div className='h-10 flex'>
+						<div className="h-10">
+							<Button
+								icon={<BiEdit size={16} />}
+								onClick={() => {
+									setCookies("pageBeforeEdit", currentPage?.toString())
+									router.push(`grupo/atualizar?id=${rowData.id}`)
+								}}
+								bgColor="bg-blue-600"
+								textColor="white"
+							/>
+						</div>
 					</div>
-				</div>
+				) : (
+					<div className='h-10 flex'>
+						<div className="h-10">
+							<Button
+								icon={<BiEdit size={16} />}
+								title={'Grupo já associado a uma NPE'}
+								disabled={true}
+								bgColor="bg-gray-600"
+								textColor="white"
+								onClick={() => { }}
+							/>
+						</div>
+					</div>
+				)
 			),
-
 		}
 	}
 
@@ -256,8 +245,8 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 			if (columnCampos[index] === 'safra') {
 				tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
 			}
-			if (columnCampos[index] === 'grupo') {
-				tableFields.push(headerTableFactory('Grupo', 'grupo'));
+			if (columnCampos[index] === 'group') {
+				tableFields.push(headerTableFactory('Grupo', 'group'));
 			}
 			if (columnCampos[index] === 'status') {
 				tableFields.push(statusHeaderFactory());
@@ -265,6 +254,8 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		});
 		return tableFields;
 	};
+
+	const columns = columnsOrder(camposGerenciados);
 
 	async function handleOrder(column: string, order: string | any): Promise<void> {
 		let typeOrder: any;
@@ -291,7 +282,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 			}
 		}
 
-		await grupoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+		await groupService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response: any) => {
 			if (response.status === 200) {
 				setGrupos(response.response)
 			}
@@ -322,12 +313,12 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		const campos = selecionados.substr(0, totalString - 1)
 		if (preferences.id === 0) {
 			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 20 }).then((response) => {
-				userLogado.preferences.grupo = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+				userLogado.preferences.group = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
 				preferences.id = response.response.id;
 			});
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		} else {
-			userLogado.preferences.grupo = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+			userLogado.preferences.group = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
 			await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		}
@@ -352,7 +343,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		if (!filterAplication.includes("paramSelect")) {
 			filterAplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
 		}
-		await grupoService.getAll(filterAplication).then((response) => {
+		await groupService.getAll(filterAplication).then((response: any) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
@@ -372,7 +363,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
 				const workSheet = XLSX.utils.json_to_sheet(newData);
 				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, "grupos");
+				XLSX.utils.book_append_sheet(workBook, workSheet, "group");
 
 				// Buffer
 				let buf = XLSX.write(workBook, {
@@ -400,12 +391,12 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
 	async function handlePagination(): Promise<void> {
 		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take + "&id_foco=" + id_foco;
+		let parametersFilter = "skip=" + skip + "&take=" + take
 
 		if (filter) {
 			parametersFilter = parametersFilter + "&" + filter;
 		}
-		await grupoService.getAll(parametersFilter).then((response) => {
+		await groupService.getAll(parametersFilter).then((response: any) => {
 			if (response.status === 200) {
 				setGrupos(response.response);
 			}
@@ -648,13 +639,13 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	);
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
-	const token = context.req.cookies.token;
-	const id_safra = context.req.cookies.safraId
-	const pageBeforeEdit = context.req.cookies.pageBeforeEdit ? context.req.cookies.pageBeforeEdit : 0;
+	const token = req.cookies.token;
+	const id_safra = req.cookies.safraId
+	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
@@ -662,18 +653,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		headers: { Authorization: `Bearer ${token}` }
 	};
 
-	const id_foco = Number(context.query.id);
-	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_grupo=${id_foco}`;
+	const id_foco = Number(query.id);
+	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_foco=${id_foco}`;
+
 	const { publicRuntimeConfig } = getConfig();
-
 	const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
-	const response = await fetch(`${baseUrlGrupo}?id_foco=${id_foco}`, requestOptions);
-
-	const { response: allItens, total: totalItems } = await response.json();
-
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
-	const apiFoco = await fetch(`${baseUrlShow}/` + context.query.id, requestOptions);
-	const foco = await apiFoco.json();
+
+	const grupos = await fetch(`${baseUrlGrupo}?id_foco=${id_foco}`, requestOptions);
+	const { response: allItens, total: totalItems } = await grupos.json();
+
+	const focos = await fetch(`${baseUrlShow}/` + id_foco, requestOptions);
+	const foco = await focos.json();
 
 	return {
 		props: {

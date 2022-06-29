@@ -2,9 +2,41 @@
 2 - variaveis e funções no estilo camelcase(primeira letra minuscula e inicial das outras palavras maiuscula)
 3 - get para controller e resto, find para repository
 4 - response para controller e resto, result para repository
-5 - tremplate string(`` crase para strings com ${} chaves para variavel)
-6 - desestruturação para receber variaveis( const {response, total} = data)
-7 - tentar tipar sempre que possivel
-8 - tratar os erros do catch, para ficar mais facil encontrar onde esta o erro
+5 - template string(`` crase para strings com ${} chaves para variável)
+6 - desestruturação para receber variáveis( const {response, total} = data)
+7 - tentar tipar sempre que possível
+8 - tratar os erros do catch, para ficar mais fácil encontrar onde esta o erro
 9 - fazer comparação com tipo certo (string com string, objeto com null ou tamanho)
-10 - todas variaveis e funções em ingles
+10 - todas variáveis e funções em ingles
+11 - especificar o nome da função ou variável bem definido no próprio nome 
+			ex: (array que gera as colunas da tabela ruim: arrOrb | campos  bom: camposTabela (tableFields))
+			PS: tentar não abreviar muito ex: ruim: nome_un_cultura bom: nome_unidade_cultura
+12 - não repetir código( se ver que algo se repete, criar uma função genérica para faze-lo)
+
+Tabela bancos para refatorar:
+	quadra
+	npe
+	lote
+	genótipo
+	experimento
+
+
+Links:
+	- Resumo do SOLID guia de princípios para programação
+			https://medium.com/desenvolvendo-com-paixao/o-que-%C3%A9-solid-o-guia-completo-para-voc%C3%AA-entender-os-5-princ%C3%ADpios-da-poo-2b937b3fc530
+
+	- Resumo do clean code e suas melhores praticas de programação e manutenibilidade
+			https://medium.com/desenvolvendo-com-paixao/2-clean-code-boas-pr%C3%A1ticas-para-escrever-c%C3%B3digos-impec%C3%A1veis-361997b3c8b5
+
+	- Boas praticas javascript
+			https://code.tutsplus.com/pt/tutorials/24-javascript-best-practices-for-beginners--net-5399
+			http://opensource.locaweb.com.br/locawebstyle-v2/manual/praticas-padroes/javascript/
+
+	- Convenções de boas praticas de JavaScript segundo padrão AIRBNB
+			https://github.com/airbnb/javascript
+
+	- Usando ESLINT no código e explicando para que server
+			https://www.youtube.com/watch?v=9UJYaAt7v2o&t=1534s
+		
+	- Clean code melhores praticas de programação
+		https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
