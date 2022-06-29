@@ -349,7 +349,7 @@ export class ImportController {
 								if (data.spreadSheet[keySheet][sheet] != "") {
 									if (typeof (data.spreadSheet[keySheet][sheet]) == 'string') {
 
-										let foco: any = await this.focoController.listAllFocos({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+										let foco: any = await this.focoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
 										if (foco.total == 0) {
 											// console.log('aqui Foco');
 											responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</li><br>`;
@@ -466,7 +466,7 @@ export class ImportController {
 
 							if (configModule.response[0].fields[sheet] == 'Foco') {
 								// console.log("FOCO R");
-								let foco: any = await this.focoController.listAllFocos({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+								let foco: any = await this.focoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
 								this.aux.id_foco = Number(foco.response[0].id);
 							}
 
@@ -2453,7 +2453,7 @@ export class ImportController {
 								if (String(data.spreadSheet[keySheet][sheet]) == "") {
 									responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo foco é obrigatorio.</li><br>`;
 								} else {
-									let foco: any = await this.focoController.listAllFocos({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+									let foco: any = await this.focoController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
 									if (foco.total == 0) {
 										responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco informado não existe no sistema.</li><br>`;
 									}
