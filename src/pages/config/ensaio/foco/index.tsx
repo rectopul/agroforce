@@ -30,7 +30,6 @@ interface IFilter {
 export interface IFocos {
 	id: number;
 	name: string;
-	group: number;
 	group?: [];
 	tableData?: []
 	status?: number;
