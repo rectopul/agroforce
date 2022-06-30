@@ -11,8 +11,8 @@ export class LocalController {
 				if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
 			}
 
-			if (options.filterName_local_culture) {
-				parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterName_local_culture}" }`);
+			if (options.filterNameLocalCulture) {
+				parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterNameLocalCulture}" }`);
 			}
 
 			if (options.filterLabel) {
@@ -27,16 +27,16 @@ export class LocalController {
 				parameters.adress = JSON.parse(`{ "contains":"${options.filterAdress}" }`);
 			}
 
-			if (options.filterLabel_country) {
-				parameters.label_country = JSON.parse(`{ "contains":"${options.filterLabel_country}" }`);
+			if (options.filterLabelCountry) {
+				parameters.label_country = JSON.parse(`{ "contains":"${options.filterLabelCountry}" }`);
 			}
 
-			if (options.filterLabel_region) {
-				parameters.label_region = JSON.parse(`{ "contains":"${options.filterLabel_region}" }`);
+			if (options.filterLabelRegion) {
+				parameters.label_region = JSON.parse(`{ "contains":"${options.filterLabelRegion}" }`);
 			}
 
-			if (options.filterName_locality) {
-				parameters.name_locality = JSON.parse(`{ "contains":"${options.filterName_locality}" }`);
+			if (options.filterNameLocality) {
+				parameters.name_locality = JSON.parse(`{ "contains":"${options.filterNameLocality}" }`);
 			}
 
 
@@ -61,10 +61,25 @@ export class LocalController {
 				});
 				select = Object.assign({}, select);
 			} else {
-				select = { id: true, name_local_culture: true, label: true, mloc: true, label_country: true, label_region: true, name_locality: true, adress: true, status: true };
+				select = {
+					id: true,
+					name_local_culture: true,
+					label: true,
+					mloc: true,
+					label_country: true,
+					label_region: true,
+					name_locality: true,
+					adress: true,
+					status: true,
+					cultureUnity: true
+				};
 			}
 
-			const response = await this.localRepository.findAll(parameters, select, take, skip, orderBy);
+			const response = await this.localRepository.findAll(parameters,
+				select,
+				take,
+				skip,
+				orderBy);
 			if (!response || response.total <= 0) {
 				return { status: 400, response: [], total: 0 };
 			} else {

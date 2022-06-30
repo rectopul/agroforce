@@ -3,7 +3,7 @@ import { prisma } from "../pages/api/db/db";
 export class UnidadeCulturaRepository {
 
 	async create(data: any) {
-		const result = await prisma.local_children.create({
+		const result = await prisma.cultureUnity.create({
 			data: data
 		});
 
@@ -11,7 +11,7 @@ export class UnidadeCulturaRepository {
 	}
 
 	async findById(id: number) {
-		const result = await prisma.local_children.findUnique({
+		const result = await prisma.cultureUnity.findUnique({
 			where: { id }
 		});
 
@@ -19,17 +19,17 @@ export class UnidadeCulturaRepository {
 	}
 
 	async update(id: number, data: any) {
-		const result = await prisma.local_children.update({
+		const result = await prisma.cultureUnity.update({
 			where: { id },
 			data: data
 		});
 		return result;
 	}
 
-	async findByName({ culture_unity_name }: any) {
-		const result = await prisma.local_children.findFirst({
+	async findByName({ name_unity_culture }: any) {
+		const result = await prisma.cultureUnity.findFirst({
 			where: {
-				culture_unity_name: culture_unity_name
+				name_unity_culture: name_unity_culture
 			}
 		});
 
@@ -41,9 +41,9 @@ export class UnidadeCulturaRepository {
 			orderBy = JSON.parse(orderBy);
 		}
 
-		const count = await prisma.local_children.count({ where: where });
+		const count = await prisma.cultureUnity.count({ where: where });
 
-		const result: object | any = await prisma.local_children.findMany({
+		const result: object | any = await prisma.cultureUnity.findMany({
 			select: select,
 			skip: skip,
 			take: take,

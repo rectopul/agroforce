@@ -188,17 +188,17 @@ model local {
   created_by         Int
   status             Int      @default(1)
 
-  npe            npe[]
-  quadra         quadra[]
-  local_children local_children[]
+  npe          npe[]
+  quadra       quadra[]
+  cultureUnity cultureUnity[]
 }
 
-model local_children {
+model cultureUnity {
   id                 Int       @id @default(autoincrement())
   id_local           Int
-  id_culture_unity   Int
+  id_unity_culture   Int
   year               Int
-  culture_unity_name String    @unique
+  name_unity_culture String    @unique
   local              local     @relation(fields: [id_local], references: [id])
   status             Int?      @default(1)
   created_by         Int
@@ -344,7 +344,7 @@ model group {
   id         Int       @id @default(autoincrement())
   id_safra   Int
   id_foco    Int
-  grupo      Int
+  group      Int
   status     Int?      @default(1)
   created_by Int
   created_at DateTime? @default(now())
@@ -474,24 +474,24 @@ model sequencia_delineamento {
 }
 
 model experiment {
-  id                 Int       @id @default(autoincrement())
-  id_culture         Int
-  protocol_name      String
-  experiment_id      Int
-  experiment_name    String
-  year               Int
-  label              String
-  id_safra           Int
-  id_foco            Int
-  id_ensaio          Int
-  id_tecnologia      Int
-  epoca              Int
-  pjr                String
-  id_culture_unity   Int
-  culture_unity_name String
-  status             Int       @default(1)
-  created_by         Int
-  created_at         DateTime? @default(now())
+  id               Int       @id @default(autoincrement())
+  id_culture       Int
+  protocol_name    String
+  experiment_id    Int
+  experiment_name  String
+  year             Int
+  label            String
+  id_safra         Int
+  id_foco          Int
+  id_ensaio        Int
+  id_tecnologia    Int
+  epoca            Int
+  pjr              String
+  id_unity_culture Int
+  name_cult        String
+  status           Int       @default(1)
+  created_by       Int
+  created_at       DateTime? @default(now())
 
   safra      safra      @relation(fields: [id_safra], references: [id])
   foco       foco       @relation(fields: [id_foco], references: [id])
