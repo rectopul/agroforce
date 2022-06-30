@@ -14,30 +14,33 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { localService, userPreferencesService } from "src/services";
+import { unidadeCulturaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
 	AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../components";
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../../components";
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 
 
-interface ILocalProps {
-	id: Number | any;
-	name_local_culture: String | any;
-	cod_red_local: String | any;
-	label_country: String | any;
-	label_region: String | any;
-	name_locality: String | any;
-	adress: String | any;
-	created_by: Number;
-	status: Number;
+interface IUnityCultureProps {
+	id: number
+	name_unity_culture: string
+	year: number
+	name_local_culture: string
+	label: string
+	mloc: string
+	adress: string
+	label_country: string
+	label_region: string
+	name_locality: string
 };
 
 
 interface IFilter {
 	filterStatus: object | any;
+	filterNameUnityCulture: string | any;
+	filterYear: string | any;
 	filterNameLocalCulture: string | any;
 	filterLabel: string | any;
 	filterMloc: string | any;
@@ -54,7 +57,7 @@ interface IGenarateProps {
 	value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	locais: ILocalProps[];
+	allCultureUnity: IUnityCultureProps[];
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
@@ -63,7 +66,7 @@ interface Idata {
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ locais, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allCultureUnity, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 	const tabsDropDowns = TabsDropDowns('config');
 	tabsDropDowns.map((tab) => (
@@ -73,10 +76,11 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	));
 
 	const userLogado = JSON.parse(localStorage.getItem("user") as string);
-	const preferences = userLogado.preferences.local || { id: 0, table_preferences: "id,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,status" };
+	const preferences = userLogado.preferences.unidadeCultura || {
+		id: 0, table_preferences: "id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality"
+	};
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-
-	const [local, setLocal] = useState<ILocalProps[]>(() => locais);
+	const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(() => allCultureUnity);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [orderList, setOrder] = useState<number>(1);
@@ -85,6 +89,8 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
+		{ name: "CamposGerenciados[]", title: "Nome da unidade de cultura", value: "name_unity_culture", defaultChecked: () => camposGerenciados.includes('name_unity_culture') },
+		{ name: "CamposGerenciados[]", title: "Ano", value: "year", defaultChecked: () => camposGerenciados.includes('year') },
 		{ name: "CamposGerenciados[]", title: "Nome do L. de Cult.", value: "name_local_culture", defaultChecked: () => camposGerenciados.includes('name_local_culture') },
 		{ name: "CamposGerenciados[]", title: "Rótulo", value: "label", defaultChecked: () => camposGerenciados.includes('label') },
 		{ name: "CamposGerenciados[]", title: "MLOC", value: "mloc", defaultChecked: () => camposGerenciados.includes('mloc') },
@@ -92,7 +98,6 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 		{ name: "CamposGerenciados[]", title: "País", value: "label_country", defaultChecked: () => camposGerenciados.includes('label_country') },
 		{ name: "CamposGerenciados[]", title: "Região", value: "label_region", defaultChecked: () => camposGerenciados.includes('label_region') },
 		{ name: "CamposGerenciados[]", title: "Localidade", value: "name_locality", defaultChecked: () => camposGerenciados.includes('name_locality') },
-		{ name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') },
 	]);
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [selectedRowById, setSelectedRowById] = useState<number>();
@@ -108,6 +113,8 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	const formik = useFormik<IFilter>({
 		initialValues: {
 			filterStatus: '',
+			filterNameUnityCulture: '',
+			filterYear: '',
 			filterNameLocalCulture: '',
 			filterLabel: '',
 			filterMloc: '',
@@ -120,6 +127,8 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 		},
 		onSubmit: async ({
 			filterStatus,
+			filterNameUnityCulture,
+			filterYear,
 			filterNameLocalCulture,
 			filterLabel,
 			filterMloc,
@@ -128,14 +137,13 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 			filterLabelRegion,
 			filterNameLocality
 		}) => {
-			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`
-
+			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`
 			setFiltersParams(parametersFilter)
 			setCookies("filterBeforeEdit", filtersParams)
-			await localService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+			await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
 				setFilter(parametersFilter);
 				setTotalItems(response.total)
-				setLocal(response.response);
+				setUnidadeCultura(response.response);
 				setCurrentPage(0)
 			})
 		},
@@ -203,110 +211,42 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 		};
 	}
 
-	function statusHeaderFactory() {
-		return {
-			title: "Status",
-			field: "status",
-			sorting: false,
-			searchable: false,
-			filterPlaceholder: "Filtrar por status",
-			render: (rowData: ILocalProps) => (
-				rowData.status ? (
-					<div className='h-10 flex'>
-						<div className="
-							h-10
-						">
-							<Button
-								icon={<BiEdit size={16} />}
-								title={`Atualizar ${rowData.adress}`}
-								onClick={() => {
-									setCookies("filterBeforeEdit", filtersParams)
-									setCookies("pageBeforeEdit", currentPage?.toString())
-									router.push(`/config/local/atualizar?id=${rowData.id}`)
-								}}
-								bgColor="bg-blue-600"
-								textColor="white"
-							/>
-						</div>
-						<div>
-							<Button
-								icon={<FaRegThumbsUp size={16} />}
-								onClick={async () => await handleStatus(
-									rowData.id,
-									rowData.status
-								)}
-								bgColor="bg-green-600"
-								textColor="white"
-							/>
-						</div>
-					</div>
-				) : (
-					<div className='h-10 flex'>
-						<div className="
-							h-10
-						">
-							<Button
-								icon={<BiEdit size={16} />}
-								title={`Atualizar ${rowData.adress}`}
-								onClick={() => {
-									setCookies("filterBeforeEdit", filtersParams)
-									setCookies("pageBeforeEdit", currentPage?.toString())
-									router.push(`/config/local/atualizar?id=${rowData.id}`)
-								}}
-								bgColor="bg-blue-600"
-								textColor="white"
-							/>
-						</div>
-						<div>
-							<Button
-								icon={<FaRegThumbsDown size={16} />}
-								onClick={async () => await handleStatus(
-									rowData.id,
-									rowData.status
-								)}
-								bgColor="bg-red-800"
-								textColor="white"
-							/>
-						</div>
-					</div>
-				)
-			),
-		}
-	}
-
 	function columnsOrder(camposGerenciados: any): any {
-		const objectCampos: any = camposGerenciados.split(',');
-		const arrOb: any = [];
-		Object.keys(objectCampos).forEach((item) => {
-			if (objectCampos[item] === 'id') {
-				arrOb.push(idHeaderFactory())
+		const columnCampos: any = camposGerenciados.split(',');
+		const tableFields: any = [];
+		Object.keys(columnCampos).forEach((item) => {
+			if (columnCampos[item] === 'id') {
+				tableFields.push(idHeaderFactory())
 			}
-			if (objectCampos[item] === 'name_local_culture') {
-				arrOb.push(headerTableFactory('Nome do L. de cult.', 'name_local_culture'))
+			if (columnCampos[item] === 'name_unity_culture') {
+				tableFields.push(headerTableFactory('Nome do lugar de cultura', 'name_unity_culture'))
 			}
-			if (objectCampos[item] === 'label') {
-				arrOb.push(headerTableFactory('Rótulo', 'label'))
+			if (columnCampos[item] === 'year') {
+				tableFields.push(headerTableFactory('Ano', 'year'))
 			}
-			if (objectCampos[item] === 'adress') {
-				arrOb.push(headerTableFactory('Nome da fazenda', 'adress'))
+			if (columnCampos[item] === 'name_local_culture') {
+				tableFields.push(headerTableFactory('Nome do L. de cult.', 'local.name_local_culture'))
 			}
-			if (objectCampos[item] === 'mloc') {
-				arrOb.push(headerTableFactory('MLOC', 'mloc'))
+			if (columnCampos[item] === 'label') {
+				tableFields.push(headerTableFactory('Rótulo', 'local.label'))
 			}
-			if (objectCampos[item] === 'label_country') {
-				arrOb.push(headerTableFactory('País', 'label_country'))
+			if (columnCampos[item] === 'adress') {
+				tableFields.push(headerTableFactory('Nome da fazenda', 'local.adress'))
 			}
-			if (objectCampos[item] === 'label_region') {
-				arrOb.push(headerTableFactory('Região', 'label_region'))
+			if (columnCampos[item] === 'mloc') {
+				tableFields.push(headerTableFactory('MLOC', 'local.mloc'))
 			}
-			if (objectCampos[item] === 'name_locality') {
-				arrOb.push(headerTableFactory('Localidade', 'name_locality'))
+			if (columnCampos[item] === 'label_country') {
+				tableFields.push(headerTableFactory('País', 'local.label_country'))
 			}
-			if (objectCampos[item] === 'status') {
-				arrOb.push(statusHeaderFactory())
+			if (columnCampos[item] === 'label_region') {
+				tableFields.push(headerTableFactory('Região', 'local.label_region'))
+			}
+			if (columnCampos[item] === 'name_locality') {
+				tableFields.push(headerTableFactory('Localidade', 'local.name_locality'))
 			}
 		});
-		return arrOb;
+		return tableFields;
 	};
 
 	async function handleOrder(column: string, order: string | any): Promise<void> {
@@ -334,9 +274,9 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 			}
 		}
 
-		await localService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+		await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
 			if (response.status === 200) {
-				setLocal(response.response)
+				setUnidadeCultura(response.response)
 			}
 		});
 
@@ -354,59 +294,29 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	};
 
 	async function getValuesComluns(): Promise<void> {
-		let els: any = document.querySelectorAll("input[type='checkbox'");
+		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
 			if (els[i].checked) {
 				selecionados += els[i].value + ',';
 			}
 		}
-		let totalString = selecionados.length;
-		let campos = selecionados.substr(0, totalString - 1)
+		const totalString = selecionados.length;
+		const campos = selecionados.substr(0, totalString - 1)
 		if (preferences.id === 0) {
-			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 4 }).then((response) => {
-				userLogado.preferences.local = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 21 }).then((response) => {
+				userLogado.preferences.unidadeCultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
 				preferences.id = response.response.id;
 			});
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		} else {
-			userLogado.preferences.local = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+			userLogado.preferences.unidadeCultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
 			await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		}
 
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
-	};
-
-	async function handleStatus(idLocal: number, rowStatus: any): Promise<void> {
-		if (rowStatus === 0) {
-			rowStatus = 1;
-		} else {
-			rowStatus = 0;
-		}
-
-		const index = local.findIndex((local) => local.id === idLocal);
-
-		if (index === -1) {
-			return;
-		}
-
-		setLocal((oldLocal) => {
-			const copy = [...oldLocal];
-			copy[index].status = rowStatus;
-			return copy;
-		});
-
-		const {
-			id,
-			status
-		} = local[index];
-
-		await localService.update({
-			id,
-			status
-		});
 	};
 
 	function handleOnDragEnd(result: DropResult) {
@@ -426,7 +336,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 			filterAplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await localService.getAll(filterAplication).then((response) => {
+		await unidadeCulturaService.getAll(filterAplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
@@ -436,10 +346,10 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 
 				const workSheet = XLSX.utils.json_to_sheet(newData);
 				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, "locais");
+				XLSX.utils.book_append_sheet(workBook, workSheet, "unidade-cultura");
 
 				// buffer
-				let blabel_region = XLSX.write(workBook, {
+				XLSX.write(workBook, {
 					bookType: "xlsx", //xlsx
 					type: "buffer",
 				});
@@ -449,7 +359,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 					type: "binary",
 				});
 				// Download
-				XLSX.writeFile(workBook, "Locais.xlsx");
+				XLSX.writeFile(workBook, "Unidade-cultura.xlsx");
 			}
 		});
 	};
@@ -464,14 +374,14 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 
 	async function handlePagination(): Promise<void> {
 		const skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take;
+		let parametersFilter = `skip=${skip}&take=${take}`
 
 		if (filter) {
-			parametersFilter = parametersFilter + "&" + filter;
+			parametersFilter = `${parametersFilter}&${filter}`
 		}
-		await localService.getAll(parametersFilter).then((response) => {
+		await unidadeCulturaService.getAll(parametersFilter).then((response) => {
 			if (response.status === 200) {
-				setLocal(response.response);
+				setUnidadeCultura(response.response);
 			}
 		});
 	};
@@ -501,7 +411,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	return (
 		<>
 			<Head>
-				<title>Listagem dos Locais</title>
+				<title>Listagem das unidades de cultura</title>
 			</Head>
 			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
 				<main className="h-full w-full
@@ -509,7 +419,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
           items-start
           gap-8
         ">
-					<AccordionFilter title="Filtrar locais">
+					<AccordionFilter title="Filtrar unidades de cultura">
 						<div className='w-full flex gap-2'>
 							<form
 								className="flex flex-col
@@ -525,12 +435,10 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
                   justify-center
                   pb-2
                 ">
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Status
-										</label>
-										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
-									</div>
+
+									{filterFieldFactory('filterNameUnityCulture', 'Nome Un. de Cult.')}
+
+									{filterFieldFactory('filterYear', 'Ano')}
 
 									{filterFieldFactory('filterNameLocalCulture', 'Nome do L. de Cult.')}
 
@@ -565,8 +473,8 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 					<div className="w-full h-full overflow-y-scroll">
 						<MaterialTable
 							columns={columns}
-							data={local}
-							onRowClick={((evt?, selectedRow?: ILocalProps) => {
+							data={unidadeCultura}
+							onRowClick={((evt?, selectedRow?: IUnityCultureProps) => {
 								setSelectedRowById(selectedRow?.id)
 							})}
 							options={{
@@ -574,7 +482,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 								search: false,
 								filtering: false,
 								pageSize: itensPerPage,
-								rowStyle: (rowData: ILocalProps) => ({
+								rowStyle: (rowData: IUnityCultureProps) => ({
 									backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff')
 								}),
 							}}
@@ -592,17 +500,6 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
                     border-solid border-b
                     border-gray-200
                   '>
-										<div className='h-12'>
-											<Button
-												title="Importar Planilha"
-												value="Importar Planilha"
-												bgColor="bg-blue-600"
-												textColor="white"
-												onClick={() => { }}
-												href="local/importar-planilha"
-												icon={<RiFileExcel2Line size={20} />}
-											/>
-										</div>
 
 										<strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
@@ -653,10 +550,6 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 											<div className='h-12 flex items-center justify-center w-full'>
 												<Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
 											</div>
-											<div className='h-12 flex items-center justify-center w-full'>
-												<Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { }} href="local/importar-planilha/config-planilha" />
-											</div>
-
 										</div>
 									</div>
 								),
@@ -730,17 +623,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const userPreferenceController = new UserPreferenceController();
 	const itensPerPage = await (await userPreferenceController.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+	const token = req.cookies.token;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
 	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
-	const token = req.cookies.token;
 
 	removeCookies('filterBeforeEdit', { req, res });
 	removeCookies('pageBeforeEdit', { req, res });
 
 
 	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
 	const urlParameters: any = new URL(baseUrl);
@@ -751,12 +644,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	} as RequestInit | undefined;
 
-	const local = await fetch(urlParameters.toString(), requestOptions);
-	const { response: locais, total: totalItems } = await local.json();
+	const cultureUnity = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allCultureUnity, total: totalItems } = await cultureUnity.json();
 
 	return {
 		props: {
-			locais,
+			allCultureUnity,
 			totalItems,
 			itensPerPage,
 			filterAplication,

@@ -24,7 +24,7 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 
 export interface IData {
-	unidadesCultura: any;
+	allCultureUnity: any;
 	totalItems: number;
 	itensPerPage: number;
 	filterAplication: object | any;
@@ -53,13 +53,13 @@ interface IUpdateLocal {
 	status: Number;
 };
 
-export default function AtualizarLocal({ local, unidadesCultura, totalItems, itensPerPage, filterAplication, id_local, id_safra, pageBeforeEdit }: IData) {
+export default function AtualizarLocal({ local, allCultureUnity, totalItems, itensPerPage, filterAplication, id_local, id_safra, pageBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns('config');
 
 	tabsDropDowns.map((tab) => (
-		tab.titleTab === 'LOCAL'
+		tab.titleTab === 'LUGAR DE CULTURA'
 			? tab.statusTab = true
 			: tab.statusTab = false
 	));
@@ -68,10 +68,10 @@ export default function AtualizarLocal({ local, unidadesCultura, totalItems, ite
 	const router = useRouter();
 
 	const userLogado = JSON.parse(localStorage.getItem("user") as string);
-	const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id,culture_unity_name,year" };
+	const preferences = userLogado.preferences.unidadeCultura || { id: 0, table_preferences: "id,name_unity_culture,year" };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-	const [unidadeCultura, setUnidadeCultura] = useState<any>(() => unidadesCultura);
+	const [unidadeCultura, setUnidadeCultura] = useState<any>(() => allCultureUnity);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
 	const [orderList, setOrder] = useState<number>(1);
@@ -81,7 +81,7 @@ export default function AtualizarLocal({ local, unidadesCultura, totalItems, ite
 	const [colorStar, setColorStar] = useState<string>('');
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-		{ name: "CamposGerenciados[]", title: "Nome de Unidade de Cultura", value: "culture_unity_name" },
+		{ name: "CamposGerenciados[]", title: "Nome de Unidade de Cultura", value: "name_unity_culture" },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year" },
 	]);
 
@@ -187,8 +187,8 @@ export default function AtualizarLocal({ local, unidadesCultura, totalItems, ite
 			if (columnCampos[index] === 'id') {
 				tableFields.push(idHeaderFactory())
 			}
-			if (columnCampos[index] === 'culture_unity_name') {
-				tableFields.push(headerTableFactory('Nome da Unidade de Cultura', 'culture_unity_name'));
+			if (columnCampos[index] === 'name_unity_culture') {
+				tableFields.push(headerTableFactory('Nome da Unidade de Cultura', 'name_unity_culture'));
 			}
 			if (columnCampos[index] === 'year') {
 				tableFields.push(headerTableFactory('Ano', 'year'));
@@ -668,13 +668,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_local=${id_local}`;
 
 
-	const { response: unidadesCultura, total: totalItems }: any = await responseUnidadeCultura.json();
+	const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
 
 	const { response: local } = await responseLocal.json();
 
+	console.log('allCultureUnity')
+	console.log(allCultureUnity)
+
 	return {
 		props: {
-			unidadesCultura,
+			allCultureUnity,
 			totalItems,
 			itensPerPage,
 			filterAplication,

@@ -1,4 +1,5 @@
 import handleError from 'src/shared/utils/handleError';
+import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
 import { number, object, SchemaOf, string } from 'yup';
 import { UnidadeCulturaRepository } from '../repository/unidade-cultura.repository';
 
@@ -55,8 +56,50 @@ export class UnidadeCulturaController {
 
 	async getAll(options: any) {
 		const parameters: object | any = {};
+		let orderBy: object | any;
 		let select: any = [];
 		try {
+			if (options.filterStatus) {
+				if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+			}
+
+			if (options.filterNameUnityCulture) {
+				parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
+			}
+
+			if (options.filterYear) {
+				parameters.year = Number(options.filterYear);
+			}
+
+			if (options.filterNameLocalCulture) {
+				parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
+			}
+
+			if (options.filterLabel) {
+				parameters.local = JSON.parse(`{ "label": { "contains": "${options.filterLabel}" } }`);
+			}
+
+			if (options.filterMloc) {
+				parameters.local = JSON.parse(`{ "mloc": { "contains": "${options.filterMloc}" } }`);
+			}
+
+			if (options.filterAdress) {
+				parameters.local = JSON.parse(`{ "adress": {"contains": "${options.filterAdress}" } }`);
+			}
+
+			if (options.filterLabelCountry) {
+				parameters.local = JSON.parse(`{ "label_country": {"contains": "${options.filterLabelCountry}" } }`);
+			}
+
+			if (options.filterLabelRegion) {
+				parameters.local = JSON.parse(`{ "label_region": {"contains": "${options.filterLabelRegion}" } }`);
+			}
+
+			if (options.filterNameLocality) {
+				parameters.local = JSON.parse(`{ "name_locality": {"contains": "${options.filterNameLocality}" } }`);
+			}
+
+
 			if (options.paramSelect) {
 				const objSelect = options.paramSelect.split(',');
 				Object.keys(objSelect).forEach((item) => {
@@ -66,20 +109,21 @@ export class UnidadeCulturaController {
 			} else {
 				select = {
 					id: true,
-					id_culture_unity: true,
+					id_unity_culture: true,
 					id_local: true,
 					year: true,
-					culture_unity_name: true,
+					name_unity_culture: true,
+					local: true,
 					status: true
 				};
 			}
 
-			if (options.id_culture_unity) {
-				parameters.id_culture_unity = options.id_culture_unity;
+			if (options.id_unity_culture) {
+				parameters.id_unity_culture = options.id_unity_culture;
 			}
 
-			if (options.culture_unity_name) {
-				parameters.culture_unity_name = options.culture_unity_name;
+			if (options.name_unity_culture) {
+				parameters.name_unity_culture = options.name_unity_culture;
 			}
 
 			if (options.id_local) {
@@ -90,8 +134,10 @@ export class UnidadeCulturaController {
 
 			const skip = (options.skip) ? Number(options.skip) : undefined;
 
-			const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
+			if (options.orderBy) {
+				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
+				orderBy = orderBy ? orderBy : `{"${options.orderBy}":"${options.typeOrder}"}`
+			}
 			const response: object | any = await this.unidadeCulturaRepository.findAll(
 				parameters,
 				select,
