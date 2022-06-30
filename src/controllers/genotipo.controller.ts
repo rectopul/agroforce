@@ -32,6 +32,7 @@ export class GenotipoController {
 	genotipoRepository = new GenotipoRepository();
 
 	async listAllGenotipos(options: any) {
+		console.log(options);
 		const parameters: object | any = {};
 		let take;
 		let skip;
@@ -67,6 +68,8 @@ export class GenotipoController {
 				Object.keys(objSelect).forEach((item) => {
 					if (objSelect[item] === 'tecnologia') {
 						select[objSelect[item]] = true;
+					} else if (objSelect[item] === 'number_lotes') {
+						select['lote'] = true;
 					} else {
 						select[objSelect[item]] = true;
 					}
