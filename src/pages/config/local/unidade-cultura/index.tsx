@@ -8,28 +8,46 @@ import router from "next/router";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { tecnologiaService, userPreferencesService } from "src/services";
+import { unidadeCulturaService, userPreferencesService } from "src/services";
 import * as XLSX from 'xlsx';
 import {
 	AccordionFilter, Button, CheckBox, Content, Input, Select
 } from "../../../../components";
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface ITecnologiaProps {
-	id: Number | any;
-	name: String | any;
-	created_by: Number;
-	status: Number;
+
+
+interface IUnityCultureProps {
+	id: number
+	name_unity_culture: string
+	year: number
+	name_local_culture: string
+	label: string
+	mloc: string
+	adress: string
+	label_country: string
+	label_region: string
+	name_locality: string
 };
+
 
 interface IFilter {
 	filterStatus: object | any;
-	filterName: string | any;
+	filterNameUnityCulture: string | any;
+	filterYear: string | any;
+	filterNameLocalCulture: string | any;
+	filterLabel: string | any;
+	filterMloc: string | any;
+	filterAdress: string | any;
+	filterLabelCountry: string | any;
+	filterLabelRegion: string | any;
+	filterNameLocality: string | any;
 	orderBy: object | any;
 	typeOrder: object | any;
 }
@@ -39,69 +57,93 @@ interface IGenarateProps {
 	value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	allItems: ITecnologiaProps[];
+	allCultureUnity: IUnityCultureProps[];
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterAplication: object | any;
-	id_culture: number;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, id_culture, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allCultureUnity, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
-
 	const tabsDropDowns = TabsDropDowns('config');
-
 	tabsDropDowns.map((tab) => (
-		tab.titleTab === 'ENSAIO'
+		tab.titleTab === 'LOCAL'
 			? tab.statusTab = true
 			: tab.statusTab = false
 	));
 
 	const userLogado = JSON.parse(localStorage.getItem("user") as string);
-	const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: "id,name,desc,cod_tec,status" };
+	const preferences = userLogado.preferences.unidadeCultura || {
+		id: 0, table_preferences: "id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality"
+	};
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-
-	const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
+	const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(() => allCultureUnity);
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [filter, setFilter] = useState<any>(filterAplication);
-	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-		{ name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-		{ name: "CamposGerenciados[]", title: "Rótulo ", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
-		{ name: "CamposGerenciados[]", title: "Código Tecnologia ", value: "cod_tec", defaultChecked: () => camposGerenciados.includes('cod_tec') },
+		{ name: "CamposGerenciados[]", title: "Nome da unidade de cultura", value: "name_unity_culture", defaultChecked: () => camposGerenciados.includes('name_unity_culture') },
+		{ name: "CamposGerenciados[]", title: "Ano", value: "year", defaultChecked: () => camposGerenciados.includes('year') },
+		{ name: "CamposGerenciados[]", title: "Nome do L. de Cult.", value: "name_local_culture", defaultChecked: () => camposGerenciados.includes('name_local_culture') },
+		{ name: "CamposGerenciados[]", title: "Rótulo", value: "label", defaultChecked: () => camposGerenciados.includes('label') },
+		{ name: "CamposGerenciados[]", title: "MLOC", value: "mloc", defaultChecked: () => camposGerenciados.includes('mloc') },
+		{ name: "CamposGerenciados[]", title: "Nome Fazenda", value: "adress", defaultChecked: () => camposGerenciados.includes('adress') },
+		{ name: "CamposGerenciados[]", title: "País", value: "label_country", defaultChecked: () => camposGerenciados.includes('label_country') },
+		{ name: "CamposGerenciados[]", title: "Região", value: "label_region", defaultChecked: () => camposGerenciados.includes('label_region') },
+		{ name: "CamposGerenciados[]", title: "Localidade", value: "name_locality", defaultChecked: () => camposGerenciados.includes('name_locality') },
 	]);
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+	const [selectedRowById, setSelectedRowById] = useState<number>();
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const take: number = itensPerPage;
 	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
 	const pages = Math.ceil(total / take);
 
-	const columns = colums(camposGerenciados);
+	const columns = columnsOrder(camposGerenciados);
+
 
 	const formik = useFormik<IFilter>({
 		initialValues: {
 			filterStatus: '',
-			filterName: '',
+			filterNameUnityCulture: '',
+			filterYear: '',
+			filterNameLocalCulture: '',
+			filterLabel: '',
+			filterMloc: '',
+			filterAdress: '',
+			filterLabelCountry: '',
+			filterLabelRegion: '',
+			filterNameLocality: '',
 			orderBy: '',
 			typeOrder: '',
 		},
-
-		onSubmit: async ({ filterStatus, filterName }) => {
-			let parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName=${filterName}&id_culture=${id_culture}`;
+		onSubmit: async ({
+			filterStatus,
+			filterNameUnityCulture,
+			filterYear,
+			filterNameLocalCulture,
+			filterLabel,
+			filterMloc,
+			filterAdress,
+			filterLabelCountry,
+			filterLabelRegion,
+			filterNameLocality
+		}) => {
+			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`
 			setFiltersParams(parametersFilter)
 			setCookies("filterBeforeEdit", filtersParams)
-			await tecnologiaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+			await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
 				setFilter(parametersFilter);
-				setTecnologias(response.response);
 				setTotalItems(response.total)
+				setUnidadeCultura(response.response);
 				setCurrentPage(0)
 			})
 		},
@@ -169,21 +211,39 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		};
 	}
 
-	function colums(camposGerenciados: any): any {
+	function columnsOrder(camposGerenciados: any): any {
 		const columnCampos: any = camposGerenciados.split(',');
 		const tableFields: any = [];
 		Object.keys(columnCampos).forEach((item) => {
 			if (columnCampos[item] === 'id') {
 				tableFields.push(idHeaderFactory())
 			}
-			if (columnCampos[item] === 'name') {
-				tableFields.push(headerTableFactory('Nome', 'name'))
+			if (columnCampos[item] === 'name_unity_culture') {
+				tableFields.push(headerTableFactory('Nome do lugar de cultura', 'name_unity_culture'))
 			}
-			if (columnCampos[item] === 'desc') {
-				tableFields.push(headerTableFactory('Descrição', 'desc'))
+			if (columnCampos[item] === 'year') {
+				tableFields.push(headerTableFactory('Ano', 'year'))
 			}
-			if (columnCampos[item] === 'cod_tec') {
-				tableFields.push(headerTableFactory('Código tecnologia', 'cod_tec'))
+			if (columnCampos[item] === 'name_local_culture') {
+				tableFields.push(headerTableFactory('Nome do L. de cult.', 'local.name_local_culture'))
+			}
+			if (columnCampos[item] === 'label') {
+				tableFields.push(headerTableFactory('Rótulo', 'local.label'))
+			}
+			if (columnCampos[item] === 'adress') {
+				tableFields.push(headerTableFactory('Nome da fazenda', 'local.adress'))
+			}
+			if (columnCampos[item] === 'mloc') {
+				tableFields.push(headerTableFactory('MLOC', 'local.mloc'))
+			}
+			if (columnCampos[item] === 'label_country') {
+				tableFields.push(headerTableFactory('País', 'local.label_country'))
+			}
+			if (columnCampos[item] === 'label_region') {
+				tableFields.push(headerTableFactory('Região', 'local.label_region'))
+			}
+			if (columnCampos[item] === 'name_locality') {
+				tableFields.push(headerTableFactory('Localidade', 'local.name_locality'))
 			}
 		});
 		return tableFields;
@@ -200,9 +260,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 			typeOrder = '';
 		}
 
-		if (filter && typeof (filter) !== undefined) {
+		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
 			} else {
 				parametersFilter = filter;
 			}
@@ -214,9 +274,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 			}
 		}
 
-		await tecnologiaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+		await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
 			if (response.status === 200) {
-				setTecnologias(response.response)
+				setUnidadeCultura(response.response)
 			}
 		});
 
@@ -234,23 +294,23 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	};
 
 	async function getValuesComluns(): Promise<void> {
-		let els: any = document.querySelectorAll("input[type='checkbox'");
+		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
 			if (els[i].checked) {
 				selecionados += els[i].value + ',';
 			}
 		}
-		let totalString = selecionados.length;
-		let campos = selecionados.substr(0, totalString - 1)
+		const totalString = selecionados.length;
+		const campos = selecionados.substr(0, totalString - 1)
 		if (preferences.id === 0) {
-			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 8 }).then((response) => {
-				userLogado.preferences.ogm = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 21 }).then((response) => {
+				userLogado.preferences.unidadeCultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
 				preferences.id = response.response.id;
 			});
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		} else {
-			userLogado.preferences.ogm = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+			userLogado.preferences.unidadeCultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
 			await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
 			localStorage.setItem('user', JSON.stringify(userLogado));
 		}
@@ -273,10 +333,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 	const downloadExcel = async (): Promise<void> => {
 		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${id_culture}`;
+			filterAplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await tecnologiaService.getAll(filterAplication).then((response) => {
+		await unidadeCulturaService.getAll(filterAplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
@@ -286,10 +346,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 
 				const workSheet = XLSX.utils.json_to_sheet(newData);
 				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, "Tecnologias");
+				XLSX.utils.book_append_sheet(workBook, workSheet, "unidade-cultura");
 
-				// Buffer
-				let buf = XLSX.write(workBook, {
+				// buffer
+				XLSX.write(workBook, {
 					bookType: "xlsx", //xlsx
 					type: "buffer",
 				});
@@ -299,7 +359,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 					type: "binary",
 				});
 				// Download
-				XLSX.writeFile(workBook, "Tecnologias.xlsx");
+				XLSX.writeFile(workBook, "Unidade-cultura.xlsx");
 			}
 		});
 	};
@@ -313,18 +373,35 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	};
 
 	async function handlePagination(): Promise<void> {
-		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take;
+		const skip = currentPage * Number(take);
+		let parametersFilter = `skip=${skip}&take=${take}`
 
 		if (filter) {
-			parametersFilter = parametersFilter + "&" + filter;
+			parametersFilter = `${parametersFilter}&${filter}`
 		}
-		await tecnologiaService.getAll(parametersFilter).then((response) => {
+		await unidadeCulturaService.getAll(parametersFilter).then((response) => {
 			if (response.status === 200) {
-				setTecnologias(response.response);
+				setUnidadeCultura(response.response);
 			}
 		});
 	};
+
+	function filterFieldFactory(title: any, name: any) {
+		return (
+			<div className="h-10 w-1/2 ml-4">
+				<label className="block text-gray-900 text-sm font-bold mb-2">
+					{name}
+				</label>
+				<Input
+					type="text"
+					placeholder={name}
+					id={title}
+					name={title}
+					onChange={formik.handleChange}
+				/>
+			</div>
+		)
+	}
 
 	useEffect(() => {
 		handlePagination();
@@ -334,7 +411,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	return (
 		<>
 			<Head>
-				<title>Listagem de Tecnologias</title>
+				<title>Listagem das unidades de cultura</title>
 			</Head>
 			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
 				<main className="h-full w-full
@@ -342,7 +419,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
           items-start
           gap-8
         ">
-					<AccordionFilter title="Filtrar tecnologias">
+					<AccordionFilter title="Filtrar unidades de cultura">
 						<div className='w-full flex gap-2'>
 							<form
 								className="flex flex-col
@@ -358,26 +435,25 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                   justify-center
                   pb-2
                 ">
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Status
-										</label>
-										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
-									</div>
 
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Pesquisar
-										</label>
-										<Input
-											type="text"
-											placeholder="nome"
-											max="40"
-											id="filterName"
-											name="filterName"
-											onChange={formik.handleChange}
-										/>
-									</div>
+									{filterFieldFactory('filterNameUnityCulture', 'Nome Un. de Cult.')}
+
+									{filterFieldFactory('filterYear', 'Ano')}
+
+									{filterFieldFactory('filterNameLocalCulture', 'Nome do L. de Cult.')}
+
+									{filterFieldFactory('filterLabel', 'Rótulo')}
+
+									{filterFieldFactory('filterMloc', 'MLOC')}
+
+									{filterFieldFactory('filterAdress', 'Nome da Fazenda')}
+
+									{filterFieldFactory('filterLabelCountry', 'País')}
+
+									{filterFieldFactory('filterLabelRegion', 'Região')}
+
+									{filterFieldFactory('filterNameLocality', 'Localidade')}
+
 								</div>
 
 								<div className="h-16 w-32 mt-3">
@@ -396,23 +472,24 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 					{/* overflow-y-scroll */}
 					<div className="w-full h-full overflow-y-scroll">
 						<MaterialTable
-							style={{ background: '#f9fafb' }}
 							columns={columns}
-							data={tecnologias}
+							data={unidadeCultura}
+							onRowClick={((evt?, selectedRow?: IUnityCultureProps) => {
+								setSelectedRowById(selectedRow?.id)
+							})}
 							options={{
 								showTitle: false,
-								headerStyle: {
-									zIndex: 20
-								},
-								rowStyle: { background: '#f9fafb' },
 								search: false,
 								filtering: false,
-								pageSize: itensPerPage
+								pageSize: itensPerPage,
+								rowStyle: (rowData: IUnityCultureProps) => ({
+									backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff')
+								}),
 							}}
 							components={{
 								Toolbar: () => (
 									<div
-										className='w-full max-h-96	
+										className='w-full max-h-max	
                     flex
                     items-center
                     justify-between
@@ -423,16 +500,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                     border-solid border-b
                     border-gray-200
                   '>
-										<div className='h-12'>
-											<Button
-												title="Importar planilha"
-												value="Importar planilha"
-												bgColor="bg-blue-600"
-												textColor="white"
-												onClick={() => { router.push('tecnologia/importar-planilha') }}
-												icon={<RiFileExcel2Line size={20} />}
-											/>
-										</div>
+
 										<strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
 										<div className='h-full flex items-center gap-2
@@ -480,8 +548,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 												</div>
 											</div>
 											<div className='h-12 flex items-center justify-center w-full'>
-												<Button title="Exportar planilha de tecnologias" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
-												<Button icon={<RiSettingsFill size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { router.push("tecnologia/importar-planilha/config-planilha") }} />
+												<Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
 											</div>
 										</div>
 									</div>
@@ -553,23 +620,21 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-	const PreferencesControllers = new UserPreferenceController();
-	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+	const userPreferenceController = new UserPreferenceController();
+	const itensPerPage = await (await userPreferenceController.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
+	const token = req.cookies.token;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-	const id_culture = req.cookies.cultureId;
-	const token = req.cookies.token;
+	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 
 	removeCookies('filterBeforeEdit', { req, res });
 	removeCookies('pageBeforeEdit', { req, res });
 
 
-	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : `filterStatus=1&id_culture=${id_culture}`;
-
 	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
@@ -579,16 +644,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	} as RequestInit | undefined;
 
-	const response = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allItems, total: totalItems } = await response.json();
+	const cultureUnity = await fetch(urlParameters.toString(), requestOptions);
+	const { response: allCultureUnity, total: totalItems } = await cultureUnity.json();
 
 	return {
 		props: {
-			allItems,
+			allCultureUnity,
 			totalItems,
 			itensPerPage,
 			filterAplication,
-			id_culture,
 			pageBeforeEdit,
 			filterBeforeEdit
 		},

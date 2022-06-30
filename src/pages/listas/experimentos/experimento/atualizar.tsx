@@ -56,7 +56,7 @@ interface IUpdateExperimento {
 	cod_tec: String | any;
 	epoca: String | any;
 	pjr: String | any;
-	culture_unity_name: String | any;
+	name_unity_culture: String | any;
 	status: Number;
 };
 
@@ -115,7 +115,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 			cod_tec: experimento.tecnologia.cod_tec,
 			epoca: experimento.epoca,
 			pjr: experimento.pjr,
-			culture_unity_name: experimento.culture_unity_name,
+			name_unity_culture: experimento.name_unity_culture,
 			status: experimento.status,
 		},
 		onSubmit: async (values) => {
@@ -130,7 +130,7 @@ export default function AtualizarLocal({ experimento, allItens, totalItems, iten
 				cod_tec: formik.values.cod_tec,
 				epoca: formik.values.epoca,
 				pjr: formik.values.pjr,
-				culture_unity_name: formik.values.culture_unity_name,
+				name_unity_culture: formik.values.name_unity_culture,
 				status: formik.values.status,
 			}).then((response) => {
 				if (response.status === 200) {

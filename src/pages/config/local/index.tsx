@@ -38,13 +38,13 @@ interface ILocalProps {
 
 interface IFilter {
 	filterStatus: object | any;
-	filterName_local_culture: string | any;
+	filterNameLocalCulture: string | any;
 	filterLabel: string | any;
 	filterMloc: string | any;
 	filterAdress: string | any;
-	filterLabel_country: string | any;
-	filterLabel_region: string | any;
-	filterName_locality: string | any;
+	filterLabelCountry: string | any;
+	filterLabelRegion: string | any;
+	filterNameLocality: string | any;
 	orderBy: object | any;
 	typeOrder: object | any;
 }
@@ -108,27 +108,27 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	const formik = useFormik<IFilter>({
 		initialValues: {
 			filterStatus: '',
-			filterName_local_culture: '',
+			filterNameLocalCulture: '',
 			filterLabel: '',
 			filterMloc: '',
 			filterAdress: '',
-			filterLabel_country: '',
-			filterLabel_region: '',
-			filterName_locality: '',
+			filterLabelCountry: '',
+			filterLabelRegion: '',
+			filterNameLocality: '',
 			orderBy: '',
 			typeOrder: '',
 		},
 		onSubmit: async ({
 			filterStatus,
-			filterName_local_culture,
+			filterNameLocalCulture,
 			filterLabel,
 			filterMloc,
 			filterAdress,
-			filterLabel_country,
-			filterLabel_region,
-			filterName_locality
+			filterLabelCountry,
+			filterLabelRegion,
+			filterNameLocality
 		}) => {
-			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterName_local_culture=${filterName_local_culture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabel_country=${filterLabel_country}&filterLabel_region=${filterLabel_region}&filterName_locality=${filterName_locality}`
+			const parametersFilter = `filterStatus=${filterStatus ? filterStatus : 1}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`
 
 			setFiltersParams(parametersFilter)
 			setCookies("filterBeforeEdit", filtersParams)
@@ -430,6 +430,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
+					row.dt_export = new Date();
 					return row;
 				});
 
@@ -531,7 +532,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map(id => id)} selected={'1'} />
 									</div>
 
-									{filterFieldFactory('filterName_local_culture', 'Nome do L. de Cult.')}
+									{filterFieldFactory('filterNameLocalCulture', 'Nome do L. de Cult.')}
 
 									{filterFieldFactory('filterLabel', 'Rótulo')}
 
@@ -539,11 +540,11 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 
 									{filterFieldFactory('filterAdress', 'Nome da Fazenda')}
 
-									{filterFieldFactory('filterLabel_country', 'País')}
+									{filterFieldFactory('filterLabelCountry', 'País')}
 
-									{filterFieldFactory('filterLabel_region', 'Região')}
+									{filterFieldFactory('filterLabelRegion', 'Região')}
 
-									{filterFieldFactory('filterName_locality', 'Localidade')}
+									{filterFieldFactory('filterNameLocality', 'Localidade')}
 
 								</div>
 

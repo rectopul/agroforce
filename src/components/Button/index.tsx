@@ -13,6 +13,7 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   hoverTextColor?: string;
   href?: string | any;
   disabled?: boolean;
+	rounder?: string | any;
 }
 
 export function Button({
@@ -26,7 +27,8 @@ export function Button({
   hoverBgColor,
   hoverTextColor,
   href,
-  disabled
+  disabled,
+	rounder
 }: ITypeButtonProps) {
   const router = useRouter();
 
@@ -56,6 +58,7 @@ export function Button({
         hover:shadow-lg
         hover:text-${hoverTextColor}
         hover:shadow-lg
+				${rounder}
       `}>
         {icon}
         { value }

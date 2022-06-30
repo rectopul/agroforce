@@ -393,19 +393,16 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 
 		await genotipoService.getAll(filterAplication).then((response) => {
 			if (response.status === 200) {
-				const newData = genotipos.map((row) => {
+				const newData = genotipos.map((row: any) => {
 					if (row.status === 0) {
 						row.status = 'Inativo' as any;
 					} else {
 						row.status = 'Ativo' as any;
 					}
-
+					row.tecnologia = row.tecnologia?.tecnologia
+					row.dt_export = new Date();
 					return row;
 				});
-
-				newData.map((item: any) => {
-					return item.tecnologia = item.tecnologia?.tecnologia
-				})
 
 				const workSheet = XLSX.utils.json_to_sheet(newData);
 				const workBook = XLSX.utils.book_new();
