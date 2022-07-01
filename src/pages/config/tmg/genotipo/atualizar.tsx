@@ -1,104 +1,102 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import MaterialTable from "material-table";
-import { SiMicrogenetics } from "react-icons/si";
+import { useFormik } from "formik"
+import MaterialTable from "material-table"
+import { GetServerSideProps } from "next"
+import getConfig from "next/config"
+import Head from "next/head"
+import { useRouter } from "next/router"
+import { useState } from "react"
+import { IoMdArrowBack } from "react-icons/io"
 import {
 	Button,
 	Content,
 	Input
-} from "src/components";
-import { genotipoService } from "src/services";
-import Swal from "sweetalert2";
-import * as ITabs from '../../../../shared/utils/dropdown';
+} from "src/components"
+import { genotipoService } from "src/services"
+import Swal from "sweetalert2"
+import * as ITabs from '../../../../shared/utils/dropdown'
 
-import { ReactNode, useEffect } from "react";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
-import { AccordionFilter, CheckBox, Select } from "src/components";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, loteService } from "src/services";
-import * as XLSX from 'xlsx';
+import { ReactNode, useEffect } from "react"
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd"
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai"
+import { BiLeftArrow, BiRightArrow } from "react-icons/bi"
+import { IoReloadSharp } from "react-icons/io5"
+import { MdFirstPage, MdLastPage } from "react-icons/md"
+import { RiFileExcel2Line } from "react-icons/ri"
+import { AccordionFilter, CheckBox } from "src/components"
+import { UserPreferenceController } from "src/controllers/user-preference.controller"
+import { loteService, userPreferencesService } from "src/services"
+import * as XLSX from 'xlsx'
 
 interface IFilter {
-	filterStatus: object | any;
-	filterSearch: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+	filterStatus: object | any
+	filterSearch: string | any
+	orderBy: object | any
+	typeOrder: object | any
 }
 export interface IUpdateGenotipo {
-	id: number;
-	id_culture: number;
-	id_s1: number;
-	id_dados: string;
-	name_genotipo: string;
-	name_main: string;
-	name_public: string;
-	name_experiment: string;
-	name_alter: string;
-	elit_name: string;
-	type: string;
-	cruza: string;
-	cod_tec: string;
-	tecnologia?: object | any;
-	status: number;
-	gmr: number;
-	bgm: number;
-	progenitor_f_direto: string;
-	progenitor_m_direto: string;
-	progenitor_f_origem: string;
-	progenitor_m_origem: string;
-	progenitores_origem: string;
-	parentesco_completo: string;
+	id: number
+	id_culture: number
+	id_s1: number
+	id_dados: string
+	name_genotipo: string
+	name_main: string
+	name_public: string
+	name_experiment: string
+	name_alter: string
+	elit_name: string
+	type: string
+	cruza: string
+	cod_tec: string
+	tecnologia?: object | any
+	status: number
+	gmr: number
+	bgm: number
+	progenitor_f_direto: string
+	progenitor_m_direto: string
+	progenitor_f_origem: string
+	progenitor_m_origem: string
+	progenitores_origem: string
+	parentesco_completo: string
 }
 
 export interface LoteGenotipo {
-	id: number;
-	id_culture: number;
-	id_genotipo: number;
-	genealogy: string;
-	name: string;
-	volume: number;
-	status?: number;
+	id: number
+	id_culture: number
+	id_genotipo: number
+	genealogy: string
+	name: string
+	volume: number
+	status?: number
 }
 
 interface IGenarateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+	name: string | undefined
+	title: string | number | readonly string[] | undefined
+	value: string | number | readonly string[] | undefined
 }
 
 interface IData {
-	allLote: LoteGenotipo[];
-	totalItems: number;
-	itensPerPage: number;
-	filterAplication: object | any;
-	id_genotipo: number;
-	genotipo: IUpdateGenotipo;
+	allLote: LoteGenotipo[]
+	totalItems: number
+	itensPerPage: number
+	filterAplication: object | any
+	id_genotipo: number
+	genotipo: IUpdateGenotipo
 }
 
 export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, filterAplication, id_genotipo, genotipo }: IData) {
-	const { TabsDropDowns } = ITabs.default;
+	const { TabsDropDowns } = ITabs.default
 
-	const tabsDropDowns = TabsDropDowns();
+	const tabsDropDowns = TabsDropDowns()
 
 	tabsDropDowns.map((tab) => (
 		tab.titleTab === 'TMG'
 			? tab.statusTab = true
 			: tab.statusTab = false
-	));
+	))
 
-	const router = useRouter();
-	const [checkInput, setCheckInput] = useState('text-black');
+	const router = useRouter()
+	const [checkInput, setCheckInput] = useState('text-black')
 
 	const formik = useFormik<IUpdateGenotipo>({
 		initialValues: {
@@ -133,26 +131,26 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 				status: genotipo.status,
 			}).then((response) => {
 				if (response.status === 200) {
-					Swal.fire('Genótipo atualizado com sucesso!');
-					router.back();
+					Swal.fire('Genótipo atualizado com sucesso!')
+					router.back()
 				} else {
-					setCheckInput("text-red-600");
-					Swal.fire(response.message);
+					setCheckInput("text-red-600")
+					Swal.fire(response.message)
 				}
-			});
+			})
 		},
-	});
+	})
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
-	const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,year,cod_lote,ncc,fase,peso,quant_sementes" };
-	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+	const userLogado = JSON.parse(localStorage.getItem("user") as string)
+	const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,year,cod_lote,ncc,fase,peso,quant_sementes" }
+	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences)
 
-	const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
-	const [currentPage, setCurrentPage] = useState<number>(0);
-	const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-	const [orderList, setOrder] = useState<number>(0);
-	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
-	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+	const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote)
+	const [currentPage, setCurrentPage] = useState<number>(0)
+	const [itemsTotal, setTotaItems] = useState<number | any>(totalItems)
+	const [orderList, setOrder] = useState<number>(0)
+	const [arrowOrder, setArrowOrder] = useState<ReactNode>('')
+	const [statusAccordion, setStatusAccordion] = useState<boolean>(false)
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Ano lote", value: "year" },
@@ -161,21 +159,21 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 		{ name: "CamposGerenciados[]", title: "Fase", value: "fase" },
 		{ name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
 		{ name: "CamposGerenciados[]", title: "Quant sementes", value: "quant_sementes" },
-	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
-	const [colorStar, setColorStar] = useState<string>('');
+	])
+	const [filter, setFilter] = useState<any>(filterAplication)
+	const [colorStar, setColorStar] = useState<string>('')
 
 	const filtersStatusItem = [
 		{ id: 2, name: 'Todos' },
 		{ id: 1, name: 'Ativos' },
 		{ id: 0, name: 'Inativos' },
-	];
+	]
 
-	const take: number = itensPerPage;
-	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
-	const pages = Math.ceil(total / take);
+	const take: number = itensPerPage
+	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal)
+	const pages = Math.ceil(total / take)
 
-	const columns = columnsOrder(camposGerenciados);
+	const columns = columnsOrder(camposGerenciados)
 
 	const formikLote = useFormik<IFilter>({
 		initialValues: {
@@ -185,14 +183,14 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 			typeOrder: '',
 		},
 		onSubmit: async (values) => {
-			const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_genotipo=" + id_genotipo;
+			const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_genotipo=" + id_genotipo
 			await loteService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LoteGenotipo[]) => {
-				setLotes(response);
-				setTotaItems(response.length);
-				setFilter(parametersFilter);
+				setLotes(response)
+				setTotaItems(response.length)
+				setFilter(parametersFilter)
 			})
 		},
-	});
+	})
 
 	function headerTableFactory(name: any, title: string) {
 		return {
@@ -245,61 +243,61 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 						</div>
 					)
 			)
-		};
+		}
 	}
 
 	function columnsOrder(camposGerenciados: string) {
-		const columnCampos: string[] = camposGerenciados.split(',');
-		const tableFields: any = [];
+		const columnCampos: string[] = camposGerenciados.split(',')
+		const tableFields: any = []
 
 		Object.keys(columnCampos).forEach((item, index) => {
 			if (columnCampos[index] === 'id') {
 				tableFields.push(idHeaderFactory())
 			}
 			if (columnCampos[index] === 'year') {
-				tableFields.push(headerTableFactory('Ano', 'year'));
+				tableFields.push(headerTableFactory('Ano', 'year'))
 			}
 			if (columnCampos[index] === 'cod_lote') {
-				tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'));
+				tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'))
 			}
 			if (columnCampos[index] === 'ncc') {
-				tableFields.push(headerTableFactory('NCC', 'ncc'));
+				tableFields.push(headerTableFactory('NCC', 'ncc'))
 			}
 			if (columnCampos[index] === 'fase') {
-				tableFields.push(headerTableFactory('Fase', 'fase'));
+				tableFields.push(headerTableFactory('Fase', 'fase'))
 			}
 			if (columnCampos[index] === 'peso') {
-				tableFields.push(headerTableFactory('Peso', 'peso'));
+				tableFields.push(headerTableFactory('Peso', 'peso'))
 			}
 			if (columnCampos[index] === 'quant_sementes') {
-				tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
+				tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'))
 			}
-		});
-		return tableFields;
+		})
+		return tableFields
 	};
 
 	async function handleOrder(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
+		let typeOrder: any
+		let parametersFilter: any
 		if (order === 1) {
-			typeOrder = 'asc';
+			typeOrder = 'asc'
 		} else if (order === 2) {
-			typeOrder = 'desc';
+			typeOrder = 'desc'
 		} else {
-			typeOrder = '';
+			typeOrder = ''
 		}
 
 		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder
 			} else {
-				parametersFilter = filter;
+				parametersFilter = filter
 			}
 		} else {
 			if (typeOrder !== '') {
-				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
+				parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder
 			} else {
-				parametersFilter = filter;
+				parametersFilter = filter
 			}
 		}
 
@@ -307,123 +305,124 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 			if (response.status === 200) {
 				setLotes(response.response)
 			}
-		});
+		})
 
 		if (orderList === 2) {
-			setOrder(0);
-			setArrowOrder(<AiOutlineArrowDown />);
+			setOrder(0)
+			setArrowOrder(<AiOutlineArrowDown />)
 		} else {
-			setOrder(orderList + 1);
+			setOrder(orderList + 1)
 			if (orderList === 1) {
-				setArrowOrder(<AiOutlineArrowUp />);
+				setArrowOrder(<AiOutlineArrowUp />)
 			} else {
-				setArrowOrder('');
+				setArrowOrder('')
 			}
 		}
 	};
 
 
 	async function getValuesComluns(): Promise<void> {
-		let els: any = document.querySelectorAll("input[type='checkbox'");
-		let selecionados = '';
+		let els: any = document.querySelectorAll("input[type='checkbox'")
+		let selecionados = ''
 		for (let i = 0; i < els.length; i++) {
 			if (els[i].checked) {
-				selecionados += els[i].value + ',';
+				selecionados += els[i].value + ','
 			}
 		}
-		let totalString = selecionados.length;
+		let totalString = selecionados.length
 		let campos = selecionados.substr(0, totalString - 1)
 		if (preferences.id === 0) {
 			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
-				userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
-				preferences.id = response.response.id;
-			});
-			localStorage.setItem('user', JSON.stringify(userLogado));
+				userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos }
+				preferences.id = response.response.id
+			})
+			localStorage.setItem('user', JSON.stringify(userLogado))
 		} else {
-			userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-			await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-			localStorage.setItem('user', JSON.stringify(userLogado));
+			userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos }
+			await userPreferencesService.update({ table_preferences: campos, id: preferences.id })
+			localStorage.setItem('user', JSON.stringify(userLogado))
 		}
 
-		setStatusAccordion(false);
-		setCamposGerenciados(campos);
+		setStatusAccordion(false)
+		setCamposGerenciados(campos)
 	};
 
 	function handleOnDragEnd(result: DropResult): void {
-		setStatusAccordion(true);
-		if (!result) return;
+		setStatusAccordion(true)
+		if (!result) return
 
-		const items = Array.from(genaratesProps);
-		const [reorderedItem] = items.splice(result.source.index, 1);
-		const index: number = Number(result.destination?.index);
-		items.splice(index, 0, reorderedItem);
+		const items = Array.from(genaratesProps)
+		const [reorderedItem] = items.splice(result.source.index, 1)
+		const index: number = Number(result.destination?.index)
+		items.splice(index, 0, reorderedItem)
 
-		setGenaratesProps(items);
+		setGenaratesProps(items)
 	};
 
 	const downloadExcel = async (): Promise<void> => {
 		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
+			filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`
 		}
 
 		await loteService.getAll(filterAplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
-						row.status = "Inativo";
+						row.status = "Inativo"
 					} else {
-						row.status = "Ativo";
+						row.status = "Ativo"
 					}
 
-					return row;
-				});
+					return row
+				})
 
-				const workSheet = XLSX.utils.json_to_sheet(newData);
-				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
+				const workSheet = XLSX.utils.json_to_sheet(newData)
+				const workBook = XLSX.utils.book_new()
+				XLSX.utils.book_append_sheet(workBook, workSheet, "lotes")
 
 				// Buffer
 				let buf = XLSX.write(workBook, {
 					bookType: "xlsx", //xlsx
 					type: "buffer",
-				});
+				})
 				// Binary
 				XLSX.write(workBook, {
 					bookType: "xlsx", //xlsx
 					type: "binary",
-				});
+				})
 				// Download
-				XLSX.writeFile(workBook, "Lotes.xlsx");
+				XLSX.writeFile(workBook, "Lotes.xlsx")
 			}
-		});
-	};
+		})
+	}
 
 	function handleTotalPages(): void {
 		if (currentPage < 0) {
-			setCurrentPage(0);
+			setCurrentPage(0)
 		} else if (currentPage >= pages) {
-			setCurrentPage(pages - 1);
+			setCurrentPage(pages - 1)
 		}
 	};
 
 	async function handlePagination(): Promise<void> {
-		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take + "&id_genotipo=" + id_genotipo;
+		let skip = currentPage * Number(take)
+		let parametersFilter = "skip=" + skip + "&take=" + take + "&id_genotipo=" + id_genotipo
 
 		if (filter) {
-			parametersFilter = parametersFilter + "&" + filter;
+			parametersFilter = parametersFilter + "&" + filter
 		}
 		await loteService.getAll(parametersFilter).then((response) => {
 			if (response.status === 200) {
-				setLotes(response.response);
+				setLotes(response.response)
 			}
-		});
+		})
 	};
 
 	useEffect(() => {
 		handlePagination(); ''
-		handleTotalPages();
-	}, [currentPage]);
+		handleTotalPages()
+	}, [currentPage])
+
 	return (
 		<>
 			<Head><title>Atualizar genótipo</title></Head>
@@ -437,143 +436,150 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 						<hr></hr>
 					</div>
 					<div className="w-full flex justify-between items-start gap-5 mt-5">
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome genótipo
-							</label>
-							<Input
-								required
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="name_genotipo"
-								name="name_genotipo"
-								onChange={formik.handleChange}
-								value={formik.values.name_genotipo}
-							/>
+						<div className='w-2/4 grid grid-cols-3 gap-5'>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Nome genótipo
+								</label>
+								<Input
+									required
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="name_genotipo"
+									name="name_genotipo"
+									onChange={formik.handleChange}
+									value={formik.values.name_genotipo}
+								/>
+							</div>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Nome principal
+								</label>
+								<Input
+									required
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="name_main"
+									name="name_main"
+									onChange={formik.handleChange}
+									value={formik.values.name_main}
+								/>
+							</div>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Nome publico
+								</label>
+								<Input
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="name_public"
+									name="name_public"
+									onChange={formik.handleChange}
+									value={formik.values.name_public}
+								/>
+							</div>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Nome experimental
+								</label>
+								<Input
+									required
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="name_experiment"
+									name="name_experiment"
+									onChange={formik.handleChange}
+									value={formik.values.name_experiment}
+								/>
+							</div>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Nome alternativo
+								</label>
+								<Input
+									required
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="name_alter"
+									name="name_alter"
+									onChange={formik.handleChange}
+									value={formik.values.name_alter}
+								/>
+							</div>
+							<div className="w-full ">
+								<label className="block text-gray-900 text-sm font-bold mb-2">
+									Elite nome
+								</label>
+								<Input
+									style={{ background: '#e5e7eb' }}
+									disabled
+									id="elit_name"
+									name="elit_name"
+									onChange={formik.handleChange}
+									value={formik.values.elit_name}
+								/>
+							</div>
 						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome principal
-							</label>
-							<Input
-								required
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="name_main"
-								name="name_main"
-								onChange={formik.handleChange}
-								value={formik.values.name_main}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome publico
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="name_public"
-								name="name_public"
-								onChange={formik.handleChange}
-								value={formik.values.name_public}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Cód tecnologia
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="cod_tec"
-								name="cod_tec"
-								onChange={formik.handleChange}
-								value={formik.values.cod_tec}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Tipo
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="type"
-								name="type"
-								onChange={formik.handleChange}
-								value={formik.values.type}
-							/>
+						<div className='w-2/4 flex justify-end'>
+							<div className='w-2/4 flex flex-wrap gap-5'>
+								<div className="flex-1">
+									<label className="block text-gray-900 text-sm font-bold mb-2">
+										Cód tecnologia
+									</label>
+									<Input
+										style={{ background: '#e5e7eb' }}
+										disabled
+										id="cod_tec"
+										name="cod_tec"
+										onChange={formik.handleChange}
+										value={formik.values.cod_tec}
+									/>
+								</div>
+								<div className="w-1/4">
+									<label className="block text-gray-900 text-sm font-bold mb-2">
+										Tipo
+									</label>
+									<Input
+										style={{ background: '#e5e7eb' }}
+										disabled
+										id="type"
+										name="type"
+										onChange={formik.handleChange}
+										value={formik.values.type}
+									/>
+								</div>
+								<div className="flex w-2/4 gap-5">
+									<div className="w-full ">
+										<label className="block text-gray-900 text-sm font-bold mb-2">
+											GMR
+										</label>
+										<Input
+											style={{ background: '#e5e7eb' }}
+											disabled
+											id="gmr"
+											name="gmr"
+											onChange={formik.handleChange}
+											value={formik.values.gmr}
+										/>
+									</div>
+									<div className="w-full ">
+										<label className="block text-gray-900 text-sm font-bold mb-2">
+											BGM
+										</label>
+										<Input
+											style={{ background: '#e5e7eb' }}
+											disabled
+											id="bgm"
+											name="bgm"
+											onChange={formik.handleChange}
+											value={formik.values.bgm}
+										/>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
-					<div className="w-full flex justify-between items-start gap-5 mt-5">
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome experimental
-							</label>
-							<Input
-								required
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="name_experiment"
-								name="name_experiment"
-								onChange={formik.handleChange}
-								value={formik.values.name_experiment}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Nome alternativo
-							</label>
-							<Input
-								required
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="name_alter"
-								name="name_alter"
-								onChange={formik.handleChange}
-								value={formik.values.name_alter}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								Elite nome
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="elit_name"
-								name="elit_name"
-								onChange={formik.handleChange}
-								value={formik.values.elit_name}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								GMR
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="gmr"
-								name="gmr"
-								onChange={formik.handleChange}
-								value={formik.values.gmr}
-							/>
-						</div>
-						<div className="w-full ">
-							<label className="block text-gray-900 text-sm font-bold mb-2">
-								BGM
-							</label>
-							<Input
-								style={{ background: '#e5e7eb' }}
-								disabled
-								id="bgm"
-								name="bgm"
-								onChange={formik.handleChange}
-								value={formik.values.bgm}
-							/>
-						</div>
-					</div>
+
 					<div className="rounded border-inherit" style={{ marginTop: "3%" }}>
 						<span>Informações dos progenitores</span>
 						<hr></hr>
@@ -661,7 +667,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 						</div>
 					</div>
 					<div className="w-full flex justify-between items-start gap-5 mt-5">
-						<div className="w-96 ">
+						<div className="w-3/4 ">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								Parentesco completo
 							</label>
@@ -687,15 +693,11 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 
 					</div>
 				</form>
-				<main className="w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
+				<main
+					className="w-full flex flex-col items-start gap-8"
 					style={{ height: '45%' }}
 				>
-
-					<div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+					<div style={{ marginTop: '1%' }} className="w-full h-auto">
 						<MaterialTable
 							style={{ background: '#f9fafb' }}
 							columns={columns}
@@ -736,7 +738,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 
 										<strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
 
-										<div className='h-full flex items-center gap-2'>
+										<div className='flex items-center gap-2'>
 											<div className="border-solid border-2 border-blue-600 rounded">
 												<div className="w-72">
 													<AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
@@ -849,37 +851,37 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 				</main>
 			</Content>
 		</>
-	);
+	)
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const PreferencesControllers = new UserPreferenceController();
-	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
+	const PreferencesControllers = new UserPreferenceController()
+	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5
 
-	const token = context.req.cookies.token;
+	const token = context.req.cookies.token
 
-	const { publicRuntimeConfig } = getConfig();
+	const { publicRuntimeConfig } = getConfig()
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
 		headers: { Authorization: `Bearer ${token}` }
-	};
+	}
 
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
-	const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
-	const genotipo = await apiGenotipo.json();
+	const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`
+	const apiGenotipo = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
+	const genotipo = await apiGenotipo.json()
 
-	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`;
-	const urlParameters: any = new URL(baseUrlLote);
-	urlParameters.search = new URLSearchParams(param).toString();
+	const param = `skip=0&take=${itensPerPage}&filterStatus=1`
+	const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`
+	const urlParameters: any = new URL(baseUrlLote)
+	urlParameters.search = new URLSearchParams(param).toString()
 
-	const filterAplication = "filterStatus=1";
-	const id_genotipo = Number(context.query.id);
+	const filterAplication = "filterStatus=1"
+	const id_genotipo = Number(context.query.id)
 
-	const response = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions);
+	const response = await fetch(`${baseUrlLote}?id_genotipo=${id_genotipo}`, requestOptions)
 
-	const { response: allLote, total: totalItems } = await response.json();
+	const { response: allLote, total: totalItems } = await response.json()
 
 	return {
 		props: {
