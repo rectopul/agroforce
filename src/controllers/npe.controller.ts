@@ -139,7 +139,7 @@ export class NpeController {
 		try {
 			if (data.safra) {
 				const group: any = await this.groupController.listAll({ id_safra: data.safra, id_foco: data.foco });
-				if (!group.response?.length) {
+				if (group.response.length > 0) {
 					const safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
                                                   WHERE n.id_safra = ${data.safra}
