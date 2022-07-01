@@ -412,8 +412,6 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 
 					<div className="w-full flex justify-between items-start gap-5 mt-5">
 
-						{updateFieldFactory('id', 'Código')}
-
 						{updateFieldFactory('cod_quadra', 'Código Quadra')}
 
 						{updateFieldFactory('local_preparo', 'Local Preparo')}
