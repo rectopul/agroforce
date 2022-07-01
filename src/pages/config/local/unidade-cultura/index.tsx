@@ -89,7 +89,7 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-		{ name: "CamposGerenciados[]", title: "Nome da unidade de cultura", value: "name_unity_culture", defaultChecked: () => camposGerenciados.includes('name_unity_culture') },
+		{ name: "CamposGerenciados[]", title: "Nome un. cultura", value: "name_unity_culture", defaultChecked: () => camposGerenciados.includes('name_unity_culture') },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year", defaultChecked: () => camposGerenciados.includes('year') },
 		{ name: "CamposGerenciados[]", title: "Nome do L. de Cult.", value: "name_local_culture", defaultChecked: () => camposGerenciados.includes('name_local_culture') },
 		{ name: "CamposGerenciados[]", title: "Rótulo", value: "label", defaultChecked: () => camposGerenciados.includes('label') },
@@ -219,13 +219,13 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 				tableFields.push(idHeaderFactory())
 			}
 			if (columnCampos[item] === 'name_unity_culture') {
-				tableFields.push(headerTableFactory('Nome do lugar de cultura', 'name_unity_culture'))
+				tableFields.push(headerTableFactory('Nome un. cultura', 'name_unity_culture'))
 			}
 			if (columnCampos[item] === 'year') {
 				tableFields.push(headerTableFactory('Ano', 'year'))
 			}
 			if (columnCampos[item] === 'name_local_culture') {
-				tableFields.push(headerTableFactory('Nome do L. de cult.', 'local.name_local_culture'))
+				tableFields.push(headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'))
 			}
 			if (columnCampos[item] === 'label') {
 				tableFields.push(headerTableFactory('Rótulo', 'local.label'))
