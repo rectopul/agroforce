@@ -430,7 +430,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
-					row.dt_export = new Date();
+					row.DT = new Date();
 					return row;
 				});
 

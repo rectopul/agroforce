@@ -400,7 +400,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 						row.status = 'Ativo' as any;
 					}
 					row.tecnologia = row.tecnologia?.tecnologia
-					row.dt_export = new Date();
+					row.DT = new Date();
 					return row;
 				});
 
