@@ -33,7 +33,7 @@ interface IFilter {
   orderBy: object | any;
   typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
@@ -43,11 +43,11 @@ interface Idata {
   totalItems: Number;
   filter: string | any;
   itensPerPage: number | any;
-  filterAplication: object | any;
+  filterApplication: object | any;
   cultureId: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, cultureId }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterApplication, totalItems, cultureId }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -66,9 +66,9 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<any>('');
-  const [filter, setFilter] = useState<any>(filterAplication);
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
     { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
     { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
@@ -250,7 +250,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     return arrOb;
   };
 
-  async function getValuesComluns(): Promise<void> {
+  async function getValuesColumns(): Promise<void> {
     let els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
@@ -329,15 +329,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
-    setGenaratesProps(items);
+    setGeneratesProps(items);
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+    if (!filterApplication.includes("paramSelect")) {
+      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
-    await epocaService.getAll(filterAplication).then((response) => {
+    await epocaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = epoca.map((row) => {
           if (row.status === 0) {
@@ -518,7 +518,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
                                           value="Atualizar"
                                           bgColor='bg-blue-600'
                                           textColor='white'
-                                          onClick={getValuesComluns}
+                                          onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
@@ -629,7 +629,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = "filterStatus=1&id_culture=" + cultureId;
+  const filterApplication = "filterStatus=1&id_culture=" + cultureId;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -648,7 +648,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       allItems,
       totalItems,
       itensPerPage,
-      filterAplication,
+      filterApplication,
       cultureId
     },
   }

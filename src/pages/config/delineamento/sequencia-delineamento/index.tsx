@@ -36,7 +36,7 @@ interface ISequenciaDelineamento {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -46,11 +46,11 @@ interface IData {
 	allItems: ISequenciaDelineamento[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_delineamento: number;
 }
 
-export default function Listagem({ allItems, totalItems, itensPerPage, filterAplication, id_delineamento }: IData) {
+export default function Listagem({ allItems, totalItems, itensPerPage, filterApplication, id_delineamento }: IData) {
 	const { TabsDropDowns } = ITabs;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -72,7 +72,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 	const [orderList, setOrder] = useState<number>(0);
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Delineamento", value: "delineamento" },
 		{ name: "CamposGerenciados[]", title: "Repetição", value: "repeticao" },
@@ -81,7 +81,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 		{ name: "CamposGerenciados[]", title: "Bloco", value: "bloco" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" },
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -312,7 +312,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -347,15 +347,15 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
 		}
 
-		await sequenciaDelineamentoService.getAll(filterAplication).then((response) => {
+		await sequenciaDelineamentoService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = items.map((row) => {
 					if (row.status === 0) {
@@ -524,7 +524,7 @@ export default function Listagem({ allItems, totalItems, itensPerPage, filterApl
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -636,7 +636,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
 	let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	let filterAplication = "filterStatus=1";
+	let filterApplication = "filterStatus=1";
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
 
@@ -656,7 +656,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			allItems,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_delineamento,
 		},
 	}

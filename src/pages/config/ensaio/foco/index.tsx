@@ -35,7 +35,7 @@ export interface IFocos {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -45,12 +45,12 @@ interface IData {
 	allFocos: IFocos[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allFocos, totalItems, itensPerPage, filterAplication, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allFocos, totalItems, itensPerPage, filterApplication, pageBeforeEdit, filterBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -72,13 +72,13 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Nome", value: "name" },
 		{ name: "CamposGerenciados[]", title: "Grupo", value: "group" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -313,7 +313,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -348,15 +348,15 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await focoService.getAll(filterAplication).then((response) => {
+		await focoService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = focos.map((row) => {
 					if (row.status === 0) {
@@ -538,7 +538,7 @@ export default function Listagem({ allFocos, totalItems, itensPerPage, filterApl
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -656,7 +656,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + `&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + `&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
 
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
@@ -674,7 +674,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allFocos,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			pageBeforeEdit,
 			filterBeforeEdit
 		},

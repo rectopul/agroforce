@@ -11,11 +11,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 	switch (req.method) {
 		case 'PUT':
 			const resultPut = await tecnologiaController.update(req.body);
-			res.status(resultPut.status).json(resultPut);
+			res.status(200).json(resultPut);
 			break;
 		case 'GET':
 			const result: any = await tecnologiaController.getOne(id);
-			res.status(result.status).json(result);
+			res.status(200).json(result);
 			break;
 		default:
 			res.status(405).end(`Method ${req.method} Not Allowed`);

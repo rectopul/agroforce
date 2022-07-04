@@ -70,7 +70,7 @@ export interface LoteGenotipo {
   status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
@@ -80,12 +80,12 @@ interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
   itensPerPage: number;
-  filterAplication: object | any;
+  filterApplication: object | any;
   id_genotipo: number;
   genotipo: IUpdateGenotipo;
 }
 
-export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, filterAplication, id_genotipo, genotipo }: IData) {
+export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, filterApplication, id_genotipo, genotipo }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -152,7 +152,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Ano lote", value: "year" },
     { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
@@ -161,7 +161,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
     { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
     { name: "CamposGerenciados[]", title: "Quant sementes", value: "quant_sementes" },
   ]);
-  const [filter, setFilter] = useState<any>(filterAplication);
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
@@ -278,7 +278,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
     return arrOb;
   };
 
-  async function getValuesComluns(): Promise<void> {
+  async function getValuesColumns(): Promise<void> {
     let els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
@@ -357,15 +357,15 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
-    setGenaratesProps(items);
+    setGeneratesProps(items);
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
+    if (!filterApplication.includes("paramSelect")) {
+      filterApplication += `&paramSelect=${camposGerenciados}&id_genotipo=${id_genotipo}`;
     }
 
-    await loteService.getAll(filterAplication).then((response) => {
+    await loteService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
@@ -747,7 +747,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
                                           value="Atualizar"
                                           bgColor='bg-blue-600'
                                           textColor='white'
-                                          onClick={getValuesComluns}
+                                          onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
@@ -874,7 +874,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrlLote = `${publicRuntimeConfig.apiUrl}/lote`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let filterApplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrlLote);
   urlParameters.search = new URLSearchParams(param).toString();
   const id_genotipo = Number(context.query.id);
@@ -891,7 +891,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       allLote,
       totalItems,
       itensPerPage,
-      filterAplication,
+      filterApplication,
       id_genotipo
     }
   }

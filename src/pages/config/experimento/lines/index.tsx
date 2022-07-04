@@ -39,7 +39,7 @@ export interface IGenotipos {
   status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
@@ -49,13 +49,13 @@ interface IData {
   allGenotipos: IGenotipos[];
   totalItems: number;
   itensPerPage: number;
-  filterAplication: object | any;
+  filterApplication: object | any;
   cultureId: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -79,7 +79,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
   const [arrowGenealogy, setArrowGenealogy] = useState<ReactNode>('');
   const [arrowCruza, setArrowCruza] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
     { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
@@ -102,7 +102,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     { name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
   ]);
 
-  const [filter, setFilter] = useState<any>(filterAplication);
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
@@ -423,7 +423,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     return arrOb;
   }
 
-  async function getValuesComluns(): Promise<void> {
+  async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
@@ -458,15 +458,15 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
     const index = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
-    setGenaratesProps(items);
+    setGeneratesProps(items);
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados}`;
+    if (!filterApplication.includes("paramSelect")) {
+      filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await genotipoService.getAll(filterAplication).then((response) => {
+    await genotipoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = genotipos.map((row) => {
           if (row.status === 0) {
@@ -672,7 +672,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
                                           value="Atualizar"
                                           bgColor='bg-blue-600'
                                           textColor='white'
-                                          onClick={getValuesComluns}
+                                          onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
@@ -792,7 +792,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId : 'filterStatus=1';
+  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + '&id_culture=' + cultureId : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -818,7 +818,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       allGenotipos,
       totalItems,
       itensPerPage,
-      filterAplication,
+      filterApplication,
       cultureId,
       pageBeforeEdit,
       filterBeforeEdit

@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
         case 'GET':
             const result: any = await materiaisController.getOne(Number(id));
-            res.status(result.status).json(result.response);
+            res.status(200).json(result.response);
             break
         case 'PUT':
             const resultPut = await materiaisController.update(req.body);
