@@ -48,7 +48,10 @@
     ],
     "@typescript-eslint/no-explicit-any": "off",
     "import/prefer-default-export": "off",
+    "react/no-unstable-nested-components": "off",
     "jsx-a11y/label-has-associated-control": "off",
-    "class-methods-use-this": "off"
+    "class-methods-use-this": "off",
+    "react/jsx-no-bind": "off",
+    "react/jsx-props-no-spreading": "off"
   }
 }

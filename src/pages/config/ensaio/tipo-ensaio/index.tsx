@@ -45,7 +45,7 @@ interface IGenerateProps {
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
+interface IData {
   allItems: ITypeAssayProps[];
   totalItems: Number;
   filter: string | any;
@@ -66,7 +66,7 @@ export default function TipoEnsaio({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: Idata) {
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -88,7 +88,7 @@ export default function TipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     },
@@ -387,7 +387,7 @@ export default function TipoEnsaio({
     setStatusAccordion(true);
     if (!result) return;
 
-    const items = Array.from(genaratesProps);
+    const items = Array.from(generatesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
@@ -594,15 +594,25 @@ export default function TipoEnsaio({
                                         />
                                       </div>
                                       {
-                                        genaratesProps.map((genarate, index) => (
-                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(providers) => (
+                                              <li
+                                                ref={providers.innerRef}
+                                                {...providers.draggableProps}
+                                                {...providers.dragHandleProps}
+                                              >
                                                 <CheckBox
-                                                  name={genarate.name}
-                                                  title={genarate.title?.toString()}
-                                                  value={genarate.value}
-                                                  defaultChecked={camposGerenciados.includes(genarate.value)}
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={
+                                                    camposGerenciados.includes(generate.value)
+                                                  }
                                                 />
                                               </li>
                                             )}

@@ -1,23 +1,27 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState } from "react";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage, MdUpdate } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { epocaService, userPreferencesService } from "src/services";
+import Head from 'next/head';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
+import {
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage, MdUpdate } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { epocaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select
-} from "../../../../components";
+  AccordionFilter, Button, CheckBox, Content, Input, Select,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IEpoca {
@@ -25,7 +29,7 @@ interface IEpoca {
   id_culture: number;
   name: string;
   status?: number;
-};
+}
 
 interface IFilter {
   filterStatus: object | any;
@@ -47,7 +51,9 @@ interface Idata {
   cultureId: number;
 }
 
-export default function Listagem({ allItems, itensPerPage, filterApplication, totalItems, cultureId }: Idata) {
+export default function Listagem({
+  allItems, itensPerPage, filterApplication, totalItems, cultureId,
+}: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -58,8 +64,8 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.tipo_epoca || { id: 0, table_preferences: "id,name,status" };
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.tipo_epoca || { id: 0, table_preferences: 'id,name,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [epoca, setEpoca] = useState<IEpoca[]>(() => allItems);
@@ -68,10 +74,16 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
   const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
-    { name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
-    { name: "CamposGerenciados[]", title: "Status", value: "status", defaultChecked: () => camposGerenciados.includes('status') }
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
@@ -90,13 +102,13 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch + "&id_culture=" + cultureId;
-      await epocaService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response) => {
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_culture=${cultureId}`;
+      await epocaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setEpoca(response.response);
         setTotalItems(response.total);
         setCurrentPage(0);
-      })
+      });
     },
   });
 
@@ -113,7 +125,7 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       data.status = 0;
     }
 
-    const index = epoca.findIndex(epoca => epoca.id === idItem);
+    const index = epoca.findIndex((epoca) => epoca.id === idItem);
 
     if (index === -1) {
       return;
@@ -132,31 +144,31 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       name,
       status,
     });
-  };
+  }
 
   function colums(camposGerenciados: any): any {
-    let ObjetCampos: any = camposGerenciados.split(',');
-    let arrOb: any = [];
+    const ObjetCampos: any = camposGerenciados.split(',');
+    const arrOb: any = [];
     Object.keys(ObjetCampos).forEach((item) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
-          title: "",
-          field: "id",
+          title: '',
+          field: 'id',
           width: 0,
           render: () => (
             colorStar === '#eba417' ? (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
                     onClick={() => setColorStar('')}
                   >
-                    <AiTwotoneStar size={25} color={'#eba417'} />
+                    <AiTwotoneStar size={25} color="#eba417" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className='h-10 flex'>
+              <div className="h-10 flex">
                 <div>
                   <button
                     className="w-full h-full flex items-center justify-center border-0"
@@ -168,39 +180,40 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
               </div>
             )
           ),
-        })
+        });
       }
 
       if (ObjetCampos[item] === 'id') {
-        arrOb.push({ title: "Código", field: "id", sorting: false })
+        arrOb.push({ title: 'Código', field: 'id', sorting: false });
       }
       if (ObjetCampos[item] === 'name') {
         arrOb.push({
           title: (
-            <div className='flex items-center'>
+            <div className="flex items-center">
               {arrowName}
-              <button className='font-medium text-gray-900' onClick={() => handleOrderName('name', orderName)}>
+              <button className="font-medium text-gray-900" onClick={() => handleOrderName('name', orderName)}>
                 Nome
               </button>
             </div>
           ),
-          field: "name",
-          sorting: false
+          field: 'name',
+          sorting: false,
         });
       }
 
       if (ObjetCampos[item] === 'status') {
         arrOb.push({
-          title: "Status",
-          field: "status",
+          title: 'Status',
+          field: 'status',
           sorting: false,
           searchable: false,
-          filterPlaceholder: "Filtrar por status",
+          filterPlaceholder: 'Filtrar por status',
           render: (rowData: IEpoca) => (
-            <div className='h-10 flex'>
+            <div className="h-10 flex">
               <div className="
                 h-10
-              ">
+              "
+              >
                 <Button
                   icon={<BiEdit size={16} />}
                   onClick={() => { }}
@@ -214,13 +227,11 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                 <div>
                   <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatus(
-                      rowData.id, {
+                    onClick={async () => await handleStatus(rowData.id, {
                       status: rowData.status,
-                      ...rowData
-                    }
-                    )}
-                    title={`Ativo`}
+                      ...rowData,
+                    })}
+                    title="Ativo"
                     bgColor="bg-green-600"
                     textColor="white"
                   />
@@ -229,37 +240,35 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                 <div>
                   <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatus(
-                      rowData.id, {
+                    onClick={async () => await handleStatus(rowData.id, {
                       status: rowData.status,
-                      ...rowData
-                    }
-                    )}
-                    title={`Inativo`}
+                      ...rowData,
+                    })}
+                    title="Inativo"
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
               )}
             </div>
-          )
-        })
+          ),
+        });
       }
     });
 
     return arrOb;
-  };
+  }
 
   async function getValuesColumns(): Promise<void> {
-    let els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
       if (els[i].checked) {
-        selecionados += els[i].value + ',';
+        selecionados += `${els[i].value},`;
       }
     }
-    let totalString = selecionados.length;
-    let campos = selecionados.substr(0, totalString - 1)
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
       await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 15 }).then((response) => {
         userLogado.preferences.tipo_epoca = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
@@ -274,7 +283,7 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  };
+  }
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -289,21 +298,19 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
 
     if (filter && typeof (filter) !== undefined) {
       if (typeOrder !== '') {
-        parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
-      if (typeOrder !== '') {
-        parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
-      } else {
-        parametersFilter = filter;
-      }
+      parametersFilter = filter;
     }
 
-    await epocaService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await epocaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setEpoca(response.response)
+        setEpoca(response.response);
       }
     });
 
@@ -318,22 +325,22 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
         setArrowName('');
       }
     }
-  };
+  }
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result) return;
 
-    const items = Array.from(genaratesProps);
+    const items = Array.from(generatesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
     setGeneratesProps(items);
-  };
+  }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes("paramSelect")) {
+    if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
@@ -341,9 +348,9 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       if (response.status === 200) {
         const newData = epoca.map((row) => {
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = 'Inativo' as any;
           } else {
-            row.status = "Ativo" as any;
+            row.status = 'Ativo' as any;
           }
 
           return row;
@@ -351,20 +358,20 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Época");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Época');
 
         // Buffer
-        let buf = XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx
-          type: "buffer",
+        const buf = XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", //xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Época.xlsx");
+        XLSX.writeFile(workBook, 'Época.xlsx');
       }
     });
   };
@@ -375,21 +382,21 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
     }
-  };
+  }
 
   async function handlePagination(): Promise<void> {
-    let skip = currentPage * Number(take);
-    let parametersFilter = "skip=" + skip + "&take=" + take;
+    const skip = currentPage * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = parametersFilter + "&" + filter;
+      parametersFilter = `${parametersFilter}&${filter}`;
     }
     await epocaService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setEpoca(response.response);
       }
     });
-  };
+  }
 
   useEffect(() => {
     handlePagination();
@@ -401,14 +408,15 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
       <Head>
         <title>Listagem de Épocas</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
-        ">
+        "
+        >
           <AccordionFilter title="Filtrar épocas">
-            <div className='w-full flex gap-2'>
+            <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
                   w-full
@@ -422,12 +430,13 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                   flex
                   justify-center
                   pb-2
-                ">
+                "
+                >
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map(id => id)} selected={'1'} />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map((id) => id)} selected="1" />
                   </div>
 
                   <div className="h-10 w-1/2 ml-4">
@@ -468,17 +477,17 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20
+                  zIndex: 20,
                 },
                 rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage
+                pageSize: itensPerPage,
               }}
               components={{
                 Toolbar: () => (
                   <div
-                    className='w-full max-h-96	
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -488,8 +497,9 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                     px-5
                     border-solid border-b
                     border-gray-200
-                  '>
-                    <div className='h-12'>
+                  "
+                  >
+                    <div className="h-12">
                       <Button
                         title="Cadastrar época"
                         value="Cadastrar época"
@@ -501,37 +511,42 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                       />
                     </div>
 
-                    <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-                    <div className='h-full flex items-center gap-2
-                    '>
+                    <div className="h-full flex items-center gap-2
+                    "
+                    >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId='characters'>
+                              <Droppable droppableId="characters">
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
                                         <Button
                                           value="Atualizar"
-                                          bgColor='bg-blue-600'
-                                          textColor='white'
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
                                           onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
-                                        genaratesProps.map((genarate, index) => (
-                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
                                             {(provided) => (
                                               <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                 <CheckBox
-                                                  name={genarate.name}
-                                                  title={genarate.title?.toString()}
-                                                  value={genarate.value}
-                                                  defaultChecked={camposGerenciados.includes(genarate.value)}
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -547,69 +562,65 @@ export default function Listagem({ allItems, itensPerPage, filterApplication, to
                           </AccordionFilter>
                         </div>
                       </div>
-                      <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
                 ),
                 Pagination: (props) => (
-                  <>
-                    <div
-                      className="flex
-                      h-20 
-                      gap-2 
+                  <div
+                    className="flex
+                      h-20
+                      gap-2
                       pr-2
-                      py-5 
+                      py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {
-                        Array(1).fill('').map((value, index) => (
-                          <>
-                            <Button
-                              key={index}
-                              onClick={() => setCurrentPage(index)}
-                              value={`${currentPage + 1}`}
-                              bgColor="bg-blue-600"
-                              textColor="white"
-                              disabled={true}
-                            />
-                          </>
-                        ))
-                      }
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
-                  </>
-                ) as any
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>
@@ -623,19 +634,19 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 15;
 
-  const token = req.cookies.token;
-  const cultureId = req.cookies.cultureId;
+  const { token } = req.cookies;
+  const { cultureId } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  const filterApplication = "filterStatus=1&id_culture=" + cultureId;
+  const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const epoca = await fetch(urlParameters.toString(), requestOptions);
@@ -649,7 +660,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      cultureId
+      cultureId,
     },
-  }
-}
+  };
+};

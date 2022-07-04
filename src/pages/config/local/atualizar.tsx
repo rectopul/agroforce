@@ -79,7 +79,7 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
-	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Nome de Unidade de Cultura", value: "name_unity_culture" },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year" },
@@ -272,7 +272,7 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
@@ -544,15 +544,15 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value as string)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value as string)}
 																								/>
 																							</li>
 																						)}

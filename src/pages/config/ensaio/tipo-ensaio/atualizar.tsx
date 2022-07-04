@@ -548,7 +548,7 @@ export default function AtualizarTipoEnsaio({
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-72">
                           <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-                            <DragDropContext onDragEnd={handleOnDragEnd()}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
                                 {
                                   (provided) => (
@@ -562,15 +562,15 @@ export default function AtualizarTipoEnsaio({
                                           value="Atualizar"
                                           bgColor="bg-blue-600"
                                           textColor="white"
-                                          onClick={getValuesColumns()}
+                                          onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
-                                        generatesProps.map((genarate, index) => (
+                                        generatesProps.map((generate, index) => (
                                           <Draggable
                                             key={index}
-                                            draggableId={String(genarate.title)}
+                                            draggableId={String(generate.title)}
                                             index={index}
                                           >
                                             {(dragProps) => (
@@ -582,12 +582,12 @@ export default function AtualizarTipoEnsaio({
                                                 ...dragProps.dragHandleProps}
                                               >
                                                 <CheckBox
-                                                  name={genarate.name}
-                                                  title={genarate.title?.toString()}
-                                                  value={genarate.value}
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
                                                   defaultChecked={
                                                     camposGerenciados.includes(
-                                                      genarate.value as string,
+                                                      generate.value as string,
                                                     )
                                                   }
                                                 />

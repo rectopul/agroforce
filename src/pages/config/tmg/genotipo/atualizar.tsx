@@ -151,7 +151,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 	const [orderList, setOrder] = useState<number>(0)
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('')
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false)
-	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Ano lote", value: "year" },
 		{ name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
@@ -351,7 +351,7 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 		setStatusAccordion(true)
 		if (!result) return
 
-		const items = Array.from(genaratesProps)
+		const items = Array.from(generatesProps)
 		const [reorderedItem] = items.splice(result.source.index, 1)
 		const index: number = Number(result.destination?.index)
 		items.splice(index, 0, reorderedItem)
@@ -757,15 +757,15 @@ export default function Atualizargenotipo({ allLote, totalItems, itensPerPage, f
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value as string)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value as string)}
 																								/>
 																							</li>
 																						)}
