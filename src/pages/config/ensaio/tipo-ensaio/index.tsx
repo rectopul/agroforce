@@ -78,7 +78,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: 'id,name,protocol_name,seeds,status' };
+  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: 'id,name,protocol_name,envelope,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
@@ -99,7 +99,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Nome do Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Quant. de sementes por envelope', value: 'seeds', defaultChecked: () => camposGerenciados.includes('seeds'),
+      name: 'CamposGerenciados[]', title: 'Quant. de sementes por envelope', value: 'envelope', defaultChecked: () => camposGerenciados.includes('envelope'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
@@ -111,8 +111,6 @@ export default function TipoEnsaio({
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -185,13 +183,14 @@ export default function TipoEnsaio({
   }
 
   async function handleStatus(id: number, status: any): Promise<void> {
+    let newStatus: any;
     if (status) {
-      status = 1;
+      newStatus = 1;
     } else {
-      status = 0;
+      newStatus = 0;
     }
 
-    await typeAssayService.update({ id, status });
+    await typeAssayService.update({ id, newStatus });
 
     const index = typeAssay.findIndex((typeAssayIndex) => typeAssayIndex.id === id);
 
@@ -201,12 +200,16 @@ export default function TipoEnsaio({
 
     setTypeAssay((oldUser) => {
       const copy = [...oldUser];
-      copy[index].status = status;
+      copy[index].status = newStatus;
       return copy;
     });
   }
 
   function headerTableFactory(name: any, title: string) {
+    console.log('name');
+    console.log(name);
+    console.log('title');
+    console.log(title);
     return {
       title: (
         <div className="flex items-center">
@@ -335,8 +338,8 @@ export default function TipoEnsaio({
       if (columnOrder[item] === 'protocol_name') {
         tableFields.push(headerTableFactory('Nome do Protocolo', 'protocol_name'));
       }
-      if (columnOrder[item] === 'seeds') {
-        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'seeds'));
+      if (columnOrder[item] === 'envelope') {
+        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope.seeds'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -345,10 +348,12 @@ export default function TipoEnsaio({
     return tableFields;
   }
 
+  const columns = colums(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -396,21 +401,17 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    let newFilter;
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${idCulture}`;
+      newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
     }
 
-    await typeAssayService.getAll(filterApplication).then((response) => {
+    await typeAssayService.getAll(newFilter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           const newRow = row;
-          newRow.status = (row.status === 0) ? row.status = 'Inativo' : row.status = 'Ativo';
+          newRow.status = (row.status === 0) ? 'Inativo' : 'Ativo';
           return newRow;
-        });
-
-        newData.map((item) => {
-          delete item.envelope;
-          return item;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -727,6 +728,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const response = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await response.json();
+
+  console.log('allItems');
+  console.log(allItems[0].envelope);
 
   return {
     props: {

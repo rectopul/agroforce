@@ -23,12 +23,13 @@ export class TypeAssayRepository {
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+    let order;
     if (orderBy) {
-      orderBy = JSON.parse(orderBy);
+      order = JSON.parse(orderBy);
     }
     const count = await prisma.type_assay.count({ where });
     const result: object | any = await prisma.type_assay.findMany({
-      select, skip, take, where, orderBy,
+      select, skip, take, where, orderBy: order,
     });
     result.total = count;
     return result;
