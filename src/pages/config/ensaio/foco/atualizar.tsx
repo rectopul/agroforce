@@ -1,34 +1,39 @@
 import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, ReactNode, useEffect } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
-import { RiFileExcel2Line } from "react-icons/ri";
+import { RiFileExcel2Line } from 'react-icons/ri';
 import { focoService } from 'src/services/foco.service';
-import MaterialTable from "material-table";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { AccordionFilter, CheckBox } from "src/components";
-import { userPreferencesService, groupService, } from "src/services";
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from "react-icons/fa";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
-import { ReactNode, useEffect } from "react";
+import MaterialTable from 'material-table';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import {
+	DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import {
+	BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { AccordionFilter, CheckBox } from 'src/components';
+import { userPreferencesService, groupService } from 'src/services';
+import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from 'react-icons/fa';
+import {
+	AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar,
+} from 'react-icons/ai';
 import * as XLSX from 'xlsx';
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import Swal from 'sweetalert2';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
 	Button,
 	Content,
 	Input,
-	Select
-} from "../../../../components";
+	Select,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { removeCookies, setCookies } from 'cookies-next';
 
 export interface IUpdateFoco {
 	id: number;
@@ -41,14 +46,14 @@ interface IData {
 	allItens: any;
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_foco: number;
 	id_safra: number;
 	foco: IUpdateFoco,
 	pageBeforeEdit: string | any
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -61,8 +66,9 @@ interface IFilter {
 	typeOrder: object | any;
 }
 
-
-export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, id_safra, pageBeforeEdit }: IData) {
+export default function Atualizar({
+	foco, allItens, totalItems, itensPerPage, filterApplication, id_foco, id_safra, pageBeforeEdit,
+}: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -76,7 +82,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	const router = useRouter();
 	const [checkInput, setCheckInput] = useState('text-black');
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
+	const userLogado = JSON.parse(localStorage.getItem('user') as string);
 	const culture = userLogado.userCulture.cultura_selecionada as string;
 
 	const formik = useFormik<IUpdateFoco>({
@@ -87,11 +93,10 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 			created_by: userLogado.id,
 		},
 		onSubmit: async (values) => {
-
-			validateInputs(values)
+			validateInputs(values);
 			if (!values.name) {
-				Swal.fire('Preencha todos os campos obrigatórios')
-				return
+				Swal.fire('Preencha todos os campos obrigatórios');
+				return;
 			}
 
 			await focoService.update({
@@ -104,7 +109,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 					Swal.fire('Foco atualizado com sucesso!');
 					router.back();
 				} else {
-					setCheckInput("text-red-600");
+					setCheckInput('text-red-600');
 					Swal.fire(response.message);
 				}
 			});
@@ -113,15 +118,15 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
 	function validateInputs(values: any) {
 		if (!values.name) {
-			let inputName: any = document.getElementById("name");
+			const inputName: any = document.getElementById('name');
 			inputName.style.borderColor = 'red';
 		} else {
-			let inputName: any = document.getElementById("name");
+			const inputName: any = document.getElementById('name');
 			inputName.style.borderColor = '';
 		}
 	}
 
-	const preferences = userLogado.preferences.group || { id: 0, table_preferences: "id,safra,name,group,status" };
+	const preferences = userLogado.preferences.group || { id: 0, table_preferences: 'id,safra,name,group,status' };
 	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
 	const [grupos, setGrupos] = useState<any>(() => allItens);
@@ -130,32 +135,31 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
-		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-		{ name: "CamposGerenciados[]", title: "Safra", value: "safra" },
-		{ name: "CamposGerenciados[]", title: "Grupo", value: "group" },
-		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+		{ name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+		{ name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
+		{ name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
+		{ name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const take: number = itensPerPage;
 	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
 	const pages = Math.ceil(total / take);
 
-
 	function headerTableFactory(name: any, title: string) {
 		return {
 			title: (
-				<div className='flex items-center'>
-					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+				<div className="flex items-center">
+					<button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
 						{name}
 					</button>
 				</div>
 			),
 			field: title,
-			sorting: false
-		}
+			sorting: false,
+		};
 	}
 
 	function idHeaderFactory() {
@@ -165,23 +169,23 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 					{arrowOrder}
 				</div>
 			),
-			field: "id",
+			field: 'id',
 			width: 0,
 			sorting: false,
 			render: () => (
 				colorStar === '#eba417' ? (
-					<div className='h-10 flex'>
+					<div className="h-10 flex">
 						<div>
 							<button
 								className="w-full h-full flex items-center justify-center border-0"
 								onClick={() => setColorStar('')}
 							>
-								<AiTwotoneStar size={25} color={'#eba417'} />
+								<AiTwotoneStar size={25} color="#eba417" />
 							</button>
 						</div>
 					</div>
 				) : (
-					<div className='h-10 flex'>
+					<div className="h-10 flex">
 						<div>
 							<button
 								className="w-full h-full flex items-center justify-center border-0"
@@ -193,23 +197,23 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 					</div>
 				)
 			),
-		}
+		};
 	}
 
 	function statusHeaderFactory() {
 		return {
-			title: "Status",
-			field: "group",
+			title: 'Status',
+			field: 'group',
 			sorting: false,
 			render: (rowData: any) => (
 				!rowData.npe.length ? (
-					<div className='h-10 flex'>
+					<div className="h-10 flex">
 						<div className="h-10">
 							<Button
 								icon={<BiEdit size={16} />}
 								onClick={() => {
-									setCookies("pageBeforeEdit", currentPage?.toString())
-									router.push(`grupo/atualizar?id=${rowData.id}`)
+									setCookies('pageBeforeEdit', currentPage?.toString());
+									router.push(`grupo/atualizar?id=${rowData.id}`);
 								}}
 								bgColor="bg-blue-600"
 								textColor="white"
@@ -217,12 +221,12 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 						</div>
 					</div>
 				) : (
-					<div className='h-10 flex'>
+					<div className="h-10 flex">
 						<div className="h-10">
 							<Button
 								icon={<BiEdit size={16} />}
-								title={'Grupo já associado a uma NPE'}
-								disabled={true}
+								title="Grupo já associado a uma NPE"
+								disabled
 								bgColor="bg-gray-600"
 								textColor="white"
 								onClick={() => { }}
@@ -231,7 +235,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 					</div>
 				)
 			),
-		}
+		};
 	}
 
 	function columnsOrder(camposGerenciados: string) {
@@ -240,7 +244,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
 		Object.keys(columnCampos).forEach((item, index) => {
 			if (columnCampos[index] === 'id') {
-				tableFields.push(idHeaderFactory())
+				tableFields.push(idHeaderFactory());
 			}
 			if (columnCampos[index] === 'safra') {
 				tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
@@ -253,7 +257,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 			}
 		});
 		return tableFields;
-	};
+	}
 
 	const columns = columnsOrder(camposGerenciados);
 
@@ -274,17 +278,15 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 			} else {
 				parametersFilter = filter;
 			}
+		} else if (typeOrder !== '') {
+			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${id_safra}&id_foco${id_foco}`;
 		} else {
-			if (typeOrder !== '') {
-				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${id_safra}&id_foco${id_foco}`;
-			} else {
-				parametersFilter = filter;
-			}
+			parametersFilter = filter;
 		}
 
 		await groupService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response: any) => {
 			if (response.status === 200) {
-				setGrupos(response.response)
+				setGrupos(response.response);
 			}
 		});
 
@@ -299,18 +301,18 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 				setArrowOrder('');
 			}
 		}
-	};
+	}
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
 			if (els[i].checked) {
-				selecionados += els[i].value + ',';
+				selecionados += `${els[i].value},`;
 			}
 		}
 		const totalString = selecionados.length;
-		const campos = selecionados.substr(0, totalString - 1)
+		const campos = selecionados.substr(0, totalString - 1);
 		if (preferences.id === 0) {
 			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 20 }).then((response) => {
 				userLogado.preferences.group = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
@@ -325,58 +327,58 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 
 		setStatusAccordion(false);
 		setCamposGerenciados(campos);
-	};
+	}
 
 	function handleOnDragEnd(result: DropResult): void {
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
-	};
+		setGeneratesProps(items);
+	}
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
+		if (!filterApplication.includes('paramSelect')) {
+			filterApplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
 		}
-		await groupService.getAll(filterAplication).then((response: any) => {
+		await groupService.getAll(filterApplication).then((response: any) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
-						row.status = "Inativo";
+						row.status = 'Inativo';
 					} else {
-						row.status = "Ativo";
+						row.status = 'Ativo';
 					}
 
 					return row;
 				});
 
 				newData.map((item: any) => {
-					item.foco = item.foco?.name
-					item.safra = item.safra?.safraName
-					return item
-				})
+					item.foco = item.foco?.name;
+					item.safra = item.safra?.safraName;
+					return item;
+				});
 
 				const workSheet = XLSX.utils.json_to_sheet(newData);
 				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, "group");
+				XLSX.utils.book_append_sheet(workBook, workSheet, 'group');
 
 				// Buffer
-				let buf = XLSX.write(workBook, {
-					bookType: "xlsx", //xlsx
-					type: "buffer",
+				const buf = XLSX.write(workBook, {
+					bookType: 'xlsx', // xlsx
+					type: 'buffer',
 				});
 				// Binary
 				XLSX.write(workBook, {
-					bookType: "xlsx", //xlsx
-					type: "binary",
+					bookType: 'xlsx', // xlsx
+					type: 'binary',
 				});
 				// Download
-				XLSX.writeFile(workBook, "grupos.xlsx");
+				XLSX.writeFile(workBook, 'grupos.xlsx');
 			}
 		});
 	};
@@ -387,24 +389,24 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		} else if (currentPage >= pages) {
 			setCurrentPage(pages - 1);
 		}
-	};
+	}
 
 	async function handlePagination(): Promise<void> {
-		let skip = currentPage * Number(take);
-		let parametersFilter = "skip=" + skip + "&take=" + take
+		const skip = currentPage * Number(take);
+		let parametersFilter = `skip=${skip}&take=${take}`;
 
 		if (filter) {
-			parametersFilter = parametersFilter + "&" + filter;
+			parametersFilter = `${parametersFilter}&${filter}`;
 		}
 		await groupService.getAll(parametersFilter).then((response: any) => {
 			if (response.status === 200) {
 				setGrupos(response.response);
 			}
 		});
-	};
+	}
 
 	useEffect(() => {
-		handlePagination(); ''
+		handlePagination(); '';
 		handleTotalPages();
 	}, [currentPage]);
 
@@ -414,7 +416,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 				<title>Atualizar foco</title>
 			</Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+			<Content contentHeader={tabsDropDowns} moduloActive="config">
 				<form
 					className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -423,12 +425,13 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 					<h1 className="text-2xl">Atualizar foco</h1>
 
 					<div className="w-1/2
-              flex 
+              flex
               justify-around
               gap-6
               mt-4
               mb-4
-          ">
+          "
+					>
 
 						<div className="w-full">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
@@ -453,7 +456,8 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
               gap-3
               justify-center
               mt-10
-            ">
+            "
+					>
 						<div className="w-30">
 							<Button
 								type="button"
@@ -480,7 +484,8 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
           flex flex-col
           items-start
           gap-8
-        ">
+        "
+				>
 
 					<div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
 						<MaterialTable
@@ -490,16 +495,16 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 							options={{
 								showTitle: false,
 								headerStyle: {
-									zIndex: 20
+									zIndex: 20,
 								},
 								search: false,
 								filtering: false,
-								pageSize: itensPerPage
+								pageSize: itensPerPage,
 							}}
 							components={{
 								Toolbar: () => (
 									<div
-										className='w-full max-h-96	
+										className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -509,48 +514,53 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
                     px-5
                     border-solid border-b
                     border-gray-200
-                  '>
-										<div className='h-12'>
+                  "
+									>
+										<div className="h-12">
 											<Button
 												title="Cadastrar grupo"
 												value="Cadastrar grupo"
 												bgColor="bg-blue-600"
 												textColor="white"
-												onClick={() => { router.push(`grupo/cadastro?id_foco=${id_foco}`) }}
+												onClick={() => { router.push(`grupo/cadastro?id_foco=${id_foco}`); }}
 												icon={<FaSortAmountUpAlt size={20} />}
 											/>
 										</div>
 
-										<strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
+										<strong className="text-blue-600">
+											Total registrado:
+											{' '}
+											{itemsTotal}
+										</strong>
 
-										<div className='h-full flex items-center gap-2'>
+										<div className="h-full flex items-center gap-2">
 											<div className="border-solid border-2 border-blue-600 rounded">
 												<div className="w-72">
-													<AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+													<AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
 														<DragDropContext onDragEnd={handleOnDragEnd}>
-															<Droppable droppableId='characters'>
+															<Droppable droppableId="characters">
 																{
 																	(provided) => (
 																		<ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
 																			<div className="h-8 mb-3">
 																				<Button
 																					value="Atualizar"
-																					bgColor='bg-blue-600'
-																					textColor='white'
-																					onClick={getValuesComluns}
+																					bgColor="bg-blue-600"
+																					textColor="white"
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value as string)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value as string)}
 																								/>
 																							</li>
 																						)}
@@ -567,69 +577,65 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 												</div>
 											</div>
 
-											<div className='h-12 flex items-center justify-center w-full'>
-												<Button title="Exportar planilha de grupos" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+											<div className="h-12 flex items-center justify-center w-full">
+												<Button title="Exportar planilha de grupos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
 											</div>
 										</div>
 									</div>
 								),
 								Pagination: (props) => (
-									<>
-										<div
-											className="flex
-                      h-20 
-                      gap-2 
+									<div
+										className="flex
+                      h-20
+                      gap-2
                       pr-2
-                      py-5 
+                      py-5
                       bg-gray-50
                     "
-											{...props}
-										>
-											<Button
-												onClick={() => setCurrentPage(currentPage - 10)}
-												bgColor="bg-blue-600"
-												textColor="white"
-												icon={<MdFirstPage size={18} />}
-												disabled={currentPage <= 1}
-											/>
-											<Button
-												onClick={() => setCurrentPage(currentPage - 1)}
-												bgColor="bg-blue-600"
-												textColor="white"
-												icon={<BiLeftArrow size={15} />}
-												disabled={currentPage <= 0}
-											/>
-											{
-												Array(1).fill('').map((value, index) => (
-													<>
-														<Button
-															key={index}
-															onClick={() => setCurrentPage(index)}
-															value={`${currentPage + 1}`}
-															bgColor="bg-blue-600"
-															textColor="white"
-															disabled={true}
-														/>
-													</>
-												))
-											}
-											<Button
-												onClick={() => setCurrentPage(currentPage + 1)}
-												bgColor="bg-blue-600"
-												textColor="white"
-												icon={<BiRightArrow size={15} />}
-												disabled={currentPage + 1 >= pages}
-											/>
-											<Button
-												onClick={() => setCurrentPage(currentPage + 10)}
-												bgColor="bg-blue-600"
-												textColor="white"
-												icon={<MdLastPage size={18} />}
-												disabled={currentPage + 1 >= pages}
-											/>
-										</div>
-									</>
-								) as any
+										{...props}
+									>
+										<Button
+											onClick={() => setCurrentPage(currentPage - 10)}
+											bgColor="bg-blue-600"
+											textColor="white"
+											icon={<MdFirstPage size={18} />}
+											disabled={currentPage <= 1}
+										/>
+										<Button
+											onClick={() => setCurrentPage(currentPage - 1)}
+											bgColor="bg-blue-600"
+											textColor="white"
+											icon={<BiLeftArrow size={15} />}
+											disabled={currentPage <= 0}
+										/>
+										{
+											Array(1).fill('').map((value, index) => (
+												<Button
+													key={index}
+													onClick={() => setCurrentPage(index)}
+													value={`${currentPage + 1}`}
+													bgColor="bg-blue-600"
+													textColor="white"
+													disabled
+												/>
+											))
+										}
+										<Button
+											onClick={() => setCurrentPage(currentPage + 1)}
+											bgColor="bg-blue-600"
+											textColor="white"
+											icon={<BiRightArrow size={15} />}
+											disabled={currentPage + 1 >= pages}
+										/>
+										<Button
+											onClick={() => setCurrentPage(currentPage + 10)}
+											bgColor="bg-blue-600"
+											textColor="white"
+											icon={<MdLastPage size={18} />}
+											disabled={currentPage + 1 >= pages}
+										/>
+									</div>
+								) as any,
 							}}
 						/>
 					</div>
@@ -643,18 +649,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
 
-	const token = req.cookies.token;
-	const id_safra = req.cookies.safraId
+	const { token } = req.cookies;
+	const id_safra = req.cookies.safraId;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` }
+		headers: { Authorization: `Bearer ${token}` },
 	};
 
 	const id_foco = Number(query.id);
-	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_foco=${id_foco}`;
+	const filterApplication = `filterStatus=1&id_safra=${id_safra}&id_foco=${id_foco}`;
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
@@ -663,7 +669,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 	const grupos = await fetch(`${baseUrlGrupo}?id_foco=${id_foco}`, requestOptions);
 	const { response: allItens, total: totalItems } = await grupos.json();
 
-	const focos = await fetch(`${baseUrlShow}/` + id_foco, requestOptions);
+	const focos = await fetch(`${baseUrlShow}/${id_foco}`, requestOptions);
 	const foco = await focos.json();
 
 	return {
@@ -671,11 +677,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 			allItens,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_foco,
 			id_safra,
 			foco,
-			pageBeforeEdit
-		}
-	}
-}
+			pageBeforeEdit,
+		},
+	};
+};

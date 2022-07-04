@@ -81,13 +81,15 @@ model safra {
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe                 npe[]
-  genotipo            genotipo[]
-  quadra              quadra[]
-  group               group[]
-  lote                lote[]
-  type_assay_children type_assay_children[]
-  experiment          experiment[]
+  npe                npe[]
+  genotipo           genotipo[]
+  quadra             quadra[]
+  group              group[]
+  lote               lote[]
+  envelope           envelope[]
+  experiment         experiment[]
+  assay_list         assay_list[]
+  genotype_treatment genotype_treatment[]
 }
 
 model uf {
@@ -280,11 +282,11 @@ model disparos {
 }
 
 model genotipo {
-  id                  Int        @id @default(autoincrement())
+  id                  Int                  @id @default(autoincrement())
   id_culture          Int
   id_tecnologia       Int
   id_s1               Int
-  id_dados            String     @unique()
+  id_dados            String               @unique()
   name_genotipo       String
   name_main           String?
   name_public         String?
@@ -292,8 +294,8 @@ model genotipo {
   name_alter          String?
   elit_name           String?
   type                String?
-  gmr                 Decimal?   @db.Decimal(12, 2)
-  bgm                 Decimal?   @db.Decimal(12, 2)
+  gmr                 Decimal?             @db.Decimal(12, 2)
+  bgm                 Decimal?             @db.Decimal(12, 2)
   cruza               String?
   progenitor_f_direto String?
   progenitor_m_direto String?
@@ -301,15 +303,16 @@ model genotipo {
   progenitor_m_origem String?
   progenitores_origem String?
   parentesco_completo String?
-  status              Int        @default(1)
+  status              Int                  @default(1)
   created_by          Int
-  created_at          DateTime   @default(now())
-  dt_import           DateTime   @default(now())
-  culture             culture    @relation(fields: [id_culture], references: [id])
-  tecnologia          tecnologia @relation(fields: [id_tecnologia], references: [id])
+  created_at          DateTime             @default(now())
+  dt_import           DateTime             @default(now())
+  culture             culture              @relation(fields: [id_culture], references: [id])
+  tecnologia          tecnologia           @relation(fields: [id_tecnologia], references: [id])
   lote                lote[]
-  safra               safra?     @relation(fields: [safraId], references: [id])
+  safra               safra?               @relation(fields: [safraId], references: [id])
   safraId             Int?
+  genotype_treatment  genotype_treatment[]
 }
 
 model delineamento {
@@ -338,6 +341,7 @@ model foco {
   culture    culture      @relation(fields: [id_culture], references: [id])
   group      group[]
   experiment experiment[]
+  assay_list assay_list[]
 }
 
 model group {
@@ -355,20 +359,22 @@ model group {
 }
 
 model type_assay {
-  id         Int       @id @default(autoincrement())
-  id_culture Int
-  name       String
-  status     Int       @default(1)
-  created_by Int
-  created_at DateTime? @default(now())
+  id            Int       @id @default(autoincrement())
+  id_culture    Int
+  name          String
+  protocol_name String
+  status        Int       @default(1)
+  created_by    Int
+  created_at    DateTime? @default(now())
 
-  npe                 npe[]
-  culture             culture               @relation(fields: [id_culture], references: [id])
-  type_assay_children type_assay_children[]
-  experiment          experiment[]
+  npe        npe[]
+  culture    culture      @relation(fields: [id_culture], references: [id])
+  envelope   envelope[]
+  experiment experiment[]
+  assay_list assay_list[]
 }
 
-model type_assay_children {
+model envelope {
   id            Int       @id @default(autoincrement())
   id_safra      Int
   id_type_assay Int
@@ -396,6 +402,7 @@ model tecnologia {
   genotipo   genotipo[]
   culture    culture      @relation(fields: [id_culture], references: [id])
   experiment experiment[]
+  assay_list assay_list[]
 }
 
 model lote {
@@ -414,8 +421,9 @@ model lote {
   created_by     Int
   created_at     DateTime @default(now())
 
-  genotipo genotipo @relation(fields: [id_genotipo], references: [id])
-  safra    safra    @relation(fields: [id_safra], references: [id])
+  genotipo           genotipo             @relation(fields: [id_genotipo], references: [id])
+  safra              safra                @relation(fields: [id_safra], references: [id])
+  genotype_treatment genotype_treatment[]
 }
 
 model epoca {
@@ -531,4 +539,41 @@ model log_import {
   updated_at DateTime? @default(now())
 
   user user @relation(fields: [user_id], references: [id])
+}
+
+model assay_list {
+  id            Int    @id @default(autoincrement())
+  id_safra      Int
+  id_foco       Int
+  id_type_assay Int
+  id_tecnologia Int
+  gli           String @unique
+  period        Int
+  protocol_name String
+  bgm           Int
+  project       String
+  status        String
+
+  safra              safra                @relation(fields: [id_safra], references: [id])
+  foco               foco                 @relation(fields: [id_foco], references: [id])
+  type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
+  tecnologia         tecnologia           @relation(fields: [id_tecnologia], references: [id])
+  genotype_treatment genotype_treatment[]
+}
+
+model genotype_treatment {
+  id                Int    @id @default(autoincrement())
+  id_safra          Int
+  id_assay_list     Int
+  id_genotipo       Int
+  id_lote           Int
+  treatments_number Int
+  status            String
+  nca               String
+  comments          String
+
+  safra      safra      @relation(fields: [id_safra], references: [id])
+  assay_list assay_list @relation(fields: [id_assay_list], references: [id])
+  genotipo   genotipo   @relation(fields: [id_genotipo], references: [id])
+  lote       lote       @relation(fields: [id_lote], references: [id])
 }

@@ -41,7 +41,7 @@ export interface IGenotipos {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -51,14 +51,14 @@ interface IData {
 	allGenotipos: IGenotipos[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_culture: number;
 	id_safra: number;
 	pageBeforeEdit: string | any;
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterAplication, id_culture, id_safra, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allGenotipos, totalItems, itensPerPage, filterApplication, id_culture, id_safra, pageBeforeEdit, filterBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -80,7 +80,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
 		{ name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'name_genotipo' },
 		{ name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
@@ -103,7 +103,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		{ name: 'CamposGerenciados[]', title: 'Status', value: 'status' }
 	]);
 
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -348,7 +348,7 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox']");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -378,20 +378,20 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	}
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await genotipoService.getAll(filterAplication).then((response) => {
+		await genotipoService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = genotipos.map((row: any) => {
 					if (row.status === 0) {
@@ -573,20 +573,20 @@ export default function Listagem({ allGenotipos, totalItems, itensPerPage, filte
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(String(genarate.value))}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(String(generate.value))}
 																								/>
 																							</li>
 																						)}
@@ -698,7 +698,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
 	urlParameters.search = new URLSearchParams(param).toString();
 
-	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+	const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
 	const requestOptions = {
 		method: 'GET',
 		credentials: 'include',
@@ -713,7 +713,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allGenotipos,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_culture,
 			id_safra,
 			pageBeforeEdit,

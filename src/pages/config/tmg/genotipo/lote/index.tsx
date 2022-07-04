@@ -35,7 +35,7 @@ export interface LoteGenotipo {
   status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
@@ -45,11 +45,11 @@ interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
   itensPerPage: number;
-  filterAplication: object | any;
+  filterApplication: object | any;
   id_genotipo: number;
 }
 
-export default function Listagem({ allLote, totalItems, itensPerPage, filterAplication, id_genotipo }: IData) {
+export default function Listagem({ allLote, totalItems, itensPerPage, filterApplication, id_genotipo }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -71,14 +71,14 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
   const [orderName, setOrderName] = useState<number>(0);
   const [arrowName, setArrowName] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Genealógia", value: "genealogy" },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Volume", value: "volume" },
     { name: "CamposGerenciados[]", title: "Status", value: "status" },
   ]);
-  const [filter, setFilter] = useState<any>(filterAplication);
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
@@ -265,7 +265,7 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     return arrOb;
   };
 
-  async function getValuesComluns(): Promise<void> {
+  async function getValuesColumns(): Promise<void> {
     let els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i++) {
@@ -339,20 +339,20 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
     setStatusAccordion(true);
     if (!result) return;
 
-    const items = Array.from(genaratesProps);
+    const items = Array.from(generatesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
-    setGenaratesProps(items);
+    setGeneratesProps(items);
   };
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterAplication.includes("paramSelect")) {
-      filterAplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
+    if (!filterApplication.includes("paramSelect")) {
+      filterApplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
 
-    await loteService.getAll(filterAplication).then((response) => {
+    await loteService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
@@ -527,20 +527,20 @@ export default function Listagem({ allLote, totalItems, itensPerPage, filterApli
                                           value="Atualizar"
                                           bgColor='bg-blue-600'
                                           textColor='white'
-                                          onClick={getValuesComluns}
+                                          onClick={getValuesColumns}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
-                                        genaratesProps.map((genarate, index) => (
-                                          <Draggable key={index} draggableId={String(genarate.title)} index={index}>
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
                                             {(provided) => (
                                               <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                 <CheckBox
-                                                  name={genarate.name}
-                                                  title={genarate.title?.toString()}
-                                                  value={genarate.value}
-                                                  defaultChecked={camposGerenciados.includes(genarate.value as string)}
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
                                                 />
                                               </li>
                                             )}
@@ -637,7 +637,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
 
   let param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  let filterAplication = "filterStatus=1";
+  let filterApplication = "filterStatus=1";
   const urlParameters: any = new URL(baseUrl);
 
   urlParameters.search = new URLSearchParams(param).toString();
@@ -661,7 +661,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       allLote,
       totalItems,
       itensPerPage,
-      filterAplication,
+      filterApplication,
       id_genotipo
     },
   }

@@ -1,19 +1,21 @@
+
 import { NextApiRequest, NextApiResponse } from 'next';
-import { UnidadeCulturaController } from '../../../controllers/unidade-cultura.controller';
+import { GenotypeTreatmentController } from '../../../controllers/genotype-treatment.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const unidadeCulturaController = new UnidadeCulturaController();
+	const genotypeTreatmentController = new GenotypeTreatmentController();
 	const { id } = req.query;
+
 	switch (req.method) {
 		case 'GET':
-			const result = await unidadeCulturaController.getOne({ id: Number(id) });
-			res.status(200).json(result);
+			const result = await genotypeTreatmentController.getOne(Number(id));
+			res.status(200).json(result.response);
 			break
 		case 'PUT':
-			const resultPut = await unidadeCulturaController.update(req.body);
+			const resultPut = await genotypeTreatmentController.update(req.body);
 			res.status(200).json(resultPut);
 			break
 		default:

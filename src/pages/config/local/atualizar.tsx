@@ -27,14 +27,14 @@ export interface IData {
 	allCultureUnity: any;
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_local: number;
 	id_safra: number;
 	local: object | any,
 	pageBeforeEdit: string | any
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -53,7 +53,7 @@ interface IUpdateLocal {
 	status: Number;
 };
 
-export default function AtualizarLocal({ local, allCultureUnity, totalItems, itensPerPage, filterAplication, id_local, id_safra, pageBeforeEdit }: IData) {
+export default function AtualizarLocal({ local, allCultureUnity, totalItems, itensPerPage, filterApplication, id_local, id_safra, pageBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns('config');
@@ -77,9 +77,9 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Nome de Unidade de Cultura", value: "name_unity_culture" },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year" },
@@ -241,7 +241,7 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -272,18 +272,18 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados},foco&id_local=${id_local}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados},foco&id_local=${id_local}`;
 		}
-		await unidadeCulturaService.getAll(filterAplication).then((response) => {
+		await unidadeCulturaService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
@@ -539,20 +539,20 @@ export default function AtualizarLocal({ local, allCultureUnity, totalItems, ite
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value as string)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value as string)}
 																								/>
 																							</li>
 																						)}
@@ -665,7 +665,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/local`;
 	const responseLocal = await fetch(`${baseUrlShow}/` + query.id, requestOptions);
 
-	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_local=${id_local}`;
+	const filterApplication = `filterStatus=1&id_safra=${id_safra}&id_local=${id_local}`;
 
 
 	const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
@@ -680,7 +680,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 			allCultureUnity,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_local,
 			id_safra,
 			local,

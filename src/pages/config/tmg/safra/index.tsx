@@ -40,7 +40,7 @@ interface ISafra {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -49,13 +49,13 @@ interface IData {
 	allSafras: ISafra[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	cultureId: number;
 	pageBeforeEdit: string | any;
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allSafras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ allSafras, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -77,7 +77,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Safra", value: "safraName" },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year" },
@@ -85,7 +85,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 		{ name: "CamposGerenciados[]", title: "Período ideal do fim do plantio", value: "plantingEndTime" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -344,7 +344,7 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -374,20 +374,20 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
 		}
 
-		await safraService.getAll(filterAplication).then((response) => {
+		await safraService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = safras.map((row) => {
 					if (row.status === 0) {
@@ -640,20 +640,20 @@ export default function Listagem({ allSafras, totalItems, itensPerPage, filterAp
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value as string)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value as string)}
 																								/>
 																							</li>
 																						)}
@@ -754,7 +754,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
+	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit + "&id_culture=" + cultureId : "filterStatus=1&id_culture=" + cultureId;
 
 	removeCookies('filterBeforeEdit', { req, res });
 
@@ -780,7 +780,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allSafras,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			cultureId,
 			pageBeforeEdit,
 			filterBeforeEdit

@@ -48,7 +48,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -58,12 +58,12 @@ interface Idata {
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ locais, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ locais, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 	const tabsDropDowns = TabsDropDowns('config');
 	tabsDropDowns.map((tab) => (
@@ -81,9 +81,9 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
 		{ name: "CamposGerenciados[]", title: "Nome do L. de Cult.", value: "name_local_culture", defaultChecked: () => camposGerenciados.includes('name_local_culture') },
 		{ name: "CamposGerenciados[]", title: "Rótulo", value: "label", defaultChecked: () => camposGerenciados.includes('label') },
@@ -353,7 +353,7 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -413,20 +413,20 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await localService.getAll(filterAplication).then((response) => {
+		await localService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
@@ -621,20 +621,20 @@ export default function Listagem({ locais, itensPerPage, filterAplication, total
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(genarate.value)}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(generate.value)}
 																								/>
 																							</li>
 																						)}
@@ -732,7 +732,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 	const token = req.cookies.token;
 
 	removeCookies('filterBeforeEdit', { req, res });
@@ -759,7 +759,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			locais,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			pageBeforeEdit,
 			filterBeforeEdit
 		},

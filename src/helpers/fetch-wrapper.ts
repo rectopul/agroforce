@@ -4,70 +4,6 @@ import { userService } from '../services';
 
 const { publicRuntimeConfig } = getConfig();
 
-export const fetchWrapper = {
-  get,
-  post,
-  put,
-  delete: _delete
-};
-
-async function get(url: any, params: any) {
-  const urlParameters: any = new URL(url);
-  urlParameters.search = new URLSearchParams(params).toString();
-  const requestOptions: any = {
-    method: 'GET',
-    credentials: 'include',
-    headers: authHeader(url)
-  };
-  const response = await fetch(urlParameters, requestOptions);
-  return handleResponse(response);
-}
-
-async function post(url: any, body: any) {
-  const requestOptions: object | any = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
-    credentials: 'include',
-    body: JSON.stringify(body)
-  };
-  const response = await fetch(url, requestOptions);
-  return handleResponse(response);
-}
-
-async function put(url: any, body: any) {
-  const requestOptions: object | any = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
-    body: JSON.stringify(body)
-  };
-  const response = await fetch(url, requestOptions);
-  return handleResponse(response);
-}
-
-// prefixed with underscored because delete is a reserved word in javascript
-async function _delete(url: string | any) {
-  const requestOptions: object | any = {
-    method: 'DELETE',
-    headers: authHeader(url)
-  };
-  const response = await fetch(url, requestOptions);
-  return handleResponse(response);
-}
-
-// helper functions
-
-function authHeader(url: string | any) {
-  // return auth header with jwt if user is logged in and request is to the api url
-  const user = userService.userValue;
-  const isLoggedIn = user && user.token;
-  const isApiUrl = url.startsWith(publicRuntimeConfig.apiUrl);
-  if (isLoggedIn && isApiUrl) {
-    return { Authorization: `Bearer ${user.token}` };
-  } else {
-    return {};
-  }
-}
-
 function handleResponse(response: string | any) {
   return response.text().then((text: string) => {
     const data = text && JSON.parse(text);
@@ -84,3 +20,67 @@ function handleResponse(response: string | any) {
     return data;
   });
 }
+
+function authHeader(url: string | any) {
+  // return auth header with jwt if user is logged in and request is to the api url
+  const user = userService.userValue;
+  const isLoggedIn = user && user.token;
+  const isApiUrl = url.startsWith(publicRuntimeConfig.apiUrl);
+  if (isLoggedIn && isApiUrl) {
+    return { Authorization: `Bearer ${user.token}` };
+  }
+  return {};
+}
+
+async function get(url: any, params: any) {
+  const urlParameters: any = new URL(url);
+  urlParameters.search = new URLSearchParams(params).toString();
+  const requestOptions: any = {
+    method: 'GET',
+    credentials: 'include',
+    headers: authHeader(url),
+  };
+  const response = await fetch(urlParameters, requestOptions);
+  return handleResponse(response);
+}
+
+async function post(url: any, body: any) {
+  const requestOptions: object | any = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
+    credentials: 'include',
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(url, requestOptions);
+  return handleResponse(response);
+}
+
+async function put(url: any, body: any) {
+  const requestOptions: object | any = {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(url, requestOptions);
+  return handleResponse(response);
+}
+
+// prefixed with underscored because delete is a reserved word in javascript
+async function deleted(url: any, body: any) {
+  const requestOptions: object | any = {
+    method: 'DELETE',
+    headers: authHeader(url),
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(url, requestOptions);
+  return handleResponse(response);
+}
+
+// helper functions
+
+export const fetchWrapper = {
+  get,
+  post,
+  put,
+  deleted,
+};

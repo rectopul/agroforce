@@ -41,7 +41,7 @@ export interface IQuadra {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -51,13 +51,13 @@ interface IData {
 	quadras: IQuadra[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	cultureId: number;
 	pageBeforeEdit: string | any;
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ quadras, totalItems, itensPerPage, filterAplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
+export default function Listagem({ quadras, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -79,7 +79,7 @@ export default function Listagem({ quadras, totalItems, itensPerPage, filterApli
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Local Preparo", value: "local_preparo" },
 		{ name: "CamposGerenciados[]", title: "Código Quadra", value: "cod_quadra" },
@@ -87,7 +87,7 @@ export default function Listagem({ quadras, totalItems, itensPerPage, filterApli
 		{ name: "CamposGerenciados[]", title: "Esquema", value: "esquema" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" },
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -357,7 +357,7 @@ export default function Listagem({ quadras, totalItems, itensPerPage, filterApli
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox']");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -387,20 +387,20 @@ export default function Listagem({ quadras, totalItems, itensPerPage, filterApli
 		setStatusAccordion(true);
 		if (!result) return;
 
-		const items = Array.from(genaratesProps);
+		const items = Array.from(generatesProps);
 		const [reorderedItem] = items.splice(result.source.index, 1);
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await quadraService.getAll(filterAplication).then((response) => {
+		await quadraService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = quadra.map((row) => {
 					if (row.status === 0) {
@@ -578,20 +578,20 @@ export default function Listagem({ quadras, totalItems, itensPerPage, filterApli
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
 																			{
-																				genaratesProps.map((genarate, index) => (
-																					<Draggable key={index} draggableId={String(genarate.title)} index={index}>
+																				generatesProps.map((generate, index) => (
+																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
 																						{(provided) => (
 																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 																								<CheckBox
-																									name={genarate.name}
-																									title={genarate.title?.toString()}
-																									value={genarate.value}
-																									defaultChecked={camposGerenciados.includes(String(genarate.value))}
+																									name={generate.name}
+																									title={generate.title?.toString()}
+																									value={generate.value}
+																									defaultChecked={camposGerenciados.includes(String(generate.value))}
 																								/>
 																							</li>
 																						)}
@@ -696,7 +696,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	removeCookies('filterBeforeEdit', { req, res });
 	removeCookies('pageBeforeEdit', { req, res });
 
-	const filterAplication = "filterStatus=1&id_culture=" + cultureId;
+	const filterApplication = "filterStatus=1&id_culture=" + cultureId;
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
@@ -719,7 +719,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			quadras,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			cultureId,
 			pageBeforeEdit,
 			filterBeforeEdit

@@ -1,6 +1,6 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import {SafraController} from '../../../controllers/safra.controller';
+import { SafraController } from '../../../controllers/safra.controller';
 import { apiHandler } from '../../../helpers/api';
 
 /**
@@ -12,19 +12,19 @@ import { apiHandler } from '../../../helpers/api';
  *       200:
  *         description: safras
 */
-export default  apiHandler(handler);
+export default apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const Controller =  new SafraController();
+  const Controller = new SafraController();
   const { id } = req.query;
 
   switch (req.method) {
     case 'GET':
-        const Result = await Controller.getOneSafra(Number(id));
-        res.status(Result.status).json(Result.response);
+      const Result = await Controller.getOneSafra(Number(id));
+      res.status(200).json(Result.response);
       break
     case 'PUT':
-      let resultPut = await Controller.updateSafra(req.body);  
+      let resultPut = await Controller.updateSafra(req.body);
       res.status(200).json(resultPut);
       break
     default:
