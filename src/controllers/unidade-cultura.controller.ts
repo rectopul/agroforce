@@ -9,51 +9,6 @@ export class UnidadeCulturaController {
 
 	unidadeCulturaRepository = new UnidadeCulturaRepository();
 
-	async getOne({ id }: any) {
-		try {
-			const response = await this.unidadeCulturaRepository.findById(id);
-
-			if (!response) throw new Error('Unidade de cultura não encontrada');
-
-			return { status: 200, response: response };
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'getOne', error.message)
-			throw new Error("[Controller] - getOne Unidade Cultura erro")
-		}
-	}
-
-	async create(data: any) {
-		try {
-			const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
-
-			if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
-
-			await this.unidadeCulturaRepository.create(data);
-
-			return { status: 201, message: 'Unidade de cultura cadastrada' };
-
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'Create', error.message)
-			throw new Error("[Controller] - Create Unidade Cultura erro")
-		}
-	}
-
-	async update(data: any) {
-		try {
-
-			const unidadeCultura: any = await this.unidadeCulturaRepository.findById(data.id);
-
-			if (!unidadeCultura) return { status: 400, message: 'Unidade de cultura não existente' };
-
-			await this.unidadeCulturaRepository.update(data.id, data);
-
-			return { status: 200, message: 'Unidade de cultura atualizado' };
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'Update', error.message)
-			throw new Error("[Controller] - Update Unidade Cultura erro")
-		}
-	}
-
 	async getAll(options: any) {
 		const parameters: object | any = {};
 		let orderBy: object | any;
@@ -154,6 +109,51 @@ export class UnidadeCulturaController {
 		} catch (error: any) {
 			handleError('Unidade cultura controller', 'GetAll', error.message)
 			throw new Error("[Controller] - GetAll Unidade Cultura erro")
+		}
+	}
+
+	async getOne({ id }: any) {
+		try {
+			const response = await this.unidadeCulturaRepository.findById(id);
+
+			if (!response) throw new Error('Unidade de cultura não encontrada');
+
+			return { status: 200, response: response };
+		} catch (error: any) {
+			handleError('Unidade cultura controller', 'getOne', error.message)
+			throw new Error("[Controller] - getOne Unidade Cultura erro")
+		}
+	}
+
+	async create(data: any) {
+		try {
+			const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
+
+			if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
+
+			await this.unidadeCulturaRepository.create(data);
+
+			return { status: 201, message: 'Unidade de cultura cadastrada' };
+
+		} catch (error: any) {
+			handleError('Unidade cultura controller', 'Create', error.message)
+			throw new Error("[Controller] - Create Unidade Cultura erro")
+		}
+	}
+
+	async update(data: any) {
+		try {
+
+			const unidadeCultura: any = await this.unidadeCulturaRepository.findById(data.id);
+
+			if (!unidadeCultura) return { status: 400, message: 'Unidade de cultura não existente' };
+
+			await this.unidadeCulturaRepository.update(data.id, data);
+
+			return { status: 200, message: 'Unidade de cultura atualizado' };
+		} catch (error: any) {
+			handleError('Unidade cultura controller', 'Update', error.message)
+			throw new Error("[Controller] - Update Unidade Cultura erro")
 		}
 	}
 }
