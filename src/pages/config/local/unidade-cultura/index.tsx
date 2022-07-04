@@ -51,7 +51,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -61,12 +61,12 @@ interface Idata {
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allCultureUnity, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 	const tabsDropDowns = TabsDropDowns('config');
 	tabsDropDowns.map((tab) => (
@@ -85,9 +85,9 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
 		{ name: "CamposGerenciados[]", title: "Nome un. cultura", value: "name_unity_culture", defaultChecked: () => camposGerenciados.includes('name_unity_culture') },
 		{ name: "CamposGerenciados[]", title: "Ano", value: "year", defaultChecked: () => camposGerenciados.includes('year') },
@@ -293,7 +293,7 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -328,15 +328,15 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await unidadeCulturaService.getAll(filterAplication).then((response) => {
+		await unidadeCulturaService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
@@ -518,7 +518,7 @@ export default function Listagem({ allCultureUnity, itensPerPage, filterAplicati
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -626,7 +626,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const token = req.cookies.token;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1";
-	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
+	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : "filterStatus=1"
 
 	removeCookies('filterBeforeEdit', { req, res });
 	removeCookies('pageBeforeEdit', { req, res });
@@ -652,7 +652,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allCultureUnity,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			pageBeforeEdit,
 			filterBeforeEdit
 		},

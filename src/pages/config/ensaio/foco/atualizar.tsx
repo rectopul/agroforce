@@ -41,14 +41,14 @@ interface IData {
 	allItens: any;
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_foco: number;
 	id_safra: number;
 	foco: IUpdateFoco,
 	pageBeforeEdit: string | any
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -62,7 +62,7 @@ interface IFilter {
 }
 
 
-export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterAplication, id_foco, id_safra, pageBeforeEdit }: IData) {
+export default function Atualizar({ foco, allItens, totalItems, itensPerPage, filterApplication, id_foco, id_safra, pageBeforeEdit }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -130,13 +130,13 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Safra", value: "safra" },
 		{ name: "CamposGerenciados[]", title: "Grupo", value: "group" },
 		{ name: "CamposGerenciados[]", title: "Status", value: "status" }
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const take: number = itensPerPage;
@@ -301,7 +301,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -336,14 +336,14 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados},foco&id_foco=${id_foco}`;
 		}
-		await groupService.getAll(filterAplication).then((response: any) => {
+		await groupService.getAll(filterApplication).then((response: any) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
@@ -537,7 +537,7 @@ export default function Atualizar({ foco, allItens, totalItems, itensPerPage, fi
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -654,7 +654,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 	};
 
 	const id_foco = Number(query.id);
-	const filterAplication = `filterStatus=1&id_safra=${id_safra}&id_foco=${id_foco}`;
+	const filterApplication = `filterStatus=1&id_safra=${id_safra}&id_foco=${id_foco}`;
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
@@ -671,7 +671,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 			allItens,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_foco,
 			id_safra,
 			foco,

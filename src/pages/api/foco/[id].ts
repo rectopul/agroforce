@@ -11,11 +11,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 	switch (req.method) {
 		case 'GET':
 			const result = await focoController.getOne(Number(id));
-			res.status(result.status).json(result);
+			res.status(200).json(result);
 			break
 		case 'PUT':
 			const resultPut = await focoController.update(req.body);
-			res.status(resultPut.status).json(resultPut);
+			res.status(200).json(resultPut);
 			break
 		default:
 			res.status(405).end(`Method ${req.method} Not Allowed`);

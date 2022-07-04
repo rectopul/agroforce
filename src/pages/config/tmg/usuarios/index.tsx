@@ -43,7 +43,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -53,13 +53,13 @@ interface IData {
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
-	allUsers, itensPerPage, filterAplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+	allUsers, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
 }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
@@ -80,9 +80,9 @@ export default function Listagem({
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{
 			name: 'CamposGerenciados[]', title: 'Favorito', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
 		},
@@ -367,7 +367,7 @@ export default function Listagem({
 		}
 	}
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -423,15 +423,15 @@ export default function Listagem({
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	}
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes('paramSelect')) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes('paramSelect')) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await userService.getAll(filterAplication).then((response) => {
+		await userService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = users.map((row: { avatar: any; status: any }) => {
 					delete row.avatar;
@@ -626,7 +626,7 @@ export default function Listagem({
 																					value="Atualizar"
 																					bgColor="bg-blue-600"
 																					textColor="white"
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -730,7 +730,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const { token } = req.cookies;
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-	const filterAplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
 	removeCookies('filterBeforeEdit', { req, res });
 	removeCookies('pageBeforeEdit', { req, res });
@@ -755,7 +755,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allUsers,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			pageBeforeEdit,
 			filterBeforeEdit,
 		},

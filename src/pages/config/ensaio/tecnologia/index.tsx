@@ -33,7 +33,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -43,13 +43,13 @@ interface Idata {
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_culture: number;
 	pageBeforeEdit: string | any
 	filterBeforeEdit: string | any
 }
 
-export default function Listagem({ allItems, itensPerPage, filterAplication, totalItems, id_culture, pageBeforeEdit, filterBeforeEdit }: Idata) {
+export default function Listagem({ allItems, itensPerPage, filterApplication, totalItems, id_culture, pageBeforeEdit, filterBeforeEdit }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns('config');
@@ -68,10 +68,10 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit)
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
 		{ name: "CamposGerenciados[]", title: "Nome", value: "name", defaultChecked: () => camposGerenciados.includes('name') },
 		{ name: "CamposGerenciados[]", title: "Rótulo ", value: "desc", defaultChecked: () => camposGerenciados.includes('desc') },
@@ -233,7 +233,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -268,15 +268,15 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_culture=${id_culture}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${id_culture}`;
 		}
 
-		await tecnologiaService.getAll(filterAplication).then((response) => {
+		await tecnologiaService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
 					row.status = (row.status === 0) ? "Inativo" : "Ativo"
@@ -450,7 +450,7 @@ export default function Listagem({ allItems, itensPerPage, filterAplication, tot
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -566,7 +566,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
 
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : `filterStatus=1&id_culture=${id_culture}`;
+	const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : `filterStatus=1&id_culture=${id_culture}`;
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
@@ -587,7 +587,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allItems,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_culture,
 			pageBeforeEdit,
 			filterBeforeEdit

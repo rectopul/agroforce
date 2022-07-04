@@ -35,7 +35,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -45,12 +45,12 @@ interface IData {
 	allDisparos: any[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_quadra: number;
 	quadra: any;
 }
 
-export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage, filterAplication, id_quadra, quadra }: IData) {
+export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage, filterApplication, id_quadra, quadra }: IData) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -117,7 +117,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },
 		{ name: "CamposGerenciados[]", title: "Divisor", value: "divisor" },
 		{ name: "CamposGerenciados[]", title: "Sem metro", value: "sem_metros" },
@@ -126,7 +126,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 		{ name: "CamposGerenciados[]", title: "DI", value: "di" },
 		{ name: "CamposGerenciados[]", title: "DF", value: "df" },
 	]);
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const take: number = itensPerPage;
@@ -280,7 +280,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -315,15 +315,15 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}&id_quadra=${id_quadra}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}&id_quadra=${id_quadra}`;
 		}
 
-		await disparosService.getAll(filterAplication).then((response) => {
+		await disparosService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { status: any }) => {
 					if (row.status === 0) {
@@ -523,7 +523,7 @@ export default function Atualizarquadra({ allDisparos, totalItems, itensPerPage,
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -649,7 +649,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	urlParameters.search = new URLSearchParams(param).toString();
 	const id_quadra = Number(context.query.id);
 
-	const filterAplication = `filterStatus=1&id_quadra=${id_quadra}`;
+	const filterApplication = `filterStatus=1&id_quadra=${id_quadra}`;
 
 	const disparos = await fetch(`${baseUrlDisparos}?id_quadra=${id_quadra}`, requestOptions);
 	const { response: allDisparos, total: totalItems } = await disparos.json();
@@ -660,7 +660,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			allDisparos,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_quadra
 		}
 	}

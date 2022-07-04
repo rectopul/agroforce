@@ -81,15 +81,15 @@ model safra {
   created_by        Int
   created_at        DateTime? @default(now())
 
-  npe                 npe[]
-  genotipo            genotipo[]
-  quadra              quadra[]
-  group               group[]
-  lote                lote[]
-  type_assay_children type_assay_children[]
-  experiment          experiment[]
-  assay_list          assay_list[]
-  genotype_treatment  genotype_treatment[]
+  npe                npe[]
+  genotipo           genotipo[]
+  quadra             quadra[]
+  group              group[]
+  lote               lote[]
+  envelope           envelope[]
+  experiment         experiment[]
+  assay_list         assay_list[]
+  genotype_treatment genotype_treatment[]
 }
 
 model uf {
@@ -359,21 +359,22 @@ model group {
 }
 
 model type_assay {
-  id         Int       @id @default(autoincrement())
-  id_culture Int
-  name       String
-  status     Int       @default(1)
-  created_by Int
-  created_at DateTime? @default(now())
+  id            Int       @id @default(autoincrement())
+  id_culture    Int
+  name          String
+  protocol_name String
+  status        Int       @default(1)
+  created_by    Int
+  created_at    DateTime? @default(now())
 
-  npe                 npe[]
-  culture             culture               @relation(fields: [id_culture], references: [id])
-  type_assay_children type_assay_children[]
-  experiment          experiment[]
-  assay_list          assay_list[]
+  npe        npe[]
+  culture    culture      @relation(fields: [id_culture], references: [id])
+  envelope   envelope[]
+  experiment experiment[]
+  assay_list assay_list[]
 }
 
-model type_assay_children {
+model envelope {
   id            Int       @id @default(autoincrement())
   id_safra      Int
   id_type_assay Int

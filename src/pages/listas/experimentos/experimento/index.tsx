@@ -53,7 +53,7 @@ export interface IExperimento {
 	status?: number;
 }
 
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -63,14 +63,14 @@ interface IData {
 	allExperimentos: IExperimento[];
 	totalItems: number;
 	itensPerPage: number;
-	filterAplication: object | any;
+	filterApplication: object | any;
 	id_culture: number;
 	pageBeforeEdit: string | any;
 	filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-	allExperimentos, totalItems, itensPerPage, filterAplication, id_culture, pageBeforeEdit, filterBeforeEdit,
+	allExperimentos, totalItems, itensPerPage, filterApplication, id_culture, pageBeforeEdit, filterBeforeEdit,
 }: IData) {
 	const { TabsDropDowns } = ITabs;
 
@@ -93,7 +93,7 @@ export default function Listagem({
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
 		{ name: 'CamposGerenciados[]', title: 'Nome protocolo', value: 'protocolo_name' },
 		{ name: 'CamposGerenciados[]', title: 'Nome experimento', value: 'experimento_name' },
@@ -107,7 +107,7 @@ export default function Listagem({
 		{ name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
 	]);
 
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
 	const filtersStatusItem = [
@@ -181,15 +181,15 @@ export default function Listagem({
 	function headerTableFactory(name: any, title: string) {
 		return {
 			title: (
-				<div className='flex items-center'>
-					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+				<div className="flex items-center">
+					<button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
 						{name}
 					</button>
 				</div>
 			),
 			field: title,
-			sorting: false
-		}
+			sorting: false,
+		};
 	}
 
 	function idHeaderFactory() {
@@ -205,19 +205,19 @@ export default function Listagem({
 			render: () => (
 				colorStar === '#eba417'
 					? (
-						<div className='h-10 flex'>
+						<div className="h-10 flex">
 							<div>
 								<button
 									className="w-full h-full flex items-center justify-center border-0"
 									onClick={() => setColorStar('')}
 								>
-									<AiTwotoneStar size={25} color={'#eba417'} />
+									<AiTwotoneStar size={25} color="#eba417" />
 								</button>
 							</div>
 						</div>
 					)
 					: (
-						<div className='h-10 flex'>
+						<div className="h-10 flex">
 							<div>
 								<button
 									className="w-full h-full flex items-center justify-center border-0"
@@ -228,7 +228,7 @@ export default function Listagem({
 							</div>
 						</div>
 					)
-			)
+			),
 		};
 	}
 
@@ -285,7 +285,7 @@ export default function Listagem({
 						)}
 				</div>
 			),
-		}
+		};
 	}
 
 	function columnsOrder(camposGerenciados: any): any {
@@ -343,21 +343,19 @@ export default function Listagem({
 
 		if (filter && typeof (filter) !== 'undefined') {
 			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`
+				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
 			} else {
 				parametersFilter = filter;
 			}
+		} else if (typeOrder !== '') {
+			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
 		} else {
-			if (typeOrder !== '') {
-				parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-			} else {
-				parametersFilter = filter;
-			}
+			parametersFilter = filter;
 		}
 
 		await experimentoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
 			if (response.status === 200) {
-				setExperimento(response.response)
+				setExperimento(response.response);
 			}
 		});
 
@@ -372,9 +370,9 @@ export default function Listagem({
 				setArrowOrder('');
 			}
 		}
-	};
+	}
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox']");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -408,15 +406,15 @@ export default function Listagem({
 		const index = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	}
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes('paramSelect')) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes('paramSelect')) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await experimentoService.getAll(filterAplication).then((response) => {
+		await experimentoService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = experimentos.map((row) => {
 					if (row.status === 0) {
@@ -496,14 +494,14 @@ export default function Listagem({
 					onChange={formik.handleChange}
 				/>
 			</div>
-		)
+		);
 	}
 
 	return (
 		<>
 			<Head><title>Listagem de experimentos</title></Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive={"listas"}>
+			<Content contentHeader={tabsDropDowns} moduloActive="listas">
 				<main className="h-full w-full
                         flex flex-col
                         items-start
@@ -618,7 +616,7 @@ export default function Listagem({
 																					value="Atualizar"
 																					bgColor="bg-blue-600"
 																					textColor="white"
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -724,7 +722,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const PreferencesControllers = new UserPreferenceController();
 	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-	const token = req.cookies.token;
+	const { token } = req.cookies;
 	const id_culture = Number(req.cookies.cultureId);
 	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
@@ -736,7 +734,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/experimento`;
 
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}`;
-	const filterAplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : 'filterStatus=1';
+	const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : 'filterStatus=1';
 
 	const urlParameters: any = new URL(baseUrl);
 	urlParameters.search = new URLSearchParams(param).toString();
@@ -749,15 +747,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const experimento = await fetch(`${baseUrl}?id_culture=${id_culture}`, requestOptions);
 	const { response: allExperimentos, total: totalItems } = await experimento.json();
 
-	console.log('allExperimentos')
-	console.log(allExperimentos)
+	console.log('allExperimentos');
+	console.log(allExperimentos);
 
 	return {
 		props: {
 			allExperimentos,
 			totalItems,
 			itensPerPage,
-			filterAplication,
+			filterApplication,
 			id_culture,
 			pageBeforeEdit,
 			filterBeforeEdit,

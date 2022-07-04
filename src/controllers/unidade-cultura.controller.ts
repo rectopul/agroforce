@@ -1,159 +1,156 @@
 import handleError from 'src/shared/utils/handleError';
 import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
-import { number, object, SchemaOf, string } from 'yup';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 import { UnidadeCulturaRepository } from '../repository/unidade-cultura.repository';
 
-
 export class UnidadeCulturaController {
-	public readonly required = 'Campo obrigatório';
+  public readonly required = 'Campo obrigatório';
 
-	unidadeCulturaRepository = new UnidadeCulturaRepository();
+  unidadeCulturaRepository = new UnidadeCulturaRepository();
 
-	async getAll(options: any) {
-		const parameters: object | any = {};
-		let orderBy: object | any;
-		let select: any = [];
-		try {
-			if (options.filterStatus) {
-				if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-			}
+  async getAll(options: any) {
+    const parameters: object | any = {};
+    let orderBy: object | any;
+    let select: any = [];
+    try {
+      if (options.filterStatus) {
+        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+      }
 
-			if (options.filterNameUnityCulture) {
-				parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
-			}
+      if (options.filterNameUnityCulture) {
+        parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
+      }
 
-			if (options.filterYear) {
-				parameters.year = Number(options.filterYear);
-			}
+      if (options.filterYear) {
+        parameters.year = Number(options.filterYear);
+      }
 
-			if (options.filterNameLocalCulture) {
-				parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
-			}
+      if (options.filterNameLocalCulture) {
+        parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
+      }
 
-			if (options.filterLabel) {
-				parameters.local = JSON.parse(`{ "label": { "contains": "${options.filterLabel}" } }`);
-			}
+      if (options.filterLabel) {
+        parameters.local = JSON.parse(`{ "label": { "contains": "${options.filterLabel}" } }`);
+      }
 
-			if (options.filterMloc) {
-				parameters.local = JSON.parse(`{ "mloc": { "contains": "${options.filterMloc}" } }`);
-			}
+      if (options.filterMloc) {
+        parameters.local = JSON.parse(`{ "mloc": { "contains": "${options.filterMloc}" } }`);
+      }
 
-			if (options.filterAdress) {
-				parameters.local = JSON.parse(`{ "adress": {"contains": "${options.filterAdress}" } }`);
-			}
+      if (options.filterAdress) {
+        parameters.local = JSON.parse(`{ "adress": {"contains": "${options.filterAdress}" } }`);
+      }
 
-			if (options.filterLabelCountry) {
-				parameters.local = JSON.parse(`{ "label_country": {"contains": "${options.filterLabelCountry}" } }`);
-			}
+      if (options.filterLabelCountry) {
+        parameters.local = JSON.parse(`{ "label_country": {"contains": "${options.filterLabelCountry}" } }`);
+      }
 
-			if (options.filterLabelRegion) {
-				parameters.local = JSON.parse(`{ "label_region": {"contains": "${options.filterLabelRegion}" } }`);
-			}
+      if (options.filterLabelRegion) {
+        parameters.local = JSON.parse(`{ "label_region": {"contains": "${options.filterLabelRegion}" } }`);
+      }
 
-			if (options.filterNameLocality) {
-				parameters.local = JSON.parse(`{ "name_locality": {"contains": "${options.filterNameLocality}" } }`);
-			}
+      if (options.filterNameLocality) {
+        parameters.local = JSON.parse(`{ "name_locality": {"contains": "${options.filterNameLocality}" } }`);
+      }
 
+      if (options.paramSelect) {
+        const objSelect = options.paramSelect.split(',');
+        Object.keys(objSelect).forEach((item) => {
+          select[objSelect[item]] = true;
+        });
+        select = { ...select };
+      } else {
+        select = {
+          id: true,
+          id_unity_culture: true,
+          id_local: true,
+          year: true,
+          name_unity_culture: true,
+          local: true,
+          status: true,
+        };
+      }
 
-			if (options.paramSelect) {
-				const objSelect = options.paramSelect.split(',');
-				Object.keys(objSelect).forEach((item) => {
-					select[objSelect[item]] = true;
-				});
-				select = Object.assign({}, select);
-			} else {
-				select = {
-					id: true,
-					id_unity_culture: true,
-					id_local: true,
-					year: true,
-					name_unity_culture: true,
-					local: true,
-					status: true
-				};
-			}
+      if (options.id_unity_culture) {
+        parameters.id_unity_culture = options.id_unity_culture;
+      }
 
-			if (options.id_unity_culture) {
-				parameters.id_unity_culture = options.id_unity_culture;
-			}
+      if (options.name_unity_culture) {
+        parameters.name_unity_culture = options.name_unity_culture;
+      }
 
-			if (options.name_unity_culture) {
-				parameters.name_unity_culture = options.name_unity_culture;
-			}
+      if (options.id_local) {
+        parameters.id_local = Number(options.id_local);
+      }
 
-			if (options.id_local) {
-				parameters.id_local = Number(options.id_local);
-			}
+      const take = (options.take) ? Number(options.take) : undefined;
 
-			const take = (options.take) ? Number(options.take) : undefined;
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
-			const skip = (options.skip) ? Number(options.skip) : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeigin(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+      const response: object | any = await this.unidadeCulturaRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
-			if (options.orderBy) {
-				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
-				orderBy = orderBy ? orderBy : `{"${options.orderBy}":"${options.typeOrder}"}`
-			}
-			const response: object | any = await this.unidadeCulturaRepository.findAll(
-				parameters,
-				select,
-				take,
-				skip,
-				orderBy
-			);
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 };
+      }
+      return { status: 200, response, total: response.total };
+    } catch (error: any) {
+      handleError('Unidade cultura controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Unidade Cultura erro');
+    }
+  }
 
-			if (!response || response.total <= 0) {
-				return { status: 400, response: [], total: 0 };
-			} else {
-				return { status: 200, response: response, total: response.total };
-			}
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'GetAll', error.message)
-			throw new Error("[Controller] - GetAll Unidade Cultura erro")
-		}
-	}
+  async getOne({ id }: any) {
+    try {
+      const response = await this.unidadeCulturaRepository.findById(id);
 
-	async getOne({ id }: any) {
-		try {
-			const response = await this.unidadeCulturaRepository.findById(id);
+      if (!response) throw new Error('Unidade de cultura não encontrada');
 
-			if (!response) throw new Error('Unidade de cultura não encontrada');
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Unidade cultura controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Unidade Cultura erro');
+    }
+  }
 
-			return { status: 200, response: response };
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'getOne', error.message)
-			throw new Error("[Controller] - getOne Unidade Cultura erro")
-		}
-	}
+  async create(data: any) {
+    try {
+      const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
 
-	async create(data: any) {
-		try {
-			const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
+      if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
 
-			if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
+      await this.unidadeCulturaRepository.create(data);
 
-			await this.unidadeCulturaRepository.create(data);
+      return { status: 201, message: 'Unidade de cultura cadastrada' };
+    } catch (error: any) {
+      handleError('Unidade cultura controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Unidade Cultura erro');
+    }
+  }
 
-			return { status: 201, message: 'Unidade de cultura cadastrada' };
+  async update(data: any) {
+    try {
+      const unidadeCultura: any = await this.unidadeCulturaRepository.findById(data.id);
 
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'Create', error.message)
-			throw new Error("[Controller] - Create Unidade Cultura erro")
-		}
-	}
+      if (!unidadeCultura) return { status: 400, message: 'Unidade de cultura não existente' };
 
-	async update(data: any) {
-		try {
+      await this.unidadeCulturaRepository.update(data.id, data);
 
-			const unidadeCultura: any = await this.unidadeCulturaRepository.findById(data.id);
-
-			if (!unidadeCultura) return { status: 400, message: 'Unidade de cultura não existente' };
-
-			await this.unidadeCulturaRepository.update(data.id, data);
-
-			return { status: 200, message: 'Unidade de cultura atualizado' };
-		} catch (error: any) {
-			handleError('Unidade cultura controller', 'Update', error.message)
-			throw new Error("[Controller] - Update Unidade Cultura erro")
-		}
-	}
+      return { status: 200, message: 'Unidade de cultura atualizado' };
+    } catch (error: any) {
+      handleError('Unidade cultura controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Unidade Cultura erro');
+    }
+  }
 }

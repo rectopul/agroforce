@@ -49,7 +49,7 @@ interface IFilter {
 	orderBy: object | any;
 	typeOrder: object | any;
 }
-interface IGenarateProps {
+interface IGenerateProps {
 	name: string | undefined;
 	title: string | number | readonly string[] | undefined;
 	value: string | number | readonly string[] | undefined;
@@ -59,10 +59,10 @@ interface Idata {
 	totalItems: Number;
 	filter: string | any;
 	itensPerPage: number | any;
-	filterAplication: object | any;
+	filterApplication: object | any;
 }
 
-export default function Listagem({ allNpe, itensPerPage, filterAplication, totalItems }: Idata) {
+export default function Listagem({ allNpe, itensPerPage, filterApplication, totalItems }: Idata) {
 	const { TabsDropDowns } = ITabs.default;
 
 	const tabsDropDowns = TabsDropDowns();
@@ -81,11 +81,11 @@ export default function Listagem({ allNpe, itensPerPage, filterAplication, total
 	const [currentPage, setCurrentPage] = useState<number>(0);
 	const [orderList, setOrder] = useState<number>(1);
 	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [filter, setFilter] = useState<any>(filterAplication);
+	const [filter, setFilter] = useState<any>(filterApplication);
 	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 	const [colorStar, setColorStar] = useState<string>('');
-	const [genaratesProps, setGenaratesProps] = useState<IGenarateProps[]>(() => [
+	const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
 		{ name: "CamposGerenciados[]", title: "Favorito ", value: "id", defaultChecked: () => camposGerenciados.includes('id') },
 		{ name: "CamposGerenciados[]", title: "Local ", value: "local", defaultChecked: () => camposGerenciados.includes('local') },
 		{ name: "CamposGerenciados[]", title: "Safra ", value: "safra", defaultChecked: () => camposGerenciados.includes('safra') },
@@ -132,7 +132,7 @@ export default function Listagem({ allNpe, itensPerPage, filterAplication, total
 		{ id: 0, name: 'Inativos' },
 	];
 
-	const filterStatus = filterAplication.split('')
+	const filterStatus = filterApplication.split('')
 
 	function headerTableFactory(name: any, title: string) {
 		return {
@@ -316,7 +316,7 @@ export default function Listagem({ allNpe, itensPerPage, filterAplication, total
 		}
 	};
 
-	async function getValuesComluns(): Promise<void> {
+	async function getValuesColumns(): Promise<void> {
 		let els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
 		for (let i = 0; i < els.length; i++) {
@@ -393,15 +393,15 @@ export default function Listagem({ allNpe, itensPerPage, filterAplication, total
 		const index: number = Number(result.destination?.index);
 		items.splice(index, 0, reorderedItem);
 
-		setGenaratesProps(items);
+		setGeneratesProps(items);
 	};
 
 	const downloadExcel = async (): Promise<void> => {
-		if (!filterAplication.includes("paramSelect")) {
-			filterAplication += `&paramSelect=${camposGerenciados}`;
+		if (!filterApplication.includes("paramSelect")) {
+			filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
-		await npeService.getAll(filterAplication).then((response) => {
+		await npeService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: { avatar: any; status: any }) => {
 					delete row.avatar;
@@ -612,7 +612,7 @@ export default function Listagem({ allNpe, itensPerPage, filterAplication, total
 																					value="Atualizar"
 																					bgColor='bg-blue-600'
 																					textColor='white'
-																					onClick={getValuesComluns}
+																					onClick={getValuesColumns}
 																					icon={<IoReloadSharp size={20} />}
 																				/>
 																			</div>
@@ -728,7 +728,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-	const filterAplication = `filterStatus=1&id_safra=${id_safra}`;
+	const filterApplication = `filterStatus=1&id_safra=${id_safra}`;
 
 	const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_safra=${id_safra}`;
 	const urlParameters: any = new URL(baseUrl);
@@ -747,7 +747,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 			allNpe,
 			totalItems,
 			itensPerPage,
-			filterAplication
+			filterApplication
 		},
 	}
 }
