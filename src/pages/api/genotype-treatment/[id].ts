@@ -1,0 +1,24 @@
+
+import { NextApiRequest, NextApiResponse } from 'next';
+import { GenotypeTreatmentController } from '../../../controllers/genotype-treatment.controller';
+import { apiHandler } from '../../../helpers/api';
+
+export default apiHandler(handler);
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+	const genotypeTreatmentController = new GenotypeTreatmentController();
+	const { id } = req.query;
+
+	switch (req.method) {
+		case 'GET':
+			const result = await genotypeTreatmentController.getOne(Number(id));
+			res.status(result.status).json(result.response);
+			break
+		case 'PUT':
+			const resultPut = await genotypeTreatmentController.update(req.body);
+			res.status(resultPut.status).json(resultPut);
+			break
+		default:
+			res.status(405).end(`Method ${req.method} Not Allowed`);
+	}
+}
