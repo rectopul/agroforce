@@ -61,7 +61,7 @@ export default function AtualizarTipoEnsaio({
   };
   const itemsTotal = totalItens;
   const filter = filterApplication;
-  //  const [table, setTable] = useState<string>('genotipo');
+  const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(() => allGenotypeTreatment);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -88,7 +88,7 @@ export default function AtualizarTipoEnsaio({
   const pages = Math.ceil(total / take);
 
   const router = useRouter();
-  const formik = useFormik<IAssayListUpdate>({
+  const formik = useFormik<IAssayListUpdate | any>({
     initialValues: {
       id: assayList.id,
       foco: assayList.foco.name,
@@ -363,7 +363,7 @@ export default function AtualizarTipoEnsaio({
     });
   }
 
-  function updateFieldFactory(name: string, title: string) {
+  function updateFieldFactory(name: string, title: any) {
     return (
       <div className="w-full h-10">
         <label className="block text-gray-900 text-sm font-bold mb-2">
