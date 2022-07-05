@@ -1,3 +1,6 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -13,63 +16,33 @@ import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { typeAssayService, userPreferencesService } from '../../../../services';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { BsTrashFill } from 'react-icons/bs';
+import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../interfaces/listas/ensaio/assay-list.interface';
+import { assayListService, userPreferencesService } from '../../../services';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
-
-interface ITypeAssayProps {
-  id: Number | any;
-  name: String | any;
-  envelope?: []
-  created_by: Number;
-  status: Number;
-}
-
-interface IFilter {
-  filterStatus: object | any;
-  filterSearch: string | any;
-  orderBy: object | any;
-  typeOrder: object | any;
-}
-interface IGenerateProps {
-  name: string | undefined;
-  title: string | number | readonly string[] | undefined;
-  value: string | number | readonly string[] | undefined;
-}
-interface IData {
-  allItems: ITypeAssayProps[];
-  totalItems: Number;
-  filter: string | any;
-  itensPerPage: number | any;
-  filterApplication: object | any;
-  idCulture: number;
-  idSafra: string;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any;
-}
+  AccordionFilter, Button, CheckBox, Content, Input,
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
-  allItems,
+  allAssay,
   itensPerPage,
   filterApplication,
   totalItems,
-  idCulture,
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: IAssayListGrid) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
@@ -78,10 +51,9 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: 'id,name,protocol_name,envelope,status' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,genotype_treatment,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-
-  const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
+  const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -93,16 +65,28 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome do Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
+      name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Quant. de sementes por envelope', value: 'envelope', defaultChecked: () => camposGerenciados.includes('envelope'),
+      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'genotype_treatment', defaultChecked: () => camposGerenciados.includes('genotype_treatment'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -112,35 +96,38 @@ export default function TipoEnsaio({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const formik = useFormik<IFilter>({
+  const formik = useFormik<IAssayListFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterGli: '',
+      filterTechnology: '',
+      filterTreatmentNumber: '',
+      filterStatusAssay: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}&id_culture=${idCulture}&id_safra=${idSafra}`;
+    onSubmit: async ({
+      filterFoco,
+      filterTypeAssay,
+      filterGli,
+      filterTechnology,
+      filterTreatmentNumber,
+      filterStatusAssay,
+    }) => {
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await typeAssayService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
-        setTypeAssay(response.response);
-        setTotalItems(response.total);
+        setAssayList(response);
+        setTotalItems(allTotal);
         setCurrentPage(0);
       });
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -163,9 +150,9 @@ export default function TipoEnsaio({
       parametersFilter = filter;
     }
 
-    await typeAssayService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setTypeAssay(response.response);
+    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+      if (status === 200) {
+        setAssayList(response);
       }
     });
 
@@ -182,34 +169,7 @@ export default function TipoEnsaio({
     }
   }
 
-  async function handleStatus(id: number, status: any): Promise<void> {
-    let newStatus: any;
-    if (status) {
-      newStatus = 1;
-    } else {
-      newStatus = 0;
-    }
-
-    await typeAssayService.update({ id, newStatus });
-
-    const index = typeAssay.findIndex((typeAssayIndex) => typeAssayIndex.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setTypeAssay((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = newStatus;
-      return copy;
-    });
-  }
-
-  function headerTableFactory(name: any, title: string) {
-    console.log('name');
-    console.log(name);
-    console.log('title');
-    console.log(title);
+  function headerTableFactory(name: string, title: string) {
     return {
       title: (
         <div className="flex items-center">
@@ -267,88 +227,78 @@ export default function TipoEnsaio({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: 'Ações',
+      field: 'action',
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: ITypeAssayProps) => (
-        rowData.status ? (
-          <div className="h-10 flex">
-            <div className="h-10">
-              <Button
-                icon={<BiEdit size={16} />}
-                title={`Atualizar ${rowData.name}`}
-                onClick={() => {
-                  setCookies('pageBeforeEdit', currentPage?.toString());
-                  setCookies('filterBeforeEdit', filtersParams);
-                  router.push(`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`);
-                }}
-                bgColor="bg-blue-600"
-                textColor="white"
-              />
-            </div>
-            <div>
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={() => handleStatus(rowData.id, !rowData.status)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
+      render: (rowData: IAssayList) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              title={`Atualizar ${rowData.gli}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/listas/ensaio/atualizar?id=${rowData.id}`);
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
           </div>
-        ) : (
-          <div className="h-10 flex">
-            <div className="
-							h-10
-						"
-            >
-              <Button
-                icon={<BiEdit size={16} />}
-                onClick={() => { }}
-                bgColor="bg-blue-600"
-                textColor="white"
-                href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
-              />
-            </div>
-            <div>
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={() => handleStatus(rowData.id, !rowData.status)}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
+          <div>
+            <Button
+              icon={<BsTrashFill size={16} />}
+              onClick={() => deleteItem(rowData.id)}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
           </div>
-        )
+        </div>
       ),
     };
   }
 
-  function colums(columnsOrder: any): any {
+  async function deleteItem(id: number) {
+    await assayListService.deleted(id);
+  }
+
+  function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnOrder[item] === 'name') {
-        tableFields.push(headerTableFactory('Nome', 'name'));
-      }
       if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(headerTableFactory('Nome do Protocolo', 'protocol_name'));
+        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
       }
-      if (columnOrder[item] === 'envelope') {
-        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope.seeds'));
+      if (columnOrder[item] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+      }
+      if (columnOrder[item] === 'type_assay') {
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      }
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'gli'));
+      }
+      if (columnOrder[item] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
+      }
+      if (columnOrder[item] === 'genotype_treatment') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'genotype_treatment.treatments_number'));
       }
       if (columnOrder[item] === 'status') {
+        tableFields.push(headerTableFactory('Status do ensaio', 'status'));
+      }
+      if (columnOrder[item] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
     return tableFields;
   }
 
-  const columns = colums(camposGerenciados);
+  const columns = orderColumns(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -364,9 +314,9 @@ export default function TipoEnsaio({
       await userPreferencesService.create({
         table_preferences: campos,
         userId: userLogado.id,
-        module_id: 9,
+        module_id: 25,
       }).then((response) => {
-        userLogado.preferences.tipo_ensaio = {
+        userLogado.preferences.assayList = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -375,7 +325,7 @@ export default function TipoEnsaio({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.tipo_ensaio = {
+      userLogado.preferences.assayList = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -406,15 +356,25 @@ export default function TipoEnsaio({
       newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
     }
 
-    await typeAssayService.getAll(newFilter).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          const newRow = row;
-          newRow.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-          return newRow;
+    await assayListService.getAll(newFilter).then(({ status, response }) => {
+      if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          if (newItem.foco) {
+            newItem.foco = newItem.foco.name;
+          }
+          if (newItem.type_assay) {
+            newItem.type_assay = newItem.type_assay.name;
+          }
+          if (newItem.tecnologia) {
+            newItem.tecnologia = newItem.tecnologia.name;
+          }
+          if (newItem.genotype_treatment) {
+            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
+          }
+          return newItem;
         });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
 
@@ -449,11 +409,28 @@ export default function TipoEnsaio({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await typeAssayService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setTypeAssay(response.response);
+    await assayListService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setAssayList(response);
       }
     });
+  }
+
+  function filterFieldFactory(title: string, name: string) {
+    return (
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <Input
+          type="text"
+          placeholder={name}
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+        />
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -464,16 +441,16 @@ export default function TipoEnsaio({
   return (
     <>
       <Head>
-        <title>Listagem Tipos de Ensaio</title>
+        <title>Listagem de Ensaio</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         "
         >
-          <AccordionFilter title="Filtrar tipos de ensaio">
+          <AccordionFilter title="Filtrar ensaios">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -490,26 +467,12 @@ export default function TipoEnsaio({
                   pb-2
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Status
-                    </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
-                  </div>
-
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="nome"
-                      max="40"
-                      id="filterSearch"
-                      name="filterSearch"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
+                  {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
+                  {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -530,7 +493,7 @@ export default function TipoEnsaio({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={typeAssay}
+              data={assayList}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -558,16 +521,15 @@ export default function TipoEnsaio({
                   >
                     <div className="h-12">
                       <Button
-                        title="Cadastrar Tipo Ensaio"
-                        value="Cadastrar Tipo Ensaio"
+                        title="Importar Planilha"
+                        value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => { }}
-                        href="/config/ensaio/tipo-ensaio/cadastro"
-                        icon={<RiOrganizationChart size={20} />}
+                        href="ensaio/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
-
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -703,7 +665,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -712,9 +674,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = filterBeforeEdit
+    ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -726,15 +690,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allItems, total: totalItems } = await response.json();
+  const assayList = await fetch(urlParameters.toString(), requestOptions);
+  const { response: allAssay, total: totalItems } = await assayList.json();
 
-  console.log('allItems');
-  console.log(allItems[0].envelope);
+  console.log('allAssay');
+  console.log(allAssay);
 
   return {
     props: {
-      allItems,
+      allAssay,
       totalItems,
       itensPerPage,
       filterApplication,

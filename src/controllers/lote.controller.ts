@@ -1,4 +1,4 @@
-import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
+import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
 import { number, object, SchemaOf, string } from 'yup';
 import { LoteRepository } from '../repository/lote.repository';
 interface LoteDTO {
@@ -145,7 +145,7 @@ export class LoteController {
 			}
 
 			if (options.orderBy) {
-				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
+				orderBy = handleOrderForeign(options.orderBy, options.typeOrder)
 				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
 			}
 

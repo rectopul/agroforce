@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
@@ -18,7 +17,8 @@ export function DropDown({ label, href, icon }: IDropDownProps) {
     >
       <li>
         <Link href={href}>
-          <a className="
+          <a
+            className="
             flex
             items-center
             gap-1
@@ -27,6 +27,7 @@ export function DropDown({ label, href, icon }: IDropDownProps) {
             duration-300
             hover:text-blue-600
             "
+            href={href}
           >
             {icon}
             {label}

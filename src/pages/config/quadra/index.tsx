@@ -19,7 +19,7 @@ import * as XLSX from 'xlsx';
 import ITabs from "../../../shared/utils/dropdown";
 import Swal from "sweetalert2";
 import { removeCookies, setCookies } from "cookies-next";
-import handleOrderForeigin from "src/shared/utils/handleOrderForeigin";
+import handleOrderForeign from "src/shared/utils/handleOrderForeign";
 
 interface IFilter {
 	filterStatus: object | any;

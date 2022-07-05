@@ -1,5 +1,5 @@
 import handleError from 'src/shared/utils/handleError';
-import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
+import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
 import {
   number, object, SchemaOf, string,
 } from 'yup';
@@ -90,7 +90,7 @@ export class UnidadeCulturaController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeigin(options.orderBy, options.typeOrder);
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
       const response: object | any = await this.unidadeCulturaRepository.findAll(
