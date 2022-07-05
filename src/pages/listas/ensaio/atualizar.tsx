@@ -61,7 +61,7 @@ export default function AtualizarTipoEnsaio({
   };
   const itemsTotal = totalItens;
   const filter = filterApplication;
-  // const [table, setTable] = useState<string>('genotipo');
+  //  const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(() => allGenotypeTreatment);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [currentPage, setCurrentPage] = useState<number>(0);

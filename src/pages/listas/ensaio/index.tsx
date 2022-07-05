@@ -526,7 +526,7 @@ export default function TipoEnsaio({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => { }}
-                        href="listas/ensaio/importar-planilha"
+                        href="ensaio/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
