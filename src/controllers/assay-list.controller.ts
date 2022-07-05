@@ -1,9 +1,12 @@
 import handleError from '../shared/utils/handleError';
-import handleOrderForeigin from '../shared/utils/handleOrderForeigin';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { AssayListRepository } from '../repository/assay-list.repository';
+import { GenotypeTreatmentController } from './genotype-treatment.controller';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
+
+  genotypeTreatmentController = new GenotypeTreatmentController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -13,35 +16,33 @@ export class AssayListController {
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
-
       if (options.filterTypeAssay) {
         parameters.type_assay = JSON.parse(`{ "name": { "contains": "${options.filterTypeAssay}" } }`);
       }
-
       if (options.filterTechnology) {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTechnology}" } }`);
       }
-
       if (options.filterGli) {
         parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
       }
-
       if (options.filterPeriod) {
         parameters.period = JSON.parse(`{ "contains": "${options.filterPeriod}" }`);
       }
-
       if (options.filterBgm) {
         parameters.bgm = JSON.parse(`{ "contains": "${options.filterBgm}" }`);
       }
-
       if (options.filterProject) {
         parameters.project = JSON.parse(`{ "contains": "${options.filterProject}" }`);
       }
-
+      if (options.filterStatusAssay) {
+        parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
+      }
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
+          if (objSelect[item] !== 'action') {
+            select[objSelect[item]] = true;
+          }
         });
         select = { ...select };
       } else {
@@ -51,12 +52,14 @@ export class AssayListController {
           foco: { select: { name: true } },
           type_assay: { select: { name: true } },
           tecnologia: { select: { name: true } },
+          genotype_treatment: { select: { treatments_number: true } },
           gli: true,
           period: true,
           protocol_name: true,
           bgm: true,
           project: true,
           status: true,
+          comments: true,
         };
       }
 
@@ -69,9 +72,10 @@ export class AssayListController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeigin(options.orderBy, options.typeOrder);
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
       const response: object | any = await this.assayListRepository.findAll(
         parameters,
         select,
@@ -90,7 +94,7 @@ export class AssayListController {
     }
   }
 
-  async getOne({ id }: any) {
+  async getOne(id: number) {
     try {
       const response = await this.assayListRepository.findById(id);
 
@@ -133,7 +137,22 @@ export class AssayListController {
     }
   }
 
-  async delete(id: any) {
-    return { status: 500 };
+  async delete(id: number) {
+    try {
+      const assayListExist = await this.getOne(Number(id));
+
+      if (!assayListExist) return { status: 404, message: 'Lista de ensaio não encontrada' };
+
+      const { status } = await this.genotypeTreatmentController.deleteAll();
+
+      if (status === 200) {
+        await this.assayListRepository.delete(Number(id));
+        return { status: 201, message: 'Lista de ensaio excluída' };
+      }
+      return { status: 404, message: 'Lista de ensaio não excluída' };
+    } catch (error: any) {
+      handleError('Lista de ensaio controller', 'Delete', error.message);
+      throw new Error('[Controller] - Delete Lista de ensaio erro');
+    }
   }
 }

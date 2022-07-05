@@ -1,7 +1,7 @@
 import { GenotipoRepository } from 'src/repository/genotipo.repository';
 import { number, object, SchemaOf, string } from 'yup';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
-import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
+import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
 
 interface Genotipo {
 	id: number;
@@ -144,7 +144,7 @@ export class GenotipoController {
 			}
 
 			if (options.orderBy) {
-				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
+				orderBy = handleOrderForeign(options.orderBy, options.typeOrder)
 				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
 			}
 

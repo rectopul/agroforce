@@ -1,5 +1,5 @@
 import { QuadraRepository } from "src/repository/quadra.repository";
-import handleOrderForeigin from "src/shared/utils/handleOrderForeigin";
+import handleOrderForeign from "src/shared/utils/handleOrderForeign";
 
 export class QuadraController {
 	public readonly required = 'Campo obrigatório';
@@ -72,7 +72,7 @@ export class QuadraController {
 			}
 
 			if (options.orderBy) {
-				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
+				orderBy = handleOrderForeign(options.orderBy, options.typeOrder)
 				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
 			}
 

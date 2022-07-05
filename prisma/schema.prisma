@@ -553,6 +553,7 @@ model assay_list {
   bgm           Int
   project       String
   status        String
+  comments      String
   created_by    Int
   created_at    DateTime? @default(now())
 
