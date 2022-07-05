@@ -1,9 +1,9 @@
 export interface IAssayList {
   id: number
   id_safra: number
-  foco: { name: string }
-  type_assay: { name: string }
-  tecnologia: { name: string }
+  foco: object | any
+  type_assay: object | any
+  tecnologia: object | any
   gli: string
   period: number
   protocol_name: string
