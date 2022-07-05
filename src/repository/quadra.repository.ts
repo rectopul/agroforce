@@ -8,7 +8,23 @@ export class QuadraRepository {
 
   async findOne(id: number) {
     const quadra = await prisma.quadra.findUnique({
-      where: { id }
+      where: { id },
+      select: {
+        id: true,
+        cod_quadra: true,
+        local_plantio: true,
+        larg_q: true,
+        comp_p: true,
+        linha_p: true,
+        comp_c: true,
+        esquema: true,
+        tiro_fixo: true,
+        disparo_fixo: true,
+        q: true,
+        localPreparo: { select: { name_local_culture: true } },
+        Safra: { select: { safraName: true } },
+        status: true,
+      },
     });
     return quadra;
   }
@@ -19,31 +35,30 @@ export class QuadraRepository {
     if (quadra !== null) {
       const result = await prisma.quadra.update({
         where: { id },
-        data
+        data,
       });
       return result;
-    } else {
-      return false;
     }
+    return false;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.quadra.count({ where: where });
+    const count = await prisma.quadra.count({ where });
 
     const result: object | any = await prisma.quadra.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
-      where: where,
-      orderBy: order
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
     });
-    
+
     result.total = count;
     return result;
   }
