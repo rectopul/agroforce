@@ -1,5 +1,5 @@
 import { ExperimentRepository } from 'src/repository/experiment.repository';
-import handleOrderForeigin from 'src/shared/utils/handleOrderForeigin';
+import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
 
 // type Updategenotipo = Omit<genotipo, 'created_by'>;
 export class ExperimentController {
@@ -114,7 +114,7 @@ export class ExperimentController {
 			}
 
 			if (options.orderBy) {
-				orderBy = handleOrderForeigin(options.orderBy, options.typeOrder)
+				orderBy = handleOrderForeign(options.orderBy, options.typeOrder)
 				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
 			}
 

@@ -22,53 +22,14 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
+import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
-
-interface IAssayListProps {
-  id: number
-  protocolName: string
-  foco: string
-  ensaio: string
-  gli: string
-  tecnologia: string
-  treatment_number: number
-  status: string
-  created_by: number;
-}
-
-interface IFilter {
-  filterFoco: string
-  filterEnsaio: string
-  filterGli: string
-  filterTecnologia: string
-  filterTreatmentNumber: string
-  filterStatus: string
-  orderBy: string
-  typeOrder: string
-}
-
-interface IGenerateProps {
-  name: string
-  title: string
-  value: string
-}
-
-interface IData {
-  allAssay: IAssayListProps[];
-  totalItems: number;
-  filter: string
-  itensPerPage: number
-  filterApplication: string
-  idCulture: number;
-  idSafra: number;
-  pageBeforeEdit: number
-  filterBeforeEdit: string
-}
 
 export default function TipoEnsaio({
   allAssay,
@@ -78,7 +39,7 @@ export default function TipoEnsaio({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: IAssayListGrid) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -90,9 +51,9 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,ensaio,gli,tecnologia,treatment_number,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,genotype_treatment,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const [assayList, setAssayList] = useState<IAssayListProps[]>(() => allAssay);
+  const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -110,7 +71,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'ensaio', defaultChecked: () => camposGerenciados.includes('ensaio'),
+      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
       name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
@@ -119,7 +80,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'treatment_number', defaultChecked: () => camposGerenciados.includes('treatment_number'),
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'genotype_treatment', defaultChecked: () => camposGerenciados.includes('genotype_treatment'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
@@ -135,26 +96,26 @@ export default function TipoEnsaio({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const formik = useFormik<IFilter>({
+  const formik = useFormik<IAssayListFilter>({
     initialValues: {
       filterFoco: '',
-      filterEnsaio: '',
+      filterTypeAssay: '',
       filterGli: '',
-      filterTecnologia: '',
+      filterTechnology: '',
       filterTreatmentNumber: '',
-      filterStatus: '',
+      filterStatusAssay: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
       filterFoco,
-      filterEnsaio,
+      filterTypeAssay,
       filterGli,
-      filterTecnologia,
+      filterTechnology,
       filterTreatmentNumber,
-      filterStatus,
+      filterStatusAssay,
     }) => {
-      const parametersFilter = `filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterGli=${filterGli}&filterTecnologia=${filterTecnologia}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatus=${filterStatus}&id_safra=${idSafra}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
@@ -270,7 +231,7 @@ export default function TipoEnsaio({
       field: 'action',
       sorting: false,
       searchable: false,
-      render: (rowData: IAssayListProps) => (
+      render: (rowData: IAssayList) => (
         <div className="h-10 flex">
           <div className="h-10">
             <Button
@@ -289,7 +250,7 @@ export default function TipoEnsaio({
             <Button
               icon={<BsTrashFill size={16} />}
               onClick={() => deleteItem(rowData.id)}
-              bgColor="bg-green-600"
+              bgColor="bg-red-600"
               textColor="white"
             />
           </div>
@@ -299,7 +260,7 @@ export default function TipoEnsaio({
   }
 
   async function deleteItem(id: number) {
-    return id;
+    await assayListService.deleted(id);
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
@@ -313,10 +274,10 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
       }
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco'));
+        tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
-      if (columnOrder[item] === 'ensaio') {
-        tableFields.push(headerTableFactory('Ensaio', 'ensaio'));
+      if (columnOrder[item] === 'type_assay') {
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnOrder[item] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'gli'));
@@ -324,8 +285,8 @@ export default function TipoEnsaio({
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
       }
-      if (columnOrder[item] === 'treatment_number') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'treatment_number'));
+      if (columnOrder[item] === 'genotype_treatment') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'genotype_treatment.treatments_number'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(headerTableFactory('Status do ensaio', 'status'));
@@ -355,7 +316,7 @@ export default function TipoEnsaio({
         userId: userLogado.id,
         module_id: 25,
       }).then((response) => {
-        userLogado.preferences.tipo_ensaio = {
+        userLogado.preferences.assayList = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -364,7 +325,7 @@ export default function TipoEnsaio({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.tipo_ensaio = {
+      userLogado.preferences.assayList = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -397,6 +358,22 @@ export default function TipoEnsaio({
 
     await assayListService.getAll(newFilter).then(({ status, response }) => {
       if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          if (newItem.foco) {
+            newItem.foco = newItem.foco.name;
+          }
+          if (newItem.type_assay) {
+            newItem.type_assay = newItem.type_assay.name;
+          }
+          if (newItem.tecnologia) {
+            newItem.tecnologia = newItem.tecnologia.name;
+          }
+          if (newItem.genotype_treatment) {
+            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
+          }
+          return newItem;
+        });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
@@ -490,13 +467,12 @@ export default function TipoEnsaio({
                   pb-2
                 "
                 >
-
                   {filterFieldFactory('filterFoco', 'Foco')}
-                  {filterFieldFactory('filterEnsaio', 'Ensaio')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
                   {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
-                  {filterFieldFactory('filterStatus', 'Status do ensaio')}
+                  {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -716,6 +692,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const assayList = await fetch(urlParameters.toString(), requestOptions);
   const { response: allAssay, total: totalItems } = await assayList.json();
+
+  console.log('allAssay');
+  console.log(allAssay);
 
   return {
     props: {
