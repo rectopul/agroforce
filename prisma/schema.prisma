@@ -542,17 +542,19 @@ model log_import {
 }
 
 model assay_list {
-  id            Int    @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   id_safra      Int
   id_foco       Int
   id_type_assay Int
   id_tecnologia Int
-  gli           String @unique
+  gli           String    @unique
   period        Int
   protocol_name String
   bgm           Int
   project       String
   status        String
+  created_by    Int
+  created_at    DateTime? @default(now())
 
   safra              safra                @relation(fields: [id_safra], references: [id])
   foco               foco                 @relation(fields: [id_foco], references: [id])
@@ -568,9 +570,10 @@ model genotype_treatment {
   id_genotipo       Int
   id_lote           Int
   treatments_number Int
-  status            String
   nca               String
   comments          String
+  status            Int    @default(1)
+  created_by        Int
 
   safra      safra      @relation(fields: [id_safra], references: [id])
   assay_list assay_list @relation(fields: [id_assay_list], references: [id])
