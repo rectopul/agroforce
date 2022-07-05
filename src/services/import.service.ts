@@ -9,7 +9,7 @@ export const importService = {
   getAll,
   create,
   update,
-  validate
+  validate,
 };
 
 function create(data: any) {
