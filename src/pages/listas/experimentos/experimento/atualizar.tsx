@@ -61,6 +61,9 @@ interface IUpdateExperimento {
   repetition: number
   status: string
   comments: string
+  eel: number
+  clp: number
+  nlp: number
 }
 
 export default function AtualizarLocal({
@@ -132,6 +135,10 @@ export default function AtualizarLocal({
       delineamento: experimento.delineamento,
       repetition: experimento.repetition,
       status: experimento.status,
+      comments: experimento.comments,
+      eel: experimento.eel,
+      nlp: experimento.nlp,
+      clp: experimento.clp,
     },
     onSubmit: async (values) => {
       await materiaisService.update({
