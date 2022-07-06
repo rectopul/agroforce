@@ -445,11 +445,11 @@ export default function Atualizarquadra({
         >
           <h1 className="text-2xl">Atualizar quadra</h1>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-5">
+          <div className="w-2/4 flex justify-between items-start gap-5 mt-5">
 
             {updateFieldFactory('cod_quadra', 'Código Quadra')}
 
-            <div className="w-full h-10">
+            <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Local Preparo
               </label>
@@ -466,7 +466,7 @@ export default function Atualizarquadra({
             {updateFieldFactory('esquema', 'Esquema')}
 
           </div>
-          <div className="w-full flex justify-between items-start gap-5 mt-10">
+          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
 
             {updateFieldFactory('larg_q', 'Largura Q')}
 

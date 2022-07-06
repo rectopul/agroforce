@@ -1,33 +1,34 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import {
-  AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar,
+  AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
 } from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { genotipoService, userPreferencesService } from 'src/services';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { AnySchema } from 'yup';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input,
+} from '../../../components';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+import { genotipoService, userPreferencesService } from '../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -41,8 +42,8 @@ interface IFilter {
 
 export interface IGenotipos {
   id: number;
-  id_culture: number;
-  id_safra: number;
+  idCulture: number;
+  idSafra: number;
   genealogy: string;
   genotipo: string;
   cruza: string;
@@ -60,14 +61,21 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  id_culture: number;
-  id_safra: number;
+  idCulture: number;
+  idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  allGenotipos, totalItems, itensPerPage, filterApplication, id_culture, id_safra, pageBeforeEdit, filterBeforeEdit,
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -116,19 +124,9 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -142,7 +140,7 @@ export default function Listagem({
     onSubmit: async ({
       filterStatus, filterGenotipo, filterGenealogy, filterCruza,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&id_culture=${id_culture}&id_safra=${id_safra}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&id_culture=${idCulture}&id_safra=${idSafra}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotipoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -154,11 +152,57 @@ export default function Listagem({
     },
   });
 
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
+
+    await genotipoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setGenotipo(response.response);
+      }
+    });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
+
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -184,6 +228,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
@@ -196,6 +241,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
@@ -235,18 +281,18 @@ export default function Listagem({
     };
   }
 
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: string[] = camposGerenciados.split(',');
+  function columnsOrder(columnsCampos: any): any {
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
 
     // camposGerenciados.map((field: any) => {
-    // 	if (field.value === 'id') {
-    // 		tableFields.push(idHeaderFactory())
-    // 	} else if (field.value === 'status') {
-    // 		tableFields.push(statusHeaderFactory())
-    // 	} else {
-    // 		tableFields.push(headerTableFactory(field.title, field.value));
-    // 	}
+    // if (field.value === 'id') {
+    // tableFields.push(idHeaderFactory())
+    // } else if (field.value === 'status') {
+    // tableFields.push(statusHeaderFactory())
+    // } else {
+    // tableFields.push(headerTableFactory(field.title, field.value));
+    // }
     // })
     Object.keys(columnCampos).forEach((_, index) => {
       if (columnCampos[index] === 'id') {
@@ -314,52 +360,12 @@ export default function Listagem({
     return tableFields;
   }
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await genotipoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setGenotipo(response.response);
-      }
-    });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -367,14 +373,32 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.genotipo = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 10,
+      }).then((response) => {
+        userLogado.preferences.genotipo = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem(
+        'user',
+        JSON.stringify(userLogado),
+      );
     } else {
-      userLogado.preferences.genotipo = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.genotipo = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
     setStatusAccordion(false);
@@ -416,7 +440,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -446,7 +470,7 @@ export default function Listagem({
     let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${id_culture}`;
+      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
     }
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
@@ -593,14 +617,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(String(generate.value))}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(String(generate.value))}
                                                 />
                                               </li>
                                             )}
@@ -618,7 +651,6 @@ export default function Listagem({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
                         <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
@@ -694,8 +726,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
-  const id_safra = Number(req.cookies.safraId);
-  const id_culture = Number(req.cookies.cultureId);
+  const idSafra = Number(req.cookies.safraId);
+  const idCulture = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
@@ -705,10 +737,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -724,8 +756,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      id_culture,
-      id_safra,
+      idCulture,
+      idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
     },
