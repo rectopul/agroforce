@@ -3,7 +3,7 @@ import { fetchWrapper } from '../helpers';
 
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/grupo`;
+const baseUrl = `${publicRuntimeConfig.apiUrl}/log-import`;
 
 export const logImportService = {
 	getAll,
