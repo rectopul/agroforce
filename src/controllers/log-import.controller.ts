@@ -23,7 +23,6 @@ export class LogImportController {
   }
 
   async create(data: any) {
-    console.log(data);
     try {
       const schema: SchemaOf<any> = object({
         user_id: number().required(this.required),

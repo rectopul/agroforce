@@ -46,25 +46,29 @@ interface IData {
   allItems: LogData[];
   totalItems: number;
   itensPerPage: number;
-  filterApplication: object | any;
+  filterAplication: object | any;
   id_genotipo: number;
+  UploadInProcess: number;
 }
-export default function Import({ allItems, totalItems, itensPerPage, filterApplication }: IData) {
+export default function Import({ allItems, totalItems, itensPerPage, filterAplication, UploadInProcess }: IData) {
   const router = useRouter();
   const { TabsDropDowns } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'QUADRAS'
+    tab.titleTab === 'RD'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
   function readExcel() {
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
-    localStorage.setItem('executeUpload', '1');
-    setExecuteUpload(1);
     var value: any = document.getElementById("inputFile");
+    if (!value.files[0]) {
+      Swal.fire("Insira um arquivo")
+      return;
+    }
+    const userLogado = JSON.parse(localStorage.getItem("user") as string);
+    setExecuteUpload(1);
     readXlsxFile(value.files[0]).then((rows) => {
       importService.validateProtocol({ spreadSheet: rows, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
@@ -78,8 +82,8 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
             html: response.message,
             width: '800',
           });
-          router.back();
         }
+        setExecuteUpload(0);
       });
     });
   }
@@ -100,20 +104,21 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
   const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,user_id,created_at, table" };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [executeUpload, setExecuteUpload] = useState<any>(Number(localStorage.getItem("executeUpload")));
+  const [executeUpload, setExecuteUpload] = useState<any>(Number(UploadInProcess));
+  console.log(executeUpload);
   const [logs, setLogs] = useState<LogData[]>(allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [genaratesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Usuario", value: "user_id" },
     { name: "CamposGerenciados[]", title: "Tabela", value: "table" },
     { name: "CamposGerenciados[]", title: "Importado em", value: "created_at" },
   ]);
-  const [filter, setFilter] = useState<any>(filterApplication);
+  const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const filtersStatusItem = [
@@ -129,6 +134,7 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
   const columns = columnsOrder(camposGerenciados);
 
   const disabledButton = (executeUpload === 1) ? true : false;
+  const bgColor = (executeUpload === 1) ? 'bg-red-600' : 'bg-blue-600';
 
   const formikLote = useFormik<IFilter>({
     initialValues: {
@@ -295,7 +301,7 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
     setStatusAccordion(true);
     if (!result) return;
 
-    const items = Array.from(generatesProps);
+    const items: any = Array.from(generatesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
@@ -304,8 +310,8 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
+    if (!filterAplication.includes('paramSelect')) {
+      filterAplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await logImportService.getAll(filterAplication).then((response) => {
@@ -375,7 +381,7 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
       <Head>
         <title>Importação planilhas</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive={'listas'}>
+      <Content contentHeader={tabsDropDowns} moduloActive={'listas'}>
         <div className="grid grid-cols-3 gap-4 h-screen	">
           <div className="bg-white rounded-lg">
             <div className="mt-2 justify-center flex">
@@ -392,11 +398,11 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
 										">
                 <Button
                   textColor='white'
-                  bgColor='bg-blue-600'
+                  bgColor={bgColor}
                   rounder={`rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full`}
                   onClick={() => readExcel()}
                   icon={<IoIosCloudUpload size={40} />}
-                  // disabled={executeUpload}
+                  disabled={disabledButton}
                   type="button" />
                 <span className="text-white">{<IoIosCloudUpload size={40} />}</span>
               </div>
@@ -458,12 +464,12 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAppli
                                             value="Atualizar"
                                             bgColor='bg-blue-600'
                                             textColor='white'
-                                            onClick={getValuesComluns}
+                                            onClick={getValuesColumns}
                                             icon={<IoReloadSharp size={20} />}
                                           />
                                         </div>
                                         {
-                                          genaratesProps.map((genarate, index) => (
+                                          generatesProps.map((genarate, index) => (
                                             <Draggable key={index} draggableId={String(genarate.title)} index={index}>
                                               {(provided) => (
                                                 <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
@@ -583,6 +589,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const apiLogs: any = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await apiLogs.json();
-
-  return { props: { allItems, totalItems, itensPerPage, filterAplication } }
+  let UploadInProcess: number = 0;
+  allItems.map((item: any) => {
+    item.status === 2 ? UploadInProcess = 1 : false;
+  });
+  return { props: { allItems, totalItems, itensPerPage, filterAplication, UploadInProcess } }
 }

@@ -114,7 +114,7 @@ export class ImportController {
       let erro: any; let
         response: any;
 
-      const logImport: any = this.logImportController.create({ user_id: data.created_by, status: 2, table: data.spreadSheet[0] });
+      const logImport: any = await this.logImportController.create({ user_id: data.created_by, status: 2, table: data.spreadSheet[0][0] });
       if (logImport.status === 400) return { status: 200, message: logImport.message, error: true };
       switch (data.spreadSheet[0]) {
         case 'tecnologia':
