@@ -225,6 +225,10 @@ export default function TipoEnsaio({
     };
   }
 
+  async function deleteItem(id: number) {
+    await assayListService.deleted(id);
+  }
+
   function statusHeaderFactory() {
     return {
       title: 'Ações',
@@ -257,10 +261,6 @@ export default function TipoEnsaio({
         </div>
       ),
     };
-  }
-
-  async function deleteItem(id: number) {
-    await assayListService.deleted(id);
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
@@ -692,9 +692,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const assayList = await fetch(urlParameters.toString(), requestOptions);
   const { response: allAssay, total: totalItems } = await assayList.json();
-
-  console.log('allAssay');
-  console.log(allAssay);
 
   return {
     props: {

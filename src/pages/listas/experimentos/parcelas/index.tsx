@@ -22,7 +22,7 @@ import {
 } from 'src/components';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { userPreferencesService } from 'src/services';
-import { experimentoService } from 'src/services/experimento.service';
+import { experimentoService } from 'src/services/experiment.service';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../shared/utils/dropdown';
 

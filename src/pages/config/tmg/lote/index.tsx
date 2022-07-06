@@ -640,8 +640,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(`${urlParameters}`, requestOptions);
-  const { response: allLote, total: totalItems } = await response.json();
+  const { response: allLote, total: totalItems } = await fetch(`${urlParameters}`, requestOptions).then((response) => response.json());
 
   return {
     props: {
