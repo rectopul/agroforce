@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+/* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -15,16 +18,16 @@ import {
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { quadraService, userPreferencesService } from 'src/services';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from 'cookies-next';
-import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select,
+} from '../../../components';
+import { quadraService, userPreferencesService } from '../../../services';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import ITabs from '../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -110,8 +113,6 @@ export default function Listagem({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -139,10 +140,7 @@ export default function Listagem({
       if (response.total > 0) {
         Swal.fire('Quadra não pode ser atualizada pois já existe uma quadra com esse código local ativo!');
       } else {
-        quadraService.update({
-          id,
-          status,
-        });
+        quadraService.update({ id, status });
       }
     });
 
@@ -152,7 +150,7 @@ export default function Listagem({
       data.status = 0;
     }
 
-    const index = quadra.findIndex((quadra) => quadra.id === idQuadra);
+    const index = quadra.findIndex((quadraIndex) => quadraIndex.id === idQuadra);
 
     if (index === -1) {
       return;
@@ -168,150 +166,6 @@ export default function Listagem({
       id,
       status,
     } = quadra[index];
-  }
-
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IQuadra) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              bgColor="bg-blue-600"
-              textColor="white"
-              title={`Editar ${rowData.cod_quadra}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/quadra/atualizar?id=${rowData.id}`);
-              }}
-            />
-          </div>
-          {rowData.status === 1 ? (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => await handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                title="Ativo"
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => await handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                title="Inativo"
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[index] === 'cod_quadra') {
-        tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
-      }
-      if (columnCampos[index] === 'comp_p') {
-        tableFields.push(headerTableFactory('Comp P', 'comp_p'));
-      }
-      if (columnCampos[index] === 'linha_p') {
-        tableFields.push(headerTableFactory('Linha P', 'linha_p'));
-      }
-      if (columnCampos[index] === 'esquema') {
-        tableFields.push(headerTableFactory('Esquema', 'esquema'));
-      }
-      if (columnCampos[index] === 'divisor') {
-        tableFields.push(headerTableFactory('Divisor', 'divisor'));
-      }
-      if (columnCampos[index] === 'local_plantio') {
-        tableFields.push(headerTableFactory('Local plantio', 'local_plantio'));
-      }
-      if (columnCampos[index] === 'local_preparo') {
-        tableFields.push(headerTableFactory('Local Preparo', 'localPreparo.name_local_culture'));
-      }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
   }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
@@ -356,10 +210,162 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: IQuadra) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              bgColor="bg-blue-600"
+              textColor="white"
+              title={`Editar ${rowData.cod_quadra}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/config/quadra/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+          {rowData.status === 1 ? (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsUp size={16} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                title="Ativo"
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsDown size={16} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                title="Inativo"
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
+        </div>
+      ),
+    };
+  }
+
+  function columnsOrder(columnsCampos: any): any {
+    const columnCampos: any = columnsCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnCampos).forEach((_, index) => {
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[index] === 'cod_quadra') {
+        tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
+      }
+      if (columnCampos[index] === 'comp_p') {
+        tableFields.push(headerTableFactory('Comp P', 'comp_p'));
+      }
+      if (columnCampos[index] === 'linha_p') {
+        tableFields.push(headerTableFactory('Linha P', 'linha_p'));
+      }
+      if (columnCampos[index] === 'esquema') {
+        tableFields.push(headerTableFactory('Esquema', 'esquema'));
+      }
+      if (columnCampos[index] === 'divisor') {
+        tableFields.push(headerTableFactory('Divisor', 'divisor'));
+      }
+      if (columnCampos[index] === 'local_plantio') {
+        tableFields.push(headerTableFactory('Local plantio', 'local_plantio'));
+      }
+      if (columnCampos[index] === 'local_preparo') {
+        tableFields.push(headerTableFactory('Local Preparo', 'localPreparo.name_local_culture'));
+      }
+      if (columnCampos[index] === 'status') {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -367,14 +373,29 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 17 }).then((response) => {
-        userLogado.preferences.quadras = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 17,
+      }).then((response) => {
+        userLogado.preferences.quadras = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.quadras = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.quadras = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -416,7 +437,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -590,14 +611,24 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {
+                                                ...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(String(generate.value))}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(String(generate.value))}
                                                 />
                                               </li>
                                             )}
@@ -615,7 +646,6 @@ export default function Listagem({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
                         <Button title="Exportar planilha de quadras" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">

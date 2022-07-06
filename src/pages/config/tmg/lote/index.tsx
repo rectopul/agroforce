@@ -1,65 +1,72 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiSettingsFill } from 'react-icons/ri';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { loteService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
+  AccordionFilter, Button, CheckBox, Content, Input,
+} from '../../../../components';
+import { loteService, userPreferencesService } from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-	filterStatus: object | any;
-	filterName: string | any;
-	filterGenotipo: string | any;
-	filterVolume: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+  filterStatus: object | any;
+  filterYear: string
+  filterCodLote: string
+  filterNcc: string
+  filterFase: string
+  filterPeso: string
+  filterSeeds: string
+  filterGenotipo: string
+  filterMainName: string
+  filterGmr: string
+  filterBgm: string
+  filterTecnologia: string
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 
 export interface LoteGenotipo {
-	id: number;
-	id_culture: number;
-	id_genotipo: number;
-	genealogy: string;
-	name: string;
-	volume: number;
-	status?: number;
+  id: number;
+  id_culture: number;
+  genealogy: string;
+  name: string;
+  volume: number;
+  status?: number;
 }
 
 interface IGenerateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 
 interface IData {
-	allLote: LoteGenotipo[];
-	totalItems: number;
-	itensPerPage: number;
-	filterApplication: object | any;
-	id_genotipo: number;
+  allLote: LoteGenotipo[];
+  totalItems: number;
+  itensPerPage: number;
+  filterApplication: object | any;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication, id_genotipo,
+  allLote, totalItems, itensPerPage, filterApplication,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -71,9 +78,10 @@ export default function Listagem({
       : tab.statusTab = false
   ));
 
-  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia' };
+  const preferences = userLogado.preferences.lote || {
+    id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia',
+  };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
@@ -99,33 +107,42 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterApplication.split('');
-
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
+      filterYear: '',
+      filterCodLote: '',
+      filterNcc: '',
+      filterFase: '',
+      filterPeso: '',
+      filterSeeds: '',
       filterGenotipo: '',
-      filterName: '',
-      filterVolume: '',
+      filterMainName: '',
+      filterGmr: '',
+      filterBgm: '',
+      filterTecnologia: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterGenotipo, filterName, filterVolume,
+      filterStatus,
+      filterYear,
+      filterCodLote,
+      filterNcc,
+      filterFase,
+      filterPeso,
+      filterSeeds,
+      filterGenotipo,
+      filterMainName,
+      filterGmr,
+      filterBgm,
+      filterTecnologia,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&filterName=${filterName}&filterVolume=${filterVolume}&id_portfolio=${id_genotipo}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
       await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setLotes(response.response);
@@ -134,105 +151,6 @@ export default function Listagem({
       });
     },
   });
-
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[index] === 'year') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
-      }
-      if (columnCampos[index] === 'cod_lote') {
-        tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'));
-      }
-      if (columnCampos[index] === 'ncc') {
-        tableFields.push(headerTableFactory('NCC', 'ncc'));
-      }
-      if (columnCampos[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'fase'));
-      }
-      if (columnCampos[index] === 'peso') {
-        tableFields.push(headerTableFactory('Peso', 'peso'));
-      }
-      if (columnCampos[index] === 'quant_sementes') {
-        tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
-      }
-      if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'));
-      }
-      if (columnCampos[index] === 'name_main') {
-        tableFields.push(headerTableFactory('Nome principal', 'genotipo.name_main'));
-      }
-      if (columnCampos[index] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
-      }
-      if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
-      }
-      if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'genotipo.tecnologia.name'));
-      }
-    });
-    return tableFields;
-  }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -276,10 +194,117 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function columnsOrder(columnsCampos: string) {
+    const columnCampos: string[] = columnsCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[index] === 'year') {
+        tableFields.push(headerTableFactory('Ano', 'year'));
+      }
+      if (columnCampos[index] === 'cod_lote') {
+        tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'));
+      }
+      if (columnCampos[index] === 'ncc') {
+        tableFields.push(headerTableFactory('NCC', 'ncc'));
+      }
+      if (columnCampos[index] === 'fase') {
+        tableFields.push(headerTableFactory('Fase', 'fase'));
+      }
+      if (columnCampos[index] === 'peso') {
+        tableFields.push(headerTableFactory('Peso', 'peso'));
+      }
+      if (columnCampos[index] === 'quant_sementes') {
+        tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
+      }
+      if (columnCampos[index] === 'name_genotipo') {
+        tableFields.push(headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'));
+      }
+      if (columnCampos[index] === 'name_main') {
+        tableFields.push(headerTableFactory('Nome principal', 'genotipo.name_main'));
+      }
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
+      }
+      if (columnCampos[index] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+      }
+      if (columnCampos[index] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Tecnologia', 'genotipo.tecnologia.name'));
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -287,13 +312,25 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
-        userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 12,
+      }).then((response) => {
+        userLogado.preferences.lote = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.lote = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -336,6 +373,24 @@ export default function Listagem({
     });
   }
 
+  function filterFieldFactory(title: any, name: any) {
+    return (
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <Input
+          type="text"
+          placeholder={name}
+          max="40"
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+        />
+      </div>
+    );
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -369,51 +424,28 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Status
-										</label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Genótipo
-										</label>
-                    <Input
-                      type="text"
-                      placeholder="Genótipo"
-                      max="40"
-                      id="filterGenotipo"
-                      name="filterGenotipo"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Nome
-										</label>
-                    <Input
-                      type="text"
-                      placeholder="Nome"
-                      max="40"
-                      id="filterName"
-                      name="filterName"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-                  {/* <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Volume
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Volume"
-                      max="40"
-                      id="filterVolume"
-                      name="filterVolume"
-                      onChange={formik.handleChange}
-                    />
-                  </div> */}
+                  {filterFieldFactory('filterYear', 'Ano')}
+
+                  {filterFieldFactory('filterCodLote', 'Cód lote')}
+
+                  {filterFieldFactory('filterNcc', 'NCC')}
+
+                  {filterFieldFactory('filterFase', 'Fase')}
+
+                  {filterFieldFactory('filterPeso', 'Peso')}
+
+                  {filterFieldFactory('filterSeeds', 'Quant. sementes')}
+
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
+
+                  {filterFieldFactory('filterGmr', 'GMR')}
+
+                  {filterFieldFactory('filterBgm', 'BGM')}
+
+                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -436,18 +468,18 @@ export default function Listagem({
               columns={columns}
               data={lotes}
               options={{
-							  showTitle: false,
-							  headerStyle: {
-							    zIndex: 20,
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
                 },
-							  search: false,
-							  filtering: false,
-							  pageSize: itensPerPage,
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
               }}
               components={{
-							  Toolbar: () => (
-  <div
-    className="w-full max-h-96
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -458,130 +490,124 @@ export default function Listagem({
                     border-solid border-b
                     border-gray-200
                   "
-  >
-    {/* <div className='h-12'>
-                      <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => { }}
-                        href="lote/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div> */}
+                  >
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-    <strong className="text-blue-600">
-      Total registrado:
-      {' '}
-      {itemsTotal}
-    </strong>
-
-    <div className="h-full flex items-center gap-2">
-      <div className="border-solid border-2 border-blue-600 rounded">
-        <div className="w-72">
-          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="characters">
-                {
-																	(provided) => (
-  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-    <div className="h-8 mb-3">
-      <Button
-        value="Atualizar"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={getValuesColumns}
-        icon={<IoReloadSharp size={20} />}
-      />
-    </div>
-    {
-																				generatesProps.map((generate, index) => (
-  <Draggable key={index} draggableId={String(generate.title)} index={index}>
-    {(provided) => (
-      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <CheckBox
-          name={generate.name}
-          title={generate.title?.toString()}
-          value={generate.value}
-          defaultChecked={camposGerenciados.includes(generate.value as string)}
-        />
-      </li>
-    )}
-  </Draggable>
-																				))
-																			}
-    {provided.placeholder}
-  </ul>
-																	)
-																}
-              </Droppable>
-            </DragDropContext>
-          </AccordionFilter>
-        </div>
-      </div>
-      {/* <div className='h-12 flex items-center justify-center w-full'>
-                        <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel(); }} />
-                      </div> */}
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
-      </div>
-    </div>
-  </div>
-							  ),
-							  Pagination: (props) => (
-  <div
-    className="flex
+                    <div className="h-full flex items-center gap-2">
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
+                      </div>
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-    {...props}
-  >
-    <Button
-      onClick={() => setCurrentPage(currentPage - 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdFirstPage size={18} />}
-      disabled={currentPage <= 1}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage - 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiLeftArrow size={15} />}
-      disabled={currentPage <= 0}
-    />
-    {
-												Array(1).fill('').map((value, index) => (
-  <Button
-    key={index}
-    onClick={() => setCurrentPage(index)}
-    value={`${currentPage + 1}`}
-    bgColor="bg-blue-600"
-    textColor="white"
-    disabled
-  />
-												))
-											}
-    <Button
-      onClick={() => setCurrentPage(currentPage + 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiRightArrow size={15} />}
-      disabled={currentPage + 1 >= pages}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage + 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdLastPage size={18} />}
-      disabled={currentPage + 1 >= pages}
-    />
-  </div>
-								) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>

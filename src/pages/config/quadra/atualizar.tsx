@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
@@ -295,7 +296,7 @@ export default function Atualizarquadra({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -303,15 +304,36 @@ export default function Atualizarquadra({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 18 }).then((response) => {
-        userLogado.preferences.disparos = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 18,
+      }).then((response) => {
+        userLogado.preferences.disparos = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem(
+        'user',
+        JSON.stringify(userLogado),
+      );
     } else {
-      userLogado.preferences.disparos = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      userLogado.preferences.disparos = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem(
+        'user',
+        JSON.stringify(userLogado),
+      );
     }
 
     setStatusAccordion(false);
@@ -396,8 +418,9 @@ export default function Atualizarquadra({
 
   function updateFieldFactory(title: string, name: string) {
     return (
-      <div className="w-full h-10">
+      <div className="w-2/4 h-10">
         <label className="block text-gray-900 text-sm font-bold mb-2">
+          *
           {name}
         </label>
         <Input
@@ -422,11 +445,11 @@ export default function Atualizarquadra({
         >
           <h1 className="text-2xl">Atualizar quadra</h1>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-5">
+          <div className="w-2/4 flex justify-between items-start gap-5 mt-5">
 
             {updateFieldFactory('cod_quadra', 'Código Quadra')}
 
-            <div className="w-full h-10">
+            <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Local Preparo
               </label>
@@ -443,7 +466,7 @@ export default function Atualizarquadra({
             {updateFieldFactory('esquema', 'Esquema')}
 
           </div>
-          <div className="w-full flex justify-between items-start gap-5 mt-10">
+          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
 
             {updateFieldFactory('larg_q', 'Largura Q')}
 
@@ -458,13 +481,13 @@ export default function Atualizarquadra({
             {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
 
           </div>
-          <div className="w-full flex justify-between items-start gap-5 mt-10">
-
-            {updateFieldFactory('cruza', 'Status quadra')}
+          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
 
             {updateFieldFactory('local_plantio', 'Local realizado')}
 
             {updateFieldFactory('q', 'Q')}
+
+            {updateFieldFactory('cruza', 'Status quadra')}
 
           </div>
           <div className="h-10 w-full
@@ -575,10 +598,8 @@ export default function Atualizarquadra({
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={
-                                                    camposGerenciados
-                                                      .includes(generate.value as string)
-                                                  }
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value as string)}
                                                 />
                                               </li>
                                             )}
@@ -691,9 +712,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const disparos = await fetch(`${baseUrlDisparos}?id_quadra=${idQuadra}`, requestOptions);
   const { response: allDisparos, total: totalItems } = await disparos.json();
-
-  console.log('quadra');
-  console.log(quadra);
 
   return {
     props: {

@@ -1,48 +1,51 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import {
-  AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar,
+  AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
 } from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { genotipoService, userPreferencesService } from 'src/services';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { AnySchema } from 'yup';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input,
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
   filterGenotipo: string | any;
-  filterGenealogy: string | any;
+  filterMainName: string | any;
+  filterTecnologia: string | any;
   filterCruza: string | any;
+  filterGmr: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
 
 export interface IGenotipos {
   id: number;
-  id_culture: number;
-  id_safra: number;
+  idCulture: number;
+  idSafra: number;
   genealogy: string;
   genotipo: string;
   cruza: string;
@@ -60,14 +63,21 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  id_culture: number;
-  id_safra: number;
+  idCulture: number;
+  idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  allGenotipos, totalItems, itensPerPage, filterApplication, id_culture, id_safra, pageBeforeEdit, filterBeforeEdit,
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -98,7 +108,6 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
-    { name: 'CamposGerenciados[]', title: 'ID_S1', value: 'id_s1' },
     { name: 'CamposGerenciados[]', title: 'Nome publico', value: 'name_public' },
     { name: 'CamposGerenciados[]', title: 'Nome experimental', value: 'name_experiment' },
     { name: 'CamposGerenciados[]', title: 'Nome alternativo', value: 'name_alter' },
@@ -116,33 +125,25 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterGenotipo: '',
-      filterGenealogy: '',
+      filterMainName: '',
+      filterTecnologia: '',
       filterCruza: '',
+      filterGmr: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterGenotipo, filterGenealogy, filterCruza,
+      filterStatus, filterGenotipo, filterMainName, filterCruza, filterTecnologia, filterGmr,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&id_culture=${id_culture}&id_safra=${id_safra}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologia=${filterTecnologia}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotipoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -153,166 +154,6 @@ export default function Listagem({
       });
     },
   });
-
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IGenotipos) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              bgColor="bg-blue-600"
-              textColor="white"
-              title={`Editar ${rowData.genealogy}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
-              }}
-            />
-          </div>
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: string[] = camposGerenciados.split(',');
-    const tableFields: any = [];
-
-    // camposGerenciados.map((field: any) => {
-    // 	if (field.value === 'id') {
-    // 		tableFields.push(idHeaderFactory())
-    // 	} else if (field.value === 'status') {
-    // 		tableFields.push(statusHeaderFactory())
-    // 	} else {
-    // 		tableFields.push(headerTableFactory(field.title, field.value));
-    // 	}
-    // })
-    Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'name_genotipo'));
-      }
-      if (columnCampos[index] === 'name_main') {
-        tableFields.push(headerTableFactory('Nome principal', 'name_main'));
-      }
-      if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
-      }
-      if (columnCampos[index] === 'cruza') {
-        tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
-      }
-      if (columnCampos[index] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR', 'gmr'));
-      }
-      if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
-      }
-      if (columnCampos[index] === 'id_s1') {
-        tableFields.push(headerTableFactory('ID_S1', 'id_s1'));
-      }
-      if (columnCampos[index] === 'name_public') {
-        tableFields.push(headerTableFactory('Nome publico', 'name_public'));
-      }
-      if (columnCampos[index] === 'name_experiment') {
-        tableFields.push(headerTableFactory('Nome experimental', 'name_experiment'));
-      }
-      if (columnCampos[index] === 'name_alter') {
-        tableFields.push(headerTableFactory('Nome alternativo', 'name_alter'));
-      }
-      if (columnCampos[index] === 'elit_name') {
-        tableFields.push(headerTableFactory('Elite nome', 'elit_name'));
-      }
-      if (columnCampos[index] === 'type') {
-        tableFields.push(headerTableFactory('Tipo', 'type'));
-      }
-      if (columnCampos[index] === 'progenitor_f_direto') {
-        tableFields.push(headerTableFactory('Progenitor f direto', 'progenitor_f_direto'));
-      }
-      if (columnCampos[index] === 'progenitor_m_direto') {
-        tableFields.push(headerTableFactory('Progenitor m direto', 'progenitor_m_direto'));
-      }
-      if (columnCampos[index] === 'progenitor_f_origem') {
-        tableFields.push(headerTableFactory('Progenitor f origem', 'progenitor_f_origem'));
-      }
-      if (columnCampos[index] === 'progenitor_m_origem') {
-        tableFields.push(headerTableFactory('Progenitor m origem', 'progenitor_m_origem'));
-      }
-      if (columnCampos[index] === 'progenitores_origem') {
-        tableFields.push(headerTableFactory('Progenitores origem', 'progenitores_origem'));
-      }
-      if (columnCampos[index] === 'parentesco_completo') {
-        tableFields.push(headerTableFactory('Parentesco', 'parentesco_completo'));
-      }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-
-    return tableFields;
-  }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -356,10 +197,175 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: IGenotipos) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              bgColor="bg-blue-600"
+              textColor="white"
+              title={`Editar ${rowData.genealogy}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+        </div>
+      ),
+    };
+  }
+
+  function columnsOrder(columnsCampos: any): any {
+    const columnCampos: string[] = columnsCampos.split(',');
+    const tableFields: any = [];
+
+    // camposGerenciados.map((field: any) => {
+    // if (field.value === 'id') {
+    // tableFields.push(idHeaderFactory())
+    // } else if (field.value === 'status') {
+    // tableFields.push(statusHeaderFactory())
+    // } else {
+    // tableFields.push(headerTableFactory(field.title, field.value));
+    // }
+    // })
+    Object.keys(columnCampos).forEach((_, index) => {
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[index] === 'name_genotipo') {
+        tableFields.push(headerTableFactory('Nome genotipo', 'name_genotipo'));
+      }
+      if (columnCampos[index] === 'name_main') {
+        tableFields.push(headerTableFactory('Nome principal', 'name_main'));
+      }
+      if (columnCampos[index] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
+      }
+      if (columnCampos[index] === 'cruza') {
+        tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
+      }
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR', 'gmr'));
+      }
+      if (columnCampos[index] === 'number_lotes') {
+        tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
+      }
+      if (columnCampos[index] === 'name_public') {
+        tableFields.push(headerTableFactory('Nome publico', 'name_public'));
+      }
+      if (columnCampos[index] === 'name_experiment') {
+        tableFields.push(headerTableFactory('Nome experimental', 'name_experiment'));
+      }
+      if (columnCampos[index] === 'name_alter') {
+        tableFields.push(headerTableFactory('Nome alternativo', 'name_alter'));
+      }
+      if (columnCampos[index] === 'elit_name') {
+        tableFields.push(headerTableFactory('Elite nome', 'elit_name'));
+      }
+      if (columnCampos[index] === 'type') {
+        tableFields.push(headerTableFactory('Tipo', 'type'));
+      }
+      if (columnCampos[index] === 'progenitor_f_direto') {
+        tableFields.push(headerTableFactory('Progenitor f direto', 'progenitor_f_direto'));
+      }
+      if (columnCampos[index] === 'progenitor_m_direto') {
+        tableFields.push(headerTableFactory('Progenitor m direto', 'progenitor_m_direto'));
+      }
+      if (columnCampos[index] === 'progenitor_f_origem') {
+        tableFields.push(headerTableFactory('Progenitor f origem', 'progenitor_f_origem'));
+      }
+      if (columnCampos[index] === 'progenitor_m_origem') {
+        tableFields.push(headerTableFactory('Progenitor m origem', 'progenitor_m_origem'));
+      }
+      if (columnCampos[index] === 'progenitores_origem') {
+        tableFields.push(headerTableFactory('Progenitores origem', 'progenitores_origem'));
+      }
+      if (columnCampos[index] === 'parentesco_completo') {
+        tableFields.push(headerTableFactory('Parentesco', 'parentesco_completo'));
+      }
+      if (columnCampos[index] === 'status') {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -367,14 +373,32 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 10 }).then((response) => {
-        userLogado.preferences.genotipo = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 10,
+      }).then((response) => {
+        userLogado.preferences.genotipo = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem(
+        'user',
+        JSON.stringify(userLogado),
+      );
     } else {
-      userLogado.preferences.genotipo = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.genotipo = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
     setStatusAccordion(false);
@@ -416,7 +440,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -446,7 +470,7 @@ export default function Listagem({
     let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${id_culture}`;
+      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
     }
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
@@ -454,11 +478,6 @@ export default function Listagem({
       }
     });
   }
-
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -477,6 +496,11 @@ export default function Listagem({
       </div>
     );
   }
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
   return (
     <>
@@ -508,7 +532,13 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
 
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
+
+                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
+
+                  {filterFieldFactory('filterGmr', 'GMR')}
 
                 </div>
 
@@ -593,14 +623,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(String(generate.value))}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(String(generate.value))}
                                                 />
                                               </li>
                                             )}
@@ -618,7 +657,6 @@ export default function Listagem({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
                         <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
@@ -694,8 +732,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
-  const id_safra = Number(req.cookies.safraId);
-  const id_culture = Number(req.cookies.cultureId);
+  const idSafra = Number(req.cookies.safraId);
+  const idCulture = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
@@ -705,10 +743,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -724,8 +762,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      id_culture,
-      id_safra,
+      idCulture,
+      idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
     },
