@@ -1,3 +1,6 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -5,29 +8,29 @@ import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import {
-  AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar,
+  AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
 } from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { userPreferencesService } from 'src/services';
-import { experimentoService } from 'src/services/experimento.service';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { BsTrashFill } from 'react-icons/bs';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { userPreferencesService } from '../../../../services';
+import { experimentService } from '../../../../services/experiment.service';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input, Select,
+} from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -42,7 +45,7 @@ interface IFilter {
 export interface IExperimento {
   id: number;
   protocol_name: string;
-  experimento_name: string;
+  experiment_name: string;
   year: number;
   rotulo: string;
   foco: string;
@@ -60,17 +63,23 @@ interface IGenerateProps {
 }
 
 interface IData {
-  allExperimentos: IExperimento[];
+  allExperiments: IExperimento[];
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  id_culture: number;
+  idCulture: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  allExperimentos, totalItems, itensPerPage, filterApplication, id_culture, pageBeforeEdit, filterBeforeEdit,
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -83,10 +92,12 @@ export default function Listagem({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.experimento || { id: 0, table_preferences: 'id,protocolo_name,experimento_name,year,rotulo,foco,ensaio,tecnologia,epoca,materiais,status' };
+  const preferences = userLogado.preferences.experimento || {
+    id: 0, table_preferences: 'id,protocolo_name,foco,type_assay,gli,experiment_name,tecnologia,epoca,delineamento,repetition,status,action',
+  };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperimentos);
+  const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
@@ -95,34 +106,25 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Nome protocolo', value: 'protocolo_name' },
-    { name: 'CamposGerenciados[]', title: 'Nome experimento', value: 'experimento_name' },
-    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Rótulo', value: 'rotulo' },
+    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolo_name' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
-    { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'ensaio' },
+    { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
+    { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
+    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experiment_name' },
     { name: 'CamposGerenciados[]', title: 'Cód. Tec.', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'EP', value: 'epoca' },
-    { name: 'CamposGerenciados[]', title: 'N de materiais', value: 'materiais' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Época', value: 'epoca' },
+    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetition' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
 
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -134,12 +136,15 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterProtocolName, filterExperimentoName, filterRotulo,
+      filterStatus,
+      filterProtocolName,
+      filterExperimentoName,
+      filterRotulo,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1}&filterProtocolName=${filterProtocolName}&id_culture=${id_culture}&filterExperimentoName=${filterExperimentoName}&filterRotulo=${filterRotulo}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await experimentoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setExperimento(response.response);
         setTotalItems(response.total);
@@ -148,41 +153,57 @@ export default function Listagem({
     },
   });
 
-  async function handleStatus(idExperimento: number, data: IExperimento): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
     } else {
-      data.status = 0;
+      typeOrder = '';
     }
 
-    const index = experimentos.findIndex((experimento) => experimento.id === idExperimento);
-
-    if (index === -1) {
-      return;
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
     }
 
-    setExperimento((oldExperimento) => {
-      const copy = [...oldExperimento];
-      copy[index].status = data.status;
-      return copy;
+    await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
+      if (status === 200) {
+        setExperimento(response);
+      }
     });
 
-    const {
-      id,
-      status,
-    } = experimentos[index];
-
-    await experimentoService.update({
-      id,
-      status,
-    });
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
   }
 
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -208,6 +229,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
@@ -220,6 +242,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
@@ -232,64 +255,46 @@ export default function Listagem({
     };
   }
 
+  async function deleteItem(id: number) {
+    await experimentService.deleted(id);
+  }
+
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: 'Ações',
+      field: 'action',
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
       render: (rowData: IExperimento) => (
         <div className="h-10 flex">
           <div className="h-10">
             <Button
               icon={<BiEdit size={16} />}
-              bgColor="bg-blue-600"
-              textColor="white"
-              title={`Editar ${rowData.experimento_name}`}
+              title={`Atualizar ${rowData.experiment_name}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
                 router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
               }}
+              bgColor="bg-blue-600"
+              textColor="white"
             />
           </div>
-          {rowData.status === 1
-            ? (
-              <div className="h-10">
-                <Button
-                  icon={<FaRegThumbsUp size={16} />}
-                  onClick={async () => await handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })}
-                  title="Ativo"
-                  bgColor="bg-green-600"
-                  textColor="white"
-                />
-              </div>
-            )
-            : (
-              <div className="h-10">
-                <Button
-                  icon={<FaRegThumbsDown size={16} />}
-                  onClick={async () => await handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })}
-                  title="Inativo"
-                  bgColor="bg-red-800"
-                  textColor="white"
-                />
-              </div>
-            )}
+          <div>
+            <Button
+              icon={<BsTrashFill size={16} />}
+              onClick={() => deleteItem(rowData.id)}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
         </div>
       ),
     };
   }
 
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+  function columnsOrder(columnsCampos: any): any {
+    const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
@@ -297,85 +302,48 @@ export default function Listagem({
         tableFields.push(idHeaderFactory());
       }
       if (columnCampos[index] === 'protocolo_name') {
-        tableFields.push(headerTableFactory('Nome protocolo', 'protocolo_name'));
-      }
-      if (columnCampos[index] === 'experimento_name') {
-        tableFields.push(headerTableFactory('Nome experimento', 'experimento_name'));
-      }
-      if (columnCampos[index] === 'year') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
-      }
-      if (columnCampos[index] === 'rotulo') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
+        tableFields.push(headerTableFactory('Protocolo', 'protocolo_name'));
       }
       if (columnCampos[index] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
-      if (columnCampos[index] === 'ensaio') {
-        tableFields.push(headerTableFactory('Ensaio', 'ensaio.name'));
+      if (columnCampos[index] === 'type_assay') {
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      }
+      if (columnCampos[index] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Cód tec', 'tecnologia.cod_tec'));
+        tableFields.push(headerTableFactory('Cód tec', 'tecnologia.name'));
+      }
+      if (columnCampos[index] === 'experiment_name') {
+        tableFields.push(headerTableFactory('Nome experimento', 'experiment_name'));
       }
       if (columnCampos[index] === 'epoca') {
         tableFields.push(headerTableFactory('Época', 'epoca'));
       }
-      if (columnCampos[index] === 'materiais') {
-        tableFields.push(headerTableFactory('Nº Materiais', 'materiais'));
+      if (columnCampos[index] === 'delineamento') {
+        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
+      }
+      if (columnCampos[index] === 'repetition') {
+        tableFields.push(headerTableFactory('Rep.', 'repetition'));
       }
       if (columnCampos[index] === 'status') {
+        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+      }
+      if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
     return tableFields;
   }
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await experimentoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setExperimento(response.response);
-      }
-    });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -383,14 +351,29 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 22 }).then((response) => {
-        userLogado.preferences.experimento = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 22,
+      }).then((response) => {
+        userLogado.preferences.experimento = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.experimento = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.experimento = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
     setStatusAccordion(false);
@@ -414,28 +397,14 @@ export default function Listagem({
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await experimentoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = experimentos.map((row) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
-
-          return row;
-        });
-
-        // newData.map((item: any) => {
-        //     return item.tecnologia = item.tecnologia?.tecnologia
-        // })
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+    await experimentService.getAll(filterApplication).then(({ status, response, message }: any) => {
+      if (status === 200) {
+        const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -447,7 +416,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'Experimentos.xlsx');
       } else {
-        Swal.fire(response);
+        Swal.fire(message);
       }
     });
   };
@@ -465,11 +434,11 @@ export default function Listagem({
     let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${id_culture}`;
+      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
     }
-    await experimentoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setExperimento(response.response);
+    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+      if (status === 200) {
+        setExperimento(response);
       }
     });
   }
@@ -525,13 +494,6 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Status
-                    </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
-                  </div>
-
                   {filterFieldFactory('filterProtocolName', 'Nome Protocolo')}
 
                   {filterFieldFactory('filterExperimentoName', 'Nome Experimento')}
@@ -622,14 +584,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(String(generate.value))}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(String(generate.value))}
                                                 />
                                               </li>
                                             )}
@@ -647,7 +618,6 @@ export default function Listagem({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('portfolio/importacao')}} /> */}
                         <Button title="Exportar planilha de experimentos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
@@ -722,8 +692,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  const { token } = req.cookies;
-  const id_culture = Number(req.cookies.cultureId);
+  // const { token } = req.cookies;
+  const idCulture = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
@@ -731,32 +701,56 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/experimento`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}` : 'filterStatus=1';
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}` : 'filterStatus=1';
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` },
-  } as RequestInit | undefined;
+  // const requestOptions = {
+  //   method: 'GET',
+  //   credentials: 'include',
+  //   headers: { Authorization: `Bearer ${token}` },
+  // } as RequestInit | undefined;
 
-  const experimento = await fetch(`${baseUrl}?id_culture=${id_culture}`, requestOptions);
-  const { response: allExperimentos, total: totalItems } = await experimento.json();
+  // const experimento = await fetch(`${baseUrl}?id_culture=${idCulture}`, requestOptions);
+  // const { response: allExperiments, total: totalItems } = await experimento.json();
 
-  console.log('allExperimentos');
-  console.log(allExperimentos);
+  const totalItems = 5;
+  const allExperiments = [{
+    id: 1,
+    protocolo_name: 'hinata',
+    foco: {
+      name: 'Norte',
+    },
+    type_assay: {
+      name: 'VCA',
+    },
+    gli: 'sasuke',
+    experiment_name: 'naruto',
+    tecnologia: {
+      name: 'ak47',
+    },
+    epoca: 'verao',
+    delineamento: {
+      name: 'quadrado',
+    },
+    repetition: 5,
+    status: 'exportado',
+  },
+  ];
+
+  console.log('allExperiments');
+  console.log(allExperiments);
 
   return {
     props: {
-      allExperimentos,
+      allExperiments,
       totalItems,
       itensPerPage,
       filterApplication,
-      id_culture,
+      idCulture,
       pageBeforeEdit,
       filterBeforeEdit,
     },
