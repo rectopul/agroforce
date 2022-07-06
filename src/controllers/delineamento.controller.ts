@@ -48,6 +48,10 @@ export class DelineamentoController {
 				parameters.id_culture = parseInt(options.id_culture);
 			}
 
+			if (options.status) {
+				parameters.status = parseInt(options.status);
+			}
+
 			if (options.name) {
 				parameters.name = options.name;
 			}

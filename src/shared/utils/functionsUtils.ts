@@ -5,7 +5,8 @@ const pwd = 'TMG2022';
 export const functionsUtils = {
 	validationCPF,
 	Crypto,
-	countChildrenForSafra
+	countChildrenForSafra,
+	formatDate
 };
 
 function validationCPF(cpf: any) {
@@ -61,9 +62,17 @@ function countChildrenForSafra(dataChildren: [], safraId: number = 0) {
 	let countChildren: number = 0;
 	if (safraId != 0) {
 		dataChildren.map((item: any) => {
-			(Number(item.id_safra)  === safraId) ? countChildren += 1 : '';		
+			(Number(item.id_safra) === safraId) ? countChildren += 1 : '';
 		})
 	}
 	return countChildren;
 }
 
+function formatDate(data: any) {
+	var dia = data.getDate().toString(),
+		diaF = (dia.length == 1) ? '0' + dia : dia,
+		mes = (data.getMonth() + 1).toString(), //+1 pois no getMonth Janeiro começa com zero.
+		mesF = (mes.length == 1) ? '0' + mes : mes,
+		anoF = data.getFullYear();
+	return diaF + "/" + mesF + "/" + anoF;
+}

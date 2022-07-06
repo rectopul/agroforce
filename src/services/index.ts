@@ -27,3 +27,5 @@ export * from './experimento.service';
 export * from './materiais.service';
 export * from './assay-list.service';
 export * from './genotype-treatment.service';
+export * from './materiais.service'
+export * from './log-import.service'
