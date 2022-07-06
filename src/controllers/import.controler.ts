@@ -922,7 +922,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  const lote: any = this.loteController.listAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
+                  const lote: any = this.loteController.getAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -942,7 +942,7 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'NCC') {
-                const lote = await this.loteController.listAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
+                const lote = await this.loteController.getAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
                 if (lote.total > 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
                 }
@@ -981,7 +981,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const geno: any = await this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet], id_safra: data.id_safra });
+                  const geno: any = await this.genotipoController.getAll({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet], id_safra: data.id_safra });
                   if (geno.total > 0) {
                     this.aux.id_genotipo = geno.response[0].id;
                   }
@@ -1103,7 +1103,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const lote: any = await this.loteController.listAll({ id_dados: data.spreadSheet[keySheet][sheet] });
+                  const lote: any = await this.loteController.getAll({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0].id;
                   }
@@ -1161,7 +1161,7 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
-                  await this.genotipoController.updategenotipo({
+                  await this.genotipoController.update({
                     id: this.aux.id_genotipo,
                     id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
@@ -1187,7 +1187,7 @@ export class ImportController {
                   });
                 } else {
                   delete this.aux.id_genotipo;
-                  const genotipo: any = await this.genotipoController.createGenotipo({
+                  const genotipo: any = await this.genotipoController.create({
                     id_culture: this.aux.id_culture,
                     id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,
@@ -1282,7 +1282,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  const geno = await this.genotipoController.listAllGenotipos({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+                  const geno = await this.genotipoController.getAll({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (geno.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, genótipo não existe no sistema.</li><br>`;
                   }
@@ -1318,7 +1318,7 @@ export class ImportController {
             if (keySheet != '0') {
               if (configModule.response[0].fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const geno = await this.genotipoController.listAllGenotipos({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+                  const geno = await this.genotipoController.getAll({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (geno.total > 0) {
                     this.aux.id_genotipo = geno.response[0].id;
                   }
@@ -1327,7 +1327,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Lote') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const lote = await this.loteController.listAll({ name: data.spreadSheet[keySheet][sheet] });
+                  const lote = await this.loteController.getAll({ name: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.name = data.spreadSheet[keySheet][sheet];
                     this.aux.id = lote.response[0].id;
@@ -2532,7 +2532,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do material é obrigatorio.</li><br>`;
                 } else {
-                  const geno = await this.genotipoController.listAllGenotipos({ id_dados: data.spreadSheet[keySheet][sheet] });
+                  const geno = await this.genotipoController.getAll({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (geno.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo identificador de dados do material é obrigatorio.</li><br>`;
                   }
@@ -2576,7 +2576,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  const lote: any = this.loteController.listAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
+                  const lote: any = this.loteController.getAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -2619,7 +2619,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_geno') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const geno: any = await this.genotipoController.listAllGenotipos({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
+                  const geno: any = await this.genotipoController.getAll({ id_culture: data.id_culture, id_dados: data.spreadSheet[keySheet][sheet] });
                   if (geno.total > 0) {
                     this.aux.id_genotipo = geno.response[0].id;
                   }
@@ -2741,7 +2741,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'id_dados_lote') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const lote: any = await this.loteController.listAll({ id_dados: data.spreadSheet[keySheet][sheet] });
+                  const lote: any = await this.loteController.getAll({ id_dados: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0].id;
                   }
@@ -2793,7 +2793,7 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
-                  await this.genotipoController.updategenotipo({
+                  await this.genotipoController.update({
                     id: this.aux.id_genotipo,
                     id_culture: Number(this.aux.id_culture),
                     id_tecnologia: Number(this.aux.id_tecnologia),
@@ -2819,7 +2819,7 @@ export class ImportController {
                   });
                 } else {
                   delete this.aux.id_genotipo;
-                  const genotipo: any = await this.genotipoController.createGenotipo({
+                  const genotipo: any = await this.genotipoController.create({
                     id_culture: this.aux.id_culture,
                     id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,

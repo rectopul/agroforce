@@ -26,16 +26,18 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
-} from '../../../components';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import { genotipoService, userPreferencesService } from '../../../services';
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
   filterGenotipo: string | any;
-  filterGenealogy: string | any;
+  filterMainName: string | any;
+  filterTecnologia: string | any;
   filterCruza: string | any;
+  filterGmr: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -106,7 +108,6 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
-    { name: 'CamposGerenciados[]', title: 'ID_S1', value: 'id_s1' },
     { name: 'CamposGerenciados[]', title: 'Nome publico', value: 'name_public' },
     { name: 'CamposGerenciados[]', title: 'Nome experimental', value: 'name_experiment' },
     { name: 'CamposGerenciados[]', title: 'Nome alternativo', value: 'name_alter' },
@@ -132,15 +133,17 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterGenotipo: '',
-      filterGenealogy: '',
+      filterMainName: '',
+      filterTecnologia: '',
       filterCruza: '',
+      filterGmr: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterGenotipo, filterGenealogy, filterCruza,
+      filterStatus, filterGenotipo, filterMainName, filterCruza, filterTecnologia, filterGmr,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&id_culture=${idCulture}&id_safra=${idSafra}&filterGenealogy=${filterGenealogy}&filterCruza=${filterCruza}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologia=${filterTecnologia}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotipoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -316,9 +319,6 @@ export default function Listagem({
       if (columnCampos[index] === 'number_lotes') {
         tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
       }
-      if (columnCampos[index] === 'id_s1') {
-        tableFields.push(headerTableFactory('ID_S1', 'id_s1'));
-      }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
       }
@@ -479,11 +479,6 @@ export default function Listagem({
     });
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
-
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
@@ -501,6 +496,11 @@ export default function Listagem({
       </div>
     );
   }
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
   return (
     <>
@@ -532,7 +532,13 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
 
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
+
+                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
+
+                  {filterFieldFactory('filterGmr', 'GMR')}
 
                 </div>
 
