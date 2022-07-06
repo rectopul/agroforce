@@ -26,14 +26,14 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { userPreferencesService, disparosService, quadraService } from '../../../services';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   Button,
   Content,
   Input,
   AccordionFilter, CheckBox,
 } from '../../../components';
-import { userPreferencesService, disparosService, quadraService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -78,7 +78,7 @@ export default function Atualizarquadra({
       cod_quadra: quadra.cod_quadra,
       id_culture: quadra.id_culture,
       id_safra: quadra.id_safra,
-      local_preparo: quadra.local_preparo,
+      local_preparo: quadra.localPreparo.name_local_culture,
       local_plantio: quadra.local_plantio,
       larg_q: quadra.larg_q,
       comp_p: quadra.comp_p,
@@ -91,11 +91,11 @@ export default function Atualizarquadra({
     },
     onSubmit: async (values) => {
       await quadraService.update({
-        id: quadra.id,
+        id: values.id,
         cod_quadra: values.cod_quadra,
         id_culture: values.id_culture,
         id_safra: values.id_safra,
-        local_preparo: values.local_preparo,
+        local_preparo: values.localPreparo.name_local_culture,
         local_plantio: values.local_plantio,
         larg_q: values.larg_q,
         comp_p: values.comp_p,
@@ -104,7 +104,7 @@ export default function Atualizarquadra({
         esquema: values.esquema,
         tiro_fixo: values.tiro_fixo,
         disparo_fixo: values.disparo_fixo,
-        q: quadra.q,
+        q: values.q,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Genótipo atualizado com sucesso!');
@@ -150,7 +150,7 @@ export default function Atualizarquadra({
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_quadra=${id_quadra}`;
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_quadra=${idQuadra}`;
       await disparosService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: any[]) => {
         setDisparos(response);
         setTotaItems(response.length);
@@ -205,7 +205,11 @@ export default function Atualizarquadra({
     return {
       title: (
         <div className="flex items-center">
-          <button type="button" className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -412,7 +416,7 @@ export default function Atualizarquadra({
     handleTotalPages();
   }, [currentPage]);
 
-  function updateFieldFactory(title: any, name: any) {
+  function updateFieldFactory(title: string, name: string) {
     return (
       <div className="w-2/4 h-10">
         <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -425,7 +429,7 @@ export default function Atualizarquadra({
           required
           id={title}
           name={title}
-          value={quadra[title]}
+          value={formik.values[title]}
         />
       </div>
     );
@@ -441,24 +445,36 @@ export default function Atualizarquadra({
         >
           <h1 className="text-2xl">Atualizar quadra</h1>
 
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-5">
+          <div className="w-full flex justify-between items-start gap-5 mt-5">
 
             {updateFieldFactory('cod_quadra', 'Código Quadra')}
 
-            {updateFieldFactory('local_preparo', 'Local Preparo')}
+            <div className="w-full h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Local Preparo
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                required
+                id="localPreparo"
+                name="localPreparo"
+                value={quadra.localPreparo.name_local_culture}
+              />
+            </div>
 
-            {updateFieldFactory('larg_q', 'Largura Q')}
+            {updateFieldFactory('esquema', 'Esquema')}
 
           </div>
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
+          <div className="w-full flex justify-between items-start gap-5 mt-10">
+
+            {updateFieldFactory('larg_q', 'Largura Q')}
 
             {updateFieldFactory('comp_p', 'Comp P.')}
 
             {updateFieldFactory('linha_p', 'Linha P.')}
 
             {updateFieldFactory('comp_c', 'Comp C.')}
-
-            {updateFieldFactory('esquema', 'Esquema')}
 
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 

@@ -10,6 +10,7 @@ export const importService = {
   create,
   update,
   validate,
+  validateProtocol
 };
 
 function create(data: any) {
@@ -26,4 +27,8 @@ function getAll(parameters: any) {
 
 function validate(data: any) {
   return fetchWrapper.post(`${baseUrl}/validate`, data);
+}
+
+function validateProtocol(data: any) {
+  return fetchWrapper.post(`${baseUrl}/validateProtocol`, data);
 }

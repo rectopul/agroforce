@@ -3,15 +3,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { QuadraController } from '../../../controllers/quadra.controller';
 import { apiHandler } from '../../../helpers/api';
 
-export default  apiHandler(handler);
+export default apiHandler(handler);
 
- async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id_culture } = req.query;
-  const Controller =  new QuadraController();
+  const Controller = new QuadraController();
 
   switch (req.method) {
     case 'GET':
-      const resultGet = await Controller.listAll(req.query);
+      const resultGet = await Controller.getAll(req.query);
       res.status(200).json(resultGet);
       break
     case 'POST':
