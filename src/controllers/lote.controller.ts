@@ -1,170 +1,179 @@
-import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
-import { number, object, SchemaOf, string } from 'yup';
+import tecnologia from 'src/pages/api/tecnologia';
+import handleError from '../shared/utils/handleError';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
-interface LoteDTO {
-	id: number;
-	id_genotipo: number;
-	name: string;
-	volume: number;
-	created_by: number;
-	status: number;
-}
-
-type FindOne = Omit<LoteDTO, 'name' | 'id_genotipo' | 'volume' | 'created_by' | 'status'>;
 
 export class LoteController {
-	public readonly required = 'Campo obrigatório';
+  loteRepository = new LoteRepository();
 
-	loteRepository = new LoteRepository();
+  async getOne(id: number) {
+    try {
+      const response = await this.loteRepository.findById(id);
 
+      if (response) {
+        return { status: 200, response };
+      }
+      return { status: 404, response: [], message: 'Lote não encontrado' };
+    } catch (error: any) {
+      handleError('Lote Controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Lote erro');
+    }
+  }
 
-	async getOne(id: number) {
-		try {
-			const response = await this.loteRepository.findById(id);
+  async create(data: any) {
+    try {
+      const response = await this.loteRepository.create(data);
+      if (response) {
+        return { status: 201, response, message: 'Lote cadastrado' };
+      }
+      return { status: 400, message: 'Lote não cadastrado' };
+    } catch (error: any) {
+      handleError('Lote Controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Lote erro');
+    }
+  }
 
-			if (!response) throw new Error('Lote não encontrado');
+  async update(data: any) {
+    try {
+      const lote = await this.loteRepository.findById(data.id);
 
-			return { status: 200, response };
-		} catch (e) {
-			return { status: 400, message: 'Lote não encontrado' };
-		}
-	}
+      if (!lote) return { status: 404, message: 'Lote não existente' };
 
-	async create(data: any) {
-		try {
-			let response = await this.loteRepository.create(data);
+      const response = await this.loteRepository.update(data.id, data);
+      if (response) {
+        return { status: 201, response, message: 'Lote atualizado' };
+      }
+      return { status: 400, message: 'Lote não atualizado' };
+    } catch (error: any) {
+      handleError('Lote Controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Lote erro');
+    }
+  }
 
-			return { status: 201, message: 'Lote cadastrado', response };
-		} catch (err) {
-			console.log(err);
-			return { status: 404, message: 'Erro de cadastro' };
-		}
-	}
+  async getAll(options: any) {
+    console.log('options');
+    console.log(options);
+    const parameters: object | any = {};
+    let orderBy: object | any = '';
+    let select: any = [];
+    parameters.AND = [];
+    try {
+      if (options.filterStatus) {
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+      }
+      if (options.filterYear) {
+        parameters.year = Number(options.filterYear);
+      }
+      if (options.filterCodLote) {
+        parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
+      }
+      if (options.filterNcc) {
+        parameters.ncc = Number(options.filterNcc);
+      }
+      if (options.filterPeso) {
+        parameters.peso = Number(options.filterPeso);
+      }
+      if (options.filterFase) {
+        parameters.fase = JSON.parse(`{ "contains":"${options.filterFase}" }`);
+      }
+      if (options.filterSeeds) {
+        parameters.quant_sementes = Number(options.filterSeeds);
+      }
+      if (options.filterGenotipo) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));
+      }
+      if (options.filterMainName) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "name_main": {"contains": "${options.filterMainName}" } } }`));
+      }
+      if (options.filterGmr) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr":  ${Number(options.filterGmr)}  } }`));
+      }
+      if (options.filterBgm) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "bgm":  ${Number(options.filterBgm)}  } }`));
+      }
+      if (options.filterTecnologia) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "name": {"contains": "${options.filterTecnologia}" } } }`));
+      }
 
-	async update(data: any) {
-		try {
+      if (options.paramSelect) {
+        const objSelect = options.paramSelect.split(',');
+        Object.keys(objSelect).forEach((item) => {
+          select[objSelect[item]] = true;
+        });
+        select = { ...select };
+      } else {
+        select = {
+          id: true,
+          id_genotipo: true,
+          id_safra: true,
+          cod_lote: true,
+          id_s2: true,
+          id_dados: true,
+          year: true,
+          ncc: true,
+          fase: true,
+          peso: true,
+          quant_sementes: true,
+          status: true,
+          genotipo: {
+            select: {
+              name_genotipo: true,
+              name_main: true,
+              gmr: true,
+              bgm: true,
+              tecnologia: { select: { name: true } },
+            },
+          },
+        };
+      }
 
-			const lote = await this.loteRepository.findById(data.id);
+      console.log('parameters');
+      console.log(parameters);
 
-			if (!lote) return { status: 400, message: 'Lote não existente' };
+      if (options.genotipo) {
+        parameters.genotipo = options.genotipo;
+      }
 
-			await this.loteRepository.update(data.id, data);
+      if (options.name) {
+        parameters.name = options.name;
+      }
 
-			return { status: 200, message: 'Lote atualizado' };
-		} catch (err) {
-			return { status: 404, message: 'Erro ao atualizar' };
-		}
-	}
+      if (options.cod_lote) {
+        parameters.cod_lote = options.cod_lote;
+      }
 
-	async listAll(options: any) {
-		const parameters: object | any = {};
-		let take;
-		let skip;
-		let orderBy: object | any = '';
-		let select: any = [];
-		let include: any;
+      if (options.id_genotipo) {
+        parameters.id_genotipo = Number(options.id_genotipo);
+      }
 
-		try {
-			if (options.filterStatus) {
-				if (typeof (options.status) === 'string') {
-					options.filterStatus = parseInt(options.filterStatus);
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-				} else {
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-				}
-			}
+      if (options.id_dados) {
+        parameters.id_dados = Number(options.id_dados);
+      }
 
-			if (options.filterGenotipo) {
-				options.filterGenotipo = `{ "genotipo": { "contains":"${options.filterGenotipo}" } }`;
-				parameters.genotipo = JSON.parse(options.filterGenotipo);
-			}
+      const take = (options.take) ? Number(options.take) : undefined;
 
-			if (options.filterName) {
-				options.filterName = `{ "contains":"${options.filterName}" }`;
-				parameters.name = JSON.parse(options.filterName);
-			}
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
-			if (options.paramSelect) {
-				const objSelect = options.paramSelect.split(',');
-				Object.keys(objSelect).forEach((item) => {
-					select[objSelect[item]] = true;
-				});
-				select = Object.assign({}, select);
-			} else {
-				select = {
-					id: true,
-					id_genotipo: true,
-					id_safra: true,
-					cod_lote: true,
-					id_s2: true,
-					id_dados: true,
-					year: true,
-					ncc: true,
-					fase: true,
-					peso: true,
-					quant_sementes: true,
-					status: true,
-					genotipo: { select: { name_genotipo: true, name_main: true, gmr: true, bgm: true, tecnologia: { select: { name: true } } } }
-				};
-			}
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
 
-			if (options.genotipo) {
-				parameters.genotipo = options.genotipo;
-			}
+      const response: object | any = await this.loteRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
-			if (options.name) {
-				parameters.name = options.name;
-			}
-
-			if (options.cod_lote) {
-				parameters.cod_lote = options.cod_lote;
-			}
-
-			if (options.id_genotipo) {
-				parameters.id_genotipo = Number(options.id_genotipo);
-			}
-
-			if (options.id_dados) {
-				parameters.id_dados = Number(options.id_dados);
-			}
-
-			if (options.take) {
-				if (typeof (options.take) === 'string') {
-					take = parseInt(options.take);
-				} else {
-					take = options.take;
-				}
-			}
-
-			if (options.skip) {
-				if (typeof (options.skip) === 'string') {
-					skip = parseInt(options.skip);
-				} else {
-					skip = options.skip;
-				}
-			}
-
-			if (options.orderBy) {
-				orderBy = handleOrderForeign(options.orderBy, options.typeOrder)
-				orderBy = orderBy ? orderBy : '{"' + options.orderBy + '":"' + options.typeOrder + '"}'
-			}
-
-			const response: object | any = await this.loteRepository.findAll(
-				parameters,
-				select,
-				take,
-				skip,
-				orderBy
-			);
-
-			if (!response || response.total <= 0) {
-				return { status: 400, response: [], total: 0 };
-			} else {
-				return { status: 200, response, total: response.total };
-			}
-		} catch (err) {
-			console.log(err);
-			return { status: 400, response: [], total: 0 };
-		}
-	}
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 };
+      }
+      return { status: 200, response, total: response.total };
+    } catch (error: any) {
+      handleError('Lote Controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Lote erro');
+    }
+  }
 }
