@@ -11,7 +11,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
         case 'GET':
             const response = await Controller.getAll(Number(req.query.moduleId));
-            console.log(response)
             res.status(200).json(response);
             break;
         case 'POST':

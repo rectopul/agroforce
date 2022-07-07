@@ -105,7 +105,6 @@ export class LayoutChildrenController {
 
   async create(data: any) {
     try {
-      console.log(data)
       let response = await this.disparoRepository.create(data);
       return { status: 201, message: "Disparo cadastrado" }
     } catch (err) {

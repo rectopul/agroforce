@@ -30,7 +30,6 @@ export default function Teste() {
       input: [],
     },
     onSubmit: async (values) => {
-      console.log(values);
 
     },
   });

@@ -124,8 +124,6 @@ export class LoteController {
         };
       }
 
-      console.log('parameters');
-      console.log(parameters);
 
       if (options.genotipo) {
         parameters.genotipo = options.genotipo;

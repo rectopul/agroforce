@@ -97,11 +97,6 @@ export default function Listagem({
 	const [filter, setFilter] = useState<any>(filterApplication);
 	const [colorStar, setColorStar] = useState<string>('');
 
-	console.log('camposGerenciados');
-	console.log(camposGerenciados);
-	console.log('generatesProps');
-	console.log(generatesProps);
-
 	const filtersStatusItem = [
 		{ id: 2, name: 'Todos' },
 		{ id: 1, name: 'Ativos' },

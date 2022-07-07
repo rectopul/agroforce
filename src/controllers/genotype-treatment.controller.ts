@@ -68,12 +68,7 @@ export class GenotypeTreatmentController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('select');
-      console.log(select);
-
-      console.log('parameters');
-      console.log(parameters);
-
+     
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -81,10 +76,6 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response);
-
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

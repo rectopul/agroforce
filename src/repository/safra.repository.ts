@@ -45,7 +45,6 @@ export class SafraRepository {
 
     let count = await prisma.safra.count({ where: where });
 
-    // console.log("Where repository", where);
     // const splitStartDate = where.plantingStartTime.lte.split('-')
     // const splitEndDate = where.plantingEndTime.gte.split('-')
 
@@ -53,8 +52,6 @@ export class SafraRepository {
     // const startDate = new Date(splitStartDate[0], splitStartDate[1], splitStartDate[2])
     // const endDate = new Date(splitEndDate[0], splitEndDate[1], splitEndDate[2])
 
-    // console.log("Start Date: ", startDate)
-    // console.log("End Date: ", endDate)
 
     // try {
     //   const teste = await prisma.safra.findMany({
@@ -65,7 +62,6 @@ export class SafraRepository {
     //     orderBy: order,
     //   });
 
-    //   console.log("Teste", teste)
     // } catch (e) {
     //   console.error(e)
     // }
