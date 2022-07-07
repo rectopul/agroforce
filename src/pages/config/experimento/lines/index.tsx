@@ -816,7 +816,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const data = await api.json();
 
   const allGenotipos = data.response;
-  console.log(allGenotipos);
   const totalItems = data.total;
 
   return {

@@ -6,8 +6,6 @@ const { publicRuntimeConfig } = getConfig();
 
 function handleResponse(response: string | any) {
   return response.text().then((text: string) => {
-    console.log('text');
-    console.log(text);
     const data = text && JSON.parse(text);
 
     if (!response.ok) {

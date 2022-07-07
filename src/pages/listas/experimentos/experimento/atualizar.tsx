@@ -729,7 +729,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     requestOptions,
   ).then((response) => response.json());
 
-  console.log(experimento);
 
   const allItens: any = [];
   const totalItems = 0;
