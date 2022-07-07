@@ -1,5 +1,4 @@
 import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { GenotypeTreatmentRepository } from '../repository/genotype-treatment.repository';
 
 export class GenotypeTreatmentController {

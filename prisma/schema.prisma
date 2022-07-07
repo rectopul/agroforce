@@ -40,7 +40,6 @@ model culture {
   epoca             epoca[]
   quadra            quadra[]
   layout_quadra     layout_quadra[]
-  experiment        experiment[]
 }
 
 model department {
@@ -87,9 +86,9 @@ model safra {
   group              group[]
   lote               lote[]
   envelope           envelope[]
-  experiment         experiment[]
   assay_list         assay_list[]
   genotype_treatment genotype_treatment[]
+  experiment         experiment[]
 }
 
 model uf {
@@ -193,6 +192,7 @@ model local {
   npe          npe[]
   quadra       quadra[]
   cultureUnity cultureUnity[]
+  experiment   experiment[]
 }
 
 model cultureUnity {
@@ -327,6 +327,7 @@ model delineamento {
 
   culture                culture                  @relation(fields: [id_culture], references: [id])
   sequencia_delineamento sequencia_delineamento[]
+  experiment             experiment[]
 }
 
 model foco {
@@ -340,7 +341,6 @@ model foco {
   npe        npe[]
   culture    culture      @relation(fields: [id_culture], references: [id])
   group      group[]
-  experiment experiment[]
   assay_list assay_list[]
 }
 
@@ -370,7 +370,6 @@ model type_assay {
   npe        npe[]
   culture    culture      @relation(fields: [id_culture], references: [id])
   envelope   envelope[]
-  experiment experiment[]
   assay_list assay_list[]
 }
 
@@ -401,7 +400,6 @@ model tecnologia {
   npe        npe[]
   genotipo   genotipo[]
   culture    culture      @relation(fields: [id_culture], references: [id])
-  experiment experiment[]
   assay_list assay_list[]
 }
 
@@ -482,51 +480,28 @@ model sequencia_delineamento {
 }
 
 model experiment {
-  id               Int       @id @default(autoincrement())
-  id_culture       Int
-  protocol_name    String
-  experiment_id    Int
-  experiment_name  String
-  year             Int
-  label            String
-  id_safra         Int
-  id_foco          Int
-  id_ensaio        Int
-  id_tecnologia    Int
-  epoca            Int
-  pjr              String
-  id_unity_culture Int
-  name_cult        String
-  status           Int       @default(1)
-  created_by       Int
-  created_at       DateTime? @default(now())
+  id                Int       @id @default(autoincrement())
+  idAssayList       Int
+  idLocal           Int
+  idDelineamento    Int
+  idSafra           Int
+  experimentName    String
+  density           Int
+  period            Int
+  repetitionsNumber Int
+  nlp               Int
+  clp               Decimal   @db.Decimal(5, 2)
+  eel               Decimal   @db.Decimal(5, 2)
+  comments          String    @db.LongText
+  orderDraw         Int
+  status            String    @default("IMPORTADO")
+  created_by        Int
+  created_at        DateTime? @default(now())
 
-  safra      safra      @relation(fields: [id_safra], references: [id])
-  foco       foco       @relation(fields: [id_foco], references: [id])
-  ensaio     type_assay @relation(fields: [id_ensaio], references: [id])
-  tecnologia tecnologia @relation(fields: [id_tecnologia], references: [id])
-  culture    culture    @relation(fields: [id_culture], references: [id])
-
-  materiais materiais[]
-
-}
-
-model materiais {
-  id               Int       @id @default(autoincrement())
-  id_experiment_bd Int
-  id_l1            Int
-  id_dados         Int
-  trat             Int
-  prox_nivel       Int
-  id_d1            Int
-  name_main        String
-  genotipo_name    String
-  status           Int       @default(1)
-  created_by       Int
-  created_at       DateTime? @default(now())
-
-  experiment experiment @relation(fields: [id_experiment_bd], references: [id])
-
+  assay_list   assay_list   @relation(fields: [idAssayList], references: [id])
+  local        local        @relation(fields: [idLocal], references: [id])
+  delineamento delineamento @relation(fields: [idDelineamento], references: [id])
+  safra        safra        @relation(fields: [idSafra], references: [id])
 
 }
 
@@ -562,6 +537,7 @@ model assay_list {
   type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
   tecnologia         tecnologia           @relation(fields: [id_tecnologia], references: [id])
   genotype_treatment genotype_treatment[]
+  experiment         experiment[]
 }
 
 model genotype_treatment {

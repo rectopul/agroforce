@@ -1,26 +1,26 @@
 module.exports = {
   content: [
-    "./src/pages/*.{js,ts,jsx,tsx}",
-    "./src/pages/**/*.{js,ts,jsx,tsx}",
-    "./src/pages/**/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/**/*.{js,ts,jsx,tsx}",
+    './src/pages/*.{js,ts,jsx,tsx}',
+    './src/pages/**/*.{js,ts,jsx,tsx}',
+    './src/pages/**/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     screens: {
-      'sm': '1100px',
+      sm: '1100px',
       // => @media (min-width: 640px) { ... }
 
-      'md': '1350px',
+      md: '1350px',
       // => @media (min-width: 768px) { ... }
 
-      'gg': '1550px',
+      gg: '1550px',
 
-      'lg': '1900px',
+      lg: '1900px',
       // => @media (min-width: 1024px) { ... }
     },
     colors: {
-      'white': '#FFFFFF',
+      white: '#FFFFFF',
 
       'green-600': '#16a34a',
 
@@ -49,8 +49,8 @@ module.exports = {
     },
     extend: {
       height: {
-        'aside': 'calc(100vh - 5rem)',
-        'content': 'calc(100vh - 5rem)',
+        aside: 'calc(100vh - 5rem)',
+        content: 'calc(100vh - 5rem)',
 
         // Importação de planilha
         'importation-header': '17vh',
@@ -67,10 +67,10 @@ module.exports = {
         // Importação de planilha
         'aside-content-importation': 'calc(100vw - 88vw)',
         'importation-content': 'calc(100vw - 12vw)',
-      }
+      },
     },
   },
   plugins: [
 
   ],
-}
+};
