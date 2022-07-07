@@ -1,57 +1,104 @@
 import { prisma } from '../pages/api/db/db';
 
 export class ExperimentRepository {
-	async create(data: any) {
-		const experiment = await prisma.experiment.create({ data });
-		return experiment;
-	}
-	async findOne(id: number) {
-		const experiment = await prisma.experiment.findUnique({
-			where: { id }
-		});
-		return experiment;
-	}
+  async create(data: any) {
+    const experiment = await prisma.experiment.create({ data });
+    return experiment;
+  }
 
-	async update(id: number, data: any) {
-		const experiment = await this.findOne(id);
+  async findOne(id: number) {
+    const experiment = await prisma.experiment.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        density: true,
+        period: true,
+        repetitionsNumber: true,
+        experimentName: true,
+        status: true,
+        nlp: true,
+        clp: true,
+        eel: true,
+        comments: true,
+        orderDraw: true,
+        assay_list: {
+          select: {
+            status: true,
+            gli: true,
+            bgm: true,
+            protocol_name: true,
+            tecnologia: {
+              select: {
+                name: true,
+              },
+            },
+            foco: {
+              select: {
+                name: true,
+              },
+            },
+            type_assay: {
+              select: {
+                name: true,
+              },
+            },
+            safra: {
+              select: {
+                safraName: true,
+              },
+            },
+          },
+        },
+        local: {
+          select: {
+            name_local_culture: true,
+            cultureUnity: true,
+          },
+        },
+        delineamento: {
+          select: {
+            name: true,
+            repeticao: true,
+            trat_repeticao: true,
+          },
+        },
 
-		if (experiment !== null) {
-			const result = await prisma.experiment.update({
-				where: { id },
-				data
-			});
-			return result;
-		} else {
-			return false;
-		}
-	}
+      },
+    });
+    return experiment;
+  }
 
-	async list(id_culture: number) {
-		const experiment = await prisma.experiment.findMany({
-			where: { id_culture }
-		});
+  async update(id: number, data: any) {
+    const result = await prisma.experiment.update({
+      where: { id },
+      data,
+    });
+    return result;
+  }
 
-		return experiment;
-	}
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+    let order: object | any;
 
-	async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-		let order: object | any;
+    if (orderBy) {
+      order = JSON.parse(orderBy);
+    }
 
-		if (orderBy) {
-			order = JSON.parse(orderBy);
-		}
+    const count = await prisma.experiment.count({ where });
 
-		const count = await prisma.experiment.count({ where });
+    const result: object | any = await prisma.experiment.findMany({
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
+    });
 
-		const result: object | any = await prisma.experiment.findMany({
-			select,
-			skip,
-			take,
-			where,
-			orderBy: order
-		});
+    result.total = count;
+    return result;
+  }
 
-		result.total = count;
-		return result;
-	}
+  async delete(id: number) {
+    const result = await prisma.experiment.delete({ where: { id } });
+    return result;
+  }
 }

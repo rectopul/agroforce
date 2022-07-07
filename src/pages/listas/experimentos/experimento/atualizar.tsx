@@ -1,8 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { capitalize } from '@mui/material';
-import { setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -22,7 +20,7 @@ import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { materiaisService, userPreferencesService } from '../../../../services';
+import { experimentService, materiaisService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
@@ -49,35 +47,36 @@ interface IGenerateProps {
 
 interface IUpdateExperimento {
   id: number
-  protocol_name: string
   foco: string
   ensaio: string
-  gli: string
-  experiment_name: string
-  rotulo: string
   tecnologia: string
-  epoca: string
+  gli: string
+  experimentName: string
+  bgm: number
+  local: string
   delineamento: string
   repetition: number
+  density: number
+  drawOrder: number
   status: string
-  comments: string
   eel: number
-  clp: number
   nlp: number
+  clp: number
+  comments: string
 }
 
 export default function AtualizarLocal({
   experimento,
-  allItens,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idExperiment,
-  pageBeforeEdit,
+  // allItens,
+  // totalItems,
+  // itensPerPage,
+  // filterApplication,
+  // idExperiment,
+  // pageBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'EXPERIMENTO'
@@ -87,73 +86,67 @@ export default function AtualizarLocal({
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.materiais || {
-    id: 0, table_preferences: 'repetitionExperience,genotipo_name,gmr,bgm,fase,tecnologia,treatments_number,status,nca,npe,sequence,block,statusParcial',
-  };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  // const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  // const preferences = userLogado.preferences.materiais || {
+  //   id: 0, table_preferences: 'repetitionExperience,genotipo_name,gmr,bgm,fase,tecnologia,treatments_number,status,nca,npe,sequence,block,statusParcial',
+  // };
+  // const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [materiais, setMateriais] = useState<any>(() => allItens);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
-  const [setArrowOrder] = useState<any>('');
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Rep. Exp', value: 'repetitionExperience' },
-    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo_name' },
-    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'Cód. tec.', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'treatments_number' },
-    { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
-    { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-    { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
-    { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sequence' },
-    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
-    { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'statusParcial' },
-  ]);
+  // const [materiais, setMateriais] = useState<any>(() => allItens);
+  // const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  // const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  // const [orderList, setOrder] = useState<number>(1);
+  // const [setArrowOrder] = useState<any>('');
+  // const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  // const [filter, setFilter] = useState<any>(filterApplication);
+  // const [colorStar, setColorStar] = useState<string>('');
+  // const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+  //   { name: 'CamposGerenciados[]', title: 'Rep. Exp', value: 'repetitionExperience' },
+  //   { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo_name' },
+  //   { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+  //   { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
+  //   { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+  //   { name: 'CamposGerenciados[]', title: 'Cód. tec.', value: 'tecnologia' },
+  //   { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'treatments_number' },
+  //   { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
+  //   { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
+  //   { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
+  //   { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sequence' },
+  //   { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
+  //   { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'statusParcial' },
+  // ]);
 
-  const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
-  const pages = Math.ceil(total / take);
+  // const take: number = itensPerPage;
+  // const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  // const pages = Math.ceil(total / take);
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
       id: experimento.id,
-      protocol_name: experimento.protocol_name,
-      foco: experimento.foco,
-      ensaio: experimento.type_assay,
-      gli: experimento.gli,
-      experiment_name: experimento.experiment_name,
-      rotulo: experimento.rotulo,
-      tecnologia: experimento.tecnologia,
-      epoca: experimento.epoca,
-      delineamento: experimento.delineamento,
+      foco: experimento.assay_list.foco.name,
+      ensaio: experimento.assay_list.type_assay.name,
+      tecnologia: experimento.assay_list.tecnologia.name,
+      gli: experimento.assay_list.gli,
+      experimentName: experimento.experimentName,
+      bgm: experimento.assay_list.bgm,
+      local: experimento.local.name_local_culture,
+      delineamento: experimento.delineamento.name,
       repetition: experimento.repetition,
+      density: experimento.density,
+      drawOrder: experimento.drawOrder,
       status: experimento.status,
-      comments: experimento.comments,
       eel: experimento.eel,
       nlp: experimento.nlp,
       clp: experimento.clp,
+      comments: experimento.comments,
     },
     onSubmit: async (values) => {
-      await materiaisService.update({
+      await experimentService.update({
         id: values.id,
-        protocol_name: values.protocol_name,
-        foco: values.foco,
-        ensaio: values.ensaio,
-        gli: values.gli,
-        experiment_name: values.experiment_name,
-        tecnologia: values.tecnologia,
-        rotulo: values.rotulo,
-        epoca: values.epoca,
-        delineamento: values.delineamento,
-        repetition: values.repetition,
-        status: values.status,
+        eel: values.eel,
+        nlp: values.nlp,
+        clp: values.clp,
+        comments: values.comments,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Foco atualizado com sucesso!');
@@ -165,235 +158,235 @@ export default function AtualizarLocal({
     },
   });
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
+  // async function handleOrder(column: string, order: string | any): Promise<void> {
+  //   let typeOrder: any;
+  //   let parametersFilter: any;
+  //   if (order === 1) {
+  //     typeOrder = 'asc';
+  //   } else if (order === 2) {
+  //     typeOrder = 'desc';
+  //   } else {
+  //     typeOrder = '';
+  //   }
 
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+  //   if (filter && typeof (filter) !== 'undefined') {
+  //     if (typeOrder !== '') {
+  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+  //     } else {
+  //       parametersFilter = filter;
+  //     }
+  //   } else if (typeOrder !== '') {
+  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+  //   } else {
+  //     parametersFilter = filter;
+  //   }
 
-    await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
-      if (status === 200) {
-        setMateriais(response);
-      }
-    });
+  //   await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
+  //     if (status === 200) {
+  //       setMateriais(response);
+  //     }
+  //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  //   if (orderList === 2) {
+  //     setOrder(0);
+  //     setArrowOrder(<AiOutlineArrowDown />);
+  //   } else {
+  //     setOrder(orderList + 1);
+  //     if (orderList === 1) {
+  //       setArrowOrder(<AiOutlineArrowUp />);
+  //     } else {
+  //       setArrowOrder('');
+  //     }
+  //   }
+  // }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //   };
+  // }
 
-  function columnsOrder(columnsCampos: string) {
-    const columnCampos: string[] = columnsCampos.split(',');
-    const tableFields: any = [];
+  // function columnsOrder(columnsCampos: string) {
+  //   const columnCampos: string[] = columnsCampos.split(',');
+  //   const tableFields: any = [];
 
-    Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'repetitionExperience') {
-        tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
-      }
-      if (columnCampos[index] === 'genotipo_name') {
-        tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo_name'));
-      }
-      if (columnCampos[index] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR', 'gmr'));
-      }
-      if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'bgm'));
-      }
-      if (columnCampos[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'fase'));
-      }
-      if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Cód. tec.', 'tecnologia'));
-      }
-      if (columnCampos[index] === 'treatments_number') {
-        tableFields.push(headerTableFactory('Rep. trat.', 'treatments_number'));
-      }
-      if (columnCampos[index] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
-      }
-      if (columnCampos[index] === 'npe') {
-        tableFields.push(headerTableFactory('NPE', 'npe'));
-      }
-      if (columnCampos[index] === 'sequence') {
-        tableFields.push(headerTableFactory('Seq.', 'sequence'));
-      }
-      if (columnCampos[index] === 'block') {
-        tableFields.push(headerTableFactory('Bloco', 'block'));
-      }
-      if (columnCampos[index] === 'statusParcial') {
-        tableFields.push(headerTableFactory('Status parc.', 'statusParcial'));
-      }
-    });
-    return tableFields;
-  }
+  //   Object.keys(columnCampos).forEach((item, index) => {
+  //     if (columnCampos[index] === 'repetitionExperience') {
+  //       tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
+  //     }
+  //     if (columnCampos[index] === 'genotipo_name') {
+  //       tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo_name'));
+  //     }
+  //     if (columnCampos[index] === 'gmr') {
+  //       tableFields.push(headerTableFactory('GMR', 'gmr'));
+  //     }
+  //     if (columnCampos[index] === 'bgm') {
+  //       tableFields.push(headerTableFactory('BGM', 'bgm'));
+  //     }
+  //     if (columnCampos[index] === 'fase') {
+  //       tableFields.push(headerTableFactory('Fase', 'fase'));
+  //     }
+  //     if (columnCampos[index] === 'tecnologia') {
+  //       tableFields.push(headerTableFactory('Cód. tec.', 'tecnologia'));
+  //     }
+  //     if (columnCampos[index] === 'treatments_number') {
+  //       tableFields.push(headerTableFactory('Rep. trat.', 'treatments_number'));
+  //     }
+  //     if (columnCampos[index] === 'nca') {
+  //       tableFields.push(headerTableFactory('NCA', 'nca'));
+  //     }
+  //     if (columnCampos[index] === 'npe') {
+  //       tableFields.push(headerTableFactory('NPE', 'npe'));
+  //     }
+  //     if (columnCampos[index] === 'sequence') {
+  //       tableFields.push(headerTableFactory('Seq.', 'sequence'));
+  //     }
+  //     if (columnCampos[index] === 'block') {
+  //       tableFields.push(headerTableFactory('Bloco', 'block'));
+  //     }
+  //     if (columnCampos[index] === 'statusParcial') {
+  //       tableFields.push(headerTableFactory('Status parc.', 'statusParcial'));
+  //     }
+  //   });
+  //   return tableFields;
+  // }
 
-  const columns = columnsOrder(camposGerenciados);
+  // const columns = columnsOrder(camposGerenciados);
 
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 23,
-      }).then((response) => {
-        userLogado.preferences.materiais = {
-          id: response.response.id,
-          userId: preferences.userId,
-          table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.materiais = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
+  // async function getValuesColumns(): Promise<void> {
+  //   const els: any = document.querySelectorAll("input[type='checkbox'");
+  //   let selecionados = '';
+  //   for (let i = 0; i < els.length; i += 1) {
+  //     if (els[i].checked) {
+  //       selecionados += `${els[i].value},`;
+  //     }
+  //   }
+  //   const totalString = selecionados.length;
+  //   const campos = selecionados.substr(0, totalString - 1);
+  //   if (preferences.id === 0) {
+  //     await userPreferencesService.create({
+  //       table_preferences: campos,
+  //       userId: userLogado.id,
+  //       module_id: 23,
+  //     }).then((response) => {
+  //       userLogado.preferences.materiais = {
+  //         id: response.response.id,
+  //         userId: preferences.userId,
+  //         table_preferences: campos,
+  //       };
+  //       preferences.id = response.response.id;
+  //     });
+  //     localStorage.setItem('user', JSON.stringify(userLogado));
+  //   } else {
+  //     userLogado.preferences.materiais = {
+  //       id: preferences.id,
+  //       userId: preferences.userId,
+  //       table_preferences: campos,
+  //     };
+  //     await userPreferencesService.update({
+  //       table_preferences: campos,
+  //       id: preferences.id,
+  //     });
+  //     localStorage.setItem('user', JSON.stringify(userLogado));
+  //   }
 
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
+  //   setStatusAccordion(false);
+  //   setCamposGerenciados(campos);
+  // }
 
-  function handleOnDragEnd(result: DropResult): void {
-    setStatusAccordion(true);
-    if (!result) return;
+  // function handleOnDragEnd(result: DropResult): void {
+  //   setStatusAccordion(true);
+  //   if (!result) return;
 
-    const items = Array.from(generatesProps);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-    setGeneratesProps(items);
-  }
+  //   const items = Array.from(generatesProps);
+  //   const [reorderedItem] = items.splice(result.source.index, 1);
+  //   const index: number = Number(result.destination?.index);
+  //   items.splice(index, 0, reorderedItem);
+  //   setGeneratesProps(items);
+  // }
 
-  const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados},foco&id_experimento=${idExperiment}`;
-    }
-    await materiaisService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
+  // const downloadExcel = async (): Promise<void> => {
+  //   if (!filterApplication.includes('paramSelect')) {
+  //     filterApplication += `&paramSelect=${camposGerenciados},foco&id_experimento=${idExperiment}`;
+  //   }
+  //   await materiaisService.getAll(filterApplication).then((response) => {
+  //     if (response.status === 200) {
+  //       const newData = response.response.map((row: { status: any }) => {
+  //         if (row.status === 0) {
+  //           row.status = 'Inativo';
+  //         } else {
+  //           row.status = 'Ativo';
+  //         }
 
-          return row;
-        });
+  //         return row;
+  //       });
 
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.safra = item.safra?.safraName;
-          return item;
-        });
+  //       newData.map((item: any) => {
+  //         item.foco = item.foco?.name;
+  //         item.safra = item.safra?.safraName;
+  //         return item;
+  //       });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'materiais');
+  //       const workSheet = XLSX.utils.json_to_sheet(newData);
+  //       const workBook = XLSX.utils.book_new();
+  //       XLSX.utils.book_append_sheet(workBook, workSheet, 'materiais');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
-      }
-    });
-  };
+  //       // Buffer
+  //       XLSX.write(workBook, {
+  //         bookType: 'xlsx', // xlsx
+  //         type: 'buffer',
+  //       });
+  //       // Binary
+  //       XLSX.write(workBook, {
+  //         bookType: 'xlsx', // xlsx
+  //         type: 'binary',
+  //       });
+  //       // Download
+  //       XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
+  //     }
+  //   });
+  // };
 
-  function handleTotalPages(): void {
-    if (currentPage < 0) {
-      setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
-  }
+  // function handleTotalPages(): void {
+  //   if (currentPage < 0) {
+  //     setCurrentPage(0);
+  //   } else if (currentPage >= pages) {
+  //     setCurrentPage(pages - 1);
+  //   }
+  // }
 
-  async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+  // async function handlePagination(): Promise<void> {
+  //   const skip = currentPage * Number(take);
+  //   let parametersFilter = `skip=${skip}&take=${take}`;
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await materiaisService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setMateriais(response.response);
-      }
-    });
-  }
+  //   if (filter) {
+  //     parametersFilter = `${parametersFilter}&${filter}`;
+  //   }
+  //   await materiaisService.getAll(parametersFilter).then((response) => {
+  //     if (response.status === 200) {
+  //       setMateriais(response.response);
+  //     }
+  //   });
+  // }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
-  function updateFieldFactory(name: string, title: string) {
+  function fieldsFactory(name: string, title: string, values: any) {
     return (
       <div className="w-full h-10">
         <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -405,7 +398,23 @@ export default function AtualizarLocal({
           required
           id={title}
           name={title}
-          value={experimento[title]}
+          value={values}
+        />
+      </div>
+    );
+  }
+
+  function updateFieldsFactory(name: string, title: string, values: any) {
+    return (
+      <div className="w-full h-10">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <Input
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+          value={values}
         />
       </div>
     );
@@ -434,19 +443,19 @@ export default function AtualizarLocal({
           >
             <div className="w-full flex justify-between items-start gap-5 mt-10">
 
-              {updateFieldFactory('Foco', 'foco')}
+              {fieldsFactory('Foco', 'foco', experimento.assay_list.foco.name)}
 
-              {updateFieldFactory('Ensaio', 'type_assay')}
+              {fieldsFactory('Ensaio', 'type_assay', experimento.assay_list.type_assay.name)}
 
-              {updateFieldFactory('Nome Tecnologia', 'tecnologia')}
+              {fieldsFactory('Nome Tecnologia', 'tecnologia', experimento.assay_list.tecnologia.name)}
 
-              {updateFieldFactory('GLI', 'gli')}
+              {fieldsFactory('GLI', 'gli', experimento.assay_list.gli)}
 
-              {updateFieldFactory('Experimento', 'experiment_name')}
+              {fieldsFactory('Experimento', 'experimentName', experimento.experimentName)}
 
-              {updateFieldFactory('BGM', 'bgm')}
+              {fieldsFactory('BGM', 'bgm', experimento.assay_list.bgm)}
 
-              {updateFieldFactory('Status do ensaio', 'status')}
+              {fieldsFactory('Status do ensaio', 'status', experimento.assay_list.status)}
 
             </div>
 
@@ -462,17 +471,17 @@ export default function AtualizarLocal({
           >
             <div className="w-full flex justify-between items-start gap-5 mt-10">
 
-              {updateFieldFactory('Lugar plantio', 'local')}
+              {fieldsFactory('Lugar plantio', 'local', experimento.local.name_local_culture)}
 
-              {updateFieldFactory('Delineamento', 'delineamento')}
+              {fieldsFactory('Delineamento', 'delineamento', experimento.delineamento.name)}
 
-              {updateFieldFactory('Repetições', 'repetition')}
+              {fieldsFactory('Repetições', 'repetitionsNumber', experimento.repetitionsNumber)}
 
-              {updateFieldFactory('Densidade', 'density')}
+              {fieldsFactory('Densidade', 'density', experimento.density)}
 
-              {updateFieldFactory('Ordem de sorteio', 'sorting')}
+              {fieldsFactory('Ordem de sorteio', 'orderDraw', experimento.orderDraw)}
 
-              {updateFieldFactory('Status do experimento', 'status')}
+              {fieldsFactory('Status do experimento', 'status', experimento.status)}
 
             </div>
 
@@ -491,61 +500,13 @@ export default function AtualizarLocal({
             mb-4
           "
           >
-            <div className="w-32 flex justify-between items-start gap-5 mt-10">
+            <div className="w-full h-f10 flex justify-between items-start gap-5">
 
-              <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
-                  NLP
-                </label>
-                <Input
-                  id="nlp"
-                  name="nlp"
-                  onChange={formik.handleChange}
-                  value={formik.values.nlp}
-                />
-              </div>
-            </div>
-            <div className="w-32 flex justify-between items-start gap-5 mt-10">
+              {updateFieldsFactory('NLP', 'nlp', experimento.nlp)}
+              {updateFieldsFactory('EEL', 'eel', experimento.nlp)}
+              {updateFieldsFactory('CLP', 'clp', experimento.clp)}
+              {updateFieldsFactory('Observações', 'comments', experimento.comments)}
 
-              <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
-                  EEL
-                </label>
-                <Input
-                  id="eel"
-                  name="eel"
-                  onChange={formik.handleChange}
-                  value={formik.values.eel}
-                />
-              </div>
-            </div>
-            <div className="w-32 flex justify-between items-start gap-5 mt-10">
-
-              <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
-                  CLP
-                </label>
-                <Input
-                  id="clp"
-                  name="clp"
-                  onChange={formik.handleChange}
-                  value={formik.values.clp}
-                />
-              </div>
-            </div>
-
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
-              <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
-                  Observações
-                </label>
-                <Input
-                  id="comments"
-                  name="comments"
-                  onChange={formik.handleChange}
-                  value={formik.values.comments}
-                />
-              </div>
             </div>
 
           </div>
@@ -586,7 +547,7 @@ export default function AtualizarLocal({
         "
         >
 
-          <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+          {/* <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -735,7 +696,7 @@ export default function AtualizarLocal({
                 ) as any,
               }}
             />
-          </div>
+          </div> */}
         </main>
       </Content>
     </>
@@ -759,45 +720,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const idExperiment = Number(context.query.id);
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlMateriais = `${publicRuntimeConfig.apiUrl}/materiais`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterApplication = `filterStatus=1&$id_experimento=${idExperiment}`;
 
-  const urlParameters: any = new URL(baseUrlMateriais);
-  urlParameters.search = new URLSearchParams(param).toString();
-
-  const parcelas = await fetch(`${baseUrlMateriais}?id_experimento=${idExperiment}`, requestOptions);
-
-  const { response: allItens, total: totalItems } = await parcelas.json();
-
-  // const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
-  // const experimento = await fetch(`${baseUrlShow}/${idExperiment}`,
-  // requestOptions).then((response) => response.json());
-  const experimento = [{
-    id: 1,
-    protocolo_name: 'hinata',
-    foco: {
-      name: 'Norte',
-    },
-    type_assay: {
-      name: 'VCA',
-    },
-    gli: 'sasuke',
-    experiment_name: 'naruto',
-    tecnologia: {
-      name: 'ak47',
-    },
-    epoca: 'verao',
-    delineamento: {
-      name: 'quadrado',
-    },
-    repetition: 5,
-    status: 'exportado',
-  },
-  ];
+  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
+  const experimento = await fetch(
+    `${baseUrlShow}/${idExperiment}`,
+    requestOptions,
+  ).then((response) => response.json());
 
   console.log(experimento);
+
+  const allItens: any = [];
+  const totalItems = 0;
 
   return {
     props: {
