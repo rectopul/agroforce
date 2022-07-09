@@ -19,6 +19,7 @@ import { GroupController } from './group.controller';
 import { UnidadeCulturaController } from './unidade-cultura.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from './log-import.controller';
+import { FocoRepository } from '../repository/foco.repository';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -62,6 +63,8 @@ export class ImportController {
   experimentController = new ExperimentController();
 
   logImportController = new LogImportController();
+
+  focoRepository = new FocoRepository();
 
   aux: object | any = {};
 
@@ -152,7 +155,7 @@ export class ImportController {
     try {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
-
+        
         const configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
         if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
@@ -161,7 +164,7 @@ export class ImportController {
         let erro: any = false;
 
         // Validação Lista de Ensaio
-        if (data.moduleId == 22) {
+        if (data.moduleId == 26) {
           response = await this.validateListAssay(data);
           if (response == 'save') {
             response = 'Itens cadastrados com sucesso!';
@@ -259,7 +262,57 @@ export class ImportController {
   }
 
   async validateListAssay(data: object | any){
+
+    const responseIfError: any = [];
+    
+    try{
+
+      let Retorno: string = "";
+      if (data != null && data != undefined) {
+        let Line: number;
+        let Column: number;
+        for (const [keySheet, lines] of data.spreadSheet.entries()) {
+          Line = Number(keySheet) + 1;
+          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
+            Column = Number(sheet) + 1;
+            if (keySheet != '0') {
+              if(sheet == 2){
+                let dataFind = {
+                  name: data.spreadSheet[keySheet][sheet],
+                  id_culture: data.culture
+                };
+                const focoResult:any = await this.focoRepository.findByName(dataFind);
+                if(!focoResult){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de foco não existe na cultura selecionada.</li><br>`;
+                }
+                //return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
+              }
+              if(sheet == 10){
+                if(data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de status deve ser igual a T ou L.</li><br>`;
+                }
+              }
+              Retorno += " - " + data.spreadSheet[keySheet][sheet];
+            }
+          }
+        }
+      }
+
+      if (responseIfError.length === 0) {
+        return Retorno;
+      } else {
+        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+        return responseStringError;        
+      } 
+
+    } catch (err) {
+      console.log(err);
+      return 'Houve um erro, tente novamente mais tarde!';
+    
+    }
+    
     return false;
+  
   }
 
   async validateTechnology({

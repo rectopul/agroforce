@@ -22,6 +22,7 @@ export default function Importar() {
         spreadSheet: rows,
         moduleId: 26,
         safra: userLogado.safras.safra_selecionada,
+        culture: userLogado.userCulture.cultura_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
