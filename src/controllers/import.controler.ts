@@ -160,6 +160,16 @@ export class ImportController {
         let response: any;
         let erro: any = false;
 
+        // Validação Lista de Ensaio
+        if (data.moduleId == 22) {
+          response = await this.validateListAssay(data);
+          if (response == 'save') {
+            response = 'Itens cadastrados com sucesso!';
+          } else {
+            erro = true;
+          }
+        }
+
         // Validação do modulo Local
         if (data.moduleId == 4) {
           response = await this.validateLocal(data);
@@ -246,6 +256,10 @@ export class ImportController {
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!';
     }
+  }
+
+  async validateListAssay(data: object | any){
+    return false;
   }
 
   async validateTechnology({
