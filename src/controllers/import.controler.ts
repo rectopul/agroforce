@@ -4,6 +4,7 @@ import { SafraController } from './safra.controller';
 import { LocalController } from './local.controller';
 import { FocoController } from './foco.controller';
 import { TypeAssayController } from './tipo-ensaio.controller';
+import { AssayListController } from './assay-list.controller';
 import { TecnologiaController } from './tecnologia.controller';
 import { NpeController } from './npe.controller';
 import { DelineamentoController } from './delineamento.controller';
@@ -20,6 +21,7 @@ import { UnidadeCulturaController } from './unidade-cultura.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from './log-import.controller';
 import { FocoRepository } from '../repository/foco.repository';
+import { TecnologiaRepository } from '../repository/tecnologia.repository';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -31,6 +33,8 @@ export class ImportController {
   focoController = new FocoController();
 
   typeAssayController = new TypeAssayController();
+
+  assayListController = new AssayListController();
 
   ogmController = new TecnologiaController();
 
@@ -65,6 +69,8 @@ export class ImportController {
   logImportController = new LogImportController();
 
   focoRepository = new FocoRepository();
+
+  tecnologiaRepository = new TecnologiaRepository();
 
   aux: object | any = {};
 
@@ -287,19 +293,139 @@ export class ImportController {
                 }
                 //return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
               }
+              if(sheet == 5){
+                let take;
+                let skip;
+                let orderBy: object | any;
+                let select: any = [];
+                select = {
+                  id: true,
+                  name: true
+                };
+                let parameters: object | any = {};
+                parameters.cod_tec = String(data.spreadSheet[keySheet][sheet]);
+                parameters.id_culture = data.culture;
+                const tecnologiaFind:any = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
+                if(tecnologiaFind.length == 0){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o código da tecnologia não existe na cultura selecionada.</li><br>`;
+                }
+              }
               if(sheet == 10){
                 if(data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")){
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de status deve ser igual a T ou L.</li><br>`;
                 }
               }
-              Retorno += " - " + data.spreadSheet[keySheet][sheet];
+              //Retorno += " - " + data.spreadSheet[keySheet][sheet];
             }
           }
         }
       }
 
       if (responseIfError.length === 0) {
-        return Retorno;
+        let Line: number;
+        let Column: number;
+        for (const [keySheet, lines] of data.spreadSheet.entries()) {
+          Line = Number(keySheet) + 1;
+          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
+            Column = Number(sheet) + 1;
+            if(keySheet != 0){
+              if(sheet == 8){
+                let cultureFind = await this.culturaController.getOneCulture(data.culture);
+                
+                let assay = data.spreadSheet[keySheet][3];
+                let protocol_name = data.spreadSheet[keySheet][0];
+                let id_culture = cultureFind.response.id;
+                let options: object | any = {};
+                options.filterName = assay;
+                options.filterProtocolName = protocol_name;
+                options.id_culture = id_culture;
+                let getTypeAssay = await this.typeAssayController.getAll(options);
+
+                let savedTypeAssay = {};
+                let idSavedTypeAssay;
+
+                if(getTypeAssay.response.length == 0){
+                  savedTypeAssay = await this.typeAssayController.create({
+                    id_culture: cultureFind.response.id,
+                    name: data.spreadSheet[keySheet][3],
+                    protocol_name: data.spreadSheet[keySheet][0],
+                    status: 1,
+                    created_by: data.created_by
+                  });
+                  idSavedTypeAssay = savedTypeAssay.response.id;
+                } else {
+                  savedTypeAssay = await this.typeAssayController.update({
+                    id: getTypeAssay.response.id,
+                    id_culture: cultureFind.response.id,
+                    name: data.spreadSheet[keySheet][3],
+                    protocol_name: data.spreadSheet[keySheet][0],
+                    status: 1,
+                    created_by: data.created_by
+                  });
+                  idSavedTypeAssay = getTypeAssay.response[0].id;
+                }
+                
+                if(idSavedTypeAssay){
+                  let focoFind = await this.focoRepository.findByName({name:data.spreadSheet[keySheet][2], id_culture:data.culture});
+                  let take;
+                  let skip;
+                  let orderBy: object | any;
+                  let select: any = [];
+                  select = {
+                    id: true,
+                    name: true
+                  };
+                  let parameters: object | any = {};
+                  parameters.cod_tec = String(data.spreadSheet[keySheet][5]);
+                  parameters.id_culture = data.culture;
+                  let tecnologiaFind = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
+                  if(tecnologiaFind.length > 0){
+                    let gli = data.spreadSheet[keySheet][4];
+                    options = {};
+                    options.filterGli = gli;
+                    options.filterTypeAssay = idSavedTypeAssay;
+                    let getListAssay = await this.assayListController.getAll(options);
+
+                    if(getListAssay.response.length == 0){
+                      let savedAssayList = await this.assayListController.create({
+                        id_safra: data.safra,
+                        id_foco: focoFind.id,
+                        id_type_assay: idSavedTypeAssay,
+                        id_tecnologia: tecnologiaFind[0].id,
+                        gli: data.spreadSheet[keySheet][4],
+                        period: 1,
+                        protocol_name: data.spreadSheet[keySheet][0],
+                        bgm: data.spreadSheet[keySheet][7],
+                        project: String(data.spreadSheet[keySheet][8]),
+                        status: data.spreadSheet[keySheet][10],
+                        comments: data.spreadSheet[keySheet][13],
+                        created_by: data.created_by
+                      });
+                    } else {
+                      let savedAssayList = await this.assayListController.update({
+                        id: getListAssay.response[0].id,
+                        id_safra: data.safra,
+                        id_foco: focoFind.id,
+                        id_type_assay: idSavedTypeAssay,
+                        id_tecnologia: tecnologiaFind[0].id,
+                        gli: data.spreadSheet[keySheet][4],
+                        period: 1,
+                        protocol_name: data.spreadSheet[keySheet][0],
+                        bgm: data.spreadSheet[keySheet][7],
+                        project: String(data.spreadSheet[keySheet][8]),
+                        status: data.spreadSheet[keySheet][10],
+                        comments: data.spreadSheet[keySheet][13],
+                        created_by: data.created_by
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        return 'save';
+      
       } else {
         const responseStringError = responseIfError.join('').replace(/undefined/g, '');
         return responseStringError;        
