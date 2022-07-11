@@ -5,14 +5,6 @@ import { fetchWrapper } from '../helpers';
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/import`;
 
-export const importService = {
-  getAll,
-  create,
-  update,
-  validate,
-  validateProtocol
-};
-
 function create(data: any) {
   return fetchWrapper.post(baseUrl, data);
 }
@@ -32,3 +24,11 @@ function validate(data: any) {
 function validateProtocol(data: any) {
   return fetchWrapper.post(`${baseUrl}/validateProtocol`, data);
 }
+
+export const importService = {
+  getAll,
+  create,
+  update,
+  validate,
+  validateProtocol,
+};

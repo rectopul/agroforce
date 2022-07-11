@@ -10,9 +10,9 @@ export function getCPF(value: string): string {
   value.replace(
     /(\d{3})(\d{3})(\d{3})(\d{2})/,
     (regex, arg1: string, arg2: string, arg3: string, arg4: string) => {
-      value = `${arg1}.${arg2}.${arg3}-${arg4}`;
+      const newValue = `${arg1}.${arg2}.${arg3}-${arg4}`;
 
-      return value;
+      return newValue;
     },
   );
 

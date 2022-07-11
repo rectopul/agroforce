@@ -1,23 +1,23 @@
 export default function handleOrderForeign(orderBy: any, orderType: any) {
   const orderColumn = (orderBy.split('.')[0]);
-  const foreiginColumn = (orderBy.split('.')[1]);
+  const foreignColumn = (orderBy.split('.')[1]);
   switch (orderColumn) {
     case 'local':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'safra':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'foco':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'type_assay':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'tecnologia':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'localPreparo':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'genotipo':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     case 'ensaio':
-      return `{ "${orderColumn}": {"${foreiginColumn}": "${orderType}" } }`;
+      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
     default:
       return undefined;
   }

@@ -91,7 +91,6 @@ export class LogImportController {
   }
 
   async listAll(options: any) {
-    console.log(options)
     const parameters: object | any = {};
     let select: any = [];
     try {
