@@ -672,9 +672,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 
 	const { response: local } = await responseLocal.json();
 
-	console.log('allCultureUnity')
-	console.log(allCultureUnity)
-
 	return {
 		props: {
 			allCultureUnity,

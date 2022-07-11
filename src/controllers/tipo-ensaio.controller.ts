@@ -59,16 +59,7 @@ export class TypeAssayController {
         orderBy,
       );
 
-      // response.map((item: any) => {
-      //   item.envelope.map((seed: any) => {
-      //     // console.log(seeds.id_safra === Number(options.id_safra))
-      //     // item.foco_children = (seeds.id_safra === Number(options.id_safra)) ? seeds.grupo
-      //     if (seed.id_safra === Number(options.id_safra)) {
-      //       item.seeds = seed.seeds;
-      //     }
-      //   });
-      // });
-
+      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum envelope encontrado',

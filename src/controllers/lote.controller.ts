@@ -1,4 +1,3 @@
-import tecnologia from 'src/pages/api/tecnologia';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
@@ -51,8 +50,6 @@ export class LoteController {
   }
 
   async getAll(options: any) {
-    console.log('options');
-    console.log(options);
     const parameters: object | any = {};
     let orderBy: object | any = '';
     let select: any = [];
@@ -127,8 +124,6 @@ export class LoteController {
         };
       }
 
-      console.log('parameters');
-      console.log(parameters);
 
       if (options.genotipo) {
         parameters.genotipo = options.genotipo;

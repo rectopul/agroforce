@@ -29,15 +29,19 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import { userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
+  AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterStatus: object | any;
-  filterProtocolName: string | any;
-  filterExperimentoName: string | any;
-  filterRotulo: string | any;
+  filterFoco: string
+  filterTypeAssay: string
+  filterGli: string
+  filterExperimentName: string
+  filterTecnologia: string
+  filterPeriod: string
+  filterDelineamento: string
+  filterRepetition: string
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -67,7 +71,7 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  idCulture: number;
+  idSafra: number
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any
 }
@@ -77,7 +81,7 @@ export default function Listagem({
   totalItems,
   itensPerPage,
   filterApplication,
-  idCulture,
+  idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
 }: IData) {
@@ -93,7 +97,7 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0, table_preferences: 'id,protocolo_name,foco,type_assay,gli,experiment_name,tecnologia,epoca,delineamento,repetition,status,action',
+    id: 0, table_preferences: 'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
@@ -106,15 +110,15 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolo_name' },
+    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
     { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
-    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experiment_name' },
-    { name: 'CamposGerenciados[]', title: 'Cód. Tec.', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'Época', value: 'epoca' },
+    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
     { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
-    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetition' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
@@ -128,20 +132,28 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterProtocolName: '',
-      filterExperimentoName: '',
-      filterRotulo: '',
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterGli: '',
+      filterExperimentName: '',
+      filterTecnologia: '',
+      filterPeriod: '',
+      filterDelineamento: '',
+      filterRepetition: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus,
-      filterProtocolName,
-      filterExperimentoName,
-      filterRotulo,
+      filterFoco,
+      filterTypeAssay,
+      filterGli,
+      filterExperimentName,
+      filterTecnologia,
+      filterPeriod,
+      filterDelineamento,
+      filterRepetition,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterProtocolName=${filterProtocolName}&id_culture=${id_culture}&filterExperimentoName=${filterExperimentoName}&filterRotulo=${filterRotulo}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -301,32 +313,32 @@ export default function Listagem({
       if (columnCampos[index] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnCampos[index] === 'protocolo_name') {
-        tableFields.push(headerTableFactory('Protocolo', 'protocolo_name'));
+      if (columnCampos[index] === 'protocolName') {
+        tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
       if (columnCampos[index] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
       if (columnCampos[index] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+        tableFields.push(headerTableFactory('Ensaio', 'assay_list.type_assay.name'));
       }
       if (columnCampos[index] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'gli'));
+        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Cód tec', 'tecnologia.name'));
+        tableFields.push(headerTableFactory('Cód tec', 'assay_list.tecnologia.name'));
       }
-      if (columnCampos[index] === 'experiment_name') {
-        tableFields.push(headerTableFactory('Nome experimento', 'experiment_name'));
+      if (columnCampos[index] === 'experimentName') {
+        tableFields.push(headerTableFactory('Nome experimento', 'experimentName'));
       }
-      if (columnCampos[index] === 'epoca') {
-        tableFields.push(headerTableFactory('Época', 'epoca'));
+      if (columnCampos[index] === 'period') {
+        tableFields.push(headerTableFactory('Época', 'period'));
       }
       if (columnCampos[index] === 'delineamento') {
         tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
       }
-      if (columnCampos[index] === 'repetition') {
-        tableFields.push(headerTableFactory('Rep.', 'repetition'));
+      if (columnCampos[index] === 'repetitionsNumber') {
+        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
       }
       if (columnCampos[index] === 'status') {
         tableFields.push(headerTableFactory('Status EXP.', 'status'));
@@ -434,7 +446,7 @@ export default function Listagem({
     let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
+      parametersFilter = `${parametersFilter}&${filter}&idSafra=${idSafra}`;
     }
     await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
       if (status === 200) {
@@ -494,11 +506,14 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory('filterProtocolName', 'Nome Protocolo')}
-
-                  {filterFieldFactory('filterExperimentoName', 'Nome Experimento')}
-
-                  {filterFieldFactory('filterRotulo', 'Rótulo')}
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
+                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
+                  {filterFieldFactory('filterRepetition', 'Repetição')}
 
                 </div>
 
@@ -620,9 +635,6 @@ export default function Listagem({
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de experimentos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="experimento/importar-planilha/config-planilha" />
-                      </div>
                     </div>
                   </div>
                 ),
@@ -692,8 +704,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-  // const { token } = req.cookies;
-  const idCulture = Number(req.cookies.cultureId);
+  const { token } = req.cookies;
+  const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
@@ -703,46 +715,19 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}` : 'filterStatus=1';
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&idSafra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}` : 'filterStatus=1';
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-  // const requestOptions = {
-  //   method: 'GET',
-  //   credentials: 'include',
-  //   headers: { Authorization: `Bearer ${token}` },
-  // } as RequestInit | undefined;
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: { Authorization: `Bearer ${token}` },
+  } as RequestInit | undefined;
 
-  // const experimento = await fetch(`${baseUrl}?id_culture=${idCulture}`, requestOptions);
-  // const { response: allExperiments, total: totalItems } = await experimento.json();
+  const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
 
-  const totalItems = 5;
-  const allExperiments = [{
-    id: 1,
-    protocolo_name: 'hinata',
-    foco: {
-      name: 'Norte',
-    },
-    type_assay: {
-      name: 'VCA',
-    },
-    gli: 'sasuke',
-    experiment_name: 'naruto',
-    tecnologia: {
-      name: 'ak47',
-    },
-    epoca: 'verao',
-    delineamento: {
-      name: 'quadrado',
-    },
-    repetition: 5,
-    status: 'exportado',
-  },
-  ];
-
-  console.log('allExperiments');
-  console.log(allExperiments);
 
   return {
     props: {
@@ -750,7 +735,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      idCulture,
+      idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
     },
