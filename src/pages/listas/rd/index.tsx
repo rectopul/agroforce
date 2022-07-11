@@ -105,7 +105,6 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [executeUpload, setExecuteUpload] = useState<any>(Number(UploadInProcess));
-  console.log(executeUpload);
   const [logs, setLogs] = useState<LogData[]>(allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems || 0);
@@ -252,7 +251,6 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
     }
 
     await logImportService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
-      console.log('ENTROUUUU 1')
       if (response.status === 200) {
         setLogs(response.response)
       }
@@ -363,11 +361,8 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
     }
     await logImportService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        console.log('Itemns', allItems);
 
-        // console.log(response.response);
         setLogs(response.response);
-        console.log('Logs', logs);
       }
     });
   };

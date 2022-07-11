@@ -206,10 +206,6 @@ export default function TipoEnsaio({
   }
 
   function headerTableFactory(name: any, title: string) {
-    console.log('name');
-    console.log(name);
-    console.log('title');
-    console.log(title);
     return {
       title: (
         <div className="flex items-center">
@@ -728,9 +724,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const response = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await response.json();
-
-  console.log('allItems');
-  console.log(allItems[0].envelope);
 
   return {
     props: {

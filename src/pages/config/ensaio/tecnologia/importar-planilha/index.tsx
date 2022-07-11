@@ -133,9 +133,6 @@ export default function Importar({ idCulture }: Idata) {
 //     headers: { Authorization: `Bearer ${token}` }
 //   };
 
-//   console.log('idCulture')
-//   console.log(idCulture)
-
 //   const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
 //   let safra: any = await apiSafra.json();
 
