@@ -274,6 +274,7 @@ export class ImportController {
     try{
 
       let Retorno: string = "";
+      let options: object | any = {};
       if (data != null && data != undefined) {
         let Line: number;
         let Column: number;
@@ -282,6 +283,16 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
+              // Validação do campo Tipo de Protocolo
+              if(sheet == 0){
+                let options = {};
+                options.filterProtocolName = data.spreadSheet[keySheet][sheet];
+                let typeAssayFind = await this.typeAssayController.getAll(options);
+                if(typeAssayFind.response.length == 0){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de protocolo não está cadastro no tipo de ensaio.</li><br>`;      
+                }
+              }
+              // Validação do campo Foco
               if(sheet == 2){
                 let dataFind = {
                   name: data.spreadSheet[keySheet][sheet],
@@ -293,6 +304,23 @@ export class ImportController {
                 }
                 //return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
               }
+              // Validação do campo Tipo de Ensaio
+              if(sheet == 3){
+                let options = {};
+                options.filterName = data.spreadSheet[keySheet][sheet];
+                options.id_culture = data.culture;
+                let typeAssayFindByName = await this.typeAssayController.getAll(options);
+                if(typeAssayFindByName.response.length == 0){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor tipo de ensaio não está cadastrado nesta cultura.</li><br>`;      
+                }
+              }
+              // Validação GLI
+              if(sheet == 4){
+                if(data.spreadSheet[keySheet][sheet] == ""){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de GLI está vazio.</li><br>`;
+                }
+              }
+              // Validação do campo código da tecnologia
               if(sheet == 5){
                 let take;
                 let skip;
@@ -310,9 +338,47 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o código da tecnologia não existe na cultura selecionada.</li><br>`;
                 }
               }
+              // Validação do campo EP
+              if(sheet == 6){
+                let charactersCell =  String(data.spreadSheet[keySheet][sheet]).length;
+                let onlyNumeric = String(data.spreadSheet[keySheet][sheet]).replace(/[^\d]/g, "");
+                let charactersNumeric = String(onlyNumeric).length;
+                if(onlyNumeric == "" || onlyNumeric.length > 2 || charactersCell != charactersNumeric){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de EP não pode ser vazio, deve ser numérico e com no máximo dois caracteres.</li><br>`;
+                }
+              }
+              // Validação do campo número de tratamento
+              if(sheet == 9){
+                let number_of_treatment = data.spreadSheet[keySheet][sheet];
+                let number_of_treatment_previous = number_of_treatment - 1;
+                if(keySheet > 1 && data.spreadSheet[keySheet-1][sheet] != number_of_treatment_previous 
+                  && data.spreadSheet[keySheet-1][sheet] && data.spreadSheet[keySheet-1][4] == data.spreadSheet[keySheet][4]){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o número de tratamento não está sequencial (`+number_of_treatment+`)</li><br>`;
+                }
+              }
+              // Validação do campo status
               if(sheet == 10){
                 if(data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")){
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de status deve ser igual a T ou L.</li><br>`;
+                }
+              }
+              // Validação do campo nome do genótipo
+              if(sheet == 11){
+                options = {};
+                options.filterGenotipo = data.spreadSheet[keySheet][sheet];
+                options.id_culture = data.culture;
+                let findGenotype = await this.genotipoController.getAll(options);
+                if(data.spreadSheet[keySheet][sheet] == "" || findGenotype.response.length == 0){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de nome do genótipo não foi encontrado.</li><br>`;
+                }
+              }
+              // Validação do campo NCA
+              if(sheet == 12){
+                options = {};
+                options.filterNcc = data.spreadSheet[keySheet][sheet];
+                let findLote = await this.loteController.getAll(options);
+                if(data.spreadSheet[keySheet][sheet] != "" && findLote.response.length == 0){
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de NCA é diferente de vazio e não foi encontrado no cadastro de lotes.</li><br>`;
                 }
               }
               //Retorno += " - " + data.spreadSheet[keySheet][sheet];
@@ -335,7 +401,6 @@ export class ImportController {
                 let assay = data.spreadSheet[keySheet][3];
                 let protocol_name = data.spreadSheet[keySheet][0];
                 let id_culture = cultureFind.response.id;
-                let options: object | any = {};
                 options.filterName = assay;
                 options.filterProtocolName = protocol_name;
                 options.id_culture = id_culture;
@@ -383,8 +448,8 @@ export class ImportController {
                     let gli = data.spreadSheet[keySheet][4];
                     options = {};
                     options.filterGli = gli;
-                    options.filterTypeAssay = idSavedTypeAssay;
                     let getListAssay = await this.assayListController.getAll(options);
+                    console.log("ListAssay: "+JSON.stringify(getListAssay));
 
                     if(getListAssay.response.length == 0){
                       let savedAssayList = await this.assayListController.create({
@@ -393,7 +458,7 @@ export class ImportController {
                         id_type_assay: idSavedTypeAssay,
                         id_tecnologia: tecnologiaFind[0].id,
                         gli: data.spreadSheet[keySheet][4],
-                        period: 1,
+                        period: data.spreadSheet[keySheet][9],
                         protocol_name: data.spreadSheet[keySheet][0],
                         bgm: data.spreadSheet[keySheet][7],
                         project: String(data.spreadSheet[keySheet][8]),
@@ -401,6 +466,7 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
+                      console.log("Saved Assay List: " + JSON.stringify(savedAssayList));
                     } else {
                       let savedAssayList = await this.assayListController.update({
                         id: getListAssay.response[0].id,
@@ -409,7 +475,7 @@ export class ImportController {
                         id_type_assay: idSavedTypeAssay,
                         id_tecnologia: tecnologiaFind[0].id,
                         gli: data.spreadSheet[keySheet][4],
-                        period: 1,
+                        period: data.spreadSheet[keySheet][9],
                         protocol_name: data.spreadSheet[keySheet][0],
                         bgm: data.spreadSheet[keySheet][7],
                         project: String(data.spreadSheet[keySheet][8]),
@@ -417,6 +483,7 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
+                      //console.log("Updated Assay List: " + JSON.stringify(savedAssayList));
                     }
                   }
                 }
