@@ -20,7 +20,7 @@ import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { experimentService, materiaisService, userPreferencesService } from '../../../../services';
+import { experimentService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,

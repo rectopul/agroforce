@@ -115,7 +115,6 @@ export function TabsDropDowns(typeAside: any = 'config') {
         hrefTab: '/config/delineamento',
         data: [
           { labelDropDown: 'Experimento', hrefDropDown: '/listas/experimentos/experimento', iconDropDown: <AiOutlineFileSearch /> },
-          { labelDropDown: 'Parcelas', hrefDropDown: '/listas/experimentos/parcelas', iconDropDown: <AiOutlineFileSearch /> },
         ],
       },
 
