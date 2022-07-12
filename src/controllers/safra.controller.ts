@@ -134,7 +134,7 @@ export class SafraController {
 
   async getOneSafra(id: Number) {
     try {
-      if (!id) throw new Error('ID inválido');
+      if (!id) return { status: 409, response: [], message: 'ID invalido' };
 
       const response = await this.safraRepository.findOne(Number(id));
 

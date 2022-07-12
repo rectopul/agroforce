@@ -6,8 +6,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new ImportController();
   switch (req.method) {
     case 'POST': {
-      const resp: any = await Controller.validateProtocol(req.body);
-      res.status(resp.status).json(resp);
+      const response: any = await Controller.validateProtocol(req.body);
+      res.status(200).json(response);
       break;
     }
     default:

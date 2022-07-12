@@ -1,6 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
 import { ImportRepository } from 'src/repository/import.repository';
 import { SafraController } from './safra.controller';
 import { LocalController } from './local.controller';
@@ -24,7 +21,7 @@ import { ExperimentController } from './experiment/experiment.controller';
 import { LogImportController } from './log-import.controller';
 import { FocoRepository } from '../repository/foco.repository';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
-import { ImportExperimentController } from './experiment/importExperiment.controller';
+import { ImportExperimentController } from './experiment/import-experiment.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -167,7 +164,19 @@ export class ImportController {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
         if (data.moduleId === 22) {
+          const { status, response, message }: any = await this.logImportController.create({
+            user_id: data.created_by, status: 2, table: data.table,
+          });
+
+          if (status === 400) {
+            return {
+              status: 200, message, error: true,
+            };
+          }
+          data.idLog = response.id;
           return await ImportExperimentController.validate(data);
+          // await this.logImportController.update({ id: logImport.response.id, status: 1 });
+          // return response;
         }
 
         const configModule: object | any = await this.getAll(Number(data.moduleId));
@@ -267,6 +276,7 @@ export class ImportController {
           }
         }
 
+        // await this.logImportController.update({ id: logImport.response.id, status: 1 });
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {

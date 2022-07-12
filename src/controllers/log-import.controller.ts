@@ -1,7 +1,9 @@
 import handleError from 'src/shared/utils/handleError';
-import { number, object, SchemaOf, string } from 'yup';
-import { LogImportRepository } from '../repository/log-import.repository';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import { LogImportRepository } from '../repository/log-import.repository';
 
 export class LogImportController {
   public readonly required = 'Campo obrigatório';
@@ -15,78 +17,39 @@ export class LogImportController {
       if (!response) throw new Error('Grupo não encontrado');
 
       return { status: 200, response };
-
     } catch (error: any) {
-      handleError('Grupo controller', 'GetOne', error.message)
-      throw new Error("[Controller] - GetOne Grupo erro")
+      handleError('Grupo controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Grupo erro');
     }
   }
 
   async create(data: any) {
     try {
-      const schema: SchemaOf<any> = object({
-        user_id: number().required(this.required),
-        table: string().required(this.required),
-        status: number().required(this.required)
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
-
-      switch (data.table) {
-        case 'tecnologia':
-
-          break;
-        case 'local':
-          break;
-        case 'genotipo':
-
-          break;
-        default:
-          return {
-            status: 400, message: "A primeira coluna da planilha precisa ser a tabela que está sendo feito a importação!"
-          };
-          break;
-      }
-
       const LogsAlreadyExists = await this.logImportRepository.validateImportInExecuting(data);
 
       if (LogsAlreadyExists) return { status: 400, message: 'Importação já está sendo executada' };
 
-      await this.logImportRepository.create(data);
+      const response = await this.logImportRepository.create(data);
 
-      return { status: 201, message: 'grupo cadastrado' };
+      return { status: 201, response, message: 'grupo cadastrado' };
     } catch (error: any) {
-      handleError('Grupo controller', 'Create', error.message)
-      throw new Error("[Controller] - Create Grupo erro")
+      handleError('Grupo controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Grupo erro');
     }
   }
 
-  async update(data: any) {
+  async update({ id, status }: any) {
     try {
-      const schema: SchemaOf<any> = object({
-        id: number().required(this.required),
-        id_safra: number().required(this.required),
-        id_foco: number().required(this.required),
-        group: number().required(this.required),
-        created_by: number().required(this.required)
-      });
+      const logImport: any = await this.logImportRepository.findById(id);
 
-      const valid = schema.isValidSync(data);
+      if (!logImport) return { status: 400, message: 'Log não exsite' };
 
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
+      await this.logImportRepository.update(id, status);
 
-      const group: any = await this.logImportRepository.findById(data.id);
-
-      if (!group) return { status: 400, message: 'grupo não existente' };
-
-      await this.logImportRepository.update(data.id, data);
-
-      return { status: 200, message: 'grupo atualizado' };
+      return { status: 200, message: 'Log atualizado' };
     } catch (error: any) {
-      handleError('Grupo controller', 'Update', error.message)
-      throw new Error("[Controller] - Update Grupo erro")
+      handleError('LogImport controller', 'Update', error.message);
+      throw new Error('[Controller] - Update LogImport erro');
     }
   }
 
@@ -95,8 +58,7 @@ export class LogImportController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus != 2)
-          parameters.status = Number(options.filterStatus);
+        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.paramSelect) {
@@ -104,14 +66,14 @@ export class LogImportController {
         Object.keys(objSelect).forEach((item) => {
           select[objSelect[item]] = true;
         });
-        select = Object.assign({}, select);
+        select = { ...select };
       } else {
         select = {
           id: true,
           user_id: true,
           table: true,
           status: true,
-          created_at: true
+          created_at: true,
         };
       }
 
@@ -134,20 +96,19 @@ export class LogImportController {
         select,
         take,
         skip,
-        orderBy
+        orderBy,
       );
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
-      } else {
-        response.map((item: any) => {
-          item.created_at = functionsUtils.formatDate(item.created_at);
-        });
-        return { status: 200, response, total: response.total };
       }
+      response.map((item: any) => {
+        item.created_at = functionsUtils.formatDate(item.created_at);
+      });
+      return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Log Import controller', 'GetAll', error.message)
-      throw new Error("[Controller] - GetAll Log Import erro")
+      handleError('Log Import controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Log Import erro');
     }
   }
 }

@@ -67,6 +67,10 @@ export class AssayListController {
         parameters.id_safra = Number(options.id_safra);
       }
 
+      if (options.gli) {
+        parameters.gli = options.gli;
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
