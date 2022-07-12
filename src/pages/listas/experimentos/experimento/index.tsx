@@ -1,6 +1,3 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -103,7 +100,7 @@ export default function Listagem({
   const router = useRouter();
   const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+  const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -123,7 +120,6 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
 
-  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
@@ -154,8 +150,8 @@ export default function Listagem({
       filterRepetition,
     }) => {
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setFilter(parametersFilter);
+      setCookies('filterBeforeEdit', filter);
       await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setExperimento(response.response);
@@ -285,7 +281,7 @@ export default function Listagem({
               title={`Atualizar ${rowData.experiment_name}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies('filterBeforeEdit', filter);
                 router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -405,12 +401,30 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
+    const excelFilters = `${filterApplication}&paramSelect=${camposGerenciados}`;
+    // if (!filterApplication.includes('paramSelect')) {
+    //   filterApplication +=
+    // }
 
-    await experimentService.getAll(filterApplication).then(({ status, response, message }: any) => {
+    await experimentService.getAll(excelFilters).then(({ status, response, message }: any) => {
       if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          if (item.assay_list) {
+            newItem.gli = item.assay_list.gli;
+            newItem.protocol_name = item.assay_list.protocol_name;
+            newItem.foco = item.assay_list.foco.name;
+            newItem.type_assay = item.assay_list.type_assay.name;
+            newItem.tecnologia = item.assay_list.tecnologia.name;
+          }
+          if (item.delineamento) {
+            newItem.repeticao = item.delineamento.repeticao;
+            newItem.delineamento = item.delineamento.name;
+          }
+          delete newItem.assay_list;
+          return newItem;
+        });
+
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
@@ -446,7 +460,7 @@ export default function Listagem({
     let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&idSafra=${idSafra}`;
+      parametersFilter = `${parametersFilter}&${filter}`;
     }
     await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
       if (status === 200) {
@@ -707,7 +721,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}` : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -715,8 +730,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&idSafra=${idSafra}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}` : 'filterStatus=1';
+  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();

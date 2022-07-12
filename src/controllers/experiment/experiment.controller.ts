@@ -38,8 +38,20 @@ export class ExperimentController {
 
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
+        select.assay_list = {};
+        select.assay_list.select = {};
         Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] !== 'action') {
+          if (objSelect[item] === 'protocolName') {
+            select.assay_list.select.protocol_name = true;
+          } else if (objSelect[item] === 'type_assay') {
+            select.assay_list.select.type_assay = true;
+          } else if (objSelect[item] === 'gli') {
+            select.assay_list.select.gli = true;
+          } else if (objSelect[item] === 'tecnologia') {
+            select.assay_list.select.tecnologia = true;
+          } else if (objSelect[item] === 'foco') {
+            select.assay_list.select.foco = true;
+          } else if (objSelect[item] !== 'action') {
             select[objSelect[item]] = true;
           }
         });
@@ -126,7 +138,6 @@ export class ExperimentController {
         skip,
         orderBy,
       );
-
       if (!response && response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
