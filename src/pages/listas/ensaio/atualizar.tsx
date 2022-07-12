@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -22,7 +24,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
-  userPreferencesService, assayListService, genotypeTreatmentService,
+  userPreferencesService, assayListService, genotypeTreatmentService, experimentService,
 } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import * as ITabs from '../../../shared/utils/dropdown';
@@ -44,10 +46,12 @@ export default function AtualizarTipoEnsaio({
   idSafra,
   itensPerPage,
   filterApplication,
+  allExperiments,
+  totalExperiments,
 }: IGenotypeTreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'ENSAIO'
@@ -59,11 +63,22 @@ export default function AtualizarTipoEnsaio({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0, table_preferences: 'id,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments',
   };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+
+  const preferencesExperiments = userLogado.preferences.experimento || {
+    id: 0, table_preferences: 'id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status',
+  };
+  const [
+    experimentsCamposGerenciados,
+    setExperimentsCamposGerenciados,
+  ] = useState<any>(preferencesExperiments.table_preferences);
+
   const itemsTotal = totalItens;
+  const experimentsTotal = totalExperiments;
   const filter = filterApplication;
   const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(() => allGenotypeTreatment);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const [experiments, setExperiments] = useState<any>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
@@ -80,6 +95,21 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
+  ]);
+  const [
+    generatesPropsExperiments,
+    setGeneratesPropsExperiments,
+  ] = useState<IGenerateProps[]>(() => [
+    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'Lugar de Cultura', value: 'local' },
+    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'NLP', value: 'nlp' },
+    { name: 'CamposGerenciados[]', title: 'CLP', value: 'clp' },
+    { name: 'CamposGerenciados[]', title: 'EEL', value: 'eel' },
+    { name: 'CamposGerenciados[]', title: 'Densidade', value: 'density' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
 
@@ -158,6 +188,48 @@ export default function AtualizarTipoEnsaio({
     }
   }
 
+  async function handleOrderExperiments(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
+    } else {
+      parametersFilter = filter;
+    }
+
+    await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+      if (status === 200) {
+        setExperiments(response);
+      }
+    });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
+
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
@@ -165,7 +237,7 @@ export default function AtualizarTipoEnsaio({
           <button
             type="button"
             className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
+            onClick={() => (table === 'genotipo' ? handleOrder(title, orderList) : handleOrderExperiments(title, orderList))}
           >
             {name}
           </button>
@@ -260,7 +332,47 @@ export default function AtualizarTipoEnsaio({
     return tableFields;
   }
 
+  function experimentColumnsOrder(columnCampos: string) {
+    const columnOrder: string[] = columnCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnOrder).forEach((item, index) => {
+      if (columnOrder[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnOrder[index] === 'experimentName') {
+        tableFields.push(headerTableFactory('Experimento Planejado', 'experimentName'));
+      }
+      if (columnOrder[index] === 'local') {
+        tableFields.push(headerTableFactory('Lugar de cultura', 'local.name_local_culture'));
+      }
+      if (columnOrder[index] === 'delineamento') {
+        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
+      }
+      if (columnOrder[index] === 'repetitionsNumber') {
+        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+      }
+      if (columnOrder[index] === 'nlp') {
+        tableFields.push(headerTableFactory('NLP', 'nlp'));
+      }
+      if (columnOrder[index] === 'clp') {
+        tableFields.push(headerTableFactory('CLP', 'clp'));
+      }
+      if (columnOrder[index] === 'eel') {
+        tableFields.push(headerTableFactory('EEL', 'eel'));
+      }
+      if (columnOrder[index] === 'density') {
+        tableFields.push(headerTableFactory('Densidade', 'density'));
+      }
+      if (columnOrder[index] === 'status') {
+        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+      }
+    });
+    return tableFields;
+  }
+
   const columns = columnsOrder(camposGerenciados);
+  const experimentColumns = experimentColumnsOrder(experimentsCamposGerenciados);
 
   async function getValuesColumns() {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -303,6 +415,46 @@ export default function AtualizarTipoEnsaio({
     setCamposGerenciados(campos);
   }
 
+  async function getValuesColumnsExperiments(): Promise<void> {
+    const els: any = document.querySelectorAll("input[type='checkbox']");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i += 1) {
+      if (els[i].checked) {
+        selecionados += `${els[i].value},`;
+      }
+    }
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
+    if (preferences.id === 0) {
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 22,
+      }).then((response) => {
+        userLogado.preferences.experimento = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.experimento = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
+    setStatusAccordion(false);
+    setExperimentsCamposGerenciados(campos);
+  }
+
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result) return;
@@ -313,6 +465,18 @@ export default function AtualizarTipoEnsaio({
     items.splice(index, 0, reorderedItem);
 
     setGeneratesProps(items);
+  }
+
+  function handleOnDragEndExperiments(result: DropResult): void {
+    setStatusAccordion(true);
+    if (!result) return;
+
+    const items = Array.from(generatesPropsExperiments);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
+
+    setGeneratesPropsExperiments(items);
   }
 
   const downloadExcel = async (): Promise<void> => {
@@ -341,7 +505,41 @@ export default function AtualizarTipoEnsaio({
     });
   };
 
+  const downloadExcelExperiments = async (): Promise<void> => {
+    if (!filterApplication.includes('paramSelect')) {
+      filterApplication += `&paramSelect=${experimentsCamposGerenciados}&id_assay_list=${idAssayList}`;
+    }
+    await experimentService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const workSheet = XLSX.utils.json_to_sheet(response);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Experimentos.xlsx');
+      }
+    });
+  };
+
   function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  }
+
+  function handleTotalPagesExperiments(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
@@ -359,6 +557,20 @@ export default function AtualizarTipoEnsaio({
     await genotypeTreatmentService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
         setGenotypeTreatments(response);
+      }
+    });
+  }
+
+  async function handlePaginationExperiments(): Promise<void> {
+    const skip = currentPage * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
+
+    if (filter) {
+      parametersFilter = `${parametersFilter}&${filter}`;
+    }
+    await experimentService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setExperiments(response);
       }
     });
   }
@@ -382,8 +594,12 @@ export default function AtualizarTipoEnsaio({
   }
 
   useEffect(() => {
-    handlePagination();
-    handleTotalPages();
+    table === 'genotipo'
+      ? handlePagination()
+      : handlePaginationExperiments();
+    table === 'genotipo'
+      ? handleTotalPages()
+      : handleTotalPagesExperiments();
   }, [currentPage]);
 
   return (
@@ -505,8 +721,8 @@ export default function AtualizarTipoEnsaio({
           <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
-              columns={columns}
-              data={genotypeTreatments}
+              columns={table === 'genotipo' ? columns : experimentColumns}
+              data={table === 'genotipo' ? genotypeTreatments : experiments}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -560,14 +776,14 @@ export default function AtualizarTipoEnsaio({
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
-                      {itemsTotal}
+                      {table === 'genotipo' ? itemsTotal : experimentsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-72">
                           <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                            <DragDropContext onDragEnd={table === 'genotipo' ? handleOnDragEnd : handleOnDragEndExperiments}>
                               <Droppable droppableId="characters">
                                 {
                                   (provided) => (
@@ -581,39 +797,68 @@ export default function AtualizarTipoEnsaio({
                                           value="Atualizar"
                                           bgColor="bg-blue-600"
                                           textColor="white"
-                                          onClick={getValuesColumns}
+                                          onClick={table === 'genotipo' ? getValuesColumns : getValuesColumnsExperiments}
                                           icon={<IoReloadSharp size={20} />}
                                         />
                                       </div>
                                       {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
-                                          >
-                                            {(dragProps) => (
-                                              <li
-                                                ref={dragProps.innerRef}
-                                                {
-                                                ...dragProps.draggableProps}
-                                                {
-                                                ...dragProps.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={
-                                                    camposGerenciados.includes(
-                                                      generate.value as string,
-                                                    )
-                                                  }
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
+                                        table === 'genotipo'
+                                          ? generatesProps.map((generate, index) => (
+                                            <Draggable
+                                              key={index}
+                                              draggableId={String(generate.title)}
+                                              index={index}
+                                            >
+                                              {(dragProps) => (
+                                                <li
+                                                  ref={dragProps.innerRef}
+                                                  {
+                                                  ...dragProps.draggableProps}
+                                                  {
+                                                  ...dragProps.dragHandleProps}
+                                                >
+                                                  <CheckBox
+                                                    name={generate.name}
+                                                    title={generate.title?.toString()}
+                                                    value={generate.value}
+                                                    defaultChecked={
+                                                      camposGerenciados.includes(
+                                                        generate.value as string,
+                                                      )
+                                                    }
+                                                  />
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          ))
+                                          : generatesPropsExperiments.map((generate, index) => (
+                                            <Draggable
+                                              key={index}
+                                              draggableId={String(generate.title)}
+                                              index={index}
+                                            >
+                                              {(dragProps) => (
+                                                <li
+                                                  ref={dragProps.innerRef}
+                                                  {
+                                                  ...dragProps.draggableProps}
+                                                  {
+                                                  ...dragProps.dragHandleProps}
+                                                >
+                                                  <CheckBox
+                                                    name={generate.name}
+                                                    title={generate.title?.toString()}
+                                                    value={generate.value}
+                                                    defaultChecked={
+                                                      experimentsCamposGerenciados.includes(
+                                                        generate.value as string,
+                                                      )
+                                                    }
+                                                  />
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          ))
                                       }
                                       {provided.placeholder}
                                     </ul>
@@ -626,7 +871,13 @@ export default function AtualizarTipoEnsaio({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de Tratamentos do genótipo" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de Tratamentos do genótipo"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => { table === 'genotipo' ? downloadExcel() : downloadExcelExperiments(); }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -710,6 +961,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const idAssayList = Number(context.query.id);
   const filterApplication = `id_safra=${idSafra}&id_assay_list=${idAssayList}`;
 
+  const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;
+  const experiment = await fetch(`${baseUrlExperiment}?${filterApplication}`, requestOptions);
+  const { response: allExperiments, total: totalExperiments }: any = await experiment.json();
+
   const baseUrlGenotypeTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const genotypeTreatment = await fetch(`${baseUrlGenotypeTreatment}?${filterApplication}`, requestOptions);
   const { response: allGenotypeTreatment, total: totalItens }: any = await genotypeTreatment.json();
@@ -718,23 +973,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const assayLists = await fetch(`${baseUrlAssayList}/${context.query.id}`, requestOptions);
   const assayList = await assayLists.json();
 
-  const allExperiments = [
-    {
-      id: 2,
-      id_safra: 2,
-      genotipo: {
-        name_genotipo: '2',
-        gmr: '2',
-        bgm: '2',
-        lote: [{ cod_lote: '2', fase: '2' }],
-        tecnologia: { cod_tec: '02' },
-      },
-      treatments_number: 2,
-      status: 2,
-      nca: '2',
-      comments: '2',
-    },
-  ];
+  console.log('allExperiments');
+  console.log(allExperiments);
 
   return {
     props: {
@@ -746,6 +986,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       idSafra,
       assayList,
       allExperiments,
+      totalExperiments,
     },
   };
 };
