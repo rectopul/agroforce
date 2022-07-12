@@ -23,8 +23,8 @@ function Login() {
 
   // form validation rules
   const validationSchema = Yup.object().shape({
-    login: Yup.String().required('Login is required'),
-    password: Yup.String().required('Password is required'),
+    login: Yup.string().required('Login is required'),
+    password: Yup.string().required('Password is required'),
   });
   const formOptions = { resolver: yupResolver(validationSchema) };
 
