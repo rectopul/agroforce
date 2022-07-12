@@ -165,7 +165,7 @@ export class ImportController {
 
         if (data.moduleId === 22) {
           const { status, response, message }: any = await this.logImportController.create({
-            user_id: data.created_by, status: 2, table: data.table,
+            user_id: data.createdBy, status: 2, table: data.table,
           });
 
           if (status === 400) {
