@@ -53,7 +53,6 @@ export interface IExperimento {
   ensaio: string;
   cod_tec: number;
   epoca: number;
-  materiais: number;
   status?: number;
 }
 
