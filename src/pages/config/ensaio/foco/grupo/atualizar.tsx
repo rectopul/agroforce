@@ -5,17 +5,17 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
-import InputMask from "react-input-mask";
+import InputMask from 'react-input-mask';
 import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import {
 	Button,
 	Content,
 	Select,
-	Input
-} from "../../../../../components";
+	Input,
+} from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ICreateFoco {
@@ -39,7 +39,7 @@ export default function Cadastro({ grupo }: any) {
 	const router = useRouter();
 	const [checkInput, setCheckInput] = useState('text-black');
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
+	const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
 	const culture = userLogado.userCulture.cultura_selecionada as string;
 
@@ -51,24 +51,24 @@ export default function Cadastro({ grupo }: any) {
 			created_by: userLogado.id,
 		},
 		onSubmit: async (values) => {
-			validateInputs(values)
+			validateInputs(values);
 			if (!values.group) {
-				Swal.fire('Preencha todos os campos obrigatórios')
-				return
+				Swal.fire('Preencha todos os campos obrigatórios');
+				return;
 			}
 			await groupService.update({
-				id: Number(grupo.id),
-				id_safra: Number(grupo.safra.id),
+				id: number(grupo.id),
+				id_safra: number(grupo.safra.id),
 				id_foco: parseInt(grupo.foco.id),
-				group: Number(values.group),
-				created_by: Number(formik.values.created_by),
+				group: number(values.group),
+				created_by: number(formik.values.created_by),
 			}).then((response) => {
 				if (response.status === 200) {
 					Swal.fire('Grupo atualizado com sucesso!');
 					router.back();
 				} else {
-					setCheckInput("text-red-600");
-					Swal.fire(response.message)
+					setCheckInput('text-red-600');
+					Swal.fire(response.message);
 				}
 			}).finally(() => {
 				formik.values.safra = '';
@@ -78,10 +78,10 @@ export default function Cadastro({ grupo }: any) {
 
 	function validateInputs(values: any) {
 		if (!values.group) {
-			let inputGroup: any = document.getElementById("group");
+			const inputGroup: any = document.getElementById('group');
 			inputGroup.style.borderColor = 'red';
 		} else {
-			let inputGroup: any = document.getElementById("group");
+			const inputGroup: any = document.getElementById('group');
 			inputGroup.style.borderColor = '';
 		}
 	}
@@ -92,7 +92,7 @@ export default function Cadastro({ grupo }: any) {
 				<title>Novo</title>
 			</Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+			<Content contentHeader={tabsDropDowns} moduloActive="config">
 				<form
 					className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -101,12 +101,13 @@ export default function Cadastro({ grupo }: any) {
 					<h1 className="text-2xl">Novo</h1>
 
 					<div className="w-1/2
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-        ">
+        "
+					>
 						<div className="w-full h-10">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								<strong className={checkInput}>*</strong>
@@ -138,7 +139,7 @@ export default function Cadastro({ grupo }: any) {
                     leading-tight
                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                   "
-								mask={'99'}
+								mask="99"
 								id="group"
 								name="group"
 								onChange={formik.handleChange}
@@ -153,7 +154,8 @@ export default function Cadastro({ grupo }: any) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+					>
 						<div className="w-30">
 							<Button
 								type="button"
@@ -183,24 +185,23 @@ export default function Cadastro({ grupo }: any) {
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
 	const id_group = query.id;
-	const token = req.cookies.token;
+	const { token } = req.cookies;
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/grupo`;
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` }
+		headers: { Authorization: `Bearer ${token}` },
 	};
 
-	const grupos = await fetch(`${baseUrlShow}/` + id_group, requestOptions);
+	const grupos = await fetch(`${baseUrlShow}/${id_group}`, requestOptions);
 
 	const grupo = await grupos.json();
 
 	return {
 		props: {
-			grupo
-		}
-	}
-}
-
+			grupo,
+		},
+	};
+};

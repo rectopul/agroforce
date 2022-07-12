@@ -61,7 +61,7 @@ export default function NovoLocal() {
         name: capitalize(values.name),
         cod_tec: capitalize(values.cod_tec),
         desc: capitalize(values.desc),
-        created_by: Number(userLogado.id),
+        created_by: number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status === 200) {

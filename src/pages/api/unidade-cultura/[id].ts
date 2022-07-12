@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { id } = req.query;
 	switch (req.method) {
 		case 'GET':
-			const result = await unidadeCulturaController.getOne({ id: Number(id) });
+			const result = await unidadeCulturaController.getOne({ id: number(id) });
 			res.status(200).json(result);
 			break
 		case 'PUT':

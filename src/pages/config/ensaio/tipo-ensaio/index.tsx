@@ -27,11 +27,11 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
-  id: Number | any;
-  name: String | any;
+  id: number | any;
+  name: string | any;
   envelope?: []
-  created_by: Number;
-  status: Number;
+  created_by: number;
+  status: number;
 }
 
 interface IFilter {
@@ -47,7 +47,7 @@ interface IGenerateProps {
 }
 interface IData {
   allItems: ITypeAssayProps[];
-  totalItems: Number;
+  totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;

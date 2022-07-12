@@ -23,10 +23,10 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {
-	id: Number | any;
-	name: String | any;
-	created_by: Number;
-	status: Number;
+	id: number | any;
+	name: string | any;
+	created_by: number;
+	status: number;
 }
 
 interface IFilter {
@@ -42,7 +42,7 @@ interface IGenerateProps {
 }
 interface Idata {
 	allItems: ITecnologiaProps[];
-	totalItems: Number;
+	totalItems: number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterApplication: object | any;

@@ -56,7 +56,7 @@ export class UserCultureRepository {
         return Result;
     }
 
-    async findAllByUser(userId: Number | any) {
+    async findAllByUser(userId: number | any) {
         let Result = await prisma.users_cultures.findMany({
             where: {
                 userId: userId,

@@ -25,18 +25,18 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface INpeProps {
-	id: Number | any;
-	local: Number;
-	safra: Number;
-	foco: Number;
-	type_assay: Number;
-	ogm: Number;
-	epoca: Number;
-	npei: Number;
-	npef: Number;
-	prox_npe: Number;
-	status?: Number;
-	created_by: Number;
+	id: number | any;
+	local: number;
+	safra: number;
+	foco: number;
+	type_assay: number;
+	ogm: number;
+	epoca: number;
+	npei: number;
+	npef: number;
+	prox_npe: number;
+	status?: number;
+	created_by: number;
 }
 
 interface IFilter {
@@ -58,7 +58,7 @@ interface IGenerateProps {
 }
 interface Idata {
 	allNpe: any;
-	totalItems: Number;
+	totalItems: number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterApplication: object | any;

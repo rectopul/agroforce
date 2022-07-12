@@ -5,17 +5,17 @@ import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
-import InputMask from "react-input-mask";
-import { GetServerSideProps } from "next";
+import InputMask from 'react-input-mask';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { envelopeService } from 'src/services';
 import {
     Button,
     Content,
     Select,
-    Input
-} from "../../../../../components";
+    Input,
+} from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
-import { envelopeService } from 'src/services';
 
 interface ICreateTypeAssay {
     safra: string;
@@ -38,7 +38,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
     const router = useRouter();
     const [checkInput, setCheckInput] = useState('text-black');
 
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     const formik = useFormik<ICreateTypeAssay>({
         initialValues: {
@@ -48,34 +48,34 @@ export default function Cadastro({ safra, id_type_assay }: any) {
             created_by: userLogado.id,
         },
         onSubmit: async (values) => {
-            validateInputs(values)
+            validateInputs(values);
             if (!values.seeds) {
-                Swal.fire('Preencha todos os campos obrigatórios')
-                return
+                Swal.fire('Preencha todos os campos obrigatórios');
+                return;
             }
 
             await envelopeService.create({
-                id_safra: Number(safra.id),
+                id_safra: number(safra.id),
                 id_type_assay: parseInt(id_type_assay),
-                seeds: Number(values.seeds),
+                seeds: number(values.seeds),
                 created_by: formik.values.created_by,
             }).then((response) => {
                 if (response.status === 201) {
                     Swal.fire('Envelope cadastrado com sucesso!');
                     router.back();
                 } else {
-                    Swal.fire(response.message)
+                    Swal.fire(response.message);
                 }
-            })
+            });
         },
     });
 
     function validateInputs(values: any) {
         if (!values.seeds) {
-            let inputSeeds: any = document.getElementById("seeds");
+            const inputSeeds: any = document.getElementById('seeds');
             inputSeeds.style.borderColor = 'red';
         } else {
-            let inputSeeds: any = document.getElementById("seeds");
+            const inputSeeds: any = document.getElementById('seeds');
             inputSeeds.style.borderColor = '';
         }
     }
@@ -86,7 +86,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 <title>Novo Envelope</title>
             </Head>
 
-            <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+            <Content contentHeader={tabsDropDowns} moduloActive="config">
                 <form
                     className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -95,12 +95,13 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                     <h1 className="text-2xl">Novo Envelope</h1>
 
                     <div className="w-1/2
-                                flex 
+                                flex
                                 justify-around
                                 gap-6
                                 mt-4
                                 mb-4
-                            ">
+                            "
+                    >
                         <div className="w-full h-10">
                             <label className="block text-gray-900 text-sm font-bold mb-2">
                                 Safra
@@ -145,7 +146,8 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                             gap-3
                             justify-center
                             mt-10
-                        ">
+                        "
+                    >
                         <div className="w-30">
                             <Button
                                 type="button"
@@ -176,24 +178,23 @@ export default function Cadastro({ safra, id_type_assay }: any) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { publicRuntimeConfig } = getConfig();
     const baseUrlShow = `${publicRuntimeConfig.apiUrl}/safra`;
-    const token = context.req.cookies.token;
-    const safraId = context.req.cookies.safraId;
+    const { token } = context.req.cookies;
+    const { safraId } = context.req.cookies;
 
     const requestOptions: RequestInit | undefined = {
         method: 'GET',
         credentials: 'include',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
     };
 
-    const apiSafra = await fetch(`${baseUrlShow}/` + safraId, requestOptions);
+    const apiSafra = await fetch(`${baseUrlShow}/${safraId}`, requestOptions);
 
     const safra = await apiSafra.json();
-    const id_type_assay = context.query.id_type_assay;
+    const { id_type_assay } = context.query;
     return {
         props: {
             safra,
-            id_type_assay
-        }
-    }
-}
-
+            id_type_assay,
+        },
+    };
+};

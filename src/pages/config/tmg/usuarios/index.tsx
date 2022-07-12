@@ -50,7 +50,7 @@ interface IGenerateProps {
 }
 interface IData {
 	allUsers: IUsers[];
-	totalItems: Number;
+	totalItems: number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterApplication: object | any;
@@ -143,15 +143,15 @@ export default function Listagem({
 	function headerTableFactory(name: any, title: string) {
 		return {
 			title: (
-				<div className='flex items-center'>
-					<button className='font-medium text-gray-900' onClick={() => handleOrder(title, orderList)}>
+				<div className="flex items-center">
+					<button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
 						{name}
 					</button>
 				</div>
 			),
 			field: title,
-			sorting: false
-		}
+			sorting: false,
+		};
 	}
 
 	function idHeaderFactory() {
@@ -167,19 +167,19 @@ export default function Listagem({
 			render: () => (
 				colorStar === '#eba417'
 					? (
-						<div className='h-10 flex'>
+						<div className="h-10 flex">
 							<div>
 								<button
 									className="w-full h-full flex items-center justify-center border-0"
 									onClick={() => setColorStar('')}
 								>
-									<AiTwotoneStar size={25} color={'#eba417'} />
+									<AiTwotoneStar size={25} color="#eba417" />
 								</button>
 							</div>
 						</div>
 					)
 					: (
-						<div className='h-10 flex'>
+						<div className="h-10 flex">
 							<div>
 								<button
 									className="w-full h-full flex items-center justify-center border-0"
@@ -190,7 +190,7 @@ export default function Listagem({
 							</div>
 						</div>
 					)
-			)
+			),
 		};
 	}
 
@@ -207,8 +207,7 @@ export default function Listagem({
 						<div className="
 							h-10
 						"
-						>
-						</div>
+						/>
 						<div className="
 							h-10
 						"
@@ -240,8 +239,7 @@ export default function Listagem({
 						<div className="
 							h-10
 						"
-						>
-						</div>
+						/>
 						<div className="
 							h-10
 						"
@@ -270,7 +268,7 @@ export default function Listagem({
 					</div>
 				)
 			),
-		}
+		};
 	}
 
 	function colums(camposGerenciados: any): any {
@@ -501,7 +499,7 @@ export default function Listagem({
 					onChange={formik.handleChange}
 				/>
 			</div>
-		)
+		);
 	}
 
 	useEffect(() => {
@@ -748,7 +746,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	} as RequestInit | undefined;
 
 	const users = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allUsers, total: totalItems } = await users.json();;
+	const { response: allUsers, total: totalItems } = await users.json();
 
 	return {
 		props: {

@@ -94,7 +94,7 @@ export class UserCultureController {
         }
     }
 
-    async getByUserID(userId: Number | any) {
+    async getByUserID(userId: number | any) {
         let newID = parseInt(userId);
         try {
             if (userId && userId !== '{id}') {

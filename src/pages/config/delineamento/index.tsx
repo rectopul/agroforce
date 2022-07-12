@@ -1,8 +1,8 @@
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import Swal from "sweetalert2";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import Swal from 'sweetalert2';
+import MaterialTable from 'material-table';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import router from 'next/router';
@@ -23,19 +23,19 @@ import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { delineamentoService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
+import { number } from 'yup/lib/locale';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
-import { number } from "yup/lib/locale";
 
 interface IDelineamentoProps {
-  id: Number | any;
-  name: String | any;
+  id: number | any;
+  name: string | any;
   repeticao: string;
-  trat_repeticao: Number;
-  created_by: Number;
-  status: Number;
+  trat_repeticao: number;
+  created_by: number;
+  status: number;
 }
 
 interface IFilter {
@@ -53,7 +53,7 @@ interface IGenerateProps {
 }
 interface Idata {
   delineamentos: IDelineamentoProps[];
-  totalItems: Number;
+  totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;
@@ -359,8 +359,7 @@ export default function Listagem({
   }
 
   async function handleStatus(idDelineamento: number, data: IDelineamentoProps): Promise<void> {
-
-    let parametersFilter = "filterStatus=" + 1 + "&name=" + data.name;
+    const parametersFilter = `filterStatus=${1}&name=${data.name}`;
 
     if (data.status === 0) {
       await delineamentoService.getAll(parametersFilter).then((response) => {
@@ -371,11 +370,10 @@ export default function Listagem({
         }
         if (response.total > 0) {
           Swal.fire('Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!');
-          return;
         } else {
           delineamentoService.update({
             id: idDelineamento,
-            status: data.status
+            status: data.status,
           });
           const index = delineamento.findIndex((delineamento) => delineamento.id === idDelineamento);
 
@@ -391,11 +389,10 @@ export default function Listagem({
 
           const {
             id,
-            status
+            status,
           } = delineamento[index];
         }
-      })
-
+      });
     } else {
       if (data.status === 0) {
         data.status = 1;
@@ -405,7 +402,7 @@ export default function Listagem({
 
       delineamentoService.update({
         id: idDelineamento,
-        status: data.status
+        status: data.status,
       });
 
       const index = delineamento.findIndex((delineamento) => delineamento.id === idDelineamento);
@@ -422,10 +419,10 @@ export default function Listagem({
 
       const {
         id,
-        status
+        status,
       } = delineamento[index];
     }
-  };
+  }
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);

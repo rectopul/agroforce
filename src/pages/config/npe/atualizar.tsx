@@ -1,44 +1,44 @@
-import { GetServerSideProps } from "next";
-import { useFormik } from "formik";
-import Head from "next/head";
+import { GetServerSideProps } from 'next';
+import { useFormik } from 'formik';
+import Head from 'next/head';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import Swal from 'sweetalert2'
-import { layoutQuadraService } from "src/services";
-import InputMask from "react-input-mask";
+import Swal from 'sweetalert2';
+import { layoutQuadraService } from 'src/services';
+import InputMask from 'react-input-mask';
 
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
 import {
   Content,
   Input,
   Select,
   Button,
-} from "../../../components";
+} from '../../../components';
 
 import * as ITabs from '../../../shared/utils/dropdown';
-import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
 
 interface ILayoultProps {
-  id: Number | any;
-  esquema: String | any;
-  op: String | any;
-  semente_metros: Number | any;
-  disparos: Number | any;
-  divisor: Number | any;
-  largura: Number | any;
-  comp_fisico: Number | any;
-  comp_parcela: Number | any;
-  comp_corredor: Number | any;
-  t4_inicial: Number | any;
-  t4_final: Number | any;
-  df_inicial: Number | any;
-  df_final: Number | any;
-  localId: Number | any;
+  id: number | any;
+  esquema: string | any;
+  op: string | any;
+  semente_metros: number | any;
+  disparos: number | any;
+  divisor: number | any;
+  largura: number | any;
+  comp_fisico: number | any;
+  comp_parcela: number | any;
+  comp_corredor: number | any;
+  t4_inicial: number | any;
+  t4_final: number | any;
+  df_inicial: number | any;
+  df_final: number | any;
+  localId: number | any;
   created_by: number | any;
-  status: Number;
-};
+  status: number;
+}
 
 interface ILocal {
   id: number;
@@ -80,7 +80,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
     lng,
   };
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const locais: object | any = [];
   const router = useRouter();
   const formik = useFormik<ILayoultProps>({
@@ -101,7 +101,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
       df_final: layoultEdit.df_final,
       localId: layoultEdit.localId,
       created_by: userLogado.id,
-      status: 1
+      status: 1,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -111,50 +111,50 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         id: values.id,
         esquema: values.esquema,
         op: values.op,
-        semente_metros: Number(values.semente_metros),
-        disparos: Number(values.disparos),
-        divisor: Number(values.divisor),
+        semente_metros: number(values.semente_metros),
+        disparos: number(values.disparos),
+        divisor: number(values.divisor),
         largura: values.largura,
         comp_fisico: values.comp_fisico,
         comp_parcela: values.comp_parcela,
         comp_corredor: values.comp_corredor,
-        t4_inicial: Number(values.t4_inicial),
-        t4_final: Number(values.t4_final),
-        df_inicial: Number(values.df_inicial),
-        df_final: Number(values.df_final),
+        t4_inicial: number(values.t4_inicial),
+        t4_final: number(values.t4_final),
+        df_inicial: number(values.df_inicial),
+        df_final: number(values.df_final),
         localId: idLocal,
-        created_by: Number(userLogado.id),
-        status: 1
+        created_by: number(userLogado.id),
+        status: 1,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Layout quadra atualizado com sucesso!');
-          router.back()
+          router.back();
         } else {
           Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   local.map((value: string | object | any) => {
     locais.push({ id: value.id, name: value.name });
-  })
+  });
 
   function validateInputs(values: any) {
-    if (!values.esquema) { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor = 'red'; } else { let inputesquema: any = document.getElementById("esquema"); inputesquema.style.borderColor = ''; }
-    if (!values.op) { let inputop: any = document.getElementById("op"); inputop.style.borderColor = 'red'; } else { let inputop: any = document.getElementById("op"); inputop.style.borderColor = ''; }
-    if (!values.localId) { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor = 'red'; } else { let inputlocalId: any = document.getElementById("localId"); inputlocalId.style.borderColor = ''; }
-    if (!values.semente_metros) { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor = 'red'; } else { let inputsemente_metros: any = document.getElementById("semente_metros"); inputsemente_metros.style.borderColor = ''; }
-    if (!values.disparos) { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor = 'red'; } else { let inputdisparos: any = document.getElementById("disparos"); inputdisparos.style.borderColor = ''; }
-    if (!values.divisor) { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor = 'red'; } else { let inputdivisor: any = document.getElementById("divisor"); inputdivisor.style.borderColor = ''; }
-    if (!values.largura) { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor = 'red'; } else { let inputlargura: any = document.getElementById("largura"); inputlargura.style.borderColor = ''; }
-    if (!values.comp_fisico) { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor = 'red'; } else { let inputcomp_fisico: any = document.getElementById("comp_fisico"); inputcomp_fisico.style.borderColor = ''; }
-    if (!values.comp_parcela) { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor = 'red'; } else { let inputcomp_parcela: any = document.getElementById("comp_parcela"); inputcomp_parcela.style.borderColor = ''; }
-    if (!values.comp_corredor) { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor = 'red'; } else { let inputcomp_corredor: any = document.getElementById("comp_corredor"); inputcomp_corredor.style.borderColor = ''; }
-    if (!values.t4_inicial) { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor = 'red'; } else { let inputt4_inicial: any = document.getElementById("t4_inicial"); inputt4_inicial.style.borderColor = ''; }
-    if (!values.t4_final) { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor = 'red'; } else { let inputt4_final: any = document.getElementById("t4_final"); inputt4_final.style.borderColor = ''; }
-    if (!values.df_inicial) { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor = 'red'; } else { let inputdf_inicial: any = document.getElementById("df_inicial"); inputdf_inicial.style.borderColor = ''; }
-    if (!values.df_final) { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor = 'red'; } else { let inputdf_final: any = document.getElementById("df_final"); inputdf_final.style.borderColor = ''; }
+    if (!values.esquema) { const inputesquema: any = document.getElementById('esquema'); inputesquema.style.borderColor = 'red'; } else { const inputesquema: any = document.getElementById('esquema'); inputesquema.style.borderColor = ''; }
+    if (!values.op) { const inputop: any = document.getElementById('op'); inputop.style.borderColor = 'red'; } else { const inputop: any = document.getElementById('op'); inputop.style.borderColor = ''; }
+    if (!values.localId) { const inputlocalId: any = document.getElementById('localId'); inputlocalId.style.borderColor = 'red'; } else { const inputlocalId: any = document.getElementById('localId'); inputlocalId.style.borderColor = ''; }
+    if (!values.semente_metros) { const inputsemente_metros: any = document.getElementById('semente_metros'); inputsemente_metros.style.borderColor = 'red'; } else { const inputsemente_metros: any = document.getElementById('semente_metros'); inputsemente_metros.style.borderColor = ''; }
+    if (!values.disparos) { const inputdisparos: any = document.getElementById('disparos'); inputdisparos.style.borderColor = 'red'; } else { const inputdisparos: any = document.getElementById('disparos'); inputdisparos.style.borderColor = ''; }
+    if (!values.divisor) { const inputdivisor: any = document.getElementById('divisor'); inputdivisor.style.borderColor = 'red'; } else { const inputdivisor: any = document.getElementById('divisor'); inputdivisor.style.borderColor = ''; }
+    if (!values.largura) { const inputlargura: any = document.getElementById('largura'); inputlargura.style.borderColor = 'red'; } else { const inputlargura: any = document.getElementById('largura'); inputlargura.style.borderColor = ''; }
+    if (!values.comp_fisico) { const inputcomp_fisico: any = document.getElementById('comp_fisico'); inputcomp_fisico.style.borderColor = 'red'; } else { const inputcomp_fisico: any = document.getElementById('comp_fisico'); inputcomp_fisico.style.borderColor = ''; }
+    if (!values.comp_parcela) { const inputcomp_parcela: any = document.getElementById('comp_parcela'); inputcomp_parcela.style.borderColor = 'red'; } else { const inputcomp_parcela: any = document.getElementById('comp_parcela'); inputcomp_parcela.style.borderColor = ''; }
+    if (!values.comp_corredor) { const inputcomp_corredor: any = document.getElementById('comp_corredor'); inputcomp_corredor.style.borderColor = 'red'; } else { const inputcomp_corredor: any = document.getElementById('comp_corredor'); inputcomp_corredor.style.borderColor = ''; }
+    if (!values.t4_inicial) { const inputt4_inicial: any = document.getElementById('t4_inicial'); inputt4_inicial.style.borderColor = 'red'; } else { const inputt4_inicial: any = document.getElementById('t4_inicial'); inputt4_inicial.style.borderColor = ''; }
+    if (!values.t4_final) { const inputt4_final: any = document.getElementById('t4_final'); inputt4_final.style.borderColor = 'red'; } else { const inputt4_final: any = document.getElementById('t4_final'); inputt4_final.style.borderColor = ''; }
+    if (!values.df_inicial) { const inputdf_inicial: any = document.getElementById('df_inicial'); inputdf_inicial.style.borderColor = 'red'; } else { const inputdf_inicial: any = document.getElementById('df_inicial'); inputdf_inicial.style.borderColor = ''; }
+    if (!values.df_final) { const inputdf_final: any = document.getElementById('df_final'); inputdf_final.style.borderColor = 'red'; } else { const inputdf_final: any = document.getElementById('df_final'); inputdf_final.style.borderColor = ''; }
   }
 
   useEffect(() => {
@@ -167,7 +167,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         lat;
         lng;
       }
-    })
+    });
   }, [idLocal]);
 
   return (
@@ -176,17 +176,17 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
         <title>Atualizar Layout Quadra</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="
           w-full
           h-full
-          bg-white 
-          shadow-md 
-          rounded 
-          px-8 
-          pt-6 
-          pb-8 
+          bg-white
+          shadow-md
+          rounded
+          px-8
+          pt-6
+          pb-8
           mt-2
           overflow-y-scroll
         "
@@ -197,12 +197,13 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Esquema
@@ -245,11 +246,12 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Sementes por Metros
@@ -296,7 +298,8 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             justify-between
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Largura
@@ -400,11 +403,12 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *T4 Inicial
@@ -464,7 +468,8 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             h-4/6
             my-4
             mt-10
-          ">
+          "
+          >
             {isLoaded ? (
               <GoogleMap
                 mapContainerStyle={{
@@ -483,7 +488,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                   options={{
                     label: {
                       text: titleLocal,
-                      className: "mb-14 text-gray-50"
+                      className: 'mb-14 text-gray-50',
                     },
                   }}
                 />
@@ -497,7 +502,8 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -530,21 +536,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
   const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiLocal = await fetch(baseUrlLocal, requestOptions);
-  const resU = await fetch(`${baseUrlLayoult}/` + context.query.id, requestOptions)
+  const resU = await fetch(`${baseUrlLayoult}/${context.query.id}`, requestOptions);
 
   const layoultEdit = await resU.json();
   let local = await apiLocal.json();
-  local = local.response
-  return { props: { local, layoultEdit } }
-}
-
-
+  local = local.response;
+  return { props: { local, layoultEdit } };
+};

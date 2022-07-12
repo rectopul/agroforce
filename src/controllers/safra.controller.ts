@@ -132,7 +132,7 @@ export class SafraController {
     }
   }
 
-  async getOneSafra(id: Number) {
+  async getOneSafra(id: number) {
     try {
       if (!id) return { status: 409, response: [], message: 'ID invalido' };
 

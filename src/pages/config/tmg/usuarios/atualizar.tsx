@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { IoMdArrowBack } from "react-icons/io";
-import { RiUserSettingsLine } from "react-icons/ri";
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiUserSettingsLine } from 'react-icons/ri';
 import InputMask from 'react-input-mask';
 import { prisma } from 'src/pages/api/db/db';
-import { userService } from "src/services";
-import { functionsUtils } from "src/shared/utils/functionsUtils";
+import { userService } from 'src/services';
+import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import Swal from 'sweetalert2';
-import { Button, CheckBox, Content, Input, Select } from "../../../../components";
+import {
+  Button, CheckBox, Content, Input, Select,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartment {
@@ -63,19 +65,21 @@ export interface IData {
   departmentsData: IDepartment[];
 }
 
-export default function AtualizarUsuario({ departmentsData, data, profilesData, culturesData }: IData) {
+export default function AtualizarUsuario({
+  departmentsData, data, profilesData, culturesData,
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG' && tab.data.map(i => i.labelDropDown === 'Usuários')
+    tab.titleTab === 'TMG' && tab.data.map((i) => i.labelDropDown === 'Usuários')
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
   const router = useRouter();
 
-  const optionSorN = [{ id: 1, name: "Sim" }, { id: 0, name: "Não" }];
+  const optionSorN = [{ id: 1, name: 'Sim' }, { id: 0, name: 'Não' }];
   const userCultures = new Array();
   const userPermissions: any = new Array();
 
@@ -83,7 +87,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
     Object.keys(data.users_permissions).forEach((_, item) => {
       userCultures.push(data.users_permissions[item].id_cultures);
       if (userPermissions[data.users_permissions[item].id_cultures]) {
-        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, Number(userPermissions[data.users_permissions[item].id_cultures].join())]
+        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, Number(userPermissions[data.users_permissions[item].id_cultures].join())];
       } else {
         userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles];
       }
@@ -107,20 +111,20 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       status: data.status,
       app_login: data.app_login,
       created_by: data.created_by,
-      cultures: []
+      cultures: [],
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.login || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
       if (values.password !== values.confirmPassword) {
-        Swal.fire("As senhas devem ser iguais")
-        return
+        Swal.fire('As senhas devem ser iguais');
+        return;
       }
 
-      let checkbox: any = document.getElementsByName('cultures');
+      const checkbox: any = document.getElementsByName('cultures');
       values.cultures = [];
       for (let i = 0; i < checkbox.length; i++) {
         if (checkbox[i].checked) {
@@ -133,7 +137,7 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input = document.querySelector('select[name="profiles_' + values.cultures[item] + '"]');
+        input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i++) {
           if (input.options[i].selected) {
@@ -142,8 +146,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         }
         ObjProfiles = {
           cultureId: values.cultures[item],
-          profiles: auxObject2
-        }
+          profiles: auxObject2,
+        };
         auxObject.push(ObjProfiles);
       });
 
@@ -161,44 +165,43 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
         status: values.status,
         app_login: values.app_login,
         cultures: auxObject,
-        created_by: values.created_by
+        created_by: values.created_by,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Usuário atualizado com sucesso!')
+          Swal.fire('Usuário atualizado com sucesso!');
           router.back();
         } else {
           Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
-    if (!values.login) { let inputLogin: any = document.getElementById("login"); inputLogin.style.borderColor = 'red'; } else { let inputLogin: any = document.getElementById("login"); inputLogin.style.borderColor = ''; }
-    if (!values.cpf) { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = 'red'; } else { let inputCpf: any = document.getElementById("cpf"); inputCpf.style.borderColor = ''; }
+    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
+    if (!values.login) { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = 'red'; } else { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = ''; }
+    if (!values.cpf) { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = 'red'; } else { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = ''; }
     // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
-    if (!values.departmentId) { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = 'red'; } else { let inputDepartmentId: any = document.getElementById("departmentId"); inputDepartmentId.style.borderColor = ''; }
-    if (!values.password) { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = 'red'; } else { let inputPassword: any = document.getElementById("password"); inputPassword.style.borderColor = ''; }
-    if (!values.confirmPassword) { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = 'red'; } else { let inputconfirmPassword: any = document.getElementById("confirmPassword"); inputconfirmPassword.style.borderColor = ''; }
+    if (!values.departmentId) { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = 'red'; } else { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = ''; }
+    if (!values.password) { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = 'red'; } else { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = ''; }
+    if (!values.confirmPassword) { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = 'red'; } else { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = ''; }
 
     if (values.password !== values.confirmPassword) {
-      return true
-    } else {
-      return false
+      return true;
     }
+    return false;
   }
 
   function defineProfiles(culturedId: number, profiles: any) {
     Permissions[culturedId] = profiles.value;
-    setPermissions(Permissions)
+    setPermissions(Permissions);
   }
   return (
     <>
       <Head>
         <title>Atualizar Usuário</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -206,12 +209,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
           <h1 className="text-2xl">Atualizar usuário</h1>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
@@ -271,13 +275,13 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             </div>
           </div>
 
-
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Email
@@ -351,7 +355,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             justify-between
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Senha
@@ -386,7 +391,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             justify-between
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Libera jivochat
@@ -424,42 +430,40 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             <div className="w-full grid grid-cols-3 gap-6">
               {
                 culturesData.map((culture: ICultureUser) => (
-                  <>
-                    <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                      <div className="w-full text-xl">
-                        <CheckBox
-                          key={culture.id}
-                          title={culture.name}
-                          id={`culture_${culture.id}`}
-                          name="cultures"
-                          onChange={formik.handleChange}
-                          value={culture.id}
-                          defaultChecked={userCultures.includes(culture.id)}
+                  <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
+                    <div className="w-full text-xl">
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        id={`culture_${culture.id}`}
+                        name="cultures"
+                        onChange={formik.handleChange}
+                        value={culture.id}
+                        defaultChecked={userCultures.includes(culture.id)}
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <h4 className="block text-gray-900 text-sm font-bold mb-2">
+                        Permissões
+                      </h4>
+                      <div>
+                        <MultiSelectComponent
+                          id={`profiles_${culture.id}`}
+                          name={`profiles_${culture.id}`}
+                          dataSource={profilesData as any}
+                          onChange={(e: any) => defineProfiles(culture.id, e)}
+                          mode="Box"
+                          fields={{
+                            text: 'name',
+                            value: 'id',
+                          }}
+                          value={Permissions[culture.id]}
+                          placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
                         />
                       </div>
-
-                      <div className="w-full">
-                        <h4 className='block text-gray-900 text-sm font-bold mb-2'>
-                          Permissões
-                        </h4>
-                        <div>
-                          <MultiSelectComponent
-                            id={`profiles_${culture.id}`}
-                            name={`profiles_${culture.id}`}
-                            dataSource={profilesData as any}
-                            onChange={(e: any) => defineProfiles(culture.id, e)}
-                            mode="Box"
-                            fields={{
-                              text: "name",
-                              value: "id"
-                            }}
-                            value={Permissions[culture.id]}
-                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
-                          />
-                        </div>
-                      </div>
                     </div>
-                  </>
+                  </div>
                 ))
               }
             </div>
@@ -470,7 +474,8 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -501,22 +506,22 @@ export default function AtualizarUsuario({ departmentsData, data, profilesData, 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
   // Fetch data from external API
   const requestOptions: object | any = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const response = await prisma.user.findFirst({
     where: {
-      id: Number(context.query.id),
+      id: number(context.query.id),
     },
     include: {
       users_permissions: {
         where: {
-          userId: Number(context.query.id),
+          userId: number(context.query.id),
         },
         select: {
           id: true,
@@ -525,22 +530,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             select: {
               id: true,
               name: true,
-            }
+            },
           },
           culture: {
             select: {
               id: true,
               name: true,
-            }
-          }
+            },
+          },
         },
       },
       department: {
         select: {
           id: true,
-        }
+        },
       },
-    }
+    },
   });
 
   const responseDepartment = await prisma.department.findMany({
@@ -550,7 +555,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     select: {
       id: true,
       name: true,
-    }
+    },
   });
 
   const responseProfile = await prisma.profile.findMany({
@@ -560,7 +565,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     select: {
       id: true,
       name: true,
-    }
+    },
   });
 
   const responseCulture = await prisma.culture.findMany({
@@ -570,7 +575,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     select: {
       id: true,
       name: true,
-    }
+    },
   });
 
   if (!response?.id) {
@@ -578,9 +583,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       redirect: {
         destination: '/',
         permanent: false,
-        statusCode: 404
-      }
-    }
+        statusCode: 404,
+      },
+    };
   }
   const data = {
     id: response.id,
@@ -597,39 +602,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     app_login: response.app_login,
     status: response.status,
     created_by: response.created_by,
-    users_permissions: response.users_permissions.map(item => {
-      return {
-        id: item.id,
+    users_permissions: response.users_permissions.map((item) => ({
+      id: item.id,
 
-        id_profiles: item.profile.id,
-        name_profiles: item.profile.name,
+      id_profiles: item.profile.id,
+      name_profiles: item.profile.name,
 
-        id_cultures: item.culture.id,
-        name_cultures: item.culture.name,
-      }
-    }),
+      id_cultures: item.culture.id,
+      name_cultures: item.culture.name,
+    })),
   };
 
-  const departmentsData = responseDepartment.map(department => {
-    return {
-      id: department.id,
-      name: department.name
-    }
-  });
+  const departmentsData = responseDepartment.map((department) => ({
+    id: department.id,
+    name: department.name,
+  }));
 
-  const profilesData = responseProfile.map(profile => {
-    return {
-      id: profile.id,
-      name: profile.name
-    }
-  });
+  const profilesData = responseProfile.map((profile) => ({
+    id: profile.id,
+    name: profile.name,
+  }));
 
-  const culturesData = responseCulture.map(culture => {
-    return {
-      id: culture.id,
-      name: culture.name
-    }
-  });
+  const culturesData = responseCulture.map((culture) => ({
+    id: culture.id,
+    name: culture.name,
+  }));
 
   return {
     props: {
@@ -637,6 +634,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       departmentsData,
       profilesData,
       culturesData,
-    }
-  }
-}
+    },
+  };
+};
