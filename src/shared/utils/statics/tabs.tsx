@@ -1,4 +1,4 @@
-import { BsCheckLg } from "react-icons/bs";
+import { BsCheckLg } from 'react-icons/bs';
 
 const tabs = [
   { title: 'TMG', value: <BsCheckLg />, status: true },
@@ -32,4 +32,6 @@ const nada = [
   { labelDropDown: 'nada', hrefDropDown: '#' },
 ];
 
-export { tabs, dropDowns, teste, nada };
+export {
+  tabs, dropDowns, teste, nada,
+};

@@ -1,4 +1,6 @@
-import { number, object, SchemaOf, string, date } from 'yup';
+import {
+  number, object, SchemaOf, string, date,
+} from 'yup';
 import { SafraRepository } from '../repository/safra.repository';
 
 interface Safra {
@@ -11,7 +13,7 @@ interface Safra {
   main_safra?: number;
   status: number;
   created_by: number;
-};
+}
 
 type CreateSafra = Omit<Safra, 'id' | 'main_safra'>;
 type UpdateSafra = Omit<Safra, 'id_culture' | 'created_by' | 'main_safra'>;
@@ -31,13 +33,11 @@ export class SafraController {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
           if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        }
+        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
       }
 
       if (options.filterSafra) {
-        options.filterSafra = '{"contains":"' + options.filterSafra + '"}';
+        options.filterSafra = `{"contains":"${options.filterSafra}"}`;
         parameters.safraName = JSON.parse(options.filterSafra);
       }
 
@@ -56,11 +56,11 @@ export class SafraController {
       // }
 
       if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
+        const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
           select[objSelect[item]] = true;
         });
-        select = Object.assign({}, select);
+        select = { ...select };
       } else {
         select = {
           id: true,
@@ -69,7 +69,7 @@ export class SafraController {
           plantingStartTime: true,
           plantingEndTime: true,
           main_safra: false,
-          status: true
+          status: true,
         };
       }
 
@@ -82,7 +82,7 @@ export class SafraController {
       }
 
       if (options.safraName) {
-        parameters.safraName = options.safraName
+        parameters.safraName = options.safraName;
       }
 
       if (options.year) {
@@ -118,33 +118,31 @@ export class SafraController {
       }
 
       if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
       const response: object | any = await this.safraRepository.findAll(parameters, select, take, skip, orderBy);
 
       if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 }
-
-      } else {
-        return { status: 200, response, total: response.total }
+        return { status: 400, response: [], total: 0 };
       }
+      return { status: 200, response, total: response.total };
     } catch (err) {
-      return { status: 200, response: [], total: 0 }
+      return { status: 200, response: [], total: 0 };
     }
   }
 
-  async getOneSafra(id: number) {
+  async getOneSafra(id: Number) {
     try {
-      if (!id) throw new Error("ID inválido");
+      if (!id) return { status: 409, response: [], message: 'ID invalido' };
 
       const response = await this.safraRepository.findOne(Number(id));
 
-      if (!response) throw new Error("Dados inválidos");
+      if (!response) throw new Error('Dados inválidos');
 
       return { status: 200, response };
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return { status: 400, message: 'Safra não encontrada' };
     }
   }
@@ -163,16 +161,16 @@ export class SafraController {
 
       const valid = schema.isValidSync(data);
 
-      if (!valid) return { status: 400, message: "Dados inválidos" };
+      if (!valid) return { status: 400, message: 'Dados inválidos' };
       const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
-      if (safraAlreadyExists) return { status: 400, message: "Safra já cadastrada" };
+      if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
 
       await this.safraRepository.create(data);
 
-      return { status: 201, message: "Safra cadastrada" }
+      return { status: 201, message: 'Safra cadastrada' };
     } catch (err) {
-      console.log(err)
-      return { status: 404, message: "Erro ao cadastrar safra" }
+      console.log(err);
+      return { status: 404, message: 'Erro ao cadastrar safra' };
     }
   }
 
@@ -189,7 +187,7 @@ export class SafraController {
 
       const valid = schema.isValidSync(data);
 
-      if (!valid) return { status: 400, message: "Dados inválidos" };
+      if (!valid) return { status: 400, message: 'Dados inválidos' };
 
       const safra: any = await this.safraRepository.findOne(data.id);
 
@@ -209,9 +207,9 @@ export class SafraController {
 
       await this.safraRepository.update(safra.id, safra);
 
-      return { status: 200, message: "Item atualizado" }
+      return { status: 200, message: 'Item atualizado' };
     } catch (err) {
-      return { status: 404, message: "Erro ao atualizar safra" }
+      return { status: 404, message: 'Erro ao atualizar safra' };
     }
   }
 }
