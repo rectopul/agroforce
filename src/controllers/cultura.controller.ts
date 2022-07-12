@@ -116,7 +116,7 @@ export class CulturaController {
     }
   }
 
-  async getOneCulture(id: Number) {
+  async getOneCulture(id: number) {
     try {
       if (!id) throw new Error('Dados inválidos');
 
@@ -132,8 +132,6 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
-      
-
       const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
       if (cultureAlreadyExists) {
@@ -150,7 +148,7 @@ export class CulturaController {
 
   async updateCulture(data: UpdateCultureDTO) {
     try {
-           const culture = await this.culturaRepository.findOne(data.id);
+      const culture = await this.culturaRepository.findOne(data.id);
 
       if (!culture) return { status: 400, message: 'Cultura não existente' };
 
