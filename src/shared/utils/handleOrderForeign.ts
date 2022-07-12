@@ -1,24 +1,39 @@
 export default function handleOrderForeign(orderBy: any, orderType: any) {
-  const orderColumn = (orderBy.split('.')[0]);
-  const foreignColumn = (orderBy.split('.')[1]);
-  switch (orderColumn) {
-    case 'local':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'safra':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'foco':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'type_assay':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'tecnologia':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'localPreparo':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'genotipo':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    case 'ensaio':
-      return `{ "${orderColumn}": {"${foreignColumn}": "${orderType}" } }`;
-    default:
-      return undefined;
+  const orderColumnForeign = orderBy.split('.');
+  const foreignKey = orderColumnForeign[0];
+  const foreignColumn = orderColumnForeign[1];
+  if (orderColumnForeign.length > 2) {
+    const foreignNextKey = orderColumnForeign[2];
+    switch (foreignKey) {
+      case 'assay_list':
+        return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
+      case 'genotipo':
+        return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
+      default:
+        return undefined;
+    }
+  } else {
+    switch (foreignKey) {
+      case 'local':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'safra':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'foco':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'type_assay':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'tecnologia':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'localPreparo':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'genotipo':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'ensaio':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'assay_list':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      default:
+        return undefined;
+    }
   }
 }
