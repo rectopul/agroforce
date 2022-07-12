@@ -116,7 +116,7 @@ export class CulturaController {
     }
   }
 
-  async getOneCulture(id: number) {
+  async getOneCulture(id: Number) {
     try {
       if (!id) throw new Error('Dados inválidos');
 
@@ -132,15 +132,7 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
-      const schema: SchemaOf<CreateCultureDTO> = object({
-        name: string().required(this.required),
-        desc: string().required(this.required),
-        created_by: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
+      
 
       const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
@@ -158,18 +150,7 @@ export class CulturaController {
 
   async updateCulture(data: UpdateCultureDTO) {
     try {
-      const schema: SchemaOf<UpdateCultureDTO> = object({
-        id: number().integer().required(this.required),
-        name: string().required(this.required),
-        desc: string().required(this.required),
-        status: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
-
-      const culture = await this.culturaRepository.findOne(data.id);
+           const culture = await this.culturaRepository.findOne(data.id);
 
       if (!culture) return { status: 400, message: 'Cultura não existente' };
 

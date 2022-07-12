@@ -2,7 +2,7 @@
 2 - variaveis e funções no estilo camelcase(primeira letra minuscula e inicial das outras palavras maiuscula)
 3 - get para controller e resto, find para repository
 4 - response para controller e resto, result para repository
-5 - template string(`` crase para strings com ${} chaves para variável)
+5 - template String(`` crase para strings com ${} chaves para variável)
 6 - desestruturação para receber variáveis( const {response, total} = data)
 7 - tentar tipar sempre que possível
 8 - tratar os erros do catch, para ficar mais fácil encontrar onde esta o erro
