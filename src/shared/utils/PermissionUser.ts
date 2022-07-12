@@ -1,23 +1,13 @@
-const useGetUserPermisssions = () => {
-  // lógica para pegar as permissões das pessoas
-  return ['canEdit', 'canSave']
-}
-
-const PermisssionGate = ({ children, permissions, user }: any) => {
-  const userPermissions = user.permissions
+function PermissionGate({ children, permissions, user }: any) {
+  const userPermissions = user.permissions;
 
   if (
     permissions
-      .some((permission: string) => {
-        return userPermissions.includes(permission)
-      })
+      .some((permission: string) => userPermissions.includes(permission))
   ) {
-    return children
-  } else { 
-    throw 'você não tem permissão para acessar. ';
+    return children;
   }
-
-  return null
+  throw new Error('você não tem permissão para acessar. ');
 }
 
-export default PermisssionGate
+export default PermissionGate;

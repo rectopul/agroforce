@@ -7,17 +7,21 @@ import React, { useState, ReactNode, useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import getConfig from 'next/config';
-import { IoIosCloudUpload } from "react-icons/io";
-import MaterialTable from "material-table";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar } from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { AccordionFilter, CheckBox, Select } from "src/components";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { userPreferencesService, logImportService } from "src/services";
+import { IoIosCloudUpload } from 'react-icons/io';
+import MaterialTable from 'material-table';
+import {
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import {
+  AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiTwotoneStar,
+} from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import { AccordionFilter, CheckBox, Select } from 'src/components';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { userPreferencesService, logImportService } from 'src/services';
 import * as XLSX from 'xlsx';
 import { Button, Content, Input } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
@@ -49,8 +53,12 @@ interface IData {
   filterAplication: object | any;
   id_genotipo: number;
   UploadInProcess: number;
+  idSafra: number
+  idCulture: number
 }
-export default function Import({ allItems, totalItems, itensPerPage, filterAplication, UploadInProcess }: IData) {
+export default function Import({
+  allItems, totalItems, itensPerPage, filterAplication, UploadInProcess, idSafra, idCulture,
+}: IData) {
   const router = useRouter();
   const { TabsDropDowns } = ITabs;
 
@@ -61,30 +69,53 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
-  function readExcel() {
-    var value: any = document.getElementById("inputFile");
+
+  function readExcel(moduleId: Number, table: String) {
+    const value: any = document.getElementById(`inputFile-${moduleId}`);
     if (!value.files[0]) {
-      Swal.fire("Insira um arquivo")
+      Swal.fire('Insira um arquivo');
       return;
     }
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
     setExecuteUpload(1);
     readXlsxFile(value.files[0]).then((rows) => {
-      importService.validateProtocol({ spreadSheet: rows, created_by: userLogado.id }).then((response) => {
-        if (response.message !== '') {
-          Swal.fire({
-            html: response.message,
-            width: '900',
-          });
-        }
-        if (!response.error) {
-          Swal.fire({
-            html: response.message,
-            width: '800',
-          });
-        }
-        setExecuteUpload(0);
-      });
+      if (moduleId) {
+        importService.validate({
+          spreadSheet: rows, moduleId, created_by: userLogado.id, idSafra, idCulture, table,
+        }).then(({ status, message }: any) => {
+          if (status !== 200) {
+            Swal.fire({
+              html: message,
+              width: '900',
+            });
+          }
+          if (status === 200) {
+            Swal.fire({
+              html: message,
+              width: '800',
+            });
+          }
+          setExecuteUpload(0);
+        });
+      } else {
+        importService.validateProtocol({
+          spreadSheet: rows, created_by: userLogado.id,
+        }).then((response) => {
+          if (response.message !== '') {
+            Swal.fire({
+              html: response.message,
+              width: '900',
+            });
+          }
+          if (!response.error) {
+            Swal.fire({
+              html: response.message,
+              width: '800',
+            });
+          }
+          setExecuteUpload(0);
+        });
+      }
     });
   }
 
@@ -95,13 +126,13 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
       foco: '',
     },
     onSubmit: async (values) => {
-      var inputFile: any = document.getElementById("inputFile");
+      const inputFile: any = document.getElementById('inputFile');
       readExcel();
     },
   });
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: "id,user_id,created_at, table" };
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,user_id,created_at, table' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [executeUpload, setExecuteUpload] = useState<any>(Number(UploadInProcess));
@@ -112,10 +143,10 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
-    { name: "CamposGerenciados[]", title: "Usuario", value: "user_id" },
-    { name: "CamposGerenciados[]", title: "Tabela", value: "table" },
-    { name: "CamposGerenciados[]", title: "Importado em", value: "created_at" },
+    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Usuario', value: 'user_id' },
+    { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
+    { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
   ]);
   const [filter, setFilter] = useState<any>(filterAplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -132,7 +163,7 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
 
   const columns = columnsOrder(camposGerenciados);
 
-  const disabledButton = (executeUpload === 1) ? true : false;
+  const disabledButton = (executeUpload === 1);
   const bgColor = (executeUpload === 1) ? 'bg-red-600' : 'bg-blue-600';
 
   const formikLote = useFormik<IFilter>({
@@ -143,8 +174,8 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = "filterStatus=" + values.filterStatus + "&filterSearch=" + values.filterSearch;
-      await logImportService.getAll(parametersFilter + `&skip=0&take=${itensPerPage}`).then((response: LogData[]) => {
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}`;
+      await logImportService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: LogData[]) => {
         setLogs(response);
         setTotaItems(response.length);
         setFilter(parametersFilter);
@@ -250,9 +281,9 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
       parametersFilter = filter;
     }
 
-    await logImportService.getAll(parametersFilter + `&skip=0&take=${take}`).then((response) => {
+    await logImportService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setLogs(response.response)
+        setLogs(response.response);
       }
     });
 
@@ -361,11 +392,10 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
     }
     await logImportService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-
         setLogs(response.response);
       }
     });
-  };
+  }
 
   useEffect(() => {
     handlePagination(); '';
@@ -376,13 +406,13 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
       <Head>
         <title>Importação planilhas</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive={'listas'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <div className="grid grid-cols-3 gap-4 h-screen	">
           <div className="bg-white rounded-lg">
             <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: "5%" }}>IMPORTAÇÃO DE PLANILHAS</span>
+              <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
             </div>
-            <hr></hr>
+            <hr />
             <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
               <div className="
 											h-20
@@ -390,29 +420,55 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
 											flex
 											items-center
 											mr-1
-										">
+										"
+              >
                 <Button
-                  textColor='white'
+                  textColor="white"
                   bgColor={bgColor}
-                  rounder={`rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full`}
-                  onClick={() => readExcel()}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(0, '')}
                   icon={<IoIosCloudUpload size={40} />}
                   disabled={disabledButton}
-                  type="button" />
-                <span className="text-white">{<IoIosCloudUpload size={40} />}</span>
+                  type="button"
+                />
               </div>
-              <div className="col-span-2" style={{ marginLeft: "-15%" }}>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
                 <span className="font-bold">Titulo</span>
                 <p>ultimo update 28/06/22</p>
-                <a><Input type="file" required id="inputFile" name="inputFile" /></a>
+                <a><Input type="file" required id="inputFile-0" name="inputFile-0" /></a>
+              </div>
+            </div>
+            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+              <div className="
+											h-20
+											w-20
+											flex
+											items-center
+											mr-1
+										"
+              >
+                <Button
+                  textColor="white"
+                  bgColor={bgColor}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(22, 'experimento')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
+              </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Importar Experimento</span>
+                <p>ultimo update 28/06/22</p>
+                <a><Input type="file" required id="inputFile-22" name="inputFile-22" /></a>
               </div>
             </div>
           </div>
           <div className="bg-white rounded-lg col-span-2">
             <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: "5%" }}>HISTORICO DE IMPORTAÇÕES</span>
+              <span className="text-xl" style={{ marginLeft: '5%' }}>HISTORICO DE IMPORTAÇÕES</span>
             </div>
-            <hr></hr>
+            <hr />
 
             <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
               <MaterialTable
@@ -422,16 +478,16 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
                 options={{
                   showTitle: false,
                   headerStyle: {
-                    zIndex: 20
+                    zIndex: 20,
                   },
                   search: false,
                   filtering: false,
-                  pageSize: itensPerPage
+                  pageSize: itensPerPage,
                 }}
                 components={{
                   Toolbar: () => (
                     <div
-                      className='w-full max-h-96	
+                      className="w-full max-h-96
 												flex
 												items-center
 												justify-between
@@ -441,24 +497,29 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
 												px-5
 												border-solid border-b
 												border-gray-200
-											'>
+											"
+                    >
 
-                      <strong className='text-blue-600'>Total registrado: {itemsTotal}</strong>
+                      <strong className="text-blue-600">
+                        Total registrado:
+                        {' '}
+                        {itemsTotal}
+                      </strong>
 
-                      <div className='h-full flex items-center gap-2'>
+                      <div className="h-full flex items-center gap-2">
                         <div className="border-solid border-2 border-blue-600 rounded">
                           <div className="w-72">
-                            <AccordionFilter title='Gerenciar Campos' grid={statusAccordion}>
+                            <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                               <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId='characters'>
+                                <Droppable droppableId="characters">
                                   {
                                     (provided) => (
                                       <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                         <div className="h-8 mb-3">
                                           <Button
                                             value="Atualizar"
-                                            bgColor='bg-blue-600'
-                                            textColor='white'
+                                            bgColor="bg-blue-600"
+                                            textColor="white"
                                             onClick={getValuesColumns}
                                             icon={<IoReloadSharp size={20} />}
                                           />
@@ -489,69 +550,65 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
                           </div>
                         </div>
 
-                        <div className='h-12 flex items-center justify-center w-full'>
-                          <Button title="Exportar planilha de logs" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => { downloadExcel() }} />
+                        <div className="h-12 flex items-center justify-center w-full">
+                          <Button title="Exportar planilha de logs" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                         </div>
                       </div>
                     </div>
                   ),
                   Pagination: (props) => (
-                    <>
-                      <div
-                        className="flex
-													h-20 
-													gap-2 
+                    <div
+                      className="flex
+													h-20
+													gap-2
 													pr-2
 													py-5
 													bg-gray-50
 												"
-                        {...props}
-                      >
-                        <Button
-                          onClick={() => setCurrentPage(currentPage - 10)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<MdFirstPage size={18} />}
-                          disabled={currentPage <= 1}
-                        />
-                        <Button
-                          onClick={() => setCurrentPage(currentPage - 1)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiLeftArrow size={15} />}
-                          disabled={currentPage <= 0}
-                        />
-                        {
-                          Array(1).fill('').map((value, index) => (
-                            <>
-                              <Button
-                                key={index}
-                                onClick={() => setCurrentPage(index)}
-                                value={`${currentPage + 1}`}
-                                bgColor="bg-blue-600"
-                                textColor="white"
-                                disabled={true}
-                              />
-                            </>
-                          ))
-                        }
-                        <Button
-                          onClick={() => setCurrentPage(currentPage + 1)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiRightArrow size={15} />}
-                          disabled={currentPage + 1 >= pages}
-                        />
-                        <Button
-                          onClick={() => setCurrentPage(currentPage + 10)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<MdLastPage size={18} />}
-                          disabled={currentPage + 1 >= pages}
-                        />
-                      </div>
-                    </>
-                  ) as any
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
+                        Array(1).fill('').map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))
+                      }
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
                 }}
               />
             </div>
@@ -562,15 +619,16 @@ export default function Import({ allItems, totalItems, itensPerPage, filterAplic
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
 
   const { publicRuntimeConfig } = getConfig();
-  const token = req.cookies.token;
+  const { token } = req.cookies;
+  const idSafra = Number(req.cookies.safraId);
+  const idCulture = Number(req.cookies.cultureId);
 
-  const filterAplication = "";
+  const filterAplication = '';
   const param = `skip=0&take=${itensPerPage}`;
 
   const urlParameters: any = new URL(`${publicRuntimeConfig.apiUrl}/log-import`);
@@ -579,7 +637,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiLogs: any = await fetch(urlParameters.toString(), requestOptions);
@@ -588,5 +646,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   allItems.map((item: any) => {
     item.status === 2 ? UploadInProcess = 1 : false;
   });
-  return { props: { allItems, totalItems, itensPerPage, filterAplication, UploadInProcess } }
-}
+  return {
+    props: {
+      allItems, totalItems, itensPerPage, filterAplication, UploadInProcess, idSafra, idCulture,
+    },
+  };
+};

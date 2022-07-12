@@ -7,21 +7,20 @@ export class SafraRepository {
   }
 
   async update(id: number, data: any) {
-    let safra = await this.findOne(id);
+    const safra = await this.findOne(id);
     if (safra !== null) {
-      let Result = await prisma.safra.update({
+      const Result = await prisma.safra.update({
         where: { id },
-        data
-      })
+        data,
+      });
       return Result;
-    } else {
-      return false;
     }
+    return false;
   }
 
   async findOne(id: number) {
     const safra = await prisma.safra.findUnique({
-      where: { id }
+      where: { id },
     });
     return safra;
   }
@@ -31,7 +30,7 @@ export class SafraRepository {
       where: {
         safraName: data.safraName,
         id_culture: data.id_culture,
-      }
+      },
     });
 
     return safra;
@@ -43,15 +42,13 @@ export class SafraRepository {
       order = JSON.parse(orderBy);
     }
 
-    let count = await prisma.safra.count({ where: where });
+    const count = await prisma.safra.count({ where });
 
     // const splitStartDate = where.plantingStartTime.lte.split('-')
     // const splitEndDate = where.plantingEndTime.gte.split('-')
 
-
     // const startDate = new Date(splitStartDate[0], splitStartDate[1], splitStartDate[2])
     // const endDate = new Date(splitEndDate[0], splitEndDate[1], splitEndDate[2])
-
 
     // try {
     //   const teste = await prisma.safra.findMany({
@@ -67,10 +64,10 @@ export class SafraRepository {
     // }
 
     const response: object | any = await prisma.safra.findMany({
-      select: select,
-      skip: skip,
-      take: take,
-      where: where,
+      select,
+      skip,
+      take,
+      where,
       orderBy: order,
     });
 

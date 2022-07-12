@@ -20,7 +20,7 @@ import {
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
@@ -727,7 +727,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   } as RequestInit | undefined;
 
   const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
-
 
   return {
     props: {

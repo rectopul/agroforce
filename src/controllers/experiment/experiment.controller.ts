@@ -1,6 +1,6 @@
-import handleError from '../shared/utils/handleError';
-import { ExperimentRepository } from '../repository/experiment.repository';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
+import { ExperimentRepository } from '../../repository/experiment.repository';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -106,6 +106,10 @@ export class ExperimentController {
         parameters.idSafra = Number(options.idSafra);
       }
 
+      if (options.experimentName) {
+        parameters.experimentName = options.idSafra;
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -171,7 +175,7 @@ export class ExperimentController {
 
       const response = await this.experimentRepository.update(experimento.id, data);
       if (response) {
-        return { status: 201, message: 'Experimento atualizado' };
+        return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
     } catch (error: any) {

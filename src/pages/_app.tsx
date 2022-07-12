@@ -5,7 +5,7 @@ import '../../public/nprogress.css';
 import { userService } from '../services';
 import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
-import PermisssionGate from "../shared/utils/PermissionUser";
+import PermissionGate from "../shared/utils/PermissionUser";
 
 
 export default App;
@@ -34,22 +34,22 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     useEffect(() => {
         const handleStart = (url: any) => {
-          NProgress.start()
+            NProgress.start()
         }
         const handleStop = () => {
-          NProgress.done()
+            NProgress.done()
         }
-    
+
         router.events.on('routeChangeStart', handleStart)
         router.events.on('routeChangeComplete', handleStop)
         router.events.on('routeChangeError', handleStop)
-    
+
         return () => {
-          router.events.off('routeChangeStart', handleStart)
-          router.events.off('routeChangeComplete', handleStop)
-          router.events.off('routeChangeError', handleStop)
+            router.events.off('routeChangeStart', handleStart)
+            router.events.off('routeChangeComplete', handleStop)
+            router.events.off('routeChangeError', handleStop)
         }
-      }, [router])
+    }, [router])
 
     function authCheck(url: any) {
         // redirect to login page if accessing a private page and not logged in 
@@ -68,19 +68,19 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     return (
         <>
-            <PermisssionGate
+            <PermissionGate
                 permissions={[
                     'canEdit',
                     'canDelete',
                     'canSave',
-                ]} 
+                ]}
                 user={{ permissions: ['canSave'] }}
-                >
+            >
                 {authorized &&
-                    <Component {...pageProps}  />
-                    
+                    <Component {...pageProps} />
+
                 }
-            </PermisssionGate>
+            </PermissionGate>
         </>
     );
 }

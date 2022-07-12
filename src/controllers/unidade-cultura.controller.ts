@@ -16,7 +16,7 @@ export class UnidadeCulturaController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterNameUnityCulture) {

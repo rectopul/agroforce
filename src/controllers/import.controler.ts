@@ -1,5 +1,4 @@
 import { ImportRepository } from 'src/repository/import.repository';
-import { saveDegreesCelsius } from 'src/shared/utils/formatDegreesCelsius';
 import { SafraController } from './safra.controller';
 import { LocalController } from './local.controller';
 import { FocoController } from './foco.controller';
@@ -18,10 +17,11 @@ import { LayoutQuadraController } from './layout-quadra.controller';
 import { LayoutChildrenController } from './layout-children.controller';
 import { GroupController } from './group.controller';
 import { UnidadeCulturaController } from './unidade-cultura.controller';
-import { ExperimentController } from './experiment.controller';
+import { ExperimentController } from './experiment/experiment.controller';
 import { LogImportController } from './log-import.controller';
 import { FocoRepository } from '../repository/foco.repository';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
+import { ImportExperimentController } from './experiment/import-experiment.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -89,17 +89,15 @@ export class ImportController {
 
   async post(data: object | any) {
     try {
-      if (data != null && data != undefined) {
-        const parameters: object | any = new Object();
-        await this.delete(parseInt(data.moduleId));
-        parameters.moduleId = parseInt(data.moduleId);
-        parameters.fields = data.fields;
-        const response = await this.importRepository.create(parameters);
-        if (response.count > 0) {
-          return { status: 200, message: 'Configuração da planilha foi salva' };
-        }
-        return { status: 400, message: 'erro' };
+      const parameters: object | any = {};
+      await this.delete(Number(data.moduleId));
+      parameters.moduleId = Number(data.moduleId);
+      parameters.fields = data.fields;
+      const response = await this.importRepository.create(parameters);
+      if (response.count > 0) {
+        return { status: 200, message: 'Configuração da planilha foi salva' };
       }
+      return { status: 400, message: 'erro' };
     } catch (err) {
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!';
@@ -123,7 +121,9 @@ export class ImportController {
       let erro: any; let
         response: any;
 
-      const logImport: any = await this.logImportController.create({ user_id: data.created_by, status: 2, table: data.spreadSheet[0][0] });
+      const logImport: any = await this.logImportController.create({
+        user_id: data.created_by, status: 2, table: data.spreadSheet[0][0],
+      });
       if (logImport.status === 400) return { status: 200, message: logImport.message, error: true };
       switch (data.spreadSheet[0]) {
         case 'tecnologia':
@@ -155,6 +155,7 @@ export class ImportController {
       }
       return { status: 200, message: response, error: erro };
     }
+    return { status: 400, error: true };
   }
 
   async validateGeneral(data: object | any) {
@@ -162,7 +163,23 @@ export class ImportController {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-        const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+        if (data.moduleId === 22) {
+          const { status, response, message }: any = await this.logImportController.create({
+            user_id: data.created_by, status: 2, table: data.table,
+          });
+
+          if (status === 400) {
+            return {
+              status: 200, message, error: true,
+            };
+          }
+          data.idLog = response.id;
+          return await ImportExperimentController.validate(data);
+          // await this.logImportController.update({ id: logImport.response.id, status: 1 });
+          // return response;
+        }
+
+        const configModule: object | any = await this.getAll(Number(data.moduleId));
 
         if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
 
@@ -259,6 +276,7 @@ export class ImportController {
           }
         }
 
+        // await this.logImportController.update({ id: logImport.response.id, status: 1 });
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {
@@ -268,12 +286,10 @@ export class ImportController {
   }
 
   async validateListAssay(data: object | any) {
-
     const responseIfError: any = [];
 
     try {
-
-      let Retorno: string = "";
+      const Retorno: string = '';
       let options: object | any = {};
       if (data != null && data != undefined) {
         let Line: number;
@@ -297,13 +313,13 @@ export class ImportController {
               if (sheet == 2) {
                 let dataFind = {
                   name: data.spreadSheet[keySheet][sheet],
-                  id_culture: data.culture
+                  id_culture: data.culture,
                 };
                 const focoResult: any = await this.focoRepository.findByName(dataFind);
                 if (!focoResult) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de foco não existe na cultura selecionada.</li><br>`;
                 }
-                //return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
+                // return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
               }
               // Validação do campo Tipo de Ensaio
               if (sheet == 3) {
@@ -329,9 +345,9 @@ export class ImportController {
                 let select: any = [];
                 select = {
                   id: true,
-                  name: true
+                  name: true,
                 };
-                let parameters: object | any = {};
+                const parameters: object | any = {};
                 parameters.cod_tec = String(data.spreadSheet[keySheet][sheet]);
                 parameters.id_culture = data.culture;
                 const tecnologiaFind: any = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
@@ -382,7 +398,7 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de NCA é diferente de vazio e não foi encontrado no cadastro de lotes.</li><br>`;
                 }
               }
-              //Retorno += " - " + data.spreadSheet[keySheet][sheet];
+              // Retorno += " - " + data.spreadSheet[keySheet][sheet];
             }
           }
         }
@@ -410,7 +426,7 @@ export class ImportController {
                 options.filterName = assay;
                 options.filterProtocolName = protocol_name;
                 options.id_culture = id_culture;
-                let getTypeAssay = await this.typeAssayController.getAll(options);
+                const getTypeAssay = await this.typeAssayController.getAll(options);
 
                 let savedTypeAssay: any = {};
                 let idSavedTypeAssay: any;
@@ -421,7 +437,7 @@ export class ImportController {
                     name: data.spreadSheet[keySheet][3],
                     protocol_name: data.spreadSheet[keySheet][0],
                     status: 1,
-                    created_by: data.created_by
+                    created_by: data.created_by,
                   });
                   idSavedTypeAssay = savedTypeAssay.response.id;
                 } else {
@@ -431,7 +447,7 @@ export class ImportController {
                     name: data.spreadSheet[keySheet][3],
                     protocol_name: data.spreadSheet[keySheet][0],
                     status: 1,
-                    created_by: data.created_by
+                    created_by: data.created_by,
                   });
                   idSavedTypeAssay = getTypeAssay.response[0].id;
                 }
@@ -444,9 +460,9 @@ export class ImportController {
                   let select: any = [];
                   select = {
                     id: true,
-                    name: true
+                    name: true,
                   };
-                  let parameters: object | any = {};
+                  const parameters: object | any = {};
                   parameters.cod_tec = String(data.spreadSheet[keySheet][5]);
                   parameters.id_culture = data.culture;
                   let tecnologiaFind = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
@@ -471,7 +487,7 @@ export class ImportController {
                         project: String(data.spreadSheet[keySheet][8]),
                         status: data.spreadSheet[keySheet][10],
                         comments: data.spreadSheet[keySheet][13],
-                        created_by: data.created_by
+                        created_by: data.created_by,
                       });
                       //console.log("Created Assay List Status: " + savedAssayList.status);
                     } else {
@@ -488,7 +504,7 @@ export class ImportController {
                         project: String(data.spreadSheet[keySheet][8]),
                         status: data.spreadSheet[keySheet][10],
                         comments: data.spreadSheet[keySheet][13],
-                        created_by: data.created_by
+                        created_by: data.created_by,
                       });
                       //console.log("Updated Assay List Status: " + savedAssayList.status);
                     }
@@ -530,7 +546,7 @@ export class ImportController {
   }: object | any) {
     const responseIfError: any = [];
     try {
-      const configModule: object | any = await this.getAll(parseInt(moduleId));
+      const configModule: object | any = await this.getAll(Number(moduleId));
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
@@ -543,6 +559,7 @@ export class ImportController {
             } else if ((spreadSheet[row][column]).toString().length > 2) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o limite de caracteres para o Código da tecnologia e 2. </li> <br>`;
             } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+              // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
             } else {
               const technology = await this.tecnologiaController.getAll({ id_culture, cod_tec: (spreadSheet[row][0].toString()) });
@@ -585,9 +602,16 @@ export class ImportController {
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
-              const { response } = await this.culturaController.getAllCulture({ name: spreadSheet[row][3] });
+              const { response } = await this.culturaController.getAllCulture({
+                name: spreadSheet[row][3],
+              });
               await this.tecnologiaController.create({
-                id_culture: response[0]?.id, name: spreadSheet[row][1], cod_tec: (spreadSheet[row][0].toString()), desc: spreadSheet[row][2], created_by: 23, dt_import: spreadSheet[row][4],
+                id_culture: response[0]?.id,
+                name: spreadSheet[row][1],
+                cod_tec: (spreadSheet[row][0].toString()),
+                desc: spreadSheet[row][2],
+                created_by: 23,
+                dt_import: spreadSheet[row][4],
               });
             }
           }
@@ -612,7 +636,7 @@ export class ImportController {
     const responseIfError: any = [];
     let Column: number;
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let Line: number;
@@ -840,7 +864,7 @@ export class ImportController {
     let Column: number;
 
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
       let sorteio_anterior: number = 0;
       let tratamento_anterior: number = 0;
       let bloco_anterior: number = 0;
@@ -1073,7 +1097,7 @@ export class ImportController {
     let yearSafra: any;
     let yearLote: any;
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let Line: number;
@@ -1546,7 +1570,7 @@ export class ImportController {
     const responseIfError: any = [];
     let Column: number;
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let Line: number;
@@ -1643,9 +1667,8 @@ export class ImportController {
     spreadSheet, moduleId, id_safra, created_by,
   }: object | any) {
     const responseIfError: any = [];
-    console.log(spreadSheet);
     try {
-      const configModule: object | any = await this.getAll(parseInt(moduleId));
+      const configModule: object | any = await this.getAll(Number(moduleId));
       configModule.response[0].fields.push('DT');
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
@@ -1799,8 +1822,6 @@ export class ImportController {
                 unityCultureDTO.id_local = localAlreadyExists.response[0].id;
                 await this.localController.update(localCultureDTO);
                 const response = await this.unidadeCulturaController.create(unityCultureDTO);
-                console.log('response');
-                console.log(response);
               } else {
                 delete localCultureDTO.id;
                 const response = await this.localController.create(localCultureDTO);
@@ -1866,7 +1887,7 @@ export class ImportController {
     let Column: number;
 
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let larg_q: any; let
@@ -2263,7 +2284,7 @@ export class ImportController {
     let Column: number;
 
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let cod_esquema: any = ''; let cod_esquema_anterior: any = ''; const
@@ -2600,7 +2621,7 @@ export class ImportController {
     let id_s1: any = 0; const
       id_s2: any = 0;
     try {
-      const configModule: object | any = await this.getAll(parseInt(data.moduleId));
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
         let Line: number;
@@ -2821,8 +2842,6 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ano lote é obrigatorio.</li><br>`;
                 } else if (yearSafra && yearSafra != '') {
                   if (yearSafra != data.spreadSheet[keySheet][sheet]) {
-                    console.log(yearSafra);
-                    console.log(data.spreadSheet[keySheet][sheet]);
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, ano diferente do ano cadastrado na safra.</li><br>`;
                   }
                   yearSafra = '';

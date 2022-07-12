@@ -1,46 +1,42 @@
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
-import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
 import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import {
   Button, Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
+import { importService } from '../../../../../services';
 
-interface Idata {
-  safra: any;
+interface IData {
+  idSafra: number;
+  idCulture: number;
 }
-export default function Importar({ safra }: Idata) {
+export default function Importar({ idSafra, idCulture }: IData) {
   const { TabsDropDowns } = ITabs;
-  const safras: object | any = [];
   const router = useRouter();
-  safra.map((value: string | object | any) => {
-    safras.push({ id: value.id, name: value.year });
-  });
-
-  function readExcel(value: any, safra: any) {
+  function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
-    readXlsxFile(value[0]).then((rows) => {
+    readXlsxFile(value[0]).then((rows: any) => {
       importService.validate({
-        spreadSheet: rows, moduleId: 22, safra, created_by: userLogado.id,
-      }).then((response) => {
-        if (response.message !== '') {
+        spreadSheet: rows, moduleId: 22, idSafra, idCulture, createdBy: userLogado.id,
+      }).then(({ status, message }: any) => {
+        if (status !== 200) {
           Swal.fire({
-            html: response.message,
+            html: message,
             width: '900',
           });
+          router.back();
         }
-        if (!response.error) {
+        if (status === 200) {
           Swal.fire({
-            html: response.message,
+            html: message,
             width: '800',
           });
           router.back();
@@ -52,20 +48,19 @@ export default function Importar({ safra }: Idata) {
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      safra: '',
-      foco: '',
     },
-    onSubmit: async (values) => {
+    onSubmit: async () => {
       const inputFile: any = document.getElementById('inputFile');
-      readExcel(inputFile.files, values.safra);
+      readExcel(inputFile.files);
     },
   });
+
   return (
     <>
       <Head>
         <title>Importação experimento</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="listas">
+      <Content contentHeader={TabsDropDowns('listas')} moduloActive="listas">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -90,7 +85,6 @@ export default function Importar({ safra }: Idata) {
               />
             </div>
           </div>
-          {/* <input type="file" id="inptesteut"  onChange={e => readExcel(e.target.files)} /> */}
           <div className="
               h-10 w-full
               flex
@@ -127,25 +121,8 @@ export default function Importar({ safra }: Idata) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { publicRuntimeConfig } = getConfig();
-  const { token } = req.cookies;
-  const { cultureId } = req.cookies;
+  const idSafra = Number(req.cookies.safraId);
+  const idCulture = Number(req.cookies.cultureId);
 
-  const param = `filterStatus=1&id_culture=${cultureId}`;
-
-  const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
-  urlParametersSafra.search = new URLSearchParams(param).toString();
-
-  const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` },
-  };
-
-  const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
-  let safra: any = await apiSafra.json();
-
-  safra = safra.response;
-
-  return { props: { safra } };
+  return { props: { idSafra, idCulture } };
 };

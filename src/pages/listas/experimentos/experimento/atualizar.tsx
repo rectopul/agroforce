@@ -30,20 +30,20 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IData {
-  allItens: any;
-  totalItems: number;
-  itensPerPage: number;
-  filterApplication: object | any;
-  idExperiment: number;
+  // allItens: any;
+  // totalItems: number;
+  // itensPerPage: number;
+  // filterApplication: object | any;
+  // idExperiment: number;
   experimento: object | any,
-  pageBeforeEdit: string | any
+  // pageBeforeEdit: string | any
 }
 
-interface IGenerateProps {
-  name: string | undefined;
-  title: string | number | readonly string[] | undefined;
-  value: string | number | readonly string[] | undefined;
-}
+// interface IGenerateProps {
+//   name: string | undefined;
+//   title: string | number | readonly string[] | undefined;
+//   value: string | number | readonly string[] | undefined;
+// }
 
 interface IUpdateExperimento {
   id: number
@@ -88,7 +88,19 @@ export default function AtualizarLocal({
 
   // const userLogado = JSON.parse(localStorage.getItem('user') as string);
   // const preferences = userLogado.preferences.materiais || {
-  //   id: 0, table_preferences: 'repetitionExperience,genotipo_name,gmr,bgm,fase,tecnologia,treatments_number,status,nca,npe,sequence,block,statusParcial',
+  //   id: 0, table_preferences: 'repetitionExperience,
+  // genotipo_name,
+  // gmr,
+  // bgm,
+  // fase,
+  // tecnologia,
+  // treatments_number,
+  // status,
+  // nca,
+  // npe,
+  // sequence,
+  // block,
+  // statusParcial',
   // };
   // const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
@@ -142,14 +154,14 @@ export default function AtualizarLocal({
     },
     onSubmit: async (values) => {
       await experimentService.update({
-        id: values.id,
-        eel: values.eel,
-        nlp: values.nlp,
-        clp: values.clp,
+        id: Number(values.id),
+        eel: Number(values.eel),
+        nlp: Number(values.nlp),
+        clp: Number(values.clp),
         comments: values.comments,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Foco atualizado com sucesso!');
+          Swal.fire('Experimento atualizado com sucesso!');
           router.back();
         } else {
           Swal.fire(response.message);
@@ -181,7 +193,8 @@ export default function AtualizarLocal({
   //     parametersFilter = filter;
   //   }
 
-  //   await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
+  //   await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
+  //     .then(({ status, response }: any) => {
   //     if (status === 200) {
   //       setMateriais(response);
   //     }
@@ -319,7 +332,7 @@ export default function AtualizarLocal({
 
   // const downloadExcel = async (): Promise<void> => {
   //   if (!filterApplication.includes('paramSelect')) {
-  //     filterApplication += `&paramSelect=${camposGerenciados},foco&id_experimento=${idExperiment}`;
+  //     filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
   //   }
   //   await materiaisService.getAll(filterApplication).then((response) => {
   //     if (response.status === 200) {
@@ -502,10 +515,10 @@ export default function AtualizarLocal({
           >
             <div className="w-full h-f10 flex justify-between items-start gap-5">
 
-              {updateFieldsFactory('NLP', 'nlp', experimento.nlp)}
-              {updateFieldsFactory('EEL', 'eel', experimento.nlp)}
-              {updateFieldsFactory('CLP', 'clp', experimento.clp)}
-              {updateFieldsFactory('Observações', 'comments', experimento.comments)}
+              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp)}
+              {updateFieldsFactory('EEL', 'eel', formik.values.eel)}
+              {updateFieldsFactory('CLP', 'clp', formik.values.clp)}
+              {updateFieldsFactory('Observações', 'comments', formik.values.comments)}
 
             </div>
 
@@ -590,7 +603,9 @@ export default function AtualizarLocal({
                               <Droppable droppableId="characters">
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                    <ul className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                     ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
                                         <Button
                                           value="Atualizar"
@@ -636,7 +651,11 @@ export default function AtualizarLocal({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de materiais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Exportar planilha de materiais"
+                        icon={<RiFileExcel2Line size={20} />}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -728,7 +747,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${baseUrlShow}/${idExperiment}`,
     requestOptions,
   ).then((response) => response.json());
-
 
   const allItens: any = [];
   const totalItems = 0;
