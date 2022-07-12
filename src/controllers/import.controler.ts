@@ -301,17 +301,17 @@ export class ImportController {
             if (keySheet != '0') {
               // Validação do campo Tipo de Protocolo
               if (sheet == 0) {
-                let options: any = {};
+                const options: any = {};
                 options.filterProtocolName = data.spreadSheet[keySheet][sheet];
                 options.filterName = data.spreadSheet[keySheet][3];
-                let typeAssayFind = await this.typeAssayController.getAll(options);
+                const typeAssayFind = await this.typeAssayController.getAll(options);
                 if (typeAssayFind.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de protocolo não está cadastro no tipo de ensaio.</li><br>`;
                 }
               }
               // Validação do campo Foco
               if (sheet == 2) {
-                let dataFind = {
+                const dataFind = {
                   name: data.spreadSheet[keySheet][sheet],
                   id_culture: data.culture,
                 };
@@ -323,17 +323,17 @@ export class ImportController {
               }
               // Validação do campo Tipo de Ensaio
               if (sheet == 3) {
-                let options: any = {};
+                const options: any = {};
                 options.filterName = data.spreadSheet[keySheet][sheet];
                 options.id_culture = data.culture;
-                let typeAssayFindByName = await this.typeAssayController.getAll(options);
+                const typeAssayFindByName = await this.typeAssayController.getAll(options);
                 if (typeAssayFindByName.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor tipo de ensaio não está cadastrado nesta cultura.</li><br>`;
                 }
               }
               // Validação GLI
               if (sheet == 4) {
-                if (data.spreadSheet[keySheet][sheet] == "") {
+                if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de GLI está vazio.</li><br>`;
                 }
               }
@@ -357,25 +357,25 @@ export class ImportController {
               }
               // Validação do campo EP
               if (sheet == 6) {
-                let charactersCell = String(data.spreadSheet[keySheet][sheet]).length;
-                let onlyNumeric = String(data.spreadSheet[keySheet][sheet]).replace(/[^\d]/g, "");
-                let charactersNumeric = String(onlyNumeric).length;
-                if (onlyNumeric == "" || onlyNumeric.length > 2 || charactersCell != charactersNumeric) {
+                const charactersCell = String(data.spreadSheet[keySheet][sheet]).length;
+                const onlyNumeric = String(data.spreadSheet[keySheet][sheet]).replace(/[^\d]/g, '');
+                const charactersNumeric = String(onlyNumeric).length;
+                if (onlyNumeric == '' || onlyNumeric.length > 2 || charactersCell != charactersNumeric) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de EP não pode ser vazio, deve ser numérico e com no máximo dois caracteres.</li><br>`;
                 }
               }
               // Validação do campo número de tratamento
               if (sheet == 9) {
-                let number_of_treatment = data.spreadSheet[keySheet][sheet];
-                let number_of_treatment_previous = number_of_treatment - 1;
+                const number_of_treatment = data.spreadSheet[keySheet][sheet];
+                const number_of_treatment_previous = number_of_treatment - 1;
                 if (keySheet > 1 && data.spreadSheet[keySheet - 1][sheet] != number_of_treatment_previous
                   && data.spreadSheet[keySheet - 1][sheet] && data.spreadSheet[keySheet - 1][4] == data.spreadSheet[keySheet][4]) {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o número de tratamento não está sequencial (` + number_of_treatment + `)</li><br>`;
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o número de tratamento não está sequencial (${number_of_treatment})</li><br>`;
                 }
               }
               // Validação do campo status
               if (sheet == 10) {
-                if (data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")) {
+                if (data.spreadSheet[keySheet][sheet] == '' || (data.spreadSheet[keySheet][sheet] != 'T' && data.spreadSheet[keySheet][sheet] != 'L')) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de status deve ser igual a T ou L.</li><br>`;
                 }
               }
@@ -384,8 +384,8 @@ export class ImportController {
                 options = {};
                 options.filterGenotipo = data.spreadSheet[keySheet][sheet];
                 options.id_culture = data.culture;
-                let findGenotype = await this.genotipoController.getAll(options);
-                if (data.spreadSheet[keySheet][sheet] == "" || findGenotype.response.length == 0) {
+                const findGenotype = await this.genotipoController.getAll(options);
+                if (data.spreadSheet[keySheet][sheet] == '' || findGenotype.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de nome do genótipo não foi encontrado.</li><br>`;
                 }
               }
@@ -393,8 +393,8 @@ export class ImportController {
               if (sheet == 12) {
                 options = {};
                 options.filterNcc = data.spreadSheet[keySheet][sheet];
-                let findLote = await this.loteController.getAll(options);
-                if (data.spreadSheet[keySheet][sheet] != "" && findLote.response.length == 0) {
+                const findLote = await this.loteController.getAll(options);
+                if (data.spreadSheet[keySheet][sheet] != '' && findLote.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de NCA é diferente de vazio e não foi encontrado no cadastro de lotes.</li><br>`;
                 }
               }
@@ -418,11 +418,11 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != 0) {
               if (sheet == 8) {
-                let cultureFind: any = await this.culturaController.getOneCulture(data.culture);
+                const cultureFind: any = await this.culturaController.getOneCulture(data.culture);
 
-                let assay = data.spreadSheet[keySheet][3];
-                let protocol_name = data.spreadSheet[keySheet][0];
-                let id_culture = cultureFind.response.id;
+                const assay = data.spreadSheet[keySheet][3];
+                const protocol_name = data.spreadSheet[keySheet][0];
+                const id_culture = cultureFind.response.id;
                 options.filterName = assay;
                 options.filterProtocolName = protocol_name;
                 options.id_culture = id_culture;
@@ -453,7 +453,7 @@ export class ImportController {
                 }
 
                 if (idSavedTypeAssay) {
-                  let focoFind: any = await this.focoRepository.findByName({ name: data.spreadSheet[keySheet][2], id_culture: data.culture });
+                  const focoFind: any = await this.focoRepository.findByName({ name: data.spreadSheet[keySheet][2], id_culture: data.culture });
                   let take;
                   let skip;
                   let orderBy: object | any;
@@ -465,13 +465,13 @@ export class ImportController {
                   const parameters: object | any = {};
                   parameters.cod_tec = String(data.spreadSheet[keySheet][5]);
                   parameters.id_culture = data.culture;
-                  let tecnologiaFind = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
+                  const tecnologiaFind = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
                   if (tecnologiaFind.length > 0) {
-                    let gli = data.spreadSheet[keySheet][4];
+                    const gli = data.spreadSheet[keySheet][4];
                     options = {};
                     options.filterGli = gli;
-                    let getListAssay = await this.assayListController.getAll(options);
-                    //console.log("ListAssay: "+JSON.stringify(getListAssay));
+                    const getListAssay = await this.assayListController.getAll(options);
+                    // console.log("ListAssay: "+JSON.stringify(getListAssay));
 
                     let savedAssayList: any;
                     if (getListAssay.response.length == 0) {
@@ -484,12 +484,12 @@ export class ImportController {
                         period: data.spreadSheet[keySheet][9],
                         protocol_name: data.spreadSheet[keySheet][0],
                         bgm: data.spreadSheet[keySheet][7],
-                        project: String(data.spreadSheet[keySheet][8]),
+                        project: string(data.spreadSheet[keySheet][8]),
                         status: data.spreadSheet[keySheet][10],
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by,
                       });
-                      //console.log("Created Assay List Status: " + savedAssayList.status);
+                      // console.log("Created Assay List Status: " + savedAssayList.status);
                     } else {
                       savedAssayList = await this.assayListController.update({
                         id: getListAssay.response[0].id,
@@ -501,18 +501,18 @@ export class ImportController {
                         period: data.spreadSheet[keySheet][9],
                         protocol_name: data.spreadSheet[keySheet][0],
                         bgm: data.spreadSheet[keySheet][7],
-                        project: String(data.spreadSheet[keySheet][8]),
+                        project: string(data.spreadSheet[keySheet][8]),
                         status: data.spreadSheet[keySheet][10],
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by,
                       });
-                      //console.log("Updated Assay List Status: " + savedAssayList.status);
+                      // console.log("Updated Assay List Status: " + savedAssayList.status);
                     }
                     if (savedAssayList.status == 201 || savedAssayList.status == 200) {
-                      if (data.spreadSheet[keySheet][0] == "Produtividade") {
+                      if (data.spreadSheet[keySheet][0] == 'Produtividade') {
                         productivity++;
                       }
-                      if (data.spreadSheet[keySheet][0] == "Avanço") {
+                      if (data.spreadSheet[keySheet][0] == 'Avanço') {
                         advance++;
                       }
                       register++;
@@ -523,22 +523,17 @@ export class ImportController {
             }
           }
         }
-        return 'Ensaios importados (' + String(register) + '). Produtividade x Avanço (' + String(productivity) + ' x ' + String(advance) + ') ';
-        //return 'save';
-
-      } else {
-        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-        return responseStringError;
+        return `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) `;
+        // return 'save';
       }
-
+      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      return responseStringError;
     } catch (err) {
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!';
-
     }
 
     return false;
-
   }
 
   async validateTechnology({
@@ -691,7 +686,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                  const ogm: any = await this.ogmController.getAll({ cod_tec: string(data.spreadSheet[keySheet][sheet]) });
                   if (ogm.total == 0) {
                     // console.log('aqui OGM');
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tecnologia informado não existe no sistema.</li><br>`;
@@ -816,7 +811,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 // console.log("OGM R");
-                const ogm: any = await this.ogmController.getAll({ name: String(data.spreadSheet[keySheet][sheet]) });
+                const ogm: any = await this.ogmController.getAll({ name: string(data.spreadSheet[keySheet][sheet]) });
                 this.aux.id_ogm = ogm.response[0].id;
               }
 
@@ -1153,7 +1148,7 @@ export class ImportController {
                   if (data.spreadSheet[keySheet][sheet] < 10) {
                     data.spreadSheet[keySheet][sheet] = `0${data.spreadSheet[keySheet][sheet]}`;
                   }
-                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: string(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informado não existe no sistema.</li><br>`;
                   }
@@ -1200,7 +1195,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  const safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: String(data.spreadSheet[keySheet][sheet]) });
+                  const safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: string(data.spreadSheet[keySheet][sheet]) });
                   if (safra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
@@ -1223,7 +1218,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  const lote: any = this.loteController.getAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
+                  const lote: any = this.loteController.getAll({ cod_lote: string(data.spreadSheet[keySheet][sheet]) });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -1328,7 +1323,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, cod_tec: string(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total > 0) {
                     this.aux.id_tecnologia = tec.response[0].id;
                   }
@@ -1464,9 +1459,9 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.update({
                     id: this.aux.id_genotipo,
-                    id_tecnologia: Number(this.aux.id_tecnologia),
+                    id_tecnologia: number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
-                    id_dados: String(this.aux.id_dados_geno),
+                    id_dados: string(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
                     name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
@@ -1492,7 +1487,7 @@ export class ImportController {
                     id_culture: this.aux.id_culture,
                     id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,
-                    id_dados: String(this.aux.id_dados_geno),
+                    id_dados: string(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
                     name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
@@ -1518,14 +1513,14 @@ export class ImportController {
                 if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await this.loteController.update({
-                      id: Number(this.aux.id_lote),
-                      id_genotipo: Number(this.aux.id_genotipo),
-                      id_safra: Number(this.aux.id_safra),
-                      cod_lote: String(this.aux.cod_lote),
-                      id_s2: Number(this.aux.id_s2),
-                      id_dados: Number(this.aux.id_dados_lote),
-                      year: Number(this.aux.year),
-                      ncc: Number(this.aux.ncc),
+                      id: number(this.aux.id_lote),
+                      id_genotipo: number(this.aux.id_genotipo),
+                      id_safra: number(this.aux.id_safra),
+                      cod_lote: string(this.aux.cod_lote),
+                      id_s2: number(this.aux.id_s2),
+                      id_dados: number(this.aux.id_dados_lote),
+                      year: number(this.aux.year),
+                      ncc: number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1536,13 +1531,13 @@ export class ImportController {
                     delete this.aux.id_genotipo;
                   } else {
                     await this.loteController.create({
-                      id_genotipo: Number(this.aux.id_genotipo),
-                      id_safra: Number(this.aux.id_safra),
-                      cod_lote: String(this.aux.cod_lote),
-                      id_s2: Number(this.aux.id_s2),
-                      id_dados: Number(this.aux.id_dados_lote),
-                      year: Number(this.aux.year),
-                      ncc: Number(this.aux.ncc),
+                      id_genotipo: number(this.aux.id_genotipo),
+                      id_safra: number(this.aux.id_safra),
+                      cod_lote: string(this.aux.cod_lote),
+                      id_s2: number(this.aux.id_s2),
+                      id_dados: number(this.aux.id_dados_lote),
+                      year: number(this.aux.year),
+                      ncc: number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1906,7 +1901,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  const safra = await this.safraController.getAllSafra({ id_safra: Number(data.safra) });
+                  const safra = await this.safraController.getAllSafra({ id_safra: number(data.safra) });
                   if (safra.total > 0) {
                     if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0].safraName) {
                       return 'A safra importada precisa ser igual a safra selecionada';
@@ -2554,25 +2549,25 @@ export class ImportController {
                 if (count == 1) {
                   if (this.aux.id_layout_bd) {
                     const upLayout: any = await this.layoutQuadraController.update({
-                      id: Number(this.aux.id_layout_bd),
-                      id_culture: Number(this.aux.id_culture),
+                      id: number(this.aux.id_layout_bd),
+                      id_culture: number(this.aux.id_culture),
                       esquema: this.aux.esquema,
-                      plantadeira: String(this.aux.plantadeira),
+                      plantadeira: string(this.aux.plantadeira),
                       parcelas: this.aux.parcelas,
-                      tiros: Number(this.aux.tiroFixo),
-                      disparos: Number(this.aux.disparoFixo),
+                      tiros: number(this.aux.tiroFixo),
+                      disparos: number(this.aux.disparoFixo),
                       status: this.aux.status,
                       created_by: this.aux.created_by,
                     });
                     this.aux.id_layout = this.aux.id_layout_bd;
                   } else {
                     const saveLayout: any = await this.layoutQuadraController.post({
-                      id_culture: Number(this.aux.id_culture),
+                      id_culture: number(this.aux.id_culture),
                       esquema: this.aux.esquema,
-                      plantadeira: String(this.aux.plantadeira),
+                      plantadeira: string(this.aux.plantadeira),
                       parcelas: this.aux.parcelas,
-                      tiros: Number(this.aux.tiroFixo),
-                      disparos: Number(this.aux.disparoFixo),
+                      tiros: number(this.aux.tiroFixo),
+                      disparos: number(this.aux.disparoFixo),
                       status: this.aux.status,
                       created_by: this.aux.created_by,
                     });
@@ -2588,11 +2583,11 @@ export class ImportController {
                   sc: this.aux.sc,
                   s_aloc: this.aux.s_aloc,
                   tiro: this.aux.tiro,
-                  cj: String(this.aux.cj),
+                  cj: string(this.aux.cj),
                   disparo: this.aux.disparo,
                   dist: this.aux.dist,
-                  st: String(this.aux.st),
-                  spc: String(this.aux.spc),
+                  st: string(this.aux.st),
+                  spc: string(this.aux.spc),
                   scolheita: this.aux.scolheita,
                   tipo_parcela: this.aux.tipo_parcela,
                   status: this.aux.status,
@@ -2714,7 +2709,7 @@ export class ImportController {
                 if (String(data.spreadSheet[keySheet][sheet]) == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo foco é obrigatorio.</li><br>`;
                 } else {
-                  const foco: any = await this.focoController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  const foco: any = await this.focoController.getAll({ id_culture: data.id_culture, name: string(data.spreadSheet[keySheet][sheet]) });
                   if (foco.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco informado não existe no sistema.</li><br>`;
                   }
@@ -2725,7 +2720,7 @@ export class ImportController {
                 if (String(data.spreadSheet[keySheet][sheet]) == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo foco é obrigatorio.</li><br>`;
                 } else {
-                  const ensaio: any = await this.typeAssayController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  const ensaio: any = await this.typeAssayController.getAll({ id_culture: data.id_culture, name: string(data.spreadSheet[keySheet][sheet]) });
                   if (ensaio.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tipo de ensaio informado não existe no sistema.</li><br>`;
                   }
@@ -2736,7 +2731,7 @@ export class ImportController {
                 if (String(data.spreadSheet[keySheet][sheet]) == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo foco é obrigatorio.</li><br>`;
                 } else {
-                  const tec: any = await this.tecnologiaController.getAll({ id_culture: data.id_culture, cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                  const tec: any = await this.tecnologiaController.getAll({ id_culture: data.id_culture, cod_tec: string(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tipo de ensaio informado não existe no sistema.</li><br>`;
                   }
@@ -2872,7 +2867,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
-                  const lote: any = this.loteController.getAll({ cod_lote: String(data.spreadSheet[keySheet][sheet]) });
+                  const lote: any = this.loteController.getAll({ cod_lote: string(data.spreadSheet[keySheet][sheet]) });
                   if (lote.total > 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, código do lote deve ser um campo unico no GOM.</li><br>`;
                   }
@@ -2961,7 +2956,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'Tecnologia') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
-                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: String(data.spreadSheet[keySheet][sheet]) });
+                  const tec: any = await this.ogmController.getAll({ id_culture: data.id_culture, name: string(data.spreadSheet[keySheet][sheet]) });
                   if (tec.total > 0) {
                     this.aux.id_tecnologia = tec.response[0].id;
                   }
@@ -3091,10 +3086,10 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.update({
                     id: this.aux.id_genotipo,
-                    id_culture: Number(this.aux.id_culture),
-                    id_tecnologia: Number(this.aux.id_tecnologia),
+                    id_culture: number(this.aux.id_culture),
+                    id_tecnologia: number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
-                    id_dados: String(this.aux.id_dados_geno),
+                    id_dados: string(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
                     name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
@@ -3119,7 +3114,7 @@ export class ImportController {
                     id_culture: this.aux.id_culture,
                     id_tecnologia: this.aux.id_tecnologia,
                     id_s1: this.aux.id_s1,
-                    id_dados: String(this.aux.id_dados_geno),
+                    id_dados: string(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
                     name_main: this.aux.name_main,
                     name_public: this.aux.name_public,
@@ -3144,14 +3139,14 @@ export class ImportController {
                 if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await this.loteController.update({
-                      id: Number(this.aux.id_lote),
-                      id_genotipo: Number(this.aux.id_genotipo),
-                      id_safra: Number(this.aux.id_safra),
-                      cod_lote: String(this.aux.cod_lote),
-                      id_s2: Number(this.aux.id_s2),
-                      id_dados: Number(this.aux.id_dados_lote),
-                      year: Number(this.aux.year),
-                      ncc: Number(this.aux.ncc),
+                      id: number(this.aux.id_lote),
+                      id_genotipo: number(this.aux.id_genotipo),
+                      id_safra: number(this.aux.id_safra),
+                      cod_lote: string(this.aux.cod_lote),
+                      id_s2: number(this.aux.id_s2),
+                      id_dados: number(this.aux.id_dados_lote),
+                      year: number(this.aux.year),
+                      ncc: number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -3162,13 +3157,13 @@ export class ImportController {
                     delete this.aux.id_genotipo;
                   } else {
                     await this.loteController.create({
-                      id_genotipo: Number(this.aux.id_genotipo),
-                      id_safra: Number(this.aux.id_safra),
-                      cod_lote: String(this.aux.cod_lote),
-                      id_s2: Number(this.aux.id_s2),
-                      id_dados: Number(this.aux.id_dados_lote),
-                      year: Number(this.aux.year),
-                      ncc: Number(this.aux.ncc),
+                      id_genotipo: number(this.aux.id_genotipo),
+                      id_safra: number(this.aux.id_safra),
+                      cod_lote: string(this.aux.cod_lote),
+                      id_s2: number(this.aux.id_s2),
+                      id_dados: number(this.aux.id_dados_lote),
+                      year: number(this.aux.year),
+                      ncc: number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,

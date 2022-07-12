@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case ('GET'):
       const response = await prisma.user.findFirst({
         where: {
-          id: Number(id),
+          id: number(id),
         },
         include: {
           users_cultures: {

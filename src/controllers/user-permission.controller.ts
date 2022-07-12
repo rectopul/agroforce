@@ -38,7 +38,7 @@ export class UserPermissionController {
 		}
 	}
 
-	async getByUserID(userId: Number | any) {
+	async getByUserID(userId: number | any) {
 		const newID = parseInt(userId);
 		try {
 			if (userId && userId !== '{id}') {

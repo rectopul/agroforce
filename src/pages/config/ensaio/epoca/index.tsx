@@ -44,7 +44,7 @@ interface IGenerateProps {
 }
 interface Idata {
   allItems: IEpoca[];
-  totalItems: Number;
+  totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;

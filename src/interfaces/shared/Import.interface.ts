@@ -1,12 +1,12 @@
 export interface IReturnObject {
-  status: Number
-  message?: String
+  status: number
+  message?: string
 }
 
 export interface ImportValidate {
-  idLog: Number
+  idLog: number
   spreadSheet: Array<any>
-  idSafra: Number
-  idCulture: Number
-  created_by: Number
+  idSafra: number
+  idCulture: number
+  created_by: number
 }

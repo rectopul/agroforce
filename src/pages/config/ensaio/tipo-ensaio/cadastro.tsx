@@ -17,10 +17,10 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
   id_culture: number;
-  name: String | any;
-  protocolName: String | any;
-  created_by: Number;
-  status: Number;
+  name: string | any;
+  protocolName: string | any;
+  created_by: number;
+  status: number;
 }
 
 export default function NovoTipoEnsaio() {
@@ -49,7 +49,7 @@ export default function NovoTipoEnsaio() {
 
   const formik = useFormik<ITypeAssayProps>({
     initialValues: {
-      id_culture: Number(culture),
+      id_culture: number(culture),
       name: '',
       protocolName: 'Avanço',
       created_by: userLogado.id,
@@ -63,10 +63,10 @@ export default function NovoTipoEnsaio() {
       }
 
       await typeAssayService.create({
-        id_culture: Number(culture),
+        id_culture: number(culture),
         name: capitalize(values.name),
         protocol_name: values.protocolName,
-        created_by: Number(userLogado.id),
+        created_by: number(userLogado.id),
         status: 1,
       }).then((response) => {
         if (response.status === 200) {

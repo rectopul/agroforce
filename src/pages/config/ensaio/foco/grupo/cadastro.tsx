@@ -7,15 +7,15 @@ import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
 import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
-import InputMask from "react-input-mask";
-import { GetServerSideProps } from "next";
+import InputMask from 'react-input-mask';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import {
 	Button,
 	Content,
 	Select,
-	Input
-} from "../../../../../components";
+	Input,
+} from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ICreateFoco {
@@ -39,35 +39,34 @@ export default function Cadastro({ safra, id_foco }: any) {
 	const router = useRouter();
 	const [checkInput, setCheckInput] = useState('text-black');
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
+	const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
 	const formik = useFormik<ICreateFoco>({
 		initialValues: {
-			id_foco: Number(id_foco),
+			id_foco: number(id_foco),
 			safra: safra.id,
 			group: 0,
 			created_by: userLogado.id,
 		},
 		onSubmit: async (values) => {
-
-			validateInputs(values)
+			validateInputs(values);
 			if (!values.group) {
-				Swal.fire('Preencha todos os campos obrigatórios')
-				return
+				Swal.fire('Preencha todos os campos obrigatórios');
+				return;
 			}
 
 			await groupService.create({
-				id_safra: Number(safra.id),
-				id_foco: Number(id_foco),
-				group: Number(values.group),
+				id_safra: number(safra.id),
+				id_foco: number(id_foco),
+				group: number(values.group),
 				created_by: formik.values.created_by,
 			}).then((response) => {
 				if (response.status === 201) {
 					Swal.fire('Grupo cadastrado com sucesso!');
 					router.back();
 				} else {
-					setCheckInput("text-red-600");
-					Swal.fire(response.message)
+					setCheckInput('text-red-600');
+					Swal.fire(response.message);
 				}
 			}).finally(() => {
 				formik.values.safra = '';
@@ -77,10 +76,10 @@ export default function Cadastro({ safra, id_foco }: any) {
 
 	function validateInputs(values: any) {
 		if (!values.group) {
-			let inputGroup: any = document.getElementById("group");
+			const inputGroup: any = document.getElementById('group');
 			inputGroup.style.borderColor = 'red';
 		} else {
-			let inputGroup: any = document.getElementById("group");
+			const inputGroup: any = document.getElementById('group');
 			inputGroup.style.borderColor = '';
 		}
 	}
@@ -91,7 +90,7 @@ export default function Cadastro({ safra, id_foco }: any) {
 				<title>Novo</title>
 			</Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+			<Content contentHeader={tabsDropDowns} moduloActive="config">
 				<form
 					className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -100,12 +99,13 @@ export default function Cadastro({ safra, id_foco }: any) {
 					<h1 className="text-2xl">Novo</h1>
 
 					<div className="w-1/2
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-        ">
+        "
+					>
 						<div className="w-full h-10">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								<strong className={checkInput}>*</strong>
@@ -139,7 +139,7 @@ export default function Cadastro({ safra, id_foco }: any) {
                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                   "
 								id="group"
-								mask={'99'}
+								mask="99"
 								name="group"
 								onChange={formik.handleChange}
 								value={formik.values.group}
@@ -153,7 +153,8 @@ export default function Cadastro({ safra, id_foco }: any) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+					>
 						<div className="w-30">
 							<Button
 								type="button"
@@ -184,25 +185,24 @@ export default function Cadastro({ safra, id_foco }: any) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/safra`;
-	const token = context.req.cookies.token;
-	const safraId = context.req.cookies.safraId;
+	const { token } = context.req.cookies;
+	const { safraId } = context.req.cookies;
 
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` }
+		headers: { Authorization: `Bearer ${token}` },
 	};
 
-	const apiSafra = await fetch(`${baseUrlShow}/` + safraId, requestOptions);
+	const apiSafra = await fetch(`${baseUrlShow}/${safraId}`, requestOptions);
 
 	const safra = await apiSafra.json();
-	const id_foco = context.query.id_foco;
+	const { id_foco } = context.query;
 
 	return {
 		props: {
 			safra,
-			id_foco
-		}
-	}
-}
-
+			id_foco,
+		},
+	};
+};

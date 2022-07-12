@@ -5,18 +5,18 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
-import InputMask from "react-input-mask";
+import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { envelopeService } from 'src/services';
 import {
 	Button,
 	Content,
 	Select,
-	Input
-} from "../../../../../components";
+	Input,
+} from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
-import { envelopeService } from 'src/services';
 
 interface ICreateFoco {
 	safra: string;
@@ -39,7 +39,7 @@ export default function Cadastro({ envelope }: any) {
 	const router = useRouter();
 	const [checkInput, setCheckInput] = useState('text-black');
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
+	const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
 	const formik = useFormik<any>({
 		initialValues: {
@@ -49,34 +49,34 @@ export default function Cadastro({ envelope }: any) {
 			created_by: userLogado.id,
 		},
 		onSubmit: async (values) => {
-			validateInputs(values)
+			validateInputs(values);
 			if (!values.seeds) {
-				Swal.fire('Preencha todos os campos obrigatórios')
-				return
+				Swal.fire('Preencha todos os campos obrigatórios');
+				return;
 			}
 			await envelopeService.update({
-				id: Number(envelope.id),
-				id_safra: Number(envelope.safra.id),
+				id: number(envelope.id),
+				id_safra: number(envelope.safra.id),
 				id_type_assay: parseInt(envelope.type_assay.id),
-				seeds: Number(values.seeds),
-				created_by: Number(formik.values.created_by),
+				seeds: number(values.seeds),
+				created_by: number(formik.values.created_by),
 			}).then((response) => {
 				if (response.status === 200) {
 					Swal.fire('Envelope atualizado com sucesso!');
 					router.back();
 				} else {
-					Swal.fire(response.message)
+					Swal.fire(response.message);
 				}
-			})
+			});
 		},
 	});
 
 	function validateInputs(values: any) {
 		if (!values.seeds) {
-			let inputSeeds: any = document.getElementById("seeds");
+			const inputSeeds: any = document.getElementById('seeds');
 			inputSeeds.style.borderColor = 'red';
 		} else {
-			let inputSeeds: any = document.getElementById("seeds");
+			const inputSeeds: any = document.getElementById('seeds');
 			inputSeeds.style.borderColor = '';
 		}
 	}
@@ -87,7 +87,7 @@ export default function Cadastro({ envelope }: any) {
 				<title>Atualizar Envelope</title>
 			</Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+			<Content contentHeader={tabsDropDowns} moduloActive="config">
 				<form
 					className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -96,12 +96,13 @@ export default function Cadastro({ envelope }: any) {
 					<h1 className="text-2xl">Atualizar Envelope</h1>
 
 					<div className="w-1/2
-                            flex 
+                            flex
                             justify-around
                             gap-6
                             mt-4
                             mb-4
-                        ">
+                        "
+					>
 						<div className="w-full h-10">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								<strong className={checkInput}>*</strong>
@@ -147,7 +148,8 @@ export default function Cadastro({ envelope }: any) {
                             gap-3
                             justify-center
                             mt-10
-                        ">
+                        "
+					>
 						<div className="w-30">
 							<Button
 								type="button"
@@ -178,22 +180,21 @@ export default function Cadastro({ envelope }: any) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrlShow = `${publicRuntimeConfig.apiUrl}/envelope`;
-	const token = context.req.cookies.token;
+	const { token } = context.req.cookies;
 	const id_envelope = context.query.id;
 
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` }
+		headers: { Authorization: `Bearer ${token}` },
 	};
 
-	const apiEnvelope = await fetch(`${baseUrlShow}/` + id_envelope, requestOptions);
+	const apiEnvelope = await fetch(`${baseUrlShow}/${id_envelope}`, requestOptions);
 
 	const envelope = await apiEnvelope.json();
 	return {
 		props: {
-			envelope
-		}
-	}
-}
-
+			envelope,
+		},
+	};
+};

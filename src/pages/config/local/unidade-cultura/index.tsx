@@ -58,7 +58,7 @@ interface IGenerateProps {
 }
 interface Idata {
 	allCultureUnity: IUnityCultureProps[];
-	totalItems: Number;
+	totalItems: number;
 	filter: string | any;
 	itensPerPage: number | any;
 	filterApplication: object | any;

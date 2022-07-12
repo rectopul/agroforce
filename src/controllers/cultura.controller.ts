@@ -116,7 +116,7 @@ export class CulturaController {
     }
   }
 
-  async getOneCulture(id: Number) {
+  async getOneCulture(id: number) {
     try {
       if (!id) throw new Error('Dados inválidos');
 

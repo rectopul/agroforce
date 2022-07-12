@@ -1,50 +1,48 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from "react";
-import { FiUserPlus } from "react-icons/fi";
-import { IoMdArrowBack } from "react-icons/io";
-import InputMask from "react-input-mask";
-import { localService } from "src/services";
-import { saveDegreesCelsius } from "src/shared/utils/formatDegreesCelsius";
+import { useState } from 'react';
+import { FiUserPlus } from 'react-icons/fi';
+import { IoMdArrowBack } from 'react-icons/io';
+import InputMask from 'react-input-mask';
+import { localService } from 'src/services';
+import { saveDegreesCelsius } from 'src/shared/utils/formatDegreesCelsius';
 import Swal from 'sweetalert2';
 import {
 	Button, Content,
 	Input,
-	Select
-} from "../../../components";
+	Select,
+} from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 
-
-
 interface ILocalProps {
-	id: Number | any;
-	cod_local: String | any;
-	cod_red_local: String | any;
-	pais: String | any;
-	uf: String | any;
-	city: String | any;
-	name_farm: String | any;
+	id: number | any;
+	cod_local: string | any;
+	cod_red_local: string | any;
+	pais: string | any;
+	uf: string | any;
+	city: string | any;
+	name_farm: string | any;
 	latitude: string;
 	longitude: string;
-	altitude: String | any;
-	created_by: Number;
-	status: Number;
-};
+	altitude: string | any;
+	created_by: number;
+	status: number;
+}
 
 interface IUf {
-	id: Number;
-	npme: String;
-	sigla: String;
+	id: number;
+	npme: string;
+	sigla: string;
 }
 
 interface ICity {
-	id: Number;
-	name: String;
-	ufid: Number;
+	id: number;
+	name: string;
+	ufid: number;
 }
 
 export interface IData {
@@ -63,11 +61,11 @@ export default function NovoLocal({ uf }: IData) {
 			: tab.statusTab = false
 	));
 
-	const userLogado = JSON.parse(localStorage.getItem("user") as string);
+	const userLogado = JSON.parse(localStorage.getItem('user') as string);
 	const ufs: object | any = [];
 	const [citys, setCitys] = useState<object | any>([{ id: '0', name: 'selecione' }]);
 
-	const pais = [{ id: 'Brasil', name: "Brasil" }];
+	const pais = [{ id: 'Brasil', name: 'Brasil' }];
 	const router = useRouter();
 	const formik = useFormik<ILocalProps>({
 		initialValues: {
@@ -82,7 +80,7 @@ export default function NovoLocal({ uf }: IData) {
 			longitude: '',
 			altitude: '',
 			created_by: userLogado.id,
-			status: 1
+			status: 1,
 		},
 		onSubmit: async (values) => {
 			validateInputs(values);
@@ -101,18 +99,18 @@ export default function NovoLocal({ uf }: IData) {
 				created_by: values.created_by,
 			}).then((response) => {
 				if (response.status === 200) {
-					Swal.fire('Local cadastrado com sucesso!')
-					router.back()
+					Swal.fire('Local cadastrado com sucesso!');
+					router.back();
 				} else {
-					Swal.fire(response.message)
+					Swal.fire(response.message);
 				}
-			})
+			});
 		},
 	});
 
 	uf.map((value: string | object | any) => {
 		ufs.push({ id: value.id, name: value.sigla, ufid: value.id });
-	})
+	});
 
 	// async function showCitys(uf: any) {
 	//   if (uf) {
@@ -128,11 +126,11 @@ export default function NovoLocal({ uf }: IData) {
 	// }
 
 	function validateInputs(values: any) {
-		if (!values.cod_local) { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = 'red'; } else { let inputcod_local: any = document.getElementById("cod_local"); inputcod_local.style.borderColor = ''; }
-		if (!values.pais) { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = 'red'; } else { let inputPais: any = document.getElementById("pais"); inputPais.style.borderColor = ''; }
-		if (!values.uf) { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = 'red'; } else { let inputUf: any = document.getElementById("uf"); inputUf.style.borderColor = ''; }
-		if (!values.city) { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = 'red'; } else { let inputCity: any = document.getElementById("city"); inputCity.style.borderColor = ''; }
-		if (!values.name_farm) { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = 'red'; } else { let inputname_farm: any = document.getElementById("name_farm"); inputname_farm.style.borderColor = ''; }
+		if (!values.cod_local) { const inputcod_local: any = document.getElementById('cod_local'); inputcod_local.style.borderColor = 'red'; } else { const inputcod_local: any = document.getElementById('cod_local'); inputcod_local.style.borderColor = ''; }
+		if (!values.pais) { const inputPais: any = document.getElementById('pais'); inputPais.style.borderColor = 'red'; } else { const inputPais: any = document.getElementById('pais'); inputPais.style.borderColor = ''; }
+		if (!values.uf) { const inputUf: any = document.getElementById('uf'); inputUf.style.borderColor = 'red'; } else { const inputUf: any = document.getElementById('uf'); inputUf.style.borderColor = ''; }
+		if (!values.city) { const inputCity: any = document.getElementById('city'); inputCity.style.borderColor = 'red'; } else { const inputCity: any = document.getElementById('city'); inputCity.style.borderColor = ''; }
+		if (!values.name_farm) { const inputname_farm: any = document.getElementById('name_farm'); inputname_farm.style.borderColor = 'red'; } else { const inputname_farm: any = document.getElementById('name_farm'); inputname_farm.style.borderColor = ''; }
 	}
 
 	return (
@@ -141,8 +139,7 @@ export default function NovoLocal({ uf }: IData) {
 				<title>Novo Local</title>
 			</Head>
 
-
-			<Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+			<Content contentHeader={tabsDropDowns} moduloActive="config">
 				<form
 					className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 					onSubmit={formik.handleSubmit}
@@ -152,12 +149,13 @@ export default function NovoLocal({ uf }: IData) {
 					</div>
 
 					<div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+					>
 						<div className="w-full">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								*Código Local
@@ -188,7 +186,6 @@ export default function NovoLocal({ uf }: IData) {
 							/>
 						</div>
 
-
 						<div className="w-full h-10">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								*Pais
@@ -205,11 +202,12 @@ export default function NovoLocal({ uf }: IData) {
 					</div>
 
 					<div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mb-4
-          ">
+          "
+					>
 						<div className="w-full h-10">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								*Estado
@@ -256,7 +254,8 @@ export default function NovoLocal({ uf }: IData) {
             justify-between
             gap-6
             mb-4
-          ">
+          "
+					>
 						<div className="w-full">
 							<label className="block text-gray-900 text-sm font-bold mb-2">
 								Latitude
@@ -273,9 +272,9 @@ export default function NovoLocal({ uf }: IData) {
                  leading-tight
                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                "
-								mask={`99°99'99.99"`}
+								mask={'99°99\'99.99"'}
 								type="text"
-								placeholder={`99°99'99.99"`}
+								placeholder={'99°99\'99.99"'}
 								id="latitude"
 								name="latitude"
 								onChange={formik.handleChange}
@@ -299,9 +298,9 @@ export default function NovoLocal({ uf }: IData) {
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
-								mask={`99°99'99.99"`}
+								mask={'99°99\'99.99"'}
 								type="text"
-								placeholder={`99°99'99.99"`}
+								placeholder={'99°99\'99.99"'}
 								id="longitude"
 								name="longitude"
 								onChange={formik.handleChange}
@@ -323,7 +322,6 @@ export default function NovoLocal({ uf }: IData) {
 							/>
 						</div>
 
-
 					</div>
 
 					<div className="
@@ -332,7 +330,8 @@ export default function NovoLocal({ uf }: IData) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+					>
 						<div className="w-30">
 							<Button
 								type="button"
@@ -363,18 +362,16 @@ export default function NovoLocal({ uf }: IData) {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
-	const token = req.cookies.token;
+	const { token } = req.cookies;
 
 	const requestOptions: RequestInit | undefined = {
 		method: 'GET',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` }
+		headers: { Authorization: `Bearer ${token}` },
 	};
 
 	const apiUF = await fetch(`${baseUrl}/uf`, requestOptions);
 
 	const uf = await apiUF.json();
-	return { props: { uf } }
-}
-
-
+	return { props: { uf } };
+};

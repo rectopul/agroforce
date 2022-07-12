@@ -10,8 +10,8 @@ import Swal from 'sweetalert2';
 import {
   Button,
   Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICreateCulture {
@@ -34,23 +34,21 @@ export default function Cadastro() {
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<ICreateCulture>({
     initialValues: {
       name: '',
       desc: '',
       status: 1,
-      created_by: Number(userLogado.id),
+      created_by: number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire("Preencha os campos obrigatórios");
+        Swal.fire('Preencha os campos obrigatórios');
         return;
       }
-
 
       await cultureService.createCulture({
         name: (formik.values.name).toUpperCase(),
@@ -64,20 +62,20 @@ export default function Cadastro() {
         } else {
           Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
-      let inputDesc: any = document.getElementById("desc");
+      const inputDesc: any = document.getElementById('desc');
       inputDesc.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
-      let inputDesc: any = document.getElementById("desc");
+      const inputDesc: any = document.getElementById('desc');
       inputDesc.style.borderColor = '';
     }
   }
@@ -88,16 +86,16 @@ export default function Cadastro() {
         <title>Cadastro de cultura</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="
-            w-full 
-            bg-white 
-            shadow-md 
-            rounded 
-            px-8 
-            pt-6 
-            pb-8 
+            w-full
+            bg-white
+            shadow-md
+            rounded
+            px-8
+            pt-6
+            pb-8
             mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -109,7 +107,8 @@ export default function Cadastro() {
             gap-2
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong>*</strong>
@@ -143,13 +142,14 @@ export default function Cadastro() {
           </div>
 
           <div className="
-            h-10 
+            h-10
             w-full
             flex
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"

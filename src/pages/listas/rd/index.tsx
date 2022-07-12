@@ -70,7 +70,7 @@ export default function Import({
       : tab.statusTab = false
   ));
 
-  function readExcel(moduleId: Number, table: String) {
+  function readExcel(moduleId: number, table: string) {
     const value: any = document.getElementById(`inputFile-${moduleId}`);
     if (!value.files[0]) {
       Swal.fire('Insira um arquivo');

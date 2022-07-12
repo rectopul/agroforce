@@ -1,23 +1,23 @@
 import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { IoMdArrowBack } from "react-icons/io";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { IoMdArrowBack } from 'react-icons/io';
 import { departmentService } from 'src/services';
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 import {
   Button,
   Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartmentProps {
   name: string;
   created_by: number;
-};
+}
 
 export default function Safra() {
   const { TabsDropDowns } = ITabs.default;
@@ -33,19 +33,18 @@ export default function Safra() {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
       name: '',
-      created_by: Number(userLogado.id),
+      created_by: number(userLogado.id),
     },
     onSubmit: async (values) => {
-      validateInputs(values)
+      validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
 
       await departmentService.create({
@@ -56,7 +55,7 @@ export default function Safra() {
           Swal.fire('Setor cadastrado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -65,10 +64,10 @@ export default function Safra() {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
     }
   }
@@ -79,16 +78,16 @@ export default function Safra() {
         <title>Cadastro de setor</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="
-            w-full 
-            bg-white 
-            shadow-md 
-            rounded 
-            px-8 
-            pt-6 
-            pb-8 
+            w-full
+            bg-white
+            shadow-md
+            rounded
+            px-8
+            pt-6
+            pb-8
             mt-2"
           onSubmit={formik.handleSubmit}
         >
@@ -100,7 +99,8 @@ export default function Safra() {
             gap-2
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-2/4 h-10 mt-2">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>* </strong>
@@ -119,13 +119,14 @@ export default function Safra() {
           </div>
 
           <div className="
-            h-10 
+            h-10
             w-full
             flex
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"

@@ -33,10 +33,10 @@ import {
 
 interface ITypeAssayProps {
   name: any;
-  id: Number | any;
+  id: number | any;
   protocol_name: string;
-  created_by: Number;
-  status: Number;
+  created_by: number;
+  status: number;
 }
 
 interface IData {
@@ -123,7 +123,7 @@ export default function AtualizarTipoEnsaio({
         id: values.id,
         name: values.name,
         protocol_name: values.protocol_name,
-        created_by: Number(userLogado.id),
+        created_by: number(userLogado.id),
         status: 1,
       }).then((response) => {
         if (response.status === 200) {

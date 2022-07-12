@@ -87,7 +87,7 @@ export class UserRepository {
         return Result;
     }
 
-    async getAllCulturesByuserID(userId: Number | any) {
+    async getAllCulturesByuserID(userId: number | any) {
         let Result = await prisma.users_permissions.findMany({
             where: {
                 userId: userId

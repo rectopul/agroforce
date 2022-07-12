@@ -23,7 +23,7 @@ export class UsersPermissionsRepository {
         return Result;
     }
 
-    async findAllByUser(userId: Number | any) {
+    async findAllByUser(userId: number | any) {
         let Result = await prisma.users_permissions.findMany({
             where: {
                 userId: userId,

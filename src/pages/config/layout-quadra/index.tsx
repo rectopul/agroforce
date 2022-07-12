@@ -26,22 +26,22 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface ILayoultProps {
-  id: Number | any;
-  esquema: String | any;
-  semente_metros: Number | any;
-  disparos: Number | any;
-  divisor: Number | any;
-  largura: Number | any;
-  comp_fisico: Number | any;
-  comp_parcela: Number | any;
-  comp_corredor: Number | any;
-  t4_inicial: Number | any;
-  t4_final: Number | any;
-  df_inicial: Number | any;
-  df_final: Number | any;
-  created_by: Number;
-  local: String | any;
-  status: Number;
+  id: number | any;
+  esquema: string | any;
+  semente_metros: number | any;
+  disparos: number | any;
+  divisor: number | any;
+  largura: number | any;
+  comp_fisico: number | any;
+  comp_parcela: number | any;
+  comp_corredor: number | any;
+  t4_inicial: number | any;
+  t4_final: number | any;
+  df_inicial: number | any;
+  df_final: number | any;
+  created_by: number;
+  local: string | any;
+  status: number;
 }
 
 interface IFilter {
@@ -59,7 +59,7 @@ interface IGenerateProps {
 }
 interface Idata {
   allItems: ILayoultProps[];
-  totalItems: Number;
+  totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;

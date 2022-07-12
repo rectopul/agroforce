@@ -1,25 +1,25 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { FiUserPlus } from "react-icons/fi";
-import { IoMdArrowBack } from "react-icons/io";
-import { delineamentoService } from "src/services";
+import { FiUserPlus } from 'react-icons/fi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { delineamentoService } from 'src/services';
 import Swal from 'sweetalert2';
 import {
   Button, Content,
-  Input
-} from "../../../components";
+  Input,
+} from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface IDelineamentoProps {
   id_culture: number;
-  name: String | any;
-  repeticao: Number;
-  trat_repeticao: Number;
-  created_by: Number;
-  status: Number;
-};
+  name: string | any;
+  repeticao: number;
+  trat_repeticao: number;
+  created_by: number;
+  status: number;
+}
 
 export default function NovoLocal() {
   const { TabsDropDowns } = ITabs.default;
@@ -32,7 +32,7 @@ export default function NovoLocal() {
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function NovoLocal() {
       repeticao: 0,
       trat_repeticao: 0,
       created_by: userLogado.id,
-      status: 1
+      status: 1,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -53,25 +53,25 @@ export default function NovoLocal() {
       await delineamentoService.create({
         id_culture: parseInt(id_culture),
         name: capitalize(values.name),
-        repeticao: Number(values.repeticao),
-        trat_repeticao: Number(values.trat_repeticao),
-        created_by: Number(userLogado.id),
-        status: 1
+        repeticao: number(values.repeticao),
+        trat_repeticao: number(values.trat_repeticao),
+        created_by: number(userLogado.id),
+        status: 1,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Delineamento cadastrado com sucesso!')
+          Swal.fire('Delineamento cadastrado com sucesso!');
           router.back();
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
-    if (!values.repeticao) { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor = 'red'; } else { let inputrepeticao: any = document.getElementById("repeticao"); inputrepeticao.style.borderColor = ''; }
-    if (!values.trat_repeticao) { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor = 'red'; } else { let inputtrat_repeticao: any = document.getElementById("trat_repeticao"); inputtrat_repeticao.style.borderColor = ''; }
+    if (!values.name) { const inputname: any = document.getElementById('name'); inputname.style.borderColor = 'red'; } else { const inputname: any = document.getElementById('name'); inputname.style.borderColor = ''; }
+    if (!values.repeticao) { const inputrepeticao: any = document.getElementById('repeticao'); inputrepeticao.style.borderColor = 'red'; } else { const inputrepeticao: any = document.getElementById('repeticao'); inputrepeticao.style.borderColor = ''; }
+    if (!values.trat_repeticao) { const inputtrat_repeticao: any = document.getElementById('trat_repeticao'); inputtrat_repeticao.style.borderColor = 'red'; } else { const inputtrat_repeticao: any = document.getElementById('trat_repeticao'); inputtrat_repeticao.style.borderColor = ''; }
   }
 
   return (
@@ -80,7 +80,7 @@ export default function NovoLocal() {
         <title>Novo Delineamento</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -90,12 +90,13 @@ export default function NovoLocal() {
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
@@ -143,7 +144,8 @@ export default function NovoLocal() {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
