@@ -125,14 +125,7 @@ export class DepartamentController {
 
   async postDepartament(data: CreateDepartmentDTO) {
     try {
-      const schema: SchemaOf<CreateDepartmentDTO> = object({
-        name: string().required(this.required),
-        created_by: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: "Dados inválidos" };
+      
 
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
@@ -150,11 +143,7 @@ export class DepartamentController {
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
-      const schema: SchemaOf<UpdateDepartmentDTO> = object({
-        id: number().integer().required(this.required),
-        name: string().required(this.required),
-        status: number().required(this.required),
-      });
+      
 
       const valid = schema.isValidSync(data);
 

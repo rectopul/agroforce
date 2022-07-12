@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const user = await prisma.user.findFirst({
-      where: { login: string(userLogin) }
+      where: { login: String(userLogin) }
     });
 
     // if (!user) return res.status(400).json({message: 'Usuário não encontrado.'});

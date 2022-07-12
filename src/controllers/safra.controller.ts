@@ -149,19 +149,7 @@ export class SafraController {
 
   async postSafra(data: CreateSafra) {
     try {
-      const schema: SchemaOf<CreateSafra> = object({
-        id_culture: number().integer().required(this.required),
-        safraName: string().required(this.required),
-        year: number().integer().required(this.required),
-        plantingStartTime: string().optional(),
-        plantingEndTime: string().optional(),
-        status: number().integer().required(this.required),
-        created_by: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
+     
       const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
       if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
 
@@ -176,18 +164,7 @@ export class SafraController {
 
   async updateSafra(data: UpdateSafra) {
     try {
-      const schema: SchemaOf<UpdateSafra> = object({
-        id: number().integer().required(this.required),
-        safraName: string().required(this.required),
-        year: number().required(this.required),
-        plantingStartTime: string().nullable(),
-        plantingEndTime: string().nullable(),
-        status: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: 'Dados inválidos' };
+      
 
       const safra: any = await this.safraRepository.findOne(data.id);
 
