@@ -161,7 +161,7 @@ export class ImportController {
     try {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
-        
+
         const configModule: object | any = await this.getAll(parseInt(data.moduleId));
 
         if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
@@ -267,11 +267,11 @@ export class ImportController {
     }
   }
 
-  async validateListAssay(data: object | any){
+  async validateListAssay(data: object | any) {
 
     const responseIfError: any = [];
-    
-    try{
+
+    try {
 
       let Retorno: string = "";
       let options: object | any = {};
@@ -284,44 +284,45 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
               // Validação do campo Tipo de Protocolo
-              if(sheet == 0){
+              if (sheet == 0) {
                 let options = {};
                 options.filterProtocolName = data.spreadSheet[keySheet][sheet];
+                options.filterName = data.spreadSheet[keySheet][3];
                 let typeAssayFind = await this.typeAssayController.getAll(options);
-                if(typeAssayFind.response.length == 0){
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de protocolo não está cadastro no tipo de ensaio.</li><br>`;      
+                if (typeAssayFind.response.length == 0) {
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de protocolo não está cadastro no tipo de ensaio.</li><br>`;
                 }
               }
               // Validação do campo Foco
-              if(sheet == 2){
+              if (sheet == 2) {
                 let dataFind = {
                   name: data.spreadSheet[keySheet][sheet],
                   id_culture: data.culture
                 };
-                const focoResult:any = await this.focoRepository.findByName(dataFind);
-                if(!focoResult){
+                const focoResult: any = await this.focoRepository.findByName(dataFind);
+                if (!focoResult) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de foco não existe na cultura selecionada.</li><br>`;
                 }
                 //return JSON.stringify(dataFind) + data.spreadSheet[keySheet][sheet] + " - " + data.culture + " - " + JSON.stringify(focoResult);
               }
               // Validação do campo Tipo de Ensaio
-              if(sheet == 3){
-                let options = {};
+              if (sheet == 3) {
+                let options: any = {};
                 options.filterName = data.spreadSheet[keySheet][sheet];
                 options.id_culture = data.culture;
                 let typeAssayFindByName = await this.typeAssayController.getAll(options);
-                if(typeAssayFindByName.response.length == 0){
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor tipo de ensaio não está cadastrado nesta cultura.</li><br>`;      
+                if (typeAssayFindByName.response.length == 0) {
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor tipo de ensaio não está cadastrado nesta cultura.</li><br>`;
                 }
               }
               // Validação GLI
-              if(sheet == 4){
-                if(data.spreadSheet[keySheet][sheet] == ""){
+              if (sheet == 4) {
+                if (data.spreadSheet[keySheet][sheet] == "") {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de GLI está vazio.</li><br>`;
                 }
               }
               // Validação do campo código da tecnologia
-              if(sheet == 5){
+              if (sheet == 5) {
                 let take;
                 let skip;
                 let orderBy: object | any;
@@ -333,51 +334,51 @@ export class ImportController {
                 let parameters: object | any = {};
                 parameters.cod_tec = String(data.spreadSheet[keySheet][sheet]);
                 parameters.id_culture = data.culture;
-                const tecnologiaFind:any = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
-                if(tecnologiaFind.length == 0){
+                const tecnologiaFind: any = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
+                if (tecnologiaFind.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o código da tecnologia não existe na cultura selecionada.</li><br>`;
                 }
               }
               // Validação do campo EP
-              if(sheet == 6){
-                let charactersCell =  String(data.spreadSheet[keySheet][sheet]).length;
+              if (sheet == 6) {
+                let charactersCell = String(data.spreadSheet[keySheet][sheet]).length;
                 let onlyNumeric = String(data.spreadSheet[keySheet][sheet]).replace(/[^\d]/g, "");
                 let charactersNumeric = String(onlyNumeric).length;
-                if(onlyNumeric == "" || onlyNumeric.length > 2 || charactersCell != charactersNumeric){
+                if (onlyNumeric == "" || onlyNumeric.length > 2 || charactersCell != charactersNumeric) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de EP não pode ser vazio, deve ser numérico e com no máximo dois caracteres.</li><br>`;
                 }
               }
               // Validação do campo número de tratamento
-              if(sheet == 9){
+              if (sheet == 9) {
                 let number_of_treatment = data.spreadSheet[keySheet][sheet];
                 let number_of_treatment_previous = number_of_treatment - 1;
-                if(keySheet > 1 && data.spreadSheet[keySheet-1][sheet] != number_of_treatment_previous 
-                  && data.spreadSheet[keySheet-1][sheet] && data.spreadSheet[keySheet-1][4] == data.spreadSheet[keySheet][4]){
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o número de tratamento não está sequencial (`+number_of_treatment+`)</li><br>`;
+                if (keySheet > 1 && data.spreadSheet[keySheet - 1][sheet] != number_of_treatment_previous
+                  && data.spreadSheet[keySheet - 1][sheet] && data.spreadSheet[keySheet - 1][4] == data.spreadSheet[keySheet][4]) {
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o número de tratamento não está sequencial (` + number_of_treatment + `)</li><br>`;
                 }
               }
               // Validação do campo status
-              if(sheet == 10){
-                if(data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")){
+              if (sheet == 10) {
+                if (data.spreadSheet[keySheet][sheet] == "" || (data.spreadSheet[keySheet][sheet] != "T" && data.spreadSheet[keySheet][sheet] != "L")) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de status deve ser igual a T ou L.</li><br>`;
                 }
               }
               // Validação do campo nome do genótipo
-              if(sheet == 11){
+              if (sheet == 11) {
                 options = {};
                 options.filterGenotipo = data.spreadSheet[keySheet][sheet];
                 options.id_culture = data.culture;
                 let findGenotype = await this.genotipoController.getAll(options);
-                if(data.spreadSheet[keySheet][sheet] == "" || findGenotype.response.length == 0){
+                if (data.spreadSheet[keySheet][sheet] == "" || findGenotype.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de nome do genótipo não foi encontrado.</li><br>`;
                 }
               }
               // Validação do campo NCA
-              if(sheet == 12){
+              if (sheet == 12) {
                 options = {};
                 options.filterNcc = data.spreadSheet[keySheet][sheet];
                 let findLote = await this.loteController.getAll(options);
-                if(data.spreadSheet[keySheet][sheet] != "" && findLote.response.length == 0){
+                if (data.spreadSheet[keySheet][sheet] != "" && findLote.response.length == 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de NCA é diferente de vazio e não foi encontrado no cadastro de lotes.</li><br>`;
                 }
               }
@@ -390,14 +391,19 @@ export class ImportController {
       if (responseIfError.length === 0) {
         let Line: number;
         let Column: number;
+
+        let productivity: number = 0;
+        let advance: number = 0;
+        let register: number = 0;
+
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           Line = Number(keySheet) + 1;
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
-            if(keySheet != 0){
-              if(sheet == 8){
-                let cultureFind = await this.culturaController.getOneCulture(data.culture);
-                
+            if (keySheet != 0) {
+              if (sheet == 8) {
+                let cultureFind: any = await this.culturaController.getOneCulture(data.culture);
+
                 let assay = data.spreadSheet[keySheet][3];
                 let protocol_name = data.spreadSheet[keySheet][0];
                 let id_culture = cultureFind.response.id;
@@ -406,10 +412,10 @@ export class ImportController {
                 options.id_culture = id_culture;
                 let getTypeAssay = await this.typeAssayController.getAll(options);
 
-                let savedTypeAssay = {};
-                let idSavedTypeAssay;
+                let savedTypeAssay: any = {};
+                let idSavedTypeAssay: any;
 
-                if(getTypeAssay.response.length == 0){
+                if (getTypeAssay.response.length == 0) {
                   savedTypeAssay = await this.typeAssayController.create({
                     id_culture: cultureFind.response.id,
                     name: data.spreadSheet[keySheet][3],
@@ -429,9 +435,9 @@ export class ImportController {
                   });
                   idSavedTypeAssay = getTypeAssay.response[0].id;
                 }
-                
-                if(idSavedTypeAssay){
-                  let focoFind = await this.focoRepository.findByName({name:data.spreadSheet[keySheet][2], id_culture:data.culture});
+
+                if (idSavedTypeAssay) {
+                  let focoFind: any = await this.focoRepository.findByName({ name: data.spreadSheet[keySheet][2], id_culture: data.culture });
                   let take;
                   let skip;
                   let orderBy: object | any;
@@ -444,15 +450,16 @@ export class ImportController {
                   parameters.cod_tec = String(data.spreadSheet[keySheet][5]);
                   parameters.id_culture = data.culture;
                   let tecnologiaFind = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
-                  if(tecnologiaFind.length > 0){
+                  if (tecnologiaFind.length > 0) {
                     let gli = data.spreadSheet[keySheet][4];
                     options = {};
                     options.filterGli = gli;
                     let getListAssay = await this.assayListController.getAll(options);
-                    console.log("ListAssay: "+JSON.stringify(getListAssay));
+                    //console.log("ListAssay: "+JSON.stringify(getListAssay));
 
-                    if(getListAssay.response.length == 0){
-                      let savedAssayList = await this.assayListController.create({
+                    let savedAssayList: any;
+                    if (getListAssay.response.length == 0) {
+                      savedAssayList = await this.assayListController.create({
                         id_safra: data.safra,
                         id_foco: focoFind.id,
                         id_type_assay: idSavedTypeAssay,
@@ -466,9 +473,9 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
-                      console.log("Saved Assay List: " + JSON.stringify(savedAssayList));
+                      //console.log("Created Assay List Status: " + savedAssayList.status);
                     } else {
-                      let savedAssayList = await this.assayListController.update({
+                      savedAssayList = await this.assayListController.update({
                         id: getListAssay.response[0].id,
                         id_safra: data.safra,
                         id_foco: focoFind.id,
@@ -483,7 +490,16 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
-                      //console.log("Updated Assay List: " + JSON.stringify(savedAssayList));
+                      //console.log("Updated Assay List Status: " + savedAssayList.status);
+                    }
+                    if (savedAssayList.status == 201 || savedAssayList.status == 200) {
+                      if (data.spreadSheet[keySheet][0] == "Produtividade") {
+                        productivity++;
+                      }
+                      if (data.spreadSheet[keySheet][0] == "Avanço") {
+                        advance++;
+                      }
+                      register++;
                     }
                   }
                 }
@@ -491,21 +507,22 @@ export class ImportController {
             }
           }
         }
-        return 'save';
-      
+        return 'Ensaios importados (' + String(register) + '). Produtividade x Avanço (' + String(productivity) + ' x ' + String(advance) + ') ';
+        //return 'save';
+
       } else {
         const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-        return responseStringError;        
-      } 
+        return responseStringError;
+      }
 
     } catch (err) {
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!';
-    
+
     }
-    
+
     return false;
-  
+
   }
 
   async validateTechnology({
