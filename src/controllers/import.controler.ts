@@ -287,6 +287,7 @@ export class ImportController {
               if(sheet == 0){
                 let options = {};
                 options.filterProtocolName = data.spreadSheet[keySheet][sheet];
+                options.filterName = data.spreadSheet[keySheet][3];
                 let typeAssayFind = await this.typeAssayController.getAll(options);
                 if(typeAssayFind.response.length == 0){
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o valor de protocolo não está cadastro no tipo de ensaio.</li><br>`;      
@@ -390,6 +391,11 @@ export class ImportController {
       if (responseIfError.length === 0) {
         let Line: number;
         let Column: number;
+
+        let productivity: number = 0;
+        let advance: number = 0;
+        let register: number = 0;
+
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           Line = Number(keySheet) + 1;
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
@@ -449,10 +455,11 @@ export class ImportController {
                     options = {};
                     options.filterGli = gli;
                     let getListAssay = await this.assayListController.getAll(options);
-                    console.log("ListAssay: "+JSON.stringify(getListAssay));
+                    //console.log("ListAssay: "+JSON.stringify(getListAssay));
 
+                    let savedAssayList: any;
                     if(getListAssay.response.length == 0){
-                      let savedAssayList = await this.assayListController.create({
+                      savedAssayList = await this.assayListController.create({
                         id_safra: data.safra,
                         id_foco: focoFind.id,
                         id_type_assay: idSavedTypeAssay,
@@ -466,9 +473,9 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
-                      console.log("Saved Assay List: " + JSON.stringify(savedAssayList));
+                      //console.log("Created Assay List Status: " + savedAssayList.status);
                     } else {
-                      let savedAssayList = await this.assayListController.update({
+                      savedAssayList = await this.assayListController.update({
                         id: getListAssay.response[0].id,
                         id_safra: data.safra,
                         id_foco: focoFind.id,
@@ -483,7 +490,16 @@ export class ImportController {
                         comments: data.spreadSheet[keySheet][13],
                         created_by: data.created_by
                       });
-                      //console.log("Updated Assay List: " + JSON.stringify(savedAssayList));
+                      //console.log("Updated Assay List Status: " + savedAssayList.status);
+                    }
+                    if(savedAssayList.status == 201 || savedAssayList.status == 200){
+                      if(data.spreadSheet[keySheet][0] == "Produtividade"){
+                        productivity++;
+                      }
+                      if(data.spreadSheet[keySheet][0] == "Avanço"){
+                        advance++;
+                      }
+                      register++;
                     }
                   }
                 }
@@ -491,7 +507,8 @@ export class ImportController {
             }
           }
         }
-        return 'save';
+        return 'Ensaios importados (' + String(register) + '). Produtividade x Avanço (' + String(productivity) + ' x ' + String(advance) + ') ';
+        //return 'save';
       
       } else {
         const responseStringError = responseIfError.join('').replace(/undefined/g, '');
