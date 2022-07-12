@@ -53,9 +53,9 @@ export default function NovoLocal() {
       await delineamentoService.create({
         id_culture: parseInt(id_culture),
         name: capitalize(values.name),
-        repeticao: number(values.repeticao),
-        trat_repeticao: number(values.trat_repeticao),
-        created_by: number(userLogado.id),
+        repeticao: Number(values.repeticao),
+        trat_repeticao: Number(values.trat_repeticao),
+        created_by: Number(userLogado.id),
         status: 1,
       }).then((response) => {
         if (response.status === 200) {

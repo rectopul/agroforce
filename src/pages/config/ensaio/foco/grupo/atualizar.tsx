@@ -57,11 +57,11 @@ export default function Cadastro({ grupo }: any) {
 				return;
 			}
 			await groupService.update({
-				id: number(grupo.id),
-				id_safra: number(grupo.safra.id),
+				id: Number(grupo.id),
+				id_safra: Number(grupo.safra.id),
 				id_foco: parseInt(grupo.foco.id),
-				group: number(values.group),
-				created_by: number(formik.values.created_by),
+				group: Number(values.group),
+				created_by: Number(formik.values.created_by),
 			}).then((response) => {
 				if (response.status === 200) {
 					Swal.fire('Grupo atualizado com sucesso!');

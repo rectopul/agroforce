@@ -53,14 +53,14 @@ export default function Safra() {
 
   const formik = useFormik<ISafraProps>({
     initialValues: {
-      id_culture: number(culture),
+      id_culture: Number(culture),
       safraName: '',
       year: 0,
       plantingStartTime: '',
       plantingEndTime: '',
       main_safra: 0,
       status: 1,
-      created_by: number(userLogado.id),
+      created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       const { main_safra, ...data } = values;
@@ -93,13 +93,13 @@ export default function Safra() {
       }
 
       await safraService.create({
-        id_culture: number(culture),
+        id_culture: Number(culture),
         safraName: formik.values.safraName,
-        year: number(formik.values.year),
+        year: Number(formik.values.year),
         plantingStartTime,
         plantingEndTime,
         status: formik.values.status,
-        created_by: number(userLogado.id),
+        created_by: Number(userLogado.id),
       }).then((response) => {
         if (response.status === 201) {
           Swal.fire('Safra cadastrada com sucesso!');

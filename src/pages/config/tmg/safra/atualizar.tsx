@@ -93,7 +93,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
         id: safra.id,
         // id_culture: safra.id_culture,
         safraName: formik.values.safraName,
-        year: number(formik.values.year),
+        year: Number(formik.values.year),
         plantingStartTime,
         plantingEndTime,
         status: formik.values.status,

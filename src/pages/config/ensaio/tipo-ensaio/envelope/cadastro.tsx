@@ -55,9 +55,9 @@ export default function Cadastro({ safra, id_type_assay }: any) {
             }
 
             await envelopeService.create({
-                id_safra: number(safra.id),
+                id_safra: Number(safra.id),
                 id_type_assay: parseInt(id_type_assay),
-                seeds: number(values.seeds),
+                seeds: Number(values.seeds),
                 created_by: formik.values.created_by,
             }).then((response) => {
                 if (response.status === 201) {

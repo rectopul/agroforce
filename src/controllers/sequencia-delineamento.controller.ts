@@ -79,18 +79,7 @@ export class SequenciaDelineamentoController {
   }
   async update(data: IUpdateSequenciaDelineamento) {
     try {
-      const schema: SchemaOf<IUpdateSequenciaDelineamento> = object({
-        id: number().integer().required(this.required),
-        repeticao: number().integer().required(this.required),
-        sorteio: number().integer().required(this.required),
-        nt: number().integer().required(this.required),
-        bloco: number().integer().required(this.required),
-      });
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: "Dados inválidos" };
-
+     
       const sequenciaDelineamento = await this.SequenciaDelineamentoRepository.findById(data.id);
 
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };

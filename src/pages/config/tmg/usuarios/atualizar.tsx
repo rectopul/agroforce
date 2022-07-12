@@ -516,12 +516,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const response = await prisma.user.findFirst({
     where: {
-      id: number(context.query.id),
+      id: Number(context.query.id),
     },
     include: {
       users_permissions: {
         where: {
-          userId: number(context.query.id),
+          userId: Number(context.query.id),
         },
         select: {
           id: true,

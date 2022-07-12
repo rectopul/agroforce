@@ -53,7 +53,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
       sorteio: 0,
       nt: 0,
       bloco: 0,
-      created_by: number(userLogado.id),
+      created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);

@@ -92,10 +92,10 @@ export class LocalController {
     }
   }
 
-  async getOne({ id }: any) {
+  async getOne(id: number) {
     try {
       if (id) {
-        const response = await this.localRepository.findOne(Number(id));
+        const response = await this.localRepository.findOne(id);
         if (response) {
           return { status: 200, response };
         }

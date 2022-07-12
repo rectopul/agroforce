@@ -41,7 +41,7 @@ export default function Cadastro() {
       name: '',
       desc: '',
       status: 1,
-      created_by: number(userLogado.id),
+      created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);

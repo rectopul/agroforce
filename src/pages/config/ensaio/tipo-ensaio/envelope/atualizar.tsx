@@ -55,11 +55,11 @@ export default function Cadastro({ envelope }: any) {
 				return;
 			}
 			await envelopeService.update({
-				id: number(envelope.id),
-				id_safra: number(envelope.safra.id),
+				id: Number(envelope.id),
+				id_safra: Number(envelope.safra.id),
 				id_type_assay: parseInt(envelope.type_assay.id),
-				seeds: number(values.seeds),
-				created_by: number(formik.values.created_by),
+				seeds: Number(values.seeds),
+				created_by: Number(formik.values.created_by),
 			}).then((response) => {
 				if (response.status === 200) {
 					Swal.fire('Envelope atualizado com sucesso!');
