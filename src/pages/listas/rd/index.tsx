@@ -119,18 +119,6 @@ export default function Import({
     });
   }
 
-  const formik = useFormik<any>({
-    initialValues: {
-      input: [],
-      safra: '',
-      foco: '',
-    },
-    onSubmit: async (values) => {
-      const inputFile: any = document.getElementById('inputFile');
-      readExcel();
-    },
-  });
-
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,user_id,created_at, table' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
