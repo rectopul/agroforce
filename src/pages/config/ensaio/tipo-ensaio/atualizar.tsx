@@ -123,7 +123,7 @@ export default function AtualizarTipoEnsaio({
         id: values.id,
         name: values.name,
         protocol_name: values.protocol_name,
-        created_by: number(userLogado.id),
+        created_by: Number(userLogado.id),
         status: 1,
       }).then((response) => {
         if (response.status === 200) {

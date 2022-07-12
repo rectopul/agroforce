@@ -22,17 +22,7 @@ export class EnvelopeController {
 
 	async create(data: any) {
 		try {
-			const schema: SchemaOf<any> = object({
-				id_safra: number().required(this.required),
-				id_type_assay: number().required(this.required),
-				seeds: number().required(this.required),
-				created_by: number().integer().required(this.required)
-			});
-
-			const valid = schema.isValidSync(data);
-
-
-			if (!valid) return { status: 400, message: 'Dados inválidos' };
+			
 
 			const envelopeAlreadyExists = await this.envelopeRepository.findByData(data);
 
@@ -49,17 +39,7 @@ export class EnvelopeController {
 
 	async update(data: any) {
 		try {
-			const schema: SchemaOf<any> = object({
-				id: number().required(this.required),
-				id_type_assay: number().required(this.required),
-				id_safra: number().required(this.required),
-				seeds: number().required(this.required),
-				created_by: number().required(this.required)
-			});
-
-			const valid = schema.isValidSync(data);
-
-			if (!valid) return { status: 400, message: 'Dados inválidos' };
+			
 
 			const envelope: any = await this.envelopeRepository.findById(data.id);
 

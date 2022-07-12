@@ -38,7 +38,7 @@ export default function Cadastro() {
 
   const formik = useFormik<ICreateGenotipo>({
     initialValues: {
-      id_culture: number(id_culture),
+      id_culture: Number(id_culture),
       genealogy: '',
       cruza: '',
       status: 1,

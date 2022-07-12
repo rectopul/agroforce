@@ -154,10 +154,10 @@ export default function AtualizarLocal({
     },
     onSubmit: async (values) => {
       await experimentService.update({
-        id: number(values.id),
-        eel: number(values.eel),
-        nlp: number(values.nlp),
-        clp: number(values.clp),
+        id: Number(values.id),
+        eel: Number(values.eel),
+        nlp: Number(values.nlp),
+        clp: Number(values.clp),
         comments: values.comments,
       }).then((response) => {
         if (response.status === 200) {

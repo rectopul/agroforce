@@ -106,11 +106,7 @@ export class DepartamentController {
 
   async getOneDepartament({ id }: FindOne) {
     try {
-      const schema: SchemaOf<FindOne> = object({
-        id: number().integer().required(this.required),
-      });
-
-      if (!schema) throw new Error('Dados inválidos');
+     
 
       const response = await this.departamentRepository.findOne(id);
 

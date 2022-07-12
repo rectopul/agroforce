@@ -49,7 +49,7 @@ export default function NovoTipoEnsaio() {
 
   const formik = useFormik<ITypeAssayProps>({
     initialValues: {
-      id_culture: number(culture),
+      id_culture: Number(culture),
       name: '',
       protocolName: 'Avanço',
       created_by: userLogado.id,
@@ -63,10 +63,10 @@ export default function NovoTipoEnsaio() {
       }
 
       await typeAssayService.create({
-        id_culture: number(culture),
+        id_culture: Number(culture),
         name: capitalize(values.name),
         protocol_name: values.protocolName,
-        created_by: number(userLogado.id),
+        created_by: Number(userLogado.id),
         status: 1,
       }).then((response) => {
         if (response.status === 200) {

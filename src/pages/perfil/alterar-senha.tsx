@@ -24,7 +24,7 @@ export default function AlterarDadosPessoais() {
 		event.preventDefault();
 
 		await userService.updatePassword({
-			id: number(userLogado.id),
+			id: Number(userLogado.id),
 			currentPassword: currentPassword,
 			password: newPassword,
 			confirmPassword: confirmPassword,

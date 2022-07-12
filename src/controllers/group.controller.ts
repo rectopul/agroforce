@@ -23,16 +23,7 @@ export class GroupController {
 
 	async create(data: any) {
 		try {
-			const schema: SchemaOf<any> = object({
-				id_foco: number().required(this.required),
-				id_safra: number().required(this.required),
-				group: number().required(this.required),
-				created_by: number().integer().required(this.required)
-			});
-
-			const valid = schema.isValidSync(data);
-
-			if (!valid) return { status: 400, message: 'Dados inválidos' };
+			
 
 			const groupAlreadyExists = await this.groupRepository.findByData(data);
 
@@ -49,17 +40,7 @@ export class GroupController {
 
 	async update(data: any) {
 		try {
-			const schema: SchemaOf<any> = object({
-				id: number().required(this.required),
-				id_safra: number().required(this.required),
-				id_foco: number().required(this.required),
-				group: number().required(this.required),
-				created_by: number().required(this.required)
-			});
-
-			const valid = schema.isValidSync(data);
-
-			if (!valid) return { status: 400, message: 'Dados inválidos' };
+			
 
 			const group: any = await this.groupRepository.findById(data.id);
 

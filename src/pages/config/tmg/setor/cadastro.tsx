@@ -38,7 +38,7 @@ export default function Safra() {
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
       name: '',
-      created_by: number(userLogado.id),
+      created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);

@@ -95,17 +95,13 @@ export class DelineamentoController {
     }
   }
 
-  async getOne(id: string) {
-    const newID = parseInt(id);
+  async getOne(id: number) {
     try {
-      if (id && id !== '{id}') {
-        const response = await this.Repository.findOne(newID);
-        if (!response) {
-          return { status: 400, response: { error: 'local não existe' } };
-        }
-        return { status: 200, response };
+      const response = await this.Repository.findOne(id);
+      if (!response) {
+        return { status: 400, response: { error: 'local não existe' } };
       }
-      return { status: 405, response: { error: 'id não informado' } };
+      return { status: 200, response };
     } catch (err) {
       return { status: 400, message: err };
     }

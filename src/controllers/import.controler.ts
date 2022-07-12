@@ -1459,7 +1459,7 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.update({
                     id: this.aux.id_genotipo,
-                    id_tecnologia: number(this.aux.id_tecnologia),
+                    id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
@@ -1513,14 +1513,14 @@ export class ImportController {
                 if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await this.loteController.update({
-                      id: number(this.aux.id_lote),
-                      id_genotipo: number(this.aux.id_genotipo),
-                      id_safra: number(this.aux.id_safra),
+                      id: Number(this.aux.id_lote),
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
                       cod_lote: String(this.aux.cod_lote),
-                      id_s2: number(this.aux.id_s2),
-                      id_dados: number(this.aux.id_dados_lote),
-                      year: number(this.aux.year),
-                      ncc: number(this.aux.ncc),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1531,13 +1531,13 @@ export class ImportController {
                     delete this.aux.id_genotipo;
                   } else {
                     await this.loteController.create({
-                      id_genotipo: number(this.aux.id_genotipo),
-                      id_safra: number(this.aux.id_safra),
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
                       cod_lote: String(this.aux.cod_lote),
-                      id_s2: number(this.aux.id_s2),
-                      id_dados: number(this.aux.id_dados_lote),
-                      year: number(this.aux.year),
-                      ncc: number(this.aux.ncc),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -1683,7 +1683,7 @@ export class ImportController {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano é obrigatório. </li> <br>`;
             } else {
-              const safraYearValidate = await this.safraController.getOneSafra(id_safra);
+              const safraYearValidate: any = await this.safraController.getOneSafra(id_safra);
               if (safraYearValidate.response?.year !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Ano não corresponde ao ano da safra selecionada. </li> <br>`;
               } else if (typeof (spreadSheet[row][column]) !== 'number') {
@@ -1901,7 +1901,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  const safra = await this.safraController.getAllSafra({ id_safra: number(data.safra) });
+                  const safra = await this.safraController.getAllSafra({ id_safra: Number(data.safra) });
                   if (safra.total > 0) {
                     if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0].safraName) {
                       return 'A safra importada precisa ser igual a safra selecionada';
@@ -2549,25 +2549,25 @@ export class ImportController {
                 if (count == 1) {
                   if (this.aux.id_layout_bd) {
                     const upLayout: any = await this.layoutQuadraController.update({
-                      id: number(this.aux.id_layout_bd),
-                      id_culture: number(this.aux.id_culture),
+                      id: Number(this.aux.id_layout_bd),
+                      id_culture: Number(this.aux.id_culture),
                       esquema: this.aux.esquema,
                       plantadeira: String(this.aux.plantadeira),
                       parcelas: this.aux.parcelas,
-                      tiros: number(this.aux.tiroFixo),
-                      disparos: number(this.aux.disparoFixo),
+                      tiros: Number(this.aux.tiroFixo),
+                      disparos: Number(this.aux.disparoFixo),
                       status: this.aux.status,
                       created_by: this.aux.created_by,
                     });
                     this.aux.id_layout = this.aux.id_layout_bd;
                   } else {
                     const saveLayout: any = await this.layoutQuadraController.post({
-                      id_culture: number(this.aux.id_culture),
+                      id_culture: Number(this.aux.id_culture),
                       esquema: this.aux.esquema,
                       plantadeira: String(this.aux.plantadeira),
                       parcelas: this.aux.parcelas,
-                      tiros: number(this.aux.tiroFixo),
-                      disparos: number(this.aux.disparoFixo),
+                      tiros: Number(this.aux.tiroFixo),
+                      disparos: Number(this.aux.disparoFixo),
                       status: this.aux.status,
                       created_by: this.aux.created_by,
                     });
@@ -3086,8 +3086,8 @@ export class ImportController {
                 if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
                   await this.genotipoController.update({
                     id: this.aux.id_genotipo,
-                    id_culture: number(this.aux.id_culture),
-                    id_tecnologia: number(this.aux.id_tecnologia),
+                    id_culture: Number(this.aux.id_culture),
+                    id_tecnologia: Number(this.aux.id_tecnologia),
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
@@ -3139,14 +3139,14 @@ export class ImportController {
                 if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await this.loteController.update({
-                      id: number(this.aux.id_lote),
-                      id_genotipo: number(this.aux.id_genotipo),
-                      id_safra: number(this.aux.id_safra),
+                      id: Number(this.aux.id_lote),
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
                       cod_lote: String(this.aux.cod_lote),
-                      id_s2: number(this.aux.id_s2),
-                      id_dados: number(this.aux.id_dados_lote),
-                      year: number(this.aux.year),
-                      ncc: number(this.aux.ncc),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
@@ -3157,13 +3157,13 @@ export class ImportController {
                     delete this.aux.id_genotipo;
                   } else {
                     await this.loteController.create({
-                      id_genotipo: number(this.aux.id_genotipo),
-                      id_safra: number(this.aux.id_safra),
+                      id_genotipo: Number(this.aux.id_genotipo),
+                      id_safra: Number(this.aux.id_safra),
                       cod_lote: String(this.aux.cod_lote),
-                      id_s2: number(this.aux.id_s2),
-                      id_dados: number(this.aux.id_dados_lote),
-                      year: number(this.aux.year),
-                      ncc: number(this.aux.ncc),
+                      id_s2: Number(this.aux.id_s2),
+                      id_dados: Number(this.aux.id_dados_lote),
+                      year: Number(this.aux.year),
+                      ncc: Number(this.aux.ncc),
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,

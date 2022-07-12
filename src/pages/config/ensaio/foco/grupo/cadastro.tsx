@@ -43,7 +43,7 @@ export default function Cadastro({ safra, id_foco }: any) {
 
 	const formik = useFormik<ICreateFoco>({
 		initialValues: {
-			id_foco: number(id_foco),
+			id_foco: Number(id_foco),
 			safra: safra.id,
 			group: 0,
 			created_by: userLogado.id,
@@ -56,9 +56,9 @@ export default function Cadastro({ safra, id_foco }: any) {
 			}
 
 			await groupService.create({
-				id_safra: number(safra.id),
-				id_foco: number(id_foco),
-				group: number(values.group),
+				id_safra: Number(safra.id),
+				id_foco: Number(id_foco),
+				group: Number(values.group),
 				created_by: formik.values.created_by,
 			}).then((response) => {
 				if (response.status === 201) {

@@ -61,7 +61,7 @@ export default function NovoLocal({ tecnologia }: IData) {
         name: values.name,
         desc: values.desc,
         cod_tec: values.cod_tec,
-        created_by: number(userLogado.id),
+        created_by: Number(userLogado.id),
         status: 1
       }).then((response) => {
         if (response.status === 200) {
