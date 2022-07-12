@@ -1,4 +1,6 @@
-import { number, object, SchemaOf, string } from 'yup';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 import { DepartamentRepository } from '../repository/departament.repository';
 
 interface DepartmentDTO {
@@ -22,9 +24,9 @@ export class DepartamentController {
       const response = await this.departamentRepository.findAll();
       return response;
     } catch (err) {
-      return { status: 400, message: err }
+      return { status: 400, message: err };
     }
-  };
+  }
 
   async listAllDepartments(options: any) {
     const parameters: object | any = {};
@@ -38,29 +40,27 @@ export class DepartamentController {
         if (typeof (options.status) === 'string') {
           options.filterStatus = parseInt(options.filterStatus);
           if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        }
+        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
       } else {
         parameters.status = 1;
       }
 
       if (options.filterSearch) {
-        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
         parameters.name = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
+        const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
           select[objSelect[item]] = true;
         });
-        select = Object.assign({}, select);
+        select = { ...select };
       } else {
         select = {
           id: true,
           name: true,
-          status: true
+          status: true,
         };
       }
 
@@ -85,25 +85,24 @@ export class DepartamentController {
       }
 
       if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      let response: object | any = await this.departamentRepository.listAll(
+      const response: object | any = await this.departamentRepository.listAll(
         parameters,
         select,
         take,
         skip,
-        orderBy
+        orderBy,
       );
       if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 }
-      } else {
-        return { status: 200, response, total: response.total }
+        return { status: 400, response: [], total: 0 };
       }
+      return { status: 200, response, total: response.total };
     } catch (err) {
-      return { status: 400, message: err }
+      return { status: 400, message: err };
     }
-  };
+  }
 
   async getOneDepartament({ id }: FindOne) {
     try {
@@ -111,52 +110,44 @@ export class DepartamentController {
         id: number().integer().required(this.required),
       });
 
-      if (!schema) throw new Error("Dados inválidos");
+      if (!schema) throw new Error('Dados inválidos');
 
       const response = await this.departamentRepository.findOne(id);
 
-      if (!response) throw new Error("Setor não encontrado");
+      if (!response) throw new Error('Setor não encontrado');
 
       return { status: 200, response };
     } catch (e) {
       return { status: 400, message: 'Setor não encontrado' };
     }
-  };
+  }
 
   async postDepartament(data: CreateDepartmentDTO) {
     try {
-      
-
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
       if (departmentAlreadyExists) {
-        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+        return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
       }
 
       await this.departamentRepository.create(data);
 
-      return { status: 201, message: "Setor cadastrado" }
+      return { status: 201, message: 'Setor cadastrado' };
     } catch (err) {
-      return { status: 404, message: "Setor não cadastrado" }
+      return { status: 404, message: 'Setor não cadastrado' };
     }
-  };
+  }
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
-      
-
-      const valid = schema.isValidSync(data);
-
-      if (!valid) return { status: 400, message: "Dados inválidos" };
-
       const departament = await this.departamentRepository.findOne(data.id);
 
-      if (!departament) return { status: 400, message: "Setor não existente" };
+      if (!departament) return { status: 400, message: 'Setor não existente' };
 
       const departamentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
       if (departamentAlreadyExists && departamentAlreadyExists.id !== departament.id) {
-        return { status: 400, message: "Esse item já está cadastro. favor consultar os inativos" };
+        return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
       }
 
       departament.name = data.name;
@@ -164,9 +155,9 @@ export class DepartamentController {
 
       await this.departamentRepository.update(data.id, departament);
 
-      return { status: 200, message: "Setor atualizado" }
+      return { status: 200, message: 'Setor atualizado' };
     } catch (err) {
-      return { status: 404, message: "Erro ao atualizar" }
+      return { status: 404, message: 'Erro ao atualizar' };
     }
-  };
+  }
 }
