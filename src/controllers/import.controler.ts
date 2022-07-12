@@ -285,7 +285,7 @@ export class ImportController {
             if (keySheet != '0') {
               // Validação do campo Tipo de Protocolo
               if (sheet == 0) {
-                let options = {};
+                let options: any = {};
                 options.filterProtocolName = data.spreadSheet[keySheet][sheet];
                 options.filterName = data.spreadSheet[keySheet][3];
                 let typeAssayFind = await this.typeAssayController.getAll(options);
