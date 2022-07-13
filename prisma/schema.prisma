@@ -522,7 +522,7 @@ model assay_list {
   id_foco       Int
   id_type_assay Int
   id_tecnologia Int
-  gli           String    @unique
+  gli           String
   period        Int
   protocol_name String
   bgm           Int
