@@ -1,3 +1,5 @@
+import { IExperiments } from '../experimento/experimento.interface';
+
 export interface IAssayList {
   id: number
   id_safra: number
@@ -33,6 +35,8 @@ export interface IGenotypeTreatmentGrid {
   idSafra: number | any
   itensPerPage: number;
   filterApplication: object | any;
+  allExperiments: Array<IExperiments>
+  totalExperiments: number
 }
 
 export interface IAssayListGrid {

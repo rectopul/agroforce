@@ -8,5 +8,5 @@ export interface ImportValidate {
   spreadSheet: Array<any>
   idSafra: number
   idCulture: number
-  created_by: number
+  createdBy: number
 }
