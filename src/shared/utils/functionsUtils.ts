@@ -60,7 +60,9 @@ function formatDate(data: any) {
   const mes = (data.getMonth() + 1).toString(); // +1 pois no getMonth Janeiro começa com zero.
   const mesF = (mes.length === 1) ? `0${mes}` : mes;
   const anoF = data.getFullYear();
-  return `${diaF}/${mesF}/${anoF}`;
+  const hour = data.getHours();
+  const min = (data.getMinutes() < 10) ? `0${data.getMinutes()}` : data.getMinutes();
+  return `${diaF}/${mesF}/${anoF} ${hour}:${min}`;
 }
 
 export const functionsUtils = {
