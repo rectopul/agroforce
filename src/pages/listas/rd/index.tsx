@@ -81,7 +81,7 @@ export default function Import({
     readXlsxFile(value.files[0]).then((rows) => {
       if (moduleId) {
         importService.validate({
-          spreadSheet: rows, moduleId, created_by: userLogado.id, idSafra, idCulture, table,
+          spreadSheet: rows, moduleId, createdBy: userLogado.id, idSafra, idCulture, table,
         }).then(({ status, message }: any) => {
           if (status !== 200) {
             Swal.fire({
@@ -99,7 +99,7 @@ export default function Import({
         });
       } else {
         importService.validateProtocol({
-          spreadSheet: rows, created_by: userLogado.id,
+          spreadSheet: rows, createdBy: userLogado.id,
         }).then((response) => {
           if (response.message !== '') {
             Swal.fire({
@@ -120,7 +120,7 @@ export default function Import({
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,user_id,created_at, table' };
+  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,user_id,created_at,table' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [executeUpload, setExecuteUpload] = useState<any>(Number(UploadInProcess));

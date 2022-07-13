@@ -25,7 +25,7 @@ export default function Importar({ idSafra, idCulture }: IData) {
 
     readXlsxFile(value[0]).then((rows: any) => {
       importService.validate({
-        spreadSheet: rows, moduleId: 22, idSafra, idCulture, createdBy: userLogado.id,
+        spreadSheet: rows, moduleId: 22, idSafra, idCulture, createdBy: userLogado.id, table: 'experimento',
       }).then(({ status, message }: any) => {
         if (status !== 200) {
           Swal.fire({
