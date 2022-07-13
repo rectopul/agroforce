@@ -19,6 +19,7 @@ export default function Importar() {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
+        table: 'ensaio',
         spreadSheet: rows,
         moduleId: 26,
         safra: userLogado.safras.safra_selecionada,

@@ -421,7 +421,7 @@ export default function Import({
                 />
               </div>
               <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Titulo</span>
+                <span className="font-bold">Cadastros RD</span>
                 <p>ultimo update 28/06/22</p>
                 <a><Input type="file" required id="inputFile-0" name="inputFile-0" /></a>
               </div>
