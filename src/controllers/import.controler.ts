@@ -163,13 +163,13 @@ export class ImportController {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-        const { status, responseLog, message }: any = await this.logImportController.create({
-          user_id: data.createdBy, status: 2, table: data.table,
+        const responseLog: any = await this.logImportController.create({
+          user_id: data.created_by, status: 2, table: data.table,
         });
-
-        if (status === 400) {
+        console.log(responseLog)
+        if (responseLog.status === 400) {
           return {
-            status: 200, message, error: true,
+            status: 200, message: responseLog.message, error: true,
           };
         }
 
@@ -182,9 +182,7 @@ export class ImportController {
         }
 
         if (data.moduleId === 22) {
-          const response = await ImportExperimentController.validate(data);
-          await this.logImportController.update({ id: responseLog.id, status: 1 });
-          return response;
+          response = await ImportExperimentController.validate(data);
         }
 
         // Validação Lista de Ensaio
