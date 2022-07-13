@@ -26,7 +26,7 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 5, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
+      importService.validate({ table: 'layout-quadra', spreadSheet: rows, moduleId: 5, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
