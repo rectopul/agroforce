@@ -23,7 +23,7 @@ export default function Importar({ idCulture }: Idata) {
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ spreadSheet: rows, moduleId: 8, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
+      importService.validate({ table: 'tecnologia', spreadSheet: rows, moduleId: 8, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,

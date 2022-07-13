@@ -163,28 +163,29 @@ export class ImportController {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-        if (data.moduleId === 22) {
-          const { status, response, message }: any = await this.logImportController.create({
-            user_id: data.createdBy, status: 2, table: data.table,
-          });
+        const { status, responseLog, message }: any = await this.logImportController.create({
+          user_id: data.createdBy, status: 2, table: data.table,
+        });
 
-          if (status === 400) {
-            return {
-              status: 200, message, error: true,
-            };
-          }
-          data.idLog = response.id;
-          return await ImportExperimentController.validate(data);
-          // await this.logImportController.update({ id: logImport.response.id, status: 1 });
-          // return response;
+        if (status === 400) {
+          return {
+            status: 200, message, error: true,
+          };
         }
-
-        const configModule: object | any = await this.getAll(Number(data.moduleId));
-
-        if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
 
         let response: any;
         let erro: any = false;
+        const configModule: object | any = await this.getAll(Number(data.moduleId));
+
+        if (data.moduleId != 22 && data.moduleId != 23) {
+          if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
+        }
+
+        if (data.moduleId === 22) {
+          const response = await ImportExperimentController.validate(data);
+          await this.logImportController.update({ id: responseLog.id, status: 1 });
+          return response;
+        }
 
         // Validação Lista de Ensaio
         if (data.moduleId == 26) {
@@ -276,7 +277,7 @@ export class ImportController {
           }
         }
 
-        // await this.logImportController.update({ id: logImport.response.id, status: 1 });
+        await this.logImportController.update({ id: responseLog.response.id, status: 1 });
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {
