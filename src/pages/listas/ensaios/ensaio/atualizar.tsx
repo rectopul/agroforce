@@ -25,16 +25,16 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   userPreferencesService, assayListService, genotypeTreatmentService, experimentService,
-} from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import * as ITabs from '../../../shared/utils/dropdown';
-import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
-import { IGenotypeTreatmentGrid, IAssayList } from '../../../interfaces/listas/ensaio/assay-list.interface';
+} from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
+import { IGenotypeTreatmentGrid, IAssayList } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import {
   AccordionFilter,
   Button, CheckBox, Content,
   Input,
-} from '../../../components';
+} from '../../../../components';
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period' | 'protocol_name'>;
 
@@ -972,9 +972,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrlAssayList = `${publicRuntimeConfig.apiUrl}/assay-list`;
   const assayLists = await fetch(`${baseUrlAssayList}/${context.query.id}`, requestOptions);
   const assayList = await assayLists.json();
-
-  console.log('allExperiments');
-  console.log(allExperiments);
 
   return {
     props: {

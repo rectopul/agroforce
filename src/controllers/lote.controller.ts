@@ -124,7 +124,6 @@ export class LoteController {
         };
       }
 
-
       if (options.genotipo) {
         parameters.genotipo = options.genotipo;
       }
@@ -143,6 +142,10 @@ export class LoteController {
 
       if (options.id_dados) {
         parameters.id_dados = Number(options.id_dados);
+      }
+
+      if (options.ncc) {
+        parameters.ncc = Number(options.ncc);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

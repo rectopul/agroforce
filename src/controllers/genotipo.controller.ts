@@ -83,7 +83,7 @@ export class GenotipoController {
       }
 
       if (options.name_genotipo) {
-        parameters.name_genotipo = options.genotipo;
+        parameters.name_genotipo = options.name_genotipo;
       }
 
       if (options.cruza) {
@@ -111,7 +111,7 @@ export class GenotipoController {
         orderBy,
       );
 
-      if (!response && response.total <= 0) {
+      if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };

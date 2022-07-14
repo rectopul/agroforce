@@ -7,8 +7,7 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-export function Aside(moduloActive: any) {
-  const router = useRouter();
+export function Aside({ moduloActive }: any) {
   return (
     <aside className="h-screen w-32
       bg-gray-450
@@ -23,13 +22,13 @@ export function Aside(moduloActive: any) {
           title="Configurações"
           icon={<BsGear size={32} />}
           href="/config/tmg/usuarios"
-          active={moduloActive.moduloActive === 'config'}
+          active={moduloActive === 'config'}
         />
         <ButtonAside
           title="Lista"
           icon={<HiOutlineClipboardList size={32} />}
-          href="/listas/experimentos/experimento"
-          active={moduloActive.moduloActive === 'listas'}
+          href="/listas/rd"
+          active={moduloActive === 'listas'}
         />
         {/*
 

@@ -549,11 +549,26 @@ model genotype_treatment {
   treatments_number Int
   nca               String
   comments          String
-  status            Int    @default(1)
+  status            String
   created_by        Int
 
   safra      safra      @relation(fields: [id_safra], references: [id])
   assay_list assay_list @relation(fields: [id_assay_list], references: [id])
   genotipo   genotipo   @relation(fields: [id_genotipo], references: [id])
   lote       lote       @relation(fields: [id_lote], references: [id])
+}
+
+model history_genotype_treatment {
+  id         Int      @id @default(autoincrement())
+  gli        String
+  safra      String
+  foco       String
+  ensaio     String
+  tecnologia Int
+  bgm        Int
+  nt         Int
+  genotipo   String
+  nca        Decimal  @db.Decimal(12, 0)
+  createdBy  Int
+  createdAt  DateTime @default(now())
 }

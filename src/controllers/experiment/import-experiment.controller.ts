@@ -22,6 +22,7 @@ export class ImportExperimentController {
   static async validate({
     idLog, spreadSheet, idSafra, idCulture, createdBy,
   }: ImportValidate): Promise<IReturnObject> {
+    console.log(spreadSheet);
     const safraController = new SafraController();
     const localController = new LocalController();
     const delineamentoController = new DelineamentoController();
@@ -295,7 +296,7 @@ export class ImportExperimentController {
             }
           }
           await logImportController.update({ id: idLog, status: 1 });
-          return { status: 201, message: 'Experimento importado com sucesso' };
+          return { status: 200, message: 'Experimento importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1 });
           handleError('Experimento controller', 'Save Import', error.message);
@@ -304,7 +305,7 @@ export class ImportExperimentController {
       }
 
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      const response = await logImportController.update({ id: idLog, status: 1 });
+      await logImportController.update({ id: idLog, status: 1 });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1 });

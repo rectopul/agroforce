@@ -1,10 +1,13 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
@@ -13,80 +16,47 @@ import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { unidadeCulturaService, userPreferencesService } from 'src/services';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { BsTrashFill } from 'react-icons/bs';
+import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
+import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../../interfaces/listas/ensaio/assay-list.interface';
+import { assayListService, userPreferencesService } from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
+  AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface IUnityCultureProps {
-  id: number
-  name_unity_culture: string
-  year: number
-  name_local_culture: string
-  label: string
-  mloc: string
-  adress: string
-  label_country: string
-  label_region: string
-  name_locality: string
-}
-
-interface IFilter {
-  filterStatus: object | any;
-  filterNameUnityCulture: string | any;
-  filterYear: string | any;
-  filterNameLocalCulture: string | any;
-  filterLabel: string | any;
-  filterMloc: string | any;
-  filterAdress: string | any;
-  filterLabelCountry: string | any;
-  filterLabelRegion: string | any;
-  filterNameLocality: string | any;
-  orderBy: object | any;
-  typeOrder: object | any;
-}
-interface IGenerateProps {
-  name: string | undefined;
-  title: string | number | readonly string[] | undefined;
-  value: string | number | readonly string[] | undefined;
-}
-interface Idata {
-  allCultureUnity: IUnityCultureProps[];
-  totalItems: number;
-  filter: string | any;
-  itensPerPage: number | any;
-  filterApplication: object | any;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any
-}
-
-export default function Listagem({
-  allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
-}: Idata) {
+export default function TipoEnsaio({
+  allAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: IAssayListGrid) {
   const { TabsDropDowns } = ITabs.default;
-  const tabsDropDowns = TabsDropDowns('config');
+
+  const tabsDropDowns = TabsDropDowns('listas');
+
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LOCAL'
+    tab.titleTab === 'ENSAIO'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.unidadeCultura || {
-    id: 0, table_preferences: 'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
-  };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,genotype_treatment,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(() => allCultureUnity);
+  const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -95,95 +65,115 @@ export default function Listagem({
       name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome un. cultura', value: 'name_unity_culture', defaultChecked: () => camposGerenciados.includes('name_unity_culture'),
+      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ano', value: 'year', defaultChecked: () => camposGerenciados.includes('year'),
+      name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome do L. de Cult.', value: 'name_local_culture', defaultChecked: () => camposGerenciados.includes('name_local_culture'),
+      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Rótulo', value: 'label', defaultChecked: () => camposGerenciados.includes('label'),
+      name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'MLOC', value: 'mloc', defaultChecked: () => camposGerenciados.includes('mloc'),
+      name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome Fazenda', value: 'adress', defaultChecked: () => camposGerenciados.includes('adress'),
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'genotype_treatment', defaultChecked: () => camposGerenciados.includes('genotype_treatment'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'País', value: 'label_country', defaultChecked: () => camposGerenciados.includes('label_country'),
+      name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Região', value: 'label_region', defaultChecked: () => camposGerenciados.includes('label_region'),
-    },
-    {
-      name: 'CamposGerenciados[]', title: 'Localidade', value: 'name_locality', defaultChecked: () => camposGerenciados.includes('name_locality'),
+      name: 'CamposGerenciados[]', title: 'Status', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [selectedRowById, setSelectedRowById] = useState<number>();
   const [colorStar, setColorStar] = useState<string>('');
-
+  const router = useRouter();
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
-  const formik = useFormik<IFilter>({
+  const formik = useFormik<IAssayListFilter>({
     initialValues: {
-      filterStatus: '',
-      filterNameUnityCulture: '',
-      filterYear: '',
-      filterNameLocalCulture: '',
-      filterLabel: '',
-      filterMloc: '',
-      filterAdress: '',
-      filterLabelCountry: '',
-      filterLabelRegion: '',
-      filterNameLocality: '',
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterGli: '',
+      filterTechnology: '',
+      filterTreatmentNumber: '',
+      filterStatusAssay: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus,
-      filterNameUnityCulture,
-      filterYear,
-      filterNameLocalCulture,
-      filterLabel,
-      filterMloc,
-      filterAdress,
-      filterLabelCountry,
-      filterLabelRegion,
-      filterNameLocality,
+      filterFoco,
+      filterTypeAssay,
+      filterGli,
+      filterTechnology,
+      filterTreatmentNumber,
+      filterStatusAssay,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
-        setTotalItems(response.total);
-        setUnidadeCultura(response.response);
+        setAssayList(response);
+        setTotalItems(allTotal);
         setCurrentPage(0);
       });
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  async function handleOrder(column: string, order: number): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
 
-  const filterStatus = filterBeforeEdit.split('');
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-  function headerTableFactory(name: any, title: string) {
+    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+      if (status === 200) {
+        setAssayList(response);
+      }
+    });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
+
+  function headerTableFactory(name: string, title: string) {
     return {
       title: (
         <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button type="button" className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
             {name}
           </button>
         </div>
@@ -209,6 +199,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
@@ -221,6 +212,7 @@ export default function Listagem({
             <div className="h-10 flex">
               <div>
                 <button
+                  type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
@@ -233,90 +225,85 @@ export default function Listagem({
     };
   }
 
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+  async function deleteItem(id: number) {
+    await assayListService.deleted(id);
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Ações',
+      field: 'action',
+      sorting: false,
+      searchable: false,
+      render: (rowData: IAssayList) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              title={`Atualizar ${rowData.gli}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          <div>
+            <Button
+              icon={<BsTrashFill size={16} />}
+              onClick={() => deleteItem(rowData.id)}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
+        </div>
+      ),
+    };
+  }
+
+  function orderColumns(columnsOrder: string): Array<object> {
+    const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
+    Object.keys(columnOrder).forEach((item) => {
+      if (columnOrder[item] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnCampos[item] === 'name_unity_culture') {
-        tableFields.push(headerTableFactory('Nome un. cultura', 'name_unity_culture'));
+      if (columnOrder[item] === 'protocol_name') {
+        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
       }
-      if (columnCampos[item] === 'year') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
+      if (columnOrder[item] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
-      if (columnCampos[item] === 'name_local_culture') {
-        tableFields.push(headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'));
+      if (columnOrder[item] === 'type_assay') {
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
-      if (columnCampos[item] === 'label') {
-        tableFields.push(headerTableFactory('Rótulo', 'local.label'));
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'gli'));
       }
-      if (columnCampos[item] === 'adress') {
-        tableFields.push(headerTableFactory('Nome da fazenda', 'local.adress'));
+      if (columnOrder[item] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
       }
-      if (columnCampos[item] === 'mloc') {
-        tableFields.push(headerTableFactory('MLOC', 'local.mloc'));
+      if (columnOrder[item] === 'genotype_treatment') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'genotype_treatment.treatments_number'));
       }
-      if (columnCampos[item] === 'label_country') {
-        tableFields.push(headerTableFactory('País', 'local.label_country'));
+      if (columnOrder[item] === 'status') {
+        tableFields.push(headerTableFactory('Status do ensaio', 'status'));
       }
-      if (columnCampos[item] === 'label_region') {
-        tableFields.push(headerTableFactory('Região', 'local.label_region'));
-      }
-      if (columnCampos[item] === 'name_locality') {
-        tableFields.push(headerTableFactory('Localidade', 'local.name_locality'));
+      if (columnOrder[item] === 'action') {
+        tableFields.push(statusHeaderFactory());
       }
     });
     return tableFields;
   }
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setUnidadeCultura(response.response);
-      }
-    });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  const columns = orderColumns(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -324,13 +311,25 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 21 }).then((response) => {
-        userLogado.preferences.unidadeCultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 25,
+      }).then((response) => {
+        userLogado.preferences.assayList = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.unidadeCultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.assayList = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -352,23 +351,34 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    let newFilter;
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
+      newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
     }
 
-    await unidadeCulturaService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          row.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-          row.DT = new Date();
-          return row;
+    await assayListService.getAll(newFilter).then(({ status, response }) => {
+      if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          if (newItem.foco) {
+            newItem.foco = newItem.foco.name;
+          }
+          if (newItem.type_assay) {
+            newItem.type_assay = newItem.type_assay.name;
+          }
+          if (newItem.tecnologia) {
+            newItem.tecnologia = newItem.tecnologia.name;
+          }
+          if (newItem.genotype_treatment) {
+            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
+          }
+          return newItem;
         });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'unidade-cultura');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
 
-        // buffer
+        // Buffer
         XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
@@ -379,7 +389,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
+        XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
       }
     });
   };
@@ -399,14 +409,14 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setUnidadeCultura(response.response);
+    await assayListService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setAssayList(response);
       }
     });
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: string, name: string) {
     return (
       <div className="h-10 w-1/2 ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -431,16 +441,16 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem das unidades de cultura</title>
+        <title>Listagem de Ensaio</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         "
         >
-          <AccordionFilter title="Filtrar unidades de cultura">
+          <AccordionFilter title="Filtrar ensaios">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -457,25 +467,12 @@ export default function Listagem({
                   pb-2
                 "
                 >
-
-                  {filterFieldFactory('filterNameUnityCulture', 'Nome Un. de Cult.')}
-
-                  {filterFieldFactory('filterYear', 'Ano')}
-
-                  {filterFieldFactory('filterNameLocalCulture', 'Nome do L. de Cult.')}
-
-                  {filterFieldFactory('filterLabel', 'Rótulo')}
-
-                  {filterFieldFactory('filterMloc', 'MLOC')}
-
-                  {filterFieldFactory('filterAdress', 'Nome da Fazenda')}
-
-                  {filterFieldFactory('filterLabelCountry', 'País')}
-
-                  {filterFieldFactory('filterLabelRegion', 'Região')}
-
-                  {filterFieldFactory('filterNameLocality', 'Localidade')}
-
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
+                  {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
+                  {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -494,24 +491,23 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              style={{ background: '#f9fafb' }}
               columns={columns}
-              data={unidadeCultura}
-              onRowClick={((evt?, selectedRow?: IUnityCultureProps) => {
-                setSelectedRowById(selectedRow?.id);
-              })}
+              data={assayList}
               options={{
                 showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
+                },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
-                rowStyle: (rowData: IUnityCultureProps) => ({
-                  backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff'),
-                }),
               }}
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-full max-h-max
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -523,7 +519,17 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-
+                    <div className="h-12">
+                      <Button
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { }}
+                        href="ensaio/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -552,14 +558,24 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(providers) => (
+                                              <li
+                                                ref={providers.innerRef}
+                                                {...providers.draggableProps}
+                                                {...providers.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                  defaultChecked={
+                                                    camposGerenciados.includes(generate.value)
+                                                  }
                                                 />
                                               </li>
                                             )}
@@ -575,8 +591,9 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
+
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Exportar planilha de ensaios" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -643,21 +660,27 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const userPreferenceController = new UserPreferenceController();
-  const itensPerPage = await (await userPreferenceController.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+  const PreferencesControllers = new UserPreferenceController();
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
 
-  const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const { token } = req.cookies;
+  const idCulture = req.cookies.cultureId;
+  const idSafra = req.cookies.safraId;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
+
+  const filterApplication = filterBeforeEdit
+    ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -667,15 +690,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const cultureUnity = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allCultureUnity, total: totalItems } = await cultureUnity.json();
+  const assayList = await fetch(urlParameters.toString(), requestOptions);
+  const { response: allAssay, total: totalItems } = await assayList.json();
 
   return {
     props: {
-      allCultureUnity,
+      allAssay,
       totalItems,
       itensPerPage,
       filterApplication,
+      idCulture,
+      idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
     },
