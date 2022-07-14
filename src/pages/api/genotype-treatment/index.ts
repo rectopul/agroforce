@@ -1,6 +1,6 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { GenotypeTreatmentController } from '../../../controllers/genotype-treatment.controller';
+import { GenotypeTreatmentController } from '../../../controllers/genotype-tratment/genotype-treatment.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);

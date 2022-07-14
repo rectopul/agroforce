@@ -1,4 +1,4 @@
-import { prisma } from '../pages/api/db/db';
+import { prisma } from '../../pages/api/db/db';
 
 export class GenotypeTreatmentRepository {
   async create(data: any) {

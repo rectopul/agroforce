@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -5,41 +6,44 @@ import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
+import Modal from 'react-bootstrap/Modal';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { Checkbox as Checkbox1 } from '@mui/material';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { BsTrashFill } from 'react-icons/bs';
-import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
-import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../interfaces/listas/ensaio/assay-list.interface';
-import { assayListService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+import Swal from 'sweetalert2';
+import ActionModal from '../../../../components/ActionModal';
+import { ITreatment, ITreatmentFilter, ITreatmentGrid } from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
+
+import { genotypeTreatmentService, importService, userPreferencesService } from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
-  allAssay,
+  allTreatments,
   itensPerPage,
   filterApplication,
   totalItems,
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IAssayListGrid) {
+}: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -51,21 +55,19 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,genotype_treatment,status,action' };
+  const preferences = userLogado.preferences.genotypeTreatment
+    || { id: 0, table_preferences: 'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action' };
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
+  const [treatments, setTreatments] = useState<ITreatment[]>(() => allTreatments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
-    },
-    {
-      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
+      name: 'CamposGerenciados[]', title: 'CheckBox ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
@@ -74,53 +76,72 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
+      name: 'CamposGerenciados[]', title: 'Nome da Tec.', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+    },
+    {
       name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm', defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'genotype_treatment', defaultChecked: () => camposGerenciados.includes('genotype_treatment'),
+      name: 'CamposGerenciados[]', title: 'NT', value: 'treatments_number', defaultChecked: () => camposGerenciados.includes('treatments_number'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: 'CamposGerenciados[]', title: 'Status T', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
+      name: 'CamposGerenciados[]', title: 'Status do Ensaio', value: 'statusAssay', defaultChecked: () => camposGerenciados.includes('statusAssay'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'genotipoName', defaultChecked: () => camposGerenciados.includes('genotipoName'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'NCA', value: 'nca', defaultChecked: () => camposGerenciados.includes('nca'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
   const router = useRouter();
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
+  const checkedItems: any = [];
+  let checkedAllItems: boolean = false;
 
-  const formik = useFormik<IAssayListFilter>({
+  const formik = useFormik<ITreatmentFilter>({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
-      filterGli: '',
       filterTechnology: '',
-      filterTreatmentNumber: '',
+      filterGli: '',
+      filterBgm: '',
+      filterTreatmentsNumber: '',
+      filterStatus: '',
       filterStatusAssay: '',
+      filterGenotypeName: '',
+      filterNca: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterGli,
       filterTechnology,
-      filterTreatmentNumber,
+      filterGli,
+      filterBgm,
+      filterTreatmentsNumber,
+      filterStatus,
       filterStatusAssay,
+      filterGenotypeName,
+      filterNca,
     }) => {
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
+      await genotypeTreatmentService.getAll(`${parametersFilter}
+      &skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
-        setAssayList(response);
+        setTreatments(response);
         setTotalItems(allTotal);
         setCurrentPage(0);
       });
@@ -150,22 +171,16 @@ export default function TipoEnsaio({
       parametersFilter = filter;
     }
 
-    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+    await genotypeTreatmentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
       if (status === 200) {
-        setAssayList(response);
+        setTreatments(response);
       }
     });
 
     if (orderList === 2) {
       setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
     } else {
       setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
     }
   }
 
@@ -183,82 +198,44 @@ export default function TipoEnsaio({
     };
   }
 
+  const setCheck = (id: any) => {
+    checkedItems[id] = !checkedItems[id];
+    console.log('checkedItems');
+    console.log(checkedItems);
+  };
+
+  const setAllCheck = () => {
+    checkedAllItems = !checkedAllItems;
+    allTreatments.forEach((item) => {
+      checkedItems[item.id] = checkedAllItems;
+    });
+    console.log('checkedItems');
+    console.log(checkedItems);
+  };
+
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  async function deleteItem(id: number) {
-    await assayListService.deleted(id);
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Ações',
-      field: 'action',
-      sorting: false,
-      searchable: false,
-      render: (rowData: IAssayList) => (
+      title:
         <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              title={`Atualizar ${rowData.gli}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/listas/ensaio/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
+          <Checkbox1
+            onChange={setAllCheck}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+          />
+        </div>,
+      field: 'id',
+      sorting: false,
+      width: 0,
+      render: (rowData: any) => (
+        (
+          <div className="h-10 flex">
+            <Checkbox1
+              checked={checkedItems[rowData.id]}
+              onChange={() => setCheck(rowData.id)}
+              sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
             />
+            {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
           </div>
-          <div>
-            <Button
-              icon={<BsTrashFill size={16} />}
-              onClick={() => deleteItem(rowData.id)}
-              bgColor="bg-red-600"
-              textColor="white"
-            />
-          </div>
-        </div>
+        )
       ),
     };
   }
@@ -270,29 +247,35 @@ export default function TipoEnsaio({
       if (columnOrder[item] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
-      }
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
       if (columnOrder[item] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
-      }
-      if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'gli'));
+        tableFields.push(headerTableFactory('Ensaio', 'assay_list.type_assay.name'));
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
+        tableFields.push(headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'));
       }
-      if (columnOrder[item] === 'genotype_treatment') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'genotype_treatment.treatments_number'));
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+      }
+      if (columnOrder[item] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
+      }
+      if (columnOrder[item] === 'treatments_number') {
+        tableFields.push(headerTableFactory('NT', 'treatments_number'));
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status do ensaio', 'status'));
+        tableFields.push(headerTableFactory('Status T', 'status'));
       }
-      if (columnOrder[item] === 'action') {
-        tableFields.push(statusHeaderFactory());
+      if (columnOrder[item] === 'statusAssay') {
+        tableFields.push(headerTableFactory('Status do ensaio', 'assay_list.status'));
+      }
+      if (columnOrder[item] === 'genotipoName') {
+        tableFields.push(headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'));
+      }
+      if (columnOrder[item] === 'nca') {
+        tableFields.push(headerTableFactory('NCA', 'nca'));
       }
     });
     return tableFields;
@@ -314,9 +297,9 @@ export default function TipoEnsaio({
       await userPreferencesService.create({
         table_preferences: campos,
         userId: userLogado.id,
-        module_id: 25,
+        module_id: 27,
       }).then((response) => {
-        userLogado.preferences.assayList = {
+        userLogado.preferences.genotypeTreatment = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -325,7 +308,7 @@ export default function TipoEnsaio({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.assayList = {
+      userLogado.preferences.genotypeTreatment = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -356,27 +339,11 @@ export default function TipoEnsaio({
       newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
     }
 
-    await assayListService.getAll(newFilter).then(({ status, response }) => {
+    await genotypeTreatmentService.getAll(newFilter).then(({ status, response }) => {
       if (status === 200) {
-        response.map((item: any) => {
-          const newItem = item;
-          if (newItem.foco) {
-            newItem.foco = newItem.foco.name;
-          }
-          if (newItem.type_assay) {
-            newItem.type_assay = newItem.type_assay.name;
-          }
-          if (newItem.tecnologia) {
-            newItem.tecnologia = newItem.tecnologia.name;
-          }
-          if (newItem.genotype_treatment) {
-            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
-          }
-          return newItem;
-        });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
         // Buffer
         XLSX.write(workBook, {
@@ -389,7 +356,7 @@ export default function TipoEnsaio({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
+        XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
       }
     });
   };
@@ -409,9 +376,9 @@ export default function TipoEnsaio({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await assayListService.getAll(parametersFilter).then(({ status, response }) => {
+    await genotypeTreatmentService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
-        setAssayList(response);
+        setTreatments(response);
       }
     });
   }
@@ -433,6 +400,90 @@ export default function TipoEnsaio({
     );
   }
 
+  function importValidate() {
+    console.log('Func');
+    const user = 23;
+    const id_safra = 2;
+    const id_culture = 1;
+    const rows = [
+      [
+        'GLI (Grupo de linhagem)',
+        'SAFRA',
+        'FOCO',
+        'ENSAIO',
+        'Código da tecnologia',
+        'BGM',
+        'NT',
+        'Nome do genótipo',
+        'NCA',
+        'Novo Nome do genótipo',
+        'T',
+        'Novo NCA',
+      ],
+      [
+        'BKF2RL(0)/001',
+        '2021_22',
+        'CO',
+        'F2',
+        0,
+        13,
+        1,
+        'TMGC21-0-61301_05',
+        202120585414,
+        'T',
+        'TMGC21-0-61301_05',
+        202120585415,
+      ],
+      [
+        'BKF2RL(0)/001',
+        '2021_22',
+        'CO',
+        'F2',
+        0,
+        13,
+        2,
+        'TMGC21-0-61301_07',
+        202120585416,
+        'TMGC21-0-61301_07',
+        'L',
+        202120585413,
+      ],
+      [
+        'BKF2RL(0)/001',
+        '2021_22',
+        'CO',
+        'F2',
+        0,
+        5,
+        3,
+        'TMGC21-0-61301_04',
+        202120585412,
+        'TMGC21-0-61301_04',
+        'T',
+        202120585417,
+      ],
+    ];
+
+    importService.validate({
+      spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, createdBy: user, table: 'tratmento',
+    }).then(({ status, message }: any) => {
+      if (status !== 200) {
+        Swal.fire({
+          html: message,
+          width: '900',
+        });
+      }
+      if (status === 200) {
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+      }
+    });
+  }
+
+  const [modalShow, setModalShow] = useState(false);
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -441,8 +492,9 @@ export default function TipoEnsaio({
   return (
     <>
       <Head>
-        <title>Listagem de Ensaio</title>
+        <title>Listagem de genótipos do ensaio</title>
       </Head>
+
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main className="h-full w-full
           flex flex-col
@@ -450,6 +502,7 @@ export default function TipoEnsaio({
           gap-8
         "
         >
+
           <AccordionFilter title="Filtrar ensaios">
             <div className="w-full flex gap-2">
               <form
@@ -469,10 +522,15 @@ export default function TipoEnsaio({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterTechnology', 'Tecnologia')}
-                  {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterBgm', 'BMG')}
+                  {filterFieldFactory('filterTreatmentsNumber', 'NT')}
+                  {filterFieldFactory('filterStatus', 'Status T')}
                   {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
+                  {filterFieldFactory('filterGenotypeName', 'Nome genótipo')}
+                  {filterFieldFactory('filterNca', 'NCA')}
+
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -493,7 +551,7 @@ export default function TipoEnsaio({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={assayList}
+              data={treatments}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -519,15 +577,14 @@ export default function TipoEnsaio({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
+
+                    <div className="h-12 w-32">
                       <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Ação"
+                        value="Ação"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="ensaio/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
+                        onClick={importValidate}
                       />
                     </div>
                     <strong className="text-blue-600">
@@ -591,6 +648,10 @@ export default function TipoEnsaio({
                           </AccordionFilter>
                         </div>
                       </div>
+                      <ActionModal
+                        show={modalShow}
+                        onHide={() => importValidate}
+                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de ensaios" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
@@ -656,6 +717,7 @@ export default function TipoEnsaio({
           </div>
         </main>
       </Content>
+
     </>
   );
 }
@@ -674,13 +736,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
 
   const filterApplication = filterBeforeEdit
     ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
-    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -690,12 +752,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const assayList = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allAssay, total: totalItems } = await assayList.json();
+  const {
+    response: allTreatments,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   return {
     props: {
-      allAssay,
+      allTreatments,
       totalItems,
       itensPerPage,
       filterApplication,

@@ -73,7 +73,7 @@ export function TabsDropDowns(typeAside: any = 'config') {
       statusTab: false,
       hrefTab: '/config/local',
       data: [
-        { labelDropDown: 'Lugar cultura', hrefDropDown: '/config/local', iconDropDown: <FiMapPin /> },
+        { labelDropDown: 'Lugar cultura', hrefDropDown: '/config/local/local', iconDropDown: <FiMapPin /> },
         { labelDropDown: 'Un. cultura', hrefDropDown: '/config/local/unidade-cultura', iconDropDown: <FiMapPin /> },
       ],
     },
@@ -105,7 +105,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         statusTab: false,
         hrefTab: '/listas/ensaio',
         data: [
-          { labelDropDown: 'Ensaio', hrefDropDown: '/listas/ensaio', iconDropDown: <MdDateRange /> },
+          { labelDropDown: 'Ensaio', hrefDropDown: '/listas/ensaios/ensaio', iconDropDown: <MdDateRange /> },
+          { labelDropDown: 'Trat. Genótipo', hrefDropDown: '/listas/ensaios/tratamento-genotipo', iconDropDown: <MdDateRange /> },
         ],
       },
       {

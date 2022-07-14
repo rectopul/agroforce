@@ -22,6 +22,7 @@ import { LogImportController } from './log-import.controller';
 import { FocoRepository } from '../repository/foco.repository';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
 import { ImportExperimentController } from './experiment/import-experiment.controller';
+import { ImportGenotypeTreatmentController } from './genotype-tratment/import-genotype-treatment.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -163,8 +164,12 @@ export class ImportController {
       if (data != null && data != undefined) {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-        const responseLog: any = await this.logImportController.create({
-          user_id: data.created_by, status: 2, table: data.table,
+        if (data.moduleId === 27) {
+          return await ImportGenotypeTreatmentController.validate(data);
+        }
+
+        const { status, responseLog, message }: any = await this.logImportController.create({
+          user_id: data.createdBy, status: 2, table: data.table,
         });
         console.log(responseLog)
         if (responseLog.status === 400) {
@@ -177,12 +182,14 @@ export class ImportController {
         let erro: any = false;
         const configModule: object | any = await this.getAll(Number(data.moduleId));
 
-        if (data.moduleId != 22 && data.moduleId != 23) {
+        if (data.moduleId !== 22 && data.moduleId !== 23 && data.moduleId !== 27) {
           if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
         }
 
         if (data.moduleId === 22) {
-          response = await ImportExperimentController.validate(data);
+          const responseImport = await ImportExperimentController.validate(data);
+          await this.logImportController.update({ id: responseLog.id, status: 1 });
+          return responseImport;
         }
 
         // Validação Lista de Ensaio

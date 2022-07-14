@@ -1,5 +1,6 @@
-import handleError from '../shared/utils/handleError';
-import { GenotypeTreatmentRepository } from '../repository/genotype-treatment.repository';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
+import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -8,7 +9,45 @@ export class GenotypeTreatmentController {
     const parameters: object | any = {};
     let orderBy: object | any;
     let select: any = [];
+    parameters.AND = [];
     try {
+      if (options.filterStatus) {
+        parameters.status = JSON.parse(`{ "contains":"${options.filterStatus}" }`);
+      }
+      if (options.filterNca) {
+        parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
+      }
+      if (options.filterPeriod) {
+        parameters.period = Number(options.filterPeriod);
+      }
+      if (options.filterTreatmentsNumber) {
+        parameters.treatments_number = Number(options.filterTreatmentsNumber);
+      }
+      if (options.filterFoco) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
+      }
+      if (options.filterTypeAssay) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
+      }
+      if (options.filterGli) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
+      }
+      if (options.filterTechnology) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTechnology}" } } } }`));
+      }
+      if (options.filterBgm) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
+      }
+      if (options.filterStatusAssay) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
+      }
+      if (options.filterGenotypeName) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${options.filterGenotypeName}" }  } }`));
+      }
+      if (options.filterStatusAssay) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
+      }
+
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
@@ -45,6 +84,16 @@ export class GenotypeTreatmentController {
               },
             },
           },
+          assay_list: {
+            select: {
+              foco: { select: { name: true } },
+              type_assay: { select: { name: true } },
+              tecnologia: { select: { name: true } },
+              gli: true,
+              bgm: true,
+              status: true,
+            },
+          },
           treatments_number: true,
           status: true,
           nca: true,
@@ -60,15 +109,27 @@ export class GenotypeTreatmentController {
         parameters.id_assay_list = Number(options.id_assay_list);
       }
 
+      if (options.name_genotipo) {
+        parameters.genotipo = (JSON.parse(`{"name_genotipo": {"contains": "${options.name_genotipo}" } }`));
+      }
+
+      if (options.nca) {
+        parameters.nca = options.nca;
+      }
+
+      if (options.status) {
+        parameters.status = options.status;
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-     
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,

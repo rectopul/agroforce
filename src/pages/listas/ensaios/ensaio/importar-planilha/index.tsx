@@ -6,9 +6,9 @@ import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { importService } from '../../../../services/import.service';
-import { Button, Content, Input } from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
+import { importService } from '../../../../../services/import.service';
+import { Button, Content, Input } from '../../../../../components';
+import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export default function Importar() {
   const { TabsDropDowns } = ITabs;

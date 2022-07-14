@@ -1,7 +1,7 @@
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { AssayListRepository } from '../repository/assay-list.repository';
-import { GenotypeTreatmentController } from './genotype-treatment.controller';
+import { GenotypeTreatmentController } from './genotype-tratment/genotype-treatment.controller';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
