@@ -22,46 +22,46 @@ import { localService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ILocalProps {
-	id: number | any;
-	name_local_culture: string | any;
-	cod_red_local: string | any;
-	label_country: string | any;
-	label_region: string | any;
-	name_locality: string | any;
-	adress: string | any;
-	created_by: number;
-	status: number;
+  id: number | any;
+  name_local_culture: string | any;
+  cod_red_local: string | any;
+  label_country: string | any;
+  label_region: string | any;
+  name_locality: string | any;
+  adress: string | any;
+  created_by: number;
+  status: number;
 }
 
 interface IFilter {
-	filterStatus: object | any;
-	filterNameLocalCulture: string | any;
-	filterLabel: string | any;
-	filterMloc: string | any;
-	filterAdress: string | any;
-	filterLabelCountry: string | any;
-	filterLabelRegion: string | any;
-	filterNameLocality: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+  filterStatus: object | any;
+  filterNameLocalCulture: string | any;
+  filterLabel: string | any;
+  filterMloc: string | any;
+  filterAdress: string | any;
+  filterLabelCountry: string | any;
+  filterLabelRegion: string | any;
+  filterNameLocality: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 interface IGenerateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	locais: ILocalProps[];
-	totalItems: number;
-	filter: string | any;
-	itensPerPage: number | any;
-	filterApplication: object | any;
-	pageBeforeEdit: string | any
-	filterBeforeEdit: string | any
+  locais: ILocalProps[];
+  totalItems: number;
+  filter: string | any;
+  itensPerPage: number | any;
+  filterApplication: object | any;
+  pageBeforeEdit: string | any
+  filterBeforeEdit: string | any
 }
 
 export default function Listagem({
@@ -241,9 +241,9 @@ export default function Listagem({
                 icon={<BiEdit size={16} />}
                 title={`Atualizar ${rowData.adress}`}
                 onClick={() => {
-								  setCookies('filterBeforeEdit', filtersParams);
-								  setCookies('pageBeforeEdit', currentPage?.toString());
-								  router.push(`/config/local/atualizar?id=${rowData.id}`);
+                  setCookies('filterBeforeEdit', filtersParams);
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  router.push(`/config/local/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -253,8 +253,8 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsUp size={16} />}
                 onClick={async () => await handleStatus(
-								  rowData.id,
-								  rowData.status,
+                  rowData.id,
+                  rowData.status,
                 )}
                 bgColor="bg-green-600"
                 textColor="white"
@@ -271,9 +271,9 @@ export default function Listagem({
                 icon={<BiEdit size={16} />}
                 title={`Atualizar ${rowData.adress}`}
                 onClick={() => {
-								  setCookies('filterBeforeEdit', filtersParams);
-								  setCookies('pageBeforeEdit', currentPage?.toString());
-								  router.push(`/config/local/atualizar?id=${rowData.id}`);
+                  setCookies('filterBeforeEdit', filtersParams);
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  router.push(`/config/local/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -283,8 +283,8 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsDown size={16} />}
                 onClick={async () => await handleStatus(
-								  rowData.id,
-								  rowData.status,
+                  rowData.id,
+                  rowData.status,
                 )}
                 bgColor="bg-red-800"
                 textColor="white"
@@ -443,7 +443,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      //filterApplication += `&paramSelect=${camposGerenciados}`;
+      // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
     console.log(filterApplication);
 
@@ -451,26 +451,26 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-          let dataExp = new Date();
-          let hours:string;
+          const dataExp = new Date();
+          let hours: string;
           let minutes: string;
           let seconds: string;
-          if(String(dataExp.getHours()).length == 1){
-            hours = "0" + String(dataExp.getHours()); 
+          if (String(dataExp.getHours()).length == 1) {
+            hours = `0${String(dataExp.getHours())}`;
           } else {
             hours = String(dataExp.getHours());
           }
-          if(String(dataExp.getMinutes()).length == 1){
-            minutes = "0" + String(dataExp.getMinutes());
+          if (String(dataExp.getMinutes()).length == 1) {
+            minutes = `0${String(dataExp.getMinutes())}`;
           } else {
             minutes = String(dataExp.getMinutes());
           }
-          if(String(dataExp.getSeconds()).length == 1){
-            seconds = "0" + String(dataExp.getSeconds());
+          if (String(dataExp.getSeconds()).length == 1) {
+            seconds = `0${String(dataExp.getSeconds())}`;
           } else {
             seconds = String(dataExp.getSeconds());
           }
-          row.DT = dataExp.toLocaleDateString('pt-BR') + " " + hours  + ":" + minutes + ":" + seconds;
+          row.DT = `${dataExp.toLocaleDateString('pt-BR')} ${hours}:${minutes}:${seconds}`;
           return row;
         });
 
@@ -570,7 +570,7 @@ export default function Listagem({
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
-										</label>
+                    </label>
                     <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
                   </div>
 
@@ -609,21 +609,21 @@ export default function Listagem({
               columns={columns}
               data={local}
               onRowClick={((evt?, selectedRow?: ILocalProps) => {
-							  setSelectedRowById(selectedRow?.id);
+                setSelectedRowById(selectedRow?.id);
               })}
               options={{
-							  showTitle: false,
-							  search: false,
-							  filtering: false,
-							  pageSize: itensPerPage,
-							  rowStyle: (rowData: ILocalProps) => ({
-							    backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff'),
+                showTitle: false,
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
+                rowStyle: (rowData: ILocalProps) => ({
+                  backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff'),
                 }),
               }}
               components={{
-							  Toolbar: () => (
-  <div
-    className="w-full max-h-max
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-max
                     flex
                     items-center
                     justify-between
@@ -634,133 +634,133 @@ export default function Listagem({
                     border-solid border-b
                     border-gray-200
                   "
-  >
-    <div className="h-12">
-      <Button
-        title="Importar Planilha"
-        value="Importar Planilha"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={() => { }}
-        href="local/importar-planilha"
-        icon={<RiFileExcel2Line size={20} />}
-      />
-    </div>
+                  >
+                    <div className="h-12">
+                      <Button
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { }}
+                        href="local/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
 
-    <strong className="text-blue-600">
-      Total registrado:
-      {' '}
-      {itemsTotal}
-    </strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-    <div className="h-full flex items-center gap-2
+                    <div className="h-full flex items-center gap-2
                     "
-    >
-      <div className="border-solid border-2 border-blue-600 rounded">
-        <div className="w-64">
-          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="characters">
-                {
-																	(provided) => (
-  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-    <div className="h-8 mb-3">
-      <Button
-        value="Atualizar"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={getValuesColumns}
-        icon={<IoReloadSharp size={20} />}
-      />
-    </div>
-    {
-																				generatesProps.map((generate, index) => (
-  <Draggable key={index} draggableId={String(generate.title)} index={index}>
-    {(provided) => (
-      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <CheckBox
-          name={generate.name}
-          title={generate.title?.toString()}
-          value={generate.value}
-          defaultChecked={camposGerenciados.includes(generate.value)}
-        />
-      </li>
-    )}
-  </Draggable>
-																				))
-																			}
-    {provided.placeholder}
-  </ul>
-																	)
-																}
-              </Droppable>
-            </DragDropContext>
-          </AccordionFilter>
-        </div>
-      </div>
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-      </div>
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="local/importar-planilha/config-planilha" />
-      </div>
+                    >
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-64">
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="local/importar-planilha/config-planilha" />
+                      </div>
 
-    </div>
-  </div>
-							  ),
-							  Pagination: (props) => (
-  <div
-    className="flex
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-    {...props}
-  >
-    <Button
-      onClick={() => setCurrentPage(currentPage - 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdFirstPage size={18} />}
-      disabled={currentPage <= 1}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage - 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiLeftArrow size={15} />}
-      disabled={currentPage <= 0}
-    />
-    {
-												Array(1).fill('').map((value, index) => (
-  <Button
-    key={index}
-    onClick={() => setCurrentPage(index)}
-    value={`${currentPage + 1}`}
-    bgColor="bg-blue-600"
-    textColor="white"
-    disabled
-  />
-												))
-											}
-    <Button
-      onClick={() => setCurrentPage(currentPage + 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiRightArrow size={15} />}
-      disabled={currentPage + 1 >= pages}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage + 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdLastPage size={18} />}
-      disabled={currentPage + 1 >= pages}
-    />
-  </div>
-								) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>

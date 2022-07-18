@@ -171,7 +171,7 @@ export class ImportController {
         const { status, responseLog, message }: any = await this.logImportController.create({
           user_id: data.createdBy, status: 2, table: data.table,
         });
-        console.log(responseLog)
+        console.log(responseLog);
         if (responseLog.status === 400) {
           return {
             status: 200, message: responseLog.message, error: true,
@@ -1244,22 +1244,22 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'NCC') {
-                /*const lote = await this.loteController.getAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
+                /* const lote = await this.loteController.getAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
                 if (lote.total > 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
-                }*/
-                  const nccDados: any = [];
-                  data.spreadSheet.map(function(val, index){
-                    //console.log("key : ",index, "value : ",val*val);
-                    if(index == sheet){
-                      if(nccDados.includes(val)){
-                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
-                      } else {
-                        nccDados.push(val);
-                      }
+                } */
+                const nccDados: any = [];
+                data.spreadSheet.map((val: any, index: any) => {
+                  // console.log("key : ",index, "value : ",val*val);
+                  if (index == sheet) {
+                    if (nccDados.includes(val)) {
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
+                    } else {
+                      nccDados.push(val);
                     }
-                  })
-                }
+                  }
+                });
+              }
 
               if (configModule.response[0].fields[sheet] == 'DT') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
