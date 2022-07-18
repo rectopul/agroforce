@@ -101,12 +101,15 @@ export default function Atualizargenotipo({
 
   const router = useRouter();
 
+  console.log("genotipo");
+  console.log(genotipo);
+
   const formik = useFormik<IUpdateGenotipo>({
     initialValues: {
       id: genotipo.id,
       id_culture: genotipo.id_culture,
       cruza: genotipo.cruza,
-      cod_tec: genotipo.tecnologia.cod_tec,
+      cod_tec: genotipo.tecnologia.cod_tec + " " + genotipo.tecnologia.desc,
       status: genotipo.status,
       id_dados: genotipo.id_dados,
       name_genotipo: genotipo.name_genotipo,
@@ -537,7 +540,7 @@ export default function Atualizargenotipo({
               <div className="w-2/4 flex flex-wrap gap-5">
                 <div className="flex-1">
                   <label className="block text-gray-900 text-sm font-bold mb-2">
-                    Cód tecnologia
+                    Tecnologia
                   </label>
                   <Input
                     style={{ background: '#e5e7eb' }}

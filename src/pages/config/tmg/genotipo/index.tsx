@@ -22,13 +22,14 @@ import {
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { genotipoService, userPreferencesService } from '../../../../services';
+import { genotipoService, userPreferencesService, tecnologiaService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -50,6 +51,8 @@ export interface IGenotipos {
   genotipo: string;
   cruza: string;
   status?: number;
+  cod_tec: string;
+  desc: string;
 }
 
 interface IGenerateProps {
@@ -257,6 +260,22 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory() {
+    return {
+      title: 'Tecnologia',
+      field: 'tecnologia',
+      width: 0,
+      sorting: false,
+      render: (rowData: any, genotipo: any) => (
+            <div className="h-10 flex">
+              <div>
+                {rowData.tecnologia.cod_tec + " " +  rowData.tecnologia.desc }
+              </div>
+            </div>
+      ),
+    };
+  }
+
   function statusHeaderFactory() {
     return {
       title: 'Status',
@@ -308,7 +327,8 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
+        //tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -419,7 +439,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
+      //filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await genotipoService.getAll(filterApplication).then((response) => {
@@ -430,8 +450,31 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          row.tecnologia = row.tecnologia?.tecnologia;
-          row.DT = new Date();
+          console.log(row.tecnologia);
+          row.cod_tec = row.tecnologia?.cod_tec;
+          row.tecnologia = row.tecnologia?.name;
+          //row.DT = new Date();
+          
+          let dataExp = new Date();
+          let hours:string;
+          let minutes: string;
+          let seconds: string;
+          if(String(dataExp.getHours()).length == 1){
+            hours = "0" + String(dataExp.getHours()); 
+          } else {
+            hours = String(dataExp.getHours());
+          }
+          if(String(dataExp.getMinutes()).length == 1){
+            minutes = "0" + String(dataExp.getMinutes());
+          } else {
+            minutes = String(dataExp.getMinutes());
+          }
+          if(String(dataExp.getSeconds()).length == 1){
+            seconds = "0" + String(dataExp.getSeconds());
+          } else {
+            seconds = String(dataExp.getSeconds());
+          }
+          row.DT = dataExp.toLocaleDateString('pt-BR') + " " + hours  + ":" + minutes + ":" + seconds;
           return row;
         });
 

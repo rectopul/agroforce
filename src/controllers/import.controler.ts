@@ -1201,7 +1201,7 @@ export class ImportController {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
-                  const safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, safraName: String(data.spreadSheet[keySheet][sheet]) });
+                  const safra: any = await this.safraController.getAllSafra({ id_culture: data.id_culture, filterYear: String(data.spreadSheet[keySheet][sheet]) });
                   if (safra.total == 0) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra não cadastrada.</li><br>`;
                   } else {
@@ -1244,11 +1244,22 @@ export class ImportController {
               }
 
               if (configModule.response[0].fields[sheet] == 'NCC') {
-                const lote = await this.loteController.getAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
+                /*const lote = await this.loteController.getAll({ id_culture: data.spreadSheet[keySheet][sheet], ncc: data.spreadSheet[keySheet][sheet] });
                 if (lote.total > 0) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
+                }*/
+                  const nccDados: any = [];
+                  data.spreadSheet.map(function(val, index){
+                    //console.log("key : ",index, "value : ",val*val);
+                    if(index == sheet){
+                      if(nccDados.includes(val)){
+                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
+                      } else {
+                        nccDados.push(val);
+                      }
+                    }
+                  })
                 }
-              }
 
               if (configModule.response[0].fields[sheet] == 'DT') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
