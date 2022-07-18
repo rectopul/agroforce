@@ -15,11 +15,6 @@ import { Button } from '../../../../components/Button/index';
 import { Content } from '../../../../components/Content/index';
 import { Input } from '../../../../components/Input/index';
 import { Select } from '../../../../components/Select/index';
-/*import {
-  Button, Content,
-  Input,
-  Select,
-} from '../../../../components';*/
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ILocalProps {
