@@ -433,13 +433,11 @@ export default function Listagem({
 			if (response.status === 200) {
 				/*const newData = users.map((row: { avatar: any; status: any }) => {
 					delete row.avatar;
-
 					if (row.status === 0) {
 						row.status = 'Inativo';
 					} else {
 						row.status = 'Ativo';
 					}
-
 					return row;
 				});*/
 
