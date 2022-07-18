@@ -440,7 +440,6 @@ export default function Listagem({
 					} else {
 						row.status = 'Ativo';
 					}
-
 					return row;
 				});
 				*/
