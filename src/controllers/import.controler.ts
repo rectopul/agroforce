@@ -1249,7 +1249,7 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo ncc não pode ser repetido.</li><br>`;
                 }*/
                   const nccDados: any = [];
-                  data.spreadSheet.map(function(val, index){
+                  data.spreadSheet.map(function(val:any, index:any){
                     //console.log("key : ",index, "value : ",val*val);
                     if(index == sheet){
                       if(nccDados.includes(val)){
