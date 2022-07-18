@@ -547,7 +547,6 @@ model genotype_treatment {
   id_genotipo       Int
   id_lote           Int
   treatments_number Int
-  nca               String
   comments          String
   status            String
   created_by        Int

@@ -6,7 +6,6 @@ import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
-import Modal from 'react-bootstrap/Modal';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -24,7 +23,6 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
-import ActionModal from '../../../../components/ActionModal';
 import { ITreatment, ITreatmentFilter, ITreatmentGrid } from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
@@ -106,7 +104,7 @@ export default function TipoEnsaio({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
   const checkedItems: any = [];
-  let checkedAllItems: boolean = false;
+  const [checkedAllItems, setCheckedAllItems] = useState<boolean>(false);
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
@@ -205,8 +203,8 @@ export default function TipoEnsaio({
   };
 
   const setAllCheck = () => {
-    checkedAllItems = !checkedAllItems;
-    allTreatments.forEach((item) => {
+    setCheckedAllItems(!checkedAllItems);
+    treatments.forEach((item) => {
       checkedItems[item.id] = checkedAllItems;
     });
     console.log('checkedItems');
@@ -275,7 +273,7 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'));
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
       }
     });
     return tableFields;
@@ -482,8 +480,6 @@ export default function TipoEnsaio({
     });
   }
 
-  const [modalShow, setModalShow] = useState(false);
-
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -648,10 +644,6 @@ export default function TipoEnsaio({
                           </AccordionFilter>
                         </div>
                       </div>
-                      <ActionModal
-                        show={modalShow}
-                        onHide={() => importValidate}
-                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de ensaios" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
