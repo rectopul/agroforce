@@ -24,7 +24,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
-import ActionModal from '../../../../components/ActionModal';
+//import ActionModal from '../../../../components/ActionModal';
 import { ITreatment, ITreatmentFilter, ITreatmentGrid } from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
@@ -648,10 +648,6 @@ export default function TipoEnsaio({
                           </AccordionFilter>
                         </div>
                       </div>
-                      <ActionModal
-                        show={modalShow}
-                        onHide={() => importValidate}
-                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de ensaios" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
