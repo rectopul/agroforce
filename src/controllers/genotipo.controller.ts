@@ -23,7 +23,9 @@ export class GenotipoController {
       }
 
       if (options.filterGmr) {
-        parameters.gmr = Number(options.filterGmr);
+        //parameters.gmr = Number(options.filterGmr);
+        let gmrMax = Number(options.filterGmr) + 1;
+        parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" }`);
       }
 
       if (options.filterTecnologia) {
@@ -69,7 +71,7 @@ export class GenotipoController {
           progenitores_origem: true,
           parentesco_completo: true,
           status: true,
-          tecnologia: { select: { name: true, cod_tec: true } },
+          tecnologia: { select: { name: true, cod_tec: true, desc: true } },
           lote: true,
         };
       }

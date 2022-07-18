@@ -355,7 +355,7 @@ export default function Listagem({
 
 	const downloadExcel = async (): Promise<void> => {
 		if (!filterApplication.includes('paramSelect')) {
-			filterApplication += `&paramSelect=${camposGerenciados}`;
+			//filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
 		await focoService.getAll(filterApplication).then((response) => {

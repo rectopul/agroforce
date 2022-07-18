@@ -443,14 +443,34 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
+      //filterApplication += `&paramSelect=${camposGerenciados}`;
     }
+    console.log(filterApplication);
 
     await localService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-          row.DT = new Date();
+          let dataExp = new Date();
+          let hours:string;
+          let minutes: string;
+          let seconds: string;
+          if(String(dataExp.getHours()).length == 1){
+            hours = "0" + String(dataExp.getHours()); 
+          } else {
+            hours = String(dataExp.getHours());
+          }
+          if(String(dataExp.getMinutes()).length == 1){
+            minutes = "0" + String(dataExp.getMinutes());
+          } else {
+            minutes = String(dataExp.getMinutes());
+          }
+          if(String(dataExp.getSeconds()).length == 1){
+            seconds = "0" + String(dataExp.getSeconds());
+          } else {
+            seconds = String(dataExp.getSeconds());
+          }
+          row.DT = dataExp.toLocaleDateString('pt-BR') + " " + hours  + ":" + minutes + ":" + seconds;
           return row;
         });
 

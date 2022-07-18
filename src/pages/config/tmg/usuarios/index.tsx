@@ -426,12 +426,12 @@ export default function Listagem({
 
 	const downloadExcel = async (): Promise<void> => {
 		if (!filterApplication.includes('paramSelect')) {
-			filterApplication += `&paramSelect=${camposGerenciados}`;
+			//filterApplication += `&paramSelect=${camposGerenciados}`;
 		}
 
 		await userService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
-				const newData = users.map((row: { avatar: any; status: any }) => {
+				/*const newData = users.map((row: { avatar: any; status: any }) => {
 					delete row.avatar;
 
 					if (row.status === 0) {
@@ -441,9 +441,21 @@ export default function Listagem({
 					}
 
 					return row;
+				});*/
+
+				const dataExcel: any = response.response;
+				dataExcel.forEach(function (line:any) {
+					delete line.avatar;
+					delete line.id;
+					
+					if(line.status === 0){
+						line.status = "Inativo";
+					} else {
+						line.status = "Ativo";
+					}
 				});
 
-				const workSheet = XLSX.utils.json_to_sheet(newData);
+				const workSheet = XLSX.utils.json_to_sheet(dataExcel);
 				const workBook = XLSX.utils.book_new();
 				XLSX.utils.book_append_sheet(workBook, workSheet, 'usuarios');
 
