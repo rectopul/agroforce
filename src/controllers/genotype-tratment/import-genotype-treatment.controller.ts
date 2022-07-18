@@ -5,9 +5,9 @@
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
-  responseDiffFactory,
   responseNullFactory,
   responseGenericFactory,
+  responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
 import { AssayListController } from '../assay-list.controller';
 import { GenotipoController } from '../genotipo.controller';
@@ -31,14 +31,33 @@ export class ImportGenotypeTreatmentController {
     try {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const { status, response: assayList } = await assayListController.getAll({
+          const { status: code, response: assayList } = await assayListController.getAll({
             gli: spreadSheet[row][0],
           });
-          if (status !== 400) {
-            if (assayList?.status !== 'IMPORTADO') {
+          if (code !== 400) {
+            if ((assayList?.status.toUpperCase()) !== 'IMPORTADO') {
               responseIfError[0]
-                += `<li style="text-align:left"> Erro na linha ${row} ensaio já foi sorteado </li> <br>`;
+                += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
             }
+          }
+          const treatments: any = await genotypeTreatmentController.getAll({
+            gli: spreadSheet[row][0],
+            treatments_number: spreadSheet[row][6],
+            status: 'IMPORTADO',
+            name_genotipo: spreadSheet[row][7],
+            nca: spreadSheet[row][8],
+          });
+          if (treatments.status === 400) {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
+          }
+          if (treatments[0]?.assay_list.foco.name !== spreadSheet[row][2]
+            || treatments[0]?.assay_list.type_assay.name !== spreadSheet[row][3]
+            || treatments[0]?.assay_list.tecnologia.name !== spreadSheet[row][4]
+            || treatments[0]?.assay_list.bgm !== spreadSheet[row][5]
+          ) {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, as informações são diferentes das cadastradas. </li> <br>`;
           }
           for (const column in spreadSheet[row]) {
             if (column === '0') { // GLI
@@ -93,7 +112,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -107,7 +126,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -121,7 +140,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -138,7 +157,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -152,7 +171,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -164,13 +183,16 @@ export class ImportGenotypeTreatmentController {
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
-              const { response } = await genotipoController.getAll({
+              const { response: genotipo } = await genotipoController.getAll({
                 name_genotipo: spreadSheet[row][9],
+              });
+              const { response: lote } = await loteController.getAll({
+                ncc: spreadSheet[row][11],
               });
               await genotypeTreatmentController.update(
                 {
-                  id_genotipo: response.id,
-                  nca: spreadSheet[row][11],
+                  id_genotipo: genotipo.id,
+                  nca: lote.id,
                 },
               );
               await historyGenotypeTreatmentController.create({

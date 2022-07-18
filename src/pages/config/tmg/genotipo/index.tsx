@@ -267,11 +267,11 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: (rowData: any, genotipo: any) => (
-            <div className="h-10 flex">
-              <div>
-                {rowData.tecnologia.cod_tec + " " +  rowData.tecnologia.desc }
-              </div>
-            </div>
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+          </div>
+        </div>
       ),
     };
   }
@@ -327,8 +327,8 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        //tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        // tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
+        tableFields.push(tecnologiaHeaderFactory());
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -439,7 +439,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      //filterApplication += `&paramSelect=${camposGerenciados}`;
+      // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await genotipoService.getAll(filterApplication).then((response) => {
@@ -453,28 +453,28 @@ export default function Listagem({
           console.log(row.tecnologia);
           row.cod_tec = row.tecnologia?.cod_tec;
           row.tecnologia = row.tecnologia?.name;
-          //row.DT = new Date();
-          
-          let dataExp = new Date();
-          let hours:string;
+          // row.DT = new Date();
+
+          const dataExp = new Date();
+          let hours: string;
           let minutes: string;
           let seconds: string;
-          if(String(dataExp.getHours()).length == 1){
-            hours = "0" + String(dataExp.getHours()); 
+          if (String(dataExp.getHours()).length == 1) {
+            hours = `0${String(dataExp.getHours())}`;
           } else {
             hours = String(dataExp.getHours());
           }
-          if(String(dataExp.getMinutes()).length == 1){
-            minutes = "0" + String(dataExp.getMinutes());
+          if (String(dataExp.getMinutes()).length == 1) {
+            minutes = `0${String(dataExp.getMinutes())}`;
           } else {
             minutes = String(dataExp.getMinutes());
           }
-          if(String(dataExp.getSeconds()).length == 1){
-            seconds = "0" + String(dataExp.getSeconds());
+          if (String(dataExp.getSeconds()).length == 1) {
+            seconds = `0${String(dataExp.getSeconds())}`;
           } else {
             seconds = String(dataExp.getSeconds());
           }
-          row.DT = dataExp.toLocaleDateString('pt-BR') + " " + hours  + ":" + minutes + ":" + seconds;
+          row.DT = `${dataExp.toLocaleDateString('pt-BR')} ${hours}:${minutes}:${seconds}`;
           return row;
         });
 

@@ -71,17 +71,16 @@ export class GenotypeTreatmentController {
               name_genotipo: true,
               gmr: true,
               bgm: true,
-              lote: {
-                select: {
-                  cod_lote: true,
-                  fase: true,
-                },
-              },
               tecnologia: {
                 select: {
                   cod_tec: true,
                 },
               },
+            },
+          },
+          lote: {
+            select: {
+              ncc: true,
             },
           },
           assay_list: {
@@ -96,7 +95,6 @@ export class GenotypeTreatmentController {
           },
           treatments_number: true,
           status: true,
-          nca: true,
           comments: true,
         };
       }
@@ -109,12 +107,20 @@ export class GenotypeTreatmentController {
         parameters.id_assay_list = Number(options.id_assay_list);
       }
 
+      if (options.treatments_number) {
+        parameters.treatments_number = Number(options.treatments_number);
+      }
+
+      if (options.gli) {
+        parameters.assay_list = (JSON.parse(`{"gli": {"contains": "${options.gli}" } }`));
+      }
+
       if (options.name_genotipo) {
         parameters.genotipo = (JSON.parse(`{"name_genotipo": {"contains": "${options.name_genotipo}" } }`));
       }
 
       if (options.nca) {
-        parameters.nca = options.nca;
+        parameters.lote = (JSON.parse(`{"ncc": ${Number(options.nca)} }`));
       }
 
       if (options.status) {
