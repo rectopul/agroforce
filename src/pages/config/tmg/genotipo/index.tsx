@@ -22,7 +22,6 @@ import {
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
