@@ -431,7 +431,8 @@ export default function Listagem({
 
 		await userService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
-				/*const newData = users.map((row: { avatar: any; status: any }) => {
+				/*
+				const newData = users.map((row: { avatar: any; status: any }) => {
 					delete row.avatar;
 
 					if (row.status === 0) {
@@ -441,7 +442,8 @@ export default function Listagem({
 					}
 
 					return row;
-				});*/
+				});
+				*/
 
 				const dataExcel: any = response.response;
 				dataExcel.forEach(function (line:any) {
