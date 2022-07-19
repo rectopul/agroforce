@@ -8,11 +8,13 @@ export class GenotypeTreatmentController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
-    let select: any = [];
     parameters.AND = [];
     try {
       if (options.filterStatus) {
-        parameters.status = JSON.parse(`{ "contains":"${options.filterStatus}" }`);
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
+        parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[1]}" } } }`));
       }
       if (options.filterNca) {
         parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
@@ -48,57 +50,40 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] !== 'genotipoName'
-            && objSelect[item] !== 'genotipoGmr'
-            && objSelect[item] !== 'genotipoBgm'
-            && objSelect[item] !== 'genotipoName'
-            && objSelect[item] !== 'fase'
-            && objSelect[item] !== 'cod_tec'
-            && objSelect[item] !== 'cod_lote') {
-            select[objSelect[item]] = true;
-          }
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          id_safra: true,
-          genotipo: {
-            select: {
-              name_genotipo: true,
-              gmr: true,
-              bgm: true,
-              tecnologia: {
-                select: {
-                  cod_tec: true,
-                },
+      const select = {
+        id: true,
+        id_safra: true,
+        genotipo: {
+          select: {
+            name_genotipo: true,
+            gmr: true,
+            bgm: true,
+            tecnologia: {
+              select: {
+                cod_tec: true,
               },
             },
           },
-          lote: {
-            select: {
-              ncc: true,
-            },
+        },
+        lote: {
+          select: {
+            ncc: true,
           },
-          assay_list: {
-            select: {
-              foco: { select: { name: true } },
-              type_assay: { select: { name: true } },
-              tecnologia: { select: { name: true } },
-              gli: true,
-              bgm: true,
-              status: true,
-            },
+        },
+        assay_list: {
+          select: {
+            foco: { select: { name: true } },
+            type_assay: { select: { name: true } },
+            tecnologia: { select: { name: true } },
+            gli: true,
+            bgm: true,
+            status: true,
           },
-          treatments_number: true,
-          status: true,
-          comments: true,
-        };
-      }
-
+        },
+        treatments_number: true,
+        status: true,
+        comments: true,
+      };
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
       }
@@ -143,6 +128,7 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

@@ -103,7 +103,7 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'ENSAIO',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/listas/ensaio',
+        hrefTab: '/listas/ensaios/ensaio',
         data: [
           { labelDropDown: 'Ensaio', hrefDropDown: '/listas/ensaios/ensaio', iconDropDown: <MdDateRange /> },
           { labelDropDown: 'Trat. Genótipo', hrefDropDown: '/listas/ensaios/tratamento-genotipo', iconDropDown: <MdDateRange /> },
