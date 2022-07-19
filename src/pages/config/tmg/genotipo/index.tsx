@@ -450,7 +450,6 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          console.log(row.tecnologia);
           row.cod_tec = row.tecnologia?.cod_tec;
           row.tecnologia = row.tecnologia?.name;
           // row.DT = new Date();

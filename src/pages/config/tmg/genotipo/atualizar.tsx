@@ -101,9 +101,6 @@ export default function Atualizargenotipo({
 
   const router = useRouter();
 
-  console.log("genotipo");
-  console.log(genotipo);
-
   const formik = useFormik<IUpdateGenotipo>({
     initialValues: {
       id: genotipo.id,

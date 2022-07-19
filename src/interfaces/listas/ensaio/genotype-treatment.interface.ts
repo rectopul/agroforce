@@ -12,6 +12,8 @@ export interface ITreatment {
 
 export interface ITreatmentGrid {
   allTreatments: ITreatment[];
+  assaySelect: Array<Object>;
+  genotypeSelect: Array<Object>;
   totalItems: number;
   idAssayList: number;
   idSafra: number | any

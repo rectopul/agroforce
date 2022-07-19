@@ -19,7 +19,6 @@ export class ImportGenotypeTreatmentController {
   static async validate({
     spreadSheet, createdBy,
   }: ImportValidate): Promise<IReturnObject> {
-    console.log(spreadSheet);
     const genotipoController = new GenotipoController();
     const loteController = new LoteController();
     const assayListController = new AssayListController();

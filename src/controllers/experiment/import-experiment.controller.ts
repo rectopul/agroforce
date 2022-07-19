@@ -22,7 +22,6 @@ export class ImportExperimentController {
   static async validate({
     idLog, spreadSheet, idSafra, idCulture, createdBy,
   }: ImportValidate): Promise<IReturnObject> {
-    console.log(spreadSheet);
     const safraController = new SafraController();
     const localController = new LocalController();
     const delineamentoController = new DelineamentoController();
