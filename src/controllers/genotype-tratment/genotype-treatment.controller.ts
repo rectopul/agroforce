@@ -170,7 +170,6 @@ export class GenotypeTreatmentController {
       if (!response) return { status: 404, response, message: 'Tratamentos do genótipo não existente' };
 
       await this.genotypeTreatmentRepository.update(data.id, data);
-
       return { status: 200, message: 'Tratamentos do genótipo atualizado' };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'Update', error.message);
