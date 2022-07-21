@@ -282,15 +282,41 @@ export default function Listagem({
 	}
 
 	const downloadExcel = async (): Promise<void> => {
+		//console.log(filters);
 		if (!filterApplication.includes('paramSelect')) {
-			filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${id_culture}`;
+			//filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${id_culture}`;
 		}
+		//console.log("filters");
+		/*if(filterName){
+			filterApplication += `&filterName=${filterName}&id_culture=${id_culture}`;
+		} else {
+			filterApplication += `&id_culture=${id_culture}`;
+		}*/
+		//console.log(filterApplication);
 
-		await tecnologiaService.getAll(filterApplication).then((response) => {
+		await tecnologiaService.getAll(filtersParams).then((response) => {
 			if (response.status === 200) {
 				const newData = response.response.map((row: any) => {
-					row.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-					row.DT = new Date();
+					row.status = (row.status === 0) ? 'Inativo' : 'Ativo';          const dataExp = new Date();
+					let hours: string;
+					let minutes: string;
+					let seconds: string;
+					if (String(dataExp.getHours()).length == 1) {
+					  hours = `0${String(dataExp.getHours())}`;
+					} else {
+					  hours = String(dataExp.getHours());
+					}
+					if (String(dataExp.getMinutes()).length == 1) {
+					  minutes = `0${String(dataExp.getMinutes())}`;
+					} else {
+					  minutes = String(dataExp.getMinutes());
+					}
+					if (String(dataExp.getSeconds()).length == 1) {
+					  seconds = `0${String(dataExp.getSeconds())}`;
+					} else {
+					  seconds = String(dataExp.getSeconds());
+					}
+					row.DT = `${dataExp.toLocaleDateString('pt-BR')} ${hours}:${minutes}:${seconds}`;
 					return row;
 				});
 
@@ -370,7 +396,7 @@ export default function Listagem({
                   pb-2
                 "
 								>
-									<div className="h-10 w-1/2 ml-4">
+									<div className="h-10 w-1/2 ml-4" style={{display:"none"}}>
 										<label className="block text-gray-900 text-sm font-bold mb-2">
 											Status
 										</label>

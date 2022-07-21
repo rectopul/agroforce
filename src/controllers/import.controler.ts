@@ -84,7 +84,7 @@ export class ImportController {
       return { status: 200, message: 'ainda não há configuração de planilha para esse modulo!' };
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!1';
     }
   }
 
@@ -101,7 +101,7 @@ export class ImportController {
       return { status: 400, message: 'erro' };
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!2';
     }
   }
 
@@ -168,14 +168,19 @@ export class ImportController {
           return await ImportGenotypeTreatmentController.validate(data);
         }
 
+        console.log("check data");
+        console.log(data);
+
         const { status, responseLog, message }: any = await this.logImportController.create({
           user_id: data.createdBy, status: 2, table: data.table,
         });
-        console.log(responseLog);
-        if (responseLog.status === 400) {
-          return {
-            status: 200, message: responseLog.message, error: true,
-          };
+
+        if(responseLog){
+          if (responseLog.status === 400) {
+            return {
+              status: 200, message: responseLog.message, error: true,
+            };
+          }
         }
 
         let response: any;
@@ -281,13 +286,17 @@ export class ImportController {
             erro = true;
           }
         }
-
-        await this.logImportController.update({ id: responseLog.response.id, status: 1 });
+        console.log("responseLogaki");
+        if(responseLog){
+          if(responseLog.response){
+            await this.logImportController.update({ id: responseLog.response.id, status: 1 });
+          }
+        }
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!3';
     }
   }
 
@@ -536,7 +545,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!4';
     }
 
     return false;
@@ -550,9 +559,16 @@ export class ImportController {
       const configModule: object | any = await this.getAll(Number(moduleId));
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
+          console.log("data spreadsheet");
+          console.log(spreadSheet[row][column]);
           if (row === '0') {
-            if (!(spreadSheet[row][column].toUpperCase()).includes(configModule.response[0].fields[column].toUpperCase())) {
-              responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a sequencia de colunas da planilha esta incorreta. </li> <br>`;
+            if(spreadSheet[row][column] && configModule.response[0].fields[column]){
+              console.log("->");
+              console.log(spreadSheet[row][column]);
+              console.log(configModule.response[0].fields[column]);
+              if (!(spreadSheet[row][column].toUpperCase()).includes(configModule.response[0].fields[column].toUpperCase())) {
+                responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a sequencia de colunas da planilha esta incorreta. </li> <br>`;
+              }
             }
           } else if (column === '0') {
             if (spreadSheet[row][column] === null) {
@@ -563,36 +579,51 @@ export class ImportController {
               // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
             } else {
-              const technology = await this.tecnologiaController.getAll({ id_culture, cod_tec: (spreadSheet[row][0].toString()) });
+              /*const technology = await this.tecnologiaController.getAll({ id_culture, cod_tec: (spreadSheet[row][0].toString()) });
               if (technology.response?.length > 0) {
                 responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, tecnologia já cadastrada nessa cultura. </li> <br>`;
-              }
+              }*/
             }
           } else if (column === '1') {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Nome da tecnologia é obrigatório. </li> <br>`;
             }
           } else if (column === '3') {
+            console.log('code_tec');
+            console.log(column);
+            console.log(spreadSheet[row][column]);
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Cultura é obrigatório. </li> <br>`;
             } else {
               const cultureExist = await this.culturaController.getAllCulture({ name: spreadSheet[row][column] });
-              if (cultureExist.response?.length === 0) {
-                responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura não esta cadastrada. </li> <br>`;
-              } else {
-                const cultureSeleciona = await this.culturaController.getOneCulture(id_culture);
-                if (cultureSeleciona.response?.name !== spreadSheet[row][column]) {
-                  responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura e diferente da cultura selecionada. </li> <br>`;
+              if(cultureExist){
+                if(cultureExist.response){
+                  if (cultureExist.response?.length === 0) {
+                    responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura não esta cadastrada. (`+spreadSheet[row][column]+`) </li> <br>`;
+                  } else {
+                    const cultureSeleciona = await this.culturaController.getOneCulture(id_culture);
+                    if(cultureSeleciona){
+                      if(cultureSeleciona.response){
+                        if (cultureSeleciona.response?.name !== spreadSheet[row][column]) {
+                          responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a cultura e diferente da cultura selecionada. (`+spreadSheet[row][column]+`) </li> <br>`;
+                        }
+                      }
+                    }
+                  }
                 }
-              }
+              }           
             }
           } else if (column === '4') {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o campo Cultura é obrigatório. </li> <br>`;
             } else {
               const tec: any = await this.tecnologiaController.getAll({ id_culture, cod_tec: this.aux.cod_tec });
-              if (tec.response[0].dt_import > spreadSheet[row][column]) {
-                responseIfError[Number(column)] = `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, essa informação é mais antiga do que a informação do software`;
+              if(tec){
+                if(tec.response){
+                  if (tec.response[0].dt_import > spreadSheet[row][column]) {
+                    responseIfError[Number(column)] = `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, essa informação é mais antiga do que a informação do software`;
+                  }
+                }
               }
             }
           }
@@ -606,14 +637,33 @@ export class ImportController {
               const { response } = await this.culturaController.getAllCulture({
                 name: spreadSheet[row][3],
               });
-              await this.tecnologiaController.create({
-                id_culture: response[0]?.id,
-                name: spreadSheet[row][1],
-                cod_tec: (spreadSheet[row][0].toString()),
-                desc: spreadSheet[row][2],
-                created_by: 23,
-                dt_import: spreadSheet[row][4],
-              });
+              const technology = await this.tecnologiaController.getAll({ id_culture, cod_tec: (spreadSheet[row][0].toString()) });
+              console.log("find tech");
+              console.log(technology);
+              if(technology){
+                if(technology.response){
+                  if(technology.response.length > 0){
+                  await this.tecnologiaController.update({
+                    id: technology.response[0].id,
+                    id_culture: response[0]?.id,
+                    name: spreadSheet[row][1],
+                    cod_tec: (spreadSheet[row][0].toString()),
+                    desc: spreadSheet[row][2],
+                    createdBy: created_by,
+                    dt_import: spreadSheet[row][4],
+                  });
+                } else {
+                  await this.tecnologiaController.create({
+                    id_culture: response[0]?.id,
+                    name: spreadSheet[row][1],
+                    cod_tec: (spreadSheet[row][0].toString()),
+                    desc: spreadSheet[row][2],
+                    createdBy: created_by,
+                    dt_import: spreadSheet[row][4],
+                  });
+                }
+                }
+              }
             }
           }
           return 'save';
@@ -960,7 +1010,7 @@ export class ImportController {
                           count_trat_ant = count_trat;
                           count_trat = tratamento_anterior;
                           if (count_trat != count_trat_ant) {
-                            responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
+                            //responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                           }
                         }
                       }
@@ -969,7 +1019,7 @@ export class ImportController {
 
                     if (data.spreadSheet.length == Line) {
                       if (data.spreadSheet[keySheet][sheet] != count_trat) {
-                        responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
+                        //responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve ser igual para todas repetições.</li><br>`;
                       }
                     }
 
@@ -979,7 +1029,7 @@ export class ImportController {
                         responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, O número de tratamento deve iniciar com 1.</li><br>`;
                       }
                     } else if (tratamento_anterior >= data.spreadSheet[keySheet][sheet]) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,A coluna de tratamento deve está em ordem crescente para cada repetição..</li><br>`;
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna de tratamento deve estar em ordem crescente para cada repetição.</li><br>`;
                     } else {
                       tratamento_anterior = data.spreadSheet[keySheet][sheet];
                     }
@@ -1020,6 +1070,7 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
+              //console.log
               if (configModule.response[0].fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
                   name_anterior = data.spreadSheet[keySheet][sheet];
@@ -1074,9 +1125,8 @@ export class ImportController {
                   });
                   aux.id_delineamento = delineamento.response.id;
                   delimit = 1;
-                } else {
-                  await this.sequenciaDelineamentoController.create(aux);
                 }
+                await this.sequenciaDelineamentoController.create(aux);
               }
             }
           }
@@ -1087,7 +1137,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!5';
     }
     return 'save';
   }
@@ -1574,7 +1624,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!6';
     }
   }
 
@@ -1671,7 +1721,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!7';
     }
   }
 
@@ -1680,6 +1730,8 @@ export class ImportController {
   }: object | any) {
     const responseIfError: any = [];
     try {
+      console.log("spreadsheet");
+      console.log(spreadSheet);
       const configModule: object | any = await this.getAll(Number(moduleId));
       configModule.response[0].fields.push('DT');
       for (const row in spreadSheet) {
@@ -2287,7 +2339,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!8';
     }
   }
 
@@ -2620,7 +2672,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!9';
     }
   }
 
@@ -3200,7 +3252,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!';
+      return 'Houve um erro, tente novamente mais tarde!10';
     }
   }
 }

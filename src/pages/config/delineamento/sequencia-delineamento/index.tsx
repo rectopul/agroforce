@@ -350,9 +350,12 @@ export default function Listagem({
 	}
 
 	const downloadExcel = async (): Promise<void> => {
+		console.log(filterApplication);
 		if (!filterApplication.includes('paramSelect')) {
-			filterApplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
+			//filterApplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
 		}
+		filterApplication += `&id_delineamento=${id_delineamento}`;
+		filterApplication = filterApplication.replace("take=", "&");
 
 		await sequenciaDelineamentoService.getAll(filterApplication).then((response) => {
 			if (response.status === 200) {
