@@ -17,7 +17,7 @@ export const genotipoService = {
   update,
   getAll,
   create,
-  list
+  list,
 };
 
 async function create(data: any) {

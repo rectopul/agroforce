@@ -8,7 +8,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/user/preferences`;
 export const userPreferencesService = {
   getAll,
   create,
-  update
+  update,
 };
 
 function create(data: any) {

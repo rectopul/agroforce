@@ -10,10 +10,10 @@ interface IEpoca {
   name: string;
   status?: number;
   created_by: number;
-};
+}
 
-type ICreateEpoca = Omit<IEpoca, "id" | "status">;
-type IUpdateEpoca = Omit<IEpoca, "id_culture" | "created_by">;
+type ICreateEpoca = Omit<IEpoca, 'id' | 'status'>;
+type IUpdateEpoca = Omit<IEpoca, 'id_culture' | 'created_by'>;
 
 export const epocaService = {
   update,

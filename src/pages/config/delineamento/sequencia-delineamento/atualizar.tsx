@@ -1,6 +1,6 @@
 import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -12,12 +12,9 @@ import Swal from 'sweetalert2';
 import {
   Button,
   Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
-
-
-
 
 export interface IUpdateSequenciaDelineamento {
   id: number;
@@ -26,7 +23,7 @@ export interface IUpdateSequenciaDelineamento {
   sorteio: number;
   nt: number;
   bloco: number;
-};
+}
 
 export default function Cultura(item: IUpdateSequenciaDelineamento) {
   const { TabsDropDowns } = ITabs.default;
@@ -67,7 +64,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
           Swal.fire('Cultura atualizada com sucesso');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -76,10 +73,10 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
     }
   }
@@ -90,7 +87,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
         <title>Atualizar cultura</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -103,7 +100,8 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
           gap-2
           mt-4
           mb-4
-        ">
+        "
+          >
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código
@@ -147,7 +145,8 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
             gap-2
             mt-10
             mb-4
-          ">
+          "
+          >
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
@@ -198,7 +197,8 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
             gap-3
             justify-center
             mt-16
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -229,17 +229,17 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
-  const api = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+  const api = await fetch(`${baseUrl}/${context.query.id}`, requestOptions);
 
   const item = await api.json();
 
-  return { props: item }
-}
+  return { props: item };
+};

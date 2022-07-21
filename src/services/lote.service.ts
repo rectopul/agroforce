@@ -1,7 +1,6 @@
 import getConfig from 'next/config';
 import { fetchWrapper } from '../helpers';
 
-
 interface CreateLoteDTO {
   id_genotipo: number;
   name: string;
@@ -23,7 +22,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
 export const loteService = {
   getAll,
   create,
-  update
+  update,
 };
 
 async function create(data: CreateLoteDTO) {

@@ -1,26 +1,27 @@
-import Head from "next/head";
-import { FaHandPointLeft } from "react-icons/fa";
-import { Content } from "src/components";
-import { PDFExport } from "@progress/kendo-react-pdf";
-import { useRef } from "react";
+import Head from 'next/head';
+import { FaHandPointLeft } from 'react-icons/fa';
+import { Content } from 'src/components';
+import { PDFExport } from '@progress/kendo-react-pdf';
+import { useRef } from 'react';
 
 export default function Etiqueta() {
-
-  const pdfExportComponent: any = useRef(null)
+  const pdfExportComponent: any = useRef(null);
   const exportPDF = () => {
-    pdfExportComponent.current.save()
-  }
+    pdfExportComponent.current.save();
+  };
 
   return (
     <>
       <Head>Etiqueta</Head>
-      <PDFExport ref={pdfExportComponent} fileName="etiqueta1_600x260" paperSize={'A4'}>
+      <PDFExport ref={pdfExportComponent} fileName="etiqueta1_600x260" paperSize="A4">
         <div className="flex gap-16 mt-24">
           <div className="w-[600px] h-[260px]">
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">1B</strong>
             </div>
@@ -31,7 +32,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT325SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">4B</strong>
             </div>
@@ -42,7 +45,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">5B</strong>
             </div>
@@ -53,7 +58,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">5B</strong>
             </div>
@@ -64,7 +71,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">5B</strong>
             </div>
@@ -75,7 +84,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">5B</strong>
             </div>
@@ -86,7 +97,9 @@ export default function Etiqueta() {
             <div className="w-full h-full text-4xl">
               <span className="absolute mt-10">MT405SS02</span>
               <FaHandPointLeft className="flex ml-auto h-32 w-32" />
-              <span>SEQ-P</span> <br />
+              <span>SEQ-P</span>
+              {' '}
+              <br />
               <span> QM123_VG-2L</span>
               <strong className="pl-60 mb-16 text-8xl">5B</strong>
             </div>
@@ -95,20 +108,17 @@ export default function Etiqueta() {
       </PDFExport>
       <button onClick={exportPDF} className="bnt mt-52"> Teste </button>
     </>
-  )
+  );
 }
 
-//A4 PAPER BY CALCULATOR
-{/* <div className="w-full h-full text-8xl p-4">
+// A4 PAPER BY CALCULATOR
+{ /* <div className="w-full h-full text-8xl p-4">
             <span className="absolute mt-14">MT405SS02</span> <FaHandPointLeft className="flex ml-auto h-72 w-72" />
             <span>SEQ-P</span> <br />
             <span>QM123_VG-2L</span> <strong className="pl-32 mb-16 text-[250px]">3B</strong>
-          </div> */}
+          </div> */ }
 
-
-
-
-{/* <div className="h-[1260px] w-[384px] flex item-align-left ">
+{ /* <div className="h-[1260px] w-[384px] flex item-align-left ">
             <table className="w-96">
               <tbody>
                 <tr>
@@ -161,9 +171,9 @@ export default function Etiqueta() {
                 </tr>
               </tbody>
             </table>
-          </div> */}
+          </div> */ }
 
-{/* <table>
+{ /* <table>
             <tbody>
               <tr>
                 <td>
@@ -172,7 +182,7 @@ export default function Etiqueta() {
                     <span>SEQ-P</span> <br />
                     <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
                   </div>
-                </td>                
+                </td>
               </tr>
               <tr>
                 <td>
@@ -181,7 +191,7 @@ export default function Etiqueta() {
                     <span>SEQ-P</span> <br />
                     <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
                   </div>
-                </td>                
+                </td>
               </tr>
               <tr>
                 <td>
@@ -190,7 +200,7 @@ export default function Etiqueta() {
                     <span>SEQ-P</span> <br />
                     <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
                   </div>
-                </td>                
+                </td>
               </tr>
               <tr>
                 <td>
@@ -199,7 +209,7 @@ export default function Etiqueta() {
                     <span>SEQ-P</span> <br />
                     <span>QM123_VG-2L</span> <strong className="pl-36 mb-16 text-6xl">3B</strong>
                   </div>
-                </td>          
+                </td>
               </tr>
             </tbody>
-          </table> */}
+          </table> */ }

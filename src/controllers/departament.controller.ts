@@ -106,8 +106,6 @@ export class DepartamentController {
 
   async getOneDepartament({ id }: FindOne) {
     try {
-
-
       const response = await this.departamentRepository.findOne(id);
 
       if (!response) throw new Error('Setor não encontrado');

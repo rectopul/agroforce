@@ -1,28 +1,26 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { DepartamentController } from '../../../controllers/departament.controller';
 import { apiHandler } from '../../../helpers/api';
 
+export default apiHandler(handler);
 
-export default  apiHandler(handler);
-
- async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const departamentController =  new DepartamentController();
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const departamentController = new DepartamentController();
 
   switch (req.method) {
     case 'GET':
       const result = await departamentController.listAllDepartments(req.query);
       res.status(200).json(result);
-      break
+      break;
     case 'POST':
       const resultPost = await departamentController.postDepartament(req.body);
       res.status(201).json(resultPost);
-      break
+      break;
     case 'PUT':
       const resultPut = await departamentController.updateDepartament(req.body);
       res.status(200).json(resultPut);
-      break
+      break;
     default:
-      res.status(405).end(`Method ${req.method} Not Allowed`)
+      res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

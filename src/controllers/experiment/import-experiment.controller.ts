@@ -289,7 +289,7 @@ export class ImportExperimentController {
                   eel: spreadSheet[row][13],
                   comments,
                   orderDraw: spreadSheet[row][15],
-                  created_by: created_by,
+                  created_by,
                 },
               );
             }

@@ -1,16 +1,18 @@
-import Head from "next/head";
-import readXlsxFile from 'read-excel-file'
-import { importService } from "src/services/";
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { Button, Content, Input, Select } from "../../../../components";
+import Head from 'next/head';
+import readXlsxFile from 'read-excel-file';
+import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
-import { useFormik } from "formik";
-import { FiUserPlus } from "react-icons/fi";
-import React from "react";
-import { IoMdArrowBack } from "react-icons/io";
+import { useFormik } from 'formik';
+import { FiUserPlus } from 'react-icons/fi';
+import React from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import {
+  Button, Content, Input, Select,
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function Importar({ safra }: any) {
   const { TabsDropDowns } = ITabs.default;
@@ -18,7 +20,7 @@ export default function Importar({ safra }: any) {
   const safras: object | any = [];
   safra.map((value: string | object | any) => {
     safras.push({ id: value.safraName, name: value.safraName });
-  })
+  });
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -28,30 +30,32 @@ export default function Importar({ safra }: any) {
       : tab.statusTab = false
   ));
   function readExcel(value: any) {
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ table: 'quadra', spreadSheet: rows, moduleId: 17, safra: userLogado.safras.safra_selecionada, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id }).then((response) => {
+      importService.validate({
+        table: 'quadra', spreadSheet: rows, moduleId: 17, safra: userLogado.safras.safra_selecionada, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id,
+      }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
-            width: "900"
+            width: '900',
           });
           if (!response.erro) {
             router.back();
           }
         }
       });
-    })
+    });
   }
 
   const formik = useFormik<any>({
     initialValues: {
       input: [],
-      genotipo: ''
+      genotipo: '',
     },
     onSubmit: async (values) => {
-      let inputFile: any = document.getElementById("inputFile");
+      const inputFile: any = document.getElementById('inputFile');
       readExcel(inputFile.files);
     },
   });
@@ -60,18 +64,19 @@ export default function Importar({ safra }: any) {
       <Head>
         <title>Importação Genótipo</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive={'config'}>
+      <Content contentHeader={TabsDropDowns()} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
-                flex 
+                flex
                 justify-around
                 gap-6
                 mt-4
                 mb-4
-            ">
+            "
+          >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Excel
@@ -90,7 +95,8 @@ export default function Importar({ safra }: any) {
               gap-3
               justify-center
               mt-10
-            ">
+            "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -118,13 +124,12 @@ export default function Importar({ safra }: any) {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { publicRuntimeConfig } = getConfig();
-  const token = req.cookies.token;
-  const cultureId = req.cookies.cultureId;
+  const { token } = req.cookies;
+  const { cultureId } = req.cookies;
 
-  let param = `filterStatus=1&id_culture=${cultureId}`;
+  const param = `filterStatus=1&id_culture=${cultureId}`;
 
   const urlParametersSafra: any = new URL(`${publicRuntimeConfig.apiUrl}/safra`);
   urlParametersSafra.search = new URLSearchParams(param).toString();
@@ -132,12 +137,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiSafra = await fetch(urlParametersSafra.toString(), requestOptions);
   let safra: any = await apiSafra.json();
 
   safra = safra.response;
-  return { props: { safra } }
-}
+  return { props: { safra } };
+};

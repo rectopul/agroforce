@@ -59,7 +59,7 @@ export default function TipoEnsaio({
     || { id: 0, table_preferences: 'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action' };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const [treatments, setTreatments] = useState<ITreatment[]>();
+  const [treatments, setTreatments] = useState<ITreatment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -234,12 +234,12 @@ export default function TipoEnsaio({
   function idHeaderFactory() {
     return {
       title:
-        <div className="h-10 flex">
-          <Checkbox1
-            onChange={setAllCheck}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
-          />
-        </div>,
+  <div className="h-10 flex">
+    <Checkbox1
+      onChange={setAllCheck}
+      sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+    />
+  </div>,
       field: 'id',
       sorting: false,
       width: 0,

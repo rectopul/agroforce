@@ -1,13 +1,13 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { SiMicrogenetics } from "react-icons/si";
-import { Button, Content, Input } from "src/components";
-import { genotipoService } from "src/services";
-import Swal from "sweetalert2";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { SiMicrogenetics } from 'react-icons/si';
+import { Button, Content, Input } from 'src/components';
+import { genotipoService } from 'src/services';
+import Swal from 'sweetalert2';
 import * as ITabs from '../../../shared/utils/dropdown';
 
 export interface ICreateGenotipo {
@@ -32,8 +32,7 @@ export default function Cadastro() {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ICreateGenotipo>({
@@ -56,7 +55,7 @@ export default function Cadastro() {
           Swal.fire('Genótipo cadastrado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -69,7 +68,7 @@ export default function Cadastro() {
         <title>Cadastro de genótipo</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -112,7 +111,8 @@ export default function Cadastro() {
           gap-3
           justify-center
           mt-14
-        ">
+        "
+          >
             <div className="w-30">
               <Button
                 type="button"

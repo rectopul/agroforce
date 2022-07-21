@@ -1,4 +1,4 @@
-import { BsCheckLg } from "react-icons/bs";
+import { BsCheckLg } from 'react-icons/bs';
 
 const tabs = [
   { title: 'TMG', value: <BsCheckLg />, status: false },

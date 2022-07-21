@@ -14,11 +14,11 @@ interface ISequenciaDelineamento {
 }
 
 type ICreateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id" | "status"
+  ISequenciaDelineamento, 'id' | 'status'
 >;
 
 type IUpdateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id_delineamento" | "status" | "created_by"
+  ISequenciaDelineamento, 'id_delineamento' | 'status' | 'created_by'
 >;
 
 const { publicRuntimeConfig } = getConfig();
@@ -42,7 +42,7 @@ async function update(data: IUpdateSequenciaDelineamento) {
 }
 
 async function getAll(parameters: any) {
-  const genotipo = await fetchWrapper.get(baseUrl + '/list', parameters);
+  const genotipo = await fetchWrapper.get(`${baseUrl}/list`, parameters);
   return genotipo;
 }
 

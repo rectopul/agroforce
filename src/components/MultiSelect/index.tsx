@@ -14,7 +14,7 @@ interface IMultiSelect {
 export function MultiSelect(props: IMultiSelect) {
   return (
     <div className="control-styles">
-      <h4 className='block text-gray-900 text-sm font-bold mb-2'>
+      <h4 className="block text-gray-900 text-sm font-bold mb-2">
         {props.title}
       </h4>
       <div>

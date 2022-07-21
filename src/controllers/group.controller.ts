@@ -1,122 +1,117 @@
 import handleError from 'src/shared/utils/handleError';
-import { number, object, SchemaOf, string } from 'yup';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 import { GroupRepository } from '../repository/group.repository';
 
 export class GroupController {
-	public readonly required = 'Campo obrigatório';
+  public readonly required = 'Campo obrigatório';
 
-	groupRepository = new GroupRepository();
+  groupRepository = new GroupRepository();
 
-	async getOne({ id }: any) {
-		try {
-			const response = await this.groupRepository.findById(id);
+  async getOne({ id }: any) {
+    try {
+      const response = await this.groupRepository.findById(id);
 
-			if (!response) throw new Error('Grupo não encontrado');
+      if (!response) throw new Error('Grupo não encontrado');
 
-			return { status: 200, response };
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Grupo controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Grupo erro');
+    }
+  }
 
-		} catch (error: any) {
-			handleError('Grupo controller', 'GetOne', error.message)
-			throw new Error("[Controller] - GetOne Grupo erro")
-		}
-	}
+  async create(data: any) {
+    try {
+      const groupAlreadyExists = await this.groupRepository.findByData(data);
 
-	async create(data: any) {
-		try {
-			
+      if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
-			const groupAlreadyExists = await this.groupRepository.findByData(data);
+      await this.groupRepository.create(data);
 
-			if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
+      return { status: 201, message: 'grupo cadastrado' };
+    } catch (error: any) {
+      handleError('Grupo controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Grupo erro');
+    }
+  }
 
-			await this.groupRepository.create(data);
+  async update(data: any) {
+    try {
+      const group: any = await this.groupRepository.findById(data.id);
 
-			return { status: 201, message: 'grupo cadastrado' };
-		} catch (error: any) {
-			handleError('Grupo controller', 'Create', error.message)
-			throw new Error("[Controller] - Create Grupo erro")
-		}
-	}
+      if (!group) return { status: 400, message: 'grupo não existente' };
 
-	async update(data: any) {
-		try {
-			
+      await this.groupRepository.update(data.id, data);
 
-			const group: any = await this.groupRepository.findById(data.id);
+      return { status: 200, message: 'grupo atualizado' };
+    } catch (error: any) {
+      handleError('Grupo controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Grupo erro');
+    }
+  }
 
-			if (!group) return { status: 400, message: 'grupo não existente' };
+  async listAll(options: any) {
+    const parameters: object | any = {};
+    let select: any = [];
+    try {
+      if (options.filterStatus) {
+        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+      }
 
-			await this.groupRepository.update(data.id, data);
+      if (options.paramSelect) {
+        const objSelect = options.paramSelect.split(',');
+        Object.keys(objSelect).forEach((item) => {
+          select[objSelect[item]] = true;
+        });
+        select = { ...select };
+      } else {
+        select = {
+          id: true,
+          id_safra: true,
+          id_foco: true,
+          foco: { select: { name: true } },
+          safra: { select: { safraName: true } },
+          npe: { select: { id: true } },
+          group: true,
+          status: true,
+        };
+      }
 
-			return { status: 200, message: 'grupo atualizado' };
-		} catch (error: any) {
-			handleError('Grupo controller', 'Update', error.message)
-			throw new Error("[Controller] - Update Grupo erro")
-		}
-	}
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
 
-	async listAll(options: any) {
-		const parameters: object | any = {};
-		let select: any = [];
-		try {
-			if (options.filterStatus) {
-				if (options.filterStatus != 2)
-					parameters.status = Number(options.filterStatus);
-			}
+      if (options.id_foco) {
+        parameters.id_foco = Number(options.id_foco);
+      }
 
-			if (options.paramSelect) {
-				const objSelect = options.paramSelect.split(',');
-				Object.keys(objSelect).forEach((item) => {
-					select[objSelect[item]] = true;
-				});
-				select = Object.assign({}, select);
-			} else {
-				select = {
-					id: true,
-					id_safra: true,
-					id_foco: true,
-					foco: { select: { name: true } },
-					safra: { select: { safraName: true } },
-					npe: { select: { id: true } },
-					group: true,
-					status: true
-				};
-			}
+      const take = (options.take) ? Number(options.take) : undefined;
 
-			if (options.id_safra) {
-				parameters.id_safra = Number(options.id_safra);
-			}
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
-			if (options.id_foco) {
-				parameters.id_foco = Number(options.id_foco);
-			}
+      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-			const take = (options.take) ? Number(options.take) : undefined;
+      const response: object | any = await this.groupRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
-			const skip = (options.skip) ? Number(options.skip) : undefined;
+      response.map((item: any) => {
+        item.group = (item.group.toString()).length > 1 ? item.group : `0${item.group.toString()}`;
+      });
 
-			const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
-			const response: object | any = await this.groupRepository.findAll(
-				parameters,
-				select,
-				take,
-				skip,
-				orderBy
-			);
-
-			response.map((item: any) => {
-				item.group = (item.group.toString()).length > 1 ? item.group : '0' + item.group.toString()
-			})
-
-			if (!response || response.total <= 0) {
-				return { status: 400, response: [], total: 0 };
-			} else {
-				return { status: 200, response, total: response.total };
-			}
-		} catch (error: any) {
-			handleError('Grupo controller', 'GetAll', error.message)
-			throw new Error("[Controller] - GetAll Grupo erro")
-		}
-	}
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 };
+      }
+      return { status: 200, response, total: response.total };
+    } catch (error: any) {
+      handleError('Grupo controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Grupo erro');
+    }
+  }
 }

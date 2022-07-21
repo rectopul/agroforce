@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next';
 import { UserController } from '../../../controllers/user.controller';
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -7,7 +7,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     id,
     currentPassword,
     password,
-    confirmPassword
+    confirmPassword,
   } = req.body;
 
   const userController = new UserController();
@@ -21,11 +21,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       Number(id),
       currentPassword,
       password,
-      confirmPassword
+      confirmPassword,
     );
-  
+
     res.status(200).json(result);
-  } catch  {
+  } catch {
     res.status(405).end({ message: req.method });
   }
-}
+};

@@ -1,43 +1,45 @@
-import Head from "next/head";
-import readXlsxFile from 'read-excel-file'
-import { importService } from "src/services/";
-import * as ITabs from '../../../../../shared/utils/dropdown';
-import { Button, Content, Input } from "../../../../../components";
+import Head from 'next/head';
+import readXlsxFile from 'read-excel-file';
+import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
-import { useFormik } from "formik";
-import { FiUserPlus } from "react-icons/fi";
-import React from "react";
-import { IoMdArrowBack } from "react-icons/io";
+import { useFormik } from 'formik';
+import { FiUserPlus } from 'react-icons/fi';
+import React from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
+import { Button, Content, Input } from '../../../../../components';
+import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export default function Importar() {
   const { TabsDropDowns } = ITabs;
   const router = useRouter();
 
   function readExcel(value: any) {
-    const userLogado = JSON.parse(localStorage.getItem("user") as string);
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({ table: 'local', spreadSheet: rows, moduleId: 4, id_safra: userLogado.safras.safra_selecionada, created_by: userLogado.id }).then((response) => {
+      importService.validate({
+        table: 'local', spreadSheet: rows, moduleId: 4, id_safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
+      }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
-            width: "800"
+            width: '800',
           });
           if (!response.erro) {
             router.back();
           }
         }
       });
-    })
+    });
   }
 
   const formik = useFormik<any>({
     initialValues: {
-      input: []
+      input: [],
     },
     onSubmit: async (values) => {
-      const inputFile: any = document.getElementById("inputFile");
+      const inputFile: any = document.getElementById('inputFile');
       readExcel(inputFile.files);
     },
   });
@@ -46,18 +48,19 @@ export default function Importar() {
       <Head>
         <title>Importação Local</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive={'config'}>
+      <Content contentHeader={TabsDropDowns()} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
-                flex 
+                flex
                 justify-around
                 gap-6
                 mt-4
                 mb-4
-            ">
+            "
+          >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Excel
@@ -76,7 +79,8 @@ export default function Importar() {
               gap-3
               justify-center
               mt-10
-            ">
+            "
+          >
             <div className="w-30">
               <Button
                 type="button"

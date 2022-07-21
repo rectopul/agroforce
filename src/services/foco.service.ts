@@ -13,19 +13,19 @@ interface UpdateLoteDTO {
 }
 
 export const focoService = {
-	update,
-	getAll,
-	create,
+  update,
+  getAll,
+  create,
 };
 
 async function create(data: any) {
-	return fetchWrapper.post(baseUrl, data);
+  return fetchWrapper.post(baseUrl, data);
 }
 
 async function update(data: UpdateLoteDTO) {
-	return fetchWrapper.put(baseUrl, data);
+  return fetchWrapper.put(baseUrl, data);
 }
 
 async function getAll(parameters: any) {
-	return fetchWrapper.get(baseUrl, parameters);
+  return fetchWrapper.get(baseUrl, parameters);
 }

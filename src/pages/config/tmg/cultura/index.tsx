@@ -8,18 +8,18 @@ import { useRouter } from 'next/router';
 import { setCookie } from 'nookies';
 import { ReactNode, useEffect, useState } from 'react';
 import {
-	DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import {
-	BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
 import {
-	AccordionFilter, Button, CheckBox, Content, Input, Select,
+  AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from 'src/components';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { cultureService, userPreferencesService } from 'src/services';
@@ -56,462 +56,462 @@ interface IData {
 }
 
 export default function Listagem({
-	allCultures, totalItems, itensPerPage, filterApplication, pageBeforeEdit, filterBeforeEdit,
+  allCultures, totalItems, itensPerPage, filterApplication, pageBeforeEdit, filterBeforeEdit,
 }: IData) {
-	const { TabsDropDowns } = ITabs;
+  const { TabsDropDowns } = ITabs;
 
-	const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns();
 
-	tabsDropDowns.map((tab) => (
-		tab.titleTab === 'TMG'
-			? tab.statusTab = true
-			: tab.statusTab = false
-	));
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'TMG'
+      ? tab.statusTab = true
+      : tab.statusTab = false
+  ));
 
-	const router = useRouter();
-	const userLogado = JSON.parse(localStorage.getItem('user') as string);
-	const preferences = userLogado.preferences.cultura || { id: 0, table_preferences: 'id,name,desc,status' };
-	const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const router = useRouter();
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.cultura || { id: 0, table_preferences: 'id,name,desc,status' };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-	const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
-	const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-	const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-	const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-	const [orderList, setOrder] = useState<number>(1);
-	const [arrowOrder, setArrowOrder] = useState<any>('');
-	const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-	const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-		{
-			name: 'CamposGerenciados[]', title: 'Favorito', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
-		},
-		{
-			name: 'CamposGerenciados[]', title: 'Código Reduzido', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
-		},
-		{
-			name: 'CamposGerenciados[]', title: 'Nome', value: 'desc', defaultChecked: () => camposGerenciados.includes('desc'),
-		},
-		{
-			name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
-		},
-	]);
-	const [filter, setFilter] = useState<any>(filterApplication);
-	const [colorStar, setColorStar] = useState<string>('');
+  const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+  const [orderList, setOrder] = useState<number>(1);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'CamposGerenciados[]', title: 'Favorito', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Código Reduzido', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome', value: 'desc', defaultChecked: () => camposGerenciados.includes('desc'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
+  ]);
+  const [filter, setFilter] = useState<any>(filterApplication);
+  const [colorStar, setColorStar] = useState<string>('');
 
-	const filtersStatusItem = [
-		{ id: 2, name: 'Todos' },
-		{ id: 1, name: 'Ativos' },
-		{ id: 0, name: 'Inativos' },
-	];
+  const filtersStatusItem = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
 
-	const filterStatus = filterBeforeEdit.split('');
+  const filterStatus = filterBeforeEdit.split('');
 
-	const take: number = itensPerPage;
-	const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
-	const pages = Math.ceil(total / take);
+  const take: number = itensPerPage;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const pages = Math.ceil(total / take);
 
-	const columns = columnsOrder(camposGerenciados);
+  const columns = columnsOrder(camposGerenciados);
 
-	const formik = useFormik<IFilter>({
-		initialValues: {
-			filterStatus: '',
-			filterSearch: '',
-			orderBy: '',
-			typeOrder: '',
-		},
-		onSubmit: async ({ filterStatus, filterSearch }) => {
-			const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}`;
-			setFiltersParams(parametersFilter);
-			setCookies('filterBeforeEdit', filtersParams);
-			await cultureService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-				setFilter(parametersFilter);
-				setCultures(response.response);
-				setTotalItems(response.total);
-				setCurrentPage(0);
-			});
-		},
-	});
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}`;
+      setFiltersParams(parametersFilter);
+      setCookies('filterBeforeEdit', filtersParams);
+      await cultureService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
+        setCultures(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0);
+      });
+    },
+  });
 
-	async function handleStatusCulture(idCulture: number, data: ICulture): Promise<void> {
-		if (data.status === 0) {
-			data.status = 1;
-		} else {
-			data.status = 0;
-		}
+  async function handleStatusCulture(idCulture: number, data: ICulture): Promise<void> {
+    if (data.status === 0) {
+      data.status = 1;
+    } else {
+      data.status = 0;
+    }
 
-		const index = cultures.findIndex((culture) => culture.id === idCulture);
+    const index = cultures.findIndex((culture) => culture.id === idCulture);
 
-		if (index === -1) {
-			return;
-		}
+    if (index === -1) {
+      return;
+    }
 
-		setCultures((oldCulture) => {
-			const copy = [...oldCulture];
-			copy[index].status = data.status;
-			return copy;
-		});
+    setCultures((oldCulture) => {
+      const copy = [...oldCulture];
+      copy[index].status = data.status;
+      return copy;
+    });
 
-		const {
-			id, name, desc, status,
-		} = cultures[index];
+    const {
+      id, name, desc, status,
+    } = cultures[index];
 
-		await cultureService.updateCulture({
-			id, name, desc, status,
-		});
-	}
+    await cultureService.updateCulture({
+      id, name, desc, status,
+    });
+  }
 
-	function headerTableFactory(name: any, title: string) {
-		return {
-			title: (
-				<div className="flex items-center">
-					<button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-						{name}
-					</button>
-				</div>
-			),
-			field: title,
-			sorting: false,
-		};
-	}
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
 
-	function idHeaderFactory() {
-		return {
-			title: (
-				<div className="flex items-center">
-					{arrowOrder}
-				</div>
-			),
-			field: 'id',
-			width: 0,
-			sorting: false,
-			render: () => (
-				colorStar === '#eba417'
-					? (
-						<div className="h-10 flex">
-							<div>
-								<button
-									className="w-full h-full flex items-center justify-center border-0"
-									onClick={() => setColorStar('')}
-								>
-									<AiTwotoneStar size={25} color="#eba417" />
-								</button>
-							</div>
-						</div>
-					)
-					: (
-						<div className="h-10 flex">
-							<div>
-								<button
-									className="w-full h-full flex items-center justify-center border-0"
-									onClick={() => setColorStar('#eba417')}
-								>
-									<AiTwotoneStar size={25} />
-								</button>
-							</div>
-						</div>
-					)
-			),
-		};
-	}
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
 
-	function statusHeaderFactory() {
-		return {
-			title: 'Status',
-			field: 'status',
-			sorting: false,
-			searchable: false,
-			filterPlaceholder: 'Filtrar por status',
-			render: (rowData: ICulture) => (
-				<div className="h-10 flex">
-					<div className="h-10">
-						<Button
-							icon={<BiEdit size={16} />}
-							title={`Atualizar ${rowData.name}`}
-							onClick={() => {
-								setCookies('pageBeforeEdit', currentPage?.toString());
-								setCookies('filterBeforeEdit', filtersParams);
-								router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
-							}}
-							bgColor="bg-blue-600"
-							textColor="white"
-						/>
-					</div>
-					{rowData.status ? (
-						<div className="h-10">
-							<Button
-								icon={<FaRegThumbsUp size={16} />}
-								onClick={async () => await handleStatusCulture(rowData.id, {
-									status: rowData.status,
-									...rowData,
-								})}
-								bgColor="bg-green-600"
-								textColor="white"
-							/>
-						</div>
-					) : (
-						<div className="h-10">
-							<Button
-								icon={<FaRegThumbsDown size={16} />}
-								onClick={async () => await handleStatusCulture(rowData.id, {
-									status: rowData.status,
-									...rowData,
-								})}
-								bgColor="bg-red-800"
-								textColor="white"
-							/>
-						</div>
-					)}
-				</div>
-			),
-		};
-	}
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: ICulture) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              title={`Atualizar ${rowData.name}`}
+              onClick={() => {
+							  setCookies('pageBeforeEdit', currentPage?.toString());
+							  setCookies('filterBeforeEdit', filtersParams);
+							  router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          {rowData.status ? (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsUp size={16} />}
+                onClick={async () => await handleStatusCulture(rowData.id, {
+								  status: rowData.status,
+								  ...rowData,
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsDown size={16} />}
+                onClick={async () => await handleStatusCulture(rowData.id, {
+								  status: rowData.status,
+								  ...rowData,
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
+        </div>
+      ),
+    };
+  }
 
-	function columnsOrder(camposGerenciados: string) {
-		const columnCampos: string[] = camposGerenciados.split(',');
-		const tableFields: any = [];
+  function columnsOrder(camposGerenciados: string) {
+    const columnCampos: string[] = camposGerenciados.split(',');
+    const tableFields: any = [];
 
-		Object.keys(columnCampos).forEach((item, index) => {
-			if (columnCampos[index] === 'id') {
-				tableFields.push(idHeaderFactory());
-			}
-			if (columnCampos[index] === 'name') {
-				tableFields.push(headerTableFactory('Código reduzido', 'name'));
-			}
-			if (columnCampos[index] === 'desc') {
-				tableFields.push(headerTableFactory('Nome', 'desc'));
-			}
-			if (columnCampos[index] === 'status') {
-				tableFields.push(statusHeaderFactory());
-			}
-		});
-		return tableFields;
-	}
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[index] === 'name') {
+        tableFields.push(headerTableFactory('Código reduzido', 'name'));
+      }
+      if (columnCampos[index] === 'desc') {
+        tableFields.push(headerTableFactory('Nome', 'desc'));
+      }
+      if (columnCampos[index] === 'status') {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
 
-	async function getValuesColumns(): Promise<void> {
-		const els: any = document.querySelectorAll("input[type='checkbox'");
-		let selecionados = '';
-		for (let i = 0; i < els.length; i += 1) {
-			if (els[i].checked) {
-				selecionados += `${els[i].value},`;
-			}
-		}
-		const totalString = selecionados.length;
-		const campos = selecionados.substr(0, totalString - 1);
-		if (preferences.id === 0) {
-			await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 2 }).then((response) => {
-				userLogado.preferences.cultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
-				preferences.id = response.response.id;
-			});
-			localStorage.setItem('user', JSON.stringify(userLogado));
-		} else {
-			userLogado.preferences.cultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-			await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-			localStorage.setItem('user', JSON.stringify(userLogado));
-		}
+  async function getValuesColumns(): Promise<void> {
+    const els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i += 1) {
+      if (els[i].checked) {
+        selecionados += `${els[i].value},`;
+      }
+    }
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
+    if (preferences.id === 0) {
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 2 }).then((response) => {
+        userLogado.preferences.cultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.cultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
-		setStatusAccordion(false);
-		setCamposGerenciados(campos);
-	}
+    setStatusAccordion(false);
+    setCamposGerenciados(campos);
+  }
 
-	async function handleOrder(column: string, order: string | any): Promise<void> {
-		let typeOrder: any;
-		let parametersFilter: any;
-		if (order === 1) {
-			typeOrder = 'asc';
-		} else if (order === 2) {
-			typeOrder = 'desc';
-		} else {
-			typeOrder = '';
-		}
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
 
-		if (filter && typeof (filter) !== 'undefined') {
-			if (typeOrder !== '') {
-				parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-			} else {
-				parametersFilter = filter;
-			}
-		} else if (typeOrder !== '') {
-			parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-		} else {
-			parametersFilter = filter;
-		}
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-		await cultureService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-			if (response.status === 200) {
-				setCultures(response.response);
-			}
-		});
+    await cultureService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setCultures(response.response);
+      }
+    });
 
-		if (orderList === 2) {
-			setOrder(0);
-			setArrowOrder(<AiOutlineArrowDown />);
-		} else {
-			setOrder(orderList + 1);
-			if (orderList === 1) {
-				setArrowOrder(<AiOutlineArrowUp />);
-			} else {
-				setArrowOrder('');
-			}
-		}
-	}
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
 
-	function handleOnDragEnd(result: DropResult): void {
-		setStatusAccordion(true);
-		if (!result) return;
+  function handleOnDragEnd(result: DropResult): void {
+    setStatusAccordion(true);
+    if (!result) return;
 
-		const items = Array.from(generatesProps);
-		const [reorderedItem] = items.splice(result.source.index, 1);
-		const index: number = Number(result.destination?.index);
-		items.splice(index, 0, reorderedItem);
+    const items = Array.from(generatesProps);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
 
-		setGeneratesProps(items);
-	}
+    setGeneratesProps(items);
+  }
 
-	const downloadExcel = async (): Promise<void> => {
-		if (!filterApplication.includes('paramSelect')) {
-			filterApplication += `&paramSelect=${camposGerenciados}`;
-		}
+  const downloadExcel = async (): Promise<void> => {
+    if (!filterApplication.includes('paramSelect')) {
+      filterApplication += `&paramSelect=${camposGerenciados}`;
+    }
 
-		await cultureService.getAll(filterApplication).then((response) => {
-			if (response.status === 200) {
-				const newData = cultures.map((row) => {
-					if (row.status === 0) {
-						row.status = 'Inativo' as any;
-					} else {
-						row.status = 'Ativo' as any;
-					}
+    await cultureService.getAll(filterApplication).then((response) => {
+      if (response.status === 200) {
+        const newData = cultures.map((row) => {
+          if (row.status === 0) {
+            row.status = 'Inativo' as any;
+          } else {
+            row.status = 'Ativo' as any;
+          }
 
-					return row;
-				});
+          return row;
+        });
 
-				const workSheet = XLSX.utils.json_to_sheet(newData);
-				const workBook = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(workBook, workSheet, 'cultures');
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'cultures');
 
-				// Buffer
-				const buf = XLSX.write(workBook, {
-					bookType: 'xlsx', // xlsx
-					type: 'buffer',
-				});
-				// Binary
-				XLSX.write(workBook, {
-					bookType: 'xlsx', // xlsx
-					type: 'binary',
-				});
-				// Download
-				XLSX.writeFile(workBook, 'Culturas.xlsx');
-			}
-		});
-	};
+        // Buffer
+        const buf = XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Culturas.xlsx');
+      }
+    });
+  };
 
-	function handleTotalPages(): void {
-		if (currentPage < 0) {
-			setCurrentPage(0);
-		} else if (currentPage >= pages) {
-			setCurrentPage(pages - 1);
-		}
-	}
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  }
 
-	async function handlePagination(): Promise<void> {
-		const skip = currentPage * Number(take);
-		let parametersFilter = `skip=${skip}&take=${take}`;
+  async function handlePagination(): Promise<void> {
+    const skip = currentPage * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
-		if (filter) {
-			parametersFilter = `${parametersFilter}&${filter}`;
-		}
-		await cultureService.getAll(parametersFilter).then((response) => {
-			if (response.status === 200) {
-				setCultures(response.response);
-			}
-		});
-	}
+    if (filter) {
+      parametersFilter = `${parametersFilter}&${filter}`;
+    }
+    await cultureService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setCultures(response.response);
+      }
+    });
+  }
 
-	useEffect(() => {
-		handlePagination();
-		handleTotalPages();
-	}, [currentPage]);
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
-	return (
-		<>
-			<Head><title>Listagem de culturas</title></Head>
+  return (
+    <>
+      <Head><title>Listagem de culturas</title></Head>
 
-			<Content contentHeader={tabsDropDowns} moduloActive="config">
-				<main className="h-full w-full
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
+        <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         "
-				>
-					<AccordionFilter title="Filtrar culturas">
-						<div className="w-full flex gap-2">
-							<form
-								className="flex flex-col
+        >
+          <AccordionFilter title="Filtrar culturas">
+            <div className="w-full flex gap-2">
+              <form
+                className="flex flex-col
                   w-full
                   items-center
                   px-4
                   bg-white
                 "
-								onSubmit={formik.handleSubmit}
-							>
-								<div className="w-full h-full
+                onSubmit={formik.handleSubmit}
+              >
+                <div className="w-full h-full
                   flex
                   justify-center
                   pb-2
                 "
-								>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Status
+                >
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                    Status
 										</label>
-										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
-									</div>
-									<div className="h-10 w-1/2 ml-4">
-										<label className="block text-gray-900 text-sm font-bold mb-2">
-											Pesquisar
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                    Pesquisar
 										</label>
-										<Input
-											type="text"
-											placeholder="cultura"
-											max="40"
-											id="filterSearch"
-											name="filterSearch"
-											onChange={formik.handleChange}
-										/>
-									</div>
-								</div>
+                    <Input
+                    type="text"
+                    placeholder="cultura"
+                    max="40"
+                    id="filterSearch"
+                    name="filterSearch"
+                    onChange={formik.handleChange}
+                  />
+                  </div>
+                </div>
 
-								<div className="h-16 w-32 mt-3">
-									<Button
-										type="submit"
-										onClick={() => { }}
-										value="Filtrar"
-										bgColor="bg-blue-600"
-										textColor="white"
-										icon={<BiFilterAlt size={20} />}
-									/>
-								</div>
-							</form>
-						</div>
-					</AccordionFilter>
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
+              </form>
+            </div>
+          </AccordionFilter>
 
-					<div className="w-full h-full overflow-y-scroll">
-						<MaterialTable
-							style={{ background: '#f9fafb' }}
-							columns={columns}
-							data={cultures}
-							options={{
-								showTitle: false,
-								headerStyle: {
-									zIndex: 20,
-								},
-								rowStyle: { background: '#f9fafb' },
-								search: false,
-								filtering: false,
-								pageSize: itensPerPage,
-							}}
-							components={{
-								Toolbar: () => (
-									<div
-										className="w-full max-h-96
+          <div className="w-full h-full overflow-y-scroll">
+            <MaterialTable
+              style={{ background: '#f9fafb' }}
+              columns={columns}
+              data={cultures}
+              options={{
+							  showTitle: false,
+							  headerStyle: {
+							    zIndex: 20,
+							  },
+							  rowStyle: { background: '#f9fafb' },
+							  search: false,
+							  filtering: false,
+							  pageSize: itensPerPage,
+              }}
+              components={{
+							  Toolbar: () => (
+  <div
+    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -522,170 +522,170 @@ export default function Listagem({
                     border-solid border-b
                     border-gray-200
                   "
-									>
-										<div className="h-12">
-											<Button
-												title="Cadastrar cultura"
-												value="Cadastrar cultura"
-												bgColor="bg-blue-600"
-												textColor="white"
-												onClick={() => { router.push('cultura/cadastro'); }}
-												href="cultura/cadastro"
-												icon={<RiPlantLine size={20} />}
-											/>
-										</div>
+  >
+    <div className="h-12">
+      <Button
+        title="Cadastrar cultura"
+        value="Cadastrar cultura"
+        bgColor="bg-blue-600"
+        textColor="white"
+        onClick={() => { router.push('cultura/cadastro'); }}
+        href="cultura/cadastro"
+        icon={<RiPlantLine size={20} />}
+      />
+    </div>
 
-										<strong className="text-blue-600">
-											Total registrado:
-											{' '}
-											{itemsTotal}
-										</strong>
+    <strong className="text-blue-600">
+      Total registrado:
+      {' '}
+      {itemsTotal}
+    </strong>
 
-										<div className="h-full flex items-center gap-2">
-											<div className="border-solid border-2 border-blue-600 rounded">
-												<div className="w-72">
-													<AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-														<DragDropContext onDragEnd={handleOnDragEnd}>
-															<Droppable droppableId="characters">
-																{
+    <div className="h-full flex items-center gap-2">
+      <div className="border-solid border-2 border-blue-600 rounded">
+        <div className="w-72">
+          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="characters">
+                {
 																	(provided) => (
-																		<ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-																			<div className="h-8 mb-3">
-																				<Button
-																					value="Atualizar"
-																					bgColor="bg-blue-600"
-																					textColor="white"
-																					onClick={getValuesColumns}
-																					icon={<IoReloadSharp size={20} />}
-																				/>
-																			</div>
-																			{
+  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+    <div className="h-8 mb-3">
+      <Button
+        value="Atualizar"
+        bgColor="bg-blue-600"
+        textColor="white"
+        onClick={getValuesColumns}
+        icon={<IoReloadSharp size={20} />}
+      />
+    </div>
+    {
 																				generatesProps.map((generate, index) => (
-																					<Draggable key={index} draggableId={String(generate.title)} index={index}>
-																						{(provided) => (
-																							<li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-																								<CheckBox
-																									name={generate.name}
-																									title={generate.title?.toString()}
-																									value={generate.value}
-																									defaultChecked={camposGerenciados.includes(generate.value)}
-																								/>
-																							</li>
-																						)}
-																					</Draggable>
+  <Draggable key={index} draggableId={String(generate.title)} index={index}>
+    {(provided) => (
+      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <CheckBox
+          name={generate.name}
+          title={generate.title?.toString()}
+          value={generate.value}
+          defaultChecked={camposGerenciados.includes(generate.value)}
+        />
+      </li>
+    )}
+  </Draggable>
 																				))
 																			}
-																			{provided.placeholder}
-																		</ul>
+    {provided.placeholder}
+  </ul>
 																	)
 																}
-															</Droppable>
-														</DragDropContext>
-													</AccordionFilter>
-												</div>
-											</div>
-											<div className="h-12 flex items-center justify-center w-full">
-												<Button title="Exportar planilha de culturas" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-											</div>
-										</div>
-									</div>
-								),
-								Pagination: (props) => (
-									<div
-										className="flex
+              </Droppable>
+            </DragDropContext>
+          </AccordionFilter>
+        </div>
+      </div>
+      <div className="h-12 flex items-center justify-center w-full">
+        <Button title="Exportar planilha de culturas" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+      </div>
+    </div>
+  </div>
+							  ),
+							  Pagination: (props) => (
+  <div
+    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-										{...props}
-									>
-										<Button
-											onClick={() => setCurrentPage(currentPage - 10)}
-											bgColor="bg-blue-600"
-											textColor="white"
-											icon={<MdFirstPage size={18} />}
-											disabled={currentPage <= 1}
-										/>
-										<Button
-											onClick={() => setCurrentPage(currentPage - 1)}
-											bgColor="bg-blue-600"
-											textColor="white"
-											icon={<BiLeftArrow size={15} />}
-											disabled={currentPage <= 0}
-										/>
-										{
+    {...props}
+  >
+    <Button
+      onClick={() => setCurrentPage(currentPage - 10)}
+      bgColor="bg-blue-600"
+      textColor="white"
+      icon={<MdFirstPage size={18} />}
+      disabled={currentPage <= 1}
+    />
+    <Button
+      onClick={() => setCurrentPage(currentPage - 1)}
+      bgColor="bg-blue-600"
+      textColor="white"
+      icon={<BiLeftArrow size={15} />}
+      disabled={currentPage <= 0}
+    />
+    {
 											Array(1).fill('').map((value, index) => (
-												<Button
-													key={index}
-													onClick={() => setCurrentPage(index)}
-													value={`${currentPage + 1}`}
-													bgColor="bg-blue-600"
-													textColor="white"
-													disabled
-												/>
+  <Button
+    key={index}
+    onClick={() => setCurrentPage(index)}
+    value={`${currentPage + 1}`}
+    bgColor="bg-blue-600"
+    textColor="white"
+    disabled
+  />
 											))
 										}
-										<Button
-											onClick={() => setCurrentPage(currentPage + 1)}
-											bgColor="bg-blue-600"
-											textColor="white"
-											icon={<BiRightArrow size={15} />}
-											disabled={currentPage + 1 >= pages}
-										/>
-										<Button
-											onClick={() => setCurrentPage(currentPage + 10)}
-											bgColor="bg-blue-600"
-											textColor="white"
-											icon={<MdLastPage size={18} />}
-											disabled={currentPage + 1 >= pages}
-										/>
-									</div>
+    <Button
+      onClick={() => setCurrentPage(currentPage + 1)}
+      bgColor="bg-blue-600"
+      textColor="white"
+      icon={<BiRightArrow size={15} />}
+      disabled={currentPage + 1 >= pages}
+    />
+    <Button
+      onClick={() => setCurrentPage(currentPage + 10)}
+      bgColor="bg-blue-600"
+      textColor="white"
+      icon={<MdLastPage size={18} />}
+      disabled={currentPage + 1 >= pages}
+    />
+  </div>
 								) as any,
-							}}
-						/>
-					</div>
-				</main>
-			</Content>
-		</>
-	);
+              }}
+            />
+          </div>
+        </main>
+      </Content>
+    </>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-	const PreferencesControllers = new UserPreferenceController();
-	const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const PreferencesControllers = new UserPreferenceController();
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
-	const { token } = req.cookies;
-	const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const { token } = req.cookies;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-	deleteCookie('pageBeforeEdit', { req, res });
-	deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
 
-	const { publicRuntimeConfig } = getConfig();
-	const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-	const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-	const urlParameters: any = new URL(baseUrl);
-	urlParameters.search = new URLSearchParams(param).toString();
-	const requestOptions = {
-		method: 'GET',
-		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` },
-	} as RequestInit | undefined;
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const urlParameters: any = new URL(baseUrl);
+  urlParameters.search = new URLSearchParams(param).toString();
+  const requestOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: { Authorization: `Bearer ${token}` },
+  } as RequestInit | undefined;
 
-	const cultures = await fetch(urlParameters.toString(), requestOptions);
-	const { response: allCultures, total: totalItems } = await cultures.json();
+  const cultures = await fetch(urlParameters.toString(), requestOptions);
+  const { response: allCultures, total: totalItems } = await cultures.json();
 
-	return {
-		props: {
-			allCultures,
-			totalItems,
-			itensPerPage,
-			filterApplication,
-			pageBeforeEdit,
-			filterBeforeEdit,
-		},
-	};
+  return {
+    props: {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    },
+  };
 };
