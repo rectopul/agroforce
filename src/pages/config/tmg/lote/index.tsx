@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies } from 'cookies-next';
+import { deleteCookie } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -17,8 +17,10 @@ import {
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiSettingsFill } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Swal from 'sweetalert2';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
@@ -299,6 +301,43 @@ export default function Listagem({
     return tableFields;
   }
 
+  const downloadExcel = async (): Promise<void> => {
+    await loteService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((item: any) => {
+          const newItem = item;
+          newItem.name_genotipo = item.genotipo.name_genotipo;
+          newItem.name_main = item.genotipo.name_main;
+          newItem.gmr = item.genotipo.gmr;
+          newItem.bgm = item.genotipo.bgm;
+          newItem.tecnologia = item.genotipo.tecnologia.name;
+          delete newItem.id;
+          delete newItem.genotipo;
+          return newItem;
+        });
+
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Lotes.xlsx');
+      } else {
+        Swal.fire(response);
+      }
+    });
+  };
+
   const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
@@ -550,7 +589,7 @@ export default function Listagem({
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
+                        <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -623,8 +662,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const { token } = req.cookies;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;

@@ -13,10 +13,10 @@ export class UserCultureController {
         try {
             if (options.filterStatus) {
                 if (typeof (options.status) === 'string') {
-                    options.filterStatus = parseInt(options.filterStatus);
-                    if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+                    options.filterStatus = Number(options.filterStatus);
+                    if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
                 } else {
-                    if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+                    if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
                 }
             }
 
@@ -37,16 +37,16 @@ export class UserCultureController {
             }
 
             if (options.userId) {
-                parameters.userId = parseInt(options.userId);
+                parameters.userId = Number(options.userId);
             }
 
             if (options.cultureId) {
-                parameters.cultureId = parseInt(options.cultureId);
+                parameters.cultureId = Number(options.cultureId);
             }
 
             if (options.take) {
                 if (typeof (options.take) === 'string') {
-                    take = parseInt(options.take);
+                    take = Number(options.take);
                 } else {
                     take = options.take;
                 }
@@ -54,7 +54,7 @@ export class UserCultureController {
 
             if (options.skip) {
                 if (typeof (options.skip) === 'string') {
-                    skip = parseInt(options.skip);
+                    skip = Number(options.skip);
                 } else {
                     skip = options.skip;
                 }
@@ -77,7 +77,7 @@ export class UserCultureController {
     }
 
     async getOne(id: string) {
-        let newID = parseInt(id);
+        let newID = Number(id);
         try {
             if (id && id !== '{id}') {
                 let response = await this.userCultureRepository.findOne(newID);
@@ -95,7 +95,7 @@ export class UserCultureController {
     }
 
     async getByUserID(userId: number | any) {
-        let newID = parseInt(userId);
+        let newID = Number(userId);
         try {
             if (userId && userId !== '{id}') {
                 let response = await this.userCultureRepository.findAllByUser(newID);
@@ -116,10 +116,10 @@ export class UserCultureController {
         try {
             if (data !== null && data !== undefined) {
                 const create: object | any = {};
-                await this.delete(parseInt(data.userId));
+                await this.delete(Number(data.userId));
                 Object.keys(data.cultureId).forEach((item) => {
-                    create.cultureId = parseInt(data.cultureId[item]);
-                    create.userId = parseInt(data.userId);
+                    create.cultureId = Number(data.cultureId[item]);
+                    create.userId = Number(data.userId);
                     create.created_by = data.created_by;
                     this.userCultureRepository.create(create);
                 });
@@ -136,11 +136,11 @@ export class UserCultureController {
                 const parameters: object | any = {};
 
                 if (typeof (data.status) === 'string') {
-                    parameters.status = parseInt(data.status);
+                    parameters.status = Number(data.status);
                 } else {
                     parameters.status = data.status;
                 }
-                await this.userCultureRepository.queryRaw(parseInt(data.idUser), parseInt(data.cultureId));
+                await this.userCultureRepository.queryRaw(Number(data.idUser), Number(data.cultureId));
                 return { status: 200 }
             }
         } catch (err) {

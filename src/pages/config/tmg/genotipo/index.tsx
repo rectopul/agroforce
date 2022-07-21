@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -779,8 +779,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;

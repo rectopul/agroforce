@@ -79,7 +79,7 @@ export class SequenciaDelineamentoController {
   }
   async update(data: IUpdateSequenciaDelineamento) {
     try {
-     
+
       const sequenciaDelineamento = await this.SequenciaDelineamentoRepository.findById(data.id);
 
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
@@ -107,10 +107,10 @@ export class SequenciaDelineamentoController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
         }
       }
 
@@ -161,7 +161,7 @@ export class SequenciaDelineamentoController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -169,7 +169,7 @@ export class SequenciaDelineamentoController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }

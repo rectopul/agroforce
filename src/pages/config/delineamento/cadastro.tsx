@@ -39,7 +39,7 @@ export default function NovoLocal() {
 
   const formik = useFormik<IDelineamentoProps>({
     initialValues: {
-      id_culture: parseInt(id_culture),
+      id_culture: Number(id_culture),
       name: '',
       repeticao: 0,
       trat_repeticao: 0,
@@ -51,7 +51,7 @@ export default function NovoLocal() {
       if (!values.name || !values.repeticao || !values.trat_repeticao) { return; }
 
       await delineamentoService.create({
-        id_culture: parseInt(id_culture),
+        id_culture: Number(id_culture),
         name: capitalize(values.name),
         repeticao: Number(values.repeticao),
         trat_repeticao: Number(values.trat_repeticao),

@@ -1,128 +1,102 @@
-import { number, object, SchemaOf, string } from 'yup';
+import handleError from 'src/shared/utils/handleError';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 import { EnvelopeRepository } from '../repository/envelope.repository';
 
-
 export class EnvelopeController {
-	public readonly required = 'Campo obrigatório';
+  public readonly required = 'Campo obrigatório';
 
-	envelopeRepository = new EnvelopeRepository();
+  envelopeRepository = new EnvelopeRepository();
 
+  async getOne({ id }: any) {
+    try {
+      const response = await this.envelopeRepository.findById(id);
 
-	async listOne({ id }: any) {
-		try {
-			const response = await this.envelopeRepository.findById(id);
+      if (!response) throw new Error('envelope não encontrado');
 
-			if (!response) throw new Error('grupo não encontrado');
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Envelope controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Envelope erro');
+    }
+  }
 
-			return { status: 200, response };
-		} catch (e) {
-			return { status: 400, message: 'grupo não encontrado' };
-		}
-	}
+  async create(data: any) {
+    try {
+      const envelopeAlreadyExists = await this.envelopeRepository.findByData(data);
 
-	async create(data: any) {
-		try {
-			
+      if (envelopeAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
-			const envelopeAlreadyExists = await this.envelopeRepository.findByData(data);
+      await this.envelopeRepository.create(data);
 
-			if (envelopeAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
+      return { status: 201, message: 'envelope cadastrado' };
+    } catch (error: any) {
+      handleError('Envelope controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Envelope erro');
+    }
+  }
 
-			await this.envelopeRepository.create(data);
+  async update(data: any) {
+    try {
+      const envelope: any = await this.envelopeRepository.findById(data.id);
 
-			return { status: 201, message: 'envelope cadastrado' };
-		} catch (err) {
-			console.log("erros: ", err);
-			return { status: 404, message: 'Erro de cadastro' };
-		}
-	}
+      if (!envelope) return { status: 400, message: 'envelope não existente' };
 
-	async update(data: any) {
-		try {
-			
+      await this.envelopeRepository.update(data.id, data);
 
-			const envelope: any = await this.envelopeRepository.findById(data.id);
+      return { status: 200, message: 'envelope atualizado' };
+    } catch (error: any) {
+      handleError('Envelope controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Envelope erro');
+    }
+  }
 
-			if (!envelope) return { status: 400, message: 'envelope não existente' };
+  async getAll(options: any) {
+    const parameters: object | any = {};
+    try {
+      if (options.filterStatus) {
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+      }
 
-			await this.envelopeRepository.update(data.id, data);
+      const select = {
+        id: true,
+        id_safra: true,
+        id_type_assay: true,
+        type_assay: { select: { name: true } },
+        safra: { select: { safraName: true } },
+        seeds: true,
+        status: true,
+      };
 
-			return { status: 200, message: 'envelope atualizado' };
-		} catch (err) {
-			console.log(err)
-			return { status: 404, message: 'Erro ao atualizar' };
-		}
-	}
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
 
-	async listAll(options: any) {
-		const parameters: object | any = {};
-		let take;
-		let skip;
-		let orderBy: object | any = '';
-		let select: any = [];
-		let include: any;
-		try {
-			if (options.filterStatus) {
-				if (typeof (options.status) === 'string') {
-					options.filterStatus = parseInt(options.filterStatus);
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-				} else {
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-				}
-			}
+      if (options.id_type_assay) {
+        parameters.id_type_assay = Number(options.id_type_assay);
+      }
 
-			if (options.paramSelect) {
-				const objSelect = options.paramSelect.split(',');
-				Object.keys(objSelect).forEach((item) => {
-					select[objSelect[item]] = true;
-				});
-				select = Object.assign({}, select);
-			} else {
-				select = { id: true, id_safra: true, id_type_assay: true, type_assay: { select: { name: true } }, safra: { select: { safraName: true } }, seeds: true, status: true };
-			}
+      const take = (options.take) ? Number(options.take) : undefined;
 
-			if (options.id_safra) {
-				parameters.id_safra = Number(options.id_safra);
-			}
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
-			if (options.id_type_assay) {
-				parameters.id_type_assay = Number(options.id_type_assay);
-			}
-			if (options.take) {
-				if (typeof (options.take) === 'string') {
-					take = parseInt(options.take);
-				} else {
-					take = options.take;
-				}
-			}
+      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-			if (options.skip) {
-				if (typeof (options.skip) === 'string') {
-					skip = parseInt(options.skip);
-				} else {
-					skip = options.skip;
-				}
-			}
-
-			if (options.orderBy) {
-				orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
-			}
-
-			const response: object | any = await this.envelopeRepository.findAll(
-				parameters,
-				select,
-				take,
-				skip,
-				orderBy
-			);
-			if (!response || response.total <= 0) {
-				return { status: 400, response: [], total: 0 };
-			} else {
-				return { status: 200, response, total: response.total };
-			}
-		} catch (err) {
-			console.log(err);
-			return { status: 400, response: [], total: 0 };
-		}
-	}
+      const response: object | any = await this.envelopeRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 };
+      }
+      return { status: 200, response, total: response.total };
+    } catch (error: any) {
+      handleError('Envelope controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Envelope erro');
+    }
+  }
 }

@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -532,7 +532,7 @@ export default function TipoEnsaio({
     // ];
 
     // importService.validate({
-    //   spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, createdBy: user, table: 'tratmento',
+    //   spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, created_by: user, table: 'tratmento',
     // }).then(({ status, message }: any) => {
     //   if (status !== 200) {
     //     Swal.fire({
@@ -900,8 +900,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;

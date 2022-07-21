@@ -14,10 +14,10 @@ export class LayoutChildrenController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
         } else {
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
         }
       } else {
         parameters.status = 1;
@@ -42,17 +42,17 @@ export class LayoutChildrenController {
         select = { id: true, sl: true, sc: true, s_aloc: true, tiro: true, disparo: true, dist: true, st: true, cj: true, spc: true, scolheita: true, tipo_parcela: true, status: true };
       }
       if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.id_layout) {
-        parameters.id_layout = parseInt(options.id_layout);
+        parameters.id_layout = Number(options.id_layout);
       }
 
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -60,7 +60,7 @@ export class LayoutChildrenController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }

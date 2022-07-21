@@ -14,10 +14,10 @@ export class DisparosController {
 		try {
 			if (options.filterStatus) {
 				if (typeof (options.status) === 'string') {
-					options.filterStatus = parseInt(options.filterStatus);
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+					options.filterStatus = Number(options.filterStatus);
+					if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
 				} else {
-					if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+					if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
 				}
 			} else {
 				parameters.status = 1;
@@ -42,17 +42,17 @@ export class DisparosController {
 				select = { id: true, t4_i: true, t4_f: true, divisor: true, di: true, df: true, sem_metros: true, quadra: { select: { esquema: true } }, status: true };
 			}
 			if (options.id_culture) {
-				parameters.id_culture = parseInt(options.id_culture);
+				parameters.id_culture = Number(options.id_culture);
 			}
 
 			if (options.id_quadra) {
-				parameters.id_quadra = parseInt(options.id_quadra);
+				parameters.id_quadra = Number(options.id_quadra);
 			}
 
 
 			if (options.take) {
 				if (typeof (options.take) === 'string') {
-					take = parseInt(options.take);
+					take = Number(options.take);
 				} else {
 					take = options.take;
 				}
@@ -60,7 +60,7 @@ export class DisparosController {
 
 			if (options.skip) {
 				if (typeof (options.skip) === 'string') {
-					skip = parseInt(options.skip);
+					skip = Number(options.skip);
 				} else {
 					skip = options.skip;
 				}

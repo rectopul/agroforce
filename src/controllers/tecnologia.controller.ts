@@ -1,4 +1,4 @@
-import handleError from 'src/shared/utils/handleError';
+import handleError from '../shared/utils/handleError';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
 
 export class TecnologiaController {
@@ -6,30 +6,29 @@ export class TecnologiaController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
-    let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true, name: true, desc: true, cod_tec: true, status: true,
-        };
+      if (options.filterDescription) {
+        parameters.desc = JSON.parse(`{ "contains":"${options.filterDescription}" }`);
       }
 
+      if (options.filterCode) {
+        parameters.cod_tec = JSON.parse(`{ "contains":"${options.filterCode}" }`);
+      }
+
+      const select = {
+        id: true, name: true, desc: true, cod_tec: true, status: true,
+      };
+
       if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.name) {
@@ -46,7 +45,13 @@ export class TecnologiaController {
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      const response = await this.tecnologiaRepository.findAll(parameters, select, take, skip, orderBy);
+      const response = await this.tecnologiaRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

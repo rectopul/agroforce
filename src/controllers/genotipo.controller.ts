@@ -23,8 +23,7 @@ export class GenotipoController {
       }
 
       if (options.filterGmr) {
-        //parameters.gmr = Number(options.filterGmr);
-        let gmrMax = Number(options.filterGmr) + 1;
+        const gmrMax = Number(options.filterGmr) + 1;
         parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" }`);
       }
 

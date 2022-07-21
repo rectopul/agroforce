@@ -17,14 +17,14 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
   const safraController = new SafraController();
 
   async function authenticate() {
-    const user: any = await Controller.signinUSer(req.body);
+    const user: any = await Controller.signInUSer(req.body);
     const preferences: object | any = {};
     const userCulture: object | any = {};
     const safras: object | any = {};
 
     if (user) {
-      const validateLogin: object | any = await Controller.getAllUser({
-        paramSelect: 'id', app_login: 1, id: user.id, filterStatus: 1,
+      const validateLogin: object | any = await Controller.getAll({
+        paramSelect: 'id', id: user.id, filterStatus: 1,
       });
 
       if (validateLogin.total <= 0 || validateLogin.status === 400) throw new Error('Você não tem acesso a essa pagina, entre em contato com seu líder!');

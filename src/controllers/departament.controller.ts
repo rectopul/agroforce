@@ -38,9 +38,9 @@ export class DepartamentController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       } else {
         parameters.status = 1;
       }
@@ -70,7 +70,7 @@ export class DepartamentController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -78,7 +78,7 @@ export class DepartamentController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }
@@ -106,7 +106,7 @@ export class DepartamentController {
 
   async getOneDepartament({ id }: FindOne) {
     try {
-     
+
 
       const response = await this.departamentRepository.findOne(id);
 

@@ -1,13 +1,9 @@
-import { UsersPermissionsRepository } from 'src/repository/user-permission.repository';
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import { UsersPermissionsRepository } from '../repository/user-permission.repository';
+import { functionsUtils } from '../shared/utils/functionsUtils';
+import handleError from '../shared/utils/handleError';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
 import { UserPermissionController } from './user-permission.controller';
-
-const CryptoJS = require('crypto');
-
-const alg = 'aes-256-ctr';
-const pwd = 'TMG2022';
 
 export class UserController {
   userRepository = new UserRepository();
@@ -18,7 +14,7 @@ export class UserController {
 
   userPermissionsController = new UserPermissionController();
 
-  async getAllUser(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
     let take;
     let skip;
@@ -26,20 +22,15 @@ export class UserController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterName) {
-        options.filterName = `{"contains":"${options.filterName}"}`;
-        parameters.name = JSON.parse(options.filterName);
+        parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
       }
 
       if (options.filterLogin) {
-        options.filterLogin = `{"contains":"${options.filterLogin}"}`;
-        parameters.login = JSON.parse(options.filterLogin);
+        parameters.login = JSON.parse(`{"contains":"${options.filterLogin}"}`);
       }
 
       if (options.paramSelect) {
@@ -50,7 +41,14 @@ export class UserController {
         select = { ...select };
       } else {
         select = {
-          id: true, name: true, cpf: true, email: true, login: true, tel: true, avatar: true, status: true,
+          id: true,
+          name: true,
+          cpf: true,
+          email: true,
+          login: true,
+          tel: true,
+          avatar: true,
+          status: true,
         };
       }
 
@@ -74,9 +72,6 @@ export class UserController {
         parameters.id = options.id;
       }
 
-      if (options.app_login) {
-        parameters.app_login = options.app_login;
-      }
       if (options.departmentId) {
         parameters.departmentId = options.departmentId;
       }
@@ -87,7 +82,7 @@ export class UserController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -95,7 +90,7 @@ export class UserController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }
@@ -105,63 +100,58 @@ export class UserController {
         orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      const response: object | any = await this.userRepository.findAll(parameters, select, take, skip, orderBy);
+      const response: object | any = await this.userRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
       }
       return { status: 200, response, total: response.total };
-    } catch (err) {
-      return { status: 400, message: err };
+    } catch (error: any) {
+      handleError('User Controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll User erro');
     }
   }
 
-  async getOneUser(id: number) {
+  async getOne(id: number) {
     try {
       const response = await this.userRepository.findOne(id);
       if (!response) {
         return { status: 400, response: [], message: 'user não existe' };
       }
-      const cultures: object | any = await this.userCultureController.getByUserID(id);
+      await this.userCultureController.getByUserID(id);
       return { status: 200, response, culture: response.cultures };
-    } catch (err) {
-      return { status: 400, message: err };
+    } catch (error: any) {
+      handleError('User Controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne User erro');
     }
   }
 
-  async postUser(data: object | any) {
-    const parameters: object | any = {};
-    const parametersPermissions: object | any = {};
+  async create(data: object | any) {
     try {
+      const parameters: any = {};
       if (data !== null && data !== undefined) {
         data.password = functionsUtils.Crypto(data.password, 'cipher');
         if (typeof (data.status) === 'string') {
-          parameters.status = parseInt(data.status);
+          parameters.status = Number(data.status);
         } else {
           parameters.status = data.status;
         }
 
-        if (typeof (data.app_login) === 'string') {
-          parameters.app_login = parseInt(data.app_login);
-        } else {
-          parameters.app_login = data.app_login;
-        }
-
-        if (typeof (data.jivochat) === 'string') {
-          parameters.jivochat = parseInt(data.jivochat);
-        } else {
-          parameters.jivochat = data.jivochat;
-        }
-
         if (typeof (data.departmentId) === 'string') {
-          parameters.departmentId = parseInt(data.departmentId);
+          parameters.departmentId = Number(data.departmentId);
         } else {
           parameters.departmentId = data.departmentId;
         }
 
         if (typeof (data.registration) === 'string') {
-          parameters.registration = parseInt(data.registration);
+          parameters.registration = Number(data.registration);
         } else {
           parameters.registration = data.registration;
         }
@@ -173,11 +163,11 @@ export class UserController {
         if (!data.password) return { status: 400, message: 'Informe a senha do usuário' };
 
         // Validação de login existente.
-        const validateLogin: object | any = await this.getAllUser({ login: data.login });
+        const validateLogin: object | any = await this.getAll({ login: data.login });
         if (validateLogin.total > 0) return { status: 400, message: 'Login ja cadastrado' };
 
         // Validação de cpf existente.
-        const validateCPF: object | any = await this.getAllUser({ cpf: data.cpf });
+        const validateCPF: object | any = await this.getAll({ cpf: data.cpf });
         if (validateCPF.total > 0) return { status: 400, message: 'CPF já cadastrado' };
 
         // Validação cpf é valido
@@ -198,31 +188,36 @@ export class UserController {
             Object.keys(data.cultures).forEach((item) => {
               data.cultures[item].profiles.forEach((profile: any) => {
                 this.userPermissionsController.post({
-                  userId: response.id, profileId: parseInt(profile), cultureId: parseInt(data.cultures[item].cultureId), created_by: parseInt(data.created_by),
+                  userId: response.id,
+                  profileId: Number(profile),
+                  cultureId: Number(data.cultures[item].cultureId),
+                  created_by: Number(data.created_by),
                 });
               });
             });
           }
           if (data.cultureId) {
-            this.userCultureController.save({ cultureId: data.cultureId, userId: response.id, created_by: data.created_by });
+            this.userCultureController.save(
+              { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
+            );
           }
           return { status: 200, message: 'users inseridos' };
         }
         return { status: 400, message: 'houve um erro, tente novamente' };
       }
-    } catch (err) {
-      return { status: 400, message: err };
+    } catch (error: any) {
+      handleError('User Controller', 'Create', error.message);
+      throw new Error('[Controller] - Create User erro');
     }
   }
 
-  async signinUSer(data: object | any) {
+  async signInUSer(data: object | any) {
     try {
-      if (data !== null && data !== undefined) {
-        data.password = functionsUtils.Crypto(data.password, 'cipher');
-        return await this.userRepository.signIn(data);
-      }
-    } catch (err) {
-      return { status: 400, message: err };
+      data.password = functionsUtils.Crypto(data.password, 'cipher');
+      return await this.userRepository.signIn(data);
+    } catch (error: any) {
+      handleError('User Controller', 'SingIn', error.message);
+      throw new Error('[Controller] - SingIn User erro');
     }
   }
 
@@ -239,8 +234,9 @@ export class UserController {
       await this.userRepository.updateAvatar(id, user.avatar);
 
       return { status: 200, message: 'Avatar atualizado com sucesso!' };
-    } catch (err) {
-      return { status: 400, message: 'Erro ao atualizar avatar!' };
+    } catch (error: any) {
+      handleError('User Controller', 'Update Avatar', error.message);
+      throw new Error('[Controller] - Update Avatar User erro');
     }
   }
 
@@ -269,42 +265,31 @@ export class UserController {
       await this.userRepository.updatePassword(id, user.password);
 
       return { status: 200, message: 'Senha atualizada com sucesso!' };
-    } catch (err) {
-      return { status: 400, message: 'Erro ao atualizar senha.' };
+    } catch (error: any) {
+      handleError('User Controller', 'Update Password', error.message);
+      throw new Error('[Controller] - Update Password User erro');
     }
   }
 
-  async updateUser(data: object | any) {
+  async update(data: object | any) {
     try {
       if (data !== null && data !== undefined) {
         const parameters: object | any = {};
 
         if (typeof (data.status) === 'string') {
-          parameters.status = parseInt(data.status);
+          parameters.status = Number(data.status);
         } else {
           parameters.status = data.status;
         }
 
-        if (typeof (data.app_login) === 'string') {
-          parameters.app_login = parseInt(data.app_login);
-        } else {
-          parameters.app_login = data.app_login;
-        }
-
-        if (typeof (data.jivochat) === 'string') {
-          parameters.jivochat = parseInt(data.jivochat);
-        } else {
-          parameters.jivochat = data.jivochat;
-        }
-
         if (typeof (data.departmentId) === 'string') {
-          parameters.departmentId = parseInt(data.departmentId);
+          parameters.departmentId = Number(data.departmentId);
         } else {
           parameters.departmentId = data.departmentId;
         }
 
         if (typeof (data.registration) === 'string') {
-          parameters.registration = parseInt(data.registration);
+          parameters.registration = Number(data.registration);
         } else {
           parameters.registration = data.registration;
         }
@@ -318,7 +303,7 @@ export class UserController {
         }
 
         if (data.cpf) {
-          if (!functionsUtils.validationCPF(data.cpf)) return { message: 'CPF invalído' };
+          if (!functionsUtils.validationCPF(data.cpf)) return { message: 'CPF invalido' };
           parameters.cpf = data.cpf;
         }
 
@@ -345,17 +330,22 @@ export class UserController {
             Object.keys(data.cultures).forEach((item) => {
               data.cultures[item].profiles.forEach((profile: any) => {
                 this.userPermissionsController.post({
-                  userId: data.id, profileId: parseInt(profile), cultureId: parseInt(data.cultures[item].cultureId), created_by: parseInt(data.created_by),
+                  userId: data.id,
+                  profileId: Number(profile),
+                  cultureId: Number(data.cultures[item].cultureId),
+                  created_by: Number(data.created_by),
                 });
               });
             });
           }
-          return { status: 200, message: { message: 'Usuario atualizada' } };
+          return { status: 200, message: { message: 'Usuário atualizada' } };
         }
-        return { status: 400, message: { message: 'usuario não existe' } };
+        return { status: 400, message: { message: 'Usuário não existe' } };
       }
-    } catch (err) {
-
+      return { status: 404, message: { message: 'Usuário atualizada' } };
+    } catch (error: any) {
+      handleError('User Controller', 'Update', error.message);
+      throw new Error('[Controller] - Update User erro');
     }
   }
 }

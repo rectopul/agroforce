@@ -1,4 +1,4 @@
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -29,50 +29,50 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ILayoultProps {
-	id: number | any;
-	id_culture: number | any;
-	esquema: string | any;
-	semente_metros: number | any;
-	disparos: number | any;
-	divisor: number | any;
-	largura: number | any;
-	comp_fisico: number | any;
-	comp_parcela: number | any;
-	comp_corredor: number | any;
-	t4_inicial: number | any;
-	t4_final: number | any;
-	df_inicial: number | any;
-	df_final: number | any;
-	created_by: number;
-	local: string | any;
-	status: number;
+  id: number | any;
+  id_culture: number | any;
+  esquema: string | any;
+  semente_metros: number | any;
+  disparos: number | any;
+  divisor: number | any;
+  largura: number | any;
+  comp_fisico: number | any;
+  comp_parcela: number | any;
+  comp_corredor: number | any;
+  t4_inicial: number | any;
+  t4_final: number | any;
+  df_inicial: number | any;
+  df_final: number | any;
+  created_by: number;
+  local: string | any;
+  status: number;
 }
 
 interface IFilter {
-	filterStatus: object | any;
-	filterCodigo: string | any;
-	filterEsquema: string | any;
-	filterTiros: string | any;
-	filterDisparos: string | any;
-	filterPlantadeira: string | any;
-	filterParcelas: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+  filterStatus: object | any;
+  filterCodigo: string | any;
+  filterEsquema: string | any;
+  filterTiros: string | any;
+  filterDisparos: string | any;
+  filterPlantadeira: string | any;
+  filterParcelas: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 interface IGenerateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 interface Idata {
-	layouts: ILayoultProps[];
-	totalItems: number;
-	filter: string | any;
-	itensPerPage: number | any;
-	filterApplication: object | any;
-	local: object | any;
-	pageBeforeEdit: string | any;
-	filterBeforeEdit: string | any
+  layouts: ILayoultProps[];
+  totalItems: number;
+  filter: string | any;
+  itensPerPage: number | any;
+  filterApplication: object | any;
+  local: object | any;
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
 export default function Listagem({
@@ -239,9 +239,9 @@ export default function Listagem({
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {
-								  setCookies('pageBeforeEdit', currentPage?.toString());
-								  setCookies('filterBeforeEdit', filtersParams);
-								  router.push(`/config/quadra/layout-quadra/atualizar?id=${rowData.id}`);
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  setCookies('filterBeforeEdit', filtersParams);
+                  router.push(`/config/quadra/layout-quadra/atualizar?id=${rowData.id}`);
                 }}
               />
             </div>
@@ -265,9 +265,9 @@ export default function Listagem({
                 bgColor="bg-blue-600"
                 textColor="white"
                 onClick={() => {
-								  setCookies('pageBeforeEdit', currentPage?.toString());
-								  setCookies('filterBeforeEdit', filtersParams);
-								  router.push(`/config/layout-quadra/atualizar?id=${rowData.id}`);
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  setCookies('filterBeforeEdit', filtersParams);
+                  router.push(`/config/layout-quadra/atualizar?id=${rowData.id}`);
                 }}
               />
             </div>
@@ -368,7 +368,7 @@ export default function Listagem({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -575,7 +575,7 @@ export default function Listagem({
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
-										</label>
+                    </label>
                     <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
                   </div>
 
@@ -611,19 +611,19 @@ export default function Listagem({
               columns={columns}
               data={quadras}
               options={{
-							  showTitle: false,
-							  headerStyle: {
-							    zIndex: 20,
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
                 },
-							  rowStyle: { background: '#f9fafb' },
-							  search: false,
-							  filtering: false,
-							  pageSize: itensPerPage,
+                rowStyle: { background: '#f9fafb' },
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
               }}
               components={{
-							  Toolbar: () => (
-  <div
-    className="w-full max-h-max
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-max
                     flex
                     items-center
                     justify-between
@@ -634,132 +634,132 @@ export default function Listagem({
                     border-solid border-b
                     border-gray-200
                   "
-  >
-    <div className="h-12">
-      <Button
-        title="Importar Planilha"
-        value="Importar Planilha"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={() => { }}
-        href="layout-quadra/importar-planilha"
-        icon={<RiFileExcel2Line size={20} />}
-      />
-    </div>
-    <strong className="text-blue-600">
-      Total registrado:
-      {' '}
-      {itemsTotal}
-    </strong>
+                  >
+                    <div className="h-12">
+                      <Button
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { }}
+                        href="layout-quadra/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-    <div className="h-full flex items-center gap-2
+                    <div className="h-full flex items-center gap-2
                     "
-    >
-      <div className="border-solid border-2 border-blue-600 rounded">
-        <div className="w-64">
-          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="characters">
-                {
-																	(provided) => (
-  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-    <div className="h-8 mb-3">
-      <Button
-        value="Atualizar"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={getValuesColumns}
-        icon={<IoReloadSharp size={20} />}
-      />
-    </div>
-    {
-																				generatesProps.map((generate, index) => (
-  <Draggable key={index} draggableId={String(generate.title)} index={index}>
-    {(provided) => (
-      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <CheckBox
-          name={generate.name}
-          title={generate.title?.toString()}
-          value={generate.value}
-          defaultChecked={camposGerenciados.includes(generate.value)}
-        />
-      </li>
-    )}
-  </Draggable>
-																				))
-																			}
-    {provided.placeholder}
-  </ul>
-																	)
-																}
-              </Droppable>
-            </DragDropContext>
-          </AccordionFilter>
-        </div>
-      </div>
+                    >
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-64">
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
 
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button title="Exportar planilha de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-      </div>
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="layout-quadra/importar-planilha/config-planilha" />
-      </div>
-    </div>
-  </div>
-							  ),
-							  Pagination: (props) => (
-  <div
-    className="flex
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="layout-quadra/importar-planilha/config-planilha" />
+                      </div>
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-    {...props}
-  >
-    <Button
-      onClick={() => setCurrentPage(currentPage - 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdFirstPage size={18} />}
-      disabled={currentPage <= 1}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage - 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiLeftArrow size={15} />}
-      disabled={currentPage <= 0}
-    />
-    {
-												Array(1).fill('').map((value, index) => (
-  <Button
-    key={index}
-    onClick={() => setCurrentPage(index)}
-    value={`${currentPage + 1}`}
-    bgColor="bg-blue-600"
-    textColor="white"
-    disabled
-  />
-												))
-											}
-    <Button
-      onClick={() => setCurrentPage(currentPage + 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiRightArrow size={15} />}
-      disabled={currentPage + 1 >= pages}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage + 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdLastPage size={18} />}
-      disabled={currentPage + 1 >= pages}
-    />
-  </div>
-								) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>
@@ -777,8 +777,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;

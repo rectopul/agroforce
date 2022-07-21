@@ -71,7 +71,7 @@ export function TabsDropDowns(typeAside: any = 'config') {
       titleTab: 'LOCAL',
       valueTab: <BsCheckLg />,
       statusTab: false,
-      hrefTab: '/config/local',
+      hrefTab: '/config/local/local',
       data: [
         { labelDropDown: 'Lugar cultura', hrefDropDown: '/config/local/local', iconDropDown: <FiMapPin /> },
         { labelDropDown: 'Un. cultura', hrefDropDown: '/config/local/unidade-cultura', iconDropDown: <FiMapPin /> },

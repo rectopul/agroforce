@@ -9,11 +9,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const id = Number(req.query.id);
   switch (req.method) {
     case 'PUT':
-      const resultPut = await Controller.updateUser(req.body);
+      const resultPut = await Controller.update(req.body);
       res.status(200).json(resultPut);
       break;
     case 'GET':
-      const result = await Controller.getOneUser(id);
+      const result = await Controller.getOne(id);
       res.status(200).json(result);
       break;
     default:

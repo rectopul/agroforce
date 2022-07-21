@@ -81,7 +81,7 @@ export default function Import({
     readXlsxFile(value.files[0]).then((rows) => {
       if (moduleId) {
         importService.validate({
-          spreadSheet: rows, moduleId, createdBy: userLogado.id, idSafra, idCulture, table,
+          spreadSheet: rows, moduleId, created_by: userLogado.id, idSafra, idCulture, table,
         }).then(({ status, message }: any) => {
           if (status !== 200) {
             Swal.fire({
@@ -99,7 +99,7 @@ export default function Import({
         });
       } else {
         importService.validateProtocol({
-          spreadSheet: rows, createdBy: userLogado.id,
+          spreadSheet: rows, created_by: userLogado.id,
         }).then((response) => {
           if (response.message !== '') {
             Swal.fire({
@@ -291,7 +291,7 @@ export default function Import({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
