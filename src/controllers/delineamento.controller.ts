@@ -12,9 +12,9 @@ export class DelineamentoController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterName) {
@@ -23,11 +23,11 @@ export class DelineamentoController {
       }
 
       if (options.filterRepeat) {
-        parameters.repeticao = parseInt(options.filterRepeat);
+        parameters.repeticao = Number(options.filterRepeat);
       }
 
       if (options.filterTreatment) {
-        parameters.trat_repeticao = parseInt(options.filterTreatment);
+        parameters.trat_repeticao = Number(options.filterTreatment);
       }
 
       if (options.paramSelect) {
@@ -45,11 +45,11 @@ export class DelineamentoController {
       }
 
       if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.status) {
-        parameters.status = parseInt(options.status);
+        parameters.status = Number(options.status);
       }
 
       if (options.name) {
@@ -66,7 +66,7 @@ export class DelineamentoController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -74,7 +74,7 @@ export class DelineamentoController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }
@@ -125,7 +125,7 @@ export class DelineamentoController {
     const parameters: object | any = {};
     try {
       if (typeof (data.status) === 'string') {
-        parameters.status = parseInt(data.status);
+        parameters.status = Number(data.status);
       } else {
         parameters.status = data.status;
       }

@@ -1,4 +1,6 @@
-import { removeCookies, setCookies } from 'cookies-next';
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -27,18 +29,19 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
-  id: number | any;
-  name: string | any;
+  id: number
+  name: string
   envelope?: []
   created_by: number;
   status: number;
 }
 
 interface IFilter {
-  filterStatus: object | any;
-  filterSearch: string | any;
-  orderBy: object | any;
-  typeOrder: object | any;
+  filterStatus: string
+  filterName: string
+  filterProtocolName: string
+  orderBy: string
+  typeOrder: string
 }
 interface IGenerateProps {
   name: string | undefined;
@@ -46,19 +49,19 @@ interface IGenerateProps {
   value: string | number | readonly string[] | undefined;
 }
 interface IData {
-  allItems: ITypeAssayProps[];
+  allTypeAssay: ITypeAssayProps[];
   totalItems: number;
-  filter: string | any;
-  itensPerPage: number | any;
-  filterApplication: object | any;
+  filter: string
+  itensPerPage: number
+  filterApplication: object
   idCulture: number;
   idSafra: string;
   pageBeforeEdit: string | any
-  filterBeforeEdit: string | any;
+  filterBeforeEdit: string
 }
 
 export default function TipoEnsaio({
-  allItems,
+  allTypeAssay,
   itensPerPage,
   filterApplication,
   totalItems,
@@ -81,7 +84,7 @@ export default function TipoEnsaio({
   const preferences = userLogado.preferences.tipo_ensaio || { id: 0, table_preferences: 'id,name,protocol_name,envelope,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allItems);
+  const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(() => allTypeAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -115,12 +118,13 @@ export default function TipoEnsaio({
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
-      filterSearch: '',
+      filterName: '',
+      filterProtocolName: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}&id_culture=${idCulture}&id_safra=${idSafra}`;
+    onSubmit: async ({ filterStatus, filterName, filterProtocolName }) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1}&filterName=${filterName}&filterProtocolName=${filterProtocolName}&id_culture=${idCulture}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await typeAssayService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -295,10 +299,7 @@ export default function TipoEnsaio({
           </div>
         ) : (
           <div className="h-10 flex">
-            <div className="
-							h-10
-						"
-            >
+            <div className="h-10">
               <Button
                 icon={<BiEdit size={16} />}
                 onClick={() => { }}
@@ -335,7 +336,7 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Nome do Protocolo', 'protocol_name'));
       }
       if (columnOrder[item] === 'envelope') {
-        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope.seeds'));
+        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope[0].seeds'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -397,12 +398,7 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    let newFilter;
-    if (!filterApplication.includes('paramSelect')) {
-      newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
-    }
-
-    await typeAssayService.getAll(newFilter).then((response) => {
+    await typeAssayService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           const newRow = row;
@@ -445,9 +441,9 @@ export default function TipoEnsaio({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await typeAssayService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setTypeAssay(response.response);
+    await typeAssayService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setTypeAssay(response);
       }
     });
   }
@@ -501,8 +497,22 @@ export default function TipoEnsaio({
                       type="text"
                       placeholder="nome"
                       max="40"
-                      id="filterSearch"
-                      name="filterSearch"
+                      id="filterName"
+                      name="filterName"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                      Protocolo
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="protocolo"
+                      max="40"
+                      id="filterProtocolName"
+                      name="filterProtocolName"
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -704,8 +714,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
@@ -722,12 +732,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allItems, total: totalItems } = await response.json();
+  const { response: allTypeAssay, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {
-      allItems,
+      allTypeAssay,
       totalItems,
       itensPerPage,
       filterApplication,

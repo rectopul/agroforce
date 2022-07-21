@@ -1,4 +1,4 @@
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -289,7 +289,7 @@ export default function Listagem({
 	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
-		for (let i = 0; i < els.length; i++) {
+		for (let i = 0; i < els.length; i += 1) {
 			if (els[i].checked) {
 				selecionados += `${els[i].value},`;
 			}
@@ -661,8 +661,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-	removeCookies('pageBeforeEdit', { req, res });
-	removeCookies('filterBeforeEdit', { req, res });
+	deleteCookie('pageBeforeEdit', { req, res });
+	deleteCookie('filterBeforeEdit', { req, res });
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;

@@ -29,9 +29,9 @@ export class EpocaController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
@@ -40,7 +40,7 @@ export class EpocaController {
       }
 
       if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.paramSelect) {
@@ -63,7 +63,7 @@ export class EpocaController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -71,7 +71,7 @@ export class EpocaController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }

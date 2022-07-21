@@ -41,7 +41,7 @@ export default function NovoLocal() {
   const formik = useFormik<ITecnologiaProps>({
     initialValues: {
       id: 1,
-      id_culture: parseInt(culture),
+      id_culture: Number(culture),
       name: '',
       cod_tec: '',
       desc: '',
@@ -57,7 +57,7 @@ export default function NovoLocal() {
       }
 
       await tecnologiaService.create({
-        id_culture: parseInt(culture),
+        id_culture: Number(culture),
         name: capitalize(values.name),
         cod_tec: capitalize(values.cod_tec),
         desc: capitalize(values.desc),

@@ -1,4 +1,4 @@
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -432,7 +432,7 @@ export default function Listagem({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -800,9 +800,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
 
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 

@@ -1,7 +1,8 @@
 import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -12,8 +13,8 @@ import Swal from 'sweetalert2';
 import {
   Button,
   Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IUpdateCulture {
@@ -21,7 +22,7 @@ export interface IUpdateCulture {
   name: string;
   desc: string;
   status: number;
-};
+}
 
 export default function Cultura(culture: IUpdateCulture) {
   const { TabsDropDowns } = ITabs.default;
@@ -42,13 +43,13 @@ export default function Cultura(culture: IUpdateCulture) {
       id: culture.id,
       name: culture.name,
       desc: culture.desc,
-      status: culture.status
+      status: culture.status,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
 
       await cultureService.updateCulture({
@@ -71,14 +72,14 @@ export default function Cultura(culture: IUpdateCulture) {
 
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
-      let inputDesc: any = document.getElementById("desc");
+      const inputDesc: any = document.getElementById('desc');
       inputDesc.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
-      let inputDesc: any = document.getElementById("desc");
+      const inputDesc: any = document.getElementById('desc');
       inputDesc.style.borderColor = '';
     }
   }
@@ -89,7 +90,7 @@ export default function Cultura(culture: IUpdateCulture) {
         <title>Atualizar cultura</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -103,7 +104,8 @@ export default function Cultura(culture: IUpdateCulture) {
           gap-2
           mt-4
           mb-4
-        ">
+        "
+          >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
@@ -113,6 +115,8 @@ export default function Cultura(culture: IUpdateCulture) {
                 id="name"
                 name="name"
                 type="text"
+                style={{ background: '#f9fafb' }}
+                disabled
                 maxLength={2}
                 placeholder="ex: AL"
                 onChange={formik.handleChange}
@@ -125,6 +129,7 @@ export default function Cultura(culture: IUpdateCulture) {
                 Nome
               </label>
               <Input
+
                 id="desc"
                 name="desc"
                 type="text"
@@ -142,7 +147,8 @@ export default function Cultura(culture: IUpdateCulture) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -173,17 +179,17 @@ export default function Cultura(culture: IUpdateCulture) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiCulture = await fetch(`${baseUrl}/` + context.query.id, requestOptions);
+  const apiCulture = await fetch(`${baseUrl}/${context.query.id}`, requestOptions);
 
   const culture = await apiCulture.json();
 
-  return { props: culture }
-}
+  return { props: culture };
+};

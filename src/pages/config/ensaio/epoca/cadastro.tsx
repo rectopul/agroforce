@@ -36,7 +36,7 @@ export default function NovoLocal() {
 
   const formik = useFormik<IEpocaProps>({
     initialValues: {
-      id_culture: parseInt(culture),
+      id_culture: Number(culture),
       name: '',
       created_by: userLogado.id,
     },
@@ -45,9 +45,9 @@ export default function NovoLocal() {
       if (!values.name) { return; }
 
       await epocaService.create({
-        id_culture: parseInt(culture),
+        id_culture: Number(culture),
         name: capitalize(values.name),
-        created_by: parseInt(userLogado.id),
+        created_by: Number(userLogado.id),
       }).then((response) => {
         if (response.status === 201) {
           Swal.fire('Época cadastrada com sucesso!');

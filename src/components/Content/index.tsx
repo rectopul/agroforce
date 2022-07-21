@@ -123,7 +123,7 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
         path: '/',
       });
       setSafraSelecionada(value);
-      userLogado.safras.safra_selecionada = parseInt(value);
+      userLogado.safras.safra_selecionada = Number(value);
       localStorage.setItem('user', JSON.stringify(userLogado));
       location.reload();
     }
@@ -141,7 +141,7 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
               <Select values={cultures} onChange={(e) => validationCulture(e.target.value)} selected={culturaSelecionada} />
             </div>
             <div className="h-10 lg:w-40 md:w-32 sm:w-26">
-              <Select values={safras} onChange={(e) => validationSafras(e.target.value)} selected={parseInt(safraSelecionada)} />
+              <Select values={safras} onChange={(e) => validationSafras(e.target.value)} selected={Number(safraSelecionada)} />
             </div>
           </div>
         )}

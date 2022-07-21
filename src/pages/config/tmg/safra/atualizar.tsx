@@ -141,6 +141,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 id="safraName"
                 name="safraName"
+                disabled
+                style={{ background: '#e5e7eb' }}
                 placeholder="___________"
                 maxLength={10}
                 onChange={formik.handleChange}
@@ -172,6 +174,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 id="year"
                 name="year"
                 maxLength={4}
+                disabled
+                style={{ background: '#e5e7eb' }}
                 placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}

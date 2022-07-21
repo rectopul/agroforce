@@ -1,20 +1,24 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { FiUserPlus } from "react-icons/fi";
-import { IoMdArrowBack } from "react-icons/io";
+import { FiUserPlus } from 'react-icons/fi';
+import { IoMdArrowBack } from 'react-icons/io';
 import InputMask from 'react-input-mask';
-import { userService } from "src/services";
 import Swal from 'sweetalert2';
+import { userService } from '../../../../services/user.service';
 import {
   Button, CheckBox, Content,
-  Input, Select
-} from "../../../../components";
-import IDepartment from "../../../../components/props/departmentDTO";
+  Input, Select,
+} from '../../../../components';
+import IDepartment from '../../../../components/props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {
@@ -36,8 +40,6 @@ interface IUsers {
   avatar: string;
   registration: number;
   departmentId: number;
-  jivochat: number;
-  app_login: number;
   status?: number;
   created_by: number | any;
   confirmPassword: string;
@@ -53,7 +55,7 @@ export interface IData {
 export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'TMG'
@@ -64,8 +66,57 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
   const router = useRouter();
 
   const maskTel = '(99)99999-9999' || '(99)9999-9999';
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const optionSorN = [{ id: 1, name: "Sim" }, { id: 0, name: "Não" }];
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+
+  function validateInputs(values: any) {
+    if (!values.name) {
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
+    } else {
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
+    }
+
+    if (!values.login) {
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = 'red';
+    } else {
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = '';
+    }
+
+    if (!values.cpf) {
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = 'red';
+    } else {
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = '';
+    }
+
+    if (!values.departmentId) {
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = 'red';
+    } else {
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = '';
+    }
+
+    if (!values.password) {
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = 'red';
+    } else {
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = '';
+    }
+
+    if (!values.confirmPassword) {
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = 'red';
+    } else {
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = '';
+    }
+  }
 
   const formik = useFormik<IUsers>({
     initialValues: {
@@ -79,21 +130,24 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       confirmPassword: '',
       registration: 0,
       departmentId: 0,
-      jivochat: 0,
       status: 1,
-      app_login: 0,
       created_by: userLogado.id,
-      cultures: []
+      cultures: [],
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name || !values.login || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+      if (!values.name
+        || !values.login
+        || !values.cpf
+        || !values.departmentId
+        || !values.password
+        || !values.confirmPassword) {
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
       if (values.password !== values.confirmPassword) {
-        Swal.fire("As senhas devem ser iguais")
-        return
+        Swal.fire('As senhas devem ser iguais');
+        return;
       }
 
       let ObjProfiles;
@@ -102,17 +156,17 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input = document.querySelector('select[name="profiles_' + values.cultures[item] + '"]');
+        input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
         auxObject2 = [];
-        for (let i = 0; i < input.options.length; i++) {
+        for (let i = 0; i < input.options.length; i += 1) {
           if (input.options[i].selected) {
             auxObject2.push(input.options[i].value);
           }
         }
         ObjProfiles = {
           cultureId: values.cultures[item],
-          profiles: auxObject2
-        }
+          profiles: auxObject2,
+        };
         auxObject.push(ObjProfiles);
       });
 
@@ -126,75 +180,19 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         password: values.password,
         registration: values.registration,
         departmentId: values.departmentId,
-        jivochat: values.jivochat,
         status: values.status,
-        app_login: values.app_login,
         created_by: values.created_by,
         cultures: auxObject,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Usuário cadastrado com sucesso!')
+          Swal.fire('Usuário cadastrado com sucesso!');
           router.back();
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
-      })
+      });
     },
   });
-
-  function validateInputs(values: any) {
-    if (!values.name) {
-      let inputName: any = document.getElementById("name");
-      inputName.style.borderColor = 'red';
-    } else {
-      let inputName: any = document.getElementById("name");
-      inputName.style.borderColor = '';
-    }
-
-    if (!values.login) {
-      let inputLogin: any = document.getElementById("login");
-      inputLogin.style.borderColor = 'red';
-    } else {
-      let inputLogin: any = document.getElementById("login");
-      inputLogin.style.borderColor = '';
-    }
-
-    if (!values.cpf) {
-      let inputCpf: any = document.getElementById("cpf");
-      inputCpf.style.borderColor = 'red';
-    } else {
-      let inputCpf: any = document.getElementById("cpf");
-      inputCpf.style.borderColor = '';
-    }
-
-    if (!values.departmentId) {
-      let inputDepartmentId: any = document.getElementById("departmentId");
-      inputDepartmentId.style.borderColor = 'red';
-    } else {
-      let inputDepartmentId: any = document.getElementById("departmentId");
-      inputDepartmentId.style.borderColor = '';
-    }
-
-    if (!values.password) {
-      let inputPassword: any = document.getElementById("password");
-      inputPassword.style.borderColor = 'red';
-    } else {
-      let inputPassword: any = document.getElementById("password");
-      inputPassword.style.borderColor = '';
-    }
-
-    if (!values.confirmPassword) {
-      let inputconfirmPassword: any = document.getElementById("confirmPassword");
-      inputconfirmPassword.style.borderColor = 'red';
-    } else {
-      let inputconfirmPassword: any = document.getElementById("confirmPassword");
-      inputconfirmPassword.style.borderColor = '';
-    }
-  }
-
-  // useEffect(() => {
-
-  // }, [])
 
   return (
     <>
@@ -202,8 +200,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         <title>Novo usuário</title>
       </Head>
 
-
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -213,12 +210,13 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Nome
@@ -275,11 +273,12 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Email
@@ -321,7 +320,6 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               />
             </div>
 
-
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Telefone
@@ -354,7 +352,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             justify-between
             gap-6
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Senha
@@ -389,37 +388,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             justify-between
             gap-6
             mb-4
-          ">
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Libera jivochat
-              </label>
-              <Select
-                values={optionSorN}
-                id="jivochat"
-                name="jivochat"
-                onChange={formik.handleChange}
-                value={formik.values.jivochat}
-                selected={false}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login do App
-              </label>
-              <div className="h-10">
-                <Select
-                  values={optionSorN}
-
-                  id="app_login"
-                  name="app_login"
-                  onChange={formik.handleChange}
-                  value={formik.values.app_login}
-                  selected={false}
-                />
-              </div>
-            </div>
-          </div>
+          "
+          />
           <div className="w-full mt-6">
             <h2 className="text-gray-900 text-2xl mb-4">
               Permissões de Culturas
@@ -427,40 +397,38 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             <div className="w-full grid grid-cols-3 gap-6">
               {
                 Cultures.map((culture, index) => (
-                  <>
-                    <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                      <div className="w-full text-xl">
-                        <CheckBox
-                          key={culture.id}
-                          title={culture.name}
-                          id={`culture_${culture.id}`}
-                          name="cultures"
+                  <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
+                    <div className="w-full text-xl">
+                      <CheckBox
+                        key={culture.id}
+                        title={culture.name}
+                        id={`culture_${culture.id}`}
+                        name="cultures"
+                        onChange={formik.handleChange}
+                        value={culture.id}
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <h4 className="block text-gray-900 text-sm font-bold mb-2">
+                        Permissões
+                      </h4>
+                      <div>
+                        <MultiSelectComponent
+                          id={`profiles_${culture.id}`}
+                          name={`profiles_${culture.id}`}
                           onChange={formik.handleChange}
-                          value={culture.id}
+                          dataSource={profiles as any}
+                          mode="Box"
+                          fields={{
+                            text: 'name',
+                            value: 'id',
+                          }}
+                          placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
                         />
                       </div>
-
-                      <div className="w-full">
-                        <h4 className='block text-gray-900 text-sm font-bold mb-2'>
-                          Permissões
-                        </h4>
-                        <div>
-                          <MultiSelectComponent
-                            id={`profiles_${culture.id}`}
-                            name={`profiles_${culture.id}`}
-                            onChange={formik.handleChange}
-                            dataSource={profiles as any}
-                            mode="Box"
-                            fields={{
-                              text: "name",
-                              value: "id"
-                            }}
-                            placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
-                          />
-                        </div>
-                      </div>
                     </div>
-                  </>
+                  </div>
                 ))
               }
             </div>
@@ -472,7 +440,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -503,11 +472,11 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const token = req.cookies.token;
+  const { token } = req.cookies;
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
@@ -518,5 +487,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const profiles = await apiProfile.json();
   const Cultures = (await apiCulture.json()).response;
 
-  return { props: { departments, profiles, Cultures } }
-}
+  return { props: { departments, profiles, Cultures } };
+};

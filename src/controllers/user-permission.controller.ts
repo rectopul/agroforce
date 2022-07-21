@@ -6,7 +6,7 @@ export class UserPermissionController {
 	async getUserPermissions(userId: any) {
 		try {
 			if (typeof (userId) === 'string') {
-				userId = parseInt(userId);
+				userId = Number(userId);
 			}
 
 			// const response = await this.userPermission.getPermissionsByUser(userId);
@@ -39,7 +39,7 @@ export class UserPermissionController {
 	}
 
 	async getByUserID(userId: number | any) {
-		const newID = parseInt(userId);
+		const newID = Number(userId);
 		try {
 			if (userId && userId !== '{id}') {
 				const response = await this.userPermission.findAllByUser(newID);
@@ -59,7 +59,7 @@ export class UserPermissionController {
 	async post(data: object | any) {
 		try {
 			if (data !== null && data !== undefined) {
-				await this.delete(parseInt(data.userId));
+				await this.delete(Number(data.userId));
 				data.status = 0;
 				const response = await this.userPermission.create(data);
 				if (response.count > 0) {
@@ -79,11 +79,11 @@ export class UserPermissionController {
 				const parameters: object | any = {};
 
 				if (typeof (data.status) === 'string') {
-					parameters.status = parseInt(data.status);
+					parameters.status = Number(data.status);
 				} else {
 					parameters.status = data.status;
 				}
-				await this.userPermission.queryRaw(parseInt(data.idUser), parseInt(data.cultureId));
+				await this.userPermission.queryRaw(Number(data.idUser), Number(data.cultureId));
 				return { status: 200 }
 			}
 		} catch (err) {

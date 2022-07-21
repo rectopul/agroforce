@@ -1,15 +1,14 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { Button, Select } from "src/components";
-import { AZ } from "src/shared/utils/a-z";
-import { Input } from "../../components";
-import { useFormik } from "formik";
-import { importService } from "src/services";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import { Button, Select } from 'src/components';
+import { AZ } from 'src/shared/utils/a-z';
+import { useFormik } from 'formik';
+import { importService } from 'src/services';
 import Swal from 'sweetalert2';
-
+import { Input } from '..';
 
 interface IImportPlanilhaProps {
   data: object | any;
@@ -33,7 +32,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   const formik = useFormik<IImport>({
     initialValues: {
       moduleId: '',
-      fields: ''
+      fields: '',
     },
     onSubmit: async (values) => {
       let ObjProfiles;
@@ -41,17 +40,17 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
       const auxObject: any = [];
       let auxObject2: any = [];
 
-      for (let i = 0; i < quantityColumns; i++) {
-        input = document.querySelector('select[name="fields_' + i + '"]');
+      for (let i = 0; i < quantityColumns; i += 1) {
+        input = document.querySelector(`select[name="fields_${i}"]`);
         auxObject2 = [];
-        for (let i = 0; i < input.options.length; i++) {
-          if (input.options[i].selected) {
-            auxObject2.push(input.options[i].value);
+        for (let j = 0; j < input.options.length; j += 1) {
+          if (input.options[j].selected) {
+            auxObject2.push(input.options[j].value);
           }
         }
         ObjProfiles = {
-          profiles: auxObject2
-        }
+          profiles: auxObject2,
+        };
         auxObject.push(ObjProfiles);
       }
     },
@@ -66,8 +65,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     let input: any;
     const auxObject: any = [];
     let auxObject2: any = [];
-    for (let i = 0; i < quantityColumns; i++) {
-      input = document.querySelector('select[name="fields_' + i + '"]');
+    for (let i = 0; i < quantityColumns; i += 1) {
+      input = document.querySelector(`select[name="fields_${i}"]`);
       auxObject2 = [];
       for (let v = 0; v < input.options.length; v++) {
         if (input.options[v].selected) {
@@ -80,7 +79,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
       }
     }
     if (!hasDuplicates(auxObject)) {
-      importService.create({ moduleId: moduleId, fields: auxObject }).then((response) => {
+      importService.create({ moduleId, fields: auxObject }).then((response) => {
         if (response.status === 200) {
           Swal.fire(response.message);
           router.back();
@@ -89,19 +88,17 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
     } else {
       Swal.fire('Existe itens duplicados na configuração');
     }
-
   }
   function toLetter(columnNumber: any) {
+    const letras = 'ABCDEFGHIJKLMNOPQRSTUVXWYZ';
 
-    let letras = "ABCDEFGHIJKLMNOPQRSTUVXWYZ";
-
-    let columnName = "";
+    let columnName = '';
 
     while (columnNumber > 0) {
-      let rem = columnNumber % 26;
+      const rem = columnNumber % 26;
 
       if (rem === 0) {
-        columnName = "Z" + columnName;
+        columnName = `Z${columnName}`;
         columnNumber = Math.floor(columnNumber / 26) - 1;
       } else {
         columnName = letras.charAt(rem - 1) + columnName;
@@ -112,13 +109,13 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
   }
 
   function validateColumns(value: any) {
-    let allLetters = [];
-    let letra = "";
+    const allLetters = [];
+    let letra = '';
     setQuantityColumns(value);
-    for (let i = 0; i <= value; i++) {
+    for (let i = 0; i <= value; i += 1) {
       letra = toLetter(i);
-      if (letra !== "") {
-        allLetters.push(letra)
+      if (letra !== '') {
+        allLetters.push(letra);
       }
     }
     setLetras(allLetters);
@@ -152,7 +149,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 id="quantity-columns"
                 min={`${data.length}`}
                 value={quantityColumns}
-                onChange={(e) => validateColumns(parseInt(e.target.value))}
+                onChange={(e) => validateColumns(Number(e.target.value))}
               />
             </div>
 
@@ -163,7 +160,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiFileExcel2Line size={20} />}
-                onClick={() => { saveConfig() }}
+                onClick={() => { saveConfig(); }}
               />
             </div>
           </div>
@@ -174,7 +171,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
             bg-blue-900
             text-white
             px-2
-          ">
+          "
+          >
             <span className="h-full w-1/12 flex items-center">Coluna do Excel</span>
           </div>
         </div>
@@ -189,7 +187,8 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
             pl-2
             bg-blue-900
             text-white
-          ">
+          "
+          >
             <span className="w-full py-7">Campo(s)</span>
           </aside>
           <form
@@ -207,29 +206,25 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                   if (index < quantityColumns) {
                     {
                       return (
-                        <>
-                          <div key={index} className="sm:pb-2 md:pb-0 md:pb-0 h-16 w-32 flex items-center justify-center">
-                            <strong className="sm:h-10 sm:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 flex justify-center items-center border-2 rounded-full">
-                              {Letras[index]}
-                            </strong>
-                          </div>
-                        </>
-                      )
+                        <div key={index} className="sm:pb-2 md:pb-0 md:pb-0 h-16 w-32 flex items-center justify-center">
+                          <strong className="sm:h-10 sm:w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 flex justify-center items-center border-2 rounded-full">
+                            {Letras[index]}
+                          </strong>
+                        </div>
+                      );
                     }
                   }
                 })}
               </div>
               <div className="flex  justify-start items-center py-8 gap-3">
-                <div className="flex pl-2 justify-start items-center gap-3 py-3 mt-16 ml-2" >
+                <div className="flex pl-2 justify-start items-center gap-3 py-3 mt-16 ml-2">
                   {(quantityColumns > 0)
-                    ?
-                    Array(quantityColumns).fill('').map((_, index) => (
+                    ? Array(quantityColumns).fill('').map((_, index) => (
                       <div key={index} className="h-11 w-32">
                         <Select name={`fields_${index}`} onChange={formik.handleChange} selected={configPlanilhaSalva[index]} values={Options} />
                       </div>
                     ))
-                    : ''
-                  }
+                    : ''}
                 </div>
               </div>
             </main>

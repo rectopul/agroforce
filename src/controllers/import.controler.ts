@@ -1,4 +1,7 @@
-import { ImportRepository } from 'src/repository/import.repository';
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-await-in-loop */
 import { SafraController } from './safra.controller';
 import { LocalController } from './local.controller';
 import { FocoController } from './foco.controller';
@@ -23,6 +26,7 @@ import { FocoRepository } from '../repository/foco.repository';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
 import { ImportExperimentController } from './experiment/import-experiment.controller';
 import { ImportGenotypeTreatmentController } from './genotype-treatment/import-genotype-treatment.controller';
+import { ImportRepository } from '../repository/import.repository';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -168,13 +172,16 @@ export class ImportController {
           return await ImportGenotypeTreatmentController.validate(data);
         }
 
-        const { status, responseLog, message }: any = await this.logImportController.create({
-          user_id: data.createdBy, status: 2, table: data.table,
+        const {
+          status,
+          response: responseLog,
+          message,
+        }: any = await this.logImportController.create({
+          user_id: data.created_by, status: 2, table: data.table,
         });
-        console.log(responseLog);
-        if (responseLog.status === 400) {
+        if (status === 400) {
           return {
-            status: 200, message: responseLog.message, error: true,
+            status: 200, message, error: true,
           };
         }
 
@@ -282,7 +289,7 @@ export class ImportController {
           }
         }
 
-        await this.logImportController.update({ id: responseLog.response.id, status: 1 });
+        await this.logImportController.update({ id: responseLog?.id, status: 1 });
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {
@@ -560,7 +567,6 @@ export class ImportController {
             } else if ((spreadSheet[row][column]).toString().length > 2) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, o limite de caracteres para o Código da tecnologia e 2. </li> <br>`;
             } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
-              // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
             } else {
               const technology = await this.tecnologiaController.getAll({ id_culture, cod_tec: (spreadSheet[row][0].toString()) });
@@ -692,6 +698,9 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
+                  if ((typeof (data.spreadSheet[keySheet][sheet])) === 'number' && data.spreadSheet[keySheet][sheet].toString().length < 2) {
+                    data.spreadSheet[keySheet][sheet] = `0${data.spreadSheet[keySheet][sheet].toString()}`;
+                  }
                   const ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
                   if (ogm.total == 0) {
                     // console.log('aqui OGM');
@@ -806,7 +815,9 @@ export class ImportController {
               this.aux.prox_npe = 0;
               if (configModule.response[0].fields[sheet] == 'Local') {
                 // console.log("Local R");
-                const local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
+                const local: any = await this.localController.getAll(
+                  { name_local_culture: data.spreadSheet[keySheet][sheet] },
+                );
                 this.aux.id_local = local.response[0].id;
               }
 
@@ -817,7 +828,7 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 // console.log("OGM R");
-                const ogm: any = await this.ogmController.getAll({ name: String(data.spreadSheet[keySheet][sheet]) });
+                const ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
                 this.aux.id_ogm = ogm.response[0].id;
               }
 

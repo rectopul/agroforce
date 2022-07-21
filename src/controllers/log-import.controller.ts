@@ -14,12 +14,12 @@ export class LogImportController {
     try {
       const response = await this.logImportRepository.findById(id);
 
-      if (!response) throw new Error('Grupo não encontrado');
+      if (!response) throw new Error('Log Import não encontrado');
 
       return { status: 200, response };
     } catch (error: any) {
-      handleError('Grupo controller', 'GetOne', error.message);
-      throw new Error('[Controller] - GetOne Grupo erro');
+      handleError('Log Import controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Log Import erro');
     }
   }
 
@@ -31,10 +31,10 @@ export class LogImportController {
 
       const response = await this.logImportRepository.create(data);
 
-      return { status: 201, response, message: 'grupo cadastrado' };
+      return { status: 201, response, message: 'Log Import cadastrado' };
     } catch (error: any) {
-      handleError('Grupo controller', 'Create', error.message);
-      throw new Error('[Controller] - Create Grupo erro');
+      handleError('Log Import controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Log Import erro');
     }
   }
 

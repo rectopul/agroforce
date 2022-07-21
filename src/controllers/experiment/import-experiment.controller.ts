@@ -20,7 +20,7 @@ import { LogImportController } from '../log-import.controller';
 
 export class ImportExperimentController {
   static async validate({
-    idLog, spreadSheet, idSafra, idCulture, createdBy,
+    idLog, spreadSheet, idSafra, idCulture, created_by,
   }: ImportValidate): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
@@ -289,7 +289,7 @@ export class ImportExperimentController {
                   eel: spreadSheet[row][13],
                   comments,
                   orderDraw: spreadSheet[row][15],
-                  created_by: createdBy,
+                  created_by: created_by,
                 },
               );
             }

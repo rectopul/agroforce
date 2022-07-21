@@ -52,7 +52,6 @@ export class LoteController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any = '';
-    let select: any = [];
     parameters.AND = [];
     try {
       if (options.filterStatus) {
@@ -83,7 +82,8 @@ export class LoteController {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "name_main": {"contains": "${options.filterMainName}" } } }`));
       }
       if (options.filterGmr) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr":  ${Number(options.filterGmr)}  } }`));
+        const gmrMax = Number(options.filterGmr) + 1;
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr": {"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" } } }`));
       }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "bgm":  ${Number(options.filterBgm)}  } }`));
@@ -92,37 +92,27 @@ export class LoteController {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "name": {"contains": "${options.filterTecnologia}" } } }`));
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          id_genotipo: true,
-          id_safra: true,
-          cod_lote: true,
-          id_s2: true,
-          id_dados: true,
-          year: true,
-          ncc: true,
-          fase: true,
-          peso: true,
-          quant_sementes: true,
-          status: true,
-          genotipo: {
-            select: {
-              name_genotipo: true,
-              name_main: true,
-              gmr: true,
-              bgm: true,
-              tecnologia: { select: { name: true } },
-            },
+      const select = {
+        id: true,
+        cod_lote: true,
+        id_s2: true,
+        id_dados: true,
+        year: true,
+        ncc: true,
+        fase: true,
+        peso: true,
+        quant_sementes: true,
+        status: true,
+        genotipo: {
+          select: {
+            name_genotipo: true,
+            name_main: true,
+            gmr: true,
+            bgm: true,
+            tecnologia: { select: { name: true } },
           },
-        };
-      }
+        },
+      };
 
       if (options.genotipo) {
         parameters.genotipo = options.genotipo;
