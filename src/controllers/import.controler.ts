@@ -22,7 +22,7 @@ import { LogImportController } from './log-import.controller';
 import { FocoRepository } from '../repository/foco.repository';
 import { TecnologiaRepository } from '../repository/tecnologia.repository';
 import { ImportExperimentController } from './experiment/import-experiment.controller';
-import { ImportGenotypeTreatmentController } from './genotype-tratment/import-genotype-treatment.controller';
+import { ImportGenotypeTreatmentController } from './genotype-treatment/import-genotype-treatment.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
