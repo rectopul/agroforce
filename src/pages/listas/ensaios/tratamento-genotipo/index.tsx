@@ -27,7 +27,9 @@ import { BsDownload } from 'react-icons/bs';
 import { ITreatment, ITreatmentFilter, ITreatmentGrid } from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
-import { genotypeTreatmentService, importService, userPreferencesService } from '../../../../services';
+import {
+  genotypeTreatmentService, importService, replaceTreatmentService, userPreferencesService,
+} from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
@@ -107,12 +109,13 @@ export default function TipoEnsaio({
       name: 'StatusCheckbox', title: 'SORTEADO', value: 'sorteado', defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
+  const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-  const checkedItems: any = [];
-  const [checkedAllItems, setCheckedAllItems] = useState<boolean>(false);
+  const checkedItems: any = {};
+  const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
@@ -213,7 +216,7 @@ export default function TipoEnsaio({
   }
 
   const setCheck = (id: any) => {
-    checkedItems[id] = !checkedItems[id];
+    checkedItems[id] = checkedItems[id] ? false : treatments[id - 1]?.genotipo.name_genotipo;
     console.log('checkedItems');
     console.log(checkedItems);
   };
@@ -221,7 +224,8 @@ export default function TipoEnsaio({
   const setAllCheck = () => {
     setCheckedAllItems(!checkedAllItems);
     treatments?.forEach((item) => {
-      checkedItems[item.id] = checkedAllItems;
+      checkedItems[item.id] = (checkedItems[item.id])?.length > 0
+        ? false : item?.genotipo.name_genotipo;
     });
     console.log('checkedItems');
     console.log(checkedItems);
@@ -243,7 +247,7 @@ export default function TipoEnsaio({
         (
           <div className="h-10 flex">
             <Checkbox1
-              checked={checkedItems[rowData.id]}
+              checked={!!checkedItems[rowData.id]}
               onChange={() => setCheck(rowData.id)}
               sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
             />
@@ -464,84 +468,110 @@ export default function TipoEnsaio({
   }
 
   function importValidate() {
-    const user = 23;
-    const id_safra = 2;
-    const id_culture = 1;
-    const rows = [
-      [
-        'GLI (Grupo de linhagem)',
-        'SAFRA',
-        'FOCO',
-        'ENSAIO',
-        'Código da tecnologia',
-        'BGM',
-        'NT',
-        'Nome do genótipo',
-        'NCA',
-        'Novo Nome do genótipo',
-        'T',
-        'Novo NCA',
-      ],
-      [
-        'BKF2RL(0)/001',
-        '2021_22',
-        'CO',
-        'F2',
-        0,
-        13,
-        1,
-        'TMGC21-0-61301_05',
-        202120585414,
-        'T',
-        'TMGC21-0-61301_05',
-        202120585415,
-      ],
-      [
-        'BKF2RL(0)/001',
-        '2021_22',
-        'CO',
-        'F2',
-        0,
-        13,
-        2,
-        'TMGC21-0-61301_07',
-        202120585416,
-        'TMGC21-0-61301_07',
-        'L',
-        202120585413,
-      ],
-      [
-        'BKF2RL(0)/001',
-        '2021_22',
-        'CO',
-        'F2',
-        0,
-        5,
-        3,
-        'TMGC21-0-61301_04',
-        202120585412,
-        'TMGC21-0-61301_04',
-        'T',
-        202120585417,
-      ],
-    ];
 
-    importService.validate({
-      spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, createdBy: user, table: 'tratmento',
-    }).then(({ status, message }: any) => {
-      if (status !== 200) {
-        Swal.fire({
-          html: message,
-          width: '900',
-        });
-      }
-      if (status === 200) {
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-      }
-    });
+    // const user = 23;
+    // const id_safra = 2;
+    // const id_culture = 1;
+    // const rows = [
+    //   [
+    //     'GLI (Grupo de linhagem)',
+    //     'SAFRA',
+    //     'FOCO',
+    //     'ENSAIO',
+    //     'Código da tecnologia',
+    //     'BGM',
+    //     'NT',
+    //     'Nome do genótipo',
+    //     'NCA',
+    //     'Novo Nome do genótipo',
+    //     'T',
+    //     'Novo NCA',
+    //   ],
+    //   [
+    //     'BKF2RL(0)/001',
+    //     '2021_22',
+    //     'CO',
+    //     'F2',
+    //     0,
+    //     13,
+    //     1,
+    //     'TMGC21-0-61301_05',
+    //     202120585414,
+    //     'T',
+    //     'TMGC21-0-61301_05',
+    //     202120585415,
+    //   ],
+    //   [
+    //     'BKF2RL(0)/001',
+    //     '2021_22',
+    //     'CO',
+    //     'F2',
+    //     0,
+    //     13,
+    //     2,
+    //     'TMGC21-0-61301_07',
+    //     202120585416,
+    //     'TMGC21-0-61301_07',
+    //     'L',
+    //     202120585413,
+    //   ],
+    //   [
+    //     'BKF2RL(0)/001',
+    //     '2021_22',
+    //     'CO',
+    //     'F2',
+    //     0,
+    //     5,
+    //     3,
+    //     'TMGC21-0-61301_04',
+    //     202120585412,
+    //     'TMGC21-0-61301_04',
+    //     'T',
+    //     202120585417,
+    //   ],
+    // ];
+
+    // importService.validate({
+    //   spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, createdBy: user, table: 'tratmento',
+    // }).then(({ status, message }: any) => {
+    //   if (status !== 200) {
+    //     Swal.fire({
+    //       html: message,
+    //       width: '900',
+    //     });
+    //   }
+    //   if (status === 200) {
+    //     Swal.fire({
+    //       html: message,
+    //       width: '800',
+    //     });
+    //   }
+    // });
+  }
+
+  async function replaceNca() {
+    const checkedTreatments = JSON.stringify(checkedItems);
+    localStorage.setItem('checkedTreatments', checkedTreatments);
+    router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+  }
+
+  function replaceGenotipo() {
+    // const selectedTreatments: any = treatments?.map((_, index) => (checkedItems[index]
+    //   ? treatments[index] : null));
+
+    // console.log('selectedTreatments');
+    // console.log(selectedTreatments);
+    // //let nameGenotipo = selectedTreatments[1].genotipo.name_genotipo;
+    // const validateReplace = selectedTreatments.map((item: any) => {
+    //   if (item?.genotipo.name_genotipo === nameGenotipo) {
+    //     nameGenotipo = item.genotipo.name_genotipo;
+    //     return true;
+    //   }
+    //   nameGenotipo = item.genotipo.name_genotipo;
+    //   return false;
+    // });
+    // console.log('validateReplace');
+    // console.log(validateReplace);
   }
 
   useEffect(() => {
@@ -711,11 +741,20 @@ export default function TipoEnsaio({
 
                     <div className="h-12 w-32">
                       <Button
-                        title="Ação"
-                        value="Ação"
+                        title="NCA"
+                        value="NCA"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={importValidate}
+                        onClick={replaceNca}
+                      />
+                    </div>
+                    <div className="h-12 w-32">
+                      <Button
+                        title="GENOTIPO"
+                        value="GENOTIPO"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={replaceGenotipo}
                       />
                     </div>
                     <strong className="text-blue-600">

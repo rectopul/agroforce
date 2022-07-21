@@ -25,6 +25,20 @@ export class GenotypeTreatmentRepository {
     return result;
   }
 
+  async replace(idList: any, idLote: number) {
+    const result = await prisma.genotype_treatment.updateMany({
+      where: {
+        id: {
+          in: idList,
+        },
+      },
+      data: {
+        id_lote: idLote,
+      },
+    });
+    return result;
+  }
+
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     if (orderBy) {
       orderBy = JSON.parse(orderBy);
