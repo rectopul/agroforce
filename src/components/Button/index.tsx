@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { useRouter } from 'next/router';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   value?: string;
@@ -28,13 +28,13 @@ export function Button({
   hoverTextColor,
   href,
   disabled,
-	rounder
+  rounder,
 }: ITypeButtonProps) {
   const router = useRouter();
 
   const handleClick = () => {
     router.push(href);
-  }
+  };
 
   return (
     !href ? (
@@ -59,7 +59,8 @@ export function Button({
         hover:text-${hoverTextColor}
         hover:shadow-lg
 				${rounder}
-      `}>
+      `}
+      >
         {icon}
         { value }
       </button>
@@ -84,7 +85,8 @@ export function Button({
         hover:shadow-lg
         hover:text-${hoverTextColor}
         hover:shadow-lg
-      `}>
+      `}
+      >
         {icon}
         { value }
       </button>

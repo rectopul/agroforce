@@ -1,9 +1,8 @@
-import { prisma } from "../pages/api/db/db";
-import { GenotipoRepository } from "./genotipo.repository";
+import { prisma } from '../pages/api/db/db';
+import { GenotipoRepository } from './genotipo.repository';
 
 export class LoteRepository {
-
-  genotipoRepository = new GenotipoRepository()
+  genotipoRepository = new GenotipoRepository();
 
   async create(data: any) {
     const lote = await prisma.lote.create({ data });
@@ -13,7 +12,7 @@ export class LoteRepository {
 
   async findById(id: number) {
     const lote = await prisma.lote.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return lote;
@@ -25,14 +24,12 @@ export class LoteRepository {
     if (lote !== null) {
       const result = await prisma.lote.update({
         where: { id },
-        data
+        data,
       });
       return result;
-    } else {
-      return false;
     }
+    return false;
   }
-
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
@@ -41,14 +38,14 @@ export class LoteRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.lote.count({ where: where });
+    const count = await prisma.lote.count({ where });
 
     const result: object | any = await prisma.lote.findMany({
-      select: select,
-      skip: skip,
-      take: take,
-      where: where,
-      orderBy: order
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
     });
 
     result.total = count;

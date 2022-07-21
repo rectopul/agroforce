@@ -11,7 +11,7 @@ interface Safra {
   main_safra?: number;
   status?: number;
   created_by: number;
-};
+}
 
 type UpdateSafra = Omit<Safra, 'id_culture' | 'created_by' | 'main_safra'>;
 
@@ -21,7 +21,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 export const safraService = {
   getAll,
   create,
-  updateSafras
+  updateSafras,
 };
 
 async function create(data: any) {

@@ -11,8 +11,8 @@ import Swal from 'sweetalert2';
 import {
   Button,
   Content,
-  Input
-} from "../../../../../components";
+  Input,
+} from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ISequenciaDelineamento {
@@ -43,11 +43,11 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<ISequenciaDelineamento>({
     initialValues: {
-      id_delineamento: id_delineamento,
+      id_delineamento,
       name: '',
       repeticao: 0,
       sorteio: 0,
@@ -59,10 +59,10 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
       validateInputs(values);
       if (!values.name) return;
 
-      alert(JSON.stringify(values, null, 2))
+      alert(JSON.stringify(values, null, 2));
 
       await sequenciaDelineamentoService.create({
-        id_delineamento: id_delineamento,
+        id_delineamento,
         name: capitalize(values.name),
         repeticao: values.repeticao,
         sorteio: values.sorteio,
@@ -73,11 +73,11 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
         if (response.status === 201) {
           Swal.fire({
             title: 'Cadastrado realizado com sucesso!',
-            text: 'Sequência de delineamento cadastrado!'
+            text: 'Sequência de delineamento cadastrado!',
           });
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -86,10 +86,10 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
 
   function validateInputs(values: ISequenciaDelineamento) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
     }
   }
@@ -100,7 +100,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
         <title>Nova sequencia de delineamento</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
 
@@ -113,7 +113,8 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
             gap-2
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
@@ -163,7 +164,8 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
             gap-2
             mt-10
             mb-4
-          ">
+          "
+          >
             <div className="w-2/4 h-10">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 <strong className={checkInput}>*</strong>
@@ -200,7 +202,8 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -233,7 +236,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
 
   return {
     props: {
-      id_delineamento
+      id_delineamento,
     },
-  }
-}
+  };
+};

@@ -8,7 +8,7 @@ export class DisparoRepository {
 
   async findOne(id: number) {
     const disparos = await prisma.disparos.findUnique({
-      where: { id }
+      where: { id },
     });
     return disparos;
   }
@@ -19,31 +19,30 @@ export class DisparoRepository {
     if (disparos !== null) {
       const result = await prisma.disparos.update({
         where: { id },
-        data
+        data,
       });
       return result;
-    } else {
-      return false;
     }
+    return false;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.disparos.count({ where: where });
+    const count = await prisma.disparos.count({ where });
 
     const result: object | any = await prisma.disparos.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
-      where: where,
-      orderBy: order
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
     });
-    
+
     result.total = count;
     return result;
   }

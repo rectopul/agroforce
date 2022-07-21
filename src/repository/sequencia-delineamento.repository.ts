@@ -12,38 +12,38 @@ interface ISequenciaDelineamento {
 }
 
 type ICreateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id" | "status"
+  ISequenciaDelineamento, 'id' | 'status'
 >;
 
 type IUpdateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id_delineamento" | "status" | "created_by"
+  ISequenciaDelineamento, 'id_delineamento' | 'status' | 'created_by'
 >;
 
-export class SequenciaDelineamentoRepository {   
+export class SequenciaDelineamentoRepository {
   async findById(id: number) {
-      const result = await prisma.sequencia_delineamento.findUnique({
-        where: { id }
-      });
-      return result;
+    const result = await prisma.sequencia_delineamento.findUnique({
+      where: { id },
+    });
+    return result;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.sequencia_delineamento.count({ where: where });
+    const count = await prisma.sequencia_delineamento.count({ where });
 
     const result: object | any = await prisma.sequencia_delineamento.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
-      where: where,
-      orderBy: order
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
     });
-    
+
     result.total = count;
     return result;
   }
@@ -56,7 +56,7 @@ export class SequenciaDelineamentoRepository {
   async update(id: number, data: IUpdateSequenciaDelineamento) {
     const result = await prisma.culture.update({
       where: { id },
-      data
+      data,
     });
     return result;
   }
@@ -68,9 +68,9 @@ export class SequenciaDelineamentoRepository {
         delineamento: {
           select: {
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     return result;

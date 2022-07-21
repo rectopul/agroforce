@@ -2,7 +2,7 @@ export interface ITreatment {
   id: number;
   id_safra: number;
   idAssayList: number;
-  id_genotipo: number;
+  genotipo: any;
   id_lote: number;
   treatment_number: number;
   status: number;

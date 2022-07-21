@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ReactNode } from "react";
+import Link from 'next/link';
+import { ReactNode } from 'react';
 
 interface ITabProps {
   titleTab: string;
@@ -9,7 +9,9 @@ interface ITabProps {
   handleStatusTabs: (title: string, status: boolean) => void;
 }
 
-export function TabHeader({ titleTab, valueTab, hrefTab, statusTab, handleStatusTabs }: ITabProps) {
+export function TabHeader({
+  titleTab, valueTab, hrefTab, statusTab, handleStatusTabs,
+}: ITabProps) {
   return (
     statusTab ? (
       <Link href={hrefTab}>
@@ -17,10 +19,11 @@ export function TabHeader({ titleTab, valueTab, hrefTab, statusTab, handleStatus
           onClick={() => handleStatusTabs(titleTab, !statusTab)}
           className="
         h-full
-        flex 
-        items-center 
+        flex
+        items-center
         gap-1
-      ">
+      "
+        >
           <div className={`
           h-10 w-10
           flex 
@@ -54,17 +57,18 @@ export function TabHeader({ titleTab, valueTab, hrefTab, statusTab, handleStatus
         </a>
       </Link>
     ) : (
-      //w-12	width: 3rem; /* 48px */
-      //w-3/5	width: 60%;
+      // w-12	width: 3rem; /* 48px */
+      // w-3/5	width: 60%;
       <Link href={hrefTab}>
         <a
           onClick={() => handleStatusTabs(titleTab, !statusTab)}
           className="
         h-full
-        flex 
-        items-center 
+        flex
+        items-center
         gap-1
-      ">
+      "
+        >
           <div className={`
           h-10 w-10
           flex 
@@ -88,7 +92,7 @@ export function TabHeader({ titleTab, valueTab, hrefTab, statusTab, handleStatus
             </span>
           </div>
 
-          <span className={`border-gray-300 text-sm text-gray-50`}>{titleTab}</span>
+          <span className="border-gray-300 text-sm text-gray-50">{titleTab}</span>
         </a>
       </Link>
     )

@@ -1,8 +1,9 @@
 import { styled } from '@mui/material/styles';
 import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import * as React from 'react';
-import { ReactChild, ReactFragment, ReactNode, ReactPortal } from 'react';
-
+import {
+  ReactChild, ReactFragment, ReactNode, ReactPortal,
+} from 'react';
 
 interface IToolTipProps {
   children: ReactNode;
@@ -11,7 +12,7 @@ interface IToolTipProps {
 
 export function ToolTip({
   children,
-  contentMenu
+  contentMenu,
 }: IToolTipProps) {
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -27,7 +28,7 @@ export function ToolTip({
 
   return (
     <HtmlTooltip
-      title={<React.Fragment>{contentMenu}</React.Fragment>}
+      title={<>{contentMenu}</>}
     >
       {/* <Button style={{ padding: 0 }}>{ children }</Button> */}
       <div style={{ padding: 0 }}>{ children }</div>

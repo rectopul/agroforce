@@ -8,7 +8,7 @@ export const quadraService = {
   update,
   getAll,
   create,
-  list
+  list,
 };
 
 async function create(data: any) {

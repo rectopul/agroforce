@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../db/db";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '../db/db';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -24,13 +24,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                         select: {
                           id: true,
                           name: true,
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
           department: {
             select: {
@@ -38,7 +38,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               name: true,
             },
           },
-        }
+        },
       });
 
       if (!response) {
@@ -56,19 +56,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         registration: response?.registration,
         name_department: response?.department.name,
         status: response?.status,
-        cultures: response?.users_cultures.map(item => {
-          return {
-            culture_id: item.culture.id,
-            culture_name: item.culture.name,
-            permissions: item.culture.users_permissions.map(item => {
-              return {
-                permission_id: item.profile.id,
-                permission_name: item.profile.name,
-              }
-            })
-          }
-        })
-      }
+        cultures: response?.users_cultures.map((item) => ({
+          culture_id: item.culture.id,
+          culture_name: item.culture.name,
+          permissions: item.culture.users_permissions.map((item) => ({
+            permission_id: item.profile.id,
+            permission_name: item.profile.name,
+          })),
+        })),
+      };
 
       res.status(200).json(user);
       break;
@@ -76,4 +72,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};

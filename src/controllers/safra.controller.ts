@@ -149,7 +149,6 @@ export class SafraController {
 
   async postSafra(data: CreateSafra) {
     try {
-
       const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
       if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
 
@@ -164,8 +163,6 @@ export class SafraController {
 
   async updateSafra(data: UpdateSafra) {
     try {
-
-
       const safra: any = await this.safraRepository.findOne(data.id);
 
       if (!safra) return { status: 400, message: 'Safra não existente' };
