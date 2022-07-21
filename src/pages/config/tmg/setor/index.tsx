@@ -1,4 +1,4 @@
-import { deleteCookie, setCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -27,30 +27,30 @@ import * as XLSX from 'xlsx';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-	filterStatus: object | any;
-	filterSearch: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+  filterStatus: object | any;
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 
 interface IDepartment {
-	id: number;
-	name: string;
-	status?: number;
+  id: number;
+  name: string;
+  status?: number;
 }
 
 interface IGenerateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 interface IData {
-	allDepartments: IDepartment[];
-	totalItems: number;
-	itensPerPage: number;
-	filterApplication: object | any;
-	pageBeforeEdit: string | any;
-	filterBeforeEdit: string | any;
+  allDepartments: IDepartment[];
+  totalItems: number;
+  itensPerPage: number;
+  filterApplication: object | any;
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
@@ -213,9 +213,9 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {
-							  setCookies('pageBeforeEdit', currentPage?.toString());
-							  setCookies('filterBeforeEdit', filtersParams);
-							  router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
               }}
             />
           </div>
@@ -224,8 +224,8 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsUp size={16} />}
                 onClick={async () => await handleStatusItem(rowData.id, {
-								    status: rowData.status,
-								    ...rowData,
+                  status: rowData.status,
+                  ...rowData,
                 })}
                 bgColor="bg-green-600"
                 textColor="white"
@@ -236,8 +236,8 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsDown size={16} />}
                 onClick={async () => await handleStatusItem(rowData.id, {
-								    status: rowData.status,
-								    ...rowData,
+                  status: rowData.status,
+                  ...rowData,
                 })}
                 bgColor="bg-red-800"
                 textColor="white"
@@ -441,22 +441,22 @@ export default function Listagem({
                 >
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                    Status
-										</label>
+                      Status
+                    </label>
                     <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                    Pesquisar
-										</label>
+                      Pesquisar
+                    </label>
                     <Input
-                    type="text"
-                    placeholder="setor"
-                    max="40"
-                    id="filterSearch"
-                    name="filterSearch"
-                    onChange={formik.handleChange}
-                  />
+                      type="text"
+                      placeholder="setor"
+                      max="40"
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
                   </div>
                 </div>
 
@@ -480,18 +480,18 @@ export default function Listagem({
               columns={columns}
               data={items}
               options={{
-							  showTitle: false,
-							  headerStyle: {
-							    zIndex: 20,
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
                 },
-							  search: false,
-							  filtering: false,
-							  pageSize: itensPerPage,
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
               }}
               components={{
-							  Toolbar: () => (
-  <div
-    className="w-full max-h-96
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-96
                       flex
                       items-center
                       justify-between
@@ -502,125 +502,125 @@ export default function Listagem({
                       border-solid border-b
                       border-gray-200
                     "
-  >
-    <div className="h-12">
-      <Button
-        title="Cadastrar setor"
-        value="Cadastrar setor"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={() => { router.push('setor/cadastro'); }}
-        icon={<HiOutlineOfficeBuilding size={20} />}
-      />
-    </div>
+                  >
+                    <div className="h-12">
+                      <Button
+                        title="Cadastrar setor"
+                        value="Cadastrar setor"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { router.push('setor/cadastro'); }}
+                        icon={<HiOutlineOfficeBuilding size={20} />}
+                      />
+                    </div>
 
-    <strong className="text-blue-600">
-      Total registrado:
-      {itemsTotal}
-    </strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {itemsTotal}
+                    </strong>
 
-    <div className="h-full flex items-center gap-2">
-      <div className="border-solid border-2 border-blue-600 rounded">
-        <div className="w-72">
-          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="characters">
-                {
-																	(provided) => (
-  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-    <div className="h-8 mb-2">
-      <Button
-        value="Atualizar"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={getValuesColumns}
-        icon={<IoReloadSharp size={20} />}
-      />
-    </div>
-    {
-																				generatesProps.map((generate, index) => (
-  <Draggable key={index} draggableId={String(generate.title)} index={index}>
-    {(provided) => (
-      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <CheckBox
-          name={generate.name}
-          title={generate.title?.toString()}
-          value={generate.value}
-          defaultChecked={camposGerenciados.includes(generate.value as string)}
-        />
-      </li>
-    )}
-  </Draggable>
-																				))
-																			}
-    {provided.placeholder}
-  </ul>
-																	)
-																}
-              </Droppable>
-            </DragDropContext>
-          </AccordionFilter>
-        </div>
-      </div>
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button title="Exportar planilha de setores" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-      </div>
-    </div>
-  </div>
-							  ),
-							  Pagination: (props) => (
-  <div
-    className="flex
+                    <div className="h-full flex items-center gap-2">
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                      <div className="h-8 mb-2">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de setores" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                      </div>
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                         h-20
                         gap-2
                         pr-2
                         py-5
                         bg-gray-50
                       "
-    {...props}
-  >
-    <Button
-      onClick={() => setCurrentPage(currentPage - 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdFirstPage size={18} />}
-      disabled={currentPage <= 1}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage - 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiLeftArrow size={15} />}
-      disabled={currentPage <= 0}
-    />
-    {
-												Array(1).fill('').map((value, index) => (
-  <Button
-    key={index}
-    onClick={() => setCurrentPage(index)}
-    value={`${currentPage + 1}`}
-    bgColor="bg-blue-600"
-    textColor="white"
-    disabled
-  />
-												))
-											}
-    <Button
-      onClick={() => setCurrentPage(currentPage + 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiRightArrow size={15} />}
-      disabled={currentPage + 1 >= pages}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage + 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdLastPage size={18} />}
-      disabled={currentPage + 1 >= pages}
-    />
-  </div>
-								) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>
@@ -639,8 +639,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-  deleteCookie('filterBeforeEdit', { req, res });
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/department`;

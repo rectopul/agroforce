@@ -1,4 +1,4 @@
-import { deleteCookie, setCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -800,9 +800,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : 'filterStatus=1';
 
-  deleteCookie('filterBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
 
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
