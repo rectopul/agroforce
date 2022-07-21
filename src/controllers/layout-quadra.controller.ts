@@ -12,9 +12,9 @@ export class LayoutQuadraController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterCodigo) {
@@ -57,7 +57,7 @@ export class LayoutQuadraController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -65,7 +65,7 @@ export class LayoutQuadraController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }
@@ -129,7 +129,7 @@ export class LayoutQuadraController {
 
     try {
       if (typeof (data.status) === 'string') {
-        parameters.status = parseInt(data.status);
+        parameters.status = Number(data.status);
       } else {
         parameters.status = data.status;
       }

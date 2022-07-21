@@ -55,8 +55,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         avatar: response?.avatar,
         registration: response?.registration,
         name_department: response?.department.name,
-        jivochat: response?.jivochat,
-        app_login: response?.app_login,
         status: response?.status,
         cultures: response?.users_cultures.map(item => {
           return {

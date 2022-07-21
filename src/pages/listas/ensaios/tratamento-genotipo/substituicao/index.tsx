@@ -1,52 +1,54 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-/* eslint-disable react/no-array-index-key */
+import { deleteCookie } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { TbArrowsDownUp } from 'react-icons/tb';
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
+import { RiSettingsFill } from 'react-icons/ri';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { deleteCookie, setCookies } from 'cookies-next';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../components';
-import { quadraService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import ITabs from '../../../shared/utils/dropdown';
+  AccordionFilter, Button, CheckBox, Content, Input,
+} from '../../../../../components';
+import { loteService, replaceTreatmentService, userPreferencesService } from '../../../../../services';
+import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
+import ITabs from '../../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterStatus: object | any;
-  filterSearch: string | any;
+  filterYear: string
+  filterCodLote: string
+  filterNcc: string
+  filterFase: string
+  filterPeso: string
+  filterSeeds: string
+  filterGenotipo: string
+  filterMainName: string
+  filterGmr: string
+  filterBgm: string
+  filterTecnologia: string
   orderBy: object | any;
   typeOrder: object | any;
 }
 
-export interface IQuadra {
+export interface LoteGenotipo {
   id: number;
   id_culture: number;
-  local_preparo: string;
-  local_plagio: string;
-  cod_quadra: string;
-  comp_p: string;
-  linha_p: string;
-  esquema: string;
-  divisor: string;
+  genealogy: string;
+  name: string;
+  volume: number;
   status?: number;
 }
 
@@ -57,57 +59,54 @@ interface IGenerateProps {
 }
 
 interface IData {
-  quadras: IQuadra[];
+  allLote: LoteGenotipo[];
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  cultureId: number;
-  pageBeforeEdit: string | any;
-  filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  quadras, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
+  allLote, totalItems, itensPerPage, filterApplication,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'QUADRAS'
+    tab.titleTab === 'ENSAIO'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: 'id,local_preparo,cod_quadra,linha_p,esquema,status' };
+  const checkedTreatments = JSON.parse(localStorage.getItem('checkedTreatments') as string);
+  const preferences = userLogado.preferences.lote || {
+    id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
+  };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const router = useRouter();
-  const [quadra, setQuadra] = useState<IQuadra[]>(() => quadras);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [orderList, setOrder] = useState<number>(1);
+
+  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(1);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Local Preparo', value: 'local_preparo' },
-    { name: 'CamposGerenciados[]', title: 'Código Quadra', value: 'cod_quadra' },
-    { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
-    { name: 'CamposGerenciados[]', title: 'Esquema', value: 'esquema' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Peso (kg)', value: 'peso' },
+    { name: 'CamposGerenciados[]', title: 'Quant sementes', value: 'quant_sementes' },
+    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'name_genotipo' },
+    { name: 'CamposGerenciados[]', title: 'Mome principal', value: 'name_main' },
+    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
-
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -115,58 +114,47 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
+      filterYear: '',
+      filterCodLote: '',
+      filterNcc: '',
+      filterFase: '',
+      filterPeso: '',
+      filterSeeds: '',
+      filterGenotipo: '',
+      filterMainName: '',
+      filterGmr: '',
+      filterBgm: '',
+      filterTecnologia: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}&id_culture=${cultureId}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await quadraService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+    onSubmit: async ({
+      filterYear,
+      filterCodLote,
+      filterNcc,
+      filterFase,
+      filterPeso,
+      filterSeeds,
+      filterGenotipo,
+      filterMainName,
+      filterGmr,
+      filterBgm,
+      filterTecnologia,
+    }) => {
+      const tempParams: any = [];
+      Object.keys(checkedTreatments).forEach((item) => {
+        tempParams.push(checkedTreatments[item]);
+      });
+      const checkedParams = tempParams.join();
+      const parametersFilter = `filterStatus=${1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
+      await replaceTreatmentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${checkedParams}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
-        setQuadra(response.response);
-        setTotalItems(response.total);
+        setLotes(response);
+        setTotalItems(allTotal);
         setCurrentPage(0);
       });
     },
   });
-
-  async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra}`;
-
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        Swal.fire('Quadra não pode ser atualizada pois já existe uma quadra com esse código local ativo!');
-      } else {
-        quadraService.update({ id, status });
-      }
-    });
-
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
-
-    const index = quadra.findIndex((quadraIndex) => quadraIndex.id === idQuadra);
-
-    if (index === -1) {
-      return;
-    }
-
-    setQuadra((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const {
-      id,
-      status,
-    } = quadra[index];
-  }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -191,9 +179,9 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await quadraService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setQuadra(response.response);
+        setLotes(response.response);
       }
     });
 
@@ -210,7 +198,7 @@ export default function Listagem({
     }
   }
 
-  function headerTableFactory(name: any, title: string) {
+  function headerTableFactory(name: string, title: string) {
     return {
       title: (
         <div className="flex items-center">
@@ -228,133 +216,75 @@ export default function Listagem({
     };
   }
 
-  function idHeaderFactory() {
+  async function replaceTreatmentButton(id: number) {
+    await replaceTreatmentService.replace({ id, checkedTreatments });
+  }
+
+  function replaceFactory(name: string, title: string) {
     return {
       title: (
         <div className="flex items-center">
-          {arrowOrder}
+          {name}
         </div>
       ),
-      field: 'id',
+      field: title,
+      sorting: false,
       width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IQuadra) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              bgColor="bg-blue-600"
-              textColor="white"
-              title={`Editar ${rowData.cod_quadra}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/quadra/atualizar?id=${rowData.id}`);
-              }}
-            />
-          </div>
-          {rowData.status === 1 ? (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                title="Ativo"
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                title="Inativo"
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+      render: (rowData: any) => (
+        <div className="h-12 w-12">
+          <Button
+            type="button"
+            onClick={() => { replaceTreatmentButton(rowData.id); }}
+            rounder="rounded-full"
+            bgColor="bg-green-600"
+            textColor="white"
+            icon={<TbArrowsDownUp size={60} />}
+          />
         </div>
       ),
     };
   }
 
-  function columnsOrder(columnsCampos: any): any {
-    const columnCampos: any = columnsCampos.split(',');
+  function columnsOrder(columnsCampos: string) {
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
 
-    Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === 'year') {
+        tableFields.push(headerTableFactory('Ano', 'year'));
       }
-      if (columnCampos[index] === 'cod_quadra') {
-        tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
+      if (columnCampos[index] === 'cod_lote') {
+        tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'));
       }
-      if (columnCampos[index] === 'comp_p') {
-        tableFields.push(headerTableFactory('Comp P', 'comp_p'));
+      if (columnCampos[index] === 'ncc') {
+        tableFields.push(headerTableFactory('NCC', 'ncc'));
       }
-      if (columnCampos[index] === 'linha_p') {
-        tableFields.push(headerTableFactory('Linha P', 'linha_p'));
+      if (columnCampos[index] === 'fase') {
+        tableFields.push(headerTableFactory('Fase', 'fase'));
       }
-      if (columnCampos[index] === 'esquema') {
-        tableFields.push(headerTableFactory('Esquema', 'esquema'));
+      if (columnCampos[index] === 'peso') {
+        tableFields.push(headerTableFactory('Peso', 'peso'));
       }
-      if (columnCampos[index] === 'divisor') {
-        tableFields.push(headerTableFactory('Divisor', 'divisor'));
+      if (columnCampos[index] === 'quant_sementes') {
+        tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
       }
-      if (columnCampos[index] === 'local_plantio') {
-        tableFields.push(headerTableFactory('Local plantio', 'local_plantio'));
+      if (columnCampos[index] === 'name_genotipo') {
+        tableFields.push(headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'));
       }
-      if (columnCampos[index] === 'local_preparo') {
-        tableFields.push(headerTableFactory('Local Preparo', 'localPreparo.name_local_culture'));
+      if (columnCampos[index] === 'name_main') {
+        tableFields.push(headerTableFactory('Nome principal', 'genotipo.name_main'));
       }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
+      }
+      if (columnCampos[index] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+      }
+      if (columnCampos[index] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Tecnologia', 'genotipo.tecnologia.name'));
+      }
+      if (columnCampos[index] === 'action') {
+        tableFields.push(replaceFactory('Substituição', 'action'));
       }
     });
     return tableFields;
@@ -363,7 +293,7 @@ export default function Listagem({
   const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox']");
+    const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -376,9 +306,9 @@ export default function Listagem({
       await userPreferencesService.create({
         table_preferences: campos,
         userId: userLogado.id,
-        module_id: 17,
+        module_id: 12,
       }).then((response) => {
-        userLogado.preferences.quadras = {
+        userLogado.preferences.lote = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -387,15 +317,12 @@ export default function Listagem({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.quadras = {
+      userLogado.preferences.lote = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
+      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -409,50 +336,11 @@ export default function Listagem({
 
     const items = Array.from(generatesProps);
     const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
+    const index = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
 
     setGeneratesProps(items);
   }
-
-  const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await quadraService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = quadra.map((row) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
-
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Quadras.xlsx');
-      } else {
-        alert(response);
-      }
-    });
-  };
 
   function handleTotalPages(): void {
     if (currentPage < 0) {
@@ -463,17 +351,42 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
+    const tempParams: any = [];
+    Object.keys(checkedTreatments).forEach((item) => {
+      tempParams.push(checkedTreatments[item]);
+    });
+    console.log('tempParams');
+    console.log(tempParams);
+    const checkedParams = tempParams.join();
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${checkedParams}`;
 
     if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
+      parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setQuadra(response.response);
+    await replaceTreatmentService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setLotes(response);
       }
     });
+  }
+
+  function filterFieldFactory(title: any, name: any) {
+    return (
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <Input
+          type="text"
+          placeholder={name}
+          max="40"
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+        />
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -483,16 +396,16 @@ export default function Listagem({
 
   return (
     <>
-      <Head><title>Listagem de quadras</title></Head>
+      <Head><title>Listagem de Lotes</title></Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main className="h-full w-full
           flex flex-col
           items-start
           gap-8
         "
         >
-          <AccordionFilter title="Filtrar quadras">
+          <AccordionFilter title="Filtrar lotes">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -509,25 +422,28 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Status
-                    </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
-                  </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="código quadra"
-                      max="40"
-                      id="filterSearch"
-                      name="filterSearch"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
+                  {filterFieldFactory('filterYear', 'Ano')}
+
+                  {filterFieldFactory('filterCodLote', 'Cód lote')}
+
+                  {filterFieldFactory('filterNcc', 'NCC')}
+
+                  {filterFieldFactory('filterFase', 'Fase')}
+
+                  {filterFieldFactory('filterPeso', 'Peso')}
+
+                  {filterFieldFactory('filterSeeds', 'Quant. sementes')}
+
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
+
+                  {filterFieldFactory('filterGmr', 'GMR')}
+
+                  {filterFieldFactory('filterBgm', 'BGM')}
+
+                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+
                 </div>
 
                 <div className="h-16 w-32 mt-3">
@@ -548,7 +464,7 @@ export default function Listagem({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={quadra}
+              data={lotes}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -573,18 +489,6 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
-                      <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => { }}
-                        href="quadra/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div>
-
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -619,8 +523,7 @@ export default function Listagem({
                                             {(provider) => (
                                               <li
                                                 ref={provider.innerRef}
-                                                {
-                                                ...provider.draggableProps}
+                                                {...provider.draggableProps}
                                                 {...provider.dragHandleProps}
                                               >
                                                 <CheckBox
@@ -628,7 +531,7 @@ export default function Listagem({
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
                                                   defaultChecked={camposGerenciados
-                                                    .includes(String(generate.value))}
+                                                    .includes(generate.value as string)}
                                                 />
                                               </li>
                                             )}
@@ -644,12 +547,8 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de quadras" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="quadra/importar-planilha/config-planilha" />
+                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
                       </div>
                     </div>
                   </div>
@@ -716,45 +615,37 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page ?? 15;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
-  const cultureId: number = Number(req.cookies.cultureId);
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const { checked }: any = query;
 
   deleteCookie('filterBeforeEdit', { req, res });
   deleteCookie('pageBeforeEdit', { req, res });
 
-  const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
-
+  const param = `skip=0&take=${itensPerPage}&treatmentChecked=${checked}`;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
-
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/replace-treatment`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
+  const filterApplication = 'filterStatus=1';
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(`${baseUrl}?id_culture=${cultureId}`, requestOptions);
-  const { response: quadras, total: totalItems } = await response.json();
+  const { response: allLote, total: totalItems } = await fetch(`${urlParameters}`, requestOptions).then((response) => response.json());
 
   return {
     props: {
-      quadras,
+      allLote,
       totalItems,
       itensPerPage,
       filterApplication,
-      cultureId,
-      pageBeforeEdit,
-      filterBeforeEdit,
     },
   };
 };

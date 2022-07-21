@@ -31,9 +31,9 @@ export class SafraController {
     try {
       if (options.filterStatus) {
         if (typeof (options.status) === 'string') {
-          options.filterStatus = parseInt(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = parseInt(options.filterStatus);
+          options.filterStatus = Number(options.filterStatus);
+          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSafra) {
@@ -74,11 +74,11 @@ export class SafraController {
       }
 
       if (options.id_culture) {
-        parameters.id_culture = parseInt(options.id_culture);
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.id_safra) {
-        parameters.id = parseInt(options.id_safra);
+        parameters.id = Number(options.id_safra);
       }
 
       if (options.safraName) {
@@ -103,7 +103,7 @@ export class SafraController {
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
-          take = parseInt(options.take);
+          take = Number(options.take);
         } else {
           take = options.take;
         }
@@ -111,7 +111,7 @@ export class SafraController {
 
       if (options.skip) {
         if (typeof (options.skip) === 'string') {
-          skip = parseInt(options.skip);
+          skip = Number(options.skip);
         } else {
           skip = options.skip;
         }
@@ -149,7 +149,7 @@ export class SafraController {
 
   async postSafra(data: CreateSafra) {
     try {
-     
+
       const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
       if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
 
@@ -164,7 +164,7 @@ export class SafraController {
 
   async updateSafra(data: UpdateSafra) {
     try {
-      
+
 
       const safra: any = await this.safraRepository.findOne(data.id);
 

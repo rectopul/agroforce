@@ -17,9 +17,8 @@ import { HistoryGenotypeTreatmentController } from './history-genotype-treatment
 
 export class ImportGenotypeTreatmentController {
   static async validate({
-    spreadSheet, createdBy,
+    spreadSheet, created_by,
   }: ImportValidate): Promise<IReturnObject> {
-    console.log(spreadSheet);
     const genotipoController = new GenotipoController();
     const loteController = new LoteController();
     const assayListController = new AssayListController();
@@ -205,7 +204,7 @@ export class ImportGenotypeTreatmentController {
                 nt: spreadSheet[row][6],
                 genotipo: spreadSheet[row][7],
                 nca: spreadSheet[row][8],
-                createdBy,
+                created_by,
               });
             }
           }

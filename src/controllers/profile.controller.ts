@@ -13,7 +13,7 @@ export class ProfileController {
     }
 
     async getOneProfile(id: string) {
-        let newID = parseInt(id);
+        let newID = Number(id);
         try {
             if (id && id !== '{id}') {
                 let response = await this.profileRepository.findOne(newID);
@@ -47,7 +47,7 @@ export class ProfileController {
     }
 
     async updateProfile(id: string, data: object) {
-        let newID = parseInt(id);
+        let newID = Number(id);
         try {
             if (data !== null && data !== undefined) {
                 let response = await this.profileRepository.update(newID, data);

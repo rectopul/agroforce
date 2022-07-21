@@ -25,5 +25,6 @@ export * from './envelope.service';
 export * from './unidade-cultura.service';
 export * from './experiment.service';
 export * from './assay-list.service';
-export * from './genotype-treatment.service';
+export * from './genotypeTratment/genotype-treatment.service';
+export * from './genotypeTratment/replace-treatment.service';
 export * from './log-import.service';

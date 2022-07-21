@@ -21,7 +21,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { userPreferencesService, userService } from 'src/services';
 import { handleFormatTel } from 'src/shared/utils/tel';
 import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
+import { deleteCookie, setCookies } from 'cookies-next';
 import {
 	AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from '../../../../components';
@@ -368,7 +368,7 @@ export default function Listagem({
 	async function getValuesColumns(): Promise<void> {
 		const els: any = document.querySelectorAll("input[type='checkbox'");
 		let selecionados = '';
-		for (let i = 0; i < els.length; i++) {
+		for (let i = 0; i < els.length; i += 1) {
 			if (els[i].checked) {
 				selecionados += `${els[i].value},`;
 			}
@@ -442,11 +442,11 @@ export default function Listagem({
 				});*/
 
 				const dataExcel: any = response.response;
-				dataExcel.forEach(function (line:any) {
+				dataExcel.forEach(function (line: any) {
 					delete line.avatar;
 					delete line.id;
-					
-					if(line.status === 0){
+
+					if (line.status === 0) {
 						line.status = "Inativo";
 					} else {
 						line.status = "Ativo";
@@ -740,8 +740,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 	const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-	removeCookies('filterBeforeEdit', { req, res });
-	removeCookies('pageBeforeEdit', { req, res });
+	deleteCookie('filterBeforeEdit', { req, res });
+	deleteCookie('pageBeforeEdit', { req, res });
 
 	const { publicRuntimeConfig } = getConfig();
 	const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;

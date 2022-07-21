@@ -1,18 +1,19 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import React, { useState } from 'react';
 import { capitalize } from '@mui/material';
 import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { IoMdArrowBack } from 'react-icons/io';
 import { RiUserSettingsLine } from 'react-icons/ri';
 import InputMask from 'react-input-mask';
-import { prisma } from 'src/pages/api/db/db';
-import { userService } from 'src/services';
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
 import Swal from 'sweetalert2';
+import { prisma } from '../../../api/db/db';
+import { userService } from '../../../../services';
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import {
   Button, CheckBox, Content, Input, Select,
 } from '../../../../components';
@@ -33,13 +34,6 @@ interface ICultureUser {
   name: string;
 }
 
-interface IUserPermissions {
-  id: number;
-  id_profiles: number;
-  name_profiles: string;
-  id_cultures: number;
-  name_cultures: string;
-}
 interface IUserProps {
   id: number;
   name: string;
@@ -50,8 +44,6 @@ interface IUserProps {
   password: string;
   registration: number;
   departmentId: number;
-  jivochat: number;
-  app_login: number;
   status: number;
   cultures: object | any;
   created_by: number | any;
@@ -79,21 +71,39 @@ export default function AtualizarUsuario({
 
   const router = useRouter();
 
-  const optionSorN = [{ id: 1, name: 'Sim' }, { id: 0, name: 'Não' }];
-  const userCultures = new Array();
-  const userPermissions: any = new Array();
+  const userCultures: any = [];
+  const userPermissions: any = [];
 
   if (data.users_permissions) {
     Object.keys(data.users_permissions).forEach((_, item) => {
       userCultures.push(data.users_permissions[item].id_cultures);
       if (userPermissions[data.users_permissions[item].id_cultures]) {
-        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles, Number(userPermissions[data.users_permissions[item].id_cultures].join())];
+        userPermissions[data.users_permissions[item].id_cultures] = [
+          data.users_permissions[item].id_profiles,
+          Number(userPermissions[data.users_permissions[item].id_cultures].join()),
+        ];
       } else {
-        userPermissions[data.users_permissions[item].id_cultures] = [data.users_permissions[item].id_profiles];
+        userPermissions[data.users_permissions[item].id_cultures] = [
+          data.users_permissions[item].id_profiles,
+        ];
       }
     });
   }
   const [Permissions, setPermissions] = useState<any>(userPermissions);
+
+  function validateInputs(values: any) {
+    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
+    if (!values.login) { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = 'red'; } else { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = ''; }
+    if (!values.cpf) { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = 'red'; } else { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = ''; }
+    if (!values.departmentId) { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = 'red'; } else { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = ''; }
+    if (!values.password) { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = 'red'; } else { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = ''; }
+    if (!values.confirmPassword) { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = 'red'; } else { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = ''; }
+
+    if (values.password !== values.confirmPassword) {
+      return true;
+    }
+    return false;
+  }
 
   const formik = useFormik<IUserProps>({
     initialValues: {
@@ -107,15 +117,18 @@ export default function AtualizarUsuario({
       confirmPassword: functionsUtils.Crypto(data.password, 'decipher'),
       registration: data.registration,
       departmentId: data.departmentId,
-      jivochat: data.jivochat,
       status: data.status,
-      app_login: data.app_login,
       created_by: data.created_by,
       cultures: [],
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name || !values.login || !values.cpf || !values.departmentId || !values.password || !values.confirmPassword) {
+      if (!values.name
+        || !values.login
+        || !values.cpf
+        || !values.departmentId
+        || !values.password
+        || !values.confirmPassword) {
         Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
@@ -126,7 +139,7 @@ export default function AtualizarUsuario({
 
       const checkbox: any = document.getElementsByName('cultures');
       values.cultures = [];
-      for (let i = 0; i < checkbox.length; i++) {
+      for (let i = 0; i < checkbox.length; i += 1) {
         if (checkbox[i].checked) {
           values.cultures.push(checkbox[i].value);
         }
@@ -139,7 +152,7 @@ export default function AtualizarUsuario({
       Object.keys(values.cultures).forEach((item) => {
         input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
         auxObject2 = [];
-        for (let i = 0; i < input.options.length; i++) {
+        for (let i = 0; i < input.options.length; i += 1) {
           if (input.options[i].selected) {
             auxObject2.push(input.options[i].value);
           }
@@ -161,9 +174,7 @@ export default function AtualizarUsuario({
         password: values.password,
         registration: values.registration,
         departmentId: values.departmentId,
-        jivochat: values.jivochat,
         status: values.status,
-        app_login: values.app_login,
         cultures: auxObject,
         created_by: values.created_by,
       }).then((response) => {
@@ -176,21 +187,6 @@ export default function AtualizarUsuario({
       });
     },
   });
-
-  function validateInputs(values: any) {
-    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
-    if (!values.login) { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = 'red'; } else { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = ''; }
-    if (!values.cpf) { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = 'red'; } else { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = ''; }
-    // if (!values.registration) { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= 'red'; } else { let inpuRegistration: any = document.getElementById("registration"); inpuRegistration.style.borderColor= ''; }
-    if (!values.departmentId) { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = 'red'; } else { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = ''; }
-    if (!values.password) { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = 'red'; } else { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = ''; }
-    if (!values.confirmPassword) { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = 'red'; } else { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = ''; }
-
-    if (values.password !== values.confirmPassword) {
-      return true;
-    }
-    return false;
-  }
 
   function defineProfiles(culturedId: number, profiles: any) {
     Permissions[culturedId] = profiles.value;
@@ -392,36 +388,7 @@ export default function AtualizarUsuario({
             gap-6
             mb-4
           "
-          >
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Libera jivochat
-              </label>
-              <Select
-                values={optionSorN}
-                id="jivochat"
-                name="jivochat"
-                onChange={formik.handleChange}
-                value={Number(formik.values.jivochat)}
-                selected={data.jivochat}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Login do App
-              </label>
-              <div className="h-10">
-                <Select
-                  values={optionSorN}
-                  id="app_login"
-                  name="app_login"
-                  onChange={formik.handleChange}
-                  value={Number(formik.values.app_login)}
-                  selected={data.app_login}
-                />
-              </div>
-            </div>
-          </div>
+          />
 
           <div className="w-full mt-6">
             <h2 className="text-gray-900 text-2xl mb-4">
@@ -504,16 +471,7 @@ export default function AtualizarUsuario({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const { token } = context.req.cookies;
   // Fetch data from external API
-  const requestOptions: object | any = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` },
-  };
-
   const response = await prisma.user.findFirst({
     where: {
       id: Number(context.query.id),
@@ -598,8 +556,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     avatar: response.avatar,
     registration: response.registration,
     departmentId: response.departmentId,
-    jivochat: response.jivochat,
-    app_login: response.app_login,
     status: response.status,
     created_by: response.created_by,
     users_permissions: response.users_permissions.map((item) => ({

@@ -7,7 +7,6 @@ export class TypeAssayController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
-    let select: any = [];
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
@@ -21,21 +20,17 @@ export class TypeAssayController {
         parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          name: true,
-          protocol_name: true,
-          status: true,
-          envelope: true,
-        };
-      }
+      const select = {
+        id: true,
+        name: true,
+        protocol_name: true,
+        status: true,
+        envelope: {
+          select: {
+            seeds: true,
+          },
+        },
+      };
 
       if (options.id_culture) {
         parameters.id_culture = Number(options.id_culture);
@@ -58,8 +53,6 @@ export class TypeAssayController {
         skip,
         orderBy,
       );
-
-      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum envelope encontrado',

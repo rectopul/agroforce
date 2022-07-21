@@ -103,7 +103,9 @@ export class FocoController {
 
   async create(data: any) {
     try {
-      const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
+      const focoAlreadyExists = await this.focoRepository.findByName(
+        { name: data.name, id_culture: data.id_culture },
+      );
 
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 
@@ -123,7 +125,9 @@ export class FocoController {
       const focoExist: any = await this.focoRepository.findOne(data.id);
       if (!focoExist) return { status: 404, message: 'Foco não encontrado' };
 
-      const focoAlreadyExists = await this.focoRepository.findByName({ name: data.name, id_culture: data.id_culture });
+      const focoAlreadyExists = await this.focoRepository.findByName(
+        { name: data.name, id_culture: data.id_culture },
+      );
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 
       const response = await this.focoRepository.update(data.id, data);

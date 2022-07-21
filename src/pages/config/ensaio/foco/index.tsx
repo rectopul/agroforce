@@ -1,4 +1,7 @@
-import { removeCookies, setCookies } from 'cookies-next';
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+import { deleteCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -17,13 +20,13 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { userPreferencesService } from 'src/services';
-import { focoService } from 'src/services/foco.service';
-import * as XLSX from 'xlsx';
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { userPreferencesService } from '../../../../services';
+import { focoService } from '../../../../services/foco.service';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -95,13 +98,9 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
-
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -122,6 +121,8 @@ export default function Listagem({
       });
     },
   });
+
+  const filterStatus = filterBeforeEdit.split('');
 
   async function handleStatus(idFoco: number, data: IFocos): Promise<void> {
     if (data.status === 1) {
@@ -151,7 +152,11 @@ export default function Listagem({
     return {
       title: (
         <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -253,8 +258,8 @@ export default function Listagem({
     };
   }
 
-  function columnsOrder(camposGerenciados: string) {
-    const columnOrder: string[] = camposGerenciados.split(',');
+  function columnsOrder(columnsCampos: string) {
+    const columnOrder: string[] = columnsCampos.split(',');
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
@@ -274,6 +279,8 @@ export default function Listagem({
     return tableFields;
   }
 
+  const columns = columnsOrder(camposGerenciados);
+
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -285,7 +292,7 @@ export default function Listagem({
       typeOrder = '';
     }
 
-    if (filter && typeof (filter) !== undefined) {
+    if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
@@ -318,7 +325,7 @@ export default function Listagem({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
-    for (let i = 0; i < els.length; i++) {
+    for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
       }
@@ -326,13 +333,25 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 6 }).then((response) => {
-        userLogado.preferences.foco = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 6,
+      }).then((response) => {
+        userLogado.preferences.foco = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.foco = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.foco = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -355,7 +374,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      //filterApplication += `&paramSelect=${camposGerenciados}`;
+      // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await focoService.getAll(filterApplication).then((response) => {
@@ -382,7 +401,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'focos');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -553,14 +572,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value as string)}
                                                 />
                                               </li>
                                             )}
@@ -654,8 +682,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  deleteCookie('filterBeforeEdit', { req, res });
+  deleteCookie('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;

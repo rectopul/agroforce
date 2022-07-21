@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 			res.status(200).json(await userPreferenceController.updateUserPreferences(req.body));
 			break
 		case 'POST':
-			res.status(200).json(await userPreferenceController.postUser(req.body));
+			res.status(200).json(await userPreferenceController.create(req.body));
 			break
 		default:
 			res.status(405).end(`Method ${req.method} Not Allowed`)

@@ -1,62 +1,32 @@
-import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
-import { LoteRepository } from '../repository/lote.repository';
+import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
+import { LoteRepository } from '../../repository/lote.repository';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
 
-export class LoteController {
+export class ReplaceTreatmentController {
   loteRepository = new LoteRepository();
 
-  async getOne(id: number) {
+  genotypeTratmentRepository = new GenotypeTreatmentRepository();
+
+  async replace({ id: idLote, checkedTreatments }: any) {
     try {
-      const response = await this.loteRepository.findById(id);
-
-      if (response) {
-        return { status: 200, response };
-      }
-      return { status: 404, response: [], message: 'Lote não encontrado' };
+      const idList: any = [];
+      Object.keys(checkedTreatments).forEach((item: any) => {
+        checkedTreatments[item] ? idList.push(Number(item)) : undefined;
+      });
+      await this.genotypeTratmentRepository.replace(idList, idLote);
     } catch (error: any) {
-      handleError('Lote Controller', 'GetOne', error.message);
-      throw new Error('[Controller] - GetOne Lote erro');
-    }
-  }
-
-  async create(data: any) {
-    try {
-      const response = await this.loteRepository.create(data);
-      if (response) {
-        return { status: 201, response, message: 'Lote cadastrado' };
-      }
-      return { status: 400, message: 'Lote não cadastrado' };
-    } catch (error: any) {
-      handleError('Lote Controller', 'Create', error.message);
-      throw new Error('[Controller] - Create Lote erro');
-    }
-  }
-
-  async update(data: any) {
-    try {
-      const lote = await this.loteRepository.findById(data.id);
-
-      if (!lote) return { status: 404, message: 'Lote não existente' };
-
-      const response = await this.loteRepository.update(data.id, data);
-      if (response) {
-        return { status: 201, response, message: 'Lote atualizado' };
-      }
-      return { status: 400, message: 'Lote não atualizado' };
-    } catch (error: any) {
-      handleError('Lote Controller', 'Update', error.message);
-      throw new Error('[Controller] - Update Lote erro');
+      handleError('Substituição do genótipo do genótipo controller', 'Replace', error.message);
+      throw new Error('[Controller] - Substituição do genótipo do genótipo erro');
     }
   }
 
   async getAll(options: any) {
     const parameters: object | any = {};
-    let orderBy: object | any = '';
+    let orderBy: object | any;
+    parameters.OR = [];
     parameters.AND = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
@@ -82,8 +52,7 @@ export class LoteController {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "name_main": {"contains": "${options.filterMainName}" } } }`));
       }
       if (options.filterGmr) {
-        const gmrMax = Number(options.filterGmr) + 1;
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr": {"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr":  ${Number(options.filterGmr)}  } }`));
       }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "bgm":  ${Number(options.filterBgm)}  } }`));
@@ -94,6 +63,8 @@ export class LoteController {
 
       const select = {
         id: true,
+        id_genotipo: true,
+        id_safra: true,
         cod_lote: true,
         id_s2: true,
         id_dados: true,
@@ -114,28 +85,10 @@ export class LoteController {
         },
       };
 
-      if (options.genotipo) {
-        parameters.genotipo = options.genotipo;
-      }
-
-      if (options.name) {
-        parameters.name = options.name;
-      }
-
-      if (options.cod_lote) {
-        parameters.cod_lote = options.cod_lote;
-      }
-
-      if (options.id_genotipo) {
-        parameters.id_genotipo = Number(options.id_genotipo);
-      }
-
-      if (options.id_dados) {
-        parameters.id_dados = Number(options.id_dados);
-      }
-
-      if (options.ncc) {
-        parameters.ncc = Number(options.ncc);
+      if (options.checkedTreatments) {
+        const checkedParams = options.checkedTreatments.split(',');
+        console.log(checkedParams);
+        parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -154,14 +107,13 @@ export class LoteController {
         skip,
         orderBy,
       );
-
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Lote Controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Lote erro');
+      handleError('Tratamentos do genótipo controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Tratamentos do genótipo erro');
     }
   }
 }

@@ -238,7 +238,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
                 values={locais}
                 id="localId"
                 name="localId"
-                onChange={(e) => setIdLocal(parseInt(e.target.value))}
+                onChange={(e) => setIdLocal(Number(e.target.value))}
                 value={idLocal}
                 selected={idLocal}
               />

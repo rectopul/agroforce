@@ -42,7 +42,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
 
     const formik = useFormik<ICreateTypeAssay>({
         initialValues: {
-            id_type_assay: parseInt(id_type_assay),
+            id_type_assay: Number(id_type_assay),
             safra: safra.id,
             seeds: 0,
             created_by: userLogado.id,
@@ -56,7 +56,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
 
             await envelopeService.create({
                 id_safra: Number(safra.id),
-                id_type_assay: parseInt(id_type_assay),
+                id_type_assay: Number(id_type_assay),
                 seeds: Number(values.seeds),
                 created_by: formik.values.created_by,
             }).then((response) => {

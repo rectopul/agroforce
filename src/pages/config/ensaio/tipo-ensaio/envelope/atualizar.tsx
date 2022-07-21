@@ -43,7 +43,7 @@ export default function Cadastro({ envelope }: any) {
 
 	const formik = useFormik<any>({
 		initialValues: {
-			id_foco: parseInt(envelope.type_assay.id),
+			id_foco: Number(envelope.type_assay.id),
 			safra: envelope.safra.id,
 			seeds: envelope.seeds,
 			created_by: userLogado.id,
@@ -57,7 +57,7 @@ export default function Cadastro({ envelope }: any) {
 			await envelopeService.update({
 				id: Number(envelope.id),
 				id_safra: Number(envelope.safra.id),
-				id_type_assay: parseInt(envelope.type_assay.id),
+				id_type_assay: Number(envelope.type_assay.id),
 				seeds: Number(values.seeds),
 				created_by: Number(formik.values.created_by),
 			}).then((response) => {

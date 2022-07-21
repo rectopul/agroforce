@@ -45,7 +45,7 @@ export default function Cadastro({ grupo }: any) {
 
 	const formik = useFormik<any>({
 		initialValues: {
-			id_foco: parseInt(grupo.foco.id),
+			id_foco: Number(grupo.foco.id),
 			safra: grupo.safra.id,
 			group: grupo.group,
 			created_by: userLogado.id,
@@ -59,7 +59,7 @@ export default function Cadastro({ grupo }: any) {
 			await groupService.update({
 				id: Number(grupo.id),
 				id_safra: Number(grupo.safra.id),
-				id_foco: parseInt(grupo.foco.id),
+				id_foco: Number(grupo.foco.id),
 				group: Number(values.group),
 				created_by: Number(formik.values.created_by),
 			}).then((response) => {

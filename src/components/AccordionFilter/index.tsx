@@ -13,22 +13,21 @@ interface IAccordionFilterProps {
 }
 
 export function AccordionFilter({ title, children, grid = false }: IAccordionFilterProps) {
-
   return (
-    <div className='w-full shadow-md rounded'>
-      <Accordion className='w-full' defaultExpanded={grid}>
+    <div className="w-full shadow-md rounded">
+      <Accordion className="w-full" defaultExpanded={grid}>
         <AccordionSummary
           style={{ paddingLeft: 10, paddingRight: 10 }}
-          className='w-full'
+          className="w-full"
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography>{ title }</Typography>
+          <Typography>{title}</Typography>
         </AccordionSummary>
         <AccordionDetails className="max-h-72 overflow-y-scroll">
-          <Typography className='flex flex-col'>
-            { children }
+          <Typography className="flex flex-col">
+            {children}
           </Typography>
         </AccordionDetails>
       </Accordion>

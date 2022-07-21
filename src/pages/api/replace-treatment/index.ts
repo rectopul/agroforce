@@ -1,19 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { EnvelopeController } from '../../../controllers/envelope.controller';
+import { ReplaceTreatmentController } from '../../../controllers/genotype-treatment/replace-treatment.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const envelopeController = new EnvelopeController();
-  const { id } = req.query;
+  const replaceTreatmentController = new ReplaceTreatmentController();
 
   switch (req.method) {
     case 'GET': {
-      const result = await envelopeController.getOne({ id: Number(id) });
-      res.status(200).json(result.response);
+      const resultGet = await replaceTreatmentController.getAll(req.query);
+      res.status(200).json(resultGet);
       break;
     }
-    case 'PUT': {
-      const resultPut = await envelopeController.update(req.body);
+    case 'POST': {
+      const resultPut = await replaceTreatmentController.replace(req.body);
       res.status(200).json(resultPut);
       break;
     }
