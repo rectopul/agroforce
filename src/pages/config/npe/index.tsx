@@ -18,7 +18,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { npeService, userPreferencesService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { deleteCookie } from 'cookies-next';
+import { removeCookies } from 'cookies-next';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from '../../../components';
@@ -733,8 +733,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
 
-  deleteCookie('filterBeforeEdit', { req, res });
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;

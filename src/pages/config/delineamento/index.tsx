@@ -1,4 +1,4 @@
-import { deleteCookie, setCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import Swal from 'sweetalert2';
 import MaterialTable from 'material-table';
@@ -773,8 +773,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
-  deleteCookie('filterBeforeEdit', { req, res });
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : `filterStatus=1&id_culture=${cultureId}`;
 

@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { deleteCookie, setCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -234,12 +234,12 @@ export default function TipoEnsaio({
   function idHeaderFactory() {
     return {
       title:
-  <div className="h-10 flex">
-    <Checkbox1
-      onChange={setAllCheck}
-      sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
-    />
-  </div>,
+        <div className="h-10 flex">
+          <Checkbox1
+            onChange={setAllCheck}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+          />
+        </div>,
       field: 'id',
       sorting: false,
       width: 0,
@@ -900,8 +900,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  deleteCookie('filterBeforeEdit', { req, res });
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;

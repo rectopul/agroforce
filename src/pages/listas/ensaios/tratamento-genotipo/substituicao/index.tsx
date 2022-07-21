@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { deleteCookie } from 'cookies-next';
+import { removeCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -622,8 +622,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
   const { token } = req.cookies;
   const { checked }: any = query;
 
-  deleteCookie('filterBeforeEdit', { req, res });
-  deleteCookie('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&treatmentChecked=${checked}`;
   const { publicRuntimeConfig } = getConfig();
