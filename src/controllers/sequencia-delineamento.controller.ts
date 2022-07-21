@@ -1,5 +1,7 @@
-import { SequenciaDelineamentoRepository } from "src/repository/sequencia-delineamento.repository";
-import { number, object, SchemaOf, string } from "yup";
+import { SequenciaDelineamentoRepository } from 'src/repository/sequencia-delineamento.repository';
+import {
+  number, object, SchemaOf, string,
+} from 'yup';
 
 interface ISequenciaDelineamento {
   id: number;
@@ -13,47 +15,46 @@ interface ISequenciaDelineamento {
 }
 
 type ICreateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id" | "status"
+  ISequenciaDelineamento, 'id' | 'status'
 >;
 
 type IUpdateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, "id_delineamento" | "status" | "created_by"
+  ISequenciaDelineamento, 'id_delineamento' | 'status' | 'created_by'
 >;
 
 export class SequenciaDelineamentoController {
-  private required = "Required";
+  private required = 'Required';
+
   private SequenciaDelineamentoRepository = new SequenciaDelineamentoRepository();
 
   async getOneFoco(id: number) {
     try {
-      if (!id) throw new Error("Dados inválidos");
+      if (!id) throw new Error('Dados inválidos');
 
       const response = await this.SequenciaDelineamentoRepository.findById(id);
 
-      if (!response) throw new Error("Item não encontrado");
+      if (!response) throw new Error('Item não encontrado');
 
       return { status: 200, response };
     } catch (e) {
       return { status: 400, message: 'Item não encontrado' };
     }
-  };
+  }
 
   async list(id_delineamento: number) {
     try {
       const result = await this.SequenciaDelineamentoRepository.list(id_delineamento);
 
-      const data = result.map((item) => {
-        return {
-          id: item.id,
-          id_delineamento: item.id_delineamento,
-          delineamento: item.delineamento.name,
-          repeticao: item.repeticao,
-          sorteio: item.sorteio,
-          nt: item.nt,
-          bloco: item.bloco,
-          status: item.status,
-        }
-      });
+      const data = result.map((item) => ({
+        id: item.id,
+        id_delineamento: item.id_delineamento,
+        delineamento: item.delineamento.name,
+        repeticao: item.repeticao,
+        sorteio: item.sorteio,
+        nt: item.nt,
+        bloco: item.bloco,
+        status: item.status,
+      }));
 
       const total = data.length;
 
@@ -66,20 +67,19 @@ export class SequenciaDelineamentoController {
   async create(data: object | any) {
     try {
       if (data !== null && data !== undefined) {
-        let response = await this.SequenciaDelineamentoRepository.create(data)
+        const response = await this.SequenciaDelineamentoRepository.create(data);
         if (response) {
-          return { status: 200, message: "itens inseridos" }
-        } else {
-          return { status: 400, message: "erro" }
+          return { status: 200, message: 'itens inseridos' };
         }
+        return { status: 400, message: 'erro' };
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   }
+
   async update(data: IUpdateSequenciaDelineamento) {
     try {
-
       const sequenciaDelineamento = await this.SequenciaDelineamentoRepository.findById(data.id);
 
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
@@ -91,7 +91,7 @@ export class SequenciaDelineamentoController {
 
       await this.SequenciaDelineamentoRepository.update(sequenciaDelineamento.id, sequenciaDelineamento);
 
-      return { status: 200, message: "Sequência de delineamento atualizada!" };
+      return { status: 200, message: 'Sequência de delineamento atualizada!' };
     } catch (err) {
       return { status: 404, message: 'Erro ao atualizar!' };
     }
@@ -109,22 +109,20 @@ export class SequenciaDelineamentoController {
         if (typeof (options.status) === 'string') {
           options.filterStatus = Number(options.filterStatus);
           if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        }
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
-        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
+        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
         parameters.volume = JSON.parse(options.filterSearch);
       }
 
       if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
+        const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
           select[objSelect[item]] = true;
         });
-        select = Object.assign({}, select);
+        select = { ...select };
       } else {
         select = {
           id: true,
@@ -134,7 +132,7 @@ export class SequenciaDelineamentoController {
           nt: true,
           bloco: true,
           status: true,
-        }
+        };
       }
 
       if (options.repeticao) {
@@ -176,26 +174,24 @@ export class SequenciaDelineamentoController {
       }
 
       if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      let response: object | any = await this.SequenciaDelineamentoRepository.findAll(
+      const response: object | any = await this.SequenciaDelineamentoRepository.findAll(
         parameters,
         select,
         take,
         skip,
-        orderBy
+        orderBy,
       );
 
       if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 }
-
-      } else {
-        return { status: 200, response, total: response.total }
+        return { status: 400, response: [], total: 0 };
       }
+      return { status: 200, response, total: response.total };
     } catch (err) {
-      console.log(err)
-      return { status: 400, response: [], total: 0 }
+      console.log(err);
+      return { status: 400, response: [], total: 0 };
     }
-  };
+  }
 }

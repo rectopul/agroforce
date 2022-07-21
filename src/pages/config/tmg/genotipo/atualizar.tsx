@@ -106,7 +106,7 @@ export default function Atualizargenotipo({
       id: genotipo.id,
       id_culture: genotipo.id_culture,
       cruza: genotipo.cruza,
-      cod_tec: genotipo.tecnologia.cod_tec + " " + genotipo.tecnologia.desc,
+      cod_tec: `${genotipo.tecnologia.cod_tec} ${genotipo.tecnologia.desc}`,
       status: genotipo.status,
       id_dados: genotipo.id_dados,
       name_genotipo: genotipo.name_genotipo,

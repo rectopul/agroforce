@@ -1,25 +1,24 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import Head from "next/head";
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { IoMdArrowBack } from "react-icons/io";
-import { MdUpdate } from "react-icons/md";
-import { epocaService } from "src/services";
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdUpdate } from 'react-icons/md';
+import { epocaService } from 'src/services';
 import Swal from 'sweetalert2';
 import {
   Button, Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IEpocaProps {
   id: number;
   name: string;
   status: number;
-};
-
+}
 
 export default function NovoLocal(epoca: IEpocaProps) {
   const { TabsDropDowns } = ITabs.default;
@@ -32,7 +31,7 @@ export default function NovoLocal(epoca: IEpocaProps) {
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const router = useRouter();
   const formik = useFormik<IEpocaProps>({
     initialValues: {
@@ -50,17 +49,17 @@ export default function NovoLocal(epoca: IEpocaProps) {
         status: epoca.status,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Época atualizada com sucesso!')
+          Swal.fire('Época atualizada com sucesso!');
           router.push('/config/ensaio/epoca');
         } else {
           Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   function validateInputs(values: any) {
-    if (!values.name) { let inputname: any = document.getElementById("name"); inputname.style.borderColor = 'red'; } else { let inputname: any = document.getElementById("name"); inputname.style.borderColor = ''; }
+    if (!values.name) { const inputname: any = document.getElementById('name'); inputname.style.borderColor = 'red'; } else { const inputname: any = document.getElementById('name'); inputname.style.borderColor = ''; }
   }
 
   return (
@@ -69,7 +68,7 @@ export default function NovoLocal(epoca: IEpocaProps) {
         <title>Atualizar Época</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -79,12 +78,13 @@ export default function NovoLocal(epoca: IEpocaProps) {
           </div>
 
           <div className="w-full
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 Código
@@ -119,7 +119,8 @@ export default function NovoLocal(epoca: IEpocaProps) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -147,21 +148,20 @@ export default function NovoLocal(epoca: IEpocaProps) {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
-  const result = await fetch(`${baseUrl}/` + context.query.id, requestOptions)
+  const result = await fetch(`${baseUrl}/${context.query.id}`, requestOptions);
 
   const epoca = await result.json();
 
-  return { props: epoca }
-}
+  return { props: epoca };
+};

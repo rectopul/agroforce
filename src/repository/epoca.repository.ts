@@ -6,10 +6,10 @@ interface IEpoca {
   name: string;
   status: number;
   created_by: number;
-};
+}
 
-type ICreateEpoca = Omit<IEpoca, "id" | "status">;
-type IUpdateEpoca = Omit<IEpoca, "created_by">;
+type ICreateEpoca = Omit<IEpoca, 'id' | 'status'>;
+type IUpdateEpoca = Omit<IEpoca, 'created_by'>;
 
 export class EpocaRepository {
   async create(data: ICreateEpoca) {
@@ -19,16 +19,16 @@ export class EpocaRepository {
 
   async findOne(id: number) {
     const epoca = await prisma.epoca.findUnique({
-      where: { id }
+      where: { id },
     });
     return epoca;
   }
 
   async findByName(name: string) {
     const epoca = await prisma.epoca.findFirst({
-      where: { 
-        name
-      }
+      where: {
+        name,
+      },
     });
     return epoca;
   }
@@ -39,31 +39,30 @@ export class EpocaRepository {
     if (epoca !== null) {
       const result = await prisma.epoca.update({
         where: { id },
-        data
+        data,
       });
       return result;
-    } else {
-      return false;
     }
+    return false;
   }
 
-  async findAll (where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy){
+    if (orderBy) {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.epoca.count({ where: where });
+    const count = await prisma.epoca.count({ where });
 
     const result: object | any = await prisma.epoca.findMany({
-      select: select, 
-      skip: skip, 
-      take: take, 
-      where: where,
-      orderBy: order
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
     });
-    
+
     result.total = count;
     return result;
   }

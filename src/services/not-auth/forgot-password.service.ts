@@ -7,7 +7,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}/not-auth/forgot-password`;
 interface IForgotPassword {
   login: string;
   confirmLogin: string;
-};
+}
 
 export const forgotPasswordService = {
   sendLogin,

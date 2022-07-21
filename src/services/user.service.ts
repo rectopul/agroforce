@@ -11,79 +11,79 @@ const baseUrlProfile = `${publicRuntimeConfig.apiUrl}/profile-user`;
 const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user') as string));
 
 export const userService = {
-    user: userSubject.asObservable(),
-    get userValue() { return userSubject.value },
-    login,
-    logout,
-    getAll,
-    getPermissions,
-    create,
-    update,
-    logoutSign,
-    profileUser,
-    profileUpdateAvatar,
-    updatePassword
+  user: userSubject.asObservable(),
+  get userValue() { return userSubject.value; },
+  login,
+  logout,
+  getAll,
+  getPermissions,
+  create,
+  update,
+  logoutSign,
+  profileUser,
+  profileUpdateAvatar,
+  updatePassword,
 };
 
 async function login(login: any, password: any) {
-    return fetchWrapper.post(`${baseUrl}/signIn`, { login, password })
-        .then(user => {
-            // publish user to subscribers and store in local storage to stay logged in between page refreshes
-            userSubject.next(user);
-            localStorage.setItem('user', JSON.stringify(user));
+  return fetchWrapper.post(`${baseUrl}/signIn`, { login, password })
+    .then((user) => {
+      // publish user to subscribers and store in local storage to stay logged in between page refreshes
+      userSubject.next(user);
+      localStorage.setItem('user', JSON.stringify(user));
 
-            return user;
-        });
+      return user;
+    });
 }
 
 function create(data: any) {
-    return fetchWrapper.post(baseUrl, data);
+  return fetchWrapper.post(baseUrl, data);
 }
 
 function update(data: any) {
-    return fetchWrapper.put(baseUrl, data);
+  return fetchWrapper.put(baseUrl, data);
 }
 
 function logout() {
-    // remove user from local storage, publish null to user subscribers and redirect to login page
-    localStorage.removeItem('user');
-    userSubject.next(null);
-    Router.push('/login');
+  // remove user from local storage, publish null to user subscribers and redirect to login page
+  localStorage.removeItem('user');
+  userSubject.next(null);
+  Router.push('/login');
 }
 
 async function logoutSign(login: any, cultures: object | any) {
-    let user = await userService.getAll({ login: login, paramSelect: ['password', 'id'] });
-    userPermissionService.update({ userId: user.response[0].id });
-    userPermissionService.update({ cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id });
-    localStorage.removeItem('user');
-    userSubject.next(null);
-    let singIn = await userService.login(login, functionsUtils.Crypto(user.response[0].password, 'decipher'))
-    if (singIn) {
-        Router.push('/');
-    }
+  const user = await userService.getAll({ login, paramSelect: ['password', 'id'] });
+  userPermissionService.update({ userId: user.response[0].id });
+  userPermissionService.update({ cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id });
+  localStorage.removeItem('user');
+  userSubject.next(null);
+  const singIn = await userService.login(login, functionsUtils.Crypto(user.response[0].password, 'decipher'));
+  if (singIn) {
+    Router.push('/');
+  }
 }
 
 function getAll(parameters: any) {
-    return fetchWrapper.get(baseUrl, parameters);
+  return fetchWrapper.get(baseUrl, parameters);
 }
 
 function getPermissions(parameters: any) {
-    return fetchWrapper.get(baseUrl + '/permissions', parameters);
+  return fetchWrapper.get(`${baseUrl}/permissions`, parameters);
 }
 
 // Tela de Perfil
 
 async function profileUser(parameters: any) {
-    const user = fetchWrapper.get(baseUrlProfile, parameters);
-    return user;
+  const user = fetchWrapper.get(baseUrlProfile, parameters);
+  return user;
 }
 
 async function profileUpdateAvatar(data: any) {
-    const user = fetchWrapper.put(baseUrlProfile, data);
-    return user;
+  const user = fetchWrapper.put(baseUrlProfile, data);
+  return user;
 }
 
 async function updatePassword(data: any) {
-    const user = fetchWrapper.put(`${baseUrl}/change-password`, data);
-    return user;
+  const user = fetchWrapper.put(`${baseUrl}/change-password`, data);
+  return user;
 }

@@ -32,7 +32,7 @@ function Login() {
   const {
     register, handleSubmit, setError, formState,
   } = useForm(formOptions);
-  const { errors } = formState;
+  const { errors }: any = formState;
 
   async function onSubmit({ login, password }: any) {
     await userService.login(login, password).then(() => {

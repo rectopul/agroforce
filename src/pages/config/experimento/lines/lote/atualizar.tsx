@@ -1,19 +1,19 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { FaSortAmountUpAlt } from "react-icons/fa";
-import { IoMdArrowBack } from "react-icons/io";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
+import { IoMdArrowBack } from 'react-icons/io';
 import {
   Button,
   Content,
-  Input
-} from "src/components";
-import { loteService } from "src/services";
-import Swal from "sweetalert2";
+  Input,
+} from 'src/components';
+import { loteService } from 'src/services';
+import Swal from 'sweetalert2';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export interface IUpdateLote {
@@ -58,7 +58,7 @@ export default function Atualizar(lote: IUpdateLote) {
           Swal.fire('Lote atualizado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -66,14 +66,14 @@ export default function Atualizar(lote: IUpdateLote) {
   });
 
   function validateInputs(values: IUpdateLote) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
-    if (!values.volume) { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = 'red'; } else { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = '' }
+    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
+    if (!values.volume) { const inputVolume: any = document.getElementById('volume'); inputVolume.style.borderColor = 'red'; } else { const inputVolume: any = document.getElementById('volume'); inputVolume.style.borderColor = ''; }
   }
 
   return (
     <>
       <Head><title>Atualizar lote</title></Head>
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -124,7 +124,8 @@ export default function Atualizar(lote: IUpdateLote) {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -150,22 +151,22 @@ export default function Atualizar(lote: IUpdateLote) {
       </Content>
     </>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiLote = await fetch(`${baseUrl}/find-one?id=` + context.query.id, requestOptions);
+  const apiLote = await fetch(`${baseUrl}/find-one?id=${context.query.id}`, requestOptions);
 
   const lote = await apiLote.json();
 
-  return { props: lote }
-}
+  return { props: lote };
+};

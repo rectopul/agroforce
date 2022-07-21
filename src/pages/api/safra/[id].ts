@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SafraController } from '../../../controllers/safra.controller';
 import { apiHandler } from '../../../helpers/api';
@@ -22,11 +21,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     case 'GET':
       const Result = await Controller.getOneSafra(Number(id));
       res.status(200).json(Result.response);
-      break
+      break;
     case 'PUT':
-      let resultPut = await Controller.updateSafra(req.body);
+      const resultPut = await Controller.updateSafra(req.body);
       res.status(200).json(resultPut);
-      break
+      break;
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }

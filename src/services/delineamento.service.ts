@@ -6,24 +6,24 @@ const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
 
 export const delineamentoService = {
-    getAll,
-    create,
-    update,
-    getLocal
+  getAll,
+  create,
+  update,
+  getLocal,
 };
 
 function create(data: any) {
-    return fetchWrapper.post(baseUrl, data);
+  return fetchWrapper.post(baseUrl, data);
 }
 
 function update(data: any) {
-    return fetchWrapper.put(baseUrl, data);
+  return fetchWrapper.put(baseUrl, data);
 }
 
 function getAll(parameters: any) {
-    return fetchWrapper.get(baseUrl, parameters);
+  return fetchWrapper.get(baseUrl, parameters);
 }
 
 function getLocal(parameters: any) {
-    return fetchWrapper.get(`${baseUrl}/local`, parameters);
+  return fetchWrapper.get(`${baseUrl}/local`, parameters);
 }

@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { QuadraController } from '../../../controllers/quadra.controller';
 import { apiHandler } from '../../../helpers/api';
@@ -13,15 +12,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     case 'GET':
       const resultGet = await Controller.getAll(req.query);
       res.status(200).json(resultGet);
-      break
+      break;
     case 'POST':
       const resultPost = await Controller.create(req.body);
       res.status(201).json(resultPost);
-      break
+      break;
     case 'PUT':
-      let resultPut = await Controller.update(req.body);
+      const resultPut = await Controller.update(req.body);
       res.status(200).json(resultPut);
-      break
+      break;
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }

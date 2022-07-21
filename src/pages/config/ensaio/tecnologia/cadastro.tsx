@@ -1,15 +1,15 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { FiUserPlus } from "react-icons/fi";
-import { IoMdArrowBack } from "react-icons/io";
-import { tecnologiaService } from "src/services";
+import { FiUserPlus } from 'react-icons/fi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { tecnologiaService } from 'src/services';
 import Swal from 'sweetalert2';
 import {
   Button, Content,
-  Input
-} from "../../../../components";
+  Input,
+} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {
@@ -20,7 +20,7 @@ interface ITecnologiaProps {
   desc: string;
   created_by: number;
   status: number;
-};
+}
 
 export default function NovoLocal() {
   const { TabsDropDowns } = ITabs.default;
@@ -33,7 +33,7 @@ export default function NovoLocal() {
       : tab.statusTab = false
   ));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const router = useRouter();
@@ -46,14 +46,13 @@ export default function NovoLocal() {
       cod_tec: '',
       desc: '',
       created_by: userLogado.id,
-      status: 1
+      status: 1,
     },
     onSubmit: async (values) => {
-
-      validateInputs(values)
+      validateInputs(values);
       if (!values.cod_tec || !values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
 
       await tecnologiaService.create({
@@ -62,28 +61,27 @@ export default function NovoLocal() {
         cod_tec: capitalize(values.cod_tec),
         desc: capitalize(values.desc),
         created_by: Number(userLogado.id),
-        status: 1
+        status: 1,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Tecnologia cadastrada com sucesso!');
           router.back();
         } else {
-          Swal.fire(response.message)
+          Swal.fire(response.message);
         }
-      })
+      });
     },
   });
 
   function validateInputs(values: any) {
     if (!values.name || !values.cod_tec) {
-      let inputname: any = document.getElementById("name");
-      let inputcod_tec: any = document.getElementById("cod_tec");
+      const inputname: any = document.getElementById('name');
+      const inputcod_tec: any = document.getElementById('cod_tec');
 
       inputname.style.borderColor = 'red';
       inputcod_tec.style.borderColor = 'red';
-    }
-    else {
-      let inputname: any = document.getElementById("name");
+    } else {
+      const inputname: any = document.getElementById('name');
       inputname.style.borderColor = '';
     }
   }
@@ -94,7 +92,7 @@ export default function NovoLocal() {
         <title>Nova tecnologia</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -104,12 +102,13 @@ export default function NovoLocal() {
           </div>
 
           <div className="w-1/2
-            flex 
+            flex
             justify-around
             gap-6
             mt-4
             mb-4
-          ">
+          "
+          >
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Código Tecnologia
@@ -158,7 +157,8 @@ export default function NovoLocal() {
             gap-3
             justify-center
             mt-10
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"

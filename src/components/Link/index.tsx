@@ -7,8 +7,8 @@ interface ILinkProps {
 
 export function Navigate({
   value,
-  href
- }: ILinkProps) {
+  href,
+}: ILinkProps) {
   return (
     <ul>
       <li>
@@ -17,5 +17,5 @@ export function Navigate({
         </Link>
       </li>
     </ul>
-  )
+  );
 }

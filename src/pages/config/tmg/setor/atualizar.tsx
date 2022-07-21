@@ -1,26 +1,26 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { IoMdArrowBack } from "react-icons/io";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { IoMdArrowBack } from 'react-icons/io';
 import {
   Button,
   Content,
-  Input
-} from "src/components";
-import { departmentService } from "src/services";
-import Swal from "sweetalert2";
+  Input,
+} from 'src/components';
+import { departmentService } from 'src/services';
+import Swal from 'sweetalert2';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartmentProps {
   id: number;
   name: string;
   status: number;
-};
+}
 
 export default function AtualizarSafra(item: IDepartmentProps) {
   const { TabsDropDowns } = ITabs.default;
@@ -40,25 +40,25 @@ export default function AtualizarSafra(item: IDepartmentProps) {
     initialValues: {
       id: item.id,
       name: item.name,
-      status: item.status
+      status: item.status,
     },
     onSubmit: async (values) => {
-      validateInputs(values)
+      validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios')
-        return
+        Swal.fire('Preencha todos os campos obrigatórios');
+        return;
       }
 
       await departmentService.update({
         id: item.id,
         name: capitalize(formik.values.name),
-        status: item.status
+        status: item.status,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Setor atualizado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -67,10 +67,10 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
     } else {
-      let inputName: any = document.getElementById("name");
+      const inputName: any = document.getElementById('name');
       inputName.style.borderColor = '';
     }
   }
@@ -78,7 +78,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   return (
     <>
       <Head><title>Atualizar setor</title></Head>
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -107,7 +107,8 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             gap-3
             justify-center
             mt-12
-          ">
+          "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -132,22 +133,22 @@ export default function AtualizarSafra(item: IDepartmentProps) {
       </Content>
     </>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlList = `${publicRuntimeConfig.apiUrl}/department`;
-  const token = context.req.cookies.token;
+  const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiItem = await fetch(`${baseUrlList}/` + context.query.id, requestOptions);
+  const apiItem = await fetch(`${baseUrlList}/${context.query.id}`, requestOptions);
 
   const item = await apiItem.json();
 
-  return { props: item }
-}
+  return { props: item };
+};

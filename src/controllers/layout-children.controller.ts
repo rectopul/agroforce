@@ -1,4 +1,4 @@
-import { LayoutChildrenRepository } from "src/repository/layout-children.repository";
+import { LayoutChildrenRepository } from 'src/repository/layout-children.repository';
 
 export class LayoutChildrenController {
   public readonly required = 'Campo obrigatório';
@@ -16,20 +16,17 @@ export class LayoutChildrenController {
         if (typeof (options.status) === 'string') {
           options.filterStatus = Number(options.filterStatus);
           if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        } else {
-          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        }
+        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       } else {
         parameters.status = 1;
       }
 
       if (options.filterSearch) {
-        options.filterSearch = '{"contains":"' + options.filterSearch + '"}';
-
+        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
       }
 
       if (options.paramSelect) {
-        let objSelect = options.paramSelect.split(',');
+        const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
           if (objSelect[item] === 'tecnologia') {
             select[objSelect[item]] = true;
@@ -37,9 +34,11 @@ export class LayoutChildrenController {
             select[objSelect[item]] = true;
           }
         });
-        select = Object.assign({}, select);
+        select = { ...select };
       } else {
-        select = { id: true, sl: true, sc: true, s_aloc: true, tiro: true, disparo: true, dist: true, st: true, cj: true, spc: true, scolheita: true, tipo_parcela: true, status: true };
+        select = {
+          id: true, sl: true, sc: true, s_aloc: true, tiro: true, disparo: true, dist: true, st: true, cj: true, spc: true, scolheita: true, tipo_parcela: true, status: true,
+        };
       }
       if (options.id_culture) {
         parameters.id_culture = Number(options.id_culture);
@@ -48,7 +47,6 @@ export class LayoutChildrenController {
       if (options.id_layout) {
         parameters.id_layout = Number(options.id_layout);
       }
-
 
       if (options.take) {
         if (typeof (options.take) === 'string') {
@@ -67,55 +65,55 @@ export class LayoutChildrenController {
       }
 
       if (options.orderBy) {
-        orderBy = '{"' + options.orderBy + '":"' + options.typeOrder + '"}';
+        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      let response: object | any = await this.disparoRepository.findAll(
+      const response: object | any = await this.disparoRepository.findAll(
         parameters,
         select,
         take,
         skip,
-        orderBy
+        orderBy,
       );
 
       if (!response && response.total <= 0) {
-        return { status: 400, response: [], total: 0, message: 'nenhum resultado encontrado' };
-      } else {
-        return { status: 200, response, total: response.total }
+        return {
+          status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
+        };
       }
+      return { status: 200, response, total: response.total };
     } catch (err) {
-      console.log(err)
-      return { status: 400, response: [], total: 0 }
+      console.log(err);
+      return { status: 400, response: [], total: 0 };
     }
   }
 
   async getOne(id: number) {
     try {
-      if (!id) throw new Error("Dados inválidos");
+      if (!id) throw new Error('Dados inválidos');
 
       const response = await this.disparoRepository.findOne(id);
 
-      if (!response) throw new Error("Item não encontrado");
+      if (!response) throw new Error('Item não encontrado');
 
       return { status: 200, response };
     } catch (err) {
-      return { status: 400, message: err }
+      return { status: 400, message: err };
     }
   }
 
   async create(data: any) {
     try {
-      let response = await this.disparoRepository.create(data);
-      return { status: 201, message: "Disparo cadastrado" }
+      const response = await this.disparoRepository.create(data);
+      return { status: 201, message: 'Disparo cadastrado' };
     } catch (err) {
       console.log(err);
-      return { status: 400, message: "Erro no cadastrado" }
+      return { status: 400, message: 'Erro no cadastrado' };
     }
   }
 
   async update(data: any) {
     try {
-
       const quadra: any = await this.disparoRepository.findOne(data.id);
 
       if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
@@ -128,10 +126,10 @@ export class LayoutChildrenController {
 
       await this.disparoRepository.update(quadra.id, quadra);
 
-      return { status: 200, message: "Genótipo atualizado" }
+      return { status: 200, message: 'Genótipo atualizado' };
     } catch (err) {
       console.log(err);
-      return { status: 404, message: 'Erro ao atualizar' }
+      return { status: 404, message: 'Erro ao atualizar' };
     }
   }
 }

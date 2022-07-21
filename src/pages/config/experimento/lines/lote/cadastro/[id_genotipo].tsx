@@ -1,14 +1,14 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { FaSortAmountUpAlt } from "react-icons/fa";
-import { IoMdArrowBack } from "react-icons/io";
-import { Button, Content, Input } from "src/components";
-import { loteService } from "src/services";
-import Swal from "sweetalert2";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
+import { IoMdArrowBack } from 'react-icons/io';
+import { Button, Content, Input } from 'src/components';
+import { loteService } from 'src/services';
+import Swal from 'sweetalert2';
 import * as ITabs from '../../../../../../shared/utils/dropdown';
 
 interface ICreateLoteGenotipo {
@@ -16,7 +16,7 @@ interface ICreateLoteGenotipo {
   name: string;
   volume: number;
   created_by: number;
-};
+}
 
 interface IIdGenotipo {
   id_genotipo: number;
@@ -36,7 +36,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<ICreateLoteGenotipo>({
     initialValues: {
@@ -49,7 +49,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
       validateInputs(values);
 
       await loteService.create({
-        id_genotipo: id_genotipo,
+        id_genotipo,
         name: capitalize(formik.values.name),
         volume: formik.values.volume,
         created_by: formik.values.created_by,
@@ -58,7 +58,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
           Swal.fire('Lote cadastrado com sucesso!');
           router.back();
         } else {
-          setCheckInput("text-red-600");
+          setCheckInput('text-red-600');
           Swal.fire(response.message);
         }
       });
@@ -66,8 +66,8 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
   });
 
   function validateInputs(values: ICreateLoteGenotipo) {
-    if (!values.name) { let inputName: any = document.getElementById("name"); inputName.style.borderColor = 'red'; } else { let inputName: any = document.getElementById("name"); inputName.style.borderColor = ''; }
-    if (!values.volume) { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = 'red'; } else { let inputVolume: any = document.getElementById("volume"); inputVolume.style.borderColor = '' }
+    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
+    if (!values.volume) { const inputVolume: any = document.getElementById('volume'); inputVolume.style.borderColor = 'red'; } else { const inputVolume: any = document.getElementById('volume'); inputVolume.style.borderColor = ''; }
   }
 
   return (
@@ -76,7 +76,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
         <title>Cadastro de Lote</title>
       </Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive={'config'}>
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
           onSubmit={formik.handleSubmit}
@@ -119,7 +119,8 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
           gap-3
           justify-center
           mt-14
-        ">
+        "
+          >
             <div className="w-30">
               <Button
                 type="button"
@@ -152,7 +153,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
 
   return {
     props: {
-      id_genotipo
+      id_genotipo,
     },
-  }
-}
+  };
+};
