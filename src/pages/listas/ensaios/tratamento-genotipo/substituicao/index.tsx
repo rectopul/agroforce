@@ -12,7 +12,7 @@ import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
-import { TbArrowsDownUp } from 'react-icons/tb';
+//import { TbArrowsDownUp } from 'react-icons/tb';
 import {
   BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
@@ -238,7 +238,6 @@ export default function Listagem({
             rounder="rounded-full"
             bgColor="bg-green-600"
             textColor="white"
-            icon={<TbArrowsDownUp size={60} />}
           />
         </div>
       ),
