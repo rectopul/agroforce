@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET':
-      const result = await groupController.listAll(req.query);
+      const result = await groupController.getAll(req.query);
       res.status(200).json(result);
       break;
     case 'POST':
