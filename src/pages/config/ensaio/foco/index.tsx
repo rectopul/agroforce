@@ -270,7 +270,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
       if (columnOrder[index] === 'group') {
-        tableFields.push(headerTableFactory('Grupo', 'group'));
+        //tableFields.push(headerTableFactory('Grupo', 'group'));
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -433,6 +433,7 @@ export default function Listagem({
     }
     await focoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
+        console.log(response.response);
         setFocos(response.response);
       }
     });

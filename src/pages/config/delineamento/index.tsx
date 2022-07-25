@@ -438,8 +438,9 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+      //filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
+    filterApplication += `&id_culture=${cultureId}`;
 
     await delineamentoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {

@@ -381,6 +381,7 @@ export default function Listagem({
                   justify-center
                   pb-2
                 "
+<<<<<<< HEAD
                 >
 
                   <div className="h-10 w-1/2 ml-4">
@@ -460,6 +461,64 @@ export default function Listagem({
                 Toolbar: () => (
                   <div
                     className="w-full max-h-96
+=======
+								>
+									<div className="h-10 w-1/2 ml-4" style={{display:"none"}}>
+										<label className="block text-gray-900 text-sm font-bold mb-2">
+											Status
+										</label>
+										<Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
+									</div>
+
+									<div className="h-10 w-1/2 ml-4">
+										<label className="block text-gray-900 text-sm font-bold mb-2">
+											Pesquisar
+										</label>
+										<Input
+											type="text"
+											placeholder="nome"
+											max="40"
+											id="filterName"
+											name="filterName"
+											onChange={formik.handleChange}
+										/>
+									</div>
+								</div>
+
+								<div className="h-16 w-32 mt-3">
+									<Button
+										onClick={() => { }}
+										value="Filtrar"
+										bgColor="bg-blue-600"
+										textColor="white"
+										icon={<BiFilterAlt size={20} />}
+									/>
+								</div>
+							</form>
+						</div>
+					</AccordionFilter>
+
+					{/* overflow-y-scroll */}
+					<div className="w-full h-full overflow-y-scroll">
+						<MaterialTable
+							style={{ background: '#f9fafb' }}
+							columns={columns}
+							data={tecnologias}
+							options={{
+								showTitle: false,
+								headerStyle: {
+									zIndex: 20,
+								},
+								rowStyle: { background: '#f9fafb' },
+								search: false,
+								filtering: false,
+								pageSize: itensPerPage,
+							}}
+							components={{
+								Toolbar: () => (
+									<div
+										className="w-full max-h-96
+>>>>>>> ti-190722
                     flex
                     items-center
                     justify-between
