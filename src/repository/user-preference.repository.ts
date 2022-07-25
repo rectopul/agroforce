@@ -1,9 +1,14 @@
 import { prisma } from '../pages/api/db/db';
 
 export class UserPreferenceRepository {
-  async create(Permission: object | any) {
-    const Result = await prisma.users_preferences.create({ data: Permission, select: { id: true } });
-    return Result;
+  async create(data: object | any) {
+    const result = await prisma.users_preferences.create(
+      {
+        data,
+        select: { id: true },
+      },
+    );
+    return result;
   }
 
   async update(id: number, Data: Object | any) {
@@ -47,7 +52,7 @@ export class UserPreferenceRepository {
     return Result;
   }
 
-  async findAllconfigGerais(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAllConfigGerais(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
     if (orderBy) {
       order = JSON.parse(orderBy);

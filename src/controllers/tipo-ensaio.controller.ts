@@ -25,11 +25,7 @@ export class TypeAssayController {
         name: true,
         protocol_name: true,
         status: true,
-        envelope: {
-          select: {
-            seeds: true,
-          },
-        },
+        envelope: true,
       };
 
       if (options.id_culture) {
@@ -53,6 +49,14 @@ export class TypeAssayController {
         skip,
         orderBy,
       );
+
+      response.map((item: any) => {
+        item.envelope.map((envelope: any) => {
+          if (envelope.id_safra === Number(options.id_safra)) {
+            item.envelope = envelope;
+          }
+        });
+      });
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum envelope encontrado',

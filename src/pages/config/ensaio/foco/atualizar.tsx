@@ -358,19 +358,13 @@ export default function Atualizar({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados},foco&id_foco=${idFoco}`;
-    }
-    await groupService.getAll(filterApplication).then((response: any) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
-
-          return row;
+    await groupService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          delete newRow.npe;
+          newRow.group = Number(row.group);
+          return newRow;
         });
 
         newData.map((item: any) => {

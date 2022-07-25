@@ -339,26 +339,18 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_type_assay=${idTypeAssay}`;
-    }
-    await envelopeService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+    await envelopeService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
+          row.type_assay = row.type_assay?.name;
+          row.safra = row.safra?.safraName;
 
           return row;
-        });
-
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.safra = item.safra?.safraName;
-          delete item.type_assay;
-          return item;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -699,14 +691,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const urlParameters: any = new URL(baseUrlEnvelope);
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const envelopes = await fetch(`${baseUrlEnvelope}?id_type_assay=${idTypeAssay}`, requestOptions);
-
-  const { response: allEnvelopes, total: totalItens }: any = await envelopes.json();
+  const {
+    response: allEnvelopes,
+    total: totalItens,
+  } = await fetch(`${baseUrlEnvelope}?id_type_assay=${idTypeAssay}`, requestOptions).then((response) => response.json());
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/type-assay`;
-  const apiTypeAssay = await fetch(`${baseUrlShow}/${context.query.id}`, requestOptions);
-
-  const typeAssay = await apiTypeAssay.json();
+  const typeAssay = await fetch(`${baseUrlShow}/${context.query.id}`, requestOptions).then((response) => response.json());
 
   return {
     props: {
