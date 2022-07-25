@@ -288,17 +288,8 @@ export class ImportController {
             erro = true;
           }
         }
-<<<<<<< HEAD
 
         await this.logImportController.update({ id: responseLog?.id, status: 1 });
-=======
-        
-        if(responseLog){
-          if(responseLog.response){
-            await this.logImportController.update({ id: responseLog.response.id, status: 1 });
-          }
-        }
->>>>>>> ti-190722
         return { status: 200, message: response, error: erro };
       }
     } catch (err) {
