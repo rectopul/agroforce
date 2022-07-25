@@ -635,7 +635,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -645,7 +645,7 @@ export default function Listagem({
                         href="local/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className="text-blue-600">
                       Total registrado:

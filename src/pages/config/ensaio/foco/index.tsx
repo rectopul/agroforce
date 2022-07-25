@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import router from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
@@ -148,139 +149,6 @@ export default function Listagem({
     await focoService.update({ id, name, status });
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IFocos) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              title={`Atualizar ${rowData.name}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          {rowData.status === 1 ? (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => await handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => await handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(columnsCampos: string) {
-    const columnOrder: string[] = columnsCampos.split(',');
-    const tableFields: any = [];
-
-    Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnOrder[index] === 'name') {
-        tableFields.push(headerTableFactory('Nome', 'name'));
-      }
-      if (columnOrder[index] === 'group') {
-        //tableFields.push(headerTableFactory('Grupo', 'group'));
-      }
-      if (columnOrder[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
-  }
-
-  const columns = columnsOrder(camposGerenciados);
-
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -321,6 +189,141 @@ export default function Listagem({
       }
     }
   }
+
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: IFocos) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              title={`Atualizar ${rowData.name}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          {rowData.status === 1 ? (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsUp size={16} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsDown size={16} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
+        </div>
+      ),
+    };
+  }
+
+  function columnsOrder(columnsCampos: string) {
+    const columnOrder: string[] = columnsCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnOrder).forEach((item, index) => {
+      if (columnOrder[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnOrder[index] === 'name') {
+        tableFields.push(headerTableFactory('Nome', 'name'));
+      }
+      if (columnOrder[index] === 'group') {
+        tableFields.push(headerTableFactory('Grupo', 'group.group'));
+      }
+      if (columnOrder[index] === 'status') {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -373,29 +376,21 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await focoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = focos.map((row) => {
+    await focoService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+          delete row.tableData;
+          delete row.id;
+          row.group = row.group?.group ? Number(row.group.group) : '';
 
           return row;
         });
 
-        newData.map((item) => {
-          const statusTemp = item.status;
-          delete item.status;
-          delete item.tableData;
-          item.status = statusTemp;
-          return item;
-        });
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'focos');
@@ -431,10 +426,9 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await focoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        console.log(response.response);
-        setFocos(response.response);
+    await focoService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setFocos(response);
       }
     });
   }
@@ -675,11 +669,12 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
 
   const { token } = req.cookies;
-  const id_safra = req.cookies.safraId;
-  const id_culture = req.cookies.cultureId;
+  const idSafra = req.cookies.safraId;
+  const idCulture = req.cookies.cultureId;
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
 
@@ -689,8 +684,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${id_culture}&id_safra=${id_safra}` : `filterStatus=1&id_culture=${id_culture}&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -699,8 +697,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allFocos, total: totalItems } = await response.json();
+  const {
+    response: allFocos,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   return {
     props: {

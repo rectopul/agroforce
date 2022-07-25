@@ -1,18 +1,6 @@
-import handleError from 'src/shared/utils/handleError';
-import {
-  number, object, SchemaOf, string,
-} from 'yup';
+import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
 
-interface LoteDTO {
-  id: number;
-  name: string;
-  created_by: number;
-  status: number;
-  id_culture?: number;
-}
-
-type UpdateLoteDTO = Omit<LoteDTO, 'created_by'>;
 export class FocoController {
   public readonly required = 'Campo obrigatório';
 
@@ -20,10 +8,9 @@ export class FocoController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
-    let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
@@ -34,20 +21,12 @@ export class FocoController {
         parameters.id_culture = Number(options.id_culture);
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          name: true,
-          group: true,
-          status: true,
-        };
-      }
+      const select = {
+        id: true,
+        name: true,
+        group: true,
+        status: true,
+      };
 
       if (options.name) {
         parameters.name = options.name;
@@ -70,7 +49,12 @@ export class FocoController {
       response.map((item: any) => {
         item.group.map((group: any) => {
           if (group.id_safra === Number(options.id_safra)) {
-            item.group = (group.group.toString()).length > 1 ? group.group : `0${group.group.toString()}`;
+            if (group.group.toString().length === 1) {
+              group.group = `0${group.group.toString()}`;
+              item.group = group;
+            } else {
+              item.group = group;
+            }
           }
         });
       });
