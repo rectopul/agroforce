@@ -288,12 +288,7 @@ export class ImportController {
 
         // Validação do modulo tecnologia
         if (data.moduleId === 8) {
-          response = await this.validateTechnology(data);
-          if (response === 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
+          return await ImportTechnologyController.validate(data);
         }
 
         return { status: 200, message: response, error: erro };

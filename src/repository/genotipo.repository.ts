@@ -30,7 +30,6 @@ export class GenotipoRepository {
         progenitor_m_origem: true,
         progenitores_origem: true,
         parentesco_completo: true,
-        status: true,
         tecnologia: { select: { name: true, cod_tec: true, desc: true } },
         lote: true,
       },
