@@ -244,7 +244,7 @@ export default function Listagem({
                 onClick={() => {
                   setCookies('filterBeforeEdit', filtersParams);
                   setCookies('pageBeforeEdit', currentPage?.toString());
-                  router.push(`/config/local/atualizar?id=${rowData.id}`);
+                  router.push(`/config/local/local/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -253,7 +253,7 @@ export default function Listagem({
             <div>
               <Button
                 icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => await handleStatus(
+                onClick={async () => handleStatus(
                   rowData.id,
                   rowData.status,
                 )}
@@ -274,7 +274,7 @@ export default function Listagem({
                 onClick={() => {
                   setCookies('filterBeforeEdit', filtersParams);
                   setCookies('pageBeforeEdit', currentPage?.toString());
-                  router.push(`/config/local/atualizar?id=${rowData.id}`);
+                  router.push(`/config/local/local/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -788,6 +788,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const userPreferenceController = new UserPreferenceController();
+  // eslint-disable-next-line max-len
   const itensPerPage = await (await userPreferenceController.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
