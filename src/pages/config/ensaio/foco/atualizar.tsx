@@ -42,7 +42,6 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 export interface IUpdateFoco {
   id: number;
   name: string;
-  status: number;
   created_by: number;
 }
 
@@ -95,7 +94,6 @@ export default function Atualizar({
     initialValues: {
       id: foco.id,
       name: foco.name,
-      status: foco.status,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
@@ -109,7 +107,6 @@ export default function Atualizar({
         id: foco.id,
         name: capitalize(formik.values.name),
         id_culture: Number(culture),
-        status: foco.status,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Foco atualizado com sucesso!');
@@ -121,7 +118,7 @@ export default function Atualizar({
     },
   });
 
-  const preferences = userLogado.preferences.group || { id: 0, table_preferences: 'id,safra,name,group,status' };
+  const preferences = userLogado.preferences.group || { id: 0, table_preferences: 'id,safra,name,group,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
@@ -134,7 +131,7 @@ export default function Atualizar({
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
   const filter = filterApplication;
   const [colorStar, setColorStar] = useState<string>('');
@@ -245,8 +242,8 @@ export default function Atualizar({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'group',
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       render: (rowData: any) => (
         !rowData.npe.length ? (
@@ -295,7 +292,7 @@ export default function Atualizar({
       if (columnCampos[index] === 'group') {
         tableFields.push(headerTableFactory('Grupo', 'group'));
       }
-      if (columnCampos[index] === 'status') {
+      if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -664,7 +661,7 @@ export default function Atualizar({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
 
   const { token } = req.cookies;
   const idSafra = req.cookies.safraId;
@@ -677,7 +674,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   };
 
   const idFoco = Number(query.id);
-  const filterApplication = `filterStatus=1&id_safra=${idSafra}&id_foco=${idFoco}`;
+  const filterApplication = `&id_safra=${idSafra}&id_foco=${idFoco}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;

@@ -608,7 +608,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Nome
                     </label>
                     <Input
                       type="text"
@@ -802,7 +802,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
   const { token } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;

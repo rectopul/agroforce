@@ -11,32 +11,15 @@ export class UserPreferenceRepository {
     return result;
   }
 
-  async update(id: number, Data: Object | any) {
-    const preference: any = this.findAll({ id }, { id: true }, 1, 0, '');
-    let Result: undefined | any;
-    if (preference) {
-      Result = await prisma.users_preferences.update({
-        where: {
-          id,
-        },
-        data: { table_preferences: Data.table_preferences },
-      });
-    } else {
-      Result = await prisma.users_preferences.upsert({
-        update: {
-          table_preferences: Data.table_preferences,
-        },
-        where: {
-          id,
-        },
-        create: {
-          table_preferences: Data.table_preferences,
-          userId: Data.userId,
-          module_id: Data.module_id,
-        },
-      });
-    }
-    return Result;
+  async update(id: number, data: Object | any) {
+    const result = await prisma.users_preferences.update({
+      where: {
+        id,
+      },
+      data,
+    });
+
+    return result;
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {

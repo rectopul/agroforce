@@ -29,7 +29,6 @@ interface ITecnologiaProps {
   id: number | any;
   name: string | any;
   created_by: number;
-  status: number;
 }
 
 interface IFilter {
@@ -76,7 +75,7 @@ export default function Listagem({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: 'id,name,desc,cod_tec,status' };
+  const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: 'id,name,desc,cod_tec' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
@@ -117,7 +116,7 @@ export default function Listagem({
     },
 
     onSubmit: async ({ filterName, filterDescription, filterCode }) => {
-      const parametersFilter = `filterStatus=${1}&filterName=${filterName}&filterDescription=${filterDescription}&filterCode=${filterCode}&id_culture=${idCulture}`;
+      const parametersFilter = `&filterName=${filterName}&filterDescription=${filterDescription}&filterCode=${filterCode}&id_culture=${idCulture}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await tecnologiaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -304,8 +303,8 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await tecnologiaService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
+    await tecnologiaService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Tecnologias');
@@ -543,7 +542,14 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de tecnologias" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { router.push('tecnologia/importar-planilha/config-planilha'); }} />
+                        {/* <Button
+                          icon={<RiSettingsFill size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            router.push('tecnologia/importar-planilha/config-planilha');
+                          }}
+                        /> */}
                       </div>
                     </div>
                   </div>
@@ -612,18 +618,18 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}` : `filterStatus=1&id_culture=${idCulture}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}` : `&id_culture=${idCulture}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;

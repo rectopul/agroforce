@@ -16,18 +16,16 @@ import { LocalController } from '../local.controller';
 import { DelineamentoController } from '../delineamento.controller';
 import { AssayListController } from '../assay-list.controller';
 import { ExperimentController } from './experiment.controller';
-import { LogImportController } from '../log-import.controller';
 
 export class ImportExperimentController {
   static async validate({
-    idLog, spreadSheet, idSafra, idCulture, created_by,
+    spreadSheet, idSafra, idCulture, created_by: createdBy,
   }: ImportValidate): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
     const delineamentoController = new DelineamentoController();
     const assayListController = new AssayListController();
     const experimentController = new ExperimentController();
-    const logImportController = new LogImportController();
 
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -39,11 +37,9 @@ export class ImportExperimentController {
             experimentName,
           });
           if (experiment?.length > 0) {
-            await logImportController.update({ id: idLog, status: 1 });
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado no sistema` };
           } if (experimentNameTemp.includes(experimentName)) {
             experimentNameTemp[row] = experimentName;
-            await logImportController.update({ id: idLog, status: 1 });
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
           }
           experimentNameTemp[row] = experimentName;
@@ -289,25 +285,21 @@ export class ImportExperimentController {
                   eel: spreadSheet[row][13],
                   comments,
                   orderDraw: spreadSheet[row][15],
-                  created_by,
+                  created_by: createdBy,
                 },
               );
             }
           }
-          await logImportController.update({ id: idLog, status: 1 });
           return { status: 200, message: 'Experimento importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1 });
           handleError('Experimento controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de experimento' };
         }
       }
 
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      await logImportController.update({ id: idLog, status: 1 });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1 });
       handleError('Experimento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
     }

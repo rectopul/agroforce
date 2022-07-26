@@ -496,7 +496,7 @@ export default function TipoEnsaio({
                     </label>
                     <Input
                       type="text"
-                      placeholder="nome"
+                      placeholder="Nome"
                       max="40"
                       id="filterName"
                       name="filterName"
@@ -506,11 +506,11 @@ export default function TipoEnsaio({
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Protocolo
+                      Nome do Protocolo
                     </label>
                     <Input
                       type="text"
-                      placeholder="protocolo"
+                      placeholder="Nome do Protocolo"
                       max="40"
                       id="filterProtocolName"
                       name="filterProtocolName"

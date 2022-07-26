@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -36,7 +37,6 @@ interface ITypeAssayProps {
   id: number | any;
   protocol_name: string;
   created_by: number;
-  status: number;
 }
 
 interface IData {
@@ -77,7 +77,7 @@ export default function AtualizarTipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: 'id,seeds,safra,status' };
+  const preferences = userLogado.preferences.envelope || { id: 0, table_preferences: 'id,seeds,safra,action' };
   const itemsTotal = totalItens;
   const filter = filterApplication;
 
@@ -91,7 +91,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Quant. de sementes por envelope', value: 'seeds' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
 
@@ -110,7 +110,6 @@ export default function AtualizarTipoEnsaio({
       name: typeAssay.name,
       protocol_name: typeAssay.protocol_name,
       created_by: userLogado.id,
-      status: 1,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -124,7 +123,6 @@ export default function AtualizarTipoEnsaio({
         name: values.name,
         protocol_name: values.protocol_name,
         created_by: Number(userLogado.id),
-        status: 1,
       }).then((response) => {
         if (response.status === 200) {
           Swal.fire('Tipo de Ensaio atualizado com sucesso!');
@@ -240,8 +238,8 @@ export default function AtualizarTipoEnsaio({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       render: (rowData: any) => (
         <div className="h-10 flex">
@@ -276,7 +274,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'safra') {
         tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
       }
-      if (columnOrder[index] === 'status') {
+      if (columnOrder[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -342,11 +340,6 @@ export default function AtualizarTipoEnsaio({
     await envelopeService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
           row.type_assay = row.type_assay?.name;
           row.safra = row.safra?.safraName;
 
@@ -668,7 +661,8 @@ export default function AtualizarTipoEnsaio({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
 
   const { token } = context.req.cookies;
   const idSafra = context.req.cookies.safraId;
@@ -684,9 +678,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const idTypeAssay = Number(context.query.id);
 
-  const filterApplication = `filterStatus=1&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
+  const filterApplication = `1&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}`;
   const baseUrlEnvelope = `${publicRuntimeConfig.apiUrl}/envelope`;
   const urlParameters: any = new URL(baseUrlEnvelope);
   urlParameters.search = new URLSearchParams(param).toString();

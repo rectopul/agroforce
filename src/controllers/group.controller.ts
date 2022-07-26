@@ -52,10 +52,6 @@ export class GroupController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
-
       const select = {
         foco: { select: { name: true } },
         safra: { select: { safraName: true } },

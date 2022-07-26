@@ -2,6 +2,7 @@ import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { IoMdArrowBack } from 'react-icons/io';

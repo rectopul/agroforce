@@ -104,7 +104,7 @@ export class FocoController {
     }
   }
 
-  async update(data: UpdateLoteDTO) {
+  async update(data: any) {
     try {
       const focoExist: any = await this.focoRepository.findOne(data.id);
       if (!focoExist) return { status: 404, message: 'Foco não encontrado' };

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -675,14 +676,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -701,9 +711,15 @@ export default function Listagem({
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="local/importar-planilha/config-planilha" />
-                      </div>
+                      {/* <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          icon={<RiSettingsFill size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => { }}
+                          href="local/importar-planilha/config-planilha"
+                        />
+                      </div> */}
 
                     </div>
                   </div>
@@ -772,7 +788,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const userPreferenceController = new UserPreferenceController();
-  const itensPerPage = await (await userPreferenceController.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await userPreferenceController.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
