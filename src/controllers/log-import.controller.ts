@@ -1,8 +1,5 @@
-import handleError from 'src/shared/utils/handleError';
-import {
-  number, object, SchemaOf, string,
-} from 'yup';
-import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import handleError from '../shared/utils/handleError';
+import { functionsUtils } from '../shared/utils/functionsUtils';
 import { LogImportRepository } from '../repository/log-import.repository';
 
 export class LogImportController {
@@ -53,36 +50,19 @@ export class LogImportController {
     }
   }
 
-  async listAll(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
-    let select: any = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-      }
-
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          user_id: true,
-          table: true,
-          status: true,
-          created_at: true,
-        };
-      }
+      const select = {
+        id: true,
+        user: { select: { name: true } },
+        table: true,
+        status: true,
+        created_at: true,
+      };
 
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
-      }
-
-      if (options.id_foco) {
-        parameters.id_foco = Number(options.id_foco);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -103,7 +83,9 @@ export class LogImportController {
         return { status: 400, response: [], total: 0 };
       }
       response.map((item: any) => {
-        item.created_at = functionsUtils.formatDate(item.created_at);
+        const newItem = item;
+        newItem.created_at = functionsUtils.formatDate(item.created_at);
+        return newItem;
       });
       return { status: 200, response, total: response.total };
     } catch (error: any) {

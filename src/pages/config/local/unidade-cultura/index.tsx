@@ -1,8 +1,12 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+/* eslint-disable react/no-array-index-key */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import router from 'next/router';
 import { useEffect, useState } from 'react';
@@ -39,7 +43,6 @@ interface IUnityCultureProps {
 }
 
 interface IFilter {
-  filterStatus: object | any;
   filterNameUnityCulture: string | any;
   filterYear: string | any;
   filterNameLocalCulture: string | any;
@@ -57,7 +60,7 @@ interface IGenerateProps {
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
+interface IData {
   allCultureUnity: IUnityCultureProps[];
   totalItems: number;
   filter: string | any;
@@ -69,7 +72,7 @@ interface Idata {
 
 export default function Listagem({
   allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
-}: Idata) {
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (
@@ -130,11 +133,8 @@ export default function Listagem({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
       filterNameUnityCulture: '',
       filterYear: '',
       filterNameLocalCulture: '',
@@ -148,7 +148,6 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus,
       filterNameUnityCulture,
       filterYear,
       filterNameLocalCulture,
@@ -159,7 +158,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -170,106 +169,6 @@ export default function Listagem({
       });
     },
   });
-
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
-    const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[item] === 'name_unity_culture') {
-        tableFields.push(headerTableFactory('Nome un. cultura', 'name_unity_culture'));
-      }
-      if (columnCampos[item] === 'year') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
-      }
-      if (columnCampos[item] === 'name_local_culture') {
-        tableFields.push(headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'));
-      }
-      if (columnCampos[item] === 'label') {
-        tableFields.push(headerTableFactory('Rótulo', 'local.label'));
-      }
-      if (columnCampos[item] === 'adress') {
-        tableFields.push(headerTableFactory('Nome da fazenda', 'local.adress'));
-      }
-      if (columnCampos[item] === 'mloc') {
-        tableFields.push(headerTableFactory('MLOC', 'local.mloc'));
-      }
-      if (columnCampos[item] === 'label_country') {
-        tableFields.push(headerTableFactory('País', 'local.label_country'));
-      }
-      if (columnCampos[item] === 'label_region') {
-        tableFields.push(headerTableFactory('Região', 'local.label_region'));
-      }
-      if (columnCampos[item] === 'name_locality') {
-        tableFields.push(headerTableFactory('Localidade', 'local.name_locality'));
-      }
-    });
-    return tableFields;
-  }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -313,6 +212,106 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function columnsOrder(columnOrder: any): any {
+    const columnCampos: any = columnOrder.split(',');
+    const tableFields: any = [];
+    Object.keys(columnCampos).forEach((item) => {
+      if (columnCampos[item] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[item] === 'name_unity_culture') {
+        tableFields.push(headerTableFactory('Nome un. cultura', 'name_unity_culture'));
+      }
+      if (columnCampos[item] === 'year') {
+        tableFields.push(headerTableFactory('Ano', 'year'));
+      }
+      if (columnCampos[item] === 'name_local_culture') {
+        tableFields.push(headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'));
+      }
+      if (columnCampos[item] === 'label') {
+        tableFields.push(headerTableFactory('Rótulo', 'local.label'));
+      }
+      if (columnCampos[item] === 'adress') {
+        tableFields.push(headerTableFactory('Nome da fazenda', 'local.adress'));
+      }
+      if (columnCampos[item] === 'mloc') {
+        tableFields.push(headerTableFactory('MLOC', 'local.mloc'));
+      }
+      if (columnCampos[item] === 'label_country') {
+        tableFields.push(headerTableFactory('País', 'local.label_country'));
+      }
+      if (columnCampos[item] === 'label_region') {
+        tableFields.push(headerTableFactory('Região', 'local.label_region'));
+      }
+      if (columnCampos[item] === 'name_locality') {
+        tableFields.push(headerTableFactory('Localidade', 'local.name_locality'));
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
@@ -324,14 +323,29 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 21 }).then((response) => {
-        userLogado.preferences.unidadeCultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 21,
+      }).then((response) => {
+        userLogado.preferences.unidadeCultura = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.unidadeCultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.unidadeCultura = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -352,16 +366,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await unidadeCulturaService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          row.status = (row.status === 0) ? 'Inativo' : 'Ativo';
-          row.DT = new Date();
-          return row;
+    await unidadeCulturaService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          newRow.DT = new Date();
+          delete newRow.id;
+          delete newRow.id_unity_culture;
+          delete newRow.id_local;
+          delete newRow.local;
+          return newRow;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -399,9 +413,9 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setUnidadeCultura(response.response);
+    await unidadeCulturaService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setUnidadeCultura(response);
       }
     });
   }
@@ -552,14 +566,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -645,19 +668,20 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const userPreferenceController = new UserPreferenceController();
-  const itensPerPage = await (await userPreferenceController.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await userPreferenceController.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -667,8 +691,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const cultureUnity = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allCultureUnity, total: totalItems } = await cultureUnity.json();
+  const {
+    response: allCultureUnity,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   return {
     props: {

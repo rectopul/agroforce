@@ -4,7 +4,7 @@ import handleError from '../shared/utils/handleError';
 export class UserPreferenceController {
   userPreferences = new UserPreferenceRepository();
 
-  async getAllPreferences(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
     let take;
     let skip;
@@ -69,27 +69,13 @@ export class UserPreferenceController {
     }
   }
 
-  async updateUserPreferences(data: object | any) {
-    const { id } = data;
-    const parameters: object | any = {};
+  async update(data: object | any) {
     try {
-      if (data.table_preferences) {
-        parameters.table_preferences = data.table_preferences;
-      }
-
-      if (data.userId) {
-        parameters.userId = data.userId;
-      }
-
-      if (data.module_id) {
-        parameters.module_id = data.module_id;
-      }
-
-      const response = await this.userPreferences.update(id, parameters);
+      const response = await this.userPreferences.update(Number(data.id), data);
       if (response) {
-        return { status: 200, message: { message: 'preferences atualizada' } };
+        return { status: 200, response, message: 'Preferencias de usuário atualizada' };
       }
-      return { status: 400, message: { message: '' } };
+      return { status: 400, response, message: 'Preferencias de usuário não atualizada' };
     } catch (error: any) {
       handleError('User Preferences controller', 'Update', error.message);
       throw new Error('[Controller] - Update User Preferences erro');
