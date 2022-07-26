@@ -10,14 +10,14 @@ import {
   responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
 import { AssayListController } from '../assay-list.controller';
-import { GenotipoController } from '../genotipo.controller';
+import { GenotipoController } from '../genotype/genotipo.controller';
 import { LoteController } from '../lote.controller';
 import { GenotypeTreatmentController } from './genotype-treatment.controller';
 import { HistoryGenotypeTreatmentController } from './history-genotype-treatment.controller';
 
 export class ImportGenotypeTreatmentController {
   static async validate({
-    spreadSheet, created_by,
+    spreadSheet, created_by: createdBy,
   }: ImportValidate): Promise<IReturnObject> {
     const genotipoController = new GenotipoController();
     const loteController = new LoteController();
@@ -204,7 +204,7 @@ export class ImportGenotypeTreatmentController {
                 nt: spreadSheet[row][6],
                 genotipo: spreadSheet[row][7],
                 nca: spreadSheet[row][8],
-                created_by,
+                created_by: createdBy,
               });
             }
           }

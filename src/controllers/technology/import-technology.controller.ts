@@ -18,7 +18,7 @@ export class ImportTechnologyController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
-            if (column === '1') {
+            if (column === '0') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory(
@@ -38,7 +38,7 @@ export class ImportTechnologyController {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
               }
-            } else if (column === '2') {
+            } else if (column === '1') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory(
@@ -47,7 +47,7 @@ export class ImportTechnologyController {
                     spreadSheet[0][column],
                   );
               }
-            } else if (column === '4') {
+            } else if (column === '3') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory(
@@ -86,13 +86,13 @@ export class ImportTechnologyController {
                   }
                 }
               }
-            } else if (column === '5') {
+            } else if (column === '4') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                  { idCulture, cod_tec: String(spreadSheet[row][1]) },
+                  { idCulture, cod_tec: String(spreadSheet[row][0]) },
                 );
                 if (status === 200) {
                   if (response.length === 0) {
@@ -121,26 +121,26 @@ export class ImportTechnologyController {
                 response: responseCulture,
               }: IReturnObject = await culturaController.getOneCulture(idCulture);
               const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                { idCulture, cod_tec: String(spreadSheet[row][1]) },
+                { idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
               if (status === 200) {
                 await tecnologiaController.update({
                   id: response[0]?.id,
                   id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][1]),
-                  name: spreadSheet[row][2],
-                  desc: spreadSheet[row][3],
+                  cod_tec: String(spreadSheet[row][0]),
+                  name: spreadSheet[row][1],
+                  desc: spreadSheet[row][2],
                   created_by: createdBy,
-                  dt_import: new Date(spreadSheet[row][5]),
+                  dt_import: new Date(spreadSheet[row][4]),
                 });
               } else {
                 await tecnologiaController.create({
                   id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][1]),
-                  name: spreadSheet[row][2],
-                  desc: spreadSheet[row][3],
+                  cod_tec: String(spreadSheet[row][0]),
+                  name: spreadSheet[row][1],
+                  desc: spreadSheet[row][2],
                   created_by: createdBy,
-                  dt_import: new Date(spreadSheet[row][5]),
+                  dt_import: new Date(spreadSheet[row][4]),
                 });
               }
             }

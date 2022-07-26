@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import { ImportPlanilha } from 'src/components/ImportPlanilha';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { ImportPlanilha } from '../../../../../components/ImportPlanilha';
 
 const data: object = [
   { id: 'id_s1', name: '*ID_S1' },
