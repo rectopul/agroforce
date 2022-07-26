@@ -419,8 +419,6 @@ export default function Atualizarquadra({
 
             {updateFieldFactory('parcelas', 'Parcelas')}
 
-            {updateFieldFactory('plantadeira', 'Plantadeiras')}
-
           </div>
 
           <div className="h-10 w-full
