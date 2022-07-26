@@ -54,9 +54,6 @@ export class LoteController {
     let orderBy: object | any = '';
     parameters.AND = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
@@ -88,8 +85,11 @@ export class LoteController {
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "bgm":  ${Number(options.filterBgm)}  } }`));
       }
-      if (options.filterTecnologia) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "name": {"contains": "${options.filterTecnologia}" } } }`));
+      if (options.filterTecnologiaCod) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "cod_tec": {"contains": "${options.filterTecnologiaCod}" } } } }`));
+      }
+      if (options.filterTecnologiaDesc) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "desc": {"contains": "${options.filterTecnologiaDesc}" } } } }`));
       }
 
       const select = {
@@ -102,14 +102,19 @@ export class LoteController {
         fase: true,
         peso: true,
         quant_sementes: true,
-        status: true,
         genotipo: {
           select: {
             name_genotipo: true,
             name_main: true,
             gmr: true,
             bgm: true,
-            tecnologia: { select: { name: true } },
+            tecnologia: {
+              select:
+              {
+                desc: true,
+                cod_tec: true,
+              },
+            },
           },
         },
       };

@@ -52,15 +52,10 @@ export class EnvelopeController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
-
       const select = {
         type_assay: { select: { name: true } },
         safra: { select: { safraName: true } },
         seeds: true,
-        status: true,
       };
 
       if (options.id_type_assay) {

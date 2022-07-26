@@ -8,10 +8,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new UserPreferenceController();
   switch (req.method) {
     case 'GET':
-      res.status(200).json(await Controller.getAllPreferences(req.query));
+      res.status(200).json(await Controller.getAll(req.query));
       break;
     case 'PUT':
-      res.status(200).json(await Controller.updateUserPreferences(req.body));
+      res.status(200).json(await Controller.update(req.body));
       break;
     case 'POST':
       res.status(200).json(await Controller.create(req.body));
