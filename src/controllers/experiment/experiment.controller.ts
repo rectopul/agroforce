@@ -110,7 +110,7 @@ export class ExperimentController {
               trat_repeticao: true,
             },
           },
-
+          created_at: true,
         };
       }
 

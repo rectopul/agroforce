@@ -1,7 +1,5 @@
-import {
-  number, object, SchemaOf, string, date,
-} from 'yup';
 import { SafraRepository } from '../repository/safra.repository';
+import handleError from '../shared/utils/handleError';
 
 interface Safra {
   id: number;
@@ -22,56 +20,30 @@ export class SafraController {
 
   safraRepository = new SafraRepository();
 
-  async getAllSafra(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
-    let take;
-    let skip;
-    let orderBy: object | any;
-    let select: any = [];
     try {
       if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = Number(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSafra) {
-        options.filterSafra = `{"contains":"${options.filterSafra}"}`;
-        parameters.safraName = JSON.parse(options.filterSafra);
+        parameters.safraName = JSON.parse(`{"contains":"${options.filterSafra}"}`);
       }
 
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
 
-      // if (options.filterStartDate) {
-      //   options.filterStartDate = `{"lte": "${options.filterStartDate}"}`
-      //   parameters.plantingStartTime = JSON.parse(options.filterStartDate)
-      // }
-
-      // if (options.filterEndDate) {
-      //   options.filterSafra = `{"gte": "${options.filterEndDate}"}`
-      //   parameters.plantingEndTime = JSON.parse(options.filterSafra)
-      // }
-
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          safraName: true,
-          year: true,
-          plantingStartTime: true,
-          plantingEndTime: true,
-          main_safra: false,
-          status: true,
-        };
-      }
+      const select = {
+        id: true,
+        safraName: true,
+        year: true,
+        plantingStartTime: true,
+        plantingEndTime: true,
+        main_safra: false,
+        status: true,
+      };
 
       if (options.id_culture) {
         parameters.id_culture = Number(options.id_culture);
@@ -101,67 +73,62 @@ export class SafraController {
         parameters.main_safra = options.main_safra;
       }
 
-      if (options.take) {
-        if (typeof (options.take) === 'string') {
-          take = Number(options.take);
-        } else {
-          take = options.take;
-        }
-      }
+      const take = (options.take) ? Number(options.take) : undefined;
 
-      if (options.skip) {
-        if (typeof (options.skip) === 'string') {
-          skip = Number(options.skip);
-        } else {
-          skip = options.skip;
-        }
-      }
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy) {
-        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
-      }
+      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      const response: object | any = await this.safraRepository.findAll(parameters, select, take, skip, orderBy);
+      const response: any = await this.safraRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
-    } catch (err) {
-      return { status: 200, response: [], total: 0 };
+    } catch (error: any) {
+      handleError('Safra controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Safra erro');
     }
   }
 
-  async getOneSafra(id: number) {
+  async getOne(id: number) {
     try {
       if (!id) return { status: 409, response: [], message: 'ID invalido' };
 
       const response = await this.safraRepository.findOne(Number(id));
 
-      if (!response) throw new Error('Dados inválidos');
+      if (!response) return { status: 400, response };
 
       return { status: 200, response };
-    } catch (e) {
-      console.log(e);
-      return { status: 400, message: 'Safra não encontrada' };
+    } catch (error: any) {
+      handleError('Safra controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Safra erro');
     }
   }
 
-  async postSafra(data: CreateSafra) {
+  async create(data: CreateSafra) {
     try {
-      const safraAlreadyExists = await this.safraRepository.findBySafraName({ safraName: data.safraName, id_culture: data.id_culture });
+      const safraAlreadyExists = await this.safraRepository.findBySafraName(
+        { safraName: data.safraName, id_culture: data.id_culture },
+      );
       if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
 
       await this.safraRepository.create(data);
 
       return { status: 201, message: 'Safra cadastrada' };
-    } catch (err) {
-      console.log(err);
-      return { status: 404, message: 'Erro ao cadastrar safra' };
+    } catch (error: any) {
+      handleError('Safra controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Safra erro');
     }
   }
 
-  async updateSafra(data: UpdateSafra) {
+  async update(data: UpdateSafra) {
     try {
       const safra: any = await this.safraRepository.findOne(data.id);
 
@@ -182,8 +149,9 @@ export class SafraController {
       await this.safraRepository.update(safra.id, safra);
 
       return { status: 200, message: 'Item atualizado' };
-    } catch (err) {
-      return { status: 404, message: 'Erro ao atualizar safra' };
+    } catch (error: any) {
+      handleError('Safra controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Safra erro');
     }
   }
 }

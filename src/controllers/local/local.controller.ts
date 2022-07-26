@@ -1,5 +1,5 @@
-import handleError from 'src/shared/utils/handleError';
-import { LocalRepository } from '../repository/local.repository';
+import handleError from '../../shared/utils/handleError';
+import { LocalRepository } from '../../repository/local.repository';
 
 export class LocalController {
   localRepository = new LocalRepository();
@@ -9,7 +9,7 @@ export class LocalController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterNameLocalCulture) {

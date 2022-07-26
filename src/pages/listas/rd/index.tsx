@@ -303,6 +303,36 @@ export default function Import({
     setGeneratesProps(items);
   }
 
+  // async function lastUpdate(tableName: string) {
+  //   switch (tableName) {
+  //     case 'ensaio':
+  //       return (
+  //         <p>00-00-000 00:00:00</p>
+  //       );
+  //     case 'experimento': {
+  //       const { status, response } = await experimentService.getAll({ idSafra });
+  //       let lastExperiment: any = 0;
+  //       if (status === 200) {
+  //         const lastExperimentUpdate = response.map((item: any) => {
+  //           if (lastExperiment < item.created_at) {
+  //             lastExperiment = item.created_at;
+  //           }
+  //         });
+  //         return (
+  //           <p>{lastExperimentUpdate}</p>
+  //         );
+  //       }
+  //       return (
+  //         <p>00-00-000 00:00:00</p>
+  //       );
+  //     }
+  //     default:
+  //       return (
+  //         <p>00-00-000 00:00:00</p>
+  //       );
+  //   }
+  // }
+
   const downloadExcel = async (): Promise<void> => {
     await logImportService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
@@ -364,6 +394,7 @@ export default function Import({
               <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
             </div>
             <hr />
+
             <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
               <div className="h-20 w-20 flex items-center mr-1">
                 <Button
@@ -379,9 +410,10 @@ export default function Import({
               <div className="col-span-2" style={{ marginLeft: '-15%' }}>
                 <span className="font-bold">Cadastros RD</span>
                 <p>ultimo update 28/06/22</p>
-                <a><Input type="file" required id="inputFile-0" name="inputFile-0" /></a>
+                <Input type="file" required id="inputFile-0" name="inputFile-0" />
               </div>
             </div>
+
             <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
               <div className=" h-20 w-20 flex items-center mr-1">
                 <Button
@@ -397,10 +429,31 @@ export default function Import({
               <div className="col-span-2" style={{ marginLeft: '-15%' }}>
                 <span className="font-bold">Importar Experimento</span>
                 <p>ultimo update 28/06/22</p>
-                <a><Input type="file" required id="inputFile-22" name="inputFile-22" /></a>
+                <Input type="file" required id="inputFile-22" name="inputFile-22" />
               </div>
             </div>
+
+            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+              <div className=" h-20 w-20 flex items-center mr-1">
+                <Button
+                  textColor="white"
+                  bgColor={bgColor}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(26, 'lista-ensaio')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
+              </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Importar Lista de Ensaio</span>
+                <p>ultimo update 28/06/22</p>
+                <Input type="file" required id="inputFile-26" name="inputFile-26" />
+              </div>
+            </div>
+
           </div>
+
           <div className="bg-white rounded-lg col-span-2">
             <div className="mt-2 justify-center flex">
               <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
