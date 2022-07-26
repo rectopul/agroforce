@@ -1,6 +1,6 @@
-import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
-import { UnidadeCulturaRepository } from '../repository/unidade-cultura.repository';
+import handleError from '../../shared/utils/handleError';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
 
 export class UnidadeCulturaController {
   public readonly required = 'Campo obrigatório';

@@ -12,7 +12,7 @@ import {
 } from '../../shared/utils/responseErrorFactory';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
-import { LocalController } from '../local.controller';
+import { LocalController } from '../local/local.controller';
 import { DelineamentoController } from '../delineamento.controller';
 import { AssayListController } from '../assay-list.controller';
 import { ExperimentController } from './experiment.controller';
@@ -111,7 +111,7 @@ export class ImportExperimentController {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
-                const { response: responseSafra } = await safraController.getAllSafra({
+                const { response: responseSafra } = await safraController.getAll({
                   safraName: spreadSheet[row][0],
                 });
                 const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {

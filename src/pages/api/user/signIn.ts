@@ -42,7 +42,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       });
 
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
-      safras.safras = await safraController.getAllSafra({
+      safras.safras = await safraController.getAll({
         id_culture: userCulture.cultura_selecionada, filterStatus: 1,
       });
       if (safras.safras.total > 0) {

@@ -1,7 +1,7 @@
-import handleError from '../shared/utils/handleError';
-import { GenotipoRepository } from '../repository/genotipo.repository';
-import { functionsUtils } from '../shared/utils/functionsUtils';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
+import { GenotipoRepository } from '../../repository/genotipo.repository';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 
 export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
@@ -118,8 +118,10 @@ export class GenotipoController {
         };
       }
       response.map((item: any) => {
-        item.countChildren = functionsUtils
+        const newItem = item;
+        newItem.countChildren = functionsUtils
           .countChildrenForSafra(item.lote, Number(options.id_safra));
+        return newItem;
       });
       return { status: 200, response, total: response.total };
     } catch (error: any) {
