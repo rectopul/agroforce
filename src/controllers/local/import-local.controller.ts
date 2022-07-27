@@ -190,11 +190,12 @@ export class ImportLocalController {
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
           } else if (spreadSheet[0][column].includes('DT')) {
+            spreadSheet[row][column] = new Date(spreadSheet[row][column]);
             const { status, response }: IReturnObject = await localController.getAll(
               { name_local_culture: spreadSheet[row][4] },
             );
             if (status === 200) {
-              if (response[0]?.dt_import > spreadSheet[row][column]) {
+              if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
