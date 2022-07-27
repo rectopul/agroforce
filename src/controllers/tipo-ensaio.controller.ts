@@ -24,8 +24,8 @@ export class TypeAssayController {
         id: true,
         name: true,
         protocol_name: true,
-        status: true,
         envelope: true,
+        status: true,
       };
 
       if (options.id_culture) {
