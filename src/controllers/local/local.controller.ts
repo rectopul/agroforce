@@ -72,6 +72,7 @@ export class LocalController {
           adress: true,
           status: true,
           cultureUnity: true,
+          dt_import: true,
         };
       }
 
