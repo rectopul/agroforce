@@ -32,6 +32,7 @@ import { ImportRepository } from '../repository/import.repository';
 // eslint-disable-next-line import/no-cycle
 import { ImportGenotypeController } from './genotype/import-genotype.controller';
 import { removeProtocolLevel } from '../shared/utils/removeProtocolLevel';
+import { ImportLocalController } from './local/import-local.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -140,27 +141,18 @@ export class ImportController {
           status: 400, message,
         };
       }
-      let erro: any;
-      let response: any;
       const protocolLevel = data.spreadSheet[1][0];
       const newData = removeProtocolLevel(data);
       switch (protocolLevel) {
         case 'TECHNOLOGY_S2':
           return await ImportTechnologyController.validate(newData);
         case 'CULTURE_UNIT':
-          response = await this.validateLocal(newData);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
-          break;
+          return await ImportLocalController.validate(newData);
         case 'GENOTYPE_S2':
           return ImportGenotypeController.validate(newData);
         default:
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
-      return { status: 200, message: response, error: erro };
     } catch (error) {
       return { status: 400, message: error };
     } finally {
