@@ -7,7 +7,7 @@ export interface IReturnObject {
 
 export interface ImportValidate {
   spreadSheet: Array<any>
-  idSafra?: number
+  idSafra: number
   idCulture: number
   created_by: number
 }
