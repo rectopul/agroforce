@@ -420,25 +420,6 @@ export default function Import({
                   textColor="white"
                   bgColor={bgColor}
                   rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(22, 'experimento')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Importar Experimento</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-22" name="inputFile-22" />
-              </div>
-            </div>
-
-            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-              <div className=" h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  bgColor={bgColor}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                   onClick={() => readExcel(26, 'lista-ensaio')}
                   icon={<IoIosCloudUpload size={40} />}
                   disabled={disabledButton}
@@ -449,6 +430,25 @@ export default function Import({
                 <span className="font-bold">Importar Lista de Ensaio</span>
                 <p>ultimo update 28/06/22</p>
                 <Input type="file" required id="inputFile-26" name="inputFile-26" />
+              </div>
+            </div>
+
+            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+              <div className=" h-20 w-20 flex items-center mr-1">
+                <Button
+                  textColor="white"
+                  bgColor={bgColor}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(22, 'experimento')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
+              </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Importar Lista de Experimento</span>
+                <p>ultimo update 28/06/22</p>
+                <Input type="file" required id="inputFile-22" name="inputFile-22" />
               </div>
             </div>
 
