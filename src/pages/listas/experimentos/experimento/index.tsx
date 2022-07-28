@@ -525,6 +525,15 @@ export default function Listagem({
                   {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
+
+                </div>
+
+                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-2
+                                        "
+                >
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
                   {filterFieldFactory('filterRepetition', 'Repetição')}
 
