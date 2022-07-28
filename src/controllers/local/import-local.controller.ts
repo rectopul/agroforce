@@ -194,6 +194,10 @@ export class ImportLocalController {
             const { status, response }: IReturnObject = await localController.getAll(
               { name_local_culture: spreadSheet[row][4] },
             );
+            console.log('(response[0]?.dt_import)?.getTime()');
+            console.log((response[0]?.dt_import)?.getTime());
+            console.log('(spreadSheet[row][column].getTime())');
+            console.log((spreadSheet[row][column].getTime()));
             if (status === 200) {
               if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
                 responseIfError[Number(column)]
