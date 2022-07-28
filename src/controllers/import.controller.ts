@@ -727,19 +727,25 @@ export class ImportController {
 
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 // console.log("OGM R");
-                const ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                const ogm: any = await this.ogmController.getAll(
+                  { cod_tec: String(data.spreadSheet[keySheet][sheet]) },
+                );
                 this.aux.id_ogm = ogm.response[0].id;
               }
 
               if (configModule.response[0].fields[sheet] == 'Foco') {
                 // console.log("FOCO R");
-                const foco: any = await this.focoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+                const foco: any = await this.focoController.getAll(
+                  { name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture },
+                );
                 this.aux.id_foco = Number(foco.response[0].id);
               }
 
               if (configModule.response[0].fields[sheet] == 'Ensaio') {
                 // console.log("Ensaio R");
-                const ensaio: any = await this.typeAssayController.getAll({ name: data.spreadSheet[keySheet][sheet] });
+                const ensaio: any = await this.typeAssayController.getAll(
+                  { name: data.spreadSheet[keySheet][sheet] },
+                );
                 this.aux.id_type_assay = ensaio.response[0].id;
               }
 
@@ -752,8 +758,10 @@ export class ImportController {
               }
 
               if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                const { response: groupResponse }: any = await this.groupController.getAll({ id_safra: data.safra, id_foco: this.aux.id_foco });
-                this.aux.id_group = Number(groupResponse[0].id);
+                const { response: groupResponse }: any = await this.groupController.getAll(
+                  { id_safra: data.safra, id_foco: this.aux.id_foco },
+                );
+                this.aux.id_group = Number(groupResponse[0]?.id);
                 await this.npeController.create(this.aux);
               }
             }

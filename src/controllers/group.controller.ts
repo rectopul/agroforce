@@ -53,6 +53,7 @@ export class GroupController {
     const parameters: object | any = {};
     try {
       const select = {
+        id: true,
         foco: { select: { name: true } },
         safra: { select: { safraName: true } },
         npe: { select: { id: true } },
