@@ -117,7 +117,7 @@ export default function Atualizarquadra({
   });
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.disparos || { id: 0, table_preferences: 'id,divisor,sem_metros,t4_i,t4_f,di,df,status' };
+  const preferences = userLogado.preferences.disparos || { id: 0, table_preferences: 'id,divisor,sem_metros,t4_i,t4_f,di,df' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [disparos, setDisparos] = useState<any[]>(() => allDisparos);
@@ -150,7 +150,7 @@ export default function Atualizarquadra({
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_quadra=${idQuadra}`;
+      const parametersFilter = `&filterSearch=${values.filterSearch}&id_quadra=${idQuadra}`;
       await disparosService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: any[]) => {
         setDisparos(response);
         setTotaItems(response.length);
@@ -686,7 +686,8 @@ export default function Atualizarquadra({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = context.req.cookies;
 
@@ -703,12 +704,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const baseUrlDisparos = `${publicRuntimeConfig.apiUrl}/disparos`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}`;
   const urlParameters: any = new URL(baseUrlDisparos);
   urlParameters.search = new URLSearchParams(param).toString();
   const idQuadra = Number(context.query.id);
 
-  const filterApplication = `filterStatus=1&id_quadra=${idQuadra}`;
+  const filterApplication = '';
 
   const disparos = await fetch(`${baseUrlDisparos}?id_quadra=${idQuadra}`, requestOptions);
   const { response: allDisparos, total: totalItems } = await disparos.json();

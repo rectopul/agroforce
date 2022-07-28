@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { TecnologiaController } from '../../../controllers/tecnologia.controller';
+import { TecnologiaController } from '../../../controllers/technology/tecnologia.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);

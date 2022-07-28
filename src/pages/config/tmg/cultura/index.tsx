@@ -1,8 +1,12 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+/* eslint-disable react/no-array-index-key */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { setCookie } from 'nookies';
@@ -18,12 +22,12 @@ import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { cultureService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { cultureService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -109,8 +113,6 @@ export default function Listagem({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -159,159 +161,6 @@ export default function Listagem({
     });
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: ICulture) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              title={`Atualizar ${rowData.name}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          {rowData.status ? (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => await handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => await handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[index] === 'name') {
-        tableFields.push(headerTableFactory('Código reduzido', 'name'));
-      }
-      if (columnCampos[index] === 'desc') {
-        tableFields.push(headerTableFactory('Nome', 'desc'));
-      }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
-  }
-
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 2 }).then((response) => {
-        userLogado.preferences.cultura = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
-        preferences.id = response.response.id;
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.cultura = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
-
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -354,6 +203,184 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          {arrowOrder}
+        </div>
+      ),
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (
+        colorStar === '#eba417'
+          ? (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('')}
+                >
+                  <AiTwotoneStar size={25} color="#eba417" />
+                </button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="h-10 flex">
+              <div>
+                <button
+                  type="button"
+                  className="w-full h-full flex items-center justify-center border-0"
+                  onClick={() => setColorStar('#eba417')}
+                >
+                  <AiTwotoneStar size={25} />
+                </button>
+              </div>
+            </div>
+          )
+      ),
+    };
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: ICulture) => (
+        <div className="h-10 flex">
+          <div className="h-10">
+            <Button
+              icon={<BiEdit size={16} />}
+              title={`Atualizar ${rowData.name}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          {rowData.status ? (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsUp size={16} />}
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-10">
+              <Button
+                icon={<FaRegThumbsDown size={16} />}
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
+        </div>
+      ),
+    };
+  }
+
+  function columnsOrder(camposGerenciados: string) {
+    const columnCampos: string[] = camposGerenciados.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
+      if (columnCampos[index] === 'name') {
+        tableFields.push(headerTableFactory('Código reduzido', 'name'));
+      }
+      if (columnCampos[index] === 'desc') {
+        tableFields.push(headerTableFactory('Nome', 'desc'));
+      }
+      if (columnCampos[index] === 'status') {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
+  async function getValuesColumns(): Promise<void> {
+    const els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i += 1) {
+      if (els[i].checked) {
+        selecionados += `${els[i].value},`;
+      }
+    }
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
+    if (preferences.id === 0) {
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 2,
+      }).then((response) => {
+        console.log('response');
+        console.log(response);
+        userLogado.preferences.cultura = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.cultura = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
+
+    setStatusAccordion(false);
+    setCamposGerenciados(campos);
+  }
+
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result) return;
@@ -367,13 +394,9 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await cultureService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = cultures.map((row) => {
+    await cultureService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
@@ -388,7 +411,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'cultures');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -466,7 +489,7 @@ export default function Listagem({
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Nome
                     </label>
                     <Input
                       type="text"
@@ -561,14 +584,23 @@ export default function Listagem({
                                       </div>
                                       {
                                         generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
                                                 <CheckBox
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value)}
+                                                  defaultChecked={camposGerenciados
+                                                    .includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -654,7 +686,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;

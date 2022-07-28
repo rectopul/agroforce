@@ -1,9 +1,6 @@
-import handleError from 'src/shared/utils/handleError';
-import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
-import {
-  number, object, SchemaOf, string,
-} from 'yup';
-import { UnidadeCulturaRepository } from '../repository/unidade-cultura.repository';
+import handleError from '../../shared/utils/handleError';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
 
 export class UnidadeCulturaController {
   public readonly required = 'Campo obrigatório';
@@ -13,12 +10,7 @@ export class UnidadeCulturaController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
-    let select: any = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
-
       if (options.filterNameUnityCulture) {
         parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
       }
@@ -55,23 +47,14 @@ export class UnidadeCulturaController {
         parameters.local = JSON.parse(`{ "name_locality": {"contains": "${options.filterNameLocality}" } }`);
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          id_unity_culture: true,
-          id_local: true,
-          year: true,
-          name_unity_culture: true,
-          local: true,
-          status: true,
-        };
-      }
+      const select = {
+        id: true,
+        id_unity_culture: true,
+        id_local: true,
+        year: true,
+        name_unity_culture: true,
+        local: true,
+      };
 
       if (options.id_unity_culture) {
         parameters.id_unity_culture = options.id_unity_culture;

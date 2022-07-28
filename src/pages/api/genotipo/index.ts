@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { GenotipoController } from '../../../controllers/genotipo.controller';
+import { GenotipoController } from '../../../controllers/genotype/genotipo.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

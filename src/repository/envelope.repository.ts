@@ -18,7 +18,20 @@ export class EnvelopeRepository {
     const envelope = await prisma.envelope.findUnique({
       where: { id },
       select: {
-        id: true, safra: { select: { safraName: true, id: true } }, type_assay: { select: { name: true, id: true } }, seeds: true, status: true,
+        id: true,
+        safra: {
+          select: {
+            safraName: true,
+            id: true,
+          },
+        },
+        type_assay: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        seeds: true,
       },
     });
 

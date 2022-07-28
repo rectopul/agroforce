@@ -1,7 +1,7 @@
-import handleError from '../shared/utils/handleError';
-import { GenotipoRepository } from '../repository/genotipo.repository';
-import { functionsUtils } from '../shared/utils/functionsUtils';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
+import { GenotipoRepository } from '../../repository/genotipo.repository';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 
 export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
@@ -11,9 +11,6 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
-      }
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }
@@ -27,8 +24,12 @@ export class GenotipoController {
         parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" }`);
       }
 
-      if (options.filterTecnologia) {
-        parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
+      if (options.filterTecnologiaCod) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
+      }
+
+      if (options.filterTecnologiaDesc) {
+        parameters.tecnologia = JSON.parse(`{ "desc": {"contains": "${options.filterTecnologiaDesc}" } }`);
       }
 
       if (options.filterCruza) {
@@ -69,7 +70,6 @@ export class GenotipoController {
           progenitor_m_origem: true,
           progenitores_origem: true,
           parentesco_completo: true,
-          status: true,
           tecnologia: { select: { name: true, cod_tec: true, desc: true } },
           lote: true,
         };
@@ -118,8 +118,10 @@ export class GenotipoController {
         };
       }
       response.map((item: any) => {
-        item.countChildren = functionsUtils
+        const newItem = item;
+        newItem.countChildren = functionsUtils
           .countChildrenForSafra(item.lote, Number(options.id_safra));
+        return newItem;
       });
       return { status: 200, response, total: response.total };
     } catch (error: any) {

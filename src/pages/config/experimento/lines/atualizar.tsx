@@ -855,7 +855,7 @@ export default function Atualizargenotipo({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 5;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
   const { token } = context.req.cookies;
   const { publicRuntimeConfig } = getConfig();
 

@@ -29,24 +29,24 @@ import * as XLSX from 'xlsx';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-	filterStatus: object | any;
-	filterSearch: string | any;
-	orderBy: object | any;
-	typeOrder: object | any;
+  filterStatus: object | any;
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 interface IGenerateProps {
-	name: string | undefined;
-	title: string | number | readonly string[] | undefined;
-	value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 
 interface IData {
-	layoutChildren: any[];
-	totalItems: number;
-	itensPerPage: number;
-	filterApplication: object | any;
-	id_layout: number;
-	layout: any;
+  layoutChildren: any[];
+  totalItems: number;
+  itensPerPage: number;
+  filterApplication: object | any;
+  id_layout: number;
+  layout: any;
 }
 
 export default function Atualizarquadra({
@@ -419,8 +419,6 @@ export default function Atualizarquadra({
 
             {updateFieldFactory('parcelas', 'Parcelas')}
 
-            {updateFieldFactory('plantadeira', 'Plantadeiras')}
-
           </div>
 
           <div className="h-10 w-full
@@ -455,18 +453,18 @@ export default function Atualizarquadra({
               columns={columns}
               data={disparos}
               options={{
-							  showTitle: false,
-							  headerStyle: {
-							    zIndex: 20,
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
                 },
-							  search: false,
-							  filtering: false,
-							  pageSize: itensPerPage,
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
               }}
               components={{
-							  Toolbar: () => (
-  <div
-    className="w-full max-h-96
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -477,116 +475,116 @@ export default function Atualizarquadra({
                     border-solid border-b
                     border-gray-200
                   "
-  >
+                  >
 
-    <strong className="text-blue-600">
-      Total registrado:
-      {itemsTotal}
-    </strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {itemsTotal}
+                    </strong>
 
-    <div className="h-full flex items-center gap-2">
-      <div className="border-solid border-2 border-blue-600 rounded">
-        <div className="w-72">
-          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="characters">
-                {
-																	(provided) => (
-  <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-    <div className="h-8 mb-3">
-      <Button
-        value="Atualizar"
-        bgColor="bg-blue-600"
-        textColor="white"
-        onClick={getValuesColumns}
-        icon={<IoReloadSharp size={20} />}
-      />
-    </div>
-    {
-																				generatesProps.map((generate, index) => (
-  <Draggable key={index} draggableId={String(generate.title)} index={index}>
-    {(provided) => (
-      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <CheckBox
-          name={generate.name}
-          title={generate.title?.toString()}
-          value={generate.value}
-          defaultChecked={camposGerenciados.includes(generate.value as string)}
-        />
-      </li>
-    )}
-  </Draggable>
-																				))
-																			}
-    {provided.placeholder}
-  </ul>
-																	)
-																}
-              </Droppable>
-            </DragDropContext>
-          </AccordionFilter>
-        </div>
-      </div>
+                    <div className="h-full flex items-center gap-2">
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {
+                                  (provided) => (
+                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                      <div className="h-8 mb-3">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {
+                                        generatesProps.map((generate, index) => (
+                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
+                                            {(provided) => (
+                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))
+                                      }
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
+                      </div>
 
-      <div className="h-12 flex items-center justify-center w-full">
-        <Button title="Exportar planilha de disparos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-      </div>
-    </div>
-  </div>
-							  ),
-							  Pagination: (props) => (
-  <div
-    className="flex
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de disparos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                      </div>
+                    </div>
+                  </div>
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-    {...props}
-  >
-    <Button
-      onClick={() => setCurrentPage(currentPage - 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdFirstPage size={18} />}
-      disabled={currentPage <= 1}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage - 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiLeftArrow size={15} />}
-      disabled={currentPage <= 0}
-    />
-    {
-												Array(1).fill('').map((value, index) => (
-  <Button
-    key={index}
-    onClick={() => setCurrentPage(index)}
-    value={`${currentPage + 1}`}
-    bgColor="bg-blue-600"
-    textColor="white"
-    disabled
-  />
-												))
-											}
-    <Button
-      onClick={() => setCurrentPage(currentPage + 1)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<BiRightArrow size={15} />}
-      disabled={currentPage + 1 >= pages}
-    />
-    <Button
-      onClick={() => setCurrentPage(currentPage + 10)}
-      bgColor="bg-blue-600"
-      textColor="white"
-      icon={<MdLastPage size={18} />}
-      disabled={currentPage + 1 >= pages}
-    />
-  </div>
-								) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {
+                      Array(1).fill('').map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))
+                    }
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>
@@ -598,7 +596,7 @@ export default function Atualizarquadra({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = context.req.cookies;
 

@@ -1,7 +1,4 @@
-import handleError from 'src/shared/utils/handleError';
-import {
-  number, object, SchemaOf, string,
-} from 'yup';
+import handleError from '../shared/utils/handleError';
 import { GroupRepository } from '../repository/group.repository';
 
 export class GroupController {
@@ -52,36 +49,15 @@ export class GroupController {
     }
   }
 
-  async listAll(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
-    let select: any = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-      }
-
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          id_safra: true,
-          id_foco: true,
-          foco: { select: { name: true } },
-          safra: { select: { safraName: true } },
-          npe: { select: { id: true } },
-          group: true,
-          status: true,
-        };
-      }
-
-      if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
-      }
+      const select = {
+        foco: { select: { name: true } },
+        safra: { select: { safraName: true } },
+        npe: { select: { id: true } },
+        group: true,
+      };
 
       if (options.id_foco) {
         parameters.id_foco = Number(options.id_foco);

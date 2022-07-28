@@ -336,7 +336,7 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Nome do Protocolo', 'protocol_name'));
       }
       if (columnOrder[item] === 'envelope') {
-        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope[0].seeds'));
+        tableFields.push(headerTableFactory('Quant. de sementes por envelope', 'envelope.seeds'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -398,10 +398,11 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await typeAssayService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
+    await typeAssayService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           const newRow = row;
+          newRow.envelope = row.envelope.seeds;
           newRow.status = (row.status === 0) ? 'Inativo' : 'Ativo';
           return newRow;
         });
@@ -491,11 +492,11 @@ export default function TipoEnsaio({
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Pesquisar
+                      Nome
                     </label>
                     <Input
                       type="text"
-                      placeholder="nome"
+                      placeholder="Nome"
                       max="40"
                       id="filterName"
                       name="filterName"
@@ -505,11 +506,11 @@ export default function TipoEnsaio({
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Protocolo
+                      Nome do Protocolo
                     </label>
                     <Input
                       type="text"
-                      placeholder="protocolo"
+                      placeholder="Nome do Protocolo"
                       max="40"
                       id="filterProtocolName"
                       name="filterProtocolName"
@@ -706,7 +707,8 @@ export default function TipoEnsaio({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0].itens_per_page;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
@@ -720,7 +722,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 

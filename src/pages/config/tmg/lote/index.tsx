@@ -29,7 +29,6 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterStatus: object | any;
   filterYear: string
   filterCodLote: string
   filterNcc: string
@@ -40,7 +39,8 @@ interface IFilter {
   filterMainName: string
   filterGmr: string
   filterBgm: string
-  filterTecnologia: string
+  filterTecnologiaCod: string | any;
+  filterTecnologiaDesc: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -51,7 +51,6 @@ export interface LoteGenotipo {
   genealogy: string;
   name: string;
   volume: number;
-  status?: number;
 }
 
 interface IGenerateProps {
@@ -64,11 +63,10 @@ interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
   itensPerPage: number;
-  filterApplication: object | any;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication,
+  allLote, totalItems, itensPerPage,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -106,7 +104,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
   ]);
-  const [filter, setFilter] = useState<any>(filterApplication);
+  const [filter, setFilter] = useState<any>();
   const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
@@ -115,7 +113,6 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
       filterYear: '',
       filterCodLote: '',
       filterNcc: '',
@@ -126,12 +123,12 @@ export default function Listagem({
       filterMainName: '',
       filterGmr: '',
       filterBgm: '',
-      filterTecnologia: '',
+      filterTecnologiaCod: '',
+      filterTecnologiaDesc: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus,
       filterYear,
       filterCodLote,
       filterNcc,
@@ -142,9 +139,10 @@ export default function Listagem({
       filterMainName,
       filterGmr,
       filterBgm,
-      filterTecnologia,
+      filterTecnologiaCod,
+      filterTecnologiaDesc,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
+      const parametersFilter = `&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}`;
       await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setLotes(response.response);
@@ -211,6 +209,22 @@ export default function Listagem({
       ),
       field: title,
       sorting: false,
+    };
+  }
+
+  function tecnologiaHeaderFactory() {
+    return {
+      title: 'Tecnologia',
+      field: 'tecnologia',
+      width: 0,
+      sorting: false,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.desc}`}
+          </div>
+        </div>
+      ),
     };
   }
 
@@ -295,14 +309,14 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'genotipo.tecnologia.name'));
+        tableFields.push(tecnologiaHeaderFactory());
       }
     });
     return tableFields;
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await loteService.getAll(filterApplication).then(({ status, response }) => {
+    await loteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
@@ -310,7 +324,7 @@ export default function Listagem({
           newItem.name_main = item.genotipo.name_main;
           newItem.gmr = item.genotipo.gmr;
           newItem.bgm = item.genotipo.bgm;
-          newItem.tecnologia = item.genotipo.tecnologia.name;
+          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.desc}`;
           delete newItem.id;
           delete newItem.genotipo;
           return newItem;
@@ -483,7 +497,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterBgm', 'BGM')}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
                 </div>
 
@@ -658,7 +674,8 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  // eslint-disable-next-line max-len
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
 
@@ -669,10 +686,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
   const urlParameters: any = new URL(baseUrl);
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&`;
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = 'filterStatus=1';
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -686,7 +702,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       allLote,
       totalItems,
       itensPerPage,
-      filterApplication,
     },
   };
 };

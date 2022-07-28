@@ -7,14 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model city {
-  id   Int     @id
-  ufid Int
-  nome String? @db.Char(255)
-
-  @@index([ufid], map: "ufid")
-}
-
 model config_gerais {
   id             Int      @id @default(autoincrement())
   itens_per_page Int?
@@ -200,7 +192,6 @@ model cultureUnity {
   year               Int
   name_unity_culture String    @unique
   local              local     @relation(fields: [id_local], references: [id])
-  status             Int?      @default(1)
   created_by         Int
   created_at         DateTime? @default(now())
 }
@@ -234,7 +225,6 @@ model layout_children {
   spc          String
   scolheita    Int
   tipo_parcela String
-  status       Int           @default(1)
   created_by   Int
   created_at   DateTime      @default(now())
   Layout       layout_quadra @relation(fields: [id_layout], references: [id])
@@ -273,7 +263,6 @@ model disparos {
   divisor    Int
   df         Int
   sem_metros Int
-  status     Int      @default(1)
   created_by Int
   created_at DateTime @default(now())
   quadra     quadra   @relation(fields: [id_quadra], references: [id])
@@ -301,7 +290,6 @@ model genotipo {
   progenitor_m_origem String?
   progenitores_origem String?
   parentesco_completo String?
-  status              Int                  @default(1)
   created_by          Int
   created_at          DateTime             @default(now())
   dt_import           DateTime             @default(now())
@@ -347,7 +335,6 @@ model group {
   id_safra   Int
   id_foco    Int
   group      Int
-  status     Int?      @default(1)
   created_by Int
   created_at DateTime? @default(now())
 
@@ -376,7 +363,6 @@ model envelope {
   id_safra      Int
   id_type_assay Int
   seeds         Int
-  status        Int?      @default(1)
   created_by    Int
   created_at    DateTime? @default(now())
 
@@ -390,7 +376,6 @@ model tecnologia {
   id_culture Int
   name       String
   desc       String?
-  status     Int       @default(1)
   created_by Int
   created_at DateTime? @default(now())
   dt_import  DateTime  @default(now())
@@ -413,7 +398,6 @@ model lote {
   fase           String?
   peso           Decimal? @db.Decimal(5, 0)
   quant_sementes Int?
-  status         Int      @default(1)
   created_by     Int
   created_at     DateTime @default(now())
 

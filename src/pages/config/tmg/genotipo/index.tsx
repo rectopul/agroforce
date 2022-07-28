@@ -21,21 +21,21 @@ import {
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { genotipoService, userPreferencesService, tecnologiaService } from '../../../../services';
+import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterStatus: object | any;
   filterGenotipo: string | any;
   filterMainName: string | any;
-  filterTecnologia: string | any;
+  filterTecnologiaCod: string | any;
+  filterTecnologiaDesc: string | any;
   filterCruza: string | any;
   filterGmr: string | any;
   orderBy: object | any;
@@ -49,7 +49,6 @@ export interface IGenotipos {
   genealogy: string;
   genotipo: string;
   cruza: string;
-  status?: number;
   cod_tec: string;
   desc: string;
 }
@@ -121,7 +120,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Progenitor m origem', value: 'progenitor_m_origem' },
     { name: 'CamposGerenciados[]', title: 'Progenitores origem', value: 'progenitores_origem' },
     { name: 'CamposGerenciados[]', title: 'Parentesco', value: 'parentesco_completo' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
 
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -133,19 +132,24 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
       filterGenotipo: '',
       filterMainName: '',
-      filterTecnologia: '',
+      filterTecnologiaCod: '',
+      filterTecnologiaDesc: '',
       filterCruza: '',
       filterGmr: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterGenotipo, filterMainName, filterCruza, filterTecnologia, filterGmr,
+      filterGenotipo,
+      filterMainName,
+      filterCruza,
+      filterTecnologiaCod,
+      filterTecnologiaDesc,
+      filterGmr,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologia=${filterTecnologia}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&`;
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotipoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -265,7 +269,7 @@ export default function Listagem({
       field: 'tecnologia',
       width: 0,
       sorting: false,
-      render: (rowData: any, genotipo: any) => (
+      render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
             {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
@@ -277,11 +281,10 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
       render: (rowData: IGenotipos) => (
         <div className="h-10 flex">
           <div className="h-10">
@@ -371,7 +374,7 @@ export default function Listagem({
       if (columnCampos[index] === 'parentesco_completo') {
         tableFields.push(headerTableFactory('Parentesco', 'parentesco_completo'));
       }
-      if (columnCampos[index] === 'status') {
+      if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -444,11 +447,6 @@ export default function Listagem({
     await genotipoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = genotipos.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
           row.cod_tec = row.tecnologia?.cod_tec;
           row.tecnologia = row.tecnologia?.name;
           // row.DT = new Date();
@@ -457,17 +455,17 @@ export default function Listagem({
           let hours: string;
           let minutes: string;
           let seconds: string;
-          if (String(dataExp.getHours()).length == 1) {
+          if (String(dataExp.getHours()).length === 1) {
             hours = `0${String(dataExp.getHours())}`;
           } else {
             hours = String(dataExp.getHours());
           }
-          if (String(dataExp.getMinutes()).length == 1) {
+          if (String(dataExp.getMinutes()).length === 1) {
             minutes = `0${String(dataExp.getMinutes())}`;
           } else {
             minutes = String(dataExp.getMinutes());
           }
-          if (String(dataExp.getSeconds()).length == 1) {
+          if (String(dataExp.getSeconds()).length === 1) {
             seconds = `0${String(dataExp.getSeconds())}`;
           } else {
             seconds = String(dataExp.getSeconds());
@@ -575,7 +573,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
@@ -626,7 +626,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -636,7 +636,7 @@ export default function Listagem({
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -700,9 +700,15 @@ export default function Listagem({
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="genotipo/importar-planilha/config-planilha" />
-                      </div>
+                      {/* <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          icon={<RiSettingsFill size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => { }}
+                          href="genotipo/importar-planilha/config-planilha"
+                        />
+                      </div> */}
                     </div>
                   </div>
                 ),
@@ -770,13 +776,13 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais(''))?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -787,15 +793,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}` : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}` : `&id_culture=${idCulture}&id_safra=${idSafra}`;
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const genotipos = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allGenotipos, total: totalItems } = await genotipos.json();
+  const {
+    response: allGenotipos,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   return {
     props: {

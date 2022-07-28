@@ -42,7 +42,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       });
 
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
-      safras.safras = await safraController.getAllSafra({
+      safras.safras = await safraController.getAll({
         id_culture: userCulture.cultura_selecionada, filterStatus: 1,
       });
       if (safras.safras.total > 0) {
@@ -50,79 +50,79 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         safras.safra_selecionada = safras.safras[0].id || 0;
       }
 
-      preferences.usuario = await PreferencesControllers.getAllPreferences({
+      preferences.usuario = await PreferencesControllers.getAll({
         userId: user.id, module_id: 1,
       }); preferences.usuario = preferences.usuario.response[0];
-      preferences.culture = await PreferencesControllers.getAllPreferences({
+      preferences.culture = await PreferencesControllers.getAll({
         userId: user.id, module_id: 2,
       }); preferences.culture = preferences.culture.response[0];
-      preferences.safra = await PreferencesControllers.getAllPreferences({
+      preferences.safra = await PreferencesControllers.getAll({
         userId: user.id, module_id: 3,
       }); preferences.safra = preferences.safra.response[0];
-      preferences.local = await PreferencesControllers.getAllPreferences({
+      preferences.local = await PreferencesControllers.getAll({
         userId: user.id, module_id: 4,
       }); preferences.local = preferences.local.response[0];
-      preferences.layout_quadra = await PreferencesControllers.getAllPreferences({
+      preferences.layout_quadra = await PreferencesControllers.getAll({
         userId: user.id, module_id: 5,
       }); preferences.layout_quadra = preferences.layout_quadra.response[0];
-      preferences.foco = await PreferencesControllers.getAllPreferences({
+      preferences.foco = await PreferencesControllers.getAll({
         userId: user.id, module_id: 6,
       }); preferences.foco = preferences.foco.response[0];
-      preferences.delineamento = await PreferencesControllers.getAllPreferences({
+      preferences.delineamento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 7,
       }); preferences.delineamento = preferences.delineamento.response[0];
-      preferences.tecnologia = await PreferencesControllers.getAllPreferences({
+      preferences.tecnologia = await PreferencesControllers.getAll({
         userId: user.id, module_id: 8,
       }); preferences.tecnologia = preferences.tecnologia.response[0];
-      preferences.tipo_ensaio = await PreferencesControllers.getAllPreferences({
+      preferences.tipo_ensaio = await PreferencesControllers.getAll({
         userId: user.id, module_id: 9,
       }); preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
-      preferences.genotipo = await PreferencesControllers.getAllPreferences({
+      preferences.genotipo = await PreferencesControllers.getAll({
         userId: user.id, module_id: 10,
       }); preferences.genotipo = preferences.genotipo.response[0];
-      preferences.department = await PreferencesControllers.getAllPreferences({
+      preferences.department = await PreferencesControllers.getAll({
         userId: user.id, module_id: 11,
       }); preferences.department = preferences.department.response[0];
-      preferences.lote = await PreferencesControllers.getAllPreferences({
+      preferences.lote = await PreferencesControllers.getAll({
         userId: user.id, module_id: 12,
       }); preferences.lote = preferences.lote.response[0];
-      preferences.lote_portfolio = await PreferencesControllers.getAllPreferences({
+      preferences.lote_portfolio = await PreferencesControllers.getAll({
         userId: user.id, module_id: 13,
       }); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
-      preferences.npe = await PreferencesControllers.getAllPreferences({
+      preferences.npe = await PreferencesControllers.getAll({
         userId: user.id, module_id: 14,
       }); preferences.npe = preferences.npe.response[0];
-      preferences.sequencia_delineamento = await PreferencesControllers.getAllPreferences({
+      preferences.sequencia_delineamento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 16,
       }); preferences.sequencia_delineamento = preferences.sequencia_delineamento.response[0];
-      preferences.quadras = await PreferencesControllers.getAllPreferences({
+      preferences.quadras = await PreferencesControllers.getAll({
         userId: user.id, module_id: 17,
       }); preferences.quadras = preferences.quadras.response[0];
-      preferences.disparos = await PreferencesControllers.getAllPreferences({
+      preferences.disparos = await PreferencesControllers.getAll({
         userId: user.id, module_id: 18,
       }); preferences.disparos = preferences.disparos.response[0];
-      preferences.layout_children = await PreferencesControllers.getAllPreferences({
+      preferences.layout_children = await PreferencesControllers.getAll({
         userId: user.id, module_id: 19,
       }); preferences.layout_children = preferences.layout_children.response[0];
-      preferences.group = await PreferencesControllers.getAllPreferences({
+      preferences.group = await PreferencesControllers.getAll({
         userId: user.id, module_id: 20,
       }); preferences.group = preferences.group.response[0];
-      preferences.unidadeCultura = await PreferencesControllers.getAllPreferences({
+      preferences.unidadeCultura = await PreferencesControllers.getAll({
         userId: user.id, module_id: 21,
       }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
-      preferences.experimento = await PreferencesControllers.getAllPreferences({
+      preferences.experimento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 22,
       }); preferences.experimento = preferences.experimento.response[0];
-      preferences.envelope = await PreferencesControllers.getAllPreferences({
+      preferences.envelope = await PreferencesControllers.getAll({
         userId: user.id, module_id: 24,
       }); preferences.envelope = preferences.envelope.response[0];
-      preferences.rd = await PreferencesControllers.getAllPreferences({
+      preferences.rd = await PreferencesControllers.getAll({
         userId: user.id, module_id: 25,
       }); preferences.rd = preferences.rd.response[0];
-      preferences.assayList = await PreferencesControllers.getAllPreferences({
+      preferences.assayList = await PreferencesControllers.getAll({
         userId: user.id, module_id: 26,
       }); preferences.assayList = preferences.assayList.response[0];
-      preferences.genotypeTreatment = await PreferencesControllers.getAllPreferences({
+      preferences.genotypeTreatment = await PreferencesControllers.getAll({
         userId: user.id, module_id: 27,
       }); preferences.genotypeTreatment = preferences.genotypeTreatment.response[0];
     }
