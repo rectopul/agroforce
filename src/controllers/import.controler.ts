@@ -948,8 +948,8 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
 
-              console.log(configModule.response[0].fields[sheet]);
-              console.log(sheet);
+              //console.log(configModule.response[0].fields[sheet]);
+              //console.log(sheet);
 
               if (configModule.response[0].fields[sheet] == 'Nome') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
@@ -988,10 +988,10 @@ export class ImportController {
                     //repeticoes_tratamento.push(repeticao_atual);
                     if(repeticoes_tratamento.length > 0){
                       for(let i2 = 0; i2 < repeticoes_tratamento.length; i2++){
-                        console.log('procurando');
-                        console.log(repeticoes_tratamento[i2].repeticao);
-                        console.log(repeticao_atual);
-                        console.log(repeticoes_tratamento);
+                        //console.log('procurando');
+                        //console.log(repeticoes_tratamento[i2].repeticao);
+                        //console.log(repeticao_atual);
+                        //console.log(repeticoes_tratamento);
                         if(repeticoes_tratamento[i2].repeticao == repeticao_atual){
                           verifica_repeticao = true;
                           verifica_repeticao_indice = i2;
@@ -1020,10 +1020,10 @@ export class ImportController {
 
                   if(repeticoes_tratamento.length > 0){
                     for(let i2 = 0; i2 < repeticoes_tratamento.length; i2++){
-                      console.log('procurando2');
-                      console.log(repeticoes_tratamento[i2].repeticao);
-                      console.log(repeticao_atual);
-                      console.log(repeticoes_tratamento);
+                      //console.log('procurando2');
+                      //console.log(repeticoes_tratamento[i2].repeticao);
+                      //console.log(repeticao_atual);
+                      //console.log(repeticoes_tratamento);
                       if(repeticoes_tratamento[i2].repeticao == repeticao_atual){
                         verifica_repeticao = true;
                         verifica_repeticao_indice = i2;
@@ -1041,15 +1041,15 @@ export class ImportController {
                 }
               }
 
-              console.log("repeticao anterior:");
-              console.log(repeticao_anterior);
-              console.log("repeticao atual:");
-              console.log(repeticao_atual);
+              //console.log("repeticao anterior:");
+              //console.log(repeticao_anterior);
+              //console.log("repeticao atual:");
+              //console.log(repeticao_atual);
 
 
               if (configModule.response[0].fields[sheet] == 'Sorteio') {
-                console.log("sorteio:");
-                console.log(data.spreadSheet[keySheet][sheet]);
+                //console.log("sorteio:");
+                //console.log(data.spreadSheet[keySheet][sheet]);
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</li><br>`;
@@ -1063,6 +1063,12 @@ export class ImportController {
                     sorteio_anterior = data.spreadSheet[keySheet][sheet];
                   }
                 }
+                
+                tratamentos = []; 
+                if(repeticao_atual && repeticao_anterior != repeticao_atual && repeticao_anterior > 1){
+                  i = i + 1;
+                } 
+                repeticao_anterior = repeticao_atual;
               }
 
               if (configModule.response[0].fields[sheet] == 'Bloco') {
@@ -1077,21 +1083,33 @@ export class ImportController {
                 }
               }
               
-              tratamentos = []; 
-              if(repeticao_atual && repeticao_anterior != repeticao_atual && repeticao_anterior > 1){
-                i = i + 1;
-              } 
-              repeticao_anterior = repeticao_atual;
-
             }
           }
         }
       }
 
-      
+      let validacao_nt_repeticoes = [];
+      if(repeticoes_tratamento.length > 1){
+        for(let i3 = 1; i3 < repeticoes_tratamento.length; i3++){
+          repeticoes_tratamento[i3].tratamentos.forEach(function (value) {
+            repeticoes_tratamento[0].tratamentos.forEach(function(value2){
+              if(value == value2){
+                validacao_nt_repeticoes.push(value2);
+              }
+            });
+          }); 
+          if(repeticoes_tratamento[i3].tratamentos.length != repeticoes_tratamento[0].tratamentos.length){
+            return 'A quantidade de tratamentos da repetição ' + String(repeticoes_tratamento[i3].repeticao) + ' não é igual aos tratamentos da repetição 1.';
+          }
+          if(repeticoes_tratamento[0].tratamentos.length != validacao_nt_repeticoes.length){
+            return 'Os tratamentos da repetição ' + String(repeticoes_tratamento[i3].repeticao) + ' não coincidem com os tratamentos da repetição 1.';
+          }
+          validacao_nt_repeticoes = [];
+        }
+      }
 
-      console.log("repetições arr:");
-      console.log(repeticoes_tratamento);
+      //console.log("repetições arr:");
+      //console.log(repeticoes_tratamento);
 
       if (responseIfError == '') {
         let name_anterior: string = '';
