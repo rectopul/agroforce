@@ -937,11 +937,11 @@ export class ImportController {
       }
 
       let validacao_nt_repeticoes = [];
-      if (repeticoes_tratamento.length > 1) {
-        for (let i3 = 1; i3 < repeticoes_tratamento.length; i3++) {
-          repeticoes_tratamento[i3].tratamentos.forEach((value) => {
-            repeticoes_tratamento[0].tratamentos.forEach((value2) => {
-              if (value == value2) {
+      if(repeticoes_tratamento.length > 1){
+        for(let i3 = 1; i3 < repeticoes_tratamento.length; i3++){
+          repeticoes_tratamento[i3].tratamentos.forEach(function (value:number) {
+            repeticoes_tratamento[0].tratamentos.forEach(function(value2:number){
+              if(value == value2){
                 validacao_nt_repeticoes.push(value2);
               }
             });
