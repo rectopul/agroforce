@@ -493,6 +493,15 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
+                </div>
+
+                <div className="w-full h-full
+                  flex
+                  justify-center
+                  pb-2
+                "
+                >
+
                   {filterFieldFactory('filterGmr', 'GMR')}
 
                   {filterFieldFactory('filterBgm', 'BGM')}
