@@ -487,11 +487,11 @@ export default function Listagem({
 
                   {filterFieldFactory('filterPeso', 'Peso')}
 
-                  {filterFieldFactory('filterSeeds', 'Quant. sementes')}
+                  {filterFieldFactory('filterSeeds', 'Sementes')}
 
-                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+                  {filterFieldFactory('filterGenotipo', 'Genótipo')}
 
-                  {filterFieldFactory('filterMainName', 'Nome principal')}
+                  {filterFieldFactory('filterMainName', 'Principal')}
 
                   {filterFieldFactory('filterGmr', 'GMR')}
 

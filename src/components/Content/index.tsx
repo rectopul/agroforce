@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-multi-spaces */
 import { setCookie } from 'nookies';
 import { ReactNode, useState } from 'react';
 import { BiUser } from 'react-icons/bi';
@@ -50,8 +51,10 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
   const userLogado: IUsers | any = JSON.parse(localStorage.getItem('user') as string);
   const cultures: object | any = [];
   const safras: object | any = [];
-  const [culturaSelecionada, setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
-  const [safraSelecionada, setSafraSelecionada] = useState<any>(userLogado.safras.safra_selecionada);
+  const [culturaSelecionada,
+    setCulturaSelecionada] = useState<any>(userLogado.userCulture.cultura_selecionada);
+  const [safraSelecionada,
+    setSafraSelecionada] = useState<any>(userLogado.safras.safra_selecionada);
 
   const avatarDefault = 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag';
 
@@ -112,7 +115,10 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
   function validationCulture(value: any) {
     if (value !== culturaSelecionada) {
       setCulturaSelecionada(value);
-      userService.logoutSign(userLogado.login, { anterior: culturaSelecionada, selecionada: value });
+      userService.logoutSign(
+        userLogado.login,
+        { anterior: culturaSelecionada, selecionada: value },
+      );
     }
   }
 
@@ -138,10 +144,18 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
         headerSelects={(
           <div className="mb-4 flex gap-3">
             <div className="h-10 lg:w-40 md:w-32 sm:w-26">
-              <Select values={cultures} onChange={(e) => validationCulture(e.target.value)} selected={culturaSelecionada} />
+              <Select
+                values={cultures}
+                onChange={(e) => validationCulture(e.target.value)}
+                selected={culturaSelecionada}
+              />
             </div>
             <div className="h-10 lg:w-40 md:w-32 sm:w-26">
-              <Select values={safras} onChange={(e) => validationSafras(e.target.value)} selected={Number(safraSelecionada)} />
+              <Select
+                values={safras}
+                onChange={(e) => validationSafras(e.target.value)}
+                selected={Number(safraSelecionada)}
+              />
             </div>
           </div>
         )}
