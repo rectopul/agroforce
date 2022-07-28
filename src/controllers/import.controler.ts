@@ -231,7 +231,7 @@ export class ImportController {
 
         // Validação do modulo Delineamento
         if (data.moduleId == 7) {
-          response = await this.validateDelineamento(data);
+          response = await this.validateDelineamentoNew(data);
           if (response == 'save') {
             response = 'Itens cadastrados com sucesso!';
           } else {
@@ -910,6 +910,276 @@ export class ImportController {
       console.log(err);
       return 'Erro ao validar';
     }
+  }
+
+  
+
+  async validateDelineamentoNew(data: object | any) {
+    const responseIfError: any = [];
+    let Column: number;
+
+    try {
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
+      let sorteio_anterior: number = 0;
+      let tratamento_anterior: number = 0;
+      let bloco_anterior: number = 0;
+      let repeticao: number = 1;
+      let repeticao_ini: number = 1;
+      let repeticao_anterior: number = 0;
+      let name_anterior: string = '';
+      let name_atual: string = '';
+      let count_trat: number = 0;
+      let count_trat_ant: number = 0;
+      const count_linhas: number = 0;
+      let repeticoes: number[] = [];
+      let repeticao_atual: number = 0;
+      let tratamentos: number[] = [];
+      let tratamento_atual: number = 0;
+      let repeticoes_tratamento: any[] = [];
+      let i: number = 0;
+      let verifica_repeticao: boolean = false;
+      let verifica_repeticao_indice: number = 0;
+
+      if (data != null && data != undefined) {
+        let Line: number;
+        for (const [keySheet, lines] of data.spreadSheet.entries()) {
+          Line = Number(keySheet) + 1;
+          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
+            Column = Number(sheet) + 1;
+            if (keySheet != '0') {
+
+              console.log(configModule.response[0].fields[sheet]);
+              console.log(sheet);
+
+              if (configModule.response[0].fields[sheet] == 'Nome') {
+                if (data.spreadSheet[keySheet][sheet] != '') {
+                  const delineamento: any = await this.delineamentoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
+                  if (delineamento.total > 0) {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, nome do delineamento ja cadastrado.</li><br>`;
+                  } else if (name_anterior == '' && name_atual == '') {
+                    name_anterior = data.spreadSheet[keySheet][sheet];
+                    name_atual = data.spreadSheet[keySheet][sheet];
+                  } else {
+                    name_anterior = name_atual;
+                    name_atual = data.spreadSheet[keySheet][sheet];
+                  }
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+                if (data.spreadSheet[keySheet][sheet] == '') {                  
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, repetição não pode estar vazio.</li><br>`;
+                } else if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, repetição deve ser um número.</li><br>`;
+                } else if (data.spreadSheet[1][sheet] != 1) {                  
+                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, repetição deve iniciar com valor igual a 1.</li><br>`;
+                } else {
+                  repeticoes.push(data.spreadSheet[keySheet][sheet]);
+                  repeticao_atual = data.spreadSheet[keySheet][sheet];
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+                if(repeticao_atual == 1){
+                  if(tratamentos.includes(data.spreadSheet[keySheet][sheet])){
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tratamento não pode ser duplicado na repetição.</li><br>`;
+                  } else {
+                    tratamentos.push(data.spreadSheet[keySheet][sheet]);
+                    //repeticoes_tratamento.push(repeticao_atual);
+                    if(repeticoes_tratamento.length > 0){
+                      for(let i2 = 0; i2 < repeticoes_tratamento.length; i2++){
+                        console.log('procurando');
+                        console.log(repeticoes_tratamento[i2].repeticao);
+                        console.log(repeticao_atual);
+                        console.log(repeticoes_tratamento);
+                        if(repeticoes_tratamento[i2].repeticao == repeticao_atual){
+                          verifica_repeticao = true;
+                          verifica_repeticao_indice = i2;
+                        }
+                      }
+                      if(verifica_repeticao){
+                        repeticoes_tratamento[verifica_repeticao_indice].tratamentos.push(data.spreadSheet[keySheet][sheet]);
+                      } else {
+                        repeticoes_tratamento.push({ repeticao: repeticao_atual, tratamentos: [data.spreadSheet[keySheet][sheet]]});
+                      }
+                      verifica_repeticao = false;
+                      verifica_repeticao_indice = 0;
+                    } else {
+                      repeticoes_tratamento.push({ repeticao: repeticao_atual, tratamentos: [data.spreadSheet[keySheet][sheet]]});
+                    } 
+                  }
+                  if(keySheet > 1){
+                    if(data.spreadSheet[keySheet-1][sheet] != data.spreadSheet[keySheet][sheet] - 1){
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tratamento na repetição 1 deve ser sequencial.</li><br>`;                      
+                    } else {
+                      tratamento_atual = data.spreadSheet[keySheet][sheet];
+                    }
+                  }
+                } else {
+
+
+                  if(repeticoes_tratamento.length > 0){
+                    for(let i2 = 0; i2 < repeticoes_tratamento.length; i2++){
+                      console.log('procurando2');
+                      console.log(repeticoes_tratamento[i2].repeticao);
+                      console.log(repeticao_atual);
+                      console.log(repeticoes_tratamento);
+                      if(repeticoes_tratamento[i2].repeticao == repeticao_atual){
+                        verifica_repeticao = true;
+                        verifica_repeticao_indice = i2;
+                      }
+                    }
+                    if(verifica_repeticao){
+                      repeticoes_tratamento[verifica_repeticao_indice].tratamentos.push(data.spreadSheet[keySheet][sheet]);
+                    } else {
+                      repeticoes_tratamento.push({ repeticao: repeticao_atual, tratamentos: [data.spreadSheet[keySheet][sheet]]});
+                    }
+                    verifica_repeticao = false;
+                    verifica_repeticao_indice = 0;
+                  }
+
+                }
+              }
+
+              console.log("repeticao anterior:");
+              console.log(repeticao_anterior);
+              console.log("repeticao atual:");
+              console.log(repeticao_atual);
+
+
+              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+                console.log("sorteio:");
+                console.log(data.spreadSheet[keySheet][sheet]);
+                if (data.spreadSheet[keySheet][sheet] != '') {
+                  if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</li><br>`;
+                  } else {
+                    if (name_atual != name_anterior) {
+                      sorteio_anterior = 0;
+                    }
+                    if (sorteio_anterior > data.spreadSheet[keySheet][sheet] && repeticao_anterior == repeticao_atual) {
+                      return 'A coluna de sorteio deve está em ordem crescente.';
+                    }
+                    sorteio_anterior = data.spreadSheet[keySheet][sheet];
+                  }
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Bloco') {
+                if (data.spreadSheet[keySheet][sheet] != '') {
+                  if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o bloco tem que ser um numero.</li><br>`;
+                  } else if (bloco_anterior != 0 && bloco_anterior != data.spreadSheet[keySheet][sheet]) {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, os blocos não podem ser diferentes.</li><br>`;
+                  } else {
+                    bloco_anterior = data.spreadSheet[keySheet][sheet];
+                  }
+                }
+              }
+              
+              tratamentos = []; 
+              if(repeticao_atual && repeticao_anterior != repeticao_atual && repeticao_anterior > 1){
+                i = i + 1;
+              } 
+              repeticao_anterior = repeticao_atual;
+
+            }
+          }
+        }
+      }
+
+      
+
+      console.log("repetições arr:");
+      console.log(repeticoes_tratamento);
+
+      if (responseIfError == '') {
+        let name_anterior: string = '';
+        let name_atual: string = '';
+        let repeticao: number = 1;
+        let countTrat = 1;
+        const aux: object | any = {};
+        let Column;
+        let Lines;
+        let delimit = 0;
+
+        aux.created_by = data.created_by;
+
+        for (const [keySheet, lines] of data.spreadSheet.entries()) {
+          Lines = Number(keySheet) + 1;
+          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
+            Column = Number(sheet) + 1;
+            if (keySheet != '0') {
+              //console.log
+              if (configModule.response[0].fields[sheet] == 'Nome') {
+                if (name_anterior == '' && name_atual == '') {
+                  name_anterior = data.spreadSheet[keySheet][sheet];
+                  name_atual = data.spreadSheet[keySheet][sheet];
+                } else {
+                  name_anterior = name_atual;
+                  name_atual = data.spreadSheet[keySheet][sheet];
+                  if (name_atual != name_anterior) {
+                    delimit = 0;
+                    await this.delineamentoController.update({ id: aux.id_delineamento, repeticao, trat_repeticao: countTrat });
+                  } else if (Lines == data.spreadSheet.length) {
+                    countTrat++;
+                    await this.delineamentoController.update({ id: aux.id_delineamento, repeticao, trat_repeticao: countTrat });
+                  }
+                }
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+                if (name_atual != '' && name_anterior != '') {
+                  if (name_atual != name_anterior) {
+                    countTrat = 1;
+                    repeticao = 1;
+                  }
+                }
+
+                if (data.spreadSheet[keySheet][sheet] > repeticao) {
+                  repeticao++;
+                  countTrat = 1;
+                  tratamento_anterior = 0;
+                } else {
+                  countTrat++;
+                }
+                aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+                aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+                aux.nt = Number(data.spreadSheet[keySheet][sheet]);
+              }
+
+              if (configModule.response[0].fields[sheet] == 'Bloco') {
+                aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
+              }
+
+              if (data.spreadSheet[keySheet].length == Column && aux != []) {
+                if (name_atual == name_anterior && delimit == 0) {
+                  const delineamento: any = await this.delineamentoController.post({
+                    id_culture: data.id_culture, name: name_atual, repeticao, trat_repeticao: countTrat, status: 1, created_by: data.created_by,
+                  });
+                  aux.id_delineamento = delineamento.response.id;
+                  delimit = 1;
+                }
+                await this.sequenciaDelineamentoController.create(aux);
+              }
+            }
+          }
+        }
+        return 'save';
+      }
+      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      return responseStringError;
+    } catch (err) {
+      console.log(err);
+      return 'Houve um erro, tente novamente mais tarde!5';
+    }
+    return 'save';
   }
 
   async validateDelineamento(data: object | any) {
