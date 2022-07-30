@@ -544,6 +544,9 @@ export class ImportController {
     try {
       const configModule: object | any = await this.getAll(Number(data.moduleId));
 
+      //console.log("ini npe");
+      //console.log(data);
+
       if (data != null && data != undefined) {
         let Line: number;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -573,6 +576,8 @@ export class ImportController {
                 }
               }
 
+              //console.log("local npe ok");
+
               if (configModule.response[0].fields[sheet] == 'Safra') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
@@ -595,15 +600,20 @@ export class ImportController {
                 }
               }
 
+              //console.log("safra npe ok");
+
               if (configModule.response[0].fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if ((typeof (data.spreadSheet[keySheet][sheet])) === 'number' && data.spreadSheet[keySheet][sheet].toString().length < 2) {
                     data.spreadSheet[keySheet][sheet] = `0${data.spreadSheet[keySheet][sheet].toString()}`;
                   }
-                  const ogm: any = await this.ogmController.getAll({ cod_tec: String(data.spreadSheet[keySheet][sheet]) });
+                  let cod_tec_input = String(data.spreadSheet[keySheet][sheet]);
+                  //console.log("cod_tec");
+                  //console.log(cod_tec_input);
+                  const ogm: any = await this.ogmController.getAll({ cod_tec: cod_tec_input });
                   if (ogm.total == 0) {
                     // console.log('aqui OGM');
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tecnologia informado não existe no sistema.</li><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informada não existe no sistema.</li><br>`;
                   } else {
                     this.aux.id_ogm = ogm.response[0].id;
                   }
@@ -611,6 +621,8 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tecnologia é obrigatorio.</li><br>`;
                 }
               }
+
+              //console.log("ogm ok npe");
 
               if (configModule.response[0].fields[sheet] == 'Foco') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
@@ -630,6 +642,8 @@ export class ImportController {
                 }
               }
 
+              //console.log("foco ok npe");
+
               if (configModule.response[0].fields[sheet] == 'Ensaio') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
@@ -647,6 +661,8 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tipo de ensaio é obrigatorio.</li><br>`;
                 }
               }
+
+              //console.log("ensaio ok npe");
 
               if (configModule.response[0].fields[sheet] == 'NPEI') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
@@ -671,6 +687,8 @@ export class ImportController {
                 }
               }
 
+              //console.log("npei npe ok");
+
               if (configModule.response[0].fields[sheet] == 'Epoca') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
@@ -682,6 +700,8 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo a época é obrigatorio.</li><br>`;
                 }
               }
+
+              //console.log("epoca ok npe");
 
               if (Column == configModule.lenght) {
                 // console.log('chogu aqui');
@@ -772,8 +792,8 @@ export class ImportController {
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
-      console.log('Erro geral import NPE: ');
-      console.log(err);
+      //console.log('Erro geral import NPE: ');
+      //console.log(err);
       return 'Erro ao validar';
     }
   }
@@ -879,6 +899,7 @@ export class ImportController {
                     }
                   }
                 } else if (repeticoes_tratamento.length > 0) {
+
                   for (let i2 = 0; i2 < repeticoes_tratamento.length; i2++) {
                     // console.log('procurando2');
                     // console.log(repeticoes_tratamento[i2].repeticao);
@@ -896,6 +917,18 @@ export class ImportController {
                   }
                   verifica_repeticao = false;
                   verifica_repeticao_indice = 0;
+                }
+                if(repeticao_atual > 1){
+                  console.log("repeticao");
+                  console.log(repeticao_atual);
+                  console.log(tratamentos);
+                  console.log("tratamentos");
+                  console.log(data.spreadSheet[keySheet][sheet]);
+                  if (tratamentos.includes(data.spreadSheet[keySheet][sheet])) {
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tratamento não pode ser duplicado na repetição.</li><br>`;
+                  } else {
+                    tratamentos.push(data.spreadSheet[keySheet][sheet]);
+                  }
                 }
               }
 
@@ -915,15 +948,17 @@ export class ImportController {
                       sorteio_anterior = 0;
                     }
                     if (sorteio_anterior > data.spreadSheet[keySheet][sheet] && repeticao_anterior == repeticao_atual) {
-                      return 'A coluna de sorteio deve está em ordem crescente.';
+                      responseIfError[Column - 1] += `A coluna de sorteio da ${Column}º coluna da ${Line}º linha deve está em ordem crescente.`;
                     }
                     sorteio_anterior = data.spreadSheet[keySheet][sheet];
                   }
                 }
 
-                tratamentos = [];
                 if (repeticao_atual && repeticao_anterior != repeticao_atual && repeticao_anterior > 1) {
                   i += 1;
+                }
+                if (repeticao_atual && repeticao_anterior != repeticao_atual) {
+                  tratamentos = [];
                 }
                 repeticao_anterior = repeticao_atual;
               }
@@ -945,6 +980,15 @@ export class ImportController {
       }
 
       let validacao_nt_repeticoes = [];
+      if(responseIfError.length > 0){
+
+        Column = responseIfError.length - 1;
+      
+      } else {
+
+        Column = 0;
+
+      }
       if(repeticoes_tratamento.length > 1){
         for(let i3 = 1; i3 < repeticoes_tratamento.length; i3++){
           repeticoes_tratamento[i3].tratamentos.forEach(function (value:number) {
@@ -955,19 +999,24 @@ export class ImportController {
             });
           });
           if (repeticoes_tratamento[i3].tratamentos.length != repeticoes_tratamento[0].tratamentos.length) {
-            return `A quantidade de tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não é igual aos tratamentos da repetição 1.`;
+            responseIfError[Column] += `<li style="text-align:left"> A quantidade de tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não é igual aos tratamentos da repetição 1.</li><br>`;
           }
           if (repeticoes_tratamento[0].tratamentos.length != validacao_nt_repeticoes.length) {
-            return `Os tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não coincidem com os tratamentos da repetição 1.`;
+            responseIfError[Column] += `<li style="text-align:left"> Os tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não coincidem com os tratamentos da repetição 1.</li><br>`;
           }
           validacao_nt_repeticoes = [];
         }
       }
 
+      //console.log("errors");
+      //console.log(responseIfError.length);
+      //console.log(responseIfError[0]);
+      //console.log(responseIfError);
+
       // console.log("repetições arr:");
       // console.log(repeticoes_tratamento);
 
-      if (responseIfError == '') {
+      if (responseIfError == '' && responseIfError.length == 0) {
         let name_anterior: string = '';
         let name_atual: string = '';
         let repeticao: number = 1;
@@ -1047,13 +1096,14 @@ export class ImportController {
         }
         return 'save';
       }
+      console.log(responseIfError);
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!5';
     }
-    return 'save';
+    //return 'save';
   }
 
   async validateDelineamento(data: object | any) {
