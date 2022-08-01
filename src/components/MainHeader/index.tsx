@@ -16,7 +16,7 @@ export function MainHeader({
   return (
     <header className="
 			h-20
-			w-full
+			w-screen
       flex
 			items-center
       bg-gray-450
@@ -25,23 +25,23 @@ export function MainHeader({
       <div className="
 				w-full
         flex
-				justify-between
+				justify-center
 				items-center
 				text-center
         pr-2
         text-4xl
       "
       >
-        <div className="lg:w-2/6 md:w-5/12 gg:w-[580px] sm:w-[400px] gap-1 flex  items-center pr-3 mr-5">
+        <div className="w-6/12 gap-1 flex items-center">
           <Link passHref href="/">
-            <Image src="/images/logo-tmg.png" alt="TMG" width={160} height={150} />
+            <Image src="/images/logo-tmg.png" alt="TMG" width={130} height={130} />
           </Link>
           {headerSelects}
         </div>
 
         <div className="
           flex
-					gap-8
+					gap-4
           w-content-main-header
           text-white
         "

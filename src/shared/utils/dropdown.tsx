@@ -113,7 +113,7 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'EXPERIMENTOS',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/config/delineamento',
+        hrefTab: '/listas/experimentos/experimento',
         data: [
           { labelDropDown: 'Experimento', hrefDropDown: '/listas/experimentos/experimento', iconDropDown: <AiOutlineFileSearch /> },
         ],
