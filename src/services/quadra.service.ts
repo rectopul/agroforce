@@ -22,6 +22,10 @@ async function update(data: any) {
 }
 
 async function getAll(parameters: any) {
+  console.log("parameters");
+  console.log(parameters);
+  parameters = String(parameters).replace("filterStatus=2", "");
+  console.log(parameters);
   const genotipo = await fetchWrapper.get(baseUrl, parameters);
   return genotipo;
 }

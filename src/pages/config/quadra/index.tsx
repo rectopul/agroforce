@@ -135,20 +135,28 @@ export default function Listagem({
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra}`;
-
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        Swal.fire('Quadra não pode ser atualizada pois já existe uma quadra com esse código local ativo!');
-      } else {
-        quadraService.update({ id, status });
-      }
-    });
+    console.log("quadra:");
+    console.log(data);
 
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
+
+    
+    await quadraService.getAll(parametersFilter).then((response) => {
+      if (response.total > 0) {
+        let statusEdit: number = 0;
+        if(response.response[response.total - 1].status === 0){
+          statusEdit = 1;
+        } else {
+          statusEdit = 0;
+        }
+        let idEdit:number = response.response[response.total - 1].id;
+        let quadraEdit = quadraService.update({ id: idEdit, status: statusEdit });
+      }
+    });
 
     const index = quadra.findIndex((quadraIndex) => quadraIndex.id === idQuadra);
 
@@ -728,7 +736,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
+  const filterApplication = `filterStatus=2&id_culture=${cultureId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
