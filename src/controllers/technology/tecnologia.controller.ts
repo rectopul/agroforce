@@ -6,6 +6,8 @@ export class TecnologiaController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    //console.log("tecnologia");
+    //console.log(options);
     try {
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
@@ -17,6 +19,10 @@ export class TecnologiaController {
 
       if (options.filterCode) {
         parameters.cod_tec = JSON.parse(`{ "contains":"${options.filterCode}" }`);
+      }
+
+      if (options.cod_tec) {
+        parameters.cod_tec = options.cod_tec;
       }
 
       const select = {
@@ -48,6 +54,9 @@ export class TecnologiaController {
         skip,
         orderBy,
       );
+
+      //console.log("response - tecnologia");
+      //console.log(response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
