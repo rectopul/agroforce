@@ -70,7 +70,7 @@ export class GenotipoController {
           progenitor_m_origem: true,
           progenitores_origem: true,
           parentesco_completo: true,
-          tecnologia: { select: { name: true, cod_tec: true, desc: true } },
+          tecnologia: true,
           lote: true,
         };
       }
