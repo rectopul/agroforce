@@ -11,7 +11,6 @@ export class AssayListController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
-    let select: any = [];
     try {
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
@@ -37,31 +36,22 @@ export class AssayListController {
       if (options.filterStatusAssay) {
         parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
       }
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] !== 'action') {
-            select[objSelect[item]] = true;
-          }
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          id_safra: true,
-          foco: { select: { name: true } },
-          type_assay: { select: { name: true } },
-          tecnologia: { select: { name: true } },
-          genotype_treatment: { select: { treatments_number: true } },
-          gli: true,
-          period: true,
-          protocol_name: true,
-          bgm: true,
-          project: true,
-          status: true,
-          comments: true,
-        };
-      }
+
+      const select = {
+        id: true,
+        id_safra: true,
+        foco: { select: { name: true } },
+        type_assay: { select: { name: true } },
+        tecnologia: { select: { name: true } },
+        genotype_treatment: { select: { treatments_number: true } },
+        gli: true,
+        period: true,
+        protocol_name: true,
+        bgm: true,
+        project: true,
+        status: true,
+        comments: true,
+      };
 
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);

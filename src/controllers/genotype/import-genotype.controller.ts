@@ -47,7 +47,7 @@ export class ImportGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const genotipo: any = await tecnologiaController.getAll(
+                const genotipo: any = await genotipoController.getAll(
                   { id_dados_geno: spreadSheet[row][column] },
                 );
                 if (genotipo.total > 0) {
@@ -267,7 +267,7 @@ export class ImportGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const geno: any = await tecnologiaController.getAll({
+                const geno: any = await genotipoController.getAll({
                   id_dados: this.aux.id_dados_geno,
                 });
                 if (geno.response[0].dt_import > spreadSheet[row][column]) {

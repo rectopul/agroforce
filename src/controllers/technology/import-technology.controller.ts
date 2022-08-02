@@ -92,7 +92,7 @@ export class ImportTechnologyController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                  { idCulture, cod_tec: String(spreadSheet[row][0]) },
+                  { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
                 );
                 if (status === 200) {
                   if (response.length === 0) {
@@ -121,7 +121,7 @@ export class ImportTechnologyController {
                 response: responseCulture,
               }: IReturnObject = await culturaController.getOneCulture(idCulture);
               const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                { idCulture, cod_tec: String(spreadSheet[row][0]) },
+                { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
               if (status === 200) {
                 await tecnologiaController.update({

@@ -367,15 +367,15 @@ export class ImportAssayListController {
           }
           return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
         } catch (error: any) {
-          handleError('Genótipo controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Genótipo' };
+          handleError('Lista de ensaio controller', 'Save Import', error.message);
+          return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
         }
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      handleError('Genótipo controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Genótipo' };
+      handleError('Lista de ensaio controller', 'Validate Import', error.message);
+      return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }
   }
 }
