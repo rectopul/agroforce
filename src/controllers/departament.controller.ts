@@ -126,7 +126,7 @@ export class DepartamentController {
 
       await this.departamentRepository.create(data);
 
-      return { status: 201, message: 'Setor cadastrado' };
+      return { status: 200, message: 'Setor cadastrado' };
     } catch (err) {
       return { status: 404, message: 'Setor não cadastrado' };
     }

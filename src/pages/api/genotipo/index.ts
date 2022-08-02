@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     case 'POST': {
       const resultPost = await genotipoController.create(req.body);
-      res.status(201).json(resultPost);
+      res.status(200).json(resultPost);
       break;
     }
     case 'PUT': {

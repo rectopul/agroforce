@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       break;
     case 'POST':
       const resultPost = await departamentController.postDepartament(req.body);
-      res.status(201).json(resultPost);
+      res.status(200).json(resultPost);
       break;
     case 'PUT':
       const resultPut = await departamentController.updateDepartament(req.body);

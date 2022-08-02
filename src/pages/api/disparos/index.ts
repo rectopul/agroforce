@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       break;
     case 'POST':
       const resultPost = await Controller.create(req.body);
-      res.status(201).json(resultPost);
+      res.status(200).json(resultPost);
       break;
     case 'PUT':
       const resultPut = await Controller.update(req.body);

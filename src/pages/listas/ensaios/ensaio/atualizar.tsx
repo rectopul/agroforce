@@ -138,7 +138,7 @@ export default function AtualizarTipoEnsaio({
       }).then(({ status, message }) => {
         if (status === 200) {
           Swal.fire('Lista de Ensaio atualizado com sucesso!');
-          router.push('/listas/ensaio');
+          router.back();
         } else {
           Swal.fire(message);
         }
@@ -299,7 +299,7 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(idHeaderFactory());
       }
       if (columnOrder[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'genotipo.lote[0].fase'));
+        tableFields.push(headerTableFactory('Fase', 'genotipo.lote[0]?.fase'));
       }
       if (columnOrder[index] === 'cod_tec') {
         tableFields.push(headerTableFactory('Cód. tec. genótipo', 'genotipo.tecnologia.cod_tec'));
@@ -323,7 +323,7 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(headerTableFactory('NCA', 'nca'));
       }
       if (columnOrder[index] === 'cod_lote') {
-        tableFields.push(headerTableFactory('Cód. lote', 'genotipo.lote[0].cod_lote'));
+        tableFields.push(headerTableFactory('Cód. lote', 'genotipo.lote[0]?.cod_lote'));
       }
       if (columnOrder[index] === 'comments') {
         tableFields.push(headerTableFactory('OBS', 'comments'));
@@ -946,6 +946,7 @@ export default function AtualizarTipoEnsaio({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
+  // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
 
   const { token } = context.req.cookies;

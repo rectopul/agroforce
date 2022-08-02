@@ -309,7 +309,7 @@ export class ImportController {
               this.aux.created_by = data.created_by;
               this.aux.npef = 0;
               this.aux.prox_npe = 0;
-              if (configModule.response[0].fields[sheet] == 'Local') {
+              if (configModule.response[0]?.fields[sheet] == 'Local') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
@@ -317,7 +317,7 @@ export class ImportController {
                       // console.log('aqui Local');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                     } else {
-                      this.aux.id_local = local.response[0].id;
+                      this.aux.id_local = local.response[0]?.id;
                     }
                   } else {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, local deve ser um campo de texto.</li><br>`;
@@ -329,7 +329,7 @@ export class ImportController {
 
               // console.log("local npe ok");
 
-              if (configModule.response[0].fields[sheet] == 'Safra') {
+              if (configModule.response[0]?.fields[sheet] == 'Safra') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const validateSafra: any = await this.safraController.getOne(Number(data.safra));
@@ -341,7 +341,7 @@ export class ImportController {
                       // console.log('aqui Safra');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a safra não existe no sistema.</li><br>`;
                     } else {
-                      this.aux.id_safra = safras.response[0].id;
+                      this.aux.id_safra = safras.response[0]?.id;
                     }
                   } else {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, safra deve ser um campo de texto.</li><br>`;
@@ -353,7 +353,7 @@ export class ImportController {
 
               // console.log("safra npe ok");
 
-              if (configModule.response[0].fields[sheet] == 'OGM') {
+              if (configModule.response[0]?.fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if ((typeof (data.spreadSheet[keySheet][sheet])) === 'number' && data.spreadSheet[keySheet][sheet].toString().length < 2) {
                     data.spreadSheet[keySheet][sheet] = `0${data.spreadSheet[keySheet][sheet].toString()}`;
@@ -366,7 +366,7 @@ export class ImportController {
                     // console.log('aqui OGM');
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informada não existe no sistema.</li><br>`;
                   } else {
-                    this.aux.id_ogm = ogm.response[0].id;
+                    this.aux.id_ogm = ogm.response[0]?.id;
                   }
                 } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tecnologia é obrigatorio.</li><br>`;
@@ -375,7 +375,7 @@ export class ImportController {
 
               // console.log("ogm ok npe");
 
-              if (configModule.response[0].fields[sheet] == 'Foco') {
+              if (configModule.response[0]?.fields[sheet] == 'Foco') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const foco: any = await this.focoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
@@ -383,7 +383,7 @@ export class ImportController {
                       // console.log('aqui Foco');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</li><br>`;
                     } else {
-                      this.aux.id_foco = foco.response[0].id;
+                      this.aux.id_foco = foco.response[0]?.id;
                     }
                   } else {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, foco deve ser um campo de texto.</li><br>`;
@@ -395,7 +395,7 @@ export class ImportController {
 
               // console.log("foco ok npe");
 
-              if (configModule.response[0].fields[sheet] == 'Ensaio') {
+              if (configModule.response[0]?.fields[sheet] == 'Ensaio') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const ensaio: any = await this.typeAssayController.getAll({ name: data.spreadSheet[keySheet][sheet] });
@@ -403,7 +403,7 @@ export class ImportController {
                       // console.log('aqui Ensaio');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,o tipo de ensaio não existe no sistema.</li><br>`;
                     } else {
-                      this.aux.id_type_assay = ensaio.response[0].id;
+                      this.aux.id_type_assay = ensaio.response[0]?.id;
                     }
                   } else {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tipo de ensaio deve ser um campo de texto.</li><br>`;
@@ -415,7 +415,7 @@ export class ImportController {
 
               // console.log("ensaio ok npe");
 
-              if (configModule.response[0].fields[sheet] == 'NPEI') {
+              if (configModule.response[0]?.fields[sheet] == 'NPEI') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'number') {
                     if (typeof (this.aux.id_foco) === 'undefined') {
@@ -440,7 +440,7 @@ export class ImportController {
 
               // console.log("npei npe ok");
 
-              if (configModule.response[0].fields[sheet] == 'Epoca') {
+              if (configModule.response[0]?.fields[sheet] == 'Epoca') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, época deve ser um campo numerico.</li><br>`;
@@ -483,48 +483,48 @@ export class ImportController {
               this.aux.created_by = data.created_by;
               this.aux.npef = 0;
               this.aux.prox_npe = 0;
-              if (configModule.response[0].fields[sheet] == 'Local') {
+              if (configModule.response[0]?.fields[sheet] == 'Local') {
                 // console.log("Local R");
                 const local: any = await this.localController.getAll(
                   { name_local_culture: data.spreadSheet[keySheet][sheet] },
                 );
-                this.aux.id_local = local.response[0].id;
+                this.aux.id_local = local.response[0]?.id;
               }
 
-              if (configModule.response[0].fields[sheet] == 'Safra') {
+              if (configModule.response[0]?.fields[sheet] == 'Safra') {
                 // console.log("Safra R");
                 this.aux.id_safra = Number(data.safra);
               }
 
-              if (configModule.response[0].fields[sheet] == 'OGM') {
+              if (configModule.response[0]?.fields[sheet] == 'OGM') {
                 // console.log("OGM R");
                 const ogm: any = await this.ogmController.getAll(
                   { cod_tec: String(data.spreadSheet[keySheet][sheet]) },
                 );
-                this.aux.id_ogm = ogm.response[0].id;
+                this.aux.id_ogm = ogm.response[0]?.id;
               }
 
-              if (configModule.response[0].fields[sheet] == 'Foco') {
+              if (configModule.response[0]?.fields[sheet] == 'Foco') {
                 // console.log("FOCO R");
                 const foco: any = await this.focoController.getAll(
                   { name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture },
                 );
-                this.aux.id_foco = Number(foco.response[0].id);
+                this.aux.id_foco = Number(foco.response[0]?.id);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Ensaio') {
+              if (configModule.response[0]?.fields[sheet] == 'Ensaio') {
                 // console.log("Ensaio R");
                 const ensaio: any = await this.typeAssayController.getAll(
                   { name: data.spreadSheet[keySheet][sheet] },
                 );
-                this.aux.id_type_assay = ensaio.response[0].id;
+                this.aux.id_type_assay = ensaio.response[0]?.id;
               }
 
-              if (configModule.response[0].fields[sheet] == 'Epoca') {
+              if (configModule.response[0]?.fields[sheet] == 'Epoca') {
                 this.aux.epoca = String(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'NPEI') {
+              if (configModule.response[0]?.fields[sheet] == 'NPEI') {
                 this.aux.npei = data.spreadSheet[keySheet][sheet];
               }
 
@@ -582,10 +582,10 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              // console.log(configModule.response[0].fields[sheet]);
+              // console.log(configModule.response[0]?.fields[sheet]);
               // console.log(sheet);
 
-              if (configModule.response[0].fields[sheet] == 'Nome') {
+              if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   const delineamento: any = await this.delineamentoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (delineamento.total > 0) {
@@ -600,7 +600,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+              if (configModule.response[0]?.fields[sheet] == 'Repeticao') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, repetição não pode estar vazio.</li><br>`;
                 } else if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
@@ -613,7 +613,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+              if (configModule.response[0]?.fields[sheet] == 'Tratamento') {
                 if (repeticao_atual == 1) {
                   if (tratamentos.includes(data.spreadSheet[keySheet][sheet])) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tratamento não pode ser duplicado na repetição.</li><br>`;
@@ -687,7 +687,7 @@ export class ImportController {
               // console.log("repeticao atual:");
               // console.log(repeticao_atual);
 
-              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+              if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
                 // console.log("sorteio:");
                 // console.log(data.spreadSheet[keySheet][sheet]);
                 if (data.spreadSheet[keySheet][sheet] != '') {
@@ -713,7 +713,7 @@ export class ImportController {
                 repeticao_anterior = repeticao_atual;
               }
 
-              if (configModule.response[0].fields[sheet] == 'Bloco') {
+              if (configModule.response[0]?.fields[sheet] == 'Bloco') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o bloco tem que ser um numero.</li><br>`;
@@ -738,16 +738,16 @@ export class ImportController {
       if (repeticoes_tratamento.length > 1) {
         for (let i3 = 1; i3 < repeticoes_tratamento.length; i3++) {
           repeticoes_tratamento[i3].tratamentos.forEach((value: number) => {
-            repeticoes_tratamento[0].tratamentos.forEach((value2: number) => {
+            repeticoes_tratamento[0]?.tratamentos.forEach((value2: number) => {
               if (value == value2) {
                 validacao_nt_repeticoes.push(value2);
               }
             });
           });
-          if (repeticoes_tratamento[i3].tratamentos.length != repeticoes_tratamento[0].tratamentos.length) {
+          if (repeticoes_tratamento[i3].tratamentos.length != repeticoes_tratamento[0]?.tratamentos.length) {
             responseIfError[Column] += `<li style="text-align:left"> A quantidade de tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não é igual aos tratamentos da repetição 1.</li><br>`;
           }
-          if (repeticoes_tratamento[0].tratamentos.length != validacao_nt_repeticoes.length) {
+          if (repeticoes_tratamento[0]?.tratamentos.length != validacao_nt_repeticoes.length) {
             responseIfError[Column] += `<li style="text-align:left"> Os tratamentos da repetição ${String(repeticoes_tratamento[i3].repeticao)} não coincidem com os tratamentos da repetição 1.</li><br>`;
           }
           validacao_nt_repeticoes = [];
@@ -780,7 +780,7 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
               // console.log
-              if (configModule.response[0].fields[sheet] == 'Nome') {
+              if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
                   name_anterior = data.spreadSheet[keySheet][sheet];
                   name_atual = data.spreadSheet[keySheet][sheet];
@@ -797,7 +797,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+              if (configModule.response[0]?.fields[sheet] == 'Repeticao') {
                 if (name_atual != '' && name_anterior != '') {
                   if (name_atual != name_anterior) {
                     countTrat = 1;
@@ -815,15 +815,15 @@ export class ImportController {
                 aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+              if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
                 aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+              if (configModule.response[0]?.fields[sheet] == 'Tratamento') {
                 aux.nt = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Bloco') {
+              if (configModule.response[0]?.fields[sheet] == 'Bloco') {
                 aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
               }
 
@@ -877,7 +877,7 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Nome') {
+              if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   const delineamento: any = await this.delineamentoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (delineamento.total > 0) {
@@ -892,7 +892,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+              if (configModule.response[0]?.fields[sheet] == 'Repeticao') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a repetição tem que ser um numero.</li><br>`;
@@ -919,7 +919,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+              if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</li><br>`;
@@ -935,7 +935,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+              if (configModule.response[0]?.fields[sheet] == 'Tratamento') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tratamento tem que ser um numero.</li><br>`;
@@ -979,7 +979,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Bloco') {
+              if (configModule.response[0]?.fields[sheet] == 'Bloco') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o bloco tem que ser um numero.</li><br>`;
@@ -1013,7 +1013,7 @@ export class ImportController {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
               // console.log
-              if (configModule.response[0].fields[sheet] == 'Nome') {
+              if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
                   name_anterior = data.spreadSheet[keySheet][sheet];
                   name_atual = data.spreadSheet[keySheet][sheet];
@@ -1030,7 +1030,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Repeticao') {
+              if (configModule.response[0]?.fields[sheet] == 'Repeticao') {
                 if (name_atual != '' && name_anterior != '') {
                   if (name_atual != name_anterior) {
                     countTrat = 1;
@@ -1048,15 +1048,15 @@ export class ImportController {
                 aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Sorteio') {
+              if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
                 aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tratamento') {
+              if (configModule.response[0]?.fields[sheet] == 'Tratamento') {
                 aux.nt = Number(data.spreadSheet[keySheet][sheet]);
               }
 
-              if (configModule.response[0].fields[sheet] == 'Bloco') {
+              if (configModule.response[0]?.fields[sheet] == 'Bloco') {
                 aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
               }
 
@@ -1097,7 +1097,7 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Genotipo') {
+              if (configModule.response[0]?.fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo genótipo é obrigatorio.</li><br>`;
                 } else {
@@ -1108,7 +1108,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Lote') {
+              if (configModule.response[0]?.fields[sheet] == 'Lote') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo Lote é obrigatorio.</li><br>`;
                 } else {
@@ -1116,7 +1116,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Volume') {
+              if (configModule.response[0]?.fields[sheet] == 'Volume') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo volume é obrigatorio.</li><br>`;
                 } else {
@@ -1135,27 +1135,27 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Genotipo') {
+              if (configModule.response[0]?.fields[sheet] == 'Genotipo') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   const geno = await this.genotipoController.getAll({ genotipo: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                   if (geno.total > 0) {
-                    this.aux.id_genotipo = geno.response[0].id;
+                    this.aux.id_genotipo = geno.response[0]?.id;
                   }
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Lote') {
+              if (configModule.response[0]?.fields[sheet] == 'Lote') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   const lote = await this.loteController.getAll({ name: data.spreadSheet[keySheet][sheet] });
                   if (lote.total > 0) {
                     this.aux.name = data.spreadSheet[keySheet][sheet];
-                    this.aux.id = lote.response[0].id;
+                    this.aux.id = lote.response[0]?.id;
                   }
                   this.aux.name = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Volume') {
+              if (configModule.response[0]?.fields[sheet] == 'Volume') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.volume = data.spreadSheet[keySheet][sheet];
                 }
@@ -1189,11 +1189,11 @@ export class ImportController {
       console.log('spreadsheet');
       console.log(spreadSheet);
       const configModule: object | any = await this.getAll(Number(moduleId));
-      configModule.response[0].fields.push('DT');
+      configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
-            if (!(spreadSheet[row][column].toUpperCase()).includes(configModule.response[0].fields[column].toUpperCase())) {
+            if (!(spreadSheet[row][column].toUpperCase()).includes(configModule.response[0]?.fields[column].toUpperCase())) {
               responseIfError[Number(column)] += `<li style="text-align:left"> A ${Number(column) + 1}º coluna da ${row}º linha está incorreta, a sequencia de colunas da planilha esta incorreta. </li> <br>`;
             }
           } else if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
@@ -1284,7 +1284,7 @@ export class ImportController {
             }
           } else if (spreadSheet[0][column].includes('DT')) {
             const local: any = await this.localController.getAll({ id_local_culture: this.aux.id_local_culture });
-            if (local.response[0].dt_import > spreadSheet[row][column]) {
+            if (local.response[0]?.dt_import > spreadSheet[row][column]) {
               responseIfError[Number(column)] = `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, essa informação é mais antiga do que a informação do software`;
             }
           }
@@ -1338,8 +1338,8 @@ export class ImportController {
               unityCultureDTO.created_by = Number(created_by);
               const localAlreadyExists = await this.localController.getAll({ id_local_culture: localCultureDTO.id_local_culture });
               if (localAlreadyExists.response?.length > 0) {
-                localCultureDTO.id = localAlreadyExists.response[0].id;
-                unityCultureDTO.id_local = localAlreadyExists.response[0].id;
+                localCultureDTO.id = localAlreadyExists.response[0]?.id;
+                unityCultureDTO.id_local = localAlreadyExists.response[0]?.id;
                 await this.localController.update(localCultureDTO);
                 const response = await this.unidadeCulturaController.create(unityCultureDTO);
               } else {
@@ -1378,19 +1378,19 @@ export class ImportController {
       for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
         Column = Number(sheet) + 1;
         if (keySheet != '0') {
-          if (configModule.response[0].fields[sheet] == 'Repeticao') {
+          if (configModule.response[0]?.fields[sheet] == 'Repeticao') {
             aux.repeticao = Number(data.spreadSheet[keySheet][sheet]);
           }
 
-          if (configModule.response[0].fields[sheet] == 'Sorteio') {
+          if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
             aux.sorteio = Number(data.spreadSheet[keySheet][sheet]);
           }
 
-          if (configModule.response[0].fields[sheet] == 'Tratamento') {
+          if (configModule.response[0]?.fields[sheet] == 'Tratamento') {
             aux.nt = Number(data.spreadSheet[keySheet][sheet]);
           }
 
-          if (configModule.response[0].fields[sheet] == 'Bloco') {
+          if (configModule.response[0]?.fields[sheet] == 'Bloco') {
             aux.bloco = Number(data.spreadSheet[keySheet][sheet]);
           }
 
@@ -1422,13 +1422,13 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Safra') {
+              if (configModule.response[0]?.fields[sheet] == 'Safra') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
                 } else {
                   const safra = await this.safraController.getAll({ id_safra: Number(data.safra) });
                   if (safra.total > 0) {
-                    if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0].safraName) {
+                    if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0]?.safraName) {
                       return 'A safra importada precisa ser igual a safra selecionada';
                     }
                   } else {
@@ -1437,7 +1437,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Cultura') {
+              if (configModule.response[0]?.fields[sheet] == 'Cultura') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</li><br>`;
                 } else {
@@ -1449,7 +1449,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'LocalPrep') {
+              if (configModule.response[0]?.fields[sheet] == 'LocalPrep') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</li><br>`;
                 } else {
@@ -1459,12 +1459,12 @@ export class ImportController {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                   } else {
                     local_preparo = 1;
-                    this.aux.local_preparo = local.response[0].id;
+                    this.aux.local_preparo = local.response[0]?.id;
                   }
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CodigoQuadra') {
+              if (configModule.response[0]?.fields[sheet] == 'CodigoQuadra') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</li><br>`;
                 } else {
@@ -1483,7 +1483,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'LargQ') {
+              if (configModule.response[0]?.fields[sheet] == 'LargQ') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a largq é obrigatorio.</li><br>`;
                 } else if (larg_q != '') {
@@ -1500,7 +1500,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CompP') {
+              if (configModule.response[0]?.fields[sheet] == 'CompP') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compp é obrigatorio.</li><br>`;
                 } else if (cod_quadra == cod_quadra_anterior) {
@@ -1515,7 +1515,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'LinhaP') {
+              if (configModule.response[0]?.fields[sheet] == 'LinhaP') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a linhap é obrigatorio.</li><br>`;
                 } else {
@@ -1523,7 +1523,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CompC') {
+              if (configModule.response[0]?.fields[sheet] == 'CompC') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compc é obrigatorio.</li><br>`;
                 } else {
@@ -1531,7 +1531,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Esquema') {
+              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
@@ -1542,7 +1542,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Divisor') {
+              if (configModule.response[0]?.fields[sheet] == 'Divisor') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a divisor é obrigatorio.</li><br>`;
                 } else if (cod_quadra == cod_quadra_anterior) {
@@ -1571,7 +1571,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Semente') {
+              if (configModule.response[0]?.fields[sheet] == 'Semente') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro é obrigatorio.</li><br>`;
                 } else if (data.spreadSheet[keySheet][sheet] <= 0) {
@@ -1579,7 +1579,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'T4I') {
+              if (configModule.response[0]?.fields[sheet] == 'T4I') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4i é obrigatorio.</li><br>`;
                 } else if (cod_quadra == cod_quadra_anterior) {
@@ -1602,7 +1602,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'T4F') {
+              if (configModule.response[0]?.fields[sheet] == 'T4F') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4f é obrigatorio.</li><br>`;
                 } else if (cod_quadra == cod_quadra_anterior) {
@@ -1626,7 +1626,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'DI') {
+              if (configModule.response[0]?.fields[sheet] == 'DI') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a di é obrigatorio.</li><br>`;
                 } else if (data.spreadSheet[keySheet][sheet] != 1) {
@@ -1634,7 +1634,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'DF') {
+              if (configModule.response[0]?.fields[sheet] == 'DF') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a df é obrigatorio.</li><br>`;
                 } else if (df == 0) {
@@ -1667,13 +1667,13 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'LocalPrep') {
+              if (configModule.response[0]?.fields[sheet] == 'LocalPrep') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   // this.aux.local_preparo = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CodigoQuadra') {
+              if (configModule.response[0]?.fields[sheet] == 'CodigoQuadra') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if ((this.aux.cod_quadra) && this.aux.cod_quadra != data.spreadSheet[keySheet][sheet]) {
                     this.aux.disparo_fixo = this.aux.t4_f;
@@ -1683,67 +1683,67 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'LargQ') {
+              if (configModule.response[0]?.fields[sheet] == 'LargQ') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.larg_q = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CompP') {
+              if (configModule.response[0]?.fields[sheet] == 'CompP') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.comp_p = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'LinhaP') {
+              if (configModule.response[0]?.fields[sheet] == 'LinhaP') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.linha_p = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CompC') {
+              if (configModule.response[0]?.fields[sheet] == 'CompC') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.comp_c = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Esquema') {
+              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.esquema = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Divisor') {
+              if (configModule.response[0]?.fields[sheet] == 'Divisor') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.divisor = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Semente') {
+              if (configModule.response[0]?.fields[sheet] == 'Semente') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.sem_metros = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'T4I') {
+              if (configModule.response[0]?.fields[sheet] == 'T4I') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.t4_i = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'T4F') {
+              if (configModule.response[0]?.fields[sheet] == 'T4F') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.t4_f = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'DI') {
+              if (configModule.response[0]?.fields[sheet] == 'DI') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.di = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'DF') {
+              if (configModule.response[0]?.fields[sheet] == 'DF') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.df = data.spreadSheet[keySheet][sheet];
                 }
@@ -1820,7 +1820,7 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Esquema') {
+              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
                 } else {
@@ -1834,7 +1834,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
+              if (configModule.response[0]?.fields[sheet] == 'Plantadeiras') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a plantadeira é obrigatorio.</li><br>`;
                 } else if (Number(data.spreadSheet[keySheet][sheet]) != 4 && Number(data.spreadSheet[keySheet][sheet]) != 8 && Number(data.spreadSheet[keySheet][sheet] != 12)) {
@@ -1842,7 +1842,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tiro') {
+              if (configModule.response[0]?.fields[sheet] == 'Tiro') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o tiro é obrigatorio.</li><br>`;
                 } else if (tiro == 0) {
@@ -1855,7 +1855,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Disparo') {
+              if (configModule.response[0]?.fields[sheet] == 'Disparo') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo disparos é obrigatorio.</li><br>`;
                 } else {
@@ -1870,7 +1870,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SL') {
+              if (configModule.response[0]?.fields[sheet] == 'SL') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
                 } else {
@@ -1887,7 +1887,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SC') {
+              if (configModule.response[0]?.fields[sheet] == 'SC') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sc é obrigatorio.</li><br>`;
                 } else {
@@ -1900,7 +1900,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SALOC') {
+              if (configModule.response[0]?.fields[sheet] == 'SALOC') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo saloc é obrigatorio.</li><br>`;
                 } else {
@@ -1913,19 +1913,19 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CJ') {
+              if (configModule.response[0]?.fields[sheet] == 'CJ') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cj é obrigatorio.</li><br>`;
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Dist') {
+              if (configModule.response[0]?.fields[sheet] == 'Dist') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo dist é obrigatorio.</li><br>`;
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'ST') {
+              if (configModule.response[0]?.fields[sheet] == 'ST') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a st é obrigatorio.</li><br>`;
                 } else {
@@ -1933,7 +1933,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SPC') {
+              if (configModule.response[0]?.fields[sheet] == 'SPC') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a spc é obrigatorio.</li><br>`;
                 } else {
@@ -1941,7 +1941,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SColheita') {
+              if (configModule.response[0]?.fields[sheet] == 'SColheita') {
                 if (String(data.spreadSheet[keySheet][sheet]) == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a scolheita é obrigatorio.</li><br>`;
                 } else {
@@ -1954,7 +1954,7 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'TipoParcela') {
+              if (configModule.response[0]?.fields[sheet] == 'TipoParcela') {
                 if (data.spreadSheet[keySheet][sheet] == '' || data.spreadSheet[keySheet][sheet] == null) {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tipo parcela é obrigatorio.</li><br>`;
                 } else if ((data.spreadSheet[keySheet][sheet] != 'P' && data.spreadSheet[keySheet][sheet] != 'p') && (data.spreadSheet[keySheet][sheet] != 'V' && data.spreadSheet[keySheet][sheet] != 'v')) {
@@ -1976,12 +1976,12 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              if (configModule.response[0].fields[sheet] == 'Esquema') {
+              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if ((this.aux.esquema) && this.aux.esquema != data.spreadSheet[keySheet][sheet]) {
                     const layoutQuadra: any = await this.layoutQuadraController.getAll({ status: 1, id_culture: data.id_culture, esquema: data.spreadSheet[keySheet][sheet] });
                     if (layoutQuadra.total > 0) {
-                      this.aux.id_layout_bd = layoutQuadra.response[0].id;
+                      this.aux.id_layout_bd = layoutQuadra.response[0]?.id;
                     } else {
                       delete this.aux.id_layout_bd;
                     }
@@ -1997,73 +1997,73 @@ export class ImportController {
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Plantadeiras') {
+              if (configModule.response[0]?.fields[sheet] == 'Plantadeiras') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.plantadeira = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Tiro') {
+              if (configModule.response[0]?.fields[sheet] == 'Tiro') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.tiro = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Disparo') {
+              if (configModule.response[0]?.fields[sheet] == 'Disparo') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.disparo = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SL') {
+              if (configModule.response[0]?.fields[sheet] == 'SL') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.sl = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SC') {
+              if (configModule.response[0]?.fields[sheet] == 'SC') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.sc = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SALOC') {
+              if (configModule.response[0]?.fields[sheet] == 'SALOC') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.s_aloc = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'CJ') {
+              if (configModule.response[0]?.fields[sheet] == 'CJ') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.cj = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'Dist') {
+              if (configModule.response[0]?.fields[sheet] == 'Dist') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.dist = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'ST') {
+              if (configModule.response[0]?.fields[sheet] == 'ST') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.st = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SPC') {
+              if (configModule.response[0]?.fields[sheet] == 'SPC') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.spc = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'SColheita') {
+              if (configModule.response[0]?.fields[sheet] == 'SColheita') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.scolheita = data.spreadSheet[keySheet][sheet];
                 }
               }
 
-              if (configModule.response[0].fields[sheet] == 'TipoParcela') {
+              if (configModule.response[0]?.fields[sheet] == 'TipoParcela') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   this.aux.tipo_parcela = data.spreadSheet[keySheet][sheet];
                 }

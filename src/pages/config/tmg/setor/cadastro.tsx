@@ -51,7 +51,7 @@ export default function Safra() {
         name: capitalize(formik.values.name),
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Setor cadastrado com sucesso!');
           router.back();
         } else {

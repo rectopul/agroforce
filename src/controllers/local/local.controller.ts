@@ -113,7 +113,7 @@ export class LocalController {
     try {
       const response = await this.localRepository.create(data);
       if (response) {
-        return { status: 201, response, message: 'Local criado' };
+        return { status: 200, response, message: 'Local criado' };
       }
       return { status: 400, message: 'Erro ao criar local' };
     } catch (error: any) {

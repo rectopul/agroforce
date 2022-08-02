@@ -18,10 +18,10 @@ import {
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ICreateTypeAssay {
-    safra: string;
-    seeds: number;
-    id_type_assay: number;
-    created_by: number;
+  safra: string;
+  seeds: number;
+  id_type_assay: number;
+  created_by: number;
 }
 
 export default function Cadastro({ safra, id_type_assay }: any) {
@@ -60,7 +60,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
         seeds: Number(values.seeds),
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Envelope cadastrado com sucesso!');
           router.back();
         } else {

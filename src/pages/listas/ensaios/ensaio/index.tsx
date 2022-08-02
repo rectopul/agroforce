@@ -22,6 +22,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
+import Swal from 'sweetalert2';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../../services';
@@ -30,6 +31,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { IReturnObject } from '../../../../interfaces/shared/Import.interface';
 
 export default function TipoEnsaio({
   allAssay,
@@ -226,8 +228,15 @@ export default function TipoEnsaio({
   }
 
   async function deleteItem(id: number) {
-    await assayListService.deleted(id);
-    router.reload();
+    const { status, message } = await assayListService.deleted(id);
+    if (status === 200) {
+      router.reload();
+    } else {
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    }
   }
 
   function statusHeaderFactory() {
@@ -400,7 +409,7 @@ export default function TipoEnsaio({
             newItem.tecnologia = newItem.tecnologia.name;
           }
           if (newItem.genotype_treatment) {
-            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
+            newItem.genotype_treatment = newItem.genotype_treatment[0]?.treatments_number;
           }
           return newItem;
         });
@@ -441,7 +450,6 @@ export default function TipoEnsaio({
     }
     await assayListService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
-        console.log('aqui');
         setAssayList(response);
       }
     });
@@ -693,7 +701,7 @@ export default function TipoEnsaio({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';

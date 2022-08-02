@@ -144,16 +144,16 @@ export default function Listagem({
       data.status = 0;
     }
 
-    
+
     await quadraService.getAll(parametersFilter).then((response) => {
       if (response.total > 0) {
         let statusEdit: number = 0;
-        if(response.response[response.total - 1].status === 0){
+        if (response.response[response.total - 1].status === 0) {
           statusEdit = 1;
         } else {
           statusEdit = 0;
         }
-        let idEdit:number = response.response[response.total - 1].id;
+        let idEdit: number = response.response[response.total - 1].id;
         let quadraEdit = quadraService.update({ id: idEdit, status: statusEdit });
       }
     });
@@ -726,7 +726,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page ?? 15;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 15;
 
   const { token } = req.cookies;
   const cultureId: number = Number(req.cookies.cultureId);

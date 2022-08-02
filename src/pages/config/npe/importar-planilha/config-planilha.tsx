@@ -21,7 +21,7 @@ export default function ImportacaoPlanilha({ config }: any) {
 
       <ImportPlanilha
         data={data}
-        configSalva={config[0].fields}
+        configSalva={config[0]?.fields}
         moduleId={14}
       />
     </>

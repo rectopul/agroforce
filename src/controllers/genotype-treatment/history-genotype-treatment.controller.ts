@@ -8,7 +8,7 @@ export class HistoryGenotypeTreatmentController {
     try {
       await this.historyGenotypeTreatmentRepository.create(data);
 
-      return { status: 201, message: 'Tratamentos do genótipo cadastrada' };
+      return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
     } catch (error: any) {
       handleError('Historico tratamentos do genótipo controller', 'Create', error.message);
       throw new Error('[Controller] - Create Historico tratamentos do genótipo erro');

@@ -115,7 +115,7 @@ export class ImportExperimentController {
                   safraName: spreadSheet[row][0],
                 });
                 const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
-                  if (item.year === responseSafra[0].year) return true;
+                  if (item?.year === responseSafra[0]?.year) return true;
                   return false;
                 });
                 if (!cultureUnityValidate?.includes(true)) {
@@ -270,7 +270,7 @@ export class ImportExperimentController {
               });
               const comments = spreadSheet[row][14].substr(0, 255) ? spreadSheet[row][14].substr(0, 255) : '';
               const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
-              await experimentController.create(
+              const { status }: IReturnObject = await experimentController.create(
                 {
                   idAssayList: assayList[0]?.id,
                   idLocal: local[0]?.id,
@@ -288,6 +288,12 @@ export class ImportExperimentController {
                   created_by: createdBy,
                 },
               );
+              if (status === 200) {
+                await assayListController.update({
+                  id: assayList[0]?.id,
+                  status: 'UTILIZADO',
+                });
+              }
             }
           }
           return { status: 200, message: 'Experimento importado com sucesso' };

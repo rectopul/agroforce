@@ -27,7 +27,7 @@ export class GroupController {
 
       await this.groupRepository.create(data);
 
-      return { status: 201, message: 'grupo cadastrado' };
+      return { status: 200, message: 'grupo cadastrado' };
     } catch (error: any) {
       handleError('Grupo controller', 'Create', error.message);
       throw new Error('[Controller] - Create Grupo erro');

@@ -77,7 +77,7 @@ export class DisparosController {
   async create(data: any) {
     try {
       const response = await this.disparoRepository.create(data);
-      return { status: 201, message: 'Disparo cadastrado' };
+      return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
       handleError('Disparos controller', 'Create', error.message);
       throw new Error('[Controller] - Create Disparos erro');

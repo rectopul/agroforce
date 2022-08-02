@@ -11,6 +11,7 @@ export class ExperimentRepository {
       where: { id },
       select: {
         id: true,
+        idAssayList: true,
         density: true,
         period: true,
         repetitionsNumber: true,

@@ -41,13 +41,13 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         }
       });
 
-      userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0].cultureId;
+      userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
       safras.safras = await safraController.getAll({
         id_culture: userCulture.cultura_selecionada, filterStatus: 1,
       });
       if (safras.safras.total > 0) {
         safras.safras = safras.safras.response;
-        safras.safra_selecionada = safras.safras[0].id || 0;
+        safras.safra_selecionada = safras.safras[0]?.id || 0;
       }
 
       preferences.usuario = await PreferencesControllers.getAll({

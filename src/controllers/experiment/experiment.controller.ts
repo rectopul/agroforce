@@ -1,9 +1,12 @@
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { AssayListController } from '../assay-list/assay-list.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
+
+  assayListController = new AssayListController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -169,7 +172,7 @@ export class ExperimentController {
     try {
       const response = await this.experimentRepository.create(data);
       if (response) {
-        return { status: 201, response, message: 'Experimento cadastrado' };
+        return { status: 200, response, message: 'Experimento cadastrado' };
       }
       return { status: 400, message: 'Experimento não cadastrado' };
     } catch (error: any) {
@@ -197,13 +200,13 @@ export class ExperimentController {
 
   async delete(id: number) {
     try {
-      const assayListExist = await this.getOne(Number(id));
+      const { response: experimentExist } = await this.getOne(Number(id));
 
-      if (!assayListExist) return { status: 404, message: 'Experimento não encontrado' };
+      if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
 
       const response = await this.experimentRepository.delete(Number(id));
       if (response) {
-        return { status: 201, message: 'Experimento excluído' };
+        return { status: 200, message: 'Experimento excluído' };
       }
       return { status: 404, message: 'Experimento não excluído' };
     } catch (error: any) {

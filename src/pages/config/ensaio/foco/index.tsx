@@ -670,7 +670,7 @@ export default function Listagem({
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
 
   const { token } = req.cookies;
   const idSafra = req.cookies.safraId;
