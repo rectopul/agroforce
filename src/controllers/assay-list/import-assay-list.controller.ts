@@ -135,6 +135,10 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
+              if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+              }
               const { response }: IReturnObject = await tecnologiaController.getAll({
                 cod_tec: String(spreadSheet[row][column]),
                 id_culture: idCulture,
@@ -316,7 +320,7 @@ export class ImportAssayListController {
                   period: spreadSheet[row][9],
                   protocol_name: spreadSheet[row][0],
                   bgm: Number(spreadSheet[row][7]),
-                  project: spreadSheet[row][8],
+                  project: String(spreadSheet[row][8]),
                   created_by: createdBy,
                 });
                 await genotypeTreatmentController.create({
@@ -340,7 +344,7 @@ export class ImportAssayListController {
                   period: spreadSheet[row][9],
                   protocol_name: spreadSheet[row][0],
                   bgm: Number(spreadSheet[row][7]),
-                  project: spreadSheet[row][8],
+                  project: String(spreadSheet[row][8]),
                   created_by: createdBy,
                 });
                 await genotypeTreatmentController.create({
