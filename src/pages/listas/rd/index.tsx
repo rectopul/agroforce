@@ -629,7 +629,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
   let uploadInProcess: number = 0;
-  allLogs.map((item: any) => (item.status === 2 ? uploadInProcess = 1 : false));
+  allLogs?.map((item: any) => (item.status === 2 ? uploadInProcess = 1 : false));
   return {
     props: {
       allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,

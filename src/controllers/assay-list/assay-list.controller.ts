@@ -1,7 +1,7 @@
-import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
-import { AssayListRepository } from '../repository/assay-list.repository';
-import { GenotypeTreatmentController } from './genotype-treatment/genotype-treatment.controller';
+import handleError from '../../shared/utils/handleError';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { AssayListRepository } from '../../repository/assay-list.repository';
+import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
@@ -117,9 +117,9 @@ export class AssayListController {
 
       if (assayListAlreadyExist) return { status: 409, message: 'Lista de ensaio já cadastrados' };
 
-      await this.assayListRepository.create(data);
+      const response = await this.assayListRepository.create(data);
 
-      return { status: 201, message: 'Lista de ensaio cadastrada' };
+      return { status: 200, response, message: 'Lista de ensaio cadastrada' };
     } catch (error: any) {
       handleError('Lista de ensaio controller', 'Create', error.message);
       throw new Error('[Controller] - Create Lista de ensaio erro');
@@ -132,9 +132,9 @@ export class AssayListController {
 
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
 
-      await this.assayListRepository.update(data.id, data);
+      const response = await this.assayListRepository.update(data.id, data);
 
-      return { status: 200, message: 'Lista de ensaio atualizado' };
+      return { status: 200, response, message: 'Lista de ensaio atualizado' };
     } catch (error: any) {
       handleError('Lista de ensaio controller', 'Update', error.message);
       throw new Error('[Controller] - Update Lista de ensaio erro');
@@ -151,7 +151,7 @@ export class AssayListController {
 
       if (status === 200) {
         await this.assayListRepository.delete(Number(id));
-        return { status: 201, message: 'Lista de ensaio excluída' };
+        return { status: 200, message: 'Lista de ensaio excluída' };
       }
       return { status: 404, message: 'Lista de ensaio não excluída' };
     } catch (error: any) {

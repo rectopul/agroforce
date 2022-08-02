@@ -14,7 +14,7 @@ import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.in
 import { SafraController } from '../safra.controller';
 import { LocalController } from '../local/local.controller';
 import { DelineamentoController } from '../delineamento.controller';
-import { AssayListController } from '../assay-list.controller';
+import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 
 export class ImportExperimentController {

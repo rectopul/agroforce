@@ -508,8 +508,8 @@ model assay_list {
   protocol_name String
   bgm           Int
   project       String
-  status        String
-  comments      String
+  status        String    @default("IMPORTADO")
+  comments      String?
   created_by    Int
   created_at    DateTime? @default(now())
 
@@ -522,13 +522,13 @@ model assay_list {
 }
 
 model genotype_treatment {
-  id                Int    @id @default(autoincrement())
+  id                Int     @id @default(autoincrement())
   id_safra          Int
   id_assay_list     Int
   id_genotipo       Int
   id_lote           Int
   treatments_number Int
-  comments          String
+  comments          String?
   status            String
   created_by        Int
 

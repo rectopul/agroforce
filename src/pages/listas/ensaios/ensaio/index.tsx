@@ -227,6 +227,7 @@ export default function TipoEnsaio({
 
   async function deleteItem(id: number) {
     await assayListService.deleted(id);
+    router.reload();
   }
 
   function statusHeaderFactory() {
@@ -411,6 +412,7 @@ export default function TipoEnsaio({
     }
     await assayListService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
+        console.log('aqui');
         setAssayList(response);
       }
     });
