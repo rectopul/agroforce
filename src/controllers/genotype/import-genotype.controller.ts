@@ -270,7 +270,7 @@ export class ImportGenotypeController {
                 const geno: any = await genotipoController.getAll({
                   id_dados: this.aux.id_dados_geno,
                 });
-                if (geno.response[0].dt_import > spreadSheet[row][column]) {
+                if (geno.response[0]?.dt_import > spreadSheet[row][column]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
