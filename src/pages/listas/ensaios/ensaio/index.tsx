@@ -380,7 +380,7 @@ export default function TipoEnsaio({
             newItem.tecnologia = newItem.tecnologia.name;
           }
           if (newItem.genotype_treatment) {
-            newItem.genotype_treatment = newItem.genotype_treatment[0].treatments_number;
+            newItem.genotype_treatment = newItem.genotype_treatment[0]?.treatments_number;
           }
           return newItem;
         });
@@ -672,7 +672,7 @@ export default function TipoEnsaio({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
