@@ -54,7 +54,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
         volume: formik.values.volume,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Lote cadastrado com sucesso!');
           router.back();
         } else {

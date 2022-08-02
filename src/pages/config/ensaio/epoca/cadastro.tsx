@@ -49,7 +49,7 @@ export default function NovoLocal() {
         name: capitalize(values.name),
         created_by: Number(userLogado.id),
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Época cadastrada com sucesso!');
           router.push('/config/ensaio/epoca');
         } else {

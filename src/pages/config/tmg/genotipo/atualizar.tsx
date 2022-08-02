@@ -868,6 +868,7 @@ export default function Atualizargenotipo({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
+  // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
 
   const { token } = context.req.cookies;

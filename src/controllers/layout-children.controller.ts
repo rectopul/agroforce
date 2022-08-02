@@ -81,7 +81,7 @@ export class LayoutChildrenController {
   async create(data: any) {
     try {
       const response = await this.disparoRepository.create(data);
-      return { status: 201, message: 'Disparo cadastrado' };
+      return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
       handleError('Layout children controller', 'Creat', error.message);
       throw new Error('[Controller] - Creat Layout children erro');

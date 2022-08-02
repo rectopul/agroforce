@@ -51,7 +51,7 @@ export default function Cadastro() {
         status: formik.values.status,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Genótipo cadastrado com sucesso!');
           router.back();
         } else {

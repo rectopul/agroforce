@@ -101,7 +101,7 @@ export class QuadraController {
   async create(data: any) {
     try {
       const response = await this.quadraRepository.create(data);
-      return { status: 201, message: 'Genealogia cadastrada', response };
+      return { status: 200, message: 'Genealogia cadastrada', response };
     } catch (error: any) {
       handleError('Quadra Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Quadra erro');

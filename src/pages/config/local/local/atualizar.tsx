@@ -645,6 +645,7 @@ export default function AtualizarLocal({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
   const PreferencesControllers = new UserPreferenceController();
+  // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
 
   const { token } = req.cookies;

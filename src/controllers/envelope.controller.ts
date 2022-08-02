@@ -27,7 +27,7 @@ export class EnvelopeController {
 
       await this.envelopeRepository.create(data);
 
-      return { status: 201, message: 'envelope cadastrado' };
+      return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
       handleError('Envelope controller', 'Create', error.message);
       throw new Error('[Controller] - Create Envelope erro');

@@ -28,7 +28,7 @@ export class LogImportController {
 
       const response = await this.logImportRepository.create(data);
 
-      return { status: 201, response, message: 'Log Import cadastrado' };
+      return { status: 200, response, message: 'Log Import cadastrado' };
     } catch (error: any) {
       handleError('Log Import controller', 'Create', error.message);
       throw new Error('[Controller] - Create Log Import erro');

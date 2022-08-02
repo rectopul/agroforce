@@ -156,7 +156,7 @@ export class GenotypeTreatmentController {
     try {
       await this.genotypeTreatmentRepository.create(data);
 
-      return { status: 201, message: 'Tratamentos do genótipo cadastrada' };
+      return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'Create', error.message);
       throw new Error('[Controller] - Create Tratamentos do genótipo erro');

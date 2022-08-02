@@ -122,7 +122,7 @@ export class AssayListController {
 
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
 
-      const response = await this.assayListRepository.update(data.id, data);
+      const response = await this.assayListRepository.update(Number(data.id), data);
 
       return { status: 200, response, message: 'Lista de ensaio atualizado' };
     } catch (error: any) {
@@ -133,9 +133,10 @@ export class AssayListController {
 
   async delete(id: number) {
     try {
-      const assayListExist = await this.getOne(Number(id));
+      const { status: statusAssay, response } = await this.getOne(Number(id));
 
-      if (!assayListExist) return { status: 404, message: 'Lista de ensaio não encontrada' };
+      if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
+      if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
       const { status } = await this.genotypeTreatmentController.deleteAll();
 
@@ -143,7 +144,7 @@ export class AssayListController {
         await this.assayListRepository.delete(Number(id));
         return { status: 200, message: 'Lista de ensaio excluída' };
       }
-      return { status: 404, message: 'Lista de ensaio não excluída' };
+      return { status: 400, message: 'Lista de ensaio não excluída' };
     } catch (error: any) {
       handleError('Lista de ensaio controller', 'Delete', error.message);
       throw new Error('[Controller] - Delete Lista de ensaio erro');

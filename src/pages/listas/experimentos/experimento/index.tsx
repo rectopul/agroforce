@@ -263,7 +263,15 @@ export default function Listagem({
   }
 
   async function deleteItem(id: number) {
-    await experimentService.deleted(id);
+    const { status, message } = await await experimentService.deleted(id);
+    if (status === 200) {
+      router.reload();
+    } else {
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    }
   }
 
   function statusHeaderFactory() {

@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         bloco,
         created_by,
       });
-      res.status(201).json(resultPost);
+      res.status(200).json(resultPost);
       break;
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`);

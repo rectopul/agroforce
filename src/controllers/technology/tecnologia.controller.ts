@@ -86,7 +86,7 @@ export class TecnologiaController {
     try {
       const response = await this.tecnologiaRepository.create(data);
       if (response) {
-        return { status: 201, message: 'Tecnologia cadastrada' };
+        return { status: 200, message: 'Tecnologia cadastrada' };
       }
       return { status: 400, message: 'Erro ao cadastrar tecnologia' };
     } catch (error: any) {

@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     case 'DELETE': {
       const resultDelete = await assayListController.delete(req.body);
-      res.status(resultDelete.status).json(resultDelete);
+      res.status(200).json(resultDelete);
       break;
     }
     default:

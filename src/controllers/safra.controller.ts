@@ -121,7 +121,7 @@ export class SafraController {
 
       await this.safraRepository.create(data);
 
-      return { status: 201, message: 'Safra cadastrada' };
+      return { status: 200, message: 'Safra cadastrada' };
     } catch (error: any) {
       handleError('Safra controller', 'Create', error.message);
       throw new Error('[Controller] - Create Safra erro');

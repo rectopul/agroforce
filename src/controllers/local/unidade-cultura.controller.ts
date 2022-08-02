@@ -115,7 +115,7 @@ export class UnidadeCulturaController {
 
       await this.unidadeCulturaRepository.create(data);
 
-      return { status: 201, message: 'Unidade de cultura cadastrada' };
+      return { status: 200, message: 'Unidade de cultura cadastrada' };
     } catch (error: any) {
       handleError('Unidade cultura controller', 'Create', error.message);
       throw new Error('[Controller] - Create Unidade Cultura erro');

@@ -12,7 +12,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     case 'POST': {
       const responsePost = await envelopeController.create(req.body);
-      res.status(201).json(responsePost);
+      res.status(200).json(responsePost);
       break;
     }
     case 'PUT': {
