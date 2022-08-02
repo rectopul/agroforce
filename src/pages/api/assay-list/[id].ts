@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { AssayListController } from '../../../controllers/assay-list.controller';
+import { AssayListController } from '../../../controllers/assay-list/assay-list.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
