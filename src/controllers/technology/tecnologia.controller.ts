@@ -6,8 +6,6 @@ export class TecnologiaController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
-    //console.log("tecnologia");
-    //console.log(options);
     try {
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
@@ -26,7 +24,10 @@ export class TecnologiaController {
       }
 
       const select = {
-        id: true, name: true, desc: true, cod_tec: true,
+        id: true,
+        name: true,
+        desc: true,
+        cod_tec: true,
       };
 
       if (options.id_culture) {
@@ -54,9 +55,6 @@ export class TecnologiaController {
         skip,
         orderBy,
       );
-
-      //console.log("response - tecnologia");
-      //console.log(response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
@@ -86,8 +84,6 @@ export class TecnologiaController {
 
   async create(data: object | any) {
     try {
-      console.log('data');
-      console.log(data);
       const response = await this.tecnologiaRepository.create(data);
       if (response) {
         return { status: 201, message: 'Tecnologia cadastrada' };
