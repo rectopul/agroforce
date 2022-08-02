@@ -237,29 +237,58 @@ export default function TipoEnsaio({
       sorting: false,
       searchable: false,
       render: (rowData: IAssayList) => (
-        <div className="h-10 flex">
-          <div className="h-10">
-            <Button
-              icon={<BiEdit size={16} />}
-              title={`Atualizar ${rowData.gli}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
+        !rowData.experiment.length ? (
+          <div className="h-10 flex">
+            <div className="h-10">
+              <Button
+                icon={<BiEdit size={16} />}
+                title={`Atualizar ${rowData.gli}`}
+                onClick={() => {
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  setCookies('filterBeforeEdit', filtersParams);
+                  router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+            <div>
+              <Button
+                icon={<BsTrashFill size={16} />}
+                onClick={() => deleteItem(rowData.id)}
+                bgColor="bg-red-600"
+                textColor="white"
+              />
+            </div>
           </div>
-          <div>
-            <Button
-              icon={<BsTrashFill size={16} />}
-              onClick={() => deleteItem(rowData.id)}
-              bgColor="bg-red-600"
-              textColor="white"
-            />
+        ) : (
+          <div className="h-10 flex">
+            <div className="h-10">
+              <Button
+                icon={<BiEdit size={16} />}
+                title={`Atualizar ${rowData.gli}`}
+                onClick={() => {
+                  setCookies('pageBeforeEdit', currentPage?.toString());
+                  setCookies('filterBeforeEdit', filtersParams);
+                  router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+            <div>
+              <Button
+                icon={<BsTrashFill size={16} />}
+                title="Ensaio já associado a um experimento"
+                disabled
+                onClick={() => deleteItem(rowData.id)}
+                bgColor="bg-gray-600"
+                textColor="white"
+              />
+            </div>
           </div>
-        </div>
+        )
+
       ),
     };
   }

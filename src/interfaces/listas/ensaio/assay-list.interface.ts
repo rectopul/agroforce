@@ -6,6 +6,7 @@ export interface IAssayList {
   foco: object | any
   type_assay: object | any
   tecnologia: object | any
+  experiment: object | any
   gli: string
   period: number
   protocol_name: string

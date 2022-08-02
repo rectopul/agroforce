@@ -44,6 +44,7 @@ export class AssayListController {
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true } },
         genotype_treatment: { select: { treatments_number: true } },
+        experiment: true,
         gli: true,
         period: true,
         protocol_name: true,
