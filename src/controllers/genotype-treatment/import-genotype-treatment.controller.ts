@@ -9,7 +9,7 @@ import {
   responseGenericFactory,
   responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
-import { AssayListController } from '../assay-list.controller';
+import { AssayListController } from '../assay-list/assay-list.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { LoteController } from '../lote.controller';
 import { GenotypeTreatmentController } from './genotype-treatment.controller';
