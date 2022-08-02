@@ -23,7 +23,7 @@ export class LoteController {
     try {
       const response = await this.loteRepository.create(data);
       if (response) {
-        return { status: 201, response, message: 'Lote cadastrado' };
+        return { status: 200, response, message: 'Lote cadastrado' };
       }
       return { status: 400, message: 'Lote não cadastrado' };
     } catch (error: any) {
@@ -40,7 +40,7 @@ export class LoteController {
 
       const response = await this.loteRepository.update(data.id, data);
       if (response) {
-        return { status: 201, response, message: 'Lote atualizado' };
+        return { status: 200, response, message: 'Lote atualizado' };
       }
       return { status: 400, message: 'Lote não atualizado' };
     } catch (error: any) {

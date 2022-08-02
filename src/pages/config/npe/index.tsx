@@ -728,7 +728,7 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0].itens_per_page;
+  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
 
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;

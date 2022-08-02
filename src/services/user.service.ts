@@ -53,11 +53,11 @@ function logout() {
 
 async function logoutSign(login: any, cultures: object | any) {
   const user = await userService.getAll({ login, paramSelect: ['password', 'id'] });
-  userPermissionService.update({ userId: user.response[0].id });
-  userPermissionService.update({ cultureId: cultures.selecionada, status: 1, idUser: user.response[0].id });
+  userPermissionService.update({ userId: user.response[0]?.id });
+  userPermissionService.update({ cultureId: cultures.selecionada, status: 1, idUser: user.response[0]?.id });
   localStorage.removeItem('user');
   userSubject.next(null);
-  const singIn = await userService.login(login, functionsUtils.Crypto(user.response[0].password, 'decipher'));
+  const singIn = await userService.login(login, functionsUtils.Crypto(user.response[0]?.password, 'decipher'));
   if (singIn) {
     Router.push('/');
   }

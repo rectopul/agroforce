@@ -101,7 +101,7 @@ export default function Safra() {
         status: formik.values.status,
         created_by: Number(userLogado.id),
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Safra cadastrada com sucesso!');
           router.back();
         } else {

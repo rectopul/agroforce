@@ -70,7 +70,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
         bloco: values.bloco,
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire({
             title: 'Cadastrado realizado com sucesso!',
             text: 'Sequência de delineamento cadastrado!',

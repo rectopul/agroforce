@@ -148,7 +148,7 @@ export class GenotipoController {
   async create(data: any) {
     try {
       const response = await this.genotipoRepository.create(data);
-      return { status: 201, message: 'Genealogia cadastrada', response };
+      return { status: 200, message: 'Genealogia cadastrada', response };
     } catch (error: any) {
       handleError('Genotipo Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Genotipo erro');

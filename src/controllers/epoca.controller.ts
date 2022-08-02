@@ -119,7 +119,7 @@ export class EpocaController {
 
       await this.epocaRepository.create(data);
 
-      return { status: 201, message: 'Época cadastrada com sucesso!' };
+      return { status: 200, message: 'Época cadastrada com sucesso!' };
     } catch (err) {
       return { status: 404, message: 'Erro no cadastrado' };
     }

@@ -24,12 +24,12 @@ export class ImportLocalController {
     const responseIfError: any = [];
     try {
       const configModule: object | any = await importController.getAll(4);
-      configModule.response[0].fields.push('DT');
+      configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
             if (!(spreadSheet[row][column].toUpperCase())
-              .includes(configModule.response[0].fields[column].toUpperCase())) {
+              .includes(configModule.response[0]?.fields[column].toUpperCase())) {
               responseIfError[Number(column)]
                 += responseGenericFactory(
                   (Number(column) + 1),
@@ -258,8 +258,8 @@ export class ImportLocalController {
                 { id_local_culture: localCultureDTO.id_local_culture },
               );
               if (localAlreadyExists.response?.length > 0) {
-                localCultureDTO.id = localAlreadyExists.response[0].id;
-                unityCultureDTO.id_local = localAlreadyExists.response[0].id;
+                localCultureDTO.id = localAlreadyExists.response[0]?.id;
+                unityCultureDTO.id_local = localAlreadyExists.response[0]?.id;
                 await localController.update(localCultureDTO);
                 await unidadeCulturaController.create(unityCultureDTO);
               } else {

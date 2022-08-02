@@ -140,7 +140,7 @@ export class CulturaController {
 
       await this.culturaRepository.create(data);
 
-      return { status: 201, message: 'Cultura cadastrada' };
+      return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
       return { status: 404, message: 'Cultura não cadastrada' };
     }

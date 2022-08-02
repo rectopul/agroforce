@@ -19,10 +19,10 @@ import {
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ICreateFoco {
-	safra: string;
-	group: number;
-	id_foco: number;
-	created_by: number;
+  safra: string;
+  group: number;
+  id_foco: number;
+  created_by: number;
 }
 
 export default function Cadastro({ safra, id_foco }: any) {
@@ -61,7 +61,7 @@ export default function Cadastro({ safra, id_foco }: any) {
         group: Number(values.group),
         created_by: formik.values.created_by,
       }).then((response) => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           Swal.fire('Grupo cadastrado com sucesso!');
           router.back();
         } else {
