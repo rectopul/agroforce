@@ -25,7 +25,7 @@ interface ICreateFoco {
 	created_by: number;
 }
 
-export default function Cadastro({ grupo }: any) {
+export default function Cadastro({ grupo, safra }: any) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -45,8 +45,8 @@ export default function Cadastro({ grupo }: any) {
 
   const formik = useFormik<any>({
     initialValues: {
-      id_foco: Number(grupo.foco.id),
-      safra: grupo.safra.id,
+      id_foco: Number(grupo.id_foco),
+      safra: grupo.id_safra,
       group: grupo.group,
       created_by: userLogado.id,
     },
@@ -120,7 +120,7 @@ export default function Cadastro({ grupo }: any) {
                 type="text"
                 disabled
                 max="50"
-                value={grupo.safra.safraName}
+                value={safra.safraName}
               />
             </div>
             <div className="w-full h-10">
@@ -199,9 +199,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 
   const grupo = await grupos.json();
 
+  const baseUrlShow2 = `${publicRuntimeConfig.apiUrl}/`;
+  let id_safra = grupo.id_safra;
+
+  const safras = await fetch(`${baseUrlShow2}safra/${id_safra}`, requestOptions);
+  const safra = await safras.json();
+
   return {
     props: {
       grupo,
+      safra,
     },
   };
 };
