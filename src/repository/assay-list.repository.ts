@@ -18,6 +18,7 @@ export class AssayListRepository {
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true } },
+        experiment: true,
         gli: true,
         period: true,
         protocol_name: true,

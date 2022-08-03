@@ -31,7 +31,6 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { IReturnObject } from '../../../../interfaces/shared/Import.interface';
 
 export default function TipoEnsaio({
   allAssay,
