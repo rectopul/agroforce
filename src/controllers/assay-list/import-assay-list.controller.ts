@@ -208,7 +208,8 @@ export class ImportAssayListController {
                     );
                 }
               } else if (
-                (Number(spreadSheet[row][column] - 1) !== spreadSheet[Number(row) - 1][column])
+                (Number(spreadSheet[row][column] - 1) !== spreadSheet[Number(row) - 1][column]
+                && spreadSheet[Number(row) - 1][4] === spreadSheet[row][4])
               ) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
@@ -283,7 +284,7 @@ export class ImportAssayListController {
         let productivity: number = 0;
         let advance: number = 0;
         let register: number = 0;
-
+        let verifyToDelete: boolean = false;
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
@@ -309,6 +310,7 @@ export class ImportAssayListController {
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
               });
+
               let savedAssayList: any;
               if (assayList.length === 0) {
                 savedAssayList = await assayListController.create({
@@ -334,6 +336,9 @@ export class ImportAssayListController {
                   created_by: createdBy,
                 });
               } else {
+                if (Number(spreadSheet[row][9]) === 1) {
+                  verifyToDelete = true;
+                }
                 savedAssayList = await assayListController.update({
                   id: assayList[0]?.id,
                   id_safra: idSafra,
@@ -347,6 +352,10 @@ export class ImportAssayListController {
                   project: String(spreadSheet[row][8]),
                   created_by: createdBy,
                 });
+                if (verifyToDelete) {
+                  await genotypeTreatmentController.deleteAll(Number(savedAssayList.response?.id));
+                  verifyToDelete = false;
+                }
                 await genotypeTreatmentController.create({
                   id_safra: idSafra,
                   id_assay_list: savedAssayList.response?.id,

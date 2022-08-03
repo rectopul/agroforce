@@ -205,6 +205,16 @@ export class ExperimentController {
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
 
       const response = await this.experimentRepository.delete(Number(id));
+      const {
+        response: assayList,
+      } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
+      if (!assayList?.experiment.length) {
+        await this.assayListController.update({
+          id: experimentExist?.idAssayList,
+          status: 'IMPORTADO',
+        });
+      }
+
       if (response) {
         return { status: 200, message: 'Experimento excluído' };
       }
