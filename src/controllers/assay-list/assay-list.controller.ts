@@ -139,7 +139,7 @@ export class AssayListController {
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
-      const { status } = await this.genotypeTreatmentController.deleteAll();
+      const { status } = await this.genotypeTreatmentController.deleteAll(id);
 
       if (status === 200) {
         await this.assayListRepository.delete(Number(id));
