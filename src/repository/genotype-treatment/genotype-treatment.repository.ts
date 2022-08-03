@@ -58,8 +58,12 @@ export class GenotypeTreatmentRepository {
     return result;
   }
 
-  async deleteAll() {
-    const result = await prisma.genotype_treatment.deleteMany({});
+  async deleteAll(idAssayList: number) {
+    const result = await prisma.genotype_treatment.deleteMany({
+      where: {
+        id_assay_list: idAssayList,
+      },
+    });
     return result;
   }
 }
