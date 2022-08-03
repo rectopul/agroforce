@@ -681,7 +681,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  const { response: allItens, total: totalItems } = await fetch(`${baseUrlGrupo}?id_foco=${idFoco}`, requestOptions).then((response) => response.json());
+  const { response: allItens, total: totalItems } = await fetch(`${baseUrlGrupo}?id_foco=${idFoco}&id_safra=${idSafra}`, requestOptions).then((response) => response.json());
 
   const { response: foco } = await fetch(`${baseUrlShow}/${idFoco}`, requestOptions).then((response) => response.json());
 
