@@ -7,11 +7,11 @@ export class LogImportController {
 
   logImportRepository = new LogImportRepository();
 
-  async getOne({ id }: any) {
+  async getOne(id: number) {
     try {
-      const response = await this.logImportRepository.findById(id);
+      const response = await this.logImportRepository.findById(Number(id));
 
-      if (!response) throw new Error('Log Import não encontrado');
+      if (!response) return { status: 400, response, message: 'Log Import não encontrado' };
 
       return { status: 200, response };
     } catch (error: any) {
@@ -35,13 +35,16 @@ export class LogImportController {
     }
   }
 
-  async update({ id, status }: any) {
+  async update({ id, status, state }: any) {
     try {
-      const logImport: any = await this.logImportRepository.findById(id);
+      const logImport: any = await this.getOne(id);
 
-      if (!logImport) return { status: 400, message: 'Log não exsite' };
+      if (!logImport) return { status: 400, message: 'Log não existe' };
+      if (logImport.response.state === 'FALHA') {
+        return { status: 200, logImport };
+      }
 
-      await this.logImportRepository.update(id, status);
+      await this.logImportRepository.update(id, status, state);
 
       return { status: 200, message: 'Log atualizado' };
     } catch (error: any) {
@@ -52,17 +55,41 @@ export class LogImportController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
+    parameters.AND = [];
     try {
+      if (options.filterUser) {
+        parameters.user = JSON.parse(`{"name": {"contains":"${options.filterUser}"} }`);
+      }
+
+      if (options.filterTable) {
+        parameters.table = JSON.parse(`{"contains":"${options.filterTable}"}`);
+      }
+
+      if (options.filterState) {
+        parameters.state = JSON.parse(`{"contains":"${options.filterState}"}`);
+      }
+
+      if (options.filterStartDate) {
+        const newStartDate = new Date(options.filterStartDate);
+        parameters.AND.push({ created_at: { gte: newStartDate } });
+      }
+
+      if (options.filterEndDate) {
+        const newEndDate = new Date(options.filterEndDate);
+        parameters.AND.push({ created_at: { lte: newEndDate } });
+      }
+
       const select = {
         id: true,
         user: { select: { name: true } },
         table: true,
+        state: true,
         status: true,
         created_at: true,
       };
 
-      if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
+      if (options.status) {
+        parameters.status = Number(options.status);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

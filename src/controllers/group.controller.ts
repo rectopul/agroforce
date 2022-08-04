@@ -55,7 +55,13 @@ export class GroupController {
       let npe: any;
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
-        npe = JSON.stringify({ select: { id: true }, where: { id_safra: Number(options.id_safra) } }, null);
+        npe = JSON.stringify(
+          {
+            select: { id: true },
+            where: { id_safra: Number(options.id_safra) },
+          },
+          null,
+        );
       } else {
         npe = JSON.stringify({ select: { id: true } }, null);
       }

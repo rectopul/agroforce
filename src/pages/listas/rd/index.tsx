@@ -15,12 +15,13 @@ import {
 import {
   AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { useFormik } from 'formik';
 import {
   AccordionFilter, CheckBox, Button, Content, Input,
 } from '../../../components';
@@ -65,6 +66,8 @@ export default function Import({
   ));
 
   const [executeUpload, setExecuteUpload] = useState<any>(Number(uploadInProcess));
+  const disabledButton = (executeUpload === 1);
+  const bgColor = (executeUpload === 1) ? 'bg-red-600' : 'bg-blue-600';
 
   function readExcel(moduleId: number, table: string) {
     const value: any = document.getElementById(`inputFile-${moduleId}`);
@@ -77,7 +80,13 @@ export default function Import({
     readXlsxFile(value.files[0]).then((rows) => {
       if (moduleId) {
         importService.validate({
-          spreadSheet: rows, moduleId, created_by: userLogado.id, idSafra, idCulture, table,
+          spreadSheet: rows,
+          moduleId,
+          created_by: userLogado.id,
+          idSafra,
+          idCulture,
+          table,
+          disabledButton,
         }).then(({ message }: any) => {
           Swal.fire({
             html: message,
@@ -87,7 +96,13 @@ export default function Import({
         });
       } else {
         importService.validateProtocol({
-          spreadSheet: rows, moduleId, created_by: userLogado.id, idSafra, idCulture, table,
+          spreadSheet: rows,
+          moduleId,
+          created_by: userLogado.id,
+          idSafra,
+          idCulture,
+          table,
+          disabledButton,
         }).then(({ message }) => {
           Swal.fire({
             html: message,
@@ -100,30 +115,54 @@ export default function Import({
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.rd || { id: 0, table_preferences: 'id,user_id,created_at,table' };
+  const preferences = userLogado.preferences.rd || { id: 0, table_preferences: 'id,user_id,created_at,table,state' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const itemsTotal = (totalItems || 0);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Usuario', value: 'user_id' },
+    { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
+    { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
     { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
   ]);
-  const filter = filterApplication;
   const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage || 10;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const disabledButton = (executeUpload === 1);
-  const bgColor = (executeUpload === 1) ? 'bg-red-600' : 'bg-blue-600';
+  const formik = useFormik<any>({
+    initialValues: {
+      filterUser: '',
+      filterTable: '',
+      filterStartDate: '',
+      filterEndDate: '',
+      filterState: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async ({
+      filterUser,
+      filterTable,
+      filterStartDate,
+      filterEndDate,
+      filterState,
+    }) => {
+      const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
+      await logImportService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
+        setFilter(parametersFilter);
+        setLogs(response);
+        setTotalItems(allTotal);
+        setCurrentPage(0);
+      });
+    },
+  });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -243,6 +282,9 @@ export default function Import({
       }
       if (columnCampos[index] === 'created_at') {
         tableFields.push(headerTableFactory('Importado em', 'created_at'));
+      }
+      if (columnCampos[index] === 'state') {
+        tableFields.push(headerTableFactory('Status', 'state'));
       }
     });
     return tableFields;
@@ -378,6 +420,23 @@ export default function Import({
     });
   }
 
+  function filterFieldFactory(title: string, name: string) {
+    return (
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <Input
+          type="text"
+          placeholder={name}
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+        />
+      </div>
+    );
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -400,6 +459,7 @@ export default function Import({
                 <Button
                   textColor="white"
                   bgColor={bgColor}
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
                   rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                   onClick={() => readExcel(0, '')}
                   icon={<IoIosCloudUpload size={40} />}
@@ -419,6 +479,7 @@ export default function Import({
                 <Button
                   textColor="white"
                   bgColor={bgColor}
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
                   rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                   onClick={() => readExcel(26, 'lista-ensaio')}
                   icon={<IoIosCloudUpload size={40} />}
@@ -437,6 +498,7 @@ export default function Import({
               <div className=" h-20 w-20 flex items-center mr-1">
                 <Button
                   textColor="white"
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
                   bgColor={bgColor}
                   rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                   onClick={() => readExcel(22, 'experimento')}
@@ -459,6 +521,63 @@ export default function Import({
               <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
             </div>
             <hr />
+
+            <AccordionFilter title="Filtrar ensaios">
+              <div className="w-full flex gap-2">
+                <form
+                  className="flex flex-col
+                  w-full
+                  items-center
+                  px-4
+                  bg-white
+                "
+                  onSubmit={formik.handleSubmit}
+                >
+                  <div className="w-full h-full
+                  flex
+                  justify-center
+                  pb-2
+                "
+                  >
+                    {filterFieldFactory('filterUser', 'Usuário')}
+                    {filterFieldFactory('filterTable', 'Tabela')}
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        De:
+                      </label>
+                      <Input
+                        type="date"
+                        id="filterStartDate"
+                        name="filterStartDate"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-2">
+                        Até:
+                      </label>
+                      <Input
+                        type="date"
+                        id="filterEndDate"
+                        name="filterEndDate"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                    {filterFieldFactory('filterState', 'Status')}
+                  </div>
+
+                  <div className="h-16 w-32 mt-3">
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
+                </form>
+              </div>
+            </AccordionFilter>
 
             <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
               <MaterialTable

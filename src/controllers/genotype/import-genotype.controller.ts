@@ -8,6 +8,7 @@ import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { CulturaController } from '../cultura.controller';
 import { ImportController } from '../import.controller';
+import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 import { SafraController } from '../safra.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
@@ -17,23 +18,39 @@ import { GenotipoController } from './genotipo.controller';
 export class ImportGenotypeController {
   static aux: any = {};
 
-  static async validate({
-    spreadSheet, idSafra, idCulture, created_by: createdBy,
-  }: ImportValidate): Promise<IReturnObject> {
-    const importController = new ImportController();
-    const tecnologiaController = new TecnologiaController();
-    const genotipoController = new GenotipoController();
+  static async validate(
+    idLog: number,
+    {
+      spreadSheet, idSafra, idCulture, created_by: createdBy,
+    }: ImportValidate,
+  ): Promise<IReturnObject> {
     const loteController = new LoteController();
     const safraController = new SafraController();
+    const importController = new ImportController();
     const culturaController = new CulturaController();
+    const genotipoController = new GenotipoController();
+    const logImportController = new LogImportController();
+    const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
       for (const row in spreadSheet) {
-        if (row !== '0') {
-          for (const column in spreadSheet[row]) {
-            configModule.response[0]?.fields.push('DT');
+        spreadSheet[row].pop();
+        for (const column in spreadSheet[row]) {
+          if (row === '0') {
+            if (!(spreadSheet[row][column].toUpperCase())
+              .includes(configModule.response[0]?.fields[column]?.toUpperCase())) {
+              responseIfError[Number(column)]
+                  += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'a sequencia de colunas da planilha esta incorreta',
+                );
+            }
+          }
+          if (row !== '0') {
             // campos genotipo
             if (configModule.response[0]?.fields[column] === 'id_s1') {
               if (spreadSheet[row][column] === null) {
@@ -267,17 +284,21 @@ export class ImportGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const geno: any = await genotipoController.getAll({
-                  id_dados: this.aux.id_dados_geno,
-                });
-                if (geno.response[0]?.dt_import > spreadSheet[row][column]) {
-                  responseIfError[Number(column)]
-                    += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'essa informação é mais antiga do que a informação do software',
-                    );
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][column] = new Date(spreadSheet[row][column]);
+                const { status, response }: IReturnObject = await genotipoController.getAll(
+                  { id_dados: this.aux.id_dados_geno },
+                );
+                if (status === 200) {
+                  if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
+                    responseIfError[Number(column)]
+                  += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'essa informação é mais antiga do que a informação do software',
+                      );
+                  }
                 }
               }
             }
@@ -584,15 +605,19 @@ export class ImportGenotypeController {
               }
             }
           }
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Genótipo importado com sucesso' };
         } catch (error: any) {
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Genótipo controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Genótipo' };
         }
       }
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Genótipo controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Genótipo' };
     }

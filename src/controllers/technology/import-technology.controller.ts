@@ -5,14 +5,18 @@ import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.in
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
 import { CulturaController } from '../cultura.controller';
+import { LogImportController } from '../log-import.controller';
 import { TecnologiaController } from './tecnologia.controller';
 
 export class ImportTechnologyController {
-  static async validate({
-    spreadSheet, idCulture, created_by: createdBy,
-  }: ImportValidate): Promise<IReturnObject> {
+  static async validate(
+    idLog: number,
+    { spreadSheet, idCulture, created_by: createdBy }: ImportValidate,
+  ): Promise<IReturnObject> {
     const culturaController = new CulturaController();
+    const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
+
     const responseIfError: any = [];
     try {
       for (const row in spreadSheet) {
@@ -91,20 +95,20 @@ export class ImportTechnologyController {
                 responseIfError[column]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await tecnologiaController.getAll(
                   { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
                 );
                 if (status === 200) {
-                  if (response.length === 0) {
-                    if (response.dt_import > spreadSheet[row][column]) {
-                      responseIfError[column]
-                        += responseGenericFactory(
-                          (Number(column) + 1),
-                          row,
-                          spreadSheet[0][column],
-                          'essa informação é mais antiga do que a informação do software',
-                        );
-                    }
+                  if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
+                    responseIfError[Number(column)]
+                  += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'essa informação é mais antiga do que a informação do software',
+                      );
                   }
                 }
               }
@@ -145,16 +149,20 @@ export class ImportTechnologyController {
               }
             }
           });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Tecnologia controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tecnologia' };
         }
       }
 
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Tecnologia controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tecnologia' };
     }

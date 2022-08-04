@@ -148,12 +148,13 @@ export class ImportController {
       const newData = removeProtocolLevel(data);
       switch (protocolLevel) {
         case 'TECHNOLOGY_S2':
-          return await ImportTechnologyController.validate(newData);
+          return await ImportTechnologyController.validate(responseLog?.id, newData);
         case 'CULTURE_UNIT':
-          return await ImportLocalController.validate(newData);
+          return await ImportLocalController.validate(responseLog?.id, newData);
         case 'GENOTYPE_S2':
-          return ImportGenotypeController.validate(newData);
+          return ImportGenotypeController.validate(responseLog?.id, newData);
         default:
+          await this.logImportController.update({ id: responseLog?.id, status: 1, state: 'FALHA' });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
     } catch (error) {
@@ -164,6 +165,12 @@ export class ImportController {
   }
 
   async validateGeneral(data: object | any) {
+    const { status: validateTraffic }: any = await this.logImportController.getAll({
+      status: 2,
+    });
+    if (validateTraffic === 200) {
+      return { status: 400, message: 'Uma importação ja esta sendo executada' };
+    }
     const {
       status,
       response: responseLog,
@@ -176,7 +183,7 @@ export class ImportController {
         if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
         if (data.moduleId === 27) {
-          return await ImportGenotypeTreatmentController.validate(data);
+          return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
         }
 
         if (status === 400) {
@@ -197,16 +204,12 @@ export class ImportController {
         }
 
         if (data.moduleId === 22) {
-          const responseImport = await ImportExperimentController.validate(data);
-          await this.logImportController.update({ id: responseLog.id, status: 1 });
-          return responseImport;
+          return await ImportExperimentController.validate(responseLog?.id, data);
         }
 
         // Validação Lista de Ensaio
         if (data.moduleId === 26) {
-          const responseImport = await ImportAssayListController.validate(data);
-          await this.logImportController.update({ id: responseLog.id, status: 1 });
-          return responseImport;
+          return await ImportAssayListController.validate(responseLog?.id, data);
         }
 
         // Validação do modulo Local
@@ -276,7 +279,7 @@ export class ImportController {
 
         // Validação do modulo tecnologia
         if (data.moduleId === 8) {
-          return await ImportTechnologyController.validate(data);
+          return await ImportTechnologyController.validate({ idLog: responseLog?.id, data });
         }
 
         return { status: 200, message: response, error: erro };

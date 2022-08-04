@@ -16,16 +16,21 @@ import { LocalController } from '../local/local.controller';
 import { DelineamentoController } from '../delineamento.controller';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
+import { LogImportController } from '../log-import.controller';
 
 export class ImportExperimentController {
-  static async validate({
-    spreadSheet, idSafra, idCulture, created_by: createdBy,
-  }: ImportValidate): Promise<IReturnObject> {
+  static async validate(
+    idLog: number,
+    {
+      spreadSheet, idSafra, idCulture, created_by: createdBy,
+    }: ImportValidate,
+  ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
-    const delineamentoController = new DelineamentoController();
+    const logImportController = new LogImportController();
     const assayListController = new AssayListController();
     const experimentController = new ExperimentController();
+    const delineamentoController = new DelineamentoController();
 
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -296,16 +301,19 @@ export class ImportExperimentController {
               }
             }
           }
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Experimento importado com sucesso' };
         } catch (error: any) {
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Experimento controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de experimento' };
         }
       }
-
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Experimento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
     }
