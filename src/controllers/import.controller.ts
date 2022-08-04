@@ -152,7 +152,7 @@ export class ImportController {
         case 'CULTURE_UNIT':
           return await ImportLocalController.validate(responseLog?.id, newData);
         case 'GENOTYPE_S2':
-          return ImportGenotypeController.validate(responseLog?.id, newData);
+          return await ImportGenotypeController.validate(responseLog?.id, newData);
         default:
           await this.logImportController.update({ id: responseLog?.id, status: 1, state: 'FALHA' });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
@@ -214,12 +214,7 @@ export class ImportController {
 
         // Validação do modulo Local
         if (data.moduleId == 4) {
-          response = await this.validateLocal(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
+          return await ImportLocalController.validate(responseLog?.id, data);
         }
 
         // Validação do modulo Layout Quadra
@@ -244,7 +239,7 @@ export class ImportController {
 
         // Validação do modulo Genotipo
         if (data.moduleId == 10) {
-          return ImportGenotypeController.validate(data);
+          return await ImportGenotypeController.validate(responseLog?.id, data);
         }
 
         // Validação do modulo Lote
@@ -279,7 +274,7 @@ export class ImportController {
 
         // Validação do modulo tecnologia
         if (data.moduleId === 8) {
-          return await ImportTechnologyController.validate({ idLog: responseLog?.id, data });
+          return await ImportTechnologyController.validate(responseLog?.id, data);
         }
 
         return { status: 200, message: response, error: erro };
