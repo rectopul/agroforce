@@ -68,6 +68,8 @@ export class GenotypeTreatmentController {
         lote: {
           select: {
             ncc: true,
+            cod_lote: true,
+            fase: true,
           },
         },
         assay_list: {

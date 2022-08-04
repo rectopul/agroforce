@@ -52,7 +52,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,genotype_treatment,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,countNT,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
@@ -81,7 +81,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'genotype_treatment', defaultChecked: () => camposGerenciados.includes('genotype_treatment'),
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'countNT', defaultChecked: () => camposGerenciados.includes('countNT'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
@@ -323,8 +323,8 @@ export default function TipoEnsaio({
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
       }
-      if (columnOrder[item] === 'genotype_treatment') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'genotype_treatment.treatments_number'));
+      if (columnOrder[item] === 'countNT') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'countNT'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(headerTableFactory('Status do ensaio', 'status'));
@@ -630,9 +630,15 @@ export default function TipoEnsaio({
                         </div>
                       </div>
 
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de ensaios" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-                      </div>
+                      {/* <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          title="Exportar planilha de ensaios"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => { downloadExcel(); }}
+                        />
+                      </div> */}
                     </div>
                   </div>
                 ),
@@ -732,8 +738,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     response: allAssay,
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
-  console.log('allAssay');
-  console.log(allAssay);
 
   return {
     props: {

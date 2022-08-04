@@ -299,7 +299,7 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(idHeaderFactory());
       }
       if (columnOrder[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'genotipo.lote[0]?.fase'));
+        tableFields.push(headerTableFactory('Fase', 'lote.fase'));
       }
       if (columnOrder[index] === 'cod_tec') {
         tableFields.push(headerTableFactory('Cód. tec. genótipo', 'genotipo.tecnologia.cod_tec'));
@@ -320,10 +320,10 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(headerTableFactory('T', 'status'));
       }
       if (columnOrder[index] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
       }
       if (columnOrder[index] === 'cod_lote') {
-        tableFields.push(headerTableFactory('Cód. lote', 'genotipo.lote[0]?.cod_lote'));
+        tableFields.push(headerTableFactory('Cód. lote', 'lote.cod_lote'));
       }
       if (columnOrder[index] === 'comments') {
         tableFields.push(headerTableFactory('OBS', 'comments'));
@@ -963,16 +963,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const filterApplication = `id_safra=${idSafra}&id_assay_list=${idAssayList}`;
 
   const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;
-  const experiment = await fetch(`${baseUrlExperiment}?${filterApplication}`, requestOptions);
-  const { response: allExperiments, total: totalExperiments }: any = await experiment.json();
+  const {
+    response: allExperiments,
+    total: totalExperiments,
+  } = await fetch(`${baseUrlExperiment}?${filterApplication}`, requestOptions).then((response) => response.json());
 
   const baseUrlGenotypeTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
-  const genotypeTreatment = await fetch(`${baseUrlGenotypeTreatment}?${filterApplication}`, requestOptions);
-  const { response: allGenotypeTreatment, total: totalItens }: any = await genotypeTreatment.json();
+  const {
+    response: allGenotypeTreatment,
+    total: totalItens,
+  } = await fetch(`${baseUrlGenotypeTreatment}?${filterApplication}`, requestOptions).then((response) => response.json());
 
   const baseUrlAssayList = `${publicRuntimeConfig.apiUrl}/assay-list`;
-  const assayLists = await fetch(`${baseUrlAssayList}/${context.query.id}`, requestOptions);
-  const assayList = await assayLists.json();
+  const assayList = await fetch(`${baseUrlAssayList}/${context.query.id}`, requestOptions).then((response) => response.json());
 
   return {
     props: {

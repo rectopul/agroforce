@@ -17,10 +17,10 @@ export class LogImportRepository {
     return result;
   }
 
-  async update(id: number, status: number) {
+  async update(id: number, status: number, state: string) {
     const result = await prisma.log_import.update({
       where: { id },
-      data: { status },
+      data: { status, state },
     });
     return result;
   }

@@ -9,6 +9,7 @@ import { responseGenericFactory, responseNullFactory, responsePositiveNumericFac
 import { FocoController } from '../foco.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
+import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 import { SafraController } from '../safra.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
@@ -16,13 +17,17 @@ import { TypeAssayController } from '../tipo-ensaio.controller';
 import { AssayListController } from './assay-list.controller';
 
 export class ImportAssayListController {
-  static async validate({
-    spreadSheet, idSafra, idCulture, created_by: createdBy,
-  }: ImportValidate): Promise<IReturnObject> {
+  static async validate(
+    idLog: number,
+    {
+      spreadSheet, idSafra, idCulture, created_by: createdBy,
+    }: ImportValidate,
+  ): Promise<IReturnObject> {
     const focoController = new FocoController();
     const loteController = new LoteController();
     const safraController = new SafraController();
     const genotipoController = new GenotipoController();
+    const logImportController = new LogImportController();
     const assayListController = new AssayListController();
     const typeAssayController = new TypeAssayController();
     const tecnologiaController = new TecnologiaController();
@@ -163,10 +168,11 @@ export class ImportAssayListController {
                 || spreadSheet[row][column].toString().length > 2
                 || spreadSheet[row][column] < 0) {
                 responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                  += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'deve ser um numero de ate 2 dígitos',
                   );
               }
             }
@@ -258,22 +264,24 @@ export class ImportAssayListController {
             }
             // Validação do campo NCA
             if (column === '12') {
-              const { response: genotype }: IReturnObject = await genotipoController.getAll({
-                filterGenotipo: spreadSheet[row][11],
-                id_culture: idCulture,
-              });
-              const { response }: IReturnObject = await loteController.getAll({
-                filterNcc: spreadSheet[row][column],
-                id_genotipo: genotype[0]?.id,
-              });
-              if (response?.length === 0) {
-                responseIfError[Number(column)]
-                  += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'o valor de NCA não foi encontrado no cadastro de lotes relacionado ao genótipo',
-                  );
+              if (spreadSheet[row][column] !== null) {
+                const { response: genotype }: IReturnObject = await genotipoController.getAll({
+                  filterGenotipo: spreadSheet[row][11],
+                  id_culture: idCulture,
+                });
+                const { response }: IReturnObject = await loteController.getAll({
+                  filterNcc: spreadSheet[row][column],
+                  id_genotipo: genotype[0]?.id,
+                });
+                if (response?.length === 0) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'o valor de NCA não foi encontrado no cadastro de lotes relacionado ao genótipo',
+                    );
+                }
               }
             }
           }
@@ -305,7 +313,7 @@ export class ImportAssayListController {
 
               });
               const { response: lote }: IReturnObject = await loteController.getAll({
-                filterNcc: spreadSheet[row][12],
+                filterNcc: spreadSheet[row][12] || '0',
               });
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
@@ -331,7 +339,7 @@ export class ImportAssayListController {
                   id_genotipo: genotype[0]?.id,
                   id_lote: lote[0]?.id,
                   treatments_number: spreadSheet[row][9],
-                  status: spreadSheet[row][11],
+                  status: spreadSheet[row][10],
                   comments: spreadSheet[row][13] || '',
                   created_by: createdBy,
                 });
@@ -363,7 +371,7 @@ export class ImportAssayListController {
                   id_lote: lote[0]?.id,
                   treatments_number: spreadSheet[row][9],
                   comments: spreadSheet[row][13] || '',
-                  status: spreadSheet[row][11],
+                  status: spreadSheet[row][10],
                   created_by: createdBy,
                 });
               }
@@ -378,15 +386,19 @@ export class ImportAssayListController {
               }
             }
           }
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
         } catch (error: any) {
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Lista de ensaio controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
         }
       }
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Lista de ensaio controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }

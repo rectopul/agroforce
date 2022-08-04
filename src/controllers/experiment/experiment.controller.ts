@@ -121,6 +121,10 @@ export class ExperimentController {
         parameters.idSafra = Number(options.idSafra);
       }
 
+      if (options.id_assay_list) {
+        parameters.idAssayList = Number(options.id_assay_list);
+      }
+
       if (options.experimentName) {
         parameters.experimentName = options.idSafra;
       }
