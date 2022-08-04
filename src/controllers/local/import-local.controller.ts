@@ -6,6 +6,7 @@ import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 // eslint-disable-next-line import/no-cycle
 import { ImportController } from '../import.controller';
+import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';
 import { LocalController } from './local.controller';
 import { UnidadeCulturaController } from './unidade-cultura.controller';
@@ -13,12 +14,14 @@ import { UnidadeCulturaController } from './unidade-cultura.controller';
 export class ImportLocalController {
   static aux: any = {};
 
-  static async validate({
-    spreadSheet, idSafra, created_by: createdBy,
-  }: ImportValidate): Promise<IReturnObject> {
-    const importController = new ImportController();
+  static async validate(
+    idLog: number,
+    { spreadSheet, idSafra, created_by: createdBy }: ImportValidate,
+  ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
+    const importController = new ImportController();
+    const logImportController = new LogImportController();
     const unidadeCulturaController = new UnidadeCulturaController();
 
     const responseIfError: any = [];
@@ -190,6 +193,7 @@ export class ImportLocalController {
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
           } else if (spreadSheet[0][column].includes('DT')) {
+            // eslint-disable-next-line no-param-reassign
             spreadSheet[row][column] = new Date(spreadSheet[row][column]);
             const { status, response }: IReturnObject = await localController.getAll(
               { name_local_culture: spreadSheet[row][4] },
@@ -270,16 +274,19 @@ export class ImportLocalController {
               }
             }
           }
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Local importado com sucesso' };
         } catch (error: any) {
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Local controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Local' };
         }
       }
-
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Local controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Local' };
     }

@@ -6,6 +6,7 @@ export interface IReturnObject {
 }
 
 export interface ImportValidate {
+  idLog?: number
   spreadSheet: Array<any>
   idSafra: number
   idCulture: number

@@ -2,6 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListRepository } from '../../repository/assay-list.repository';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
@@ -43,7 +44,7 @@ export class AssayListController {
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true } },
-        genotype_treatment: { select: { treatments_number: true } },
+        genotype_treatment: true,
         experiment: true,
         gli: true,
         period: true,
@@ -78,6 +79,13 @@ export class AssayListController {
         skip,
         orderBy,
       );
+
+      response.map((item: any) => {
+        const newItem = item;
+        newItem.countNT = functionsUtils
+          .countChildrenForSafra(item.genotype_treatment, Number(options.id_safra));
+        return newItem;
+      });
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
