@@ -599,7 +599,7 @@ export default function Listagem({
 
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: '#f9fafb', width: "100%" }}
               columns={columns}
               data={genotipos}
               options={{

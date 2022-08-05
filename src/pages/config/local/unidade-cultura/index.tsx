@@ -482,6 +482,16 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
 
+                </div>
+
+                <div className="w-full h-full
+                flex
+                justify-center
+                pt-2
+                pb-2
+                "
+                >
+
                   {filterFieldFactory('filterAdress', 'Nome da Fazenda')}
 
                   {filterFieldFactory('filterLabelCountry', 'País')}

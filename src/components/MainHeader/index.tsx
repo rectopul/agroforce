@@ -16,7 +16,7 @@ export function MainHeader({
   return (
     <header className="
 			h-20
-			w-screen
+			w-res-1366-768
       flex
 			items-center
       bg-gray-450
