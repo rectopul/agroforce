@@ -557,7 +557,7 @@ export default function TipoEnsaio({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -567,7 +567,7 @@ export default function TipoEnsaio({
                         href="ensaio/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -630,7 +630,7 @@ export default function TipoEnsaio({
                         </div>
                       </div>
 
-                      {/* <div className="h-12 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de ensaios"
                           icon={<RiFileExcel2Line size={20} />}
@@ -638,7 +638,7 @@ export default function TipoEnsaio({
                           textColor="white"
                           onClick={() => { downloadExcel(); }}
                         />
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 ),

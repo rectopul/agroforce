@@ -591,7 +591,7 @@ export default function Listagem({
                                             "
                   >
 
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -601,7 +601,7 @@ export default function Listagem({
                         href="experimento/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -662,7 +662,7 @@ export default function Listagem({
                         </div>
                       </div>
 
-                      {/* <div className="h-12 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de experimentos"
                           icon={<RiFileExcel2Line size={20} />}
@@ -670,7 +670,7 @@ export default function Listagem({
                           textColor="white"
                           onClick={() => { downloadExcel(); }}
                         />
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 ),
