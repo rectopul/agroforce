@@ -573,7 +573,6 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll d-mt-1366-768">
             <MaterialTable
-              className="mt-1366-768"
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={users}
