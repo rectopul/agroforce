@@ -30,3 +30,29 @@
   color: #fff;
   border: solid 1px #d1d5db;
 }
+
+.w-res-1366-768{
+  max-width: 1349;
+}
+
+.table-res-1366-768{
+  height: 1000px;
+}
+
+.h-1366-768{
+  height: 568px;
+}
+
+.d-mt-1366-768{
+  height: 500px;
+  width: 1155px;
+  overflow-x: scroll;
+}
+
+.mt-1366-768{
+  width: 100%;
+}
+
+.Component-horizontalScrollContainer-5 div div{
+  overflow: visible!important;
+}

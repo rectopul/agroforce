@@ -571,8 +571,9 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full overflow-y-scroll d-mt-1366-768">
             <MaterialTable
+              className="mt-1366-768"
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={users}
@@ -589,7 +590,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-full max-h-96
+                    className="w-max max-h-96
                     flex
                     items-center
                     justify-between

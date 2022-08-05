@@ -628,6 +628,14 @@ export default function TipoEnsaio({
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
                   {filterFieldFactory('filterBgm', 'BMG')}
+                </div>
+                <div className="w-full h-full
+                  flex
+                  justify-center
+                  pt-2
+                  pb-3
+                  "
+                  >
                   {filterFieldFactory('filterTreatmentsNumber', 'NT')}
                   {filterFieldFactory('filterStatus', 'Status T')}
 

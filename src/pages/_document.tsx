@@ -19,7 +19,7 @@ export default class MyDocument extends Document {
 
           <link rel="shortcut icon" href="/images/logo.png" type="image/png" />
         </Head>
-        <body>
+        <body style={{maxWidth: "1366px", height: "100%"}}>
           <Main />
           <NextScript />
         </body>
