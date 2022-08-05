@@ -195,7 +195,7 @@ export function Content({ contentHeader, children, moduloActive }: IContentData)
         ))}
       </MainHeader>
 
-      <div className="h-screen flex flex-row w-full">
+      <div className="h-1366-768 flex flex-row w-full">
         <Aside moduloActive={moduloActive} />
         <div className="
 						flex
