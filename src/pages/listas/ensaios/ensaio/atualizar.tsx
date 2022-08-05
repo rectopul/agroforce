@@ -137,7 +137,7 @@ export default function AtualizarTipoEnsaio({
         comments: values.comments,
       }).then(({ status, message }) => {
         if (status === 200) {
-          Swal.fire('Lista de Ensaio atualizado com sucesso!');
+          Swal.fire('Experimento atualizado com sucesso!');
           router.back();
         } else {
           Swal.fire(message);
@@ -605,7 +605,7 @@ export default function AtualizarTipoEnsaio({
   return (
     <>
       <Head>
-        <title>Atualizar Lista de Ensaio</title>
+        <title>Atualizar Experimento</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
@@ -614,7 +614,7 @@ export default function AtualizarTipoEnsaio({
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Lista de Ensaio</h1>
+            <h1 className="text-2xl">Atualizar Experimento</h1>
           </div>
 
           <div className="w-full
