@@ -381,6 +381,13 @@ export default function Import({
   const downloadExcel = async (): Promise<void> => {
     await logImportService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          newItem.user = item.user.name;
+          delete newItem.id;
+          delete newItem.status;
+          return newItem;
+        });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'logs');
@@ -490,7 +497,7 @@ export default function Import({
                       bgColor={bgColor}
                       title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(26, 'lista-ensaio')}
+                      onClick={() => readExcel(26, 'ASSAY_LIST')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
@@ -510,7 +517,7 @@ export default function Import({
                       title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
                       bgColor={bgColor}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(22, 'experimento')}
+                      onClick={() => readExcel(22, 'EXPERIMENT')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
@@ -531,7 +538,7 @@ export default function Import({
                 </div>
                 <hr />
 
-                <AccordionFilter title="Filtrar ensaios">
+                <AccordionFilter title="Filtrar log de importação">
                   <div className="w-full flex gap-2">
                     <form
                       className="flex flex-col
@@ -668,7 +675,13 @@ export default function Import({
                             </div>
 
                             <div className="h-12 flex items-center justify-center w-full">
-                              <Button title="Exportar planilha de logs" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                              <Button
+                                title="Exportar planilha de logs"
+                                icon={<RiFileExcel2Line size={20} />}
+                                bgColor="bg-blue-600"
+                                textColor="white"
+                                onClick={() => { downloadExcel(); }}
+                              />
                             </div>
                           </div>
                         </div>
