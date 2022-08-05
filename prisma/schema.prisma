@@ -273,7 +273,7 @@ model genotipo {
   id_culture          Int
   id_tecnologia       Int
   id_s1               Int
-  id_dados            String               @unique()
+  id_dados            String               
   name_genotipo       String
   name_main           String?
   name_public         String?
