@@ -224,6 +224,15 @@ export class ImportAssayListController {
                     spreadSheet[0][column],
                     'o número de tratamento não está sequencial',
                   );
+              } else if (spreadSheet[Number(row) - 1][4] !== spreadSheet[row][4]
+               && Number(spreadSheet[row][column]) !== 1) {
+                responseIfError[Number(column)]
+                  += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'cada ensaio deve ter tratamentos sequenciais começados em 1',
+                  );
               }
             }
             // Validação do campo status
