@@ -136,7 +136,7 @@ export class ImportController {
       response: responseLog,
       message,
     }: any = await this.logImportController.create({
-      user_id: data.created_by, status: 2, table: data.spreadSheet[1][0],
+      user_id: data.created_by, status: 2, table: String(data.spreadSheet[1][0]),
     });
     try {
       if (status === 400) {
@@ -144,7 +144,7 @@ export class ImportController {
           status: 400, message,
         };
       }
-      const protocolLevel = data.spreadSheet[1][0];
+      const protocolLevel = String(data.spreadSheet[1][0]);
       const newData = removeProtocolLevel(data);
       switch (protocolLevel) {
         case 'TECHNOLOGY_S2':

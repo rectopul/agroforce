@@ -12,6 +12,7 @@ import MaterialTable from 'material-table';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
+import Spinner from 'react-bootstrap/Spinner';
 import {
   AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
 } from 'react-icons/ai';
@@ -68,8 +69,9 @@ export default function Import({
   const [executeUpload, setExecuteUpload] = useState<any>(Number(uploadInProcess));
   const disabledButton = (executeUpload === 1);
   const bgColor = (executeUpload === 1) ? 'bg-red-600' : 'bg-blue-600';
+  const [loading, setLoading] = useState<boolean>(false);
 
-  function readExcel(moduleId: number, table: string) {
+  async function readExcel(moduleId: number, table: string) {
     const value: any = document.getElementById(`inputFile-${moduleId}`);
     if (!value.files[0]) {
       Swal.fire('Insira um arquivo');
@@ -77,9 +79,10 @@ export default function Import({
     }
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
     setExecuteUpload(1);
-    readXlsxFile(value.files[0]).then((rows) => {
+    readXlsxFile(value.files[0]).then(async (rows) => {
+      setLoading(true);
       if (moduleId) {
-        importService.validate({
+        const { message } = await importService.validate({
           spreadSheet: rows,
           moduleId,
           created_by: userLogado.id,
@@ -87,15 +90,15 @@ export default function Import({
           idCulture,
           table,
           disabledButton,
-        }).then(({ message }: any) => {
-          Swal.fire({
-            html: message,
-            width: '800',
-          });
-          setExecuteUpload(0);
         });
+        setLoading(false);
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+        setExecuteUpload(0);
       } else {
-        importService.validateProtocol({
+        const { message } = await importService.validateProtocol({
           spreadSheet: rows,
           moduleId,
           created_by: userLogado.id,
@@ -103,13 +106,13 @@ export default function Import({
           idCulture,
           table,
           disabledButton,
-        }).then(({ message }) => {
-          Swal.fire({
-            html: message,
-            width: '800',
-          });
-          setExecuteUpload(0);
         });
+        setLoading(false);
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+        setExecuteUpload(0);
       }
     });
   }
@@ -442,282 +445,289 @@ export default function Import({
     handleTotalPages();
   }, [currentPage]);
   return (
-    <>
-      <Head>
-        <title>Importação planilhas</title>
-      </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <div className="grid grid-cols-3 gap-4 h-screen">
-          <div className="bg-white rounded-lg">
-            <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
-            </div>
-            <hr />
+    loading ? (
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    )
+      : (
+        <>
+          <Head>
+            <title>Importação planilhas</title>
+          </Head>
+          <Content contentHeader={tabsDropDowns} moduloActive="listas">
+            <div className="grid grid-cols-3 gap-4 h-screen">
+              <div className="bg-white rounded-lg">
+                <div className="mt-2 justify-center flex">
+                  <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
+                </div>
+                <hr />
 
-            <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
-              <div className="h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  bgColor={bgColor}
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(0, '')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Cadastros RD</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-0" name="inputFile-0" />
-              </div>
-            </div>
-
-            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-              <div className=" h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  bgColor={bgColor}
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(26, 'lista-ensaio')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Importar Lista de Ensaio</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-26" name="inputFile-26" />
-              </div>
-            </div>
-
-            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-              <div className=" h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  bgColor={bgColor}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(22, 'experimento')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Importar Lista de Experimento</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-22" name="inputFile-22" />
-              </div>
-            </div>
-
-          </div>
-
-          <div className="bg-white rounded-lg col-span-2">
-            <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
-            </div>
-            <hr />
-
-            <AccordionFilter title="Filtrar ensaios">
-              <div className="w-full flex gap-2">
-                <form
-                  className="flex flex-col
-                  w-full
-                  items-center
-                  px-4
-                  bg-white
-                "
-                  onSubmit={formik.handleSubmit}
-                >
-                  <div className="w-full h-full
-                  flex
-                  justify-center
-                  pb-2
-                "
-                  >
-                    {filterFieldFactory('filterUser', 'Usuário')}
-                    {filterFieldFactory('filterTable', 'Tabela')}
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        De:
-                      </label>
-                      <Input
-                        type="date"
-                        id="filterStartDate"
-                        name="filterStartDate"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                    <div className="h-10 w-1/2 ml-4">
-                      <label className="block text-gray-900 text-sm font-bold mb-2">
-                        Até:
-                      </label>
-                      <Input
-                        type="date"
-                        id="filterEndDate"
-                        name="filterEndDate"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                    {filterFieldFactory('filterState', 'Status')}
-                  </div>
-
-                  <div className="h-16 w-32 mt-3">
+                <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
+                  <div className="h-20 w-20 flex items-center mr-1">
                     <Button
-                      onClick={() => { }}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
                       textColor="white"
-                      icon={<BiFilterAlt size={20} />}
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(0, '')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
                     />
                   </div>
-                </form>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Cadastros RD</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-0" name="inputFile-0" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(26, 'lista-ensaio')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Lista de Ensaio</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-26" name="inputFile-26" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, 'experimento')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Lista de Experimento</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-22" name="inputFile-22" />
+                  </div>
+                </div>
+
               </div>
-            </AccordionFilter>
 
-            <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
-              <MaterialTable
-                style={{ background: '#f9fafb' }}
-                columns={columns}
-                data={logs}
-                options={{
-                  showTitle: false,
-                  headerStyle: {
-                    zIndex: 20,
-                  },
-                  search: false,
-                  filtering: false,
-                  pageSize: itensPerPage,
-                }}
-                components={{
-                  Toolbar: () => (
-                    <div
-                      className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200"
+              <div className="bg-white rounded-lg col-span-2">
+                <div className="mt-2 justify-center flex">
+                  <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
+                </div>
+                <hr />
+
+                <AccordionFilter title="Filtrar ensaios">
+                  <div className="w-full flex gap-2">
+                    <form
+                      className="flex flex-col
+                      w-full
+                      items-center
+                      px-4
+                      bg-white
+                    "
+                      onSubmit={formik.handleSubmit}
                     >
+                      <div className="w-full h-full
+                      flex
+                      justify-center
+                      pb-2
+                    "
+                      >
+                        {filterFieldFactory('filterUser', 'Usuário')}
+                        {filterFieldFactory('filterTable', 'Tabela')}
+                        <div className="h-10 w-1/2 ml-4">
+                          <label className="block text-gray-900 text-sm font-bold mb-2">
+                            De:
+                          </label>
+                          <Input
+                            type="date"
+                            id="filterStartDate"
+                            name="filterStartDate"
+                            onChange={formik.handleChange}
+                          />
+                        </div>
+                        <div className="h-10 w-1/2 ml-4">
+                          <label className="block text-gray-900 text-sm font-bold mb-2">
+                            Até:
+                          </label>
+                          <Input
+                            type="date"
+                            id="filterEndDate"
+                            name="filterEndDate"
+                            onChange={formik.handleChange}
+                          />
+                        </div>
+                        {filterFieldFactory('filterState', 'Status')}
+                      </div>
 
-                      <strong className="text-blue-600">
-                        Total registrado:
-                        {' '}
-                        {itemsTotal}
-                      </strong>
+                      <div className="h-16 w-32 mt-3">
+                        <Button
+                          onClick={() => { }}
+                          value="Filtrar"
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiFilterAlt size={20} />}
+                        />
+                      </div>
+                    </form>
+                  </div>
+                </AccordionFilter>
 
-                      <div className="h-full flex items-center gap-2">
-                        <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-72">
-                            <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-                              <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId="characters">
-                                  {
-                                    (provided) => (
-                                      <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                        <div className="h-8 mb-3">
-                                          <Button
-                                            value="Atualizar"
-                                            bgColor="bg-blue-600"
-                                            textColor="white"
-                                            onClick={getValuesColumns}
-                                            icon={<IoReloadSharp size={20} />}
-                                          />
-                                        </div>
-                                        {
-                                          generatesProps.map((genarate, index) => (
-                                            <Draggable
-                                              key={index}
-                                              draggableId={String(genarate.title)}
-                                              index={index}
-                                            >
-                                              {(provider) => (
-                                                <li
-                                                  ref={provider.innerRef}
-                                                  {...provider.draggableProps}
-                                                  {...provider.dragHandleProps}
+                <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+                  <MaterialTable
+                    style={{ background: '#f9fafb' }}
+                    columns={columns}
+                    data={logs}
+                    options={{
+                      showTitle: false,
+                      headerStyle: {
+                        zIndex: 20,
+                      },
+                      search: false,
+                      filtering: false,
+                      pageSize: itensPerPage,
+                    }}
+                    components={{
+                      Toolbar: () => (
+                        <div
+                          className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200"
+                        >
+
+                          <strong className="text-blue-600">
+                            Total registrado:
+                            {' '}
+                            {itemsTotal}
+                          </strong>
+
+                          <div className="h-full flex items-center gap-2">
+                            <div className="border-solid border-2 border-blue-600 rounded">
+                              <div className="w-72">
+                                <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                                  <DragDropContext onDragEnd={handleOnDragEnd}>
+                                    <Droppable droppableId="characters">
+                                      {
+                                        (provided) => (
+                                          <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                            <div className="h-8 mb-3">
+                                              <Button
+                                                value="Atualizar"
+                                                bgColor="bg-blue-600"
+                                                textColor="white"
+                                                onClick={getValuesColumns}
+                                                icon={<IoReloadSharp size={20} />}
+                                              />
+                                            </div>
+                                            {
+                                              generatesProps.map((genarate, index) => (
+                                                <Draggable
+                                                  key={index}
+                                                  draggableId={String(genarate.title)}
+                                                  index={index}
                                                 >
-                                                  <CheckBox
-                                                    name={genarate.name}
-                                                    title={genarate.title?.toString()}
-                                                    value={genarate.value}
-                                                    defaultChecked={camposGerenciados
-                                                      .includes(genarate.value as string)}
-                                                  />
-                                                </li>
-                                              )}
-                                            </Draggable>
-                                          ))
-                                        }
-                                        {provided.placeholder}
-                                      </ul>
-                                    )
-                                  }
-                                </Droppable>
-                              </DragDropContext>
-                            </AccordionFilter>
+                                                  {(provider) => (
+                                                    <li
+                                                      ref={provider.innerRef}
+                                                      {...provider.draggableProps}
+                                                      {...provider.dragHandleProps}
+                                                    >
+                                                      <CheckBox
+                                                        name={genarate.name}
+                                                        title={genarate.title?.toString()}
+                                                        value={genarate.value}
+                                                        defaultChecked={camposGerenciados
+                                                          .includes(genarate.value as string)}
+                                                      />
+                                                    </li>
+                                                  )}
+                                                </Draggable>
+                                              ))
+                                            }
+                                            {provided.placeholder}
+                                          </ul>
+                                        )
+                                      }
+                                    </Droppable>
+                                  </DragDropContext>
+                                </AccordionFilter>
+                              </div>
+                            </div>
+
+                            <div className="h-12 flex items-center justify-center w-full">
+                              <Button title="Exportar planilha de logs" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                            </div>
                           </div>
                         </div>
-
-                        <div className="h-12 flex items-center justify-center w-full">
-                          <Button title="Exportar planilha de logs" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-                        </div>
-                      </div>
-                    </div>
-                  ),
-                  Pagination: (props) => (
-                    <div
-                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {
-                        Array(1).fill('').map((value, index) => (
+                      ),
+                      Pagination: (props) => (
+                        <div
+                          className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                          {...props}
+                        >
                           <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
+                            onClick={() => setCurrentPage(currentPage - 10)}
                             bgColor="bg-blue-600"
                             textColor="white"
-                            disabled
+                            icon={<MdFirstPage size={18} />}
+                            disabled={currentPage <= 1}
                           />
-                        ))
-                      }
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
-                  ) as any,
-                }}
-              />
+                          <Button
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            icon={<BiLeftArrow size={15} />}
+                            disabled={currentPage <= 0}
+                          />
+                          {
+                            Array(1).fill('').map((value, index) => (
+                              <Button
+                                key={index}
+                                onClick={() => setCurrentPage(index)}
+                                value={`${currentPage + 1}`}
+                                bgColor="bg-blue-600"
+                                textColor="white"
+                                disabled
+                              />
+                            ))
+                          }
+                          <Button
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            icon={<BiRightArrow size={15} />}
+                            disabled={currentPage + 1 >= pages}
+                          />
+                          <Button
+                            onClick={() => setCurrentPage(currentPage + 10)}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            icon={<MdLastPage size={18} />}
+                            disabled={currentPage + 1 >= pages}
+                          />
+                        </div>
+                      ) as any,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </Content>
-    </>
+          </Content>
+        </>
+      )
   );
 }
 
