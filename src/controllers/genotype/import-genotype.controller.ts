@@ -35,8 +35,14 @@ export class ImportGenotypeController {
     const responseIfError: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
+      if (spreadSheet[0]?.length < 30) {
+        return { status: 400, message: 'O numero de colunas e menor do que o esperado' };
+      }
+      if (spreadSheet[0]?.length > 30) {
+        return { status: 400, message: 'O numero de colunas e maior do que o esperado' };
+      }
+
       for (const row in spreadSheet) {
-        spreadSheet[row].pop();
         for (const column in spreadSheet[row]) {
           if (row === '0') {
             if (!(spreadSheet[row][column].toUpperCase())
@@ -59,7 +65,7 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'id_dados_geno') {
+            if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -70,13 +76,6 @@ export class ImportGenotypeController {
                 if (genotipo.total > 0) {
                   this.aux.id_dados_geno = genotipo.response[0]?.id_dados;
                 }
-              }
-            }
-
-            if (configModule.response[0]?.fields[column] === 'Genotipo') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
 
@@ -110,8 +109,15 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'Tecnologia') {
-              if (String(spreadSheet[row][column]) === '') {
+            if (configModule.response[0]?.fields[column] === 'Nome do genótipo') {
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              }
+            }
+
+            if (configModule.response[0]?.fields[column] === 'Código da tecnologia') {
+              if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
@@ -138,7 +144,7 @@ export class ImportGenotypeController {
             }
 
             if (configModule.response[0]?.fields[column] === 'GMR') {
-              if (spreadSheet[row][column] !== '') {
+              if (spreadSheet[row][column] !== null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if (typeof (spreadSheet[row][column]) !== 'number') {
@@ -152,7 +158,7 @@ export class ImportGenotypeController {
             }
 
             if (configModule.response[0]?.fields[column] === 'BGM') {
-              if (spreadSheet[row][column] !== '') {
+              if (spreadSheet[row][column] !== null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if (typeof (spreadSheet[row][column]) !== 'number') {
@@ -166,14 +172,14 @@ export class ImportGenotypeController {
             }
 
             // Campos lote
-            if (configModule.response[0]?.fields[column] === 'id_dados_lote') {
+            if (configModule.response[0]?.fields[column] === 'DATA_ID') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'Ano') {
+            if (configModule.response[0]?.fields[column] === 'Ano do lote') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -194,6 +200,7 @@ export class ImportGenotypeController {
                   );
               }
             }
+
             if (configModule.response[0]?.fields[column] === 'Safra') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -225,7 +232,7 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'CodLote') {
+            if (configModule.response[0]?.fields[column] === 'Código do lote') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -245,7 +252,7 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'Cruza') {
+            if (configModule.response[0]?.fields[column] === 'Cruzamento de origem') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -316,13 +323,13 @@ export class ImportGenotypeController {
                 this.aux.genealogy = '';
                 // campos genotipo
                 if (configModule.response[0]?.fields[column] === 'id_s1') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.id_s1 = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'id_dados_geno') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
+                  if (spreadSheet[row][column] !== null) {
                     const geno: any = await genotipoController.getAll(
                       {
                         id_culture: idCulture,
@@ -337,44 +344,44 @@ export class ImportGenotypeController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Genotipo') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Nome do genótipo') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.name_genotipo = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'NomePrincipal') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Nome principal') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.name_main = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'NomePublico') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Nome público') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.name_public = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'NomeExperimental') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Nome experimental') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.name_experiment = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'NomeAlternativo') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Nome alternativo') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.name_alter = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'EliteNome') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Elite_Nome') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.elite_name = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Tecnologia') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Código da tecnologia') {
+                  if (spreadSheet[row][column] !== null) {
                     const tec: any = await tecnologiaController.getAll(
                       { id_culture: idCulture, cod_tec: String(spreadSheet[row][column]) },
                     );
@@ -385,74 +392,74 @@ export class ImportGenotypeController {
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Tipo') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.type = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'gmr') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.gmr = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'bgm') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.bgm = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Cruza') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Cruzamento de origem') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.cruza = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ProgenitorFdireito') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Progenitor F direto') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.progenitor_f_direto = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ProgenitorMdireito') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Progenitor M direto') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.progenitor_m_direto = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ProgenitorForigem') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Progenitor F de origem') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.progenitor_f_origem = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ProgenitorMorigem') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Progenitor M de origem') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.progenitor_m_origem = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ProgenitoresOrigem') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Progenitores de origem') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.progenitores_origem = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'ParentescoCompleto') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Parentesco Completo') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.parentesco_completo = spreadSheet[row][column];
                   }
                 }
 
                 // Campos lote
                 if (configModule.response[0]?.fields[column] === 'id_s2') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.id_s2 = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'id_dados_lote') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'DATA_ID') {
+                  if (spreadSheet[row][column] !== null) {
                     const lote: any = await loteController.getAll(
                       { id_dados: spreadSheet[row][column] },
                     );
@@ -463,50 +470,50 @@ export class ImportGenotypeController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Ano') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Ano do lote') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.year = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'NCC') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.ncc = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Safra') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.id_safra = idSafra;
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'CodLote') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'Código do lote') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.cod_lote = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Fase') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.fase = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Peso') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.peso = spreadSheet[row][column];
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'QuantidadeSementes') {
-                  if (spreadSheet[row][column] !== '') {
+                if (configModule.response[0]?.fields[column] === 'SEMENTES') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.quant_sementes = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'DT') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.dt_import = spreadSheet[row][column];
                   }
                 }
