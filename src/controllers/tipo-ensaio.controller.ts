@@ -9,7 +9,7 @@ export class TypeAssayController {
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterName) {
