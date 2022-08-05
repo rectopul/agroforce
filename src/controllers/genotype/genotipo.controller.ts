@@ -24,6 +24,10 @@ export class GenotipoController {
         parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmr).toFixed(1)}", "lt": "${gmrMax.toFixed(1)}" }`);
       }
 
+      if (options.filterGmrRangeFrom && options.filterGmrRangeTo) {
+        parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}", "lte": "${Number(options.filterGmrRangeTo)}" }`);
+      }
+
       if (options.filterTecnologiaCod) {
         parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
       }

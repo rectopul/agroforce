@@ -38,6 +38,8 @@ interface IFilter {
   filterTecnologiaDesc: string | any;
   filterCruza: string | any;
   filterGmr: string | any;
+  filterGmrRangeTo: string | any;
+  filterGmrRangeFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -138,6 +140,8 @@ export default function Listagem({
       filterTecnologiaDesc: '',
       filterCruza: '',
       filterGmr: '',
+      filterGmrRangeFrom: '',
+      filterGmrRangeTo: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -148,8 +152,10 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
       filterGmr,
+      filterGmrRangeTo,
+      filterGmrRangeFrom,
     }) => {
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&`;
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotipoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -536,6 +542,38 @@ export default function Listagem({
     );
   }
 
+  function filterFieldFactoryGmrRange(title: any, name: any) {
+    return (
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterGmrRangeFrom"
+              name="filterGmrRangeFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterGmrRangeTo"
+              name="filterGmrRangeTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -575,11 +613,25 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
 
+                </div> 
+                
+                <div className="w-full h-full
+                  flex
+                  justify-center
+                  pb-2
+                  pt-2
+                ">
+
                   {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+
 
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {filterFieldFactory('filterGmr', 'GMR')}
+                  {//filterFieldFactory('filterGmr', 'GMR')
+                  }
+
+                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+
 
                 </div>
 
