@@ -141,10 +141,11 @@ export class ImportExperimentController {
               } else if ((spreadSheet[row][column]).toString().length > 2
                 || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                  += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'deve ser um numero de ate 2 dígitos',
                   );
               }
             }
