@@ -87,7 +87,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
+      name: 'CamposGerenciados[]', title: 'Ação', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);

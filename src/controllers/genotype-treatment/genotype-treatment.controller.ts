@@ -181,7 +181,7 @@ export class GenotypeTreatmentController {
 
   async deleteAll(idAssayList: number) {
     try {
-      const response = await this.genotypeTreatmentRepository.deleteAll(idAssayList);
+      const response = await this.genotypeTreatmentRepository.deleteAll(Number(idAssayList));
       if (response) {
         return { status: 200, message: 'Tratamentos do genótipo excluídos' };
       }
