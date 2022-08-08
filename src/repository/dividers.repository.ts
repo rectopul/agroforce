@@ -2,28 +2,23 @@ import { prisma } from '../pages/api/db/db';
 
 export class DisparoRepository {
   async create(data: any) {
-    const disparos = await prisma.disparos.create({ data });
-    return disparos;
+    const result = await prisma.dividers.create({ data });
+    return result;
   }
 
   async findOne(id: number) {
-    const disparos = await prisma.disparos.findUnique({
+    const result = await prisma.dividers.findUnique({
       where: { id },
     });
-    return disparos;
+    return result;
   }
 
   async update(id: number, data: any) {
-    const disparos = await this.findOne(id);
-
-    if (disparos !== null) {
-      const result = await prisma.disparos.update({
-        where: { id },
-        data,
-      });
-      return result;
-    }
-    return false;
+    const result = await prisma.dividers.update({
+      where: { id },
+      data,
+    });
+    return result;
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
@@ -33,9 +28,9 @@ export class DisparoRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.disparos.count({ where });
+    const count = await prisma.dividers.count({ where });
 
-    const result: object | any = await prisma.disparos.findMany({
+    const result: object | any = await prisma.dividers.findMany({
       select,
       skip,
       take,

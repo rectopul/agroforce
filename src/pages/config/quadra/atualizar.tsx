@@ -26,7 +26,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { userPreferencesService, disparosService, quadraService } from '../../../services';
+import { userPreferencesService, dividersService, quadraService } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   Button,
@@ -49,7 +49,7 @@ interface IGenerateProps {
 }
 
 interface IData {
-  allDisparos: any[];
+  allDividers: any[];
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
@@ -57,8 +57,8 @@ interface IData {
   quadra: any;
 }
 
-export default function Atualizarquadra({
-  allDisparos, totalItems, itensPerPage, filterApplication, idQuadra, quadra,
+export default function AtualizarQuadra({
+  allDividers, totalItems, itensPerPage, filterApplication, idQuadra, quadra,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -78,15 +78,15 @@ export default function Atualizarquadra({
       cod_quadra: quadra.cod_quadra,
       id_culture: quadra.id_culture,
       id_safra: quadra.id_safra,
-      local_preparo: quadra.localPreparo.name_local_culture,
+      local: quadra.local.name_local_culture,
       local_plantio: quadra.local_plantio,
       larg_q: quadra.larg_q,
       comp_p: quadra.comp_p,
       linha_p: quadra.linha_p,
       comp_c: quadra.comp_c,
       esquema: quadra.esquema,
-      tiro_fixo: quadra.tiro_fixo,
-      disparo_fixo: quadra.disparo_fixo,
+      tiro_fixo: quadra.tf,
+      disparo_fixo: quadra.dividers[0]?.df,
       q: quadra.q,
     },
     onSubmit: async (values) => {
@@ -95,19 +95,17 @@ export default function Atualizarquadra({
         cod_quadra: values.cod_quadra,
         id_culture: values.id_culture,
         id_safra: values.id_safra,
-        local_preparo: values.localPreparo.name_local_culture,
+        local: values.local.name_local_culture,
         local_plantio: values.local_plantio,
         larg_q: values.larg_q,
         comp_p: values.comp_p,
         linha_p: values.linha_p,
         comp_c: values.comp_c,
         esquema: values.esquema,
-        tiro_fixo: values.tiro_fixo,
-        disparo_fixo: values.disparo_fixo,
         q: values.q,
       }).then((response) => {
         if (response.status === 200) {
-          Swal.fire('Genótipo atualizado com sucesso!');
+          Swal.fire('Quadra atualizado com sucesso!');
           router.back();
         } else {
           Swal.fire(response.message);
@@ -117,12 +115,12 @@ export default function Atualizarquadra({
   });
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.disparos || { id: 0, table_preferences: 'id,divisor,sem_metros,t4_i,t4_f,di,df' };
+  const preferences = userLogado.preferences.dividers || { id: 0, table_preferences: 'id,divisor,sem_metros,t4_i,t4_f,di,df' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [disparos, setDisparos] = useState<any[]>(() => allDisparos);
+  const [dividers, setDividers] = useState<any[]>(() => allDividers);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -151,9 +149,9 @@ export default function Atualizarquadra({
     },
     onSubmit: async (values) => {
       const parametersFilter = `&filterSearch=${values.filterSearch}&id_quadra=${idQuadra}`;
-      await disparosService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: any[]) => {
-        setDisparos(response);
-        setTotaItems(response.length);
+      await dividersService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: any[]) => {
+        setDividers(response);
+        setTotalItems(response.length);
         setFilter(parametersFilter);
       });
     },
@@ -182,9 +180,9 @@ export default function Atualizarquadra({
       parametersFilter = filter;
     }
 
-    await disparosService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    await dividersService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setDisparos(response.response);
+        setDividers(response.response);
       }
     });
 
@@ -309,7 +307,7 @@ export default function Atualizarquadra({
         userId: userLogado.id,
         module_id: 18,
       }).then((response) => {
-        userLogado.preferences.disparos = {
+        userLogado.preferences.dividers = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -321,7 +319,7 @@ export default function Atualizarquadra({
         JSON.stringify(userLogado),
       );
     } else {
-      userLogado.preferences.disparos = {
+      userLogado.preferences.dividers = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -357,7 +355,7 @@ export default function Atualizarquadra({
       filterApplication += `&paramSelect=${camposGerenciados}&id_quadra=${idQuadra}`;
     }
 
-    await disparosService.getAll(filterApplication).then((response) => {
+    await dividersService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
@@ -371,7 +369,7 @@ export default function Atualizarquadra({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'disparos');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'dividers');
 
         // Buffer
         XLSX.write(workBook, {
@@ -384,7 +382,7 @@ export default function Atualizarquadra({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'disparos.xlsx');
+        XLSX.writeFile(workBook, 'divisores.xlsx');
       }
     });
   };
@@ -404,9 +402,9 @@ export default function Atualizarquadra({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await disparosService.getAll(parametersFilter).then((response) => {
+    await dividersService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        setDisparos(response.response);
+        setDividers(response.response);
       }
     });
   }
@@ -420,7 +418,6 @@ export default function Atualizarquadra({
     return (
       <div className="w-2/4 h-10">
         <label className="block text-gray-900 text-sm font-bold mb-2">
-          *
           {name}
         </label>
         <Input
@@ -457,9 +454,9 @@ export default function Atualizarquadra({
                 style={{ background: '#e5e7eb' }}
                 disabled
                 required
-                id="localPreparo"
-                name="localPreparo"
-                value={quadra.localPreparo.name_local_culture}
+                id="local"
+                name="local"
+                value={quadra.local.name_local_culture}
               />
             </div>
 
@@ -478,7 +475,19 @@ export default function Atualizarquadra({
 
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 
-            {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
+            <div className="w-2/4 h-10">
+              <label className="block text-gray-900 text-sm font-bold mb-2">
+                Disparo fixo
+              </label>
+              <Input
+                style={{ background: '#e5e7eb' }}
+                disabled
+                required
+                id="df"
+                name="df"
+                value={quadra.dividers[0]?.df}
+              />
+            </div>
 
           </div>
           <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
@@ -531,7 +540,7 @@ export default function Atualizarquadra({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={disparos}
+              data={dividers}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -617,7 +626,7 @@ export default function Atualizarquadra({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de disparos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Exportar planilha de divisores" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -702,22 +711,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiQuadra = await fetch(`${baseUrl}/${context.query.id}`, requestOptions);
   const quadra = await apiQuadra.json();
 
-  const baseUrlDisparos = `${publicRuntimeConfig.apiUrl}/disparos`;
+  const baseUrlDividers = `${publicRuntimeConfig.apiUrl}/dividers`;
 
   const param = `skip=0&take=${itensPerPage}`;
-  const urlParameters: any = new URL(baseUrlDisparos);
+  const urlParameters: any = new URL(baseUrlDividers);
   urlParameters.search = new URLSearchParams(param).toString();
   const idQuadra = Number(context.query.id);
 
   const filterApplication = '';
 
-  const disparos = await fetch(`${baseUrlDisparos}?id_quadra=${idQuadra}`, requestOptions);
-  const { response: allDisparos, total: totalItems } = await disparos.json();
+  const {
+    response: allDividers,
+    total: totalItems,
+  } = await fetch(`${baseUrlDividers}?id_quadra=${idQuadra}`, requestOptions).then((response) => response.json());
 
   return {
     props: {
       quadra,
-      allDisparos,
+      allDividers,
       totalItems,
       itensPerPage,
       filterApplication,

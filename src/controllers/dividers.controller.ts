@@ -1,8 +1,8 @@
-import { DisparoRepository } from '../repository/disparos.repository';
+import { DisparoRepository } from '../repository/dividers.repository';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
-export class DisparosController {
+export class DividersController {
   public readonly required = 'Campo obrigatório';
 
   disparoRepository = new DisparoRepository();
@@ -54,8 +54,8 @@ export class DisparosController {
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Disparos controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Disparos erro');
+      handleError('Divisores controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Divisores erro');
     }
   }
 
@@ -69,18 +69,18 @@ export class DisparosController {
 
       return { status: 200, response };
     } catch (error: any) {
-      handleError('Disparos controller', 'GetOne', error.message);
-      throw new Error('[Controller] - GetOne Disparos erro');
+      handleError('Divisores controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Divisores erro');
     }
   }
 
   async create(data: any) {
     try {
-      const response = await this.disparoRepository.create(data);
+      await this.disparoRepository.create(data);
       return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
-      handleError('Disparos controller', 'Create', error.message);
-      throw new Error('[Controller] - Create Disparos erro');
+      handleError('Divisores controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Divisores erro');
     }
   }
 
@@ -100,8 +100,8 @@ export class DisparosController {
 
       return { status: 200, message: 'Genótipo atualizado' };
     } catch (error: any) {
-      handleError('Disparos controller', 'Update', error.message);
-      throw new Error('[Controller] - Update Disparos erro');
+      handleError('Divisores controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Divisores erro');
     }
   }
 }

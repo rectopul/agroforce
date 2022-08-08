@@ -19,7 +19,7 @@ export * from './user.service';
 export * from './npe.service';
 export * from './group.service';
 export * from './quadra.service';
-export * from './disparos.service';
+export * from './dividers.service';
 export * from './layout-children.service';
 export * from './envelope.service';
 export * from './unidade-cultura.service';
