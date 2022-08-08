@@ -605,7 +605,7 @@ export default function AtualizarTipoEnsaio({
   return (
     <>
       <Head>
-        <title>Atualizar Experimento</title>
+        <title>Atualizar Lista de Ensaio</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
@@ -614,7 +614,7 @@ export default function AtualizarTipoEnsaio({
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Experimento</h1>
+            <h1 className="text-2xl">Atualizar Lista de Ensaio</h1>
           </div>
 
           <div className="w-full
