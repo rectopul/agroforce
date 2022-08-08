@@ -2,14 +2,7 @@ import getConfig from 'next/config';
 import { fetchWrapper } from '../helpers';
 
 const { publicRuntimeConfig } = getConfig();
-const baseUrl = `${publicRuntimeConfig.apiUrl}/disparos`;
-
-export const disparosService = {
-  update,
-  getAll,
-  create,
-  list,
-};
+const baseUrl = `${publicRuntimeConfig.apiUrl}/dividers`;
 
 async function create(data: any) {
   const genotipo = await fetchWrapper.post(baseUrl, data);
@@ -30,3 +23,10 @@ async function list(id_culture: number) {
   const genotipo = await fetchWrapper.get(baseUrl, id_culture);
   return genotipo;
 }
+
+export const dividersService = {
+  update,
+  getAll,
+  create,
+  list,
+};

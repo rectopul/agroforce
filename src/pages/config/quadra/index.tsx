@@ -29,6 +29,7 @@ import {
 import { quadraService, userPreferencesService } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import ITabs from '../../../shared/utils/dropdown';
+import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 
 interface IFilter {
   filterStatus: object | any;
@@ -40,7 +41,7 @@ interface IFilter {
 export interface IQuadra {
   id: number;
   id_culture: number;
-  local_preparo: string;
+  local: any;
   local_plagio: string;
   cod_quadra: string;
   comp_p: string;
@@ -80,7 +81,7 @@ export default function Listagem({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: 'id,local_preparo,cod_quadra,linha_p,esquema,status' };
+  const preferences = userLogado.preferences.quadras || { id: 0, table_preferences: 'id,local,cod_quadra,linha_p,esquema,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => quadras);
@@ -92,7 +93,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Local Preparo', value: 'local_preparo' },
+    { name: 'CamposGerenciados[]', title: 'Local Preparo', value: 'local' },
     { name: 'CamposGerenciados[]', title: 'Código Quadra', value: 'cod_quadra' },
     { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
     { name: 'CamposGerenciados[]', title: 'Esquema', value: 'esquema' },
@@ -134,46 +135,34 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra}`;
-    console.log("quadra:");
-    console.log(data);
-
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra}&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
 
+    await quadraService.getAll(parametersFilter).then(({ status }) => {
+      if (status === 200 && data.status !== 0) {
+        Swal.fire({
+          html: 'Não e possível ativar pois já existe uma quadra ativa',
+          width: '800',
+        });
+      } else {
+        quadraService.update({ id: idQuadra, status: data.status });
+        const index = quadra.findIndex((quadraIndex) => quadraIndex.id === idQuadra);
 
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        let statusEdit: number = 0;
-        if (response.response[response.total - 1].status === 0) {
-          statusEdit = 1;
-        } else {
-          statusEdit = 0;
+        if (index === -1) {
+          return;
         }
-        let idEdit: number = response.response[response.total - 1].id;
-        let quadraEdit = quadraService.update({ id: idEdit, status: statusEdit });
+
+        setQuadra((oldSafra) => {
+          const copy = [...oldSafra];
+          copy[index].status = data.status;
+          return copy;
+        });
       }
     });
-
-    const index = quadra.findIndex((quadraIndex) => quadraIndex.id === idQuadra);
-
-    if (index === -1) {
-      return;
-    }
-
-    setQuadra((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const {
-      id,
-      status,
-    } = quadra[index];
   }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
@@ -358,8 +347,8 @@ export default function Listagem({
       if (columnCampos[index] === 'local_plantio') {
         tableFields.push(headerTableFactory('Local plantio', 'local_plantio'));
       }
-      if (columnCampos[index] === 'local_preparo') {
-        tableFields.push(headerTableFactory('Local Preparo', 'localPreparo.name_local_culture'));
+      if (columnCampos[index] === 'local') {
+        tableFields.push(headerTableFactory('Local Preparo', 'local.name_local_culture'));
       }
       if (columnCampos[index] === 'status') {
         tableFields.push(statusHeaderFactory());

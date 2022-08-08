@@ -1,6 +1,7 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
-import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
@@ -9,8 +10,10 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { importService } from '../../../../services';
 import {
-  Button, Content, Input, Select,
+  Button, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -18,7 +21,7 @@ export default function Importar({ safra }: any) {
   const { TabsDropDowns } = ITabs.default;
   const router = useRouter();
   const safras: object | any = [];
-  safra.map((value: string | object | any) => {
+  safra.forEach((value: string | object | any) => {
     safras.push({ id: value.safraName, name: value.safraName });
   });
 
@@ -34,7 +37,12 @@ export default function Importar({ safra }: any) {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'quadra', spreadSheet: rows, moduleId: 17, safra: userLogado.safras.safra_selecionada, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id,
+        table: 'quadra',
+        spreadSheet: rows,
+        moduleId: 17,
+        idSafra: userLogado.safras.safra_selecionada,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
@@ -54,7 +62,7 @@ export default function Importar({ safra }: any) {
       input: [],
       genotipo: '',
     },
-    onSubmit: async (values) => {
+    onSubmit: async () => {
       const inputFile: any = document.getElementById('inputFile');
       readExcel(inputFile.files);
     },

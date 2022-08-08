@@ -21,8 +21,9 @@ export class QuadraRepository {
         tiro_fixo: true,
         disparo_fixo: true,
         q: true,
-        localPreparo: { select: { name_local_culture: true } },
-        Safra: { select: { safraName: true } },
+        dividers: true,
+        local: { select: { name_local_culture: true } },
+        safra: { select: { safraName: true } },
         status: true,
       },
     });
