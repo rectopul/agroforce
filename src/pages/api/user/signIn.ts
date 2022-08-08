@@ -98,9 +98,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.quadras = await PreferencesControllers.getAll({
         userId: user.id, module_id: 17,
       }); preferences.quadras = preferences.quadras.response[0];
-      preferences.disparos = await PreferencesControllers.getAll({
+      preferences.dividers = await PreferencesControllers.getAll({
         userId: user.id, module_id: 18,
-      }); preferences.disparos = preferences.disparos.response[0];
+      }); preferences.dividers = preferences.dividers.response[0];
       preferences.layout_children = await PreferencesControllers.getAll({
         userId: user.id, module_id: 19,
       }); preferences.layout_children = preferences.layout_children.response[0];

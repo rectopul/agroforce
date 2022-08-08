@@ -1,6 +1,6 @@
-import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
-import { QuadraRepository } from '../repository/quadra.repository';
+import handleError from '../../shared/utils/handleError';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { QuadraRepository } from '../../repository/quadra.repository';
 
 export class QuadraController {
   quadraRepository = new QuadraRepository();
@@ -11,7 +11,7 @@ export class QuadraController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
@@ -37,8 +37,8 @@ export class QuadraController {
           tiro_fixo: true,
           disparo_fixo: true,
           q: true,
-          localPreparo: { select: { name_local_culture: true } },
-          Safra: { select: { safraName: true } },
+          local: { select: { name_local_culture: true } },
+          safra: { select: { safraName: true } },
           status: true,
         };
       }
@@ -47,7 +47,7 @@ export class QuadraController {
       }
 
       if (options.local_preparo) {
-        parameters.local_preparo = Number(options.local_preparo);
+        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.local_preparo}"} }`);
       }
 
       if (options.cod_quadra) {
@@ -71,7 +71,7 @@ export class QuadraController {
         orderBy,
       );
 
-      if (!response && response.total <= 0) {
+      if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
@@ -87,9 +87,11 @@ export class QuadraController {
     try {
       if (!id) throw new Error('Dados inválidos');
 
-      const response = await this.quadraRepository.findOne(id);
+      const response: any = await this.quadraRepository.findOne(id);
 
       if (!response) throw new Error('Item não encontrado');
+      response.tf = response.dividers[response.dividers.length - 1].t4_f;
+      console.log(response);
 
       return { status: 200, response };
     } catch (error: any) {

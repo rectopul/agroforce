@@ -2,28 +2,23 @@ import { prisma } from '../pages/api/db/db';
 
 export class LayoutChildrenRepository {
   async create(data: any) {
-    const disparos = await prisma.layout_children.create({ data });
-    return disparos;
+    const result = await prisma.layout_children.create({ data });
+    return result;
   }
 
   async findOne(id: number) {
-    const disparos = await prisma.layout_children.findUnique({
+    const result = await prisma.layout_children.findUnique({
       where: { id },
     });
-    return disparos;
+    return result;
   }
 
   async update(id: number, data: any) {
-    const disparos = await this.findOne(id);
-
-    if (disparos !== null) {
-      const result = await prisma.layout_children.update({
-        where: { id },
-        data,
-      });
-      return result;
-    }
-    return false;
+    const result = await prisma.layout_children.update({
+      where: { id },
+      data,
+    });
+    return result;
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
