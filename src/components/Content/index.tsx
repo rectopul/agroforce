@@ -170,15 +170,15 @@ export function Content({
         name={userLogado.name}
         avatar={!userLogado.avatar ? avatarDefault : userLogado.avatar}
         headerSelects={
-          <div className="mb-4 flex gap-3">
-            <div className="h-10 lg:w-40 md:w-32 sm:w-26">
+          <div className="mb-7 flex gap-3">
+            <div className="h-7 lg:w-40 md:w-32 sm:w-26">
               <Select
                 values={cultures}
                 onChange={(e) => validationCulture(e.target.value)}
                 selected={culturaSelecionada}
               />
             </div>
-            <div className="h-10 lg:w-40 md:w-32 sm:w-26">
+            <div className="h-7 lg:w-40 md:w-32 sm:w-26">
               <Select
                 values={safras}
                 onChange={(e) => validationSafras(e.target.value)}
@@ -229,7 +229,7 @@ export function Content({
 						flex
 						flex-1
 						flex-col
-            p-8
+            p-4
             border
 						border-gray-700
             bg-gray-300
