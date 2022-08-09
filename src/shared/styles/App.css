@@ -1,20 +1,18 @@
 /* @import 'https://cdn.syncfusion.com/ej2/material.css'; */
 
-@import '../../../node_modules/@syncfusion/ej2-base/styles/material.css';  
-@import '../../../node_modules/@syncfusion/ej2-buttons/styles/material.css';  
-@import '../../../node_modules/@syncfusion/ej2-calendars/styles/material.css';  
-@import '../../../node_modules/@syncfusion/ej2-dropdowns/styles/material.css';  
-@import '../../../node_modules/@syncfusion/ej2-inputs/styles/material.css';  
-@import '../../../node_modules/@syncfusion/ej2-navigations/styles/material.css';
-@import '../../../node_modules/@syncfusion/ej2-popups/styles/material.css';
-@import '../../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css';
+@import "../../../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
 @import "../../../node_modules/@syncfusion/ej2-react-grids/styles/material.css";
-
-
 
 .e-grid .e-headercelldiv {
   font-size: 15px;
-  color: #121214;	
+  color: #121214;
 }
 
 .e-grid .e-gridpager .e-prevpagedisabled,
@@ -31,28 +29,33 @@
   border: solid 1px #d1d5db;
 }
 
-.w-res-1366-768{
-  max-width: 1349;
+.w-res-1366-768 {
+  /* max-width: 1349; */
+  width: 100vw;
 }
 
-.table-res-1366-768{
+.table-res-1366-768 {
   height: 1000px;
 }
 
-.h-1366-768{
-  height: 568px;
+.h-1366-768 {
+  /* height: 568px; */
+  /* height: 688px; */
+  height: 87.8vh;
+  width: 100vw;
+  /* overflow: hidden; */
 }
 
-.d-mt-1366-768{
+.d-mt-1366-768 {
   height: 500px;
   width: 1155px;
   overflow-x: scroll;
 }
 
-.mt-1366-768{
+.mt-1366-768 {
   width: 100%;
 }
 
-.Component-horizontalScrollContainer-5 div div{
-  overflow: visible!important;
+.Component-horizontalScrollContainer-5 div div {
+  overflow: visible !important;
 }
