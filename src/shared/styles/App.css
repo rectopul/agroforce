@@ -30,7 +30,12 @@
 }
 
 .MuiAccordion-root {
-  padding: -10px;
+  /* height: 40px; */
+  /* z-index: 999; */
+}
+
+.MuiAccordionSummary-root {
+  /* height: 40px; */
 }
 
 .MuiTableCell-root {
@@ -45,10 +50,6 @@
 .MuiTableCell-body {
   padding: 0px 10px !important;
 }
-
-/* .MuiButtonBase-root {
-  height: 10px !important;
-} */
 
 .w-res-1366-768 {
   /* max-width: 1349; */
