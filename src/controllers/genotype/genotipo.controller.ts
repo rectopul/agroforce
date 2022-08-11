@@ -76,6 +76,7 @@ export class GenotipoController {
           parentesco_completo: true,
           tecnologia: true,
           lote: true,
+          dt_import: true,
         };
       }
 

@@ -310,7 +310,7 @@ export class ImportExperimentController {
           return { status: 500, message: 'Erro ao salvar planilha de experimento' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
