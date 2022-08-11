@@ -290,7 +290,7 @@ model genotipo {
   progenitor_f_origem String?
   progenitor_m_origem String?
   progenitores_origem String?
-  parentesco_completo String?
+  parentesco_completo String?              @db.MediumText
   created_by          Int
   created_at          DateTime             @default(now())
   dt_import           DateTime             @default(now())
