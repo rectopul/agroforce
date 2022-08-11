@@ -286,7 +286,7 @@ export class ImportGenotypeController {
               });
             }
 
-            if (configModule.response[0]?.fields[column] === 'DT') {
+            if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -296,6 +296,7 @@ export class ImportGenotypeController {
                 const { status, response }: IReturnObject = await genotipoController.getAll(
                   { id_dados: this.aux.id_dados_geno },
                 );
+
                 if (status === 200) {
                   if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
                     responseIfError[Number(column)]
@@ -624,7 +625,7 @@ export class ImportGenotypeController {
           return { status: 500, message: 'Erro ao salvar planilha de Genótipo' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {

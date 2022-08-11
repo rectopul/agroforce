@@ -158,7 +158,7 @@ export class ImportTechnologyController {
         }
       }
 
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {

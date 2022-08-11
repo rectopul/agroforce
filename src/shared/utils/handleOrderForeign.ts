@@ -10,7 +10,7 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
       case 'genotipo':
         return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
       default:
-        return undefined;
+        return '';
     }
   } else {
     switch (foreignKey) {
@@ -34,8 +34,10 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'assay_list':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'user':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       default:
-        return undefined;
+        return '';
     }
   }
 }
