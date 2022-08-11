@@ -9,7 +9,9 @@ import { ButtonAside } from './ButtonAside';
 
 export function Aside({ moduloActive }: any) {
   return (
-    <aside style={{height: "auto"}} className="h-screen w-32
+    <aside
+      style={{ height: 'auto' }}
+      className="h-screen w-32
       bg-gray-450
     "
     >

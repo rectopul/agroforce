@@ -50,7 +50,7 @@ interface IFilter {
 export interface IQuadra {
   id: number;
   id_culture: number;
-  local_preparo: string;
+  local: any;
   local_plagio: string;
   cod_quadra: string;
   comp_p: string;
@@ -169,10 +169,9 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra}`;
-    console.log("quadra:");
-    console.log(data);
-
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${
+      data.cod_quadra
+    }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {

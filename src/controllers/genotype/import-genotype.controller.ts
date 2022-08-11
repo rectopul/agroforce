@@ -382,6 +382,10 @@ export class ImportGenotypeController {
 
                 if (configModule.response[0]?.fields[column] === 'Código da tecnologia') {
                   if (spreadSheet[row][column] !== null) {
+                    if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                      // eslint-disable-next-line no-param-reassign
+                      spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                    }
                     const tec: any = await tecnologiaController.getAll(
                       { id_culture: idCulture, cod_tec: String(spreadSheet[row][column]) },
                     );
