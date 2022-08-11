@@ -226,7 +226,12 @@ export class ImportController {
       }
       // Validação do modulo Layout Quadra
       if (data.moduleId === 5) {
-        return await ImportBlockController.validate(responseLog?.id, data);
+        response = await this.validateLayoutQuadra(data);
+        if (response == 'save') {
+          response = 'Itens cadastrados com sucesso!';
+        } else {
+          erro = true;
+        }
       }
 
       // Validação do modulo Delineamento
