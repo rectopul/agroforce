@@ -1,18 +1,14 @@
-import { capitalize } from '@mui/material';
-import { useFormik } from 'formik';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { HiOutlineOfficeBuilding } from 'react-icons/hi';
-import { IoMdArrowBack } from 'react-icons/io';
-import { departmentService } from 'src/services';
-import Swal from 'sweetalert2';
-import {
-  Button,
-  Content,
-  Input,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
+import { capitalize } from "@mui/material";
+import { useFormik } from "formik";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { IoMdArrowBack } from "react-icons/io";
+import { departmentService } from "src/services";
+import Swal from "sweetalert2";
+import { Button, Content, Input } from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
 
 interface IDepartmentProps {
   name: string;
@@ -24,51 +20,51 @@ export default function Safra() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState('text-black');
+  const [checkInput, setCheckInput] = useState("text-black");
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
-      name: '',
+      name: "",
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire("Preencha todos os campos obrigatórios");
         return;
       }
 
-      await departmentService.create({
-        name: capitalize(formik.values.name),
-        created_by: formik.values.created_by,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Setor cadastrado com sucesso!');
-          router.back();
-        } else {
-          setCheckInput('text-red-600');
-          Swal.fire(response.message);
-        }
-      });
+      await departmentService
+        .create({
+          name: capitalize(formik.values.name),
+          created_by: formik.values.created_by,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire("Setor cadastrado com sucesso!");
+            router.back();
+          } else {
+            setCheckInput("text-red-600");
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = 'red';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "red";
     } else {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = '';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "";
     }
   }
 
@@ -80,20 +76,13 @@ export default function Safra() {
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="
-            w-full
-            bg-white
-            shadow-md
-            rounded
-            px-8
-            pt-6
-            pb-8
-            mt-2"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Novo setor</h1>
 
-          <div className="
+          <div
+            className="
             w-full
             flex
             gap-2
@@ -102,7 +91,7 @@ export default function Safra() {
           "
           >
             <div className="w-2/4 h-10 mt-2">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>* </strong>
                 Nome
               </label>
@@ -118,7 +107,8 @@ export default function Safra() {
             </div>
           </div>
 
-          <div className="
+          <div
+            className="
             h-10
             w-full
             flex
@@ -144,7 +134,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
