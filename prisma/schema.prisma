@@ -240,7 +240,7 @@ model quadra {
   larg_q        Int
   comp_p        Int
   linha_p       Int
-  comp_c        Int
+  comp_c        Decimal  @db.Decimal(2, 1)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?
