@@ -349,10 +349,10 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       render: (rowData: IGenotipos) => (
-        <div className="h-10 flex">
-          <div className="h-10">
+        <div className="h-7 flex">
+          <div className="h-7">
             <Button
-              icon={<BiEdit size={16} />}
+              icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
               title={`Editar ${rowData.genealogy}`}
@@ -825,10 +825,10 @@ export default function Listagem({
                         </div>
                       </div>
 
-                      <div className="h-12 flex items-center justify-center w-full">
+                      <div className="h-10 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de genótipos"
-                          icon={<RiFileExcel2Line size={20} />}
+                          icon={<RiFileExcel2Line size={16} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {

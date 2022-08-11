@@ -44,7 +44,7 @@ export function Button({
       onClick={onClick}
       className={`w-full h-full
         flex justify-center items-center gap-2
-        px-4 
+        px-3 
         ${bgColor}
         text-${textColor}
         text-base
@@ -71,7 +71,7 @@ export function Button({
       onClick={handleClick}
       className={`w-full h-full
         flex justify-center items-center gap-2
-        px-4 
+        px-3 
         ${bgColor}
         text-${textColor}
         text-base
