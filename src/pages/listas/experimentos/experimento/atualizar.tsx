@@ -443,7 +443,7 @@ export default function AtualizarLocal({
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Lista de Ensaio</h1>
+            <h1 className="text-2xl">Atualizar Lista de Experimento</h1>
           </div>
 
           <div className="w-full

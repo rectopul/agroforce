@@ -1,28 +1,40 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useEffect, useState } from "react";
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
-} from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { useRouter } from 'next/router';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { npeService, userPreferencesService } from 'src/services';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { removeCookies } from 'cookies-next';
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from "react-icons/ai";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { npeService, userPreferencesService } from "src/services";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { removeCookies } from "cookies-next";
+import {
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
+} from "../../../components";
+import * as ITabs from "../../../shared/utils/dropdown";
 
 interface INpeProps {
   id: number | any;
@@ -65,103 +77,153 @@ interface Idata {
 }
 
 export default function Listagem({
-  allNpe, itensPerPage, filterApplication, totalItems,
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
 }: Idata) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'NPE'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "NPE" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.npe || { id: 0, table_preferences: 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,status' };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.npe || {
+    id: 0,
+    table_preferences:
+      "id,local,safra,foco,ensaio,tecnologia,epoca,npei,status",
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences
+  );
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+      name: "CamposGerenciados[]",
+      title: "Favorito ",
+      value: "id",
+      defaultChecked: () => camposGerenciados.includes("id"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Local ', value: 'local', defaultChecked: () => camposGerenciados.includes('local'),
+      name: "CamposGerenciados[]",
+      title: "Local ",
+      value: "local",
+      defaultChecked: () => camposGerenciados.includes("local"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Safra ', value: 'safra', defaultChecked: () => camposGerenciados.includes('safra'),
+      name: "CamposGerenciados[]",
+      title: "Safra ",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Foco ', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
+      name: "CamposGerenciados[]",
+      title: "Foco ",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ensaio ', value: 'ensaio', defaultChecked: () => camposGerenciados.includes('ensaio'),
+      name: "CamposGerenciados[]",
+      title: "Ensaio ",
+      value: "ensaio",
+      defaultChecked: () => camposGerenciados.includes("ensaio"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Epoca ', value: 'epoca', defaultChecked: () => camposGerenciados.includes('epoca'),
+      name: "CamposGerenciados[]",
+      title: "Epoca ",
+      value: "epoca",
+      defaultChecked: () => camposGerenciados.includes("epoca"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'NPE Inicial ', value: 'npei', defaultChecked: () => camposGerenciados.includes('npei'),
+      name: "CamposGerenciados[]",
+      title: "NPE Inicial ",
+      value: "npei",
+      defaultChecked: () => camposGerenciados.includes("npei"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
 
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterLocal: '',
-      filterSafra: '',
-      filterFoco: '',
-      filterEnsaio: '',
-      filterTecnologia: '',
-      filterEpoca: '',
-      filterNPE: '',
-      orderBy: '',
-      typeOrder: '',
+      filterStatus: "",
+      filterLocal: "",
+      filterSafra: "",
+      filterFoco: "",
+      filterEnsaio: "",
+      filterTecnologia: "",
+      filterEpoca: "",
+      filterNPE: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
-      filterStatus, filterLocal, filterSafra, filterFoco, filterEnsaio, filterTecnologia, filterEpoca, filterNPE,
+      filterStatus,
+      filterLocal,
+      filterSafra,
+      filterFoco,
+      filterEnsaio,
+      filterTecnologia,
+      filterEpoca,
+      filterNPE,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada}`;
-      await npeService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setNPE(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${
+        userLogado.safras.safra_selecionada
+      }`;
+      await npeService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setNPE(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatus = filterApplication.split('');
+  const filterStatus = filterApplication.split("");
 
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -173,21 +235,17 @@ export default function Listagem({
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
+      title: <div className="flex items-center">{arrowOrder}</div>,
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417' ? (
+      render: () =>
+        colorStar === "#eba417" ? (
           <div className="h-10 flex">
             <div>
               <button
                 className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar('')}
+                onClick={() => setColorStar("")}
               >
                 <AiTwotoneStar size={25} color="#eba417" />
               </button>
@@ -198,86 +256,93 @@ export default function Listagem({
             <div>
               <button
                 className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar('#eba417')}
+                onClick={() => setColorStar("#eba417")}
               >
                 <AiTwotoneStar size={25} />
               </button>
             </div>
           </div>
-        )
-      ),
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: "Status",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: INpeProps) => (
+      filterPlaceholder: "Filtrar por status",
+      render: (rowData: INpeProps) =>
         rowData.status ? (
-          <div className="h-10 flex">
-            <div className="h-10" />
+          <div className="h-7 flex">
+            <div className="h-7" />
             <div>
               <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={() => handleStatus(rowData.id, { status: rowData.status, ...rowData })}
+                icon={<FaRegThumbsUp size={14} />}
+                onClick={() =>
+                  handleStatus(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 bgColor="bg-green-600"
                 textColor="white"
               />
             </div>
           </div>
         ) : (
-          <div className="h-10 flex">
-            <div className="h-10" />
+          <div className="h-7 flex">
+            <div className="h-7" />
             <div>
               <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
+                icon={<FaRegThumbsDown size={14} />}
+                onClick={async () =>
+                  handleStatus(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 bgColor="bg-red-800"
                 textColor="white"
               />
             </div>
           </div>
-        )
-      ),
+        ),
     };
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
+      if (columnCampos[item] === "id") {
         tableFields.push(idHeaderFactory());
       }
-      if (columnCampos[item] === 'local') {
-        tableFields.push(headerTableFactory('Local', 'local.name_local_culture'));
+      if (columnCampos[item] === "local") {
+        tableFields.push(
+          headerTableFactory("Local", "local.name_local_culture")
+        );
       }
-      if (columnCampos[item] === 'safra') {
-        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
+      if (columnCampos[item] === "safra") {
+        tableFields.push(headerTableFactory("Safra", "safra.safraName"));
       }
-      if (columnCampos[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+      if (columnCampos[item] === "foco") {
+        tableFields.push(headerTableFactory("Foco", "foco.name"));
       }
-      if (columnCampos[item] === 'ensaio') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      if (columnCampos[item] === "ensaio") {
+        tableFields.push(headerTableFactory("Ensaio", "type_assay.name"));
       }
-      if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
+      if (columnCampos[item] === "tecnologia") {
+        tableFields.push(headerTableFactory("Tecnologia", "tecnologia.name"));
       }
-      if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Epoca', 'epoca'));
+      if (columnCampos[item] === "epoca") {
+        tableFields.push(headerTableFactory("Epoca", "epoca"));
       }
-      if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+      if (columnCampos[item] === "npei") {
+        tableFields.push(headerTableFactory("NPE Inicial", "npei"));
       }
-      if (columnCampos[item] === 'status') {
+      if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -286,34 +351,39 @@ export default function Listagem({
 
   const columns = colums(camposGerenciados);
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
 
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
     }
 
-    await npeService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setNPE(response.response);
-      }
-    });
+    await npeService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setNPE(response.response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -323,14 +393,14 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
   }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -339,15 +409,32 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 5 }).then((response) => {
-        userLogado.preferences.npe = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
-        preferences.id = response.response.id;
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      await userPreferencesService
+        .create({
+          table_preferences: campos,
+          userId: userLogado.id,
+          module_id: 5,
+        })
+        .then((response) => {
+          userLogado.preferences.npe = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.layout_quadra = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      userLogado.preferences.layout_quadra = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -355,14 +442,19 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra}&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay}&epoca=${String(data.epoca)}`;
+    const parametersFilter = `filterStatus=${1}&id_safra=${
+      data.id_safra
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
+      data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
-          Swal.fire('NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações');
-          router.push('');
+          Swal.fire(
+            "NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações"
+          );
+          router.push("");
         } else {
-
         }
       });
     } else {
@@ -385,10 +477,7 @@ export default function Listagem({
         return copy;
       });
 
-      const {
-        id,
-        status,
-      } = npe[index];
+      const { id, status } = npe[index];
     }
   }
 
@@ -405,22 +494,24 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
+    if (!filterApplication.includes("paramSelect")) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await npeService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { avatar: any; status: any }) => {
-          delete row.avatar;
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
+        const newData = response.response.map(
+          (row: { avatar: any; status: any }) => {
+            delete row.avatar;
+            if (row.status === 0) {
+              row.status = "Inativo";
+            } else {
+              row.status = "Ativo";
+            }
 
-          return row;
-        });
+            return row;
+          }
+        );
 
         newData.map((item: any) => {
           item.foco = item.foco?.name;
@@ -432,22 +523,22 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         const buf = XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
-        Swal.fire('Erro ao exportar');
+        Swal.fire("Erro ao exportar");
       }
     });
   };
@@ -503,7 +594,8 @@ export default function Listagem({
         <title>Listagem dos NPEs</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
           gap-8
@@ -520,7 +612,8 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-2
@@ -530,28 +623,33 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filters.map((id) => id)} selected="1" />
+                    <Select
+                      name="filterStatus"
+                      onChange={formik.handleChange}
+                      defaultValue={filterStatus[13]}
+                      values={filters.map((id) => id)}
+                      selected="1"
+                    />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory("filterLocal", "Local")}
 
-                  {filterFieldFactory('filterSafra', 'Safra')}
+                  {filterFieldFactory("filterSafra", "Safra")}
 
-                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory("filterFoco", "Foco")}
 
-                  {filterFieldFactory('filterEnsaio', 'Ensaio')}
+                  {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory("filterTecnologia", "Tecnologia")}
 
-                  {filterFieldFactory('filterEpoca', 'Epoca')}
+                  {filterFieldFactory("filterEpoca", "Epoca")}
 
-                  {filterFieldFactory('filterNPE', 'NPE Inicial')}
-
+                  {filterFieldFactory("filterNPE", "NPE Inicial")}
                 </div>
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => { }}
+                    onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -565,7 +663,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={npe}
               options={{
@@ -573,7 +671,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: "#f9fafb" },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -599,58 +697,70 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
+                        onClick={() => {}}
                         href="npe/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2
+                    <div
+                      className="h-full flex items-center gap-2
                     "
                     >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provided) => (
+                                          <li
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                          >
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
@@ -658,65 +768,80 @@ export default function Listagem({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de NPE" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="npe/importar-planilha/config-planilha" />
+                        <Button
+                          title="Exportar planilha de NPE"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
+                        <Button
+                          icon={<RiSettingsFill size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {}}
+                          href="npe/importar-planilha/config-planilha"
+                        />
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))
-                    }
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -728,13 +853,15 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page;
 
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
@@ -745,8 +872,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 

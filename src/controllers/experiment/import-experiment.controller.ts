@@ -39,7 +39,7 @@ export class ImportExperimentController {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
           const { response: experiment } = await experimentController.getAll({
-            experimentName,
+            filterExperimentName: experimentName,
           });
           if (experiment?.length > 0) {
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado no sistema` };

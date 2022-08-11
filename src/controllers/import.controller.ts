@@ -13,8 +13,8 @@ import { DelineamentoController } from './delineamento.controller';
 import { SequenciaDelineamentoController } from './sequencia-delineamento.controller';
 import { GenotipoController } from './genotype/genotipo.controller';
 import { LoteController } from './lote.controller';
-import { QuadraController } from './quadra.controller';
-import { DisparosController } from './disparos.controller';
+import { QuadraController } from './block/quadra.controller';
+import { DividersController } from './dividers.controller';
 import { CulturaController } from './cultura.controller';
 import { LayoutQuadraController } from './layout-quadra.controller';
 import { LayoutChildrenController } from './layout-children.controller';
@@ -36,6 +36,7 @@ import { removeProtocolLevel } from '../shared/utils/removeProtocolLevel';
 import { ImportLocalController } from './local/import-local.controller';
 import { ImportAssayListController } from './assay-list/import-assay-list.controller';
 import handleError from '../shared/utils/handleError';
+import { ImportBlockController } from './block/import-block.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -64,7 +65,7 @@ export class ImportController {
 
   quadraController = new QuadraController();
 
-  disparosController = new DisparosController();
+  dividersController = new DividersController();
 
   culturaController = new CulturaController();
 
@@ -213,18 +214,12 @@ export class ImportController {
         }
 
         // Validação do modulo Local
-        if (data.moduleId == 4) {
+        if (data.moduleId === 4) {
           return await ImportLocalController.validate(responseLog?.id, data);
         }
-
         // Validação do modulo Layout Quadra
-        if (data.moduleId == 5) {
-          response = await this.validateLayoutQuadra(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
+        if (data.moduleId === 5) {
+          return await ImportBlockController.validate(responseLog?.id, data);
         }
 
         // Validação do modulo Delineamento
@@ -264,12 +259,7 @@ export class ImportController {
 
         // Validação do modulo quadra
         if (data.moduleId == 17) {
-          response = await this.validateQuadra(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
+          return await ImportBlockController.validate(responseLog?.id, data);
         }
 
         // Validação do modulo tecnologia
@@ -1397,402 +1387,6 @@ export class ImportController {
           }
         }
       }
-    }
-  }
-
-  async validateQuadra(data: object | any) {
-    const responseIfError: any = [];
-    let Column: number;
-
-    try {
-      const configModule: object | any = await this.getAll(Number(data.moduleId));
-
-      if (data != null && data != undefined) {
-        let larg_q: any; let
-          comp_p: any;
-        let df: any = 0; let cod_quadra: any; let cod_quadra_anterior: any; let t4_i: any = 0; let
-          t4_f: any = 0;
-        let divisor_anterior: any = 0;
-        let Line: number;
-        let local_preparo: any = 0;
-        for (const [keySheet, lines] of data.spreadSheet.entries()) {
-          Line = Number(keySheet) + 1;
-          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
-            Column = Number(sheet) + 1;
-            if (keySheet != '0') {
-              if (configModule.response[0]?.fields[sheet] == 'Safra') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo safra é obrigatorio.</li><br>`;
-                } else {
-                  const safra = await this.safraController.getAll({ id_safra: Number(data.safra) });
-                  if (safra.total > 0) {
-                    if (String(data.spreadSheet[keySheet][sheet]) != safra.response[0]?.safraName) {
-                      return 'A safra importada precisa ser igual a safra selecionada';
-                    }
-                  } else {
-                    return 'A safra importada precisa ser igual a safra selecionada';
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Cultura') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo cultura é obrigatorio.</li><br>`;
-                } else {
-                  const culture: any = await this.culturaController.getOneCulture(Number(data.id_culture));
-
-                  if (data.spreadSheet[keySheet][sheet].toUpperCase() != culture.response.name.toUpperCase()) {
-                    return 'A cultura importada precisa ser igual a cultura selecionada';
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'LocalPrep') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o localprep cruza é obrigatorio.</li><br>`;
-                } else {
-                  const local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
-                  if (local.total == 0) {
-                    local_preparo = 2;
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
-                  } else {
-                    local_preparo = 1;
-                    this.aux.local_preparo = local.response[0]?.id;
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CodigoQuadra') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo código quadra é obrigatorio.</li><br>`;
-                } else {
-                  if (local_preparo == 0) {
-                    return 'Local preparo precisa ser importado antes do código da quadra';
-                  }
-                  if (local_preparo == 1) {
-                    local_preparo = 0;
-                    const quadra: any = await this.quadraController.getAll({ cod_quadra: data.spreadSheet[keySheet][sheet], local_preparo: this.aux.local_preparo, filterStatus: 1 });
-                    if (quadra.total > 0) {
-                      return 'Código quadra já existe neste local, para poder atualiza-lo você precisa inativar o existente';
-                    }
-                    cod_quadra_anterior = cod_quadra;
-                    cod_quadra = data.spreadSheet[keySheet][sheet];
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'LargQ') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a largq é obrigatorio.</li><br>`;
-                } else if (larg_q != '') {
-                  if (cod_quadra == cod_quadra_anterior) {
-                    if (data.spreadSheet[keySheet][sheet] != larg_q) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a largQ precisa ser igual na planilha inteira.</li><br>`;
-                      larg_q = data.spreadSheet[keySheet][sheet];
-                    } else {
-                      larg_q = data.spreadSheet[keySheet][sheet];
-                    }
-                  } else {
-                    larg_q = data.spreadSheet[keySheet][sheet];
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CompP') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compp é obrigatorio.</li><br>`;
-                } else if (cod_quadra == cod_quadra_anterior) {
-                  if (data.spreadSheet[keySheet][sheet] != comp_p) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o compP precisa ser igual na planilha inteira.</li><br>`;
-                    comp_p = data.spreadSheet[keySheet][sheet];
-                  } else {
-                    comp_p = data.spreadSheet[keySheet][sheet];
-                  }
-                } else {
-                  comp_p = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'LinhaP') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a linhap é obrigatorio.</li><br>`;
-                } else {
-
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CompC') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a compc é obrigatorio.</li><br>`;
-                } else {
-
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema é obrigatorio.</li><br>`;
-                } else {
-                  const layoutQuadra: any = await this.layoutQuadraController.getAll({ esquema: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture, status: 1 });
-                  if (layoutQuadra.total == 0) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o esquema do layout ainda não foi cadastrado.</li><br>`;
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Divisor') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a divisor é obrigatorio.</li><br>`;
-                } else if (cod_quadra == cod_quadra_anterior) {
-                  if (divisor_anterior == 0) {
-                    if (data.spreadSheet[keySheet][sheet] <= 0) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
-                    } else {
-                      divisor_anterior = data.spreadSheet[keySheet][sheet];
-                    }
-                  } else if (data.spreadSheet[keySheet][sheet] > divisor_anterior) {
-                    if ((divisor_anterior + 1) != data.spreadSheet[keySheet][sheet]) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, não pode ter intersecção de parcelas.</li><br>`;
-                    }
-                    divisor_anterior = data.spreadSheet[keySheet][sheet];
-                  } else {
-                    divisor_anterior = data.spreadSheet[keySheet][sheet];
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna dos divisores precisa está em sequencia.</li><br>`;
-                  }
-                } else if (divisor_anterior == 0) {
-                  if (data.spreadSheet[keySheet][sheet] <= 0) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o divisor precisa começar com 1 e ser positivo.</li><br>`;
-                  }
-                  divisor_anterior = data.spreadSheet[keySheet][sheet];
-                } else {
-                  divisor_anterior = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Semente') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro é obrigatorio.</li><br>`;
-                } else if (data.spreadSheet[keySheet][sheet] <= 0) {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a semmetro precisar ser maior que 0.</li><br>`;
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'T4I') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4i é obrigatorio.</li><br>`;
-                } else if (cod_quadra == cod_quadra_anterior) {
-                  if (t4_i == 0) {
-                    if (data.spreadSheet[keySheet][sheet] != 1) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1.</li><br>`;
-                    }
-                    t4_i = data.spreadSheet[keySheet][sheet];
-                  } else {
-                    if (data.spreadSheet[keySheet][sheet] <= t4_f) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa ser maior que a t4f anterior.</li><br>`;
-                    }
-                    t4_i = data.spreadSheet[keySheet][sheet];
-                  }
-                } else {
-                  if (data.spreadSheet[keySheet][sheet] != 1) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i precisa começar com 1.</li><br>`;
-                  }
-                  t4_i = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'T4F') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a t4f é obrigatorio.</li><br>`;
-                } else if (cod_quadra == cod_quadra_anterior) {
-                  if (t4_i == 0) {
-                    return 'A coluna t4f precisa está depois da coluna t4i';
-                  }
-                  if (t4_i > data.spreadSheet[keySheet][sheet]) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
-                  } else {
-                    t4_f = data.spreadSheet[keySheet][sheet];
-                  }
-                } else {
-                  if (t4_i == 0) {
-                    return 'A coluna t4f precisa está depois da coluna t4i';
-                  }
-                  if (t4_i > data.spreadSheet[keySheet][sheet]) {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o t4i e o t4f precisam estar em ordem crescente.</li><br>`;
-                  } else {
-                    t4_f = data.spreadSheet[keySheet][sheet];
-                  }
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'DI') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a di é obrigatorio.</li><br>`;
-                } else if (data.spreadSheet[keySheet][sheet] != 1) {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o di precisa ser 1. </li><br>`;
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'DF') {
-                if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a df é obrigatorio.</li><br>`;
-                } else if (df == 0) {
-                  df = data.spreadSheet[keySheet][sheet];
-                } else {
-                  df = data.spreadSheet[keySheet][sheet];
-                  if (cod_quadra == cod_quadra_anterior) {
-                    if (df != data.spreadSheet[keySheet][sheet]) {
-                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a coluna df deve ser igual para este pai.</li><br>`;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (responseIfError == '') {
-        // this.aux = "";
-        this.aux.created_by = Number(data.created_by);
-        this.aux.id_culture = Number(data.id_culture);
-        this.aux.status = 1;
-        let count = 1;
-        let tiro_fixo; let
-          disparo_fixo;
-
-        this.aux.id_safra = Number(data.safra);
-        for (const [keySheet, lines] of data.spreadSheet.entries()) {
-          for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
-            Column = Number(sheet) + 1;
-            if (keySheet != '0') {
-              if (configModule.response[0]?.fields[sheet] == 'LocalPrep') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  // this.aux.local_preparo = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CodigoQuadra') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  if ((this.aux.cod_quadra) && this.aux.cod_quadra != data.spreadSheet[keySheet][sheet]) {
-                    this.aux.disparo_fixo = this.aux.t4_f;
-                    count = 1;
-                  }
-                  this.aux.cod_quadra = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'LargQ') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.larg_q = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CompP') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.comp_p = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'LinhaP') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.linha_p = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'CompC') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.comp_c = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Esquema') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.esquema = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Divisor') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.divisor = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'Semente') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.sem_metros = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'T4I') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.t4_i = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'T4F') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.t4_f = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'DI') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.di = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (configModule.response[0]?.fields[sheet] == 'DF') {
-                if (data.spreadSheet[keySheet][sheet] != '') {
-                  this.aux.df = data.spreadSheet[keySheet][sheet];
-                }
-              }
-
-              if (data.spreadSheet[keySheet].length == Column && this.aux != []) {
-                if (count == 1) {
-                  this.aux.tiro_fixo = this.aux.t4_i;
-
-                  if (this.aux.id_quadra) {
-                    const update = await this.quadraController.update({ id: this.aux.id_quadra, tiro_fixo: this.aux.tiro_fixo, disparo_fixo: this.aux.disparo_fixo });
-                  }
-
-                  const saveQuadra: any = await this.quadraController.create({
-                    cod_quadra: this.aux.cod_quadra,
-                    id_culture: this.aux.id_culture,
-                    id_safra: this.aux.id_safra,
-                    local_preparo: this.aux.local_preparo,
-                    larg_q: this.aux.larg_q,
-                    comp_p: this.aux.comp_p,
-                    linha_p: this.aux.linha_p,
-                    comp_c: this.aux.comp_c,
-                    esquema: this.aux.esquema,
-                    status: this.aux.status,
-                    created_by: this.aux.created_by,
-                  });
-                  this.aux.id_quadra = saveQuadra.response.id;
-                  count++;
-                }
-
-                await this.disparosController.create({
-                  id_quadra: this.aux.id_quadra,
-                  t4_i: this.aux.t4_i,
-                  t4_f: this.aux.t4_f,
-                  di: this.aux.di,
-                  divisor: this.aux.divisor,
-                  df: this.aux.df,
-                  sem_metros: this.aux.sem_metros,
-                  created_by: this.aux.created_by,
-                });
-              }
-            }
-          }
-        }
-        return 'save';
-      }
-      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      return responseStringError;
-    } catch (err) {
-      console.log(err);
-      return 'Houve um erro, tente novamente mais tarde!8';
     }
   }
 

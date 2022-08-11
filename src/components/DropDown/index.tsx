@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ReactNode } from 'react';
+import Link from "next/link";
+import { ReactNode } from "react";
 
 interface IDropDownProps {
   label: string;
@@ -9,10 +9,11 @@ interface IDropDownProps {
 
 export function DropDown({ label, href, icon }: IDropDownProps) {
   return (
-    <ul className="
+    <ul
+      className="
       h-7 w-40
       px-2
-      bg-white mb-2
+      bg-white mb-0.5
     "
     >
       <li>
@@ -21,8 +22,8 @@ export function DropDown({ label, href, icon }: IDropDownProps) {
             className="
             flex
             items-center
-            gap-1
-            text-lg
+            gap-2
+            text-base
             text-gray-900
             duration-300
             hover:text-blue-600

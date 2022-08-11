@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ReactNode } from 'react';
+import Link from "next/link";
+import { ReactNode } from "react";
 
 interface ITabProps {
   titleTab: string;
@@ -10,22 +10,26 @@ interface ITabProps {
 }
 
 export function TabHeader({
-  titleTab, valueTab, hrefTab, statusTab, handleStatusTabs,
+  titleTab,
+  valueTab,
+  hrefTab,
+  statusTab,
+  handleStatusTabs,
 }: ITabProps) {
-  return (
-    statusTab ? (
-      <Link href={hrefTab}>
-        <a
-          onClick={() => handleStatusTabs(titleTab, !statusTab)}
-          className="
+  return statusTab ? (
+    <Link href={hrefTab}>
+      <a
+        onClick={() => handleStatusTabs(titleTab, !statusTab)}
+        className="
         h-full
         flex
         items-center
         gap-1
       "
-        >
-          <div className={`
-          h-10 w-10
+      >
+        <div
+          className={`
+          h-6 w-6
           flex 
           justify-center 
           items-center
@@ -38,39 +42,45 @@ export function TabHeader({
           rounded-br-full	
           rounded-tr-full	
           rounded-tl-full
-        `}>
-            <span className={`
+        `}
+        >
+          <span
+            className={`
           text-white 
-            text-2xl
-          `}>
-              {valueTab}
-            </span>
-          </div>
+            text-sm
+          `}
+          >
+            {valueTab}
+          </span>
+        </div>
 
-          <span className={`
+        <span
+          className={`
         border-white 
           text-sm 
         text-white
-        `}>
-            {titleTab}
-          </span>
-        </a>
-      </Link>
-    ) : (
-      // w-12	width: 3rem; /* 48px */
-      // w-3/5	width: 60%;
-      <Link href={hrefTab}>
-        <a
-          onClick={() => handleStatusTabs(titleTab, !statusTab)}
-          className="
+        `}
+        >
+          {titleTab}
+        </span>
+      </a>
+    </Link>
+  ) : (
+    // w-12	width: 3rem; /* 48px */
+    // w-3/5	width: 60%;
+    <Link href={hrefTab}>
+      <a
+        onClick={() => handleStatusTabs(titleTab, !statusTab)}
+        className="
         h-full
         flex
         items-center
         gap-1
       "
-        >
-          <div className={`
-          h-10 w-10
+      >
+        <div
+          className={`
+          h-6 w-6
           flex 
           justify-center 
           items-center
@@ -83,18 +93,20 @@ export function TabHeader({
           rounded-br-full	
           rounded-tr-full	
           rounded-tl-full
-        `}>
-            <span className={`
+        `}
+        >
+          <span
+            className={`
           text-gray-700 
-            text-2xl
-          `}>
-              {valueTab}
-            </span>
-          </div>
+            text-sm
+          `}
+          >
+            {valueTab}
+          </span>
+        </div>
 
-          <span className="border-gray-300 text-sm text-gray-50">{titleTab}</span>
-        </a>
-      </Link>
-    )
+        <span className="border-gray-300 text-sm text-gray-50">{titleTab}</span>
+      </a>
+    </Link>
   );
 }

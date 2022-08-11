@@ -1,34 +1,44 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
-import { ReactNode, useEffect, useState } from 'react';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { setCookie } from "nookies";
+import { ReactNode, useEffect, useState } from "react";
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
-} from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
+import * as XLSX from "xlsx";
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { cultureService, userPreferencesService } from '../../../../services';
-import ITabs from '../../../../shared/utils/dropdown';
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
+} from "../../../../components";
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import { cultureService, userPreferencesService } from "../../../../services";
+import ITabs from "../../../../shared/utils/dropdown";
 
 interface IFilter {
   filterStatus: object | any;
@@ -55,85 +65,114 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
-  allCultures, totalItems, itensPerPage, filterApplication, pageBeforeEdit, filterBeforeEdit,
+  allCultures,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const router = useRouter();
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.cultura || { id: 0, table_preferences: 'id,name,desc,status' };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.cultura || {
+    id: 0,
+    table_preferences: "id,name,desc,status",
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences
+  );
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(pageBeforeEdit)
+  );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'Favorito', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+      name: "CamposGerenciados[]",
+      title: "Favorito",
+      value: "id",
+      defaultChecked: () => camposGerenciados.includes("id"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Código Reduzido', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Código Reduzido",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome', value: 'desc', defaultChecked: () => camposGerenciados.includes('desc'),
+      name: "CamposGerenciados[]",
+      title: "Nome",
+      value: "desc",
+      defaultChecked: () => camposGerenciados.includes("desc"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
 
   const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatus = filterBeforeEdit.split("");
 
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
-      orderBy: '',
-      typeOrder: '',
+      filterStatus: "",
+      filterSearch: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1}&filterSearch=${filterSearch}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterSearch=${filterSearch}`;
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await cultureService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setCultures(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      setCookies("filterBeforeEdit", filtersParams);
+      await cultureService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setCultures(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
-  async function handleStatusCulture(idCulture: number, data: ICulture): Promise<void> {
+  async function handleStatusCulture(
+    idCulture: number,
+    data: ICulture
+  ): Promise<void> {
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -152,43 +191,49 @@ export default function Listagem({
       return copy;
     });
 
-    const {
-      id, name, desc, status,
-    } = cultures[index];
+    const { id, name, desc, status } = cultures[index];
 
     await cultureService.updateCulture({
-      id, name, desc, status,
+      id,
+      name,
+      desc,
+      status,
     });
   }
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
 
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
     }
 
-    await cultureService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setCultures(response.response);
-      }
-    });
+    await cultureService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setCultures(response.response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -198,7 +243,7 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
   }
@@ -223,88 +268,86 @@ export default function Listagem({
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
+      title: <div className="flex items-center">{arrowOrder}</div>,
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-10 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={25} color="#eba417" />
+              </button>
             </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
+          </div>
+        ) : (
+          <div className="h-10 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={25} />
+              </button>
             </div>
-          )
-      ),
+          </div>
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: "Status",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: ICulture) => (
-        <div className="h-10 flex">
-          <div className="h-10">
+        <div className="h-7 flex">
+          <div className="h-7">
             <Button
-              icon={<BiEdit size={16} />}
+              icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
+          <div style={{ width: 5 }} />
           {rowData.status ? (
-            <div className="h-10">
+            <div className="h-7">
               <Button
-                icon={<FaRegThumbsUp size={16} />}
-                onClick={async () => handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
+                icon={<FaRegThumbsUp size={14} />}
+                onClick={async () =>
+                  handleStatusCulture(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 bgColor="bg-green-600"
                 textColor="white"
               />
             </div>
           ) : (
-            <div className="h-10">
+            <div className="h-7">
               <Button
-                icon={<FaRegThumbsDown size={16} />}
-                onClick={async () => handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
+                icon={<FaRegThumbsDown size={14} />}
+                onClick={async () =>
+                  handleStatusCulture(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 bgColor="bg-red-800"
                 textColor="white"
               />
@@ -316,20 +359,20 @@ export default function Listagem({
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
+    const columnCampos: string[] = camposGerenciados.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
+      if (columnCampos[index] === "id") {
         tableFields.push(idHeaderFactory());
       }
-      if (columnCampos[index] === 'name') {
-        tableFields.push(headerTableFactory('Código reduzido', 'name'));
+      if (columnCampos[index] === "name") {
+        tableFields.push(headerTableFactory("Código reduzido", "name"));
       }
-      if (columnCampos[index] === 'desc') {
-        tableFields.push(headerTableFactory('Nome', 'desc'));
+      if (columnCampos[index] === "desc") {
+        tableFields.push(headerTableFactory("Nome", "desc"));
       }
-      if (columnCampos[index] === 'status') {
+      if (columnCampos[index] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -340,7 +383,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -349,21 +392,23 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 2,
-      }).then((response) => {
-        console.log('response');
-        console.log(response);
-        userLogado.preferences.cultura = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+          userId: userLogado.id,
+          module_id: 2,
+        })
+        .then((response) => {
+          console.log("response");
+          console.log(response);
+          userLogado.preferences.cultura = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.cultura = {
         id: preferences.id,
@@ -374,7 +419,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -394,36 +439,38 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await cultureService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
+    await cultureService
+      .getAll(filterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            if (row.status === 0) {
+              row.status = "Inativo" as any;
+            } else {
+              row.status = "Ativo" as any;
+            }
 
-          return row;
-        });
+            return row;
+          });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'cultures');
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, "cultures");
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Culturas.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "buffer",
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "binary",
+          });
+          // Download
+          XLSX.writeFile(workBook, "Culturas.xlsx");
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -455,10 +502,13 @@ export default function Listagem({
 
   return (
     <>
-      <Head><title>Listagem de culturas</title></Head>
+      <Head>
+        <title>Listagem de culturas</title>
+      </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
           gap-8
@@ -475,7 +525,8 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-2
@@ -485,7 +536,13 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select
+                      name="filterStatus"
+                      onChange={formik.handleChange}
+                      defaultValue={filterStatus[13]}
+                      values={filtersStatusItem.map((id) => id)}
+                      selected="1"
+                    />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -505,7 +562,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => { }}
+                    onClick={() => {}}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -518,7 +575,7 @@ export default function Listagem({
 
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={cultures}
               options={{
@@ -526,7 +583,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: "#f9fafb" },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -552,129 +609,142 @@ export default function Listagem({
                         value="Cadastrar cultura"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push('cultura/cadastro'); }}
+                        onClick={() => {
+                          router.push("cultura/cadastro");
+                        }}
                         href="cultura/cadastro"
                         icon={<RiPlantLine size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-72">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
                                           >
-                                            {(provider) => (
-                                              <li
-                                                ref={provider.innerRef}
-                                                {...provider.draggableProps}
-                                                {...provider.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados
-                                                    .includes(generate.value)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de culturas" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de culturas"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))
-                    }
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -686,15 +756,24 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
-  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : "filterStatus=1";
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : "filterStatus=1";
 
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -702,8 +781,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 

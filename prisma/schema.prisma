@@ -207,7 +207,7 @@ model layout_quadra {
   status      Int               @default(1)
   created_by  Int
   created_at  DateTime          @default(now())
-  Culture     culture           @relation(fields: [id_culture], references: [id])
+  culture     culture           @relation(fields: [id_culture], references: [id])
   children    layout_children[]
 }
 
@@ -231,11 +231,11 @@ model layout_children {
 }
 
 model quadra {
-  id            Int        @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   cod_quadra    String
   id_culture    Int
   id_safra      Int
-  local_preparo Int
+  id_local      Int
   local_plantio String?
   larg_q        Int
   comp_p        Int
@@ -245,16 +245,17 @@ model quadra {
   tiro_fixo     Int?
   disparo_fixo  Int?
   q             String?
-  status        Int        @default(1)
+  status        Int      @default(1)
   created_by    Int
-  created_at    DateTime   @default(now())
-  localPreparo  local      @relation(fields: [local_preparo], references: [id])
-  Safra         safra      @relation(fields: [id_safra], references: [id])
-  Culture       culture    @relation(fields: [id_culture], references: [id])
-  disparos      disparos[]
+  created_at    DateTime @default(now())
+
+  local    local      @relation(fields: [id_local], references: [id])
+  safra    safra      @relation(fields: [id_safra], references: [id])
+  culture  culture    @relation(fields: [id_culture], references: [id])
+  dividers dividers[]
 }
 
-model disparos {
+model dividers {
   id         Int      @id @default(autoincrement())
   id_quadra  Int
   t4_i       Int
@@ -273,7 +274,7 @@ model genotipo {
   id_culture          Int
   id_tecnologia       Int
   id_s1               Int
-  id_dados            String               
+  id_dados            String
   name_genotipo       String
   name_main           String?
   name_public         String?
@@ -289,7 +290,7 @@ model genotipo {
   progenitor_f_origem String?
   progenitor_m_origem String?
   progenitores_origem String?
-  parentesco_completo String?
+  parentesco_completo String?              @db.MediumText
   created_by          Int
   created_at          DateTime             @default(now())
   dt_import           DateTime             @default(now())

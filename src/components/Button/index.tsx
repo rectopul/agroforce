@@ -1,11 +1,11 @@
-import { useRouter } from 'next/router';
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { useRouter } from "next/router";
+import { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   value?: string;
   title?: string;
   type?: string;
-  onClick: (() => any);
+  onClick: () => any;
   icon?: string | ReactNode;
   bgColor?: string;
   textColor?: string;
@@ -13,8 +13,8 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   hoverTextColor?: string;
   href?: string | any;
   disabled?: boolean;
-	rounder?: string | any;
-}
+  rounder?: string | any;
+};
 
 export function Button({
   value,
@@ -36,23 +36,22 @@ export function Button({
     router.push(href);
   };
 
-  return (
-    !href ? (
-      <button
-        title={title}
-        disabled={disabled}
-        type={type}
-        onClick={onClick}
-        className={`w-full h-full
+  return !href ? (
+    <button
+      title={title}
+      disabled={disabled}
+      type={type}
+      onClick={onClick}
+      className={`w-full h-full
         flex justify-center items-center gap-2
-        px-4 
+        px-3 
         ${bgColor}
         text-${textColor}
         text-base
         leading-tight
         rounded-lg
         shadow-md
-        border-2 border-${textColor}
+        border-1 border-${textColor}
         transition duration-150
         hover:${hoverBgColor}
         hover:shadow-lg
@@ -60,36 +59,35 @@ export function Button({
         hover:shadow-lg
 				${rounder}
       `}
-      >
-        {icon}
-        { value }
-      </button>
-    ) : (
-      <button
-        title={title}
-        type={type}
-        disabled={disabled}
-        onClick={handleClick}
-        className={`w-full h-full
+    >
+      {icon}
+      {value}
+    </button>
+  ) : (
+    <button
+      title={title}
+      type={type}
+      disabled={disabled}
+      onClick={handleClick}
+      className={`w-full h-full
         flex justify-center items-center gap-2
-        px-4 
+        px-3 
         ${bgColor}
         text-${textColor}
         text-base
         leading-tight
         rounded-lg
         shadow-md
-        border-2 border-${textColor}
+        border-1 border-${textColor}
         transition duration-150
         hover:${hoverBgColor}
         hover:shadow-lg
         hover:text-${hoverTextColor}
         hover:shadow-lg
       `}
-      >
-        {icon}
-        { value }
-      </button>
-    )
+    >
+      {icon}
+      {value}
+    </button>
   );
 }
