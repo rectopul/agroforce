@@ -586,7 +586,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar delineamentos">
@@ -607,8 +607,8 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
@@ -620,8 +620,8 @@ export default function Listagem({
                     />
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
                     <Input
@@ -632,8 +632,8 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
                     <Input
@@ -644,8 +644,8 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Trat. Repetição
                     </label>
                     <Input
@@ -656,16 +656,16 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
