@@ -234,12 +234,12 @@ export default function TipoEnsaio({
   function idHeaderFactory() {
     return {
       title:
-        <div className="h-10 flex">
-          <Checkbox1
-            onChange={setAllCheck}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
-          />
-        </div>,
+  <div className="h-10 flex">
+    <Checkbox1
+      onChange={setAllCheck}
+      sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+    />
+  </div>,
       field: 'id',
       sorting: false,
       width: 0,
@@ -635,7 +635,7 @@ export default function TipoEnsaio({
                   pt-2
                   pb-3
                   "
-                  >
+                >
                   {filterFieldFactory('filterTreatmentsNumber', 'NT')}
                   {filterFieldFactory('filterStatus', 'Status T')}
 
@@ -949,7 +949,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   teste.name = 'Selecione';
   assaySelect.unshift(teste);
 
-  const genotypeSelect = allTreatments.map((item: any) => {
+  const genotypeSelect = allTreatments?.map((item: any) => {
     const newItem: any = {};
     newItem.id = item.genotipo.name_genotipo;
     newItem.name = item.genotipo.name_genotipo;

@@ -1,6 +1,7 @@
 import handleError from '../shared/utils/handleError';
 import { functionsUtils } from '../shared/utils/functionsUtils';
 import { LogImportRepository } from '../repository/log-import.repository';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class LogImportController {
   public readonly required = 'Campo obrigatório';
@@ -22,7 +23,7 @@ export class LogImportController {
 
   async create(data: any) {
     try {
-      const LogsAlreadyExists = await this.logImportRepository.validateImportInExecuting(data);
+      const LogsAlreadyExists = await this.logImportRepository.validateImportInExecuting();
 
       if (LogsAlreadyExists) return { status: 400, message: 'Importação já está sendo executada' };
 
@@ -35,16 +36,16 @@ export class LogImportController {
     }
   }
 
-  async update({ id, status, state }: any) {
+  async update(data: any) {
     try {
-      const logImport: any = await this.getOne(id);
+      const logImport: any = await this.getOne(data.id);
 
       if (!logImport) return { status: 400, message: 'Log não existe' };
       if (logImport.response.state === 'FALHA') {
         return { status: 200, logImport };
       }
 
-      await this.logImportRepository.update(id, status, state);
+      await this.logImportRepository.update(data.id, data);
 
       return { status: 200, message: 'Log atualizado' };
     } catch (error: any) {
@@ -56,6 +57,7 @@ export class LogImportController {
   async getAll(options: any) {
     const parameters: object | any = {};
     parameters.AND = [];
+    let orderBy: string;
     try {
       if (options.filterUser) {
         parameters.user = JSON.parse(`{"name": {"contains":"${options.filterUser}"} }`);
@@ -96,7 +98,12 @@ export class LogImportController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      } else {
+        orderBy = '{ "id": "desc" }';
+      }
 
       const response: object | any = await this.logImportRepository.findAll(
         parameters,
