@@ -670,7 +670,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-max max-h-96
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -682,7 +682,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-10">
+                    <div className="h-12">
                       <Button
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
@@ -691,7 +691,7 @@ export default function Listagem({
                         onClick={() => {
                           router.push("usuarios/cadastro");
                         }}
-                        icon={<FiUserPlus size={16} />}
+                        icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
@@ -758,10 +758,10 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-                      <div className="h-10 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de usuários"
-                          icon={<RiFileExcel2Line size={16} />}
+                          icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {

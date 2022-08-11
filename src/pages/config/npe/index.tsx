@@ -777,6 +777,7 @@ export default function Listagem({
                             downloadExcel();
                           }}
                         />
+                        <div style={{ width: 20 }} />
                         <Button
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
