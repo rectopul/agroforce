@@ -356,8 +356,6 @@ export default function Listagem({
     Object.keys(checkedTreatments).forEach((item) => {
       tempParams.push(checkedTreatments[item]);
     });
-    console.log('tempParams');
-    console.log(tempParams);
     const checkedParams = tempParams.join();
     const skip = currentPage * Number(take);
     let parametersFilter;

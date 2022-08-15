@@ -119,8 +119,6 @@ export default function Import({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.rd || { id: 0, table_preferences: 'id,user_id,created_at,table,state' };
-  console.log('preferences');
-  console.log(preferences);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);

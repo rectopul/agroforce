@@ -430,7 +430,7 @@ export class ImportController {
                       this.aux.npei = data.spreadSheet[keySheet][sheet];
                     }
                   } else {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto.</li><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um numérico e inteiro.</li><br>`;
                   }
                 } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</li><br>`;
@@ -1484,7 +1484,7 @@ export class ImportController {
 
               if (configModule.response[0]?.fields[sheet] == 'SL') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
+                  responseIfError[Column - 1] += `<li validateNpeiDBA> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == sl) {

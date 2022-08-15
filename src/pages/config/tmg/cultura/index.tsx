@@ -398,8 +398,6 @@ export default function Listagem({
           module_id: 2,
         })
         .then((response) => {
-          console.log('response');
-          console.log(response);
           userLogado.preferences.cultura = {
             id: response.response.id,
             userId: preferences.userId,
