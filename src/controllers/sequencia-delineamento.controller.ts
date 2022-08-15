@@ -106,10 +106,7 @@ export class SequenciaDelineamentoController {
 
     try {
       if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = Number(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {

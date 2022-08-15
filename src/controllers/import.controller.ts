@@ -226,7 +226,7 @@ export class ImportController {
       }
       // Validação do modulo Layout Quadra
       if (data.moduleId === 5) {
-        response = await this.validateLayoutQuadra(data);
+        response = await this.validateLayoutQuadra(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
         } else {
@@ -236,7 +236,7 @@ export class ImportController {
 
       // Validação do modulo Delineamento
       if (data.moduleId == 7) {
-        response = await this.validateDelineamentoNew(data);
+        response = await this.validateDelineamentoNew(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
         } else {
@@ -251,7 +251,7 @@ export class ImportController {
 
       // Validação do modulo Lote
       if (data.moduleId == 12) {
-        response = await this.validateLote(data);
+        response = await this.validateLote(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
         } else {
@@ -261,7 +261,7 @@ export class ImportController {
 
       // Validação do modulo NPE
       if (data.moduleId == 14) {
-        response = await this.validateNPE(data);
+        response = await this.validateNPE(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
         } else {
@@ -289,7 +289,7 @@ export class ImportController {
     }
   }
 
-  async validateNPE(data: object | any) {
+  async validateNPE(idLog: number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
     try {
@@ -537,18 +537,21 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       // console.log('Erro geral import NPE: ');
       // console.log(err);
       return 'Erro ao validar';
     }
   }
 
-  async validateDelineamentoNew(data: object | any) {
+  async validateDelineamentoNew(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
 
@@ -839,12 +842,15 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       console.log(responseIfError);
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!5';
     }
@@ -1083,7 +1089,7 @@ export class ImportController {
     return 'save';
   }
 
-  async validateLote(data: object | any) {
+  async validateLote(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
     try {
@@ -1170,11 +1176,14 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!7';
     }
@@ -1401,7 +1410,7 @@ export class ImportController {
     }
   }
 
-  async validateLayoutQuadra(data: object | any) {
+  async validateLayoutQuadra(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
 
@@ -1724,11 +1733,14 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!9';
     }
