@@ -20,11 +20,16 @@ export default function Importar() {
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    //console.log("cultura selecionada:");
-    //console.log(userLogado);
+    // console.log("cultura selecionada:");
+    // console.log(userLogado);
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'npe', spreadSheet: rows, moduleId: 14, id_culture:  userLogado.userCulture.cultura_selecionada, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
+        table: 'NPE',
+        spreadSheet: rows,
+        moduleId: 14,
+        id_culture: userLogado.userCulture.cultura_selecionada,
+        safra: userLogado.safras.safra_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({

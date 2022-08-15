@@ -74,11 +74,11 @@ export class TypeAssayController {
       if (id) {
         const response = await this.typeAssayRepository.findOne(Number(id));
         if (!response) {
-          return { status: 404, response: [], message: 'Tipo de ensaio não encontrado' };
+          return { status: 400, response: [], message: 'Tipo de ensaio não encontrado' };
         }
         return { status: 200, response };
       }
-      return { status: 405, response: [], message: 'Id não informado' };
+      return { status: 400, response: [], message: 'Id não informado' };
     } catch (error: any) {
       handleError('Tipo de ensaio controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Tipo de ensaio erro');
@@ -87,7 +87,7 @@ export class TypeAssayController {
 
   async getByData(data: any) {
     try {
-      const response = await this.typeAssayRepository.findOneByData(data);
+      const response = await this.typeAssayRepository.findOneByData(data, 1);
       if (!response) {
         return { status: 404, response: [], message: 'Tipo de ensaio não encontrado' };
       }
@@ -115,11 +115,20 @@ export class TypeAssayController {
 
   async update(data: any) {
     try {
+      if (data.status === 0 || data.status === 1) {
+        const assayTypeAlreadyExist = await this.getOne(data.id);
+        if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
+        const response = await this.typeAssayRepository.update(data.id, data);
+        if (!response) {
+          return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
+        }
+        return { status: 200, response };
+      }
       const assayTypeAlreadyExist = await this.getByData(data);
-      if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe' };
+      if (assayTypeAlreadyExist.status === 200) return { status: 400, message: 'Tipo de ensaio já registrado' };
       const response = await this.typeAssayRepository.update(data.id, data);
       if (!response) {
-        return { status: 404, response: [], message: 'Tipo de ensaio não atualizado' };
+        return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
       }
       return { status: 200, response };
     } catch (error: any) {

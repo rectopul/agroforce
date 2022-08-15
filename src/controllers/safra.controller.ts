@@ -24,7 +24,7 @@ export class SafraController {
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSafra) {
@@ -130,25 +130,23 @@ export class SafraController {
 
   async update(data: UpdateSafra) {
     try {
-      const safra: any = await this.safraRepository.findOne(data.id);
-
-      if (!safra) return { status: 400, message: 'Safra não existente' };
-
-      const safraAlreadyExists = await this.safraRepository.findBySafraName(data);
-
-      if (safraAlreadyExists && safraAlreadyExists.id !== safra.id) {
-        return { status: 400, message: 'Safra já cadastrada.' };
+      console.log(data);
+      if (data.status === 0 || data.status === 1) {
+        const safraAlreadyExists = await this.getOne(data.id);
+        if (safraAlreadyExists.status !== 200) return { status: 400, message: 'Safra não encontrado' };
+        const response = await this.safraRepository.update(data.id, data);
+        if (!response) {
+          return { status: 400, response: [], message: 'Safra não atualizado' };
+        }
+        return { status: 200, response };
       }
-
-      safra.safraName = data.safraName;
-      safra.year = data.year;
-      safra.plantingStartTime = data.plantingStartTime;
-      safra.plantingEndTime = data.plantingEndTime;
-      safra.status = data.status;
-
-      await this.safraRepository.update(safra.id, safra);
-
-      return { status: 200, message: 'Item atualizado' };
+      const safraAlreadyExists = await this.safraRepository.findBySafraName(data);
+      if (safraAlreadyExists) return { status: 400, message: 'Safra já registrado' };
+      const response = await this.safraRepository.update(data.id, data);
+      if (!response) {
+        return { status: 400, response: [], message: 'Safra não atualizado' };
+      }
+      return { status: 200, response };
     } catch (error: any) {
       handleError('Safra controller', 'Update', error.message);
       throw new Error('[Controller] - Update Safra erro');
