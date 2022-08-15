@@ -14,15 +14,15 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult
+  DropResult,
 } from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiTwotoneStar
+  AiTwotoneStar,
 } from 'react-icons/ai';
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -34,7 +34,7 @@ import {
   Button,
   CheckBox,
   Content,
-  Input
+  Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { genotipoService, userPreferencesService } from '../../../../services';
@@ -347,7 +347,8 @@ export default function Listagem({
           <div>
             {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
           </div>
-        )        
+        </div>
+      ),
     };
   }
 
