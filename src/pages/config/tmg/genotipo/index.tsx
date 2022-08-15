@@ -347,8 +347,7 @@ export default function Listagem({
           <div>
             {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
           </div>
-        </div>
-      ),
+        )        
     };
   }
 
