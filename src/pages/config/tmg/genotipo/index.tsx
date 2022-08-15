@@ -92,7 +92,6 @@ export default function Listagem({
   filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
-  console.log(allGenotipos);
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
