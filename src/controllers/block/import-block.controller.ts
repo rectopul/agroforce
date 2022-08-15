@@ -223,7 +223,7 @@ export class ImportBlockController {
                       += responseGenericFactory(
                         (Number(column) + 1),
                         row,
-                        spreadSheet[0][column],
+                        'T4F',
                         'os tiros da quadra devem ser maiores ou iguais ao da esquema',
                       );
                   }
@@ -232,7 +232,7 @@ export class ImportBlockController {
                     += responseGenericFactory(
                         (Number(column) + 1),
                         row,
-                        spreadSheet[0][column],
+                        'DF',
                         'os disparos da quadra devem ser maiores ou iguais ao da esquema',
                       );
                   }

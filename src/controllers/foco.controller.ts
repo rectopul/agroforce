@@ -7,7 +7,6 @@ export class FocoController {
   focoRepository = new FocoRepository();
 
   async getAll(options: any) {
-    console.log(options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
@@ -38,10 +37,6 @@ export class FocoController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
-      // console.log("select");
-
-      // console.log(select);
 
       const response: object | any = await this.focoRepository.findAll(
         parameters,

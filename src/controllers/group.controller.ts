@@ -52,27 +52,17 @@ export class GroupController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      let npe: any;
-      if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
-        npe = JSON.stringify(
-          {
-            select: { id: true },
-            where: { id_safra: Number(options.id_safra) },
-          },
-          null,
-        );
-      } else {
-        npe = JSON.stringify({ select: { id: true } }, null);
-      }
-
       const select = {
         id: true,
         foco: { select: { name: true, id: true } },
         safra: { select: { safraName: true } },
-        npe: JSON.parse(npe),
+        npe: true,
         group: true,
       };
+
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
 
       if (options.id_foco) {
         parameters.id_foco = Number(options.id_foco);

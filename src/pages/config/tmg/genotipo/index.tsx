@@ -343,13 +343,21 @@ export default function Listagem({
       field: 'tecnologia',
       width: 0,
       sorting: false,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+      render: (rowData: any) => (rowData.tecnologia.desc !== null
+        ? (
+          <div className="h-10 flex">
+            <div>
+              {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+            </div>
           </div>
-        </div>
-      ),
+        )
+        : (
+          <div className="h-10 flex">
+            <div>
+              {`${rowData.tecnologia.cod_tec}`}
+            </div>
+          </div>
+        )),
     };
   }
 
