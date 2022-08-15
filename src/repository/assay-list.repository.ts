@@ -54,7 +54,6 @@ export class AssayListRepository {
     if (orderBy) {
       orderBy = JSON.parse(orderBy);
     }
-
     const count = await prisma.assay_list.count({ where });
 
     const result: object | any = await prisma.assay_list.findMany({

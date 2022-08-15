@@ -122,6 +122,8 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
 
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
@@ -173,6 +175,9 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
+
+    setOrderBy(column);
+    setOrderType(typeOrder);
 
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
@@ -467,7 +472,12 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&idSafra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&idSafra=${idSafra}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -689,11 +699,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -722,7 +732,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
