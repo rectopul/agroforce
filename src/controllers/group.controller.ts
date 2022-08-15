@@ -1,5 +1,5 @@
-import handleError from '../shared/utils/handleError';
 import { GroupRepository } from '../repository/group.repository';
+import handleError from '../shared/utils/handleError';
 
 export class GroupController {
   public readonly required = 'Campo obrigatório';
@@ -68,7 +68,7 @@ export class GroupController {
 
       const select = {
         id: true,
-        foco: { select: { name: true } },
+        foco: { select: { name: true, id: true } },
         safra: { select: { safraName: true } },
         npe: JSON.parse(npe),
         group: true,

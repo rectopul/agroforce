@@ -12,6 +12,12 @@ export class GroupRepository {
   async findById(id: number) {
     const result = await prisma.group.findUnique({
       where: { id },
+      select: {
+        id: true,
+        foco: { select: { name: true, id: true } },
+        safra: { select: { safraName: true, id: true } },
+        group: true,
+      },
     });
 
     return result;
