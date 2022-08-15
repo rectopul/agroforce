@@ -1,5 +1,6 @@
-import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -8,13 +9,9 @@ import { IoMdArrowBack } from 'react-icons/io';
 import InputMask from 'react-input-mask';
 import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import {
   Button,
-  Content,
-  Select,
-  Input,
+  Content, Input
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -43,11 +40,13 @@ export default function Cadastro({ grupo }: any) {
 
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
+  const formattedNumber = String(grupo.group).padStart(2, '0');
+
   const formik = useFormik<any>({
     initialValues: {
-      id_foco: Number(grupo.foco.id),
+      id_foco: Number(grupo.id_foco),
       safra: grupo.safra.id,
-      group: grupo.group,
+      group: formattedNumber,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
@@ -56,6 +55,12 @@ export default function Cadastro({ grupo }: any) {
         Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
+      const ifExistsUnderlineInGroup = values.group.split('');
+      if (ifExistsUnderlineInGroup.includes('_')) {
+        Swal.fire('O campo grupo deve ter 2 caracteres');
+        return;
+      }
+
       await groupService.update({
         id: Number(grupo.id),
         id_safra: Number(grupo.safra.id),
