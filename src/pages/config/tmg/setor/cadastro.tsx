@@ -1,14 +1,14 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { IoMdArrowBack } from "react-icons/io";
-import { departmentService } from "src/services";
-import Swal from "sweetalert2";
-import { Button, Content, Input } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { departmentService } from 'src/services';
+import Swal from 'sweetalert2';
+import { Button, Content, Input } from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartmentProps {
   name: string;
@@ -20,24 +20,22 @@ export default function Safra() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
-      name: "",
+      name: '',
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
 
@@ -48,10 +46,10 @@ export default function Safra() {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Setor cadastrado com sucesso!");
+            Swal.fire('Setor cadastrado com sucesso!');
             router.back();
           } else {
-            setCheckInput("text-red-600");
+            setCheckInput('text-red-600');
             Swal.fire(response.message);
           }
         });
@@ -60,11 +58,11 @@ export default function Safra() {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
     }
   }
 
@@ -117,7 +115,7 @@ export default function Safra() {
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

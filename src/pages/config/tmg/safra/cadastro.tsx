@@ -1,13 +1,15 @@
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import { safraService } from "src/services";
-import Swal from "sweetalert2";
-import { Button, Content, Input, Radio } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
+import { safraService } from 'src/services';
+import Swal from 'sweetalert2';
+import {
+  Button, Content, Input, Radio,
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ISafraProps {
   id_culture: number;
@@ -32,25 +34,23 @@ export default function Safra() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id_culture: Number(culture),
-      safraName: "",
+      safraName: '',
       year: 0,
-      plantingStartTime: "",
-      plantingEndTime: "",
+      plantingStartTime: '',
+      plantingEndTime: '',
       main_safra: 0,
       status: 1,
       created_by: Number(userLogado.id),
@@ -58,25 +58,27 @@ export default function Safra() {
     onSubmit: async (values) => {
       const { main_safra, ...data } = values;
 
-      const { created_by, id_culture, status, ...inputs } = data;
+      const {
+        created_by, id_culture, status, ...inputs
+      } = data;
 
       validateInputs(inputs);
       if (!values.safraName || !values.year) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
       let plantingStartTime;
       let plantingEndTime;
 
       if (values.plantingStartTime) {
-        plantingStartTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingStartTime)
+        plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingStartTime),
         );
       }
 
       if (values.plantingEndTime) {
-        plantingEndTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingEndTime)
+        plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingEndTime),
         );
       }
 
@@ -92,7 +94,7 @@ export default function Safra() {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Safra cadastrada com sucesso!");
+            Swal.fire('Safra cadastrada com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -103,15 +105,15 @@ export default function Safra() {
 
   function validateInputs(values: Input) {
     if (!values.safraName || !values.year) {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "red";
-      inputYear.style.borderColor = "red";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = 'red';
+      inputYear.style.borderColor = 'red';
     } else {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "";
-      inputYear.style.borderColor = "";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = '';
+      inputYear.style.borderColor = '';
     }
   }
 
@@ -129,7 +131,7 @@ export default function Safra() {
           <h1 className="text-2xl">Nova safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-4">
-            <div className="w-4/12 h-10">
+            <div className="w-4/12 h-7">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Safra
@@ -142,25 +144,10 @@ export default function Safra() {
                 placeholder="___________"
                 onChange={formik.handleChange}
                 value={formik.values.safraName}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
-            <div className="w-4/12 h-10">
+            <div className="w-4/12 h-7">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Ano
@@ -173,21 +160,6 @@ export default function Safra() {
                 placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
@@ -226,7 +198,7 @@ export default function Safra() {
             mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

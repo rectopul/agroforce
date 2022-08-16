@@ -159,25 +159,25 @@ export default function Atualizarquadra({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -377,8 +377,8 @@ export default function Atualizarquadra({
 
   function updateFieldFactory(title: any, name: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-6">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           *
           {name}
         </label>
@@ -399,12 +399,12 @@ export default function Atualizarquadra({
       <Head><title>Atualizar layout quadra</title></Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar layout quadra</h1>
+          <h1 className="text-xl">Atualizar layout quadra</h1>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-5">
+          <div className="w-full flex justify-between items-start gap-5 mt-2">
 
             {updateFieldFactory('esquema', 'Código esquema')}
 
@@ -419,16 +419,8 @@ export default function Atualizarquadra({
 
             {updateFieldFactory('parcelas', 'Parcelas')}
 
-          </div>
-
-          <div className="h-10 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          "
-          >
-            <div className="w-30">
+            <div style={{ minWidth: 150, maxWidth: 150 }} className="h-7 flex gap-3 justify-center mt-6">
+              <div className="w-30" />
               <Button
                 type="button"
                 value="Voltar"
@@ -439,13 +431,9 @@ export default function Atualizarquadra({
               />
             </div>
           </div>
+
         </form>
-        <main className="h-3/5 w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
+        <main className="w-full flex flex-col items-start gap-8">
 
           <div style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
             <MaterialTable

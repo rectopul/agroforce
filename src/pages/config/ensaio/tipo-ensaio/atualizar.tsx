@@ -2,48 +2,48 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { ReactNode, useEffect, useState } from 'react';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoMdArrowBack } from "react-icons/io";
-import { RiFileExcel2Line, RiOrganizationChart } from "react-icons/ri";
-import Swal from "sweetalert2";
-import * as XLSX from "xlsx";
+} from 'react-icons/ai';
+import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import MaterialTable from "material-table";
-import { FaSortAmountUpAlt } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
+} from 'react-beautiful-dnd';
+import MaterialTable from 'material-table';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   envelopeService,
   userPreferencesService,
   typeAssayService,
-} from "../../../../services";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import * as ITabs from '../../../../shared/utils/dropdown';
 import {
   AccordionFilter,
   Button,
   CheckBox,
   Content,
   Input,
-} from "../../../../components";
+} from '../../../../components';
 
 interface ITypeAssayProps {
   name: any;
@@ -83,39 +83,37 @@ export default function AtualizarTipoEnsaio({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.envelope || {
     id: 0,
-    table_preferences: "id,seeds,safra,action",
+    table_preferences: 'id,seeds,safra,action',
   };
   const itemsTotal = totalItens;
   const filter = filterApplication;
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const [seeds, setSeeds] = useState<any>(() => allEnvelopes);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
-      name: "CamposGerenciados[]",
-      title: "Quant. de sementes por envelope",
-      value: "seeds",
+      name: 'CamposGerenciados[]',
+      title: 'Quant. de sementes por envelope',
+      value: 'seeds',
     },
-    { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
+    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -123,11 +121,11 @@ export default function AtualizarTipoEnsaio({
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
     }
   }
 
@@ -142,7 +140,7 @@ export default function AtualizarTipoEnsaio({
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
 
@@ -155,8 +153,8 @@ export default function AtualizarTipoEnsaio({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Tipo de Ensaio atualizado com sucesso!");
-            router.push("/config/ensaio/tipo-ensaio");
+            Swal.fire('Tipo de Ensaio atualizado com sucesso!');
+            router.push('/config/ensaio/tipo-ensaio');
           } else {
             Swal.fire(response.message);
           }
@@ -166,25 +164,25 @@ export default function AtualizarTipoEnsaio({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
 
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
     } else {
       parametersFilter = filter;
@@ -206,7 +204,7 @@ export default function AtualizarTipoEnsaio({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder("");
+        setArrowOrder('');
       }
     }
   }
@@ -232,50 +230,49 @@ export default function AtualizarTipoEnsaio({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-10 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={25} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-7 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
           </div>
-        ) : (
-          <div className="h-10 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={25} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-7 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: "Ação",
-      field: "action",
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div className="h-10">
+        <div className="h-7 flex">
+          <div className="h-7">
             <Button
               icon={<BiEdit size={16} />}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies('pageBeforeEdit', currentPage?.toString());
                 router.push(`envelope/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -288,22 +285,22 @@ export default function AtualizarTipoEnsaio({
   }
 
   function columnsOrder(columnCampos: string) {
-    const columnOrder: string[] = columnCampos.split(",");
+    const columnOrder: string[] = columnCampos.split(',');
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === "id") {
+      if (columnOrder[index] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnOrder[index] === "seeds") {
+      if (columnOrder[index] === 'seeds') {
         tableFields.push(
-          headerTableFactory("Quant. de sementes por envelope", "seeds")
+          headerTableFactory('Quant. de sementes por envelope', 'seeds'),
         );
       }
-      if (columnOrder[index] === "safra") {
-        tableFields.push(headerTableFactory("Safra", "safra.safraName"));
+      if (columnOrder[index] === 'safra') {
+        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
       }
-      if (columnOrder[index] === "action") {
+      if (columnOrder[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -314,7 +311,7 @@ export default function AtualizarTipoEnsaio({
 
   async function getValuesColumns() {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -337,7 +334,7 @@ export default function AtualizarTipoEnsaio({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.seeds = {
         id: preferences.id,
@@ -348,7 +345,7 @@ export default function AtualizarTipoEnsaio({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -381,20 +378,20 @@ export default function AtualizarTipoEnsaio({
 
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "seeds");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'seeds');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Envelopes.xlsx");
+          XLSX.writeFile(workBook, 'Envelopes.xlsx');
         }
       });
   };
@@ -434,11 +431,11 @@ export default function AtualizarTipoEnsaio({
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8"
+          className="w-full bg-white shadow-md rounded p-4"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Tipo Ensaio</h1>
+            <h1 className="text-xl">Atualizar Tipo Ensaio</h1>
           </div>
 
           <div
@@ -446,11 +443,11 @@ export default function AtualizarTipoEnsaio({
             flex
             justify-around
             gap-6
-            mt-4
+            mt-2
             mb-4
           "
           >
-            <div className="w-full h-10">
+            <div className="w-full h-7">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome
               </label>
@@ -463,7 +460,7 @@ export default function AtualizarTipoEnsaio({
                 value={formik.values.name}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full h-7">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome
               </label>
@@ -472,7 +469,7 @@ export default function AtualizarTipoEnsaio({
                 placeholder="Protocolo"
                 id="protocol_name"
                 name="protocol_name"
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 onChange={formik.handleChange}
                 value={formik.values.protocol_name}
@@ -489,7 +486,7 @@ export default function AtualizarTipoEnsaio({
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -514,18 +511,18 @@ export default function AtualizarTipoEnsaio({
           </div>
         </form>
         <main
-          className="h-4/6 w-full
+          className="w-full
           flex flex-col
           items-start
           gap-8
         "
         >
           <div
-            style={{ marginTop: "1%" }}
+            style={{ marginTop: '1%' }}
             className="w-full h-auto overflow-y-scroll"
           >
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={seeds}
               options={{
@@ -560,7 +557,7 @@ export default function AtualizarTipoEnsaio({
                         textColor="white"
                         onClick={() => {
                           router.push(
-                            `envelope/cadastro?id_type_assay=${idTypeAssay}`
+                            `envelope/cadastro?id_type_assay=${idTypeAssay}`,
                           );
                         }}
                         icon={<FaSortAmountUpAlt size={20} />}
@@ -568,7 +565,9 @@ export default function AtualizarTipoEnsaio({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -612,7 +611,7 @@ export default function AtualizarTipoEnsaio({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string
+                                                generate.value as string,
                                               )}
                                             />
                                           </li>
@@ -642,59 +641,58 @@ export default function AtualizarTipoEnsaio({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 10)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -708,10 +706,9 @@ export default function AtualizarTipoEnsaio({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = context.req.cookies;
   const idSafra = context.req.cookies.safraId;
@@ -721,8 +718,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const { publicRuntimeConfig } = getConfig();
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -737,13 +734,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const { response: allEnvelopes, total: totalItens } = await fetch(
     `${baseUrlEnvelope}?id_type_assay=${idTypeAssay}`,
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/type-assay`;
   const typeAssay = await fetch(
     `${baseUrlShow}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {

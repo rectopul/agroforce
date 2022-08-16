@@ -1,28 +1,28 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { capitalize } from "@mui/material";
-import { MultiSelectComponent } from "@syncfusion/ej2-react-dropdowns";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { FiUserPlus } from "react-icons/fi";
-import { IoMdArrowBack } from "react-icons/io";
-import InputMask from "react-input-mask";
-import Swal from "sweetalert2";
-import { userService } from "../../../../services/user.service";
+import { capitalize } from '@mui/material';
+import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { FiUserPlus } from 'react-icons/fi';
+import { IoMdArrowBack } from 'react-icons/io';
+import InputMask from 'react-input-mask';
+import Swal from 'sweetalert2';
+import { userService } from '../../../../services/user.service';
 import {
   Button,
   CheckBox,
   Content,
   Input,
   Select,
-} from "../../../../components";
-import IDepartment from "../../../../components/props/departmentDTO";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../components';
+import IDepartment from '../../../../components/props/departmentDTO';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {
   id: number;
@@ -62,79 +62,75 @@ export default function NovoUsuario({
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns("config");
+  const tabsDropDowns = TabsDropDowns('config');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
-  const maskTel = "(99)99999-9999" || "(99)9999-9999";
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const maskTel = '(99)99999-9999' || '(99)9999-9999';
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
     }
 
     if (!values.login) {
-      const inputLogin: any = document.getElementById("login");
-      inputLogin.style.borderColor = "red";
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = 'red';
     } else {
-      const inputLogin: any = document.getElementById("login");
-      inputLogin.style.borderColor = "";
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = '';
     }
 
     if (!values.cpf) {
-      const inputCpf: any = document.getElementById("cpf");
-      inputCpf.style.borderColor = "red";
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = 'red';
     } else {
-      const inputCpf: any = document.getElementById("cpf");
-      inputCpf.style.borderColor = "";
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = '';
     }
 
     if (!values.departmentId) {
-      const inputDepartmentId: any = document.getElementById("departmentId");
-      inputDepartmentId.style.borderColor = "red";
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = 'red';
     } else {
-      const inputDepartmentId: any = document.getElementById("departmentId");
-      inputDepartmentId.style.borderColor = "";
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = '';
     }
 
     if (!values.password) {
-      const inputPassword: any = document.getElementById("password");
-      inputPassword.style.borderColor = "red";
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = 'red';
     } else {
-      const inputPassword: any = document.getElementById("password");
-      inputPassword.style.borderColor = "";
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = '';
     }
 
     if (!values.confirmPassword) {
-      const inputconfirmPassword: any =
-        document.getElementById("confirmPassword");
-      inputconfirmPassword.style.borderColor = "red";
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = 'red';
     } else {
-      const inputconfirmPassword: any =
-        document.getElementById("confirmPassword");
-      inputconfirmPassword.style.borderColor = "";
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = '';
     }
   }
 
   const formik = useFormik<IUsers>({
     initialValues: {
-      name: "",
-      avatar: "",
-      login: "",
-      cpf: "",
-      email: "",
-      tel: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      avatar: '',
+      login: '',
+      cpf: '',
+      email: '',
+      tel: '',
+      password: '',
+      confirmPassword: '',
       registration: 0,
       departmentId: 0,
       status: 1,
@@ -144,18 +140,18 @@ export default function NovoUsuario({
     onSubmit: async (values) => {
       validateInputs(values);
       if (
-        !values.name ||
-        !values.login ||
-        !values.cpf ||
-        !values.departmentId ||
-        !values.password ||
-        !values.confirmPassword
+        !values.name
+        || !values.login
+        || !values.cpf
+        || !values.departmentId
+        || !values.password
+        || !values.confirmPassword
       ) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
       if (values.password !== values.confirmPassword) {
-        Swal.fire("As senhas devem ser iguais");
+        Swal.fire('As senhas devem ser iguais');
         return;
       }
 
@@ -166,7 +162,7 @@ export default function NovoUsuario({
 
       Object.keys(values.cultures).forEach((item) => {
         input = document.querySelector(
-          `select[name="profiles_${values.cultures[item]}"]`
+          `select[name="profiles_${values.cultures[item]}"]`,
         );
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i += 1) {
@@ -184,7 +180,7 @@ export default function NovoUsuario({
       await userService
         .create({
           avatar:
-            "https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag",
+            'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
           name: capitalize(values.name),
           login: values.login,
           cpf: values.cpf,
@@ -199,7 +195,7 @@ export default function NovoUsuario({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Usuário cadastrado com sucesso!");
+            Swal.fire('Usuário cadastrado com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -216,7 +212,7 @@ export default function NovoUsuario({
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
@@ -410,15 +406,15 @@ export default function NovoUsuario({
             mb-4
           "
           />
-          <div className="w-full mt-6">
+          <div className="w-full">
             <h2 className="text-gray-900 text-2xl mb-4">
               Permissões de Culturas
             </h2>
-            <div className="w-full grid grid-cols-3 gap-6">
+            <div className="w-full grid grid-cols-3 gap-2">
               {Cultures.map((culture, index) => (
                 <div
                   key={index}
-                  className="flex items-center p-4 border border-solid border-gray-200 rounded shadow"
+                  className="flex items-center p-2 border border-solid border-gray-200 rounded shadow"
                 >
                   <div className="w-full text-xl">
                     <CheckBox
@@ -443,11 +439,11 @@ export default function NovoUsuario({
                         dataSource={profiles as any}
                         mode="Box"
                         fields={{
-                          text: "name",
-                          value: "id",
+                          text: 'name',
+                          value: 'id',
                         }}
                         placeholder={`Permissões de culturas para ${
-                          !formik.values.name ? "Usuário" : formik.values.name
+                          !formik.values.name ? 'Usuário' : formik.values.name
                         }`}
                       />
                     </div>
@@ -463,10 +459,10 @@ export default function NovoUsuario({
             flex
             gap-3
             justify-center
-            mt-10
+            mt-2
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -498,8 +494,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const { token } = req.cookies;
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -507,7 +503,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
   const apiCulture = await fetch(
     `${publicRuntimeConfig.apiUrl}/culture`,
-    requestOptions
+    requestOptions,
   );
 
   const departments = await apiDepartment.json();

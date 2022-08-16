@@ -1,14 +1,14 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { RiPlantLine } from "react-icons/ri";
-import { cultureService } from "src/services";
-import Swal from "sweetalert2";
-import { Button, Content, Input } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiPlantLine } from 'react-icons/ri';
+import { cultureService } from 'src/services';
+import Swal from 'sweetalert2';
+import { Button, Content, Input } from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICreateCulture {
   name: string;
@@ -22,25 +22,23 @@ export default function Cadastro() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const formik = useFormik<ICreateCulture>({
     initialValues: {
-      name: "",
-      desc: "",
+      name: '',
+      desc: '',
       status: 1,
       created_by: Number(userLogado.id),
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire("Preencha os campos obrigatórios");
+        Swal.fire('Preencha os campos obrigatórios');
         return;
       }
 
@@ -53,7 +51,7 @@ export default function Cadastro() {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Cultura cadastrada com sucesso!");
+            Swal.fire('Cultura cadastrada com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -64,15 +62,15 @@ export default function Cadastro() {
 
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
-      const inputDesc: any = document.getElementById("desc");
-      inputDesc.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
+      const inputDesc: any = document.getElementById('desc');
+      inputDesc.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
-      const inputDesc: any = document.getElementById("desc");
-      inputDesc.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
+      const inputDesc: any = document.getElementById('desc');
+      inputDesc.style.borderColor = '';
     }
   }
 
@@ -145,7 +143,7 @@ export default function Cadastro() {
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

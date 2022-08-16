@@ -1,17 +1,17 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { RiPlantLine } from "react-icons/ri";
-import { cultureService } from "src/services";
-import Swal from "sweetalert2";
-import { Button, Content, Input } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { RiPlantLine } from 'react-icons/ri';
+import { cultureService } from 'src/services';
+import Swal from 'sweetalert2';
+import { Button, Content, Input } from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IUpdateCulture {
   id: number;
@@ -25,12 +25,10 @@ export default function Cultura(culture: IUpdateCulture) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const formik = useFormik<IUpdateCulture>({
     initialValues: {
@@ -42,7 +40,7 @@ export default function Cultura(culture: IUpdateCulture) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
 
@@ -55,7 +53,7 @@ export default function Cultura(culture: IUpdateCulture) {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Cultura atualizada com sucesso");
+            Swal.fire('Cultura atualizada com sucesso');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -69,15 +67,15 @@ export default function Cultura(culture: IUpdateCulture) {
 
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
-      const inputDesc: any = document.getElementById("desc");
-      inputDesc.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
+      const inputDesc: any = document.getElementById('desc');
+      inputDesc.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
-      const inputDesc: any = document.getElementById("desc");
-      inputDesc.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
+      const inputDesc: any = document.getElementById('desc');
+      inputDesc.style.borderColor = '';
     }
   }
 
@@ -112,7 +110,7 @@ export default function Cultura(culture: IUpdateCulture) {
                 id="name"
                 name="name"
                 type="text"
-                style={{ background: "#f9fafb" }}
+                style={{ background: '#f9fafb' }}
                 disabled
                 maxLength={2}
                 placeholder="ex: AL"
@@ -146,7 +144,7 @@ export default function Cultura(culture: IUpdateCulture) {
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -179,14 +177,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiCulture = await fetch(
     `${baseUrl}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   );
 
   const culture = await apiCulture.json();

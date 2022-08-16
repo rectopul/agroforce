@@ -1,16 +1,16 @@
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { IoMdArrowBack } from "react-icons/io";
-import { Button, Content, Input } from "src/components";
-import { departmentService } from "src/services";
-import Swal from "sweetalert2";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { Button, Content, Input } from 'src/components';
+import { departmentService } from 'src/services';
+import Swal from 'sweetalert2';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IDepartmentProps {
   id: number;
@@ -23,12 +23,10 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const formik = useFormik<IDepartmentProps>({
     initialValues: {
@@ -39,7 +37,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
 
@@ -51,10 +49,10 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Setor atualizado com sucesso!");
+            Swal.fire('Setor atualizado com sucesso!');
             router.back();
           } else {
-            setCheckInput("text-red-600");
+            setCheckInput('text-red-600');
             Swal.fire(response.message);
           }
         });
@@ -63,11 +61,11 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
     }
   }
 
@@ -108,7 +106,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -140,14 +138,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiItem = await fetch(
     `${baseUrlList}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   );
 
   const item = await apiItem.json();

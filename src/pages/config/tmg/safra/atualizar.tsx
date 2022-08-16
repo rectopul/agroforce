@@ -1,15 +1,15 @@
-import { useFormik } from "formik";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import { Button, Content, Input } from "src/components";
-import { safraService } from "src/services";
-import Swal from "sweetalert2";
-import * as ITabs from "../../../../shared/utils/dropdown";
+import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
+import { Button, Content, Input } from 'src/components';
+import { safraService } from 'src/services';
+import Swal from 'sweetalert2';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ISafraProps {
   id: number;
@@ -33,22 +33,20 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
 
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
 
   const select = [
-    { id: 1, name: "Ativo" },
-    { id: 2, name: "Inativo" },
+    { id: 1, name: 'Ativo' },
+    { id: 2, name: 'Inativo' },
   ];
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ISafraProps>({
@@ -57,14 +55,14 @@ export default function AtualizarSafra(safra: ISafraProps) {
       // id_culture: safra.id_culture,
       safraName: safra.safraName,
       year: safra.year,
-      plantingStartTime: "",
-      plantingEndTime: "",
+      plantingStartTime: '',
+      plantingEndTime: '',
       status: safra.status,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.safraName || !values.year) {
-        Swal.fire("Preencha todos os campos obrigatórios");
+        Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
 
@@ -72,14 +70,14 @@ export default function AtualizarSafra(safra: ISafraProps) {
       let plantingEndTime;
 
       if (values.plantingStartTime) {
-        plantingStartTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingStartTime)
+        plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingStartTime),
         );
       }
 
       if (values.plantingEndTime) {
-        plantingEndTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingEndTime)
+        plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingEndTime),
         );
       }
 
@@ -95,7 +93,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Safra atualizada com sucesso!");
+            Swal.fire('Safra atualizada com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -106,15 +104,15 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
   function validateInputs(values: Input) {
     if (!values.safraName || !values.year) {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "red";
-      inputYear.style.borderColor = "red";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = 'red';
+      inputYear.style.borderColor = 'red';
     } else {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "";
-      inputYear.style.borderColor = "";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = '';
+      inputYear.style.borderColor = '';
     }
   }
 
@@ -140,26 +138,11 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 id="safraName"
                 name="safraName"
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 placeholder="___________"
                 maxLength={10}
                 onChange={formik.handleChange}
                 value={formik.values.safraName}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
@@ -173,25 +156,10 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 name="year"
                 maxLength={4}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
@@ -230,7 +198,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
             mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -265,14 +233,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiSafra = await fetch(
     `${baseUrlList}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   );
 
   const safra = await apiSafra.json();
