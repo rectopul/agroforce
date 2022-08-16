@@ -11,7 +11,7 @@ import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
 import {
   Button,
-  Content, Input
+  Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -22,7 +22,7 @@ interface ICreateFoco {
 	created_by: number;
 }
 
-export default function Cadastro({ grupo }: any) {
+export default function Cadastro({ grupo, safra }: any) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -125,7 +125,7 @@ export default function Cadastro({ grupo }: any) {
                 type="text"
                 disabled
                 max="50"
-                value={grupo.safra.safraName}
+                value={safra.safraName}
               />
             </div>
             <div className="w-full h-10">
@@ -204,9 +204,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
 
   const grupo = await grupos.json();
 
+  const baseUrlShow2 = `${publicRuntimeConfig.apiUrl}/`;
+  const { id_safra } = grupo;
+
+  const safras = await fetch(`${baseUrlShow2}safra/${id_safra}`, requestOptions);
+  const safra = await safras.json();
+
   return {
     props: {
       grupo,
+      safra,
     },
   };
 };
