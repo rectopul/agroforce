@@ -30,12 +30,16 @@
 }
 
 .MuiAccordion-root {
-  /* height: 40px; */
+  /* max-height: 30px; */
   /* z-index: 999; */
 }
 
 .MuiAccordionSummary-root {
   /* height: 40px; */
+}
+
+.MuiAccordionDetails-root {
+  margin-top: -10px;
 }
 
 .MuiTableCell-root {

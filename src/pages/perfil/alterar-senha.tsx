@@ -115,7 +115,7 @@ export default function AlterarDadosPessoais() {
             </div>
 
             <div className={stylesCommon.containerButtonSubmit}>
-              <div className="w-30">
+              <div className="w-40">
                 <Button
                   type="button"
                   value="Voltar"

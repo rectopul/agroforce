@@ -33,7 +33,7 @@ import {
   Content,
   Input,
   Select,
-} from '../../../../components';
+} from 'src/components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { safraService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
@@ -86,7 +86,6 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
-
   // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -129,7 +128,6 @@ export default function Listagem({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
     { id: 1, name: 'Ativos' },
@@ -203,6 +201,19 @@ export default function Listagem({
       copy[index].status = data.status;
       return copy;
     });
+
+    const {
+      id, safraName, year, plantingStartTime, plantingEndTime, status,
+    } = safras[index];
+
+    await safraService.updateSafras({
+      id,
+      safraName,
+      year,
+      plantingStartTime,
+      plantingEndTime,
+      status,
+    });
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -229,24 +240,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
+
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -526,7 +539,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar safras">
@@ -544,11 +557,10 @@ export default function Listagem({
                   className="w-full h-full
                     flex
                     justify-center
-                    pb-2
                   "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
@@ -560,8 +572,8 @@ export default function Listagem({
                       selected="1"
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Safra
                     </label>
                     <Input
@@ -569,21 +581,10 @@ export default function Listagem({
                       id="filterSafra"
                       name="filterSafra"
                       onChange={formik.handleChange}
-                      className="shadow
-                          appearance-none
-                          bg-white bg-no-repeat
-                          border border-solid border-gray-300
-                          rounded
-                          w-full
-                          py-2 px-3
-                          text-gray-900
-                          leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                        "
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
                     <Input
@@ -591,17 +592,6 @@ export default function Listagem({
                       id="filterYear"
                       name="filterYear"
                       onChange={formik.handleChange}
-                      className="shadow
-                          appearance-none
-                          bg-white bg-no-repeat
-                          border border-solid border-gray-300
-                          rounded
-                          w-full
-                          py-2 px-3
-                          text-gray-900
-                          leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                        "
                     />
                   </div>
 
@@ -650,17 +640,18 @@ export default function Listagem({
                         "
                     />
                   </div> */}
-                </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>

@@ -9,12 +9,17 @@ import getConfig from 'next/config';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import {
-  BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import * as XLSX from 'xlsx';
@@ -22,23 +27,27 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
 } from '../../../../components';
 import { loteService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterYear: string
-  filterCodLote: string
-  filterNcc: string
-  filterFase: string
-  filterPeso: string
-  filterSeeds: string
-  filterGenotipo: string
-  filterMainName: string
-  filterGmr: string
-  filterBgm: string
+  filterYear: string;
+  filterCodLote: string;
+  filterNcc: string;
+  filterFase: string;
+  filterPeso: string;
+  filterSeeds: string;
+  filterGenotipo: string;
+  filterMainName: string;
+  filterGmr: string;
+  filterBgm: string;
   filterTecnologiaCod: string | any;
   filterTecnologiaDesc: string | any;
   orderBy: object | any;
@@ -73,17 +82,17 @@ export default function Listagem({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.lote || {
-    id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia',
+    id: 0,
+    table_preferences:
+      'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia',
   };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -98,9 +107,21 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'Peso (kg)', value: 'peso' },
-    { name: 'CamposGerenciados[]', title: 'Quant sementes', value: 'quant_sementes' },
-    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'name_genotipo' },
-    { name: 'CamposGerenciados[]', title: 'Mome principal', value: 'name_main' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Quant sementes',
+      value: 'quant_sementes',
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Nome do genotipo',
+      value: 'name_genotipo',
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Mome principal',
+      value: 'name_main',
+    },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
@@ -110,7 +131,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
@@ -145,12 +166,14 @@ export default function Listagem({
       filterTecnologiaDesc,
     }) => {
       const parametersFilter = `&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}`;
-      await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setLotes(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await loteService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setLotes(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
@@ -164,8 +187,7 @@ export default function Listagem({
       typeOrder = 'desc';
     } else {
       typeOrder = '';
-    }
-    setOrderBy(column);
+    } setOrderBy(column);
     setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
@@ -184,7 +206,6 @@ export default function Listagem({
         setLotes(response.response);
       }
     });
-
     if (orderList === 2) {
       setOrder(0);
       setArrowOrder(<AiOutlineArrowDown />);
@@ -244,43 +265,35 @@ export default function Listagem({
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
+      title: <div className="flex items-center">{arrowOrder}</div>,
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
+          </div>
+        </div>
+      )),
     };
   }
 
@@ -308,13 +321,19 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Peso', 'peso'));
       }
       if (columnCampos[index] === 'quant_sementes') {
-        tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
+        tableFields.push(
+          headerTableFactory('Quant. sementes', 'quant_sementes'),
+        );
       }
       if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'));
+        tableFields.push(
+          headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'),
+        );
       }
       if (columnCampos[index] === 'name_main') {
-        tableFields.push(headerTableFactory('Nome principal', 'genotipo.name_main'));
+        tableFields.push(
+          headerTableFactory('Nome principal', 'genotipo.name_main'),
+        );
       }
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
@@ -379,18 +398,20 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 12,
-      }).then((response) => {
-        userLogado.preferences.lote = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
+          userId: userLogado.id,
+          module_id: 12,
+        })
+        .then((response) => {
+          userLogado.preferences.lote = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.lote = {
@@ -398,7 +419,10 @@ export default function Listagem({
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -447,8 +471,8 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-8 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -470,13 +494,16 @@ export default function Listagem({
 
   return (
     <>
-      <Head><title>Listagem de Lotes</title></Head>
+      <Head>
+        <title>Listagem de Lotes</title>
+      </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar lotes">
@@ -490,10 +517,11 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-7
                 "
                 >
                   {filterFieldFactory('filterYear', 'Ano')}
@@ -511,16 +539,15 @@ export default function Listagem({
                   {filterFieldFactory('filterGenotipo', 'Genótipo')}
 
                   {filterFieldFactory('filterMainName', 'Principal')}
-
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-
                   {filterFieldFactory('filterGmr', 'GMR')}
 
                   {filterFieldFactory('filterBgm', 'BGM')}
@@ -529,17 +556,17 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -583,57 +610,69 @@ export default function Listagem({
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-72">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
                                           >
-                                            {(provider) => (
-                                              <li
-                                                ref={provider.innerRef}
-                                                {...provider.draggableProps}
-                                                {...provider.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados
-                                                    .includes(generate.value as string)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value as string,
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de genótipos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de genótipos"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -663,8 +702,9 @@ export default function Listagem({
                       icon={<BiLeftArrow size={15} />}
                       disabled={currentPage <= 0}
                     />
-                    {
-                      Array(1).fill('').map((value, index) => (
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
                         <Button
                           key={index}
                           onClick={() => setCurrentPage(index)}
@@ -673,8 +713,7 @@ export default function Listagem({
                           textColor="white"
                           disabled
                         />
-                      ))
-                    }
+                      ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
                       bgColor="bg-blue-600"
@@ -690,7 +729,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -703,7 +742,9 @@ export default function Listagem({
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -724,7 +765,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allLote, total: totalItems } = await fetch(`${urlParameters}`, requestOptions).then((response) => response.json());
+  const { response: allLote, total: totalItems } = await fetch(
+    `${urlParameters}`,
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {

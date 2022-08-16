@@ -9,9 +9,16 @@ import Head from 'next/head';
 import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import {
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -19,9 +26,16 @@ import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { tecnologiaService, userPreferencesService } from '../../../../services';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
+  tecnologiaService,
+  userPreferencesService,
+} from '../../../../services';
+import {
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -32,11 +46,11 @@ interface ITecnologiaProps {
 }
 
 interface IFilter {
-  filterName: string
-  filterDescription: string
-  filterCode: string
-  orderBy: string
-  typeOrder: string
+  filterName: string;
+  filterDescription: string;
+  filterCode: string;
+  orderBy: string;
+  typeOrder: string;
 }
 interface IGenerateProps {
   name: string | undefined;
@@ -50,8 +64,8 @@ interface Idata {
   itensPerPage: number | any;
   filterApplication: object | any;
   idCulture: number;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
@@ -68,18 +82,23 @@ export default function Listagem({
   const tabsDropDowns = TabsDropDowns('config');
 
   // eslint-disable-next-line no-return-assign
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'ENSAIO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.ogm || { id: 0, table_preferences: 'id,name,desc,cod_tec' };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const preferences = userLogado.preferences.ogm || {
+    id: 0,
+    table_preferences: 'id,name,desc,cod_tec',
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
 
-  const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(() => allItems);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [tecnologias, setTecnologias] = useState<ITecnologiaProps[]>(
+    () => allItems,
+  );
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(pageBeforeEdit),
+  );
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -87,16 +106,28 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+      name: 'CamposGerenciados[]',
+      title: 'Favorito ',
+      value: 'id',
+      defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome',
+      value: 'name',
+      defaultChecked: () => camposGerenciados.includes('name'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Rótulo ', value: 'desc', defaultChecked: () => camposGerenciados.includes('desc'),
+      name: 'CamposGerenciados[]',
+      title: 'Rótulo ',
+      value: 'desc',
+      defaultChecked: () => camposGerenciados.includes('desc'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Código Tecnologia ', value: 'cod_tec', defaultChecked: () => camposGerenciados.includes('cod_tec'),
+      name: 'CamposGerenciados[]',
+      title: 'Código Tecnologia ',
+      value: 'cod_tec',
+      defaultChecked: () => camposGerenciados.includes('cod_tec'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -104,7 +135,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
@@ -120,16 +151,21 @@ export default function Listagem({
       const parametersFilter = `&filterName=${filterName}&filterDescription=${filterDescription}&filterCode=${filterCode}&id_culture=${idCulture}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await tecnologiaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setTecnologias(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await tecnologiaService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setTecnologias(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -153,11 +189,13 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await tecnologiaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setTecnologias(response.response);
-      }
-    });
+    await tecnologiaService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setTecnologias(response.response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -192,43 +230,35 @@ export default function Listagem({
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
+      title: <div className="flex items-center">{arrowOrder}</div>,
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
+          </div>
+        </div>
+      )),
     };
   }
 
@@ -265,18 +295,20 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 8,
-      }).then((response) => {
-        userLogado.preferences.ogm = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
+          userId: userLogado.id,
+          module_id: 8,
+        })
+        .then((response) => {
+          userLogado.preferences.ogm = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.ogm = {
@@ -284,7 +316,10 @@ export default function Listagem({
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -305,26 +340,28 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await tecnologiaService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const workSheet = XLSX.utils.json_to_sheet(response);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tecnologias');
+    await tecnologiaService
+      .getAll(filterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const workSheet = XLSX.utils.json_to_sheet(response);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tecnologias');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Tecnologias.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Tecnologias.xlsx');
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -365,10 +402,11 @@ export default function Listagem({
         <title>Listagem de Tecnologias</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar tecnologias">
@@ -382,15 +420,15 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-2
                 "
                 >
-
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
                     <Input
@@ -403,8 +441,8 @@ export default function Listagem({
                     />
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Descrição
                     </label>
                     <Input
@@ -417,8 +455,8 @@ export default function Listagem({
                     />
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Código
                     </label>
                     <Input
@@ -431,16 +469,16 @@ export default function Listagem({
                     />
                   </div>
 
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -493,62 +531,75 @@ export default function Listagem({
                       {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2
+                    <div
+                      className="h-full flex items-center gap-2
                     "
                     >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
                                           >
-                                            {(provider) => (
-                                              <li
-                                                ref={provider.innerRef}
-                                                {...provider.draggableProps}
-                                                {...provider.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados
-                                                    .includes(generate.value)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value,
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de tecnologias" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de tecnologias"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                         {/* <Button
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
@@ -586,8 +637,9 @@ export default function Listagem({
                       icon={<BiLeftArrow size={15} />}
                       disabled={currentPage <= 0}
                     />
-                    {
-                      Array(1).fill('').map((value, index) => (
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
                         <Button
                           key={index}
                           onClick={() => setCurrentPage(index)}
@@ -596,8 +648,7 @@ export default function Listagem({
                           textColor="white"
                           disabled
                         />
-                      ))
-                    }
+                      ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
                       bgColor="bg-blue-600"
@@ -613,7 +664,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -625,10 +676,16 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
@@ -636,7 +693,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}`;
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}` : `&id_culture=${idCulture}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    : `&id_culture=${idCulture}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;

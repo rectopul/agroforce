@@ -224,7 +224,6 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
     setOrderBy(column);
     setOrderType(typeOrder);
     if (filter && typeof filter !== 'undefined') {
@@ -285,26 +284,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
             </button>
           </div>
         </div>
