@@ -206,10 +206,10 @@ export class ImportBlockController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const layoutQuadra: any = await layoutQuadraController.getAll(
+                const { response, total }: any = await layoutQuadraController.getAll(
                   { esquema: spreadSheet[row][column], idCulture, status: 1 },
                 );
-                if (layoutQuadra.total === 0) {
+                if (total === 0) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
                       (Number(column) + 1),
@@ -217,6 +217,25 @@ export class ImportBlockController {
                       spreadSheet[0][column],
                       'o esquema do layout ainda não foi cadastrado',
                     );
+                } else if (spreadSheet[row][3] !== spreadSheet[Number(row) - 1][3]) {
+                  if (spreadSheet[Number(row) - 1][12] < response[0]?.tiros) {
+                    responseIfError[Number(column)]
+                      += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        'T4F',
+                        'os tiros da quadra devem ser maiores ou iguais ao da esquema',
+                      );
+                  }
+                  if (spreadSheet[row][14] < response[0]?.disparos) {
+                    responseIfError[Number(column)]
+                    += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        'DF',
+                        'os disparos da quadra devem ser maiores ou iguais ao da esquema',
+                      );
+                  }
                 }
               }
             }
@@ -422,7 +441,6 @@ export class ImportBlockController {
       }
 
       if (responseIfError.length === 0) {
-        // aux = "";
         aux.created_by = Number(createdBy);
         aux.id_culture = Number(idCulture);
         aux.status = 1;

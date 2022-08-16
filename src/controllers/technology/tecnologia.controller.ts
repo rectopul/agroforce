@@ -28,6 +28,7 @@ export class TecnologiaController {
         name: true,
         desc: true,
         cod_tec: true,
+        dt_import: true,
       };
 
       if (options.id_culture) {

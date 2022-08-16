@@ -68,7 +68,7 @@ interface IGenerateProps {
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-interface Idata {
+interface IData {
   allNpe: any;
   totalItems: number;
   filter: string | any;
@@ -81,12 +81,13 @@ export default function Listagem({
   itensPerPage,
   filterApplication,
   totalItems,
-}: Idata) {
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
 
+  // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -163,6 +164,8 @@ export default function Listagem({
     },
   ]);
 
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -219,6 +222,7 @@ export default function Listagem({
       title: (
         <div className="flex items-center">
           <button
+            type="button"
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
@@ -356,7 +360,8 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -446,7 +451,6 @@ export default function Listagem({
             'NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações',
           );
           router.push('');
-        } else {
         }
       });
     } else {
@@ -468,8 +472,6 @@ export default function Listagem({
         copy[index].status = data.status;
         return copy;
       });
-
-      const { id, status } = npe[index];
     }
   }
 
@@ -518,7 +520,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -545,7 +547,12 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -638,16 +645,17 @@ export default function Listagem({
 
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
 
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                </div>
+
+                <div style={{ width: 40 }} />
+                <div className="h-7 w-32 mt-6">
+                  <Button
+                    onClick={() => {}}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>
@@ -796,11 +804,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -829,7 +837,8 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -872,8 +881,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const npes = await fetch(urlParameters.toString(), requestOptions);
-  const { response: allNpe, total: totalItems } = await npes.json();
+  const {
+    response: allNpe,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
   return {
     props: {

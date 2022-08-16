@@ -109,6 +109,8 @@ export default function TipoEnsaio({
       name: 'StatusCheckbox', title: 'SORTEADO', value: 'sorteado', defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
@@ -175,7 +177,8 @@ export default function TipoEnsaio({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -438,7 +441,12 @@ export default function TipoEnsaio({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -848,11 +856,11 @@ export default function TipoEnsaio({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -881,7 +889,7 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -950,7 +958,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   teste.name = 'Selecione';
   assaySelect.unshift(teste);
 
-  const genotypeSelect = allTreatments.map((item: any) => {
+  const genotypeSelect = allTreatments?.map((item: any) => {
     const newItem: any = {};
     newItem.id = item.genotipo.name_genotipo;
     newItem.name = item.genotipo.name_genotipo;

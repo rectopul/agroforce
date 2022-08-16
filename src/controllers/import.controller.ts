@@ -37,6 +37,7 @@ import { ImportLocalController } from './local/import-local.controller';
 import { ImportAssayListController } from './assay-list/import-assay-list.controller';
 import handleError from '../shared/utils/handleError';
 import { ImportBlockController } from './block/import-block.controller';
+import calculatingExecutionTime from '../shared/utils/calculatingExecutionTime';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -137,7 +138,10 @@ export class ImportController {
       response: responseLog,
       message,
     }: any = await this.logImportController.create({
-      user_id: data.created_by, status: 2, table: String(data.spreadSheet[1][0]),
+      user_id: data.created_by,
+      status: 2,
+      table: String(data.spreadSheet[1][0]),
+      totalRecords: (data.spreadSheet.length - 1),
     });
     try {
       if (status === 400) {
@@ -161,7 +165,8 @@ export class ImportController {
     } catch (error) {
       return { status: 400, message: error };
     } finally {
-      await this.logImportController.update({ id: responseLog?.id, status: 1 });
+      const executeTime = await calculatingExecutionTime(responseLog?.id);
+      await this.logImportController.update({ id: responseLog?.id, status: 1, executeTime });
     }
   }
 
@@ -177,107 +182,114 @@ export class ImportController {
       response: responseLog,
       message,
     }: any = await this.logImportController.create({
-      user_id: data.created_by, status: 2, table: data.table,
+      user_id: data.created_by,
+      status: 2,
+      table: data.table,
+      totalRecords: (data.spreadSheet.length - 1),
     });
     try {
-      if (data != null && data != undefined) {
-        if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
+      if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-        if (data.moduleId === 27) {
-          return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
-        }
+      if (data.moduleId === 27) {
+        return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
+      }
 
-        if (status === 400) {
-          return {
-            status: 200, message, error: true,
-          };
-        }
+      if (status === 400) {
+        return {
+          status: 200, message, error: true,
+        };
+      }
 
-        let response: any;
-        let erro: any = false;
-        const configModule: object | any = await this.getAll(Number(data.moduleId));
+      let response: any;
+      let erro: any = false;
+      const configModule: object | any = await this.getAll(Number(data.moduleId));
 
-        if (data.moduleId !== 22
+      if (data.moduleId !== 22
           && data.moduleId !== 23
           && data.moduleId !== 27
           && data.moduleId !== 26) {
-          if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
-        }
-
-        if (data.moduleId === 22) {
-          return await ImportExperimentController.validate(responseLog?.id, data);
-        }
-
-        // Validação Lista de Ensaio
-        if (data.moduleId === 26) {
-          return await ImportAssayListController.validate(responseLog?.id, data);
-        }
-
-        // Validação do modulo Local
-        if (data.moduleId === 4) {
-          return await ImportLocalController.validate(responseLog?.id, data);
-        }
-        // Validação do modulo Layout Quadra
-        if (data.moduleId === 5) {
-          return await ImportBlockController.validate(responseLog?.id, data);
-        }
-
-        // Validação do modulo Delineamento
-        if (data.moduleId == 7) {
-          response = await this.validateDelineamentoNew(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
-        }
-
-        // Validação do modulo Genotipo
-        if (data.moduleId == 10) {
-          return await ImportGenotypeController.validate(responseLog?.id, data);
-        }
-
-        // Validação do modulo Lote
-        if (data.moduleId == 12) {
-          response = await this.validateLote(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
-        }
-
-        // Validação do modulo NPE
-        if (data.moduleId == 14) {
-          response = await this.validateNPE(data);
-          if (response == 'save') {
-            response = 'Itens cadastrados com sucesso!';
-          } else {
-            erro = true;
-          }
-        }
-
-        // Validação do modulo quadra
-        if (data.moduleId == 17) {
-          return await ImportBlockController.validate(responseLog?.id, data);
-        }
-
-        // Validação do modulo tecnologia
-        if (data.moduleId === 8) {
-          return await ImportTechnologyController.validate(responseLog?.id, data);
-        }
-
-        return { status: 200, message: response, error: erro };
+        if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
       }
+
+      if (data.moduleId === 22) {
+        return await ImportExperimentController.validate(responseLog?.id, data);
+      }
+
+      // Validação Lista de Ensaio
+      if (data.moduleId === 26) {
+        return await ImportAssayListController.validate(responseLog?.id, data);
+      }
+
+      // Validação do modulo Local
+      if (data.moduleId === 4) {
+        return await ImportLocalController.validate(responseLog?.id, data);
+      }
+      // Validação do modulo Layout Quadra
+      if (data.moduleId === 5) {
+        response = await this.validateLayoutQuadra(responseLog?.id, data);
+        if (response == 'save') {
+          response = 'Itens cadastrados com sucesso!';
+        } else {
+          erro = true;
+        }
+      }
+
+      // Validação do modulo Delineamento
+      if (data.moduleId == 7) {
+        response = await this.validateDelineamentoNew(responseLog?.id, data);
+        if (response == 'save') {
+          response = 'Itens cadastrados com sucesso!';
+        } else {
+          erro = true;
+        }
+      }
+
+      // Validação do modulo Genotipo
+      if (data.moduleId == 10) {
+        return await ImportGenotypeController.validate(responseLog?.id, data);
+      }
+
+      // Validação do modulo Lote
+      if (data.moduleId == 12) {
+        response = await this.validateLote(responseLog?.id, data);
+        if (response == 'save') {
+          response = 'Itens cadastrados com sucesso!';
+        } else {
+          erro = true;
+        }
+      }
+
+      // Validação do modulo NPE
+      if (data.moduleId == 14) {
+        response = await this.validateNPE(responseLog?.id, data);
+        if (response == 'save') {
+          response = 'Itens cadastrados com sucesso!';
+        } else {
+          erro = true;
+        }
+      }
+
+      // Validação do modulo quadra
+      if (data.moduleId == 17) {
+        return await ImportBlockController.validate(responseLog?.id, data);
+      }
+
+      // Validação do modulo tecnologia
+      if (data.moduleId === 8) {
+        return await ImportTechnologyController.validate(responseLog?.id, data);
+      }
+
+      return { status: 200, message: response, error: erro };
     } catch (error: any) {
       handleError('Validate general controller', 'Validate general', error.message);
       throw new Error('[Controller] - Validate general erro');
     } finally {
-      await this.logImportController.update({ id: responseLog?.id, status: 1 });
+      const executeTime = await calculatingExecutionTime(responseLog?.id);
+      await this.logImportController.update({ id: responseLog?.id, status: 1, executeTime });
     }
   }
 
-  async validateNPE(data: object | any) {
+  async validateNPE(idLog: number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
     try {
@@ -285,7 +297,6 @@ export class ImportController {
 
       // console.log("ini npe");
       // console.log(data);
-
       if (data != null && data != undefined) {
         let Line: number;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -322,7 +333,7 @@ export class ImportController {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const validateSafra: any = await this.safraController.getOne(Number(data.safra));
                     if (data.spreadSheet[keySheet][sheet] != validateSafra.response.safraName) {
-                      return 'A safra a ser importada tem que ser a mesma selecionada!';
+                      responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, A safra a ser importada tem que ser a mesma selecionada.</li><br>`;
                     }
                     const safras: any = await this.safraController.getAll({ safraName: data.spreadSheet[keySheet][sheet] });
                     if (safras.total == 0) {
@@ -419,7 +430,7 @@ export class ImportController {
                       this.aux.npei = data.spreadSheet[keySheet][sheet];
                     }
                   } else {
-                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um campo de texto.</li><br>`;
+                    responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, NPEI deve ser um numérico e inteiro.</li><br>`;
                   }
                 } else {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do NPEI é obrigatorio.</li><br>`;
@@ -526,18 +537,21 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       // console.log('Erro geral import NPE: ');
       // console.log(err);
       return 'Erro ao validar';
     }
   }
 
-  async validateDelineamentoNew(data: object | any) {
+  async validateDelineamentoNew(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
 
@@ -828,12 +842,15 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       console.log(responseIfError);
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!5';
     }
@@ -1072,7 +1089,7 @@ export class ImportController {
     return 'save';
   }
 
-  async validateLote(data: object | any) {
+  async validateLote(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
     try {
@@ -1159,11 +1176,14 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!7';
     }
@@ -1390,7 +1410,7 @@ export class ImportController {
     }
   }
 
-  async validateLayoutQuadra(data: object | any) {
+  async validateLayoutQuadra(idLog:number, data: object | any) {
     const responseIfError: any = [];
     let Column: number;
 
@@ -1464,7 +1484,7 @@ export class ImportController {
 
               if (configModule.response[0]?.fields[sheet] == 'SL') {
                 if (data.spreadSheet[keySheet][sheet] == '') {
-                  responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
+                  responseIfError[Column - 1] += `<li validateNpeiDBA> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sl é obrigatorio.</li><br>`;
                 } else {
                   if (cod_esquema == cod_esquema_anterior) {
                     if (data.spreadSheet[keySheet][sheet] == sl) {
@@ -1713,11 +1733,14 @@ export class ImportController {
             }
           }
         }
+        await this.logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
         return 'save';
       }
+      await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
+      await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       console.log(err);
       return 'Houve um erro, tente novamente mais tarde!9';
     }

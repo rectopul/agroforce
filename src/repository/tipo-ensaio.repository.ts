@@ -11,12 +11,13 @@ export class TypeAssayRepository {
     return result;
   }
 
-  async findOneByData({ name, protocol_name, id_culture }: any) {
+  async findOneByData({ name, protocol_name, id_culture }: any, status: number) {
     const result = await prisma.type_assay.findFirst({
       where: {
         name,
         protocol_name,
         id_culture,
+        status,
       },
     });
     return result;

@@ -240,7 +240,7 @@ model quadra {
   larg_q        Int
   comp_p        Int
   linha_p       Int
-  comp_c        Int
+  comp_c        Decimal  @db.Decimal(2, 1)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?
@@ -488,13 +488,15 @@ model experiment {
 }
 
 model log_import {
-  id         Int       @id @default(autoincrement())
-  user_id    Int
-  table      String
-  state      String?
-  status     Int       @default(2) // 0 Inativo, 1 Ativo 2 - Planilha em execução (Sendo feito o upload do)
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  table        String
+  state        String?
+  status       Int       @default(2) // 0 Inativo, 1 Ativo 2 - Planilha em execução (Sendo feito o upload do)
+  executeTime  String?
+  totalRecords Int?
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @default(now())
 
   user user @relation(fields: [user_id], references: [id])
 }

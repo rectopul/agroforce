@@ -195,18 +195,35 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column].includes('DT')) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-            const { status, response }: IReturnObject = await localController.getAll(
-              { name_local_culture: spreadSheet[row][4] },
-            );
+            const { status, response }: IReturnObject = await localController.getAll({
+              filterNameLocalCulture: spreadSheet[row][4],
+            });
+            const dateNow = new Date();
+            if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+              responseIfError[Number(column)] += responseGenericFactory(
+                Number(column) + 1,
+                row,
+                spreadSheet[0][column],
+                'a data e maior que a data atual',
+              );
+            }
             if (status === 200) {
-              if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
-                responseIfError[Number(column)]
-                  += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'essa informação é mais antiga do que a informação do software',
-                  );
+              let lastDtImport = response[0]?.dt_import?.getTime();
+              response.forEach((item: any) => {
+                lastDtImport = item.dt_import.getTime() > lastDtImport
+                  ? item.dt_import.getTime()
+                  : lastDtImport;
+              });
+              if (
+                lastDtImport
+                > spreadSheet[row][column].getTime()
+              ) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'essa informação é mais antiga do que a informação do software',
+                );
               }
             }
           }
@@ -282,7 +299,7 @@ export class ImportLocalController {
           return { status: 500, message: 'Erro ao salvar planilha de Local' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {

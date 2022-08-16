@@ -97,18 +97,35 @@ export class ImportTechnologyController {
               } else {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-                const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                  { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
-                );
+                const { status, response }: IReturnObject = await tecnologiaController.getAll({
+                  filterCode: spreadSheet[row][0],
+                });
+                const dateNow = new Date();
+                if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a data e maior que a data atual',
+                  );
+                }
                 if (status === 200) {
-                  if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
-                    responseIfError[Number(column)]
-                  += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'essa informação é mais antiga do que a informação do software',
-                      );
+                  let lastDtImport = response[0]?.dt_import?.getTime();
+                  response.forEach((item: any) => {
+                    lastDtImport = item.dt_import.getTime() > lastDtImport
+                      ? item.dt_import.getTime()
+                      : lastDtImport;
+                  });
+                  if (
+                    lastDtImport
+                    > spreadSheet[row][column].getTime()
+                  ) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'essa informação é mais antiga do que a informação do software',
+                    );
                   }
                 }
               }
@@ -158,7 +175,7 @@ export class ImportTechnologyController {
         }
       }
 
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {

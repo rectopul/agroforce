@@ -23,6 +23,9 @@ import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import { removeCookies, setCookies } from 'cookies-next';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -31,10 +34,8 @@ import {
   Input,
   Select,
 } from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { safraService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { safraService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -85,7 +86,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
-
+  // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
@@ -125,7 +126,8 @@ export default function Listagem({
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
     { id: 1, name: 'Ativos' },
@@ -189,6 +191,11 @@ export default function Listagem({
       return;
     }
 
+    await safraService.updateSafras({
+      id: idItem,
+      status: data.status,
+    });
+
     setSafras((oldSafra) => {
       const copy = [...oldSafra];
       copy[index].status = data.status;
@@ -245,12 +252,14 @@ export default function Listagem({
         </div>
       ) : (
         <div className="h-9 flex">
+
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -360,7 +369,8 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof filter !== undefined) {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -496,7 +506,12 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -772,11 +787,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -805,7 +820,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -857,11 +872,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const safra = await fetch(urlParameters.toString(), requestOptions);
-  const response = await safra.json();
-
-  const allSafras = response.response;
-  const totalItems = response.total;
+  const {
+    response: allSafras,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   return {
     props: {

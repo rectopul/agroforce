@@ -2,24 +2,24 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
 import { capitalize } from '@mui/material';
+import { setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState, ReactNode, useEffect } from 'react';
-import { IoMdArrowBack } from 'react-icons/io';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import MaterialTable from 'material-table';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { ReactNode, useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import {
+  BiEdit, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
 import { FaSortAmountUpAlt } from 'react-icons/fa';
 import {
   AiOutlineArrowDown,
@@ -27,13 +27,12 @@ import {
   AiOutlineFileSearch,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import * as XLSX from 'xlsx';
+import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
-import { setCookies } from 'cookies-next';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { focoService } from '../../../../services/foco.service';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { userPreferencesService, groupService } from '../../../../services';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
   CheckBox,
@@ -41,6 +40,9 @@ import {
   Content,
   Input,
 } from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { groupService, userPreferencesService } from '../../../../services';
+import { focoService } from '../../../../services/foco.service';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IUpdateFoco {
@@ -151,7 +153,8 @@ export default function Atualizar({
   ]);
   const filter = filterApplication;
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -169,8 +172,9 @@ export default function Atualizar({
     } else {
       typeOrder = '';
     }
-
-    if (filter && typeof filter !== 'undefined') {
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
@@ -241,6 +245,7 @@ export default function Atualizar({
         </div>
       ) : (
         <div className="h-7 flex">
+
           <div>
             <button
               type="button"
@@ -248,6 +253,7 @@ export default function Atualizar({
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -263,6 +269,7 @@ export default function Atualizar({
       render: (rowData: any) => (!rowData.npe.length ? (
         <div className="h-7 flex">
           <div className="h-7">
+
             <Button
               icon={<BiEdit size={16} />}
               onClick={() => {
@@ -277,6 +284,7 @@ export default function Atualizar({
       ) : (
         <div className="h-7 flex">
           <div className="h-7">
+
             <Button
               icon={<BiEdit size={16} />}
               title="Grupo já associado a uma NPE"
@@ -417,7 +425,12 @@ export default function Atualizar({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -505,6 +518,7 @@ export default function Atualizar({
         </form>
         <main
           className="w-full
+
           flex flex-col
           items-start
           gap-8
@@ -513,6 +527,7 @@ export default function Atualizar({
           <div
             style={{ marginTop: '1%' }}
             className="w-full h-auto"
+
           >
             <MaterialTable
               style={{ background: '#f9fafb' }}
@@ -543,16 +558,20 @@ export default function Atualizar({
                   "
                   >
                     <div className="h-12">
+
                       <Button
-                        title="Cadastrar grupo"
+                        title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
                         value="Cadastrar grupo"
-                        bgColor="bg-blue-600"
+                        bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+
+                        disabled={grupos.length}
                         onClick={() => {
                           router.push(`grupo/cadastro?id_foco=${idFoco}`);
                         }}
                         icon={<FaSortAmountUpAlt size={20} />}
                       />
+
                     </div>
 
                     <strong className="text-blue-600">
@@ -644,11 +663,11 @@ export default function Atualizar({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -677,7 +696,7 @@ export default function Atualizar({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

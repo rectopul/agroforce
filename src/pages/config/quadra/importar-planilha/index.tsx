@@ -35,7 +35,7 @@ export default function Importar({ safra }: any) {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'quadra',
+        table: 'BLOCK',
         spreadSheet: rows,
         moduleId: 17,
         idSafra: userLogado.safras.safra_selecionada,

@@ -105,7 +105,7 @@ export default function Perfil({ user }: User) {
       </Head>
       <Content
         contentHeader={[]}
-        // moduloActive="config"
+        moduloActive="config"
       >
         <div className={styles.container}>
           <div>

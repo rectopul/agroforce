@@ -17,15 +17,18 @@ export class LogImportRepository {
     return result;
   }
 
-  async update(id: number, status: number, state: string) {
+  async update(
+    id: number,
+    data: any,
+  ) {
     const result = await prisma.log_import.update({
       where: { id },
-      data: { status, state },
+      data,
     });
     return result;
   }
 
-  async validateImportInExecuting(data: any) {
+  async validateImportInExecuting() {
     const result = await prisma.log_import.findFirst({
       where: {
         status: 2,

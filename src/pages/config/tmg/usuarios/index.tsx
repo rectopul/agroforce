@@ -145,7 +145,8 @@ export default function Listagem({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -210,12 +211,14 @@ export default function Listagem({
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
         <div className="h-9 flex">
+
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
               <AiTwotoneStar size={20} color="#eba417" />
+
             </button>
           </div>
         </div>
@@ -227,6 +230,7 @@ export default function Listagem({
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -276,6 +280,7 @@ export default function Listagem({
             className="h-7"
           />
           <div className="h-7">
+
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
@@ -373,6 +378,8 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -539,7 +546,12 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = Number(currentPage) * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -618,7 +630,6 @@ export default function Listagem({
                   </div>
                   {filterFieldFactory('filterName', 'Nome')}
                   {filterFieldFactory('filterLogin', 'login')}
-
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -770,11 +781,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -803,7 +814,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

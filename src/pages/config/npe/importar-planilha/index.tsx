@@ -1,19 +1,15 @@
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
-import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
+import { importService } from '../../../../services';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface Idata {
-  safra: any;
-  foco: any;
-}
 export default function Importar() {
   const { TabsDropDowns } = ITabs.default;
 
@@ -24,11 +20,14 @@ export default function Importar() {
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    // console.log("cultura selecionada:");
-    // console.log(userLogado);
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'npe', spreadSheet: rows, moduleId: 14, id_culture: userLogado.userCulture.cultura_selecionada, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
+        table: 'NPE',
+        spreadSheet: rows,
+        moduleId: 14,
+        id_culture: userLogado.userCulture.cultura_selecionada,
+        safra: userLogado.safras.safra_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({

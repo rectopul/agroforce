@@ -15,7 +15,7 @@ export class NpeController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterLocal) {
@@ -149,10 +149,10 @@ export class NpeController {
                                                   ORDER BY npei DESC 
                                                   LIMIT 1`;
           if ((safra[0])) {
-            return { message: `<li>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, NPEI ja cadastrado dentro do grupo ${group.response[0]?.group}</li><br>`, erro: 1 };
+            return { message: `<li style="text-align:left">A ${data.Column}º coluna da ${data.Line}º linha está incorreta, NPEI ja cadastrado dentro do grupo ${group.response[0]?.group}</li><br>`, erro: 1 };
           }
         } else {
-          return { message: `<li>A ${data.Column}º coluna da ${data.Line}º linha está incorreta, todos os focos precisam ter grupos cadastrados nessa safra</li><br>`, erro: 1 };
+          return { message: `<li style="text-align:left">A ${data.Column}º coluna da ${data.Line}º linha está incorreta, todos os focos precisam ter grupos cadastrados nessa safra</li><br>`, erro: 1 };
         }
       }
       return { erro: 0 };

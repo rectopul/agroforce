@@ -54,7 +54,7 @@ export default function AlterarDadosPessoais() {
       </Head>
       <Content
         contentHeader={[]}
-        // moduloActive="config"
+        moduloActive="config"
       >
         <div className={stylesCommon.container}>
           <form onSubmit={handleChangePassword}>

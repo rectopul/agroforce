@@ -119,6 +119,8 @@ export default function Import({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.rd || { id: 0, table_preferences: 'id,user_id,created_at,table,state' };
+  console.log('preferences');
+  console.log(preferences);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);
@@ -136,6 +138,8 @@ export default function Import({
     { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>('');
 
   const take: number = itensPerPage || 10;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -168,24 +172,27 @@ export default function Import({
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
+    let orderType: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      orderType = 'asc';
     } else if (order === 2) {
-      typeOrder = 'desc';
+      orderType = 'desc';
     } else {
-      typeOrder = '';
+      orderType = '';
     }
 
+    setOrderBy(column);
+    setTypeOrder(orderType);
+
     if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      if (orderType !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${orderType}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else if (orderType !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${orderType}`;
     } else {
       parametersFilter = filter;
     }
@@ -311,7 +318,7 @@ export default function Import({
         userId: userLogado.id,
         module_id: 25,
       }).then((response) => {
-        userLogado.preferences.lote = {
+        userLogado.preferences.rd = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -320,7 +327,7 @@ export default function Import({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = {
+      userLogado.preferences.rd = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -418,7 +425,12 @@ export default function Import({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (typeOrder) {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -692,11 +704,11 @@ export default function Import({
                           {...props}
                         >
                           <Button
-                            onClick={() => setCurrentPage(currentPage - 10)}
+                            onClick={() => setCurrentPage(0)}
                             bgColor="bg-blue-600"
                             textColor="white"
                             icon={<MdFirstPage size={18} />}
-                            disabled={currentPage <= 1}
+                            disabled={currentPage < 1}
                           />
                           <Button
                             onClick={() => setCurrentPage(currentPage - 1)}
@@ -725,7 +737,7 @@ export default function Import({
                             disabled={currentPage + 1 >= pages}
                           />
                           <Button
-                            onClick={() => setCurrentPage(currentPage + 10)}
+                            onClick={() => setCurrentPage(pages)}
                             bgColor="bg-blue-600"
                             textColor="white"
                             icon={<MdLastPage size={18} />}
