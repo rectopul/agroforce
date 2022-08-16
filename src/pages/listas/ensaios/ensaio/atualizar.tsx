@@ -772,7 +772,7 @@ export default function AtualizarTipoEnsaio({
                           icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
-
+                      <div style={{ width: 10 }} />
                       <div className="h-12">
                         <Button
                           title="Experimentos"
