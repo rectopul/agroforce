@@ -15,16 +15,20 @@ interface Idata {
   foco: any;
 }
 export default function Importar() {
-  const { TabsDropDowns } = ITabs;
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    //console.log("cultura selecionada:");
-    //console.log(userLogado);
+    // console.log("cultura selecionada:");
+    // console.log(userLogado);
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'npe', spreadSheet: rows, moduleId: 14, id_culture:  userLogado.userCulture.cultura_selecionada, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
+        table: 'npe', spreadSheet: rows, moduleId: 14, id_culture: userLogado.userCulture.cultura_selecionada, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({
@@ -53,7 +57,7 @@ export default function Importar() {
       <Head>
         <title>Importação NPE</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -88,7 +92,7 @@ export default function Importar() {
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

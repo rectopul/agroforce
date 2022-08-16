@@ -19,19 +19,17 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function Importar({ safra }: any) {
   const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS' ? (tab.statusTab = true) : (tab.statusTab = false)));
+
   const safras: object | any = [];
   safra.forEach((value: string | object | any) => {
     safras.push({ id: value.safraName, name: value.safraName });
   });
 
-  const tabsDropDowns = TabsDropDowns();
-
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'QUADRAS'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
@@ -72,7 +70,7 @@ export default function Importar({ safra }: any) {
       <Head>
         <title>Importação Genótipo</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -105,7 +103,7 @@ export default function Importar({ safra }: any) {
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
