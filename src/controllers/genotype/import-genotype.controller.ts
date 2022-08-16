@@ -209,133 +209,134 @@ export class ImportGenotypeController {
               }
             }
 
-            // Campos lote
-            if (configModule.response[0]?.fields[column] === 'DATA_ID') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
+            if (spreadSheet[row][25] !== null) {
+              // Campos lote
+              if (configModule.response[0]?.fields[column] === 'DATA_ID') {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                  );
+                }
               }
-            }
 
-            if (configModule.response[0]?.fields[column] === 'Ano do lote') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              }
-              const { status }: IReturnObject = await safraController.getAll({
-                id_culture: idCulture,
-                safraName: String(spreadSheet[row][Number(column) + 1]),
-              });
-              if (status === 400) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'ano não é igual ao ano da safra',
-                );
-              }
-            }
-
-            if (configModule.response[0]?.fields[column] === 'Safra') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else {
-                const { status, response }: IReturnObject = await safraController.getAll({
+              if (configModule.response[0]?.fields[column] === 'Ano do lote') {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                  );
+                }
+                const { status }: IReturnObject = await safraController.getAll({
                   id_culture: idCulture,
-                  safraName: String(spreadSheet[row][column]),
+                  safraName: String(spreadSheet[row][Number(column) + 1]),
                 });
                 if (status === 400) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'safra não cadastrada',
-                  );
-                } else if (response[0]?.id !== Number(idSafra)) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    'safra informada diferente da safra selecionada',
+                    'ano não é igual ao ano da safra',
                   );
                 }
               }
-            }
 
-            if (configModule.response[0]?.fields[column] === 'Código do lote') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else {
-                const lote: any = loteController.getAll({
-                  cod_lote: String(spreadSheet[row][column]),
-                });
-                if (lote.total > 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
+              if (configModule.response[0]?.fields[column] === 'Safra') {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
                     Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'código do lote deve ser um campo único no GOM',
                   );
-                }
-              }
-            }
-
-            if (
-              configModule.response[0]?.fields[column]
-              === 'Cruzamento de origem'
-            ) {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              }
-            }
-
-            if (configModule.response[0]?.fields[column] === 'id_s2') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              }
-            }
-
-            if (configModule.response[0]?.fields[column] === 'NCC') {
-              const nccDados: any = [];
-              // eslint-disable-next-line array-callback-return
-              spreadSheet.map((val: any, index: any) => {
-                if (index === column) {
-                  if (nccDados.includes(val)) {
+                } else {
+                  const { status, response }: IReturnObject = await safraController.getAll({
+                    id_culture: idCulture,
+                    safraName: String(spreadSheet[row][column]),
+                  });
+                  if (status === 400) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o campo ncc não pode ser repetido',
+                      'safra não cadastrada',
                     );
-                  } else {
-                    nccDados.push(val);
+                  } else if (response[0]?.id !== Number(idSafra)) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'safra informada diferente da safra selecionada',
+                    );
                   }
                 }
-              });
-            }
+              }
 
+              if (configModule.response[0]?.fields[column] === 'Código do lote') {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                  );
+                } else {
+                  const lote: any = loteController.getAll({
+                    cod_lote: String(spreadSheet[row][column]),
+                  });
+                  if (lote.total > 0) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'código do lote deve ser um campo único no GOM',
+                    );
+                  }
+                }
+              }
+
+              if (
+                configModule.response[0]?.fields[column]
+                === 'Cruzamento de origem'
+              ) {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                  );
+                }
+              }
+
+              if (configModule.response[0]?.fields[column] === 'id_s2') {
+                if (spreadSheet[row][column] === null) {
+                  responseIfError[Number(column)] += responseNullFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                  );
+                }
+              }
+
+              if (configModule.response[0]?.fields[column] === 'NCC') {
+                const nccDados: any = [];
+                // eslint-disable-next-line array-callback-return
+                spreadSheet.map((val: any, index: any) => {
+                  if (index === column) {
+                    if (nccDados.includes(val)) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'o campo ncc não pode ser repetido',
+                      );
+                    } else {
+                      nccDados.push(val);
+                    }
+                  }
+                });
+              }
+            }
             if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -403,10 +404,11 @@ export class ImportGenotypeController {
                     const geno: any = await genotipoController.getAll({
                       id_culture: idCulture,
                       id_dados: spreadSheet[row][column],
-                      id_safra: idSafra,
                     });
                     if (geno.total > 0) {
                       this.aux.id_genotipo = geno.response[0]?.id;
+                    } else {
+                      this.aux.id_genotipo = null;
                     }
                     this.aux.id_dados_geno = spreadSheet[row][column];
                   }
@@ -596,6 +598,8 @@ export class ImportGenotypeController {
                 if (configModule.response[0]?.fields[column] === 'NCC') {
                   if (spreadSheet[row][column] !== null) {
                     this.aux.ncc = spreadSheet[row][column];
+                  } else {
+                    this.aux.ncc = null;
                   }
                 }
 
@@ -641,7 +645,7 @@ export class ImportGenotypeController {
                   spreadSheet[row].length === Number(column) + 1
                   && this.aux !== []
                 ) {
-                  if (this.aux.id_genotipo && this.aux.id_genotipo > 0) {
+                  if (this.aux.id_genotipo) {
                     await genotipoController.update({
                       id: this.aux.id_genotipo,
                       id_tecnologia: Number(this.aux.id_tecnologia),
@@ -695,7 +699,7 @@ export class ImportGenotypeController {
                     this.aux.id_genotipo = genotipo.response.id;
                   }
 
-                  if (this.aux.id_genotipo) {
+                  if (this.aux.id_genotipo && this.aux.ncc) {
                     if (this.aux.id_lote) {
                       await loteController.update({
                         id: Number(this.aux.id_lote),
