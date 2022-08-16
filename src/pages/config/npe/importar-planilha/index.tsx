@@ -11,8 +11,12 @@ import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function Importar() {
-  const { TabsDropDowns } = ITabs;
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -52,7 +56,7 @@ export default function Importar() {
       <Head>
         <title>Importação NPE</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -87,7 +91,7 @@ export default function Importar() {
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

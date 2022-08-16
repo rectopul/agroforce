@@ -15,16 +15,18 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult
+  DropResult,
 } from 'react-beautiful-dnd';
+import {
+  BiEdit, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiOutlineFileSearch,
-  AiTwotoneStar
+  AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaSortAmountUpAlt } from 'react-icons/fa';
 import { IoMdArrowBack } from 'react-icons/io';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -33,10 +35,10 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
-  Button,
   CheckBox,
+  Button,
   Content,
-  Input
+  Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { groupService, userPreferencesService } from '../../../../services';
@@ -230,26 +232,28 @@ export default function Atualizar({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-7 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-7 flex">
+
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -263,8 +267,9 @@ export default function Atualizar({
       field: 'action',
       sorting: false,
       render: (rowData: any) => (!rowData.npe.length ? (
-        <div className="h-10 flex">
-          <div className="h-10">
+        <div className="h-7 flex">
+          <div className="h-7">
+
             <Button
               icon={<BiEdit size={16} />}
               onClick={() => {
@@ -277,8 +282,9 @@ export default function Atualizar({
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
-          <div className="h-10">
+        <div className="h-7 flex">
+          <div className="h-7">
+
             <Button
               icon={<BiEdit size={16} />}
               title="Grupo já associado a uma NPE"
@@ -449,22 +455,22 @@ export default function Atualizar({
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-4"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar foco</h1>
+          <h1 className="text-xl">Atualizar foco</h1>
 
           <div
             className="w-1/2
               flex
               justify-around
               gap-6
-              mt-4
+              mt-2
               mb-4
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Nome
               </label>
               <Input
@@ -485,10 +491,10 @@ export default function Atualizar({
               flex
               gap-3
               justify-center
-              mt-10
+              mt-4
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -511,7 +517,8 @@ export default function Atualizar({
           </div>
         </form>
         <main
-          className="h-4/6 w-full
+          className="w-full
+
           flex flex-col
           items-start
           gap-8
@@ -519,7 +526,8 @@ export default function Atualizar({
         >
           <div
             style={{ marginTop: '1%' }}
-            className="w-full h-auto overflow-y-scroll"
+            className="w-full h-auto"
+
           >
             <MaterialTable
               style={{ background: '#f9fafb' }}
@@ -556,6 +564,7 @@ export default function Atualizar({
                         value="Cadastrar grupo"
                         bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+
                         disabled={grupos.length}
                         onClick={() => {
                           router.push(`grupo/cadastro?id_foco=${idFoco}`);

@@ -7,11 +7,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { IoMdArrowBack } from 'react-icons/io';
-import {
-  Button,
-  Content,
-  Input,
-} from 'src/components';
+import { Button, Content, Input } from 'src/components';
 import { departmentService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as ITabs from '../../../../shared/utils/dropdown';
@@ -27,11 +23,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
@@ -49,19 +41,21 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         return;
       }
 
-      await departmentService.update({
-        id: item.id,
-        name: capitalize(formik.values.name),
-        status: item.status,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Setor atualizado com sucesso!');
-          router.back();
-        } else {
-          setCheckInput('text-red-600');
-          Swal.fire(response.message);
-        }
-      });
+      await departmentService
+        .update({
+          id: item.id,
+          name: capitalize(formik.values.name),
+          status: item.status,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Setor atualizado com sucesso!');
+            router.back();
+          } else {
+            setCheckInput('text-red-600');
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
@@ -77,17 +71,19 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   return (
     <>
-      <Head><title>Atualizar setor</title></Head>
+      <Head>
+        <title>Atualizar setor</title>
+      </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar setor</h1>
 
           <div className="w-full flex gap-5 mt-4">
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Nome
               </label>
@@ -102,14 +98,15 @@ export default function AtualizarSafra(item: IDepartmentProps) {
             </div>
           </div>
 
-          <div className="h-10 w-full
+          <div
+            className="h-10 w-full
             flex
             gap-3
             justify-center
             mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -125,7 +122,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -146,7 +143,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiItem = await fetch(`${baseUrlList}/${context.query.id}`, requestOptions);
+  const apiItem = await fetch(
+    `${baseUrlList}/${context.query.id}`,
+    requestOptions,
+  );
 
   const item = await apiItem.json();
 

@@ -29,7 +29,7 @@ export function AccordionFilter({
         >
           <Typography>{title}</Typography>
         </AccordionSummary>
-        <AccordionDetails className="max-h-72 overflow-y-scroll">
+        <AccordionDetails className="max-h-72 overflow-y-auto">
           <Typography className="flex flex-col">{children}</Typography>
         </AccordionDetails>
       </Accordion>

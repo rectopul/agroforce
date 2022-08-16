@@ -1,20 +1,15 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { capitalize } from '@mui/material';
-import { useFormik } from 'formik';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { AiOutlineFileSearch } from 'react-icons/ai';
-import { IoMdArrowBack } from 'react-icons/io';
-import Swal from 'sweetalert2';
-import { focoService } from '../../../../services/foco.service';
-import {
-  Button,
-  Content,
-
-  Input,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
+import { capitalize } from "@mui/material";
+import { useFormik } from "formik";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { AiOutlineFileSearch } from "react-icons/ai";
+import { IoMdArrowBack } from "react-icons/io";
+import Swal from "sweetalert2";
+import { focoService } from "../../../../services/foco.service";
+import { Button, Content, Input } from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
 
 interface ICreateFoco {
   name: string;
@@ -27,54 +22,55 @@ export default function Cadastro() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'ENSAIO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   function validateInputs(values: any) {
     if (!values.name || values.group === 0) {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = 'red';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "red";
     } else {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = '';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "";
     }
   }
 
   const formik = useFormik<ICreateFoco>({
     initialValues: {
       id_culture: Number(culture),
-      name: '',
+      name: "",
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire("Preencha todos os campos obrigatórios");
         return;
       }
 
-      await focoService.create({
-        name: capitalize(formik.values.name),
-        id_culture: Number(culture),
-        created_by: formik.values.created_by,
-      }).then(({ status, message }) => {
-        if (status === 200) {
-          Swal.fire('Foco cadastrado com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(message);
-        }
-      }).finally(() => {
-        formik.values.name = '';
-      });
+      await focoService
+        .create({
+          name: capitalize(formik.values.name),
+          id_culture: Number(culture),
+          created_by: formik.values.created_by,
+        })
+        .then(({ status, message }) => {
+          if (status === 200) {
+            Swal.fire("Foco cadastrado com sucesso!");
+            router.back();
+          } else {
+            Swal.fire(message);
+          }
+        })
+        .finally(() => {
+          formik.values.name = "";
+        });
     },
   });
 
@@ -86,12 +82,13 @@ export default function Cadastro() {
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Novo foco</h1>
 
-          <div className="w-1/2
+          <div
+            className="w-1/2
             flex
             justify-around
             gap-6
@@ -100,7 +97,7 @@ export default function Cadastro() {
         "
           >
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Nome
               </label>
               <Input
@@ -115,7 +112,8 @@ export default function Cadastro() {
             </div>
           </div>
 
-          <div className="
+          <div
+            className="
             h-10 w-full
             flex
             gap-3
@@ -140,7 +138,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>

@@ -299,26 +299,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
             </button>
           </div>
         </div>
@@ -328,17 +328,7 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
+      title: 'Tecnologia',
       field: 'tecnologia',
       width: 0,
       sorting: false,
@@ -614,7 +604,7 @@ export default function Listagem({
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -631,8 +621,8 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <div className="grid grid-cols-3 gap-4">
@@ -677,7 +667,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-5
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar genótipos">
@@ -686,7 +676,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -695,7 +685,6 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
                 "
                 >
                   {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
@@ -710,7 +699,7 @@ export default function Listagem({
                   flex
                   justify-center
                   pb-2
-                  pt-2
+                  pt-6
                 "
                 >
                   {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
@@ -722,17 +711,17 @@ export default function Listagem({
                   }
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -842,10 +831,10 @@ export default function Listagem({
                         </div>
                       </div>
 
-                      <div className="h-10 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de genótipos"
-                          icon={<RiFileExcel2Line size={16} />}
+                          icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {
