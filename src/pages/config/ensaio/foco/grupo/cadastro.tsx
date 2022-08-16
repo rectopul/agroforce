@@ -1,26 +1,23 @@
-import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
+import InputMask from 'react-input-mask';
 import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
-import InputMask from 'react-input-mask';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import {
   Button,
-  Content,
-  Select,
-  Input,
+  Content, Input
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
 interface ICreateFoco {
   safra: string;
-  group: number;
+  group: string ;
   id_foco: number;
   created_by: number;
 }
@@ -45,13 +42,20 @@ export default function Cadastro({ safra, id_foco }: any) {
     initialValues: {
       id_foco: Number(id_foco),
       safra: safra.id,
-      group: 0,
+      group: '',
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.group) {
         Swal.fire('Preencha todos os campos obrigatórios');
+        return;
+      }
+
+      const ifExistsUnderlineInGroup = values.group.split('');
+
+      if (ifExistsUnderlineInGroup.includes('_')) {
+        Swal.fire('O campo grupo deve ter 2 caracteres');
         return;
       }
 

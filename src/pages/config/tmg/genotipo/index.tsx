@@ -92,7 +92,6 @@ export default function Listagem({
   filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs;
-
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -346,7 +345,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
           </div>
         </div>
       ),
