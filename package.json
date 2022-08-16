@@ -5,7 +5,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start2": "next start -p 3001",
     "lint": "eslint --fix --ext .ts,.tsx ."
   },
   "dependencies": {
