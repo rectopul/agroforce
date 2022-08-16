@@ -197,27 +197,27 @@ export default function TipoEnsaio({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -246,10 +246,10 @@ export default function TipoEnsaio({
       searchable: false,
       render: (rowData: IAssayList) => (
         !rowData.experiment.length ? (
-          <div className="h-10 flex">
-            <div className="h-10">
+          <div className="h-7 flex">
+            <div className="h-7">
               <Button
-                icon={<BiEdit size={16} />}
+                icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
                   setCookies('pageBeforeEdit', currentPage?.toString());
@@ -260,9 +260,10 @@ export default function TipoEnsaio({
                 textColor="white"
               />
             </div>
+            <div style={{ width: 5 }} />
             <div>
               <Button
-                icon={<BsTrashFill size={16} />}
+                icon={<BsTrashFill size={14} />}
                 onClick={() => deleteItem(rowData.id)}
                 bgColor="bg-red-600"
                 textColor="white"
@@ -270,10 +271,10 @@ export default function TipoEnsaio({
             </div>
           </div>
         ) : (
-          <div className="h-10 flex">
-            <div className="h-10">
+          <div className="h-7 flex">
+            <div className="h-7">
               <Button
-                icon={<BiEdit size={16} />}
+                icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
                   setCookies('pageBeforeEdit', currentPage?.toString());
@@ -284,9 +285,10 @@ export default function TipoEnsaio({
                 textColor="white"
               />
             </div>
+            <div style={{ width: 5 }} />
             <div>
               <Button
-                icon={<BsTrashFill size={16} />}
+                icon={<BsTrashFill size={14} />}
                 title="Ensaio já associado a um experimento"
                 disabled
                 onClick={() => deleteItem(rowData.id)}
@@ -456,8 +458,8 @@ export default function TipoEnsaio({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-7 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -485,7 +487,7 @@ export default function TipoEnsaio({
         <main className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar ensaios">
@@ -502,7 +504,7 @@ export default function TipoEnsaio({
                 <div className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
@@ -511,17 +513,19 @@ export default function TipoEnsaio({
                   {filterFieldFactory('filterTechnology', 'Tecnologia')}
                   {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
                   {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
+
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>

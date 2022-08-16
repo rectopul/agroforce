@@ -261,27 +261,27 @@ export default function AtualizarTipoEnsaio({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -577,8 +577,8 @@ export default function AtualizarTipoEnsaio({
 
   function updateFieldFactory(name: string, title: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -610,7 +610,7 @@ export default function AtualizarTipoEnsaio({
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-1"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
@@ -620,12 +620,12 @@ export default function AtualizarTipoEnsaio({
           <div className="w-full
             flex
             justify-around
-            gap-6
-            mt-4
-            mb-4
+            gap-0
+            mt-0
+            mb-0
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-1">
 
               {updateFieldFactory('Foco', 'foco')}
 
@@ -651,10 +651,10 @@ export default function AtualizarTipoEnsaio({
             mb-4
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-4">
 
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
+                <label className="block text-gray-900 text-sm font-bold mb-1">
                   Projeto
                 </label>
                 <Input
@@ -666,9 +666,9 @@ export default function AtualizarTipoEnsaio({
               </div>
             </div>
 
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-4">
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
+                <label className="block text-gray-900 text-sm font-bold mb-1">
                   Observações
                 </label>
                 <Input
@@ -686,10 +686,10 @@ export default function AtualizarTipoEnsaio({
             flex
             gap-3
             justify-center
-            mt-10
+            mt-6
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -718,7 +718,7 @@ export default function AtualizarTipoEnsaio({
         "
         >
 
-          <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={table === 'genotipo' ? columns : experimentColumns}

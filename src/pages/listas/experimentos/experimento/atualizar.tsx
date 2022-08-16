@@ -401,8 +401,8 @@ export default function AtualizarLocal({
 
   function fieldsFactory(name: string, title: string, values: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -419,8 +419,8 @@ export default function AtualizarLocal({
 
   function updateFieldsFactory(name: string, title: string, values: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -450,7 +450,7 @@ export default function AtualizarLocal({
             flex
             justify-around
             gap-6
-            mt-4
+            mt-0
             mb-4
           "
           >
@@ -528,10 +528,10 @@ export default function AtualizarLocal({
             flex
             gap-3
             justify-center
-            mt-10
+            mt-16
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
