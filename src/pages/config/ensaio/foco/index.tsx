@@ -28,6 +28,7 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
@@ -67,6 +68,7 @@ interface IData {
   allFocos: IFocos[];
   totalItems: number;
   itensPerPage: number;
+  idCulture: number;
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
@@ -76,6 +78,7 @@ export default function Listagem({
   allFocos,
   totalItems,
   itensPerPage,
+  idCulture,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
@@ -153,26 +156,20 @@ export default function Listagem({
   const filterStatus = filterBeforeEdit.split('');
 
   async function handleStatus(idFoco: number, data: IFocos): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
+    const parametersFilter = `filterStatus=${1}&id_culture=${idCulture}&filterSearch=${data.name}`;
+    if (data.status === 0) {
       data.status = 1;
+    } else {
+      data.status = 0;
     }
-    const index = focos.findIndex((foco) => foco.id === idFoco);
-
-    if (index === -1) {
-      return;
-    }
-
-    setFocos((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
+    await focoService.getAll(parametersFilter).then(async ({ status }) => {
+      console.log(data.status);
+      if (status === 200 && data.status === 1) {
+        Swal.fire('Foco já ativado');
+        return;
+      }
+      const { response } = await focoService.update({ id: idFoco, status: data.status });
     });
-
-    const { id, name, status } = focos[index];
-
-    await focoService.update({ id, name, status });
   }
 
   async function handleOrder(
@@ -768,12 +765,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
   return {
     props: {
       allFocos,
       totalItems,
       itensPerPage,
+      idCulture,
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,

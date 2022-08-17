@@ -38,6 +38,8 @@ export class FocoController {
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
+      console.log(parameters);
+
       const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
@@ -45,6 +47,8 @@ export class FocoController {
         skip,
         orderBy,
       );
+
+      console.log(response);
 
       if (response.total > 0) {
         response.map((item: any) => {
@@ -108,8 +112,10 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      const focoExist: any = await this.focoRepository.findOne(data.id);
-      if (!focoExist) return { status: 404, message: 'Foco não encontrado' };
+      console.log(data);
+      if (data.status === 0 || data.status === 1) {
+        const response = await this.focoRepository.update(data.id, data);
+      }
 
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture },

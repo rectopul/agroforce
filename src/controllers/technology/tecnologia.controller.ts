@@ -6,6 +6,7 @@ export class TecnologiaController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    console.log('options');
     console.log(options);
     try {
       if (options.filterName) {
