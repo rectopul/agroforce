@@ -38,6 +38,7 @@ import { ImportAssayListController } from './assay-list/import-assay-list.contro
 import handleError from '../shared/utils/handleError';
 import { ImportBlockController } from './block/import-block.controller';
 import calculatingExecutionTime from '../shared/utils/calculatingExecutionTime';
+import { ImportLayoutBlockController } from './block-layout/block-layour-import.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -190,10 +191,6 @@ export class ImportController {
     try {
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
-      if (data.moduleId === 27) {
-        return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
-      }
-
       if (status === 400) {
         return {
           status: 200, message, error: true,
@@ -211,6 +208,10 @@ export class ImportController {
         if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
       }
 
+      if (data.moduleId === 27) {
+        return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
+      }
+
       if (data.moduleId === 22) {
         return await ImportExperimentController.validate(responseLog?.id, data);
       }
@@ -226,12 +227,7 @@ export class ImportController {
       }
       // Validação do modulo Layout Quadra
       if (data.moduleId === 5) {
-        response = await this.validateLayoutQuadra(responseLog?.id, data);
-        if (response == 'save') {
-          response = 'Itens cadastrados com sucesso!';
-        } else {
-          erro = true;
-        }
+        return await ImportLayoutBlockController.validate(responseLog?.id, data);
       }
 
       // Validação do modulo Delineamento
@@ -1418,12 +1414,15 @@ export class ImportController {
       const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data != null && data != undefined) {
-        let cod_esquema: any = ''; let cod_esquema_anterior: any = ''; const
-          disparo: any = 0;
-        let sl: any = 0; let sc: any; let s_aloc: any; let scolheita: any = 0; let
-          tiro: any = 0;
-        let combinacao: any = ''; let
-          combinacao_anterior: any = '';
+        let cod_esquema: any = '';
+        let cod_esquema_anterior: any = '';
+        const disparo: any = 0;
+        let sl: any = 0;
+        let sc: any; let s_aloc: any;
+        let scolheita: any = 0;
+        let tiro: any = 0;
+        let combinacao: any = '';
+        let combinacao_anterior: any = '';
         let count_linhas = 0;
         const auxTiros: object = {};
         let Line: number;
