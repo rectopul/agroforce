@@ -72,7 +72,7 @@ export default function Importar({ safra }: any) {
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
@@ -96,7 +96,7 @@ export default function Importar({ safra }: any) {
             </div>
           </div>
           <div className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center

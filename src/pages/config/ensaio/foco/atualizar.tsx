@@ -487,7 +487,7 @@ export default function Atualizar({
 
           <div
             className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center

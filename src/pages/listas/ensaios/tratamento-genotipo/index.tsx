@@ -2,35 +2,35 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { Checkbox as Checkbox1 } from "@mui/material";
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Checkbox as Checkbox1 } from '@mui/material';
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiCloseCircleFill, RiFileExcel2Line } from "react-icons/ri";
-import Modal from "react-modal";
-import * as XLSX from "xlsx";
+} from 'react-beautiful-dnd';
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { BsDownload } from 'react-icons/bs';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import Modal from 'react-modal';
+import * as XLSX from 'xlsx';
 import {
   ITreatment,
   ITreatmentFilter,
   ITreatmentGrid,
-} from "../../../../interfaces/listas/ensaio/genotype-treatment.interface";
-import { IGenerateProps } from "../../../../interfaces/shared/generate-props.interface";
+} from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
 import {
   AccordionFilter,
@@ -39,13 +39,13 @@ import {
   Content,
   Input,
   Select,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   genotypeTreatmentService,
   userPreferencesService,
-} from "../../../../services";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../services';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
   assaySelect,
@@ -58,21 +58,19 @@ export default function TipoEnsaio({
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(true);
 
-  const tabsDropDowns = TabsDropDowns("listas");
+  const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action",
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const [treatments, setTreatments] = useState<ITreatment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -83,88 +81,88 @@ export default function TipoEnsaio({
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: "CamposGerenciados[]",
-      title: "CheckBox ",
-      value: "id",
-      defaultChecked: () => camposGerenciados.includes("id"),
+      name: 'CamposGerenciados[]',
+      title: 'CheckBox ',
+      value: 'id',
+      defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Foco",
-      value: "foco",
-      defaultChecked: () => camposGerenciados.includes("foco"),
+      name: 'CamposGerenciados[]',
+      title: 'Foco',
+      value: 'foco',
+      defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Ensaio",
-      value: "type_assay",
-      defaultChecked: () => camposGerenciados.includes("type_assay"),
+      name: 'CamposGerenciados[]',
+      title: 'Ensaio',
+      value: 'type_assay',
+      defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome da Tec.",
-      value: "tecnologia",
-      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome da Tec.',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "GLI",
-      value: "gli",
-      defaultChecked: () => camposGerenciados.includes("gli"),
+      name: 'CamposGerenciados[]',
+      title: 'GLI',
+      value: 'gli',
+      defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "BGM",
-      value: "bgm",
-      defaultChecked: () => camposGerenciados.includes("bgm"),
+      name: 'CamposGerenciados[]',
+      title: 'BGM',
+      value: 'bgm',
+      defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "NT",
-      value: "treatments_number",
-      defaultChecked: () => camposGerenciados.includes("treatments_number"),
+      name: 'CamposGerenciados[]',
+      title: 'NT',
+      value: 'treatments_number',
+      defaultChecked: () => camposGerenciados.includes('treatments_number'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status T",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Status T',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status do Ensaio",
-      value: "statusAssay",
-      defaultChecked: () => camposGerenciados.includes("statusAssay"),
+      name: 'CamposGerenciados[]',
+      title: 'Status do Ensaio',
+      value: 'statusAssay',
+      defaultChecked: () => camposGerenciados.includes('statusAssay'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome genótipo",
-      value: "genotipoName",
-      defaultChecked: () => camposGerenciados.includes("genotipoName"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome genótipo',
+      value: 'genotipoName',
+      defaultChecked: () => camposGerenciados.includes('genotipoName'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "NCA",
-      value: "nca",
-      defaultChecked: () => camposGerenciados.includes("nca"),
+      name: 'CamposGerenciados[]',
+      title: 'NCA',
+      value: 'nca',
+      defaultChecked: () => camposGerenciados.includes('nca'),
     },
   ]);
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: "StatusCheckbox",
-      title: "IMPORTADO ",
-      value: "importado",
-      defaultChecked: () => camposGerenciados.includes("importado"),
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
-      name: "StatusCheckbox",
-      title: "SORTEADO",
-      value: "sorteado",
-      defaultChecked: () => camposGerenciados.includes("sorteado"),
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>("");
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
@@ -175,18 +173,18 @@ export default function TipoEnsaio({
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
-      filterFoco: "",
-      filterTypeAssay: "",
-      filterTechnology: "",
-      filterGli: "",
-      filterBgm: "",
-      filterTreatmentsNumber: "",
-      filterStatus: "",
-      filterStatusAssay: "",
-      filterGenotypeName: "",
-      filterNca: "",
-      orderBy: "",
-      typeOrder: "",
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterTechnology: '',
+      filterGli: '',
+      filterBgm: '',
+      filterTreatmentsNumber: '',
+      filterStatus: '',
+      filterStatusAssay: '',
+      filterGenotypeName: '',
+      filterNca: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -200,9 +198,9 @@ export default function TipoEnsaio({
       filterNca,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']"
+        "input[name='StatusCheckbox']",
       );
-      let selecionados = "";
+      let selecionados = '';
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
           selecionados += `${allCheckBox[i].value},`;
@@ -211,7 +209,7 @@ export default function TipoEnsaio({
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
-      setCookies("filterBeforeEdit", filtersParams);
+      setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
         .getAll(`${parametersFilter}`)
         .then(({ response, total: allTotal }) => {
@@ -228,21 +226,21 @@ export default function TipoEnsaio({
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -285,19 +283,18 @@ export default function TipoEnsaio({
     checkedItems[id] = checkedItems[id]
       ? false
       : treatments[id - 1]?.genotipo.name_genotipo;
-    console.log("checkedItems");
+    console.log('checkedItems');
     console.log(checkedItems);
   };
 
   const setAllCheck = () => {
     setCheckedAllItems(!checkedAllItems);
     treatments?.forEach((item) => {
-      checkedItems[item.id] =
-        checkedItems[item.id]?.length > 0
-          ? false
-          : item?.genotipo.name_genotipo;
+      checkedItems[item.id] = checkedItems[item.id]?.length > 0
+        ? false
+        : item?.genotipo.name_genotipo;
     });
-    console.log("checkedItems");
+    console.log('checkedItems');
     console.log(checkedItems);
   };
 
@@ -307,11 +304,11 @@ export default function TipoEnsaio({
         <div className="h-10 flex">
           <Checkbox1
             onChange={setAllCheck}
-            sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
           />
         </div>
       ),
-      field: "id",
+      field: 'id',
       sorting: false,
       width: 0,
       render: (rowData: any) => (
@@ -319,7 +316,7 @@ export default function TipoEnsaio({
           <Checkbox1
             checked={!!checkedItems[rowData.id]}
             onChange={() => setCheck(rowData.id)}
-            sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
           />
           {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
         </div>
@@ -328,49 +325,49 @@ export default function TipoEnsaio({
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(",");
+    const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === "id") {
+      if (columnOrder[item] === 'id') {
         tableFields.push(idHeaderFactory());
       }
-      if (columnOrder[item] === "foco") {
-        tableFields.push(headerTableFactory("Foco", "assay_list.foco.name"));
+      if (columnOrder[item] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
-      if (columnOrder[item] === "type_assay") {
+      if (columnOrder[item] === 'type_assay') {
         tableFields.push(
-          headerTableFactory("Ensaio", "assay_list.type_assay.name")
+          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
         );
       }
-      if (columnOrder[item] === "tecnologia") {
+      if (columnOrder[item] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory("Nome da tecnologia", "assay_list.tecnologia.name")
+          headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'),
         );
       }
-      if (columnOrder[item] === "gli") {
-        tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
-      if (columnOrder[item] === "bgm") {
-        tableFields.push(headerTableFactory("BGM", "assay_list.bgm"));
+      if (columnOrder[item] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
       }
-      if (columnOrder[item] === "treatments_number") {
-        tableFields.push(headerTableFactory("NT", "treatments_number"));
+      if (columnOrder[item] === 'treatments_number') {
+        tableFields.push(headerTableFactory('NT', 'treatments_number'));
       }
-      if (columnOrder[item] === "status") {
-        tableFields.push(headerTableFactory("Status T", "status"));
+      if (columnOrder[item] === 'status') {
+        tableFields.push(headerTableFactory('Status T', 'status'));
       }
-      if (columnOrder[item] === "statusAssay") {
+      if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory("Status do ensaio", "assay_list.status")
+          headerTableFactory('Status do ensaio', 'assay_list.status'),
         );
       }
-      if (columnOrder[item] === "genotipoName") {
+      if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory("Nome genótipo", "genotipo.name_genotipo")
+          headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'),
         );
       }
-      if (columnOrder[item] === "nca") {
-        tableFields.push(headerTableFactory("NCA", "lote.ncc"));
+      if (columnOrder[item] === 'nca') {
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
       }
     });
     return tableFields;
@@ -380,7 +377,7 @@ export default function TipoEnsaio({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -403,7 +400,7 @@ export default function TipoEnsaio({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.genotypeTreatment = {
         id: preferences.id,
@@ -414,7 +411,7 @@ export default function TipoEnsaio({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -454,20 +451,20 @@ export default function TipoEnsaio({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
   };
@@ -489,27 +486,27 @@ export default function TipoEnsaio({
             newItem.status_ensaio = item.assay_list.status;
             newItem.genotipo = item.genotipo.name_genotipo;
             newItem.nca = item.lote.ncc;
-            newItem.novo_genotipo = "";
-            newItem.novo_status = "";
-            newItem.novo_nca = "";
+            newItem.novo_genotipo = '';
+            newItem.novo_status = '';
+            newItem.novo_nca = '';
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
   };
@@ -642,8 +639,8 @@ export default function TipoEnsaio({
 
   async function replaceNca() {
     const checkedTreatments = JSON.stringify(checkedItems);
-    localStorage.setItem("checkedTreatments", checkedTreatments);
-    router.push("/listas/ensaios/tratamento-genotipo/substituicao/");
+    localStorage.setItem('checkedTreatments', checkedTreatments);
+    router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
   }
 
   function replaceGenotipo() {
@@ -765,7 +762,7 @@ export default function TipoEnsaio({
                   </div>
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  {filterFieldFactory("filterBgm", "BMG")}
+                  {filterFieldFactory('filterBgm', 'BMG')}
                 </div>
                 <div
                   className="w-full h-full
@@ -775,8 +772,8 @@ export default function TipoEnsaio({
                   pb-3
                   "
                 >
-                  {filterFieldFactory("filterTreatmentsNumber", "NT")}
-                  {filterFieldFactory("filterStatus", "Status T")}
+                  {filterFieldFactory('filterTreatmentsNumber', 'NT')}
+                  {filterFieldFactory('filterStatus', 'Status T')}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -858,7 +855,7 @@ export default function TipoEnsaio({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={afterFilter ? treatments : []}
               options={{
@@ -867,7 +864,7 @@ export default function TipoEnsaio({
                   zIndex: 0,
                   // zIndex: 20, tava assim
                 },
-                rowStyle: { background: "#f9fafb" },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -898,7 +895,9 @@ export default function TipoEnsaio({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div
@@ -945,7 +944,7 @@ export default function TipoEnsaio({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -985,59 +984,58 @@ export default function TipoEnsaio({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -1062,20 +1060,19 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "";
+    : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication =
-    filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1083,19 +1080,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
   urlParametersTreatment.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allTreatments, total: totalItems } = await fetch(
     urlParametersTreatment.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const { response: allAssay } = await fetch(
     urlParametersAssay.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const assaySelect = allAssay.map((item: any) => {
@@ -1106,8 +1103,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   });
 
   const teste: any = {};
-  teste.id = "";
-  teste.name = "Selecione";
+  teste.id = '';
+  teste.name = 'Selecione';
   assaySelect.unshift(teste);
 
   const genotypeSelect = allTreatments?.map((item: any) => {

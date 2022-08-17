@@ -99,7 +99,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
           </div>
 
           <div
-            className="h-10 w-full
+            className="h-7 w-full
             flex
             gap-3
             justify-center

@@ -732,7 +732,7 @@ export default function Atualizargenotipo({
                 value={formik.values.parentesco_completo}
               />
             </div>
-            <div className="w-40 h-8" style={{ marginTop: '1%' }}>
+            <div className="w-40 h-7" style={{ marginTop: '1%' }}>
               <Button
                 type="button"
                 value="Voltar"

@@ -1,4 +1,3 @@
-import { removeCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
@@ -10,12 +9,12 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult
+  DropResult,
 } from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiTwotoneStar
+  AiTwotoneStar,
 } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
@@ -33,10 +32,8 @@ import {
   CheckBox,
   Content,
   Input,
-  Select
+  Select,
 } from '../../../components';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface INpeProps {

@@ -10,7 +10,7 @@ import { envelopeService } from 'src/services';
 import Swal from 'sweetalert2';
 import {
   Button,
-  Content, Input
+  Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -128,7 +128,7 @@ export default function Cadastro({ envelope }: any) {
           </div>
 
           <div className="
-                            h-10 w-full
+                            h-7 w-full
                             flex
                             gap-3
                             justify-center
