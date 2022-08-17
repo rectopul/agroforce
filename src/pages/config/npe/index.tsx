@@ -1,39 +1,38 @@
+import { removeCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult,
+  DropResult
 } from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiTwotoneStar,
+  AiTwotoneStar
 } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { useRouter } from 'next/router';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { removeCookies } from 'cookies-next';
-import { npeService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
   CheckBox,
   Content,
   Input,
-  Select,
+  Select
 } from '../../../components';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+import { npeService, userPreferencesService } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 
 interface INpeProps {

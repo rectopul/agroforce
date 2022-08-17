@@ -5,24 +5,23 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext, Draggable, Droppable, DropResult
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import {
+  AccordionFilter, Button, CheckBox, Content, Input
+} from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { tecnologiaService, userPreferencesService } from '../../../../services';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input,
-} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {
@@ -308,6 +307,7 @@ export default function Listagem({
     await tecnologiaService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
         const workSheet = XLSX.utils.json_to_sheet(response);
+
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Tecnologias');
 

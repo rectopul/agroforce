@@ -533,8 +533,12 @@ export default function Listagem({
     await genotipoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = genotipos.map((row: any) => {
-          row.cod_tec = row.tecnologia?.cod_tec;
-          row.tecnologia = row.tecnologia?.name;
+          row.codigo_tecnologia = row.tecnologia?.cod_tec;
+          delete row.id;
+          delete row.id_tecnologia;
+          delete row.tableData;
+          delete row.lote;
+
           // row.DT = new Date();
 
           const dataExp = new Date();
@@ -563,6 +567,7 @@ export default function Listagem({
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
+
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
 
@@ -579,6 +584,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'Genótipos.xlsx');
       } else {
+        // eslint-disable-next-line no-undef
         Swal.fire(response);
       }
     });

@@ -6,26 +6,26 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext, Draggable, Droppable, DropResult
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import {
-  BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiFilterAlt, BiLeftArrow, BiRightArrow
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Swal from 'sweetalert2';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
+  AccordionFilter, Button, CheckBox, Content, Input
 } from '../../../../components';
-import { loteService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -235,7 +235,8 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.desc}`}
+            {console.log(rowData.genotipo)}
+            {/* {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.name_genotipo}`} */}
           </div>
         </div>
       ),
@@ -724,7 +725,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allLote, total: totalItems } = await fetch(`${urlParameters}`, requestOptions).then((response) => response.json());
+  const { response: allLote, total: totalItems } = await fetch(`${urlParameters.toString()}`, requestOptions)
+    .then((response) => response.json());
+
+  console.log(allLote);
 
   return {
     props: {

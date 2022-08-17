@@ -1,20 +1,16 @@
-import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
-import InputMask from 'react-input-mask';
-import Swal from 'sweetalert2';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import { envelopeService } from 'src/services';
+import Swal from 'sweetalert2';
 import {
   Button,
-  Content,
-  Select,
-  Input,
+  Content, Input
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -167,7 +163,7 @@ export default function Cadastro({ envelope }: any) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { }}
+                onClick={() => router.back()}
               />
             </div>
           </div>

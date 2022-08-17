@@ -1,6 +1,6 @@
-import getConfig from 'next/config';
+import getConfig from "next/config";
 
-import { userService } from '../services';
+import { userService } from "../services";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -36,8 +36,8 @@ async function get(url: any, params: any) {
   const urlParameters: any = new URL(url);
   urlParameters.search = new URLSearchParams(params).toString();
   const requestOptions: any = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: authHeader(url),
   };
   const response = await fetch(urlParameters, requestOptions);
@@ -46,19 +46,20 @@ async function get(url: any, params: any) {
 
 async function post(url: any, body: any) {
   const requestOptions: object | any = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
-    credentials: 'include',
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader(url) },
+    credentials: "include",
     body: JSON.stringify(body),
   };
   const response = await fetch(url, requestOptions);
+  console.log(requestOptions);
   return handleResponse(response);
 }
 
 async function put(url: any, body: any) {
   const requestOptions: object | any = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authHeader(url) },
     body: JSON.stringify(body),
   };
   const response = await fetch(url, requestOptions);
@@ -68,7 +69,7 @@ async function put(url: any, body: any) {
 // prefixed with underscored because delete is a reserved word in javascript
 async function deleted(url: any, body: any) {
   const requestOptions: object | any = {
-    method: 'DELETE',
+    method: "DELETE",
     headers: authHeader(url),
     body: JSON.stringify(body),
   };
