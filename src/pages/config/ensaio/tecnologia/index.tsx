@@ -24,7 +24,6 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   tecnologiaService,
@@ -37,8 +36,6 @@ import {
   Content,
   Input,
 } from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { tecnologiaService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {
@@ -682,12 +679,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
@@ -712,6 +705,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const response = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await response.json();
+
+  console.log(allItems);
 
   return {
     props: {
