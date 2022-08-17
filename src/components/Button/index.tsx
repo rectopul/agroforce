@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { useRouter } from 'next/router';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   value?: string;

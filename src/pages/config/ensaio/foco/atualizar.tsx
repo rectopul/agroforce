@@ -562,6 +562,7 @@ export default function Atualizar({
                       <Button
                         title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
                         value="Cadastrar grupo"
+                        value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
                         bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
 

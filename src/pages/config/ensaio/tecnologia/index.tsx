@@ -5,8 +5,8 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext,
@@ -22,7 +22,7 @@ import {
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
@@ -37,6 +37,8 @@ import {
   Content,
   Input,
 } from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { tecnologiaService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITecnologiaProps {

@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -12,32 +13,31 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult,
+  DropResult
 } from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiTwotoneStar,
+  AiTwotoneStar
 } from 'react-icons/ai';
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow
 } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { typeAssayService, userPreferencesService } from '../../../../services';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
   CheckBox,
   Content,
   Input,
-  Select,
+  Select
 } from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { typeAssayService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
@@ -840,6 +840,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
+
+  console.log(allTypeAssay);
 
   return {
     props: {
