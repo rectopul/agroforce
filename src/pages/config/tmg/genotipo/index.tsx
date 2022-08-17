@@ -288,7 +288,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -331,7 +331,7 @@ export default function Listagem({
       title: 'Tecnologia',
       field: 'tecnologia',
       width: 0,
-      sorting: false,
+      sorting: true,
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
@@ -733,6 +733,7 @@ export default function Listagem({
               columns={columns}
               data={genotipos}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,

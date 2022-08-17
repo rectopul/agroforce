@@ -266,7 +266,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -375,6 +375,7 @@ export default function Listagem({
         tableFields.push(statusHeaderFactory());
       }
     });
+
     return tableFields;
   }
 
@@ -582,7 +583,8 @@ export default function Listagem({
               columns={columns}
               data={cultures}
               options={{
-                showTitle: false,
+                sorting: true,
+                showTitle: true,
                 headerStyle: {
                   zIndex: 20,
                 },

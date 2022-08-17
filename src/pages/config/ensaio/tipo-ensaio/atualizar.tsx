@@ -225,7 +225,7 @@ export default function AtualizarTipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 

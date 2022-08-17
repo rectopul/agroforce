@@ -221,7 +221,7 @@ export default function Atualizar({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 

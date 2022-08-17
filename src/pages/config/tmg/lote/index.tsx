@@ -233,7 +233,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -252,7 +252,7 @@ export default function Listagem({
       ),
       field: 'tecnologia',
       width: 0,
-      sorting: false,
+      sorting: true,
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
