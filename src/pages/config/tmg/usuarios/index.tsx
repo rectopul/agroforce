@@ -199,7 +199,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -210,24 +210,27 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
+
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
+
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
+
             </button>
           </div>
         </div>
@@ -244,16 +247,8 @@ export default function Listagem({
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: IUsers) => (rowData.status ? (
         <div className="h-7 flex">
-          <div
-            className="
-							h-7
-						"
-          />
-          <div
-            className="
-							h-7
-						"
-          >
+          <div className="h-7" />
+          <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
@@ -282,15 +277,10 @@ export default function Listagem({
       ) : (
         <div className="h-7 flex">
           <div
-            className="
-							h-7
-						"
+            className="h-7"
           />
-          <div
-            className="
-							h-7
-						"
-          >
+          <div className="h-7">
+
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
@@ -364,7 +354,7 @@ export default function Listagem({
         tableFields.push({
           title: 'Telefone',
           field: 'tel',
-          sorting: false,
+          sorting: true,
           render: (rowData: IUsers) => handleFormatTel(rowData.tel),
         });
       }
@@ -575,8 +565,8 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -605,7 +595,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar usuários">
@@ -623,11 +613,11 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
@@ -640,29 +630,30 @@ export default function Listagem({
                   </div>
                   {filterFieldFactory('filterName', 'Nome')}
                   {filterFieldFactory('filterLogin', 'login')}
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => formik.handleChange}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => formik.handleChange}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll d-mt-1366-768">
+          <div className="w-full h-full overflow-auto d-mt-1366-768">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={users}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -675,7 +666,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-max max-h-96
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -687,7 +678,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-10">
+                    <div className="h-12">
                       <Button
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
@@ -696,7 +687,7 @@ export default function Listagem({
                         onClick={() => {
                           router.push('usuarios/cadastro');
                         }}
-                        icon={<FiUserPlus size={16} />}
+                        icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
@@ -765,10 +756,10 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-                      <div className="h-10 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de usuários"
-                          icon={<RiFileExcel2Line size={16} />}
+                          icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {

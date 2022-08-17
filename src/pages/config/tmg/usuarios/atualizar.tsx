@@ -15,7 +15,11 @@ import { prisma } from '../../../api/db/db';
 import { userService } from '../../../../services';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import {
-  Button, CheckBox, Content, Input, Select,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -58,16 +62,18 @@ export interface IData {
 }
 
 export default function AtualizarUsuario({
-  departmentsData, data, profilesData, culturesData,
+  departmentsData,
+  data,
+  profilesData,
+  culturesData,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG' && tab.data.map((i) => i.labelDropDown === 'Usuários')
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
+    && tab.data.map((i) => i.labelDropDown === 'Usuários')
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
   const router = useRouter();
 
@@ -80,7 +86,9 @@ export default function AtualizarUsuario({
       if (userPermissions[data.users_permissions[item].id_cultures]) {
         userPermissions[data.users_permissions[item].id_cultures] = [
           data.users_permissions[item].id_profiles,
-          Number(userPermissions[data.users_permissions[item].id_cultures].join()),
+          Number(
+            userPermissions[data.users_permissions[item].id_cultures].join(),
+          ),
         ];
       } else {
         userPermissions[data.users_permissions[item].id_cultures] = [
@@ -92,12 +100,48 @@ export default function AtualizarUsuario({
   const [Permissions, setPermissions] = useState<any>(userPermissions);
 
   function validateInputs(values: any) {
-    if (!values.name) { const inputName: any = document.getElementById('name'); inputName.style.borderColor = 'red'; } else { const inputName: any = document.getElementById('name'); inputName.style.borderColor = ''; }
-    if (!values.login) { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = 'red'; } else { const inputLogin: any = document.getElementById('login'); inputLogin.style.borderColor = ''; }
-    if (!values.cpf) { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = 'red'; } else { const inputCpf: any = document.getElementById('cpf'); inputCpf.style.borderColor = ''; }
-    if (!values.departmentId) { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = 'red'; } else { const inputDepartmentId: any = document.getElementById('departmentId'); inputDepartmentId.style.borderColor = ''; }
-    if (!values.password) { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = 'red'; } else { const inputPassword: any = document.getElementById('password'); inputPassword.style.borderColor = ''; }
-    if (!values.confirmPassword) { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = 'red'; } else { const inputconfirmPassword: any = document.getElementById('confirmPassword'); inputconfirmPassword.style.borderColor = ''; }
+    if (!values.name) {
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
+    } else {
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
+    }
+    if (!values.login) {
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = 'red';
+    } else {
+      const inputLogin: any = document.getElementById('login');
+      inputLogin.style.borderColor = '';
+    }
+    if (!values.cpf) {
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = 'red';
+    } else {
+      const inputCpf: any = document.getElementById('cpf');
+      inputCpf.style.borderColor = '';
+    }
+    if (!values.departmentId) {
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = 'red';
+    } else {
+      const inputDepartmentId: any = document.getElementById('departmentId');
+      inputDepartmentId.style.borderColor = '';
+    }
+    if (!values.password) {
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = 'red';
+    } else {
+      const inputPassword: any = document.getElementById('password');
+      inputPassword.style.borderColor = '';
+    }
+    if (!values.confirmPassword) {
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = 'red';
+    } else {
+      const inputconfirmPassword: any = document.getElementById('confirmPassword');
+      inputconfirmPassword.style.borderColor = '';
+    }
 
     if (values.password !== values.confirmPassword) {
       return true;
@@ -124,12 +168,14 @@ export default function AtualizarUsuario({
     onSubmit: async (values) => {
       console.log(values);
       validateInputs(values);
-      if (!values.name
+      if (
+        !values.name
         || !values.login
         || !values.cpf
         || !values.departmentId
         || !values.password
-        || !values.confirmPassword) {
+        || !values.confirmPassword
+      ) {
         Swal.fire('Preencha todos os campos obrigatórios');
         return;
       }
@@ -151,7 +197,9 @@ export default function AtualizarUsuario({
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
+        input = document.querySelector(
+          `select[name="profiles_${values.cultures[item]}"]`,
+        );
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i += 1) {
           if (input.options[i].selected) {
@@ -165,27 +213,29 @@ export default function AtualizarUsuario({
         auxObject.push(ObjProfiles);
       });
 
-      await userService.update({
-        id: values.id,
-        name: capitalize(values.name),
-        login: values.login,
-        cpf: values.cpf,
-        email: values.email,
-        tel: values.tel,
-        password: values.password,
-        registration: values.registration,
-        departmentId: values.departmentId,
-        status: values.status,
-        cultures: auxObject,
-        created_by: values.created_by,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Usuário atualizado com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      });
+      await userService
+        .update({
+          id: values.id,
+          name: capitalize(values.name),
+          login: values.login,
+          cpf: values.cpf,
+          email: values.email,
+          tel: values.tel,
+          password: values.password,
+          registration: values.registration,
+          departmentId: values.departmentId,
+          status: values.status,
+          cultures: auxObject,
+          created_by: values.created_by,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Usuário atualizado com sucesso!');
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
@@ -200,12 +250,13 @@ export default function AtualizarUsuario({
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar usuário</h1>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-around
             gap-6
@@ -214,7 +265,7 @@ export default function AtualizarUsuario({
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome
               </label>
               <Input
@@ -229,7 +280,7 @@ export default function AtualizarUsuario({
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Login
               </label>
               <Input
@@ -242,7 +293,7 @@ export default function AtualizarUsuario({
               />
             </div>
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *CPF
               </label>
               <InputMask
@@ -263,8 +314,9 @@ export default function AtualizarUsuario({
                   border border-solid border-gray-300
                   rounded
                   w-full
-                  py-2 px-3
+                  py-1 px-2
                   text-gray-900
+                  text-xs
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
@@ -272,7 +324,8 @@ export default function AtualizarUsuario({
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-around
             gap-6
@@ -280,7 +333,7 @@ export default function AtualizarUsuario({
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Email
               </label>
               <Input
@@ -294,7 +347,7 @@ export default function AtualizarUsuario({
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Matricula
               </label>
               <Input
@@ -307,8 +360,8 @@ export default function AtualizarUsuario({
               />
             </div>
 
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-6">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Setor
               </label>
               <Select
@@ -321,7 +374,7 @@ export default function AtualizarUsuario({
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Telefone
               </label>
               <InputMask
@@ -337,17 +390,18 @@ export default function AtualizarUsuario({
                   border border-solid border-gray-300
                   rounded
                   w-full
-                  py-2 px-3
+                  py-1 px-2
                   text-gray-900
+                  text-xs
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
               />
             </div>
-
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-between
             gap-6
@@ -355,7 +409,7 @@ export default function AtualizarUsuario({
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Senha
               </label>
               <Input
@@ -369,7 +423,7 @@ export default function AtualizarUsuario({
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Confirmar senha
               </label>
               <Input
@@ -383,7 +437,8 @@ export default function AtualizarUsuario({
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-between
             gap-6
@@ -391,60 +446,64 @@ export default function AtualizarUsuario({
           "
           />
 
-          <div className="w-full mt-6">
+          <div className="w-full">
             <h2 className="text-gray-900 text-2xl mb-4">
               Permissões de Culturas
             </h2>
-            <div className="w-full grid grid-cols-3 gap-6">
-              {
-                culturesData.map((culture: ICultureUser) => (
-                  <div key={culture.id} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                    <div className="w-full text-xl">
-                      <CheckBox
-                        key={culture.id}
-                        title={culture.name}
-                        id={`culture_${culture.id}`}
-                        name="cultures"
-                        onChange={formik.handleChange}
-                        value={culture.id}
-                        defaultChecked={userCultures.includes(culture.id)}
+            <div className="w-full grid grid-cols-3 gap-2">
+              {culturesData.map((culture: ICultureUser) => (
+                <div
+                  key={culture.id}
+                  className="flex items-center p-2 border border-solid border-gray-200 rounded shadow"
+                >
+                  <div className="w-full text-xl">
+                    <CheckBox
+                      key={culture.id}
+                      title={culture.name}
+                      id={`culture_${culture.id}`}
+                      name="cultures"
+                      onChange={formik.handleChange}
+                      value={culture.id}
+                      defaultChecked={userCultures.includes(culture.id)}
+                    />
+                  </div>
+
+                  <div className="w-full">
+                    <h4 className="block text-gray-900 text-sm font-bold mb-1">
+                      Permissões
+                    </h4>
+                    <div>
+                      <MultiSelectComponent
+                        id={`profiles_${culture.id}`}
+                        name={`profiles_${culture.id}`}
+                        dataSource={profilesData as any}
+                        onChange={(e: any) => defineProfiles(culture.id, e)}
+                        mode="Box"
+                        fields={{
+                          text: 'name',
+                          value: 'id',
+                        }}
+                        value={Permissions[culture.id]}
+                        placeholder={`Permissões de culturas para ${
+                          !formik.values.name ? 'Usuário' : formik.values.name
+                        }`}
                       />
                     </div>
-
-                    <div className="w-full">
-                      <h4 className="block text-gray-900 text-sm font-bold mb-2">
-                        Permissões
-                      </h4>
-                      <div>
-                        <MultiSelectComponent
-                          id={`profiles_${culture.id}`}
-                          name={`profiles_${culture.id}`}
-                          dataSource={profilesData as any}
-                          onChange={(e: any) => defineProfiles(culture.id, e)}
-                          mode="Box"
-                          fields={{
-                            text: 'name',
-                            value: 'id',
-                          }}
-                          value={Permissions[culture.id]}
-                          placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
-                        />
-                      </div>
-                    </div>
                   </div>
-                ))
-              }
+                </div>
+              ))}
             </div>
           </div>
-          <div className="
+          <div
+            className="
             h-10 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-2
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -461,7 +520,7 @@ export default function AtualizarUsuario({
                 bgColor="bg-blue-600"
                 icon={<RiUserSettingsLine size={18} />}
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>

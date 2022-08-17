@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import { SelectHTMLAttributes } from 'react';
+import { SelectHTMLAttributes } from "react";
 
 type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   values: Array<string | object>;
-  selected: any
-}
+  selected: any;
+};
 
 export function Select({ selected, values, ...rest }: ITypeSelectProps) {
   return (
@@ -13,7 +13,7 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
       className="h-full w-full
       form-select form-select-sm
       shadow
-      text-base
+      text-sm
       text-gray-900
       bg-white bg-no-repeat
       border border-solid border-gray-300
@@ -25,20 +25,14 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
       aria-label=".form-select-sm example
     "
     >
-      {
-        values.map((value: string | object | any, index) => {
-          const itemSelected: any = selected === value.id ? 'selected' : '';
-          return (
-            <option
-              selected={itemSelected}
-              key={index}
-              value={value.id}
-            >
-              {value.desc ? value.desc : value.name}
-            </option>
-          );
-        })
-      }
+      {values.map((value: string | object | any, index) => {
+        const itemSelected: any = selected === value.id ? "selected" : "";
+        return (
+          <option selected={itemSelected} key={index} value={value.id}>
+            {value.desc ? value.desc : value.name}
+          </option>
+        );
+      })}
     </select>
   );
 }

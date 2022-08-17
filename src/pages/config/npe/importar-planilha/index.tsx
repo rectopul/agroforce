@@ -1,27 +1,25 @@
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
-import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
+import { importService } from '../../../../services';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface Idata {
-  safra: any;
-  foco: any;
-}
 export default function Importar() {
-  const { TabsDropDowns } = ITabs;
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    // console.log("cultura selecionada:");
-    // console.log(userLogado);
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
         table: 'NPE',
@@ -58,7 +56,7 @@ export default function Importar() {
       <Head>
         <title>Importação NPE</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
           onSubmit={formik.handleSubmit}
@@ -93,7 +91,7 @@ export default function Importar() {
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

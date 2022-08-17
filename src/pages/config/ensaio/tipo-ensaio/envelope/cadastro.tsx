@@ -103,7 +103,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                             "
           >
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Safra
               </label>
               <Input
@@ -116,22 +116,11 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 value={safra.safraName}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Quant. de sementes por envelope
               </label>
               <Input
-                className="shadow
-                                    appearance-none
-                                    bg-white bg-no-repeat
-                                    border border-solid border-gray-300
-                                    rounded
-                                    w-full
-                                    py-2 px-3
-                                    text-gray-900
-                                    leading-tight
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                                "
                 id="seeds"
                 name="seeds"
                 onChange={formik.handleChange}
@@ -148,7 +137,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                             mt-10
                         "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

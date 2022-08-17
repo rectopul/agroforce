@@ -277,7 +277,7 @@ export default function TipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -545,8 +545,8 @@ export default function TipoEnsaio({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-7 w-1/2 ml-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -727,7 +727,7 @@ export default function TipoEnsaio({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar ensaios">
@@ -736,7 +736,7 @@ export default function TipoEnsaio({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-1
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -745,14 +745,14 @@ export default function TipoEnsaio({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-8
                 "
                 >
-                  {filterFieldFactory("filterFoco", "Foco")}
-                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
-                  {filterFieldFactory("filterTechnology", "Tecnologia")}
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
+                  <div className="h-7 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       GLI
                     </label>
                     <Select
@@ -779,7 +779,7 @@ export default function TipoEnsaio({
                   {filterFieldFactory("filterStatus", "Status T")}
 
                   <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
                     </label>
                     <AccordionFilter>
@@ -822,8 +822,8 @@ export default function TipoEnsaio({
                   </div>
                   {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
 
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-7 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Genótipo
                     </label>
                     <Select
@@ -836,19 +836,21 @@ export default function TipoEnsaio({
                   </div>
 
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
-                  {filterFieldFactory("filterNca", "NCA")}
+                  {filterFieldFactory('filterNca', 'NCA')}
+
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      type="submit"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    type="submit"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>

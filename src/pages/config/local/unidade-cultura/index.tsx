@@ -11,9 +11,16 @@ import Head from 'next/head';
 import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import {
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
@@ -25,21 +32,26 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { unidadeCulturaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface IUnityCultureProps {
-  id: number
-  name_unity_culture: string
-  year: number
-  name_local_culture: string
-  label: string
-  mloc: string
-  adress: string
-  label_country: string
-  label_region: string
-  name_locality: string
+  id: number;
+  name_unity_culture: string;
+  year: number;
+  name_local_culture: string;
+  label: string;
+  mloc: string;
+  adress: string;
+  label_country: string;
+  label_region: string;
+  name_locality: string;
 }
 
 interface IFilter {
@@ -66,28 +78,37 @@ interface IData {
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;
-  pageBeforeEdit: string | any
-  filterBeforeEdit: string | any
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
-  allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+  allCultureUnity,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  pageBeforeEdit,
+  filterBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LOCAL'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.unidadeCultura || {
-    id: 0, table_preferences: 'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
+    id: 0,
+    table_preferences:
+      'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
   };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(() => allCultureUnity);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
+  const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(
+    () => allCultureUnity,
+  );
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(pageBeforeEdit),
+  );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -95,34 +116,64 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+      name: 'CamposGerenciados[]',
+      title: 'Favorito ',
+      value: 'id',
+      defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome un. cultura', value: 'name_unity_culture', defaultChecked: () => camposGerenciados.includes('name_unity_culture'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome un. cultura',
+      value: 'name_unity_culture',
+      defaultChecked: () => camposGerenciados.includes('name_unity_culture'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ano', value: 'year', defaultChecked: () => camposGerenciados.includes('year'),
+      name: 'CamposGerenciados[]',
+      title: 'Ano',
+      value: 'year',
+      defaultChecked: () => camposGerenciados.includes('year'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome do L. de Cult.', value: 'name_local_culture', defaultChecked: () => camposGerenciados.includes('name_local_culture'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome do L. de Cult.',
+      value: 'name_local_culture',
+      defaultChecked: () => camposGerenciados.includes('name_local_culture'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Rótulo', value: 'label', defaultChecked: () => camposGerenciados.includes('label'),
+      name: 'CamposGerenciados[]',
+      title: 'Rótulo',
+      value: 'label',
+      defaultChecked: () => camposGerenciados.includes('label'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'MLOC', value: 'mloc', defaultChecked: () => camposGerenciados.includes('mloc'),
+      name: 'CamposGerenciados[]',
+      title: 'MLOC',
+      value: 'mloc',
+      defaultChecked: () => camposGerenciados.includes('mloc'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome Fazenda', value: 'adress', defaultChecked: () => camposGerenciados.includes('adress'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome Fazenda',
+      value: 'adress',
+      defaultChecked: () => camposGerenciados.includes('adress'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'País', value: 'label_country', defaultChecked: () => camposGerenciados.includes('label_country'),
+      name: 'CamposGerenciados[]',
+      title: 'País',
+      value: 'label_country',
+      defaultChecked: () => camposGerenciados.includes('label_country'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Região', value: 'label_region', defaultChecked: () => camposGerenciados.includes('label_region'),
+      name: 'CamposGerenciados[]',
+      title: 'Região',
+      value: 'label_region',
+      defaultChecked: () => camposGerenciados.includes('label_region'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Localidade', value: 'name_locality', defaultChecked: () => camposGerenciados.includes('name_locality'),
+      name: 'CamposGerenciados[]',
+      title: 'Localidade',
+      value: 'name_locality',
+      defaultChecked: () => camposGerenciados.includes('name_locality'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -131,7 +182,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
@@ -162,16 +213,21 @@ export default function Listagem({
       const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setTotalItems(response.total);
-        setUnidadeCultura(response.response);
-        setCurrentPage(0);
-      });
+      await unidadeCulturaService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setTotalItems(response.total);
+          setUnidadeCultura(response.response);
+          setCurrentPage(0);
+        });
     },
   });
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -195,11 +251,13 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await unidadeCulturaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setUnidadeCultura(response.response);
-      }
-    });
+    await unidadeCulturaService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setUnidadeCultura(response.response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -228,49 +286,41 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
+      title: <div className="flex items-center">{arrowOrder}</div>,
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
+          </div>
+        </div>
+      )),
     };
   }
 
@@ -282,13 +332,17 @@ export default function Listagem({
         tableFields.push(idHeaderFactory());
       }
       if (columnCampos[item] === 'name_unity_culture') {
-        tableFields.push(headerTableFactory('Nome un. cultura', 'name_unity_culture'));
+        tableFields.push(
+          headerTableFactory('Nome un. cultura', 'name_unity_culture'),
+        );
       }
       if (columnCampos[item] === 'year') {
         tableFields.push(headerTableFactory('Ano', 'year'));
       }
       if (columnCampos[item] === 'name_local_culture') {
-        tableFields.push(headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'));
+        tableFields.push(
+          headerTableFactory('Nome do l. de cult.', 'local.name_local_culture'),
+        );
       }
       if (columnCampos[item] === 'label') {
         tableFields.push(headerTableFactory('Rótulo', 'local.label'));
@@ -306,7 +360,9 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Região', 'local.label_region'));
       }
       if (columnCampos[item] === 'name_locality') {
-        tableFields.push(headerTableFactory('Localidade', 'local.name_locality'));
+        tableFields.push(
+          headerTableFactory('Localidade', 'local.name_locality'),
+        );
       }
     });
     return tableFields;
@@ -325,18 +381,20 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 21,
-      }).then((response) => {
-        userLogado.preferences.unidadeCultura = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
+          userId: userLogado.id,
+          module_id: 21,
+        })
+        .then((response) => {
+          userLogado.preferences.unidadeCultura = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.unidadeCultura = {
@@ -368,36 +426,38 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await unidadeCulturaService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          const newRow = row;
-          newRow.DT = new Date();
-          delete newRow.id;
-          delete newRow.id_unity_culture;
-          delete newRow.id_local;
-          delete newRow.local;
-          return newRow;
-        });
+    await unidadeCulturaService
+      .getAll(filterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            const newRow = row;
+            newRow.DT = new Date();
+            delete newRow.id;
+            delete newRow.id_unity_culture;
+            delete newRow.id_local;
+            delete newRow.local;
+            return newRow;
+          });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'unidade-cultura');
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'unidade-cultura');
 
-        // buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
-      }
-    });
+          // buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -420,17 +480,19 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await unidadeCulturaService.getAll(parametersFilter).then(({ status, response }) => {
-      if (status === 200) {
-        setUnidadeCultura(response);
-      }
-    });
+    await unidadeCulturaService
+      .getAll(parametersFilter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setUnidadeCultura(response);
+        }
+      });
   }
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-4 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -455,10 +517,11 @@ export default function Listagem({
         <title>Listagem das unidades de cultura</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar unidades de cultura">
@@ -467,38 +530,43 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-8
                 "
                 >
-
-                  {filterFieldFactory('filterNameUnityCulture', 'Nome Un. de Cult.')}
+                  {filterFieldFactory(
+                    'filterNameUnityCulture',
+                    'Nome Un. de Cult.',
+                  )}
 
                   {filterFieldFactory('filterYear', 'Ano')}
 
-                  {filterFieldFactory('filterNameLocalCulture', 'Nome do L. de Cult.')}
+                  {filterFieldFactory(
+                    'filterNameLocalCulture',
+                    'Nome do L. de Cult.',
+                  )}
 
                   {filterFieldFactory('filterLabel', 'Rótulo')}
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
-
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                 flex
                 justify-center
                 pt-2
                 pb-2
                 "
                 >
-
                   {filterFieldFactory('filterAdress', 'Nome da Fazenda')}
 
                   {filterFieldFactory('filterLabelCountry', 'País')}
@@ -507,16 +575,16 @@ export default function Listagem({
 
                   {filterFieldFactory('filterNameLocality', 'Localidade')}
 
-                </div>
-
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 20 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -527,16 +595,17 @@ export default function Listagem({
             <MaterialTable
               columns={columns}
               data={unidadeCultura}
-              onRowClick={((evt?, selectedRow?: IUnityCultureProps) => {
+              onRowClick={(evt?, selectedRow?: IUnityCultureProps) => {
                 setSelectedRowById(selectedRow?.id);
-              })}
+              }}
               options={{
                 showTitle: false,
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
                 rowStyle: (rowData: IUnityCultureProps) => ({
-                  backgroundColor: (selectedRowById === rowData.id ? '#c7e3f5' : '#fff'),
+                  backgroundColor:
+                    selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
                 }),
               }}
               components={{
@@ -554,69 +623,81 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
                       {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2
+                    <div
+                      className="h-full flex items-center gap-2
                     "
                     >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
                                           >
-                                            {(provider) => (
-                                              <li
-                                                ref={provider.innerRef}
-                                                {...provider.draggableProps}
-                                                {...provider.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados
-                                                    .includes(generate.value)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value,
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de locais"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -646,8 +727,9 @@ export default function Listagem({
                       icon={<BiLeftArrow size={15} />}
                       disabled={currentPage <= 0}
                     />
-                    {
-                      Array(1).fill('').map((value, index) => (
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
                         <Button
                           key={index}
                           onClick={() => setCurrentPage(index)}
@@ -656,8 +738,7 @@ export default function Listagem({
                           textColor="white"
                           disabled
                         />
-                      ))
-                    }
+                      ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
                       bgColor="bg-blue-600"
@@ -673,7 +754,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -686,12 +767,20 @@ export default function Listagem({
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = await (await userPreferenceController.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = (await (
+    await userPreferenceController.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
-  const filterApplication = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -708,10 +797,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allCultureUnity,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allCultureUnity, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {
