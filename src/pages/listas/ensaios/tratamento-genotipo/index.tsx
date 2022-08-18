@@ -56,7 +56,7 @@ export default function TipoEnsaio({
   filterBeforeEdit,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
-  const [isOpenModal, setIsOpenModal] = useState(true);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const tabsDropDowns = TabsDropDowns('listas');
 
@@ -679,44 +679,99 @@ export default function TipoEnsaio({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
-      {/* .
-    .react-modal-close{
-        position: absolute;
-        right: 1.5rem;
-        top: 1.5rem;
-        border: 0;
-        background-color: transparent;
-        transition: filter 0.2s;
-        &:hover{
-            filter: brightness(0.7);
-        }
-    }  */}
-
       <Modal
         isOpen={isOpenModal}
         onRequestClose={handleCloseModal}
-        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-start pt-10"
-        className="w-full max-w-sm bg-gray-300 rounded-t-lg pt-4 px-8 relative shadow-indigo-400/50 border-2"
+        overlayClassName="fixed inset-0 flex bg-transparent  mt-12  justify-center"
+        className="flex
+          flex-col
+          w-full h-36
+          h-52
+          max-w-xl
+          bg-gray-50
+          rounded-tl-2xl
+          rounded-tr-2xl
+          rounded-br-2xl
+          pt-2
+          pb-4
+          px-8
+          relative
+          shadow-lg
+          shadow-gray-900/50"
       >
-        <button type="button" onClick={handleCloseModal}>
-          <RiCloseCircleFill className="absolute top-3 right-4 text-lg  fill-red-600" />
-        </button>
+        <form className="flex flex-col">
+          <button
+            type="button"
+            className="flex absolute top-4 right-3 justify-end"
+            onClick={handleCloseModal}
+          >
+            <RiCloseCircleFill className="fill-red-600 text-lg hover:fill-red-800" />
+          </button>
 
-        <header className="h-20 w-full flex items-start justify-between">
-          <div className="text-blue-600">
-            <span className="text-blue-600 text-base  ">Ação</span>
-            <p className="border-l-4">Substituir</p>
+          <div className="flex px-4  justify-between">
+            <header className="flex flex-col mt-2">
+              <h2 className="mb-2 text-blue-600 text-sm font-medium">Ação</h2>
+              <div>
+                <div className="border-l-8 border-l-blue-600 mt-4">
+                  <h2 className="mb-2 font-normal text-base ml-2 text-gray-900">
+                    Substituir
+                  </h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="radio" name="substituir" id="genotipo" />
+                  <label htmlFor="genotipo" className="font-normal">
+                    Genótipo
+                  </label>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="radio" name="substituir" id="nca" />
+                <label htmlFor="nca" className="font-normal">
+                  NCA
+                </label>
+              </div>
+            </header>
+            <div>
+              <div className="mb-2 text-blue-600 text-sm mt-2 font-medium">
+                <h2>Total selecionados: 3</h2>
+              </div>
+
+              <div className="border-l-8 border-l-blue-600">
+                <h2 className="mb-2 font-normal text-base ml-2 text-gray-900 mt-6">
+                  Importa Arquivo:
+                </h2>
+              </div>
+
+              <h2>Excell</h2>
+              <Input
+                id="import"
+                type="file"
+                className="
+
+              shadow
+              appearance-none
+              bg-white bg-no-repeat
+              border border-solid border-gray-300
+              rounded
+              w-full
+              py-1 px-1
+              text-gray-900
+              leading-tight
+              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+        "
+              />
+            </div>
           </div>
-          <div className="text-blue-600">
-            <span className="text-base text-gray-900">
-              Total selecionado: 3
-            </span>
-            <p>
-              <div className="text-blue-600" />
-            </p>
-            <p className="border-l-4">Importar arquivo:</p>
-          </div>
-        </header>
+
+          <button
+            type="submit"
+            value="Cadastrar"
+            className="ml-auto mt-6 bg-green-600 text-white px-4   rounded-lg text-sm hover:bg-green-800"
+            onClick={() => {}}
+          >
+            confirmar
+          </button>
+        </form>
       </Modal>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
