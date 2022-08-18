@@ -1,43 +1,36 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import {
   DragDropContext,
   Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
+  Droppable
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { FiUserPlus } from 'react-icons/fi';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { userPreferencesService, userService } from 'src/services';
-import { handleFormatTel } from 'src/shared/utils/tel';
-import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
+  AiTwotoneStar
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { userPreferencesService, userService } from "src/services";
+import { handleFormatTel } from "src/shared/utils/tel";
 import {
   AccordionFilter,
   Button,
   CheckBox,
   Content,
   Input,
-  Select,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
+  Select
+} from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
 
 interface IUsers {
   id: number;
@@ -80,93 +73,98 @@ export default function Listagem({
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns('config');
+  const tabsDropDowns = TabsDropDowns("config");
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
-    && tab.data.map((i) => i.labelDropDown === 'Usuários')
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "TMG" &&
+    tab.data.map((i) => i.labelDropDown === "Usuários")
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario || {
     id: 0,
-    table_preferences: 'id,avatar,name,tel,login,status',
+    table_preferences: "id,avatar,name,tel,login,status",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const router = useRouter();
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
+      name: "CamposGerenciados[]",
+      title: "Favorito",
+      value: "id",
+      defaultChecked: () => camposGerenciados.includes("id"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Avatar',
-      value: 'avatar',
-      defaultChecked: () => camposGerenciados.includes('avatar'),
+      name: "CamposGerenciados[]",
+      title: "Avatar",
+      value: "avatar",
+      defaultChecked: () => camposGerenciados.includes("avatar"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome',
-      value: 'name',
-      defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Nome",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Login',
-      value: 'login',
-      defaultChecked: () => camposGerenciados.includes('login'),
+      name: "CamposGerenciados[]",
+      title: "Login",
+      value: "login",
+      defaultChecked: () => camposGerenciados.includes("login"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Telefone',
-      value: 'tel',
-      defaultChecked: () => camposGerenciados.includes('tel'),
+      name: "CamposGerenciados[]",
+      title: "Telefone",
+      value: "tel",
+      defaultChecked: () => camposGerenciados.includes("tel"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Status',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
+  console.log(generatesProps);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  console.log(users);
 
   const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterName: '',
-      filterLogin: '',
-      orderBy: '',
-      typeOrder: '',
+      filterStatus: "",
+      filterName: "",
+      filterLogin: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
       }&filterName=${filterName}&filterLogin=${filterLogin}`;
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
       await userService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -179,10 +177,11 @@ export default function Listagem({
   });
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
+
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
@@ -206,7 +205,7 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
@@ -233,15 +232,14 @@ export default function Listagem({
 
             </button>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: "Status",
+      field: "status",
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
@@ -304,53 +302,54 @@ export default function Listagem({
               bgColor="bg-red-800"
               textColor="white"
             />
+
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
+      if (columnCampos[item] === "id") {
         tableFields.push(idHeaderFactory());
       }
 
-      if (columnCampos[item] === 'avatar') {
+      if (columnCampos[item] === "avatar") {
         tableFields.push({
-          title: 'Avatar',
-          field: 'avatar',
+          title: "Avatar",
+          field: "avatar",
           sorting: false,
           width: 0,
           exports: false,
-          render: (rowData: IUsers) => (!rowData.avatar || rowData.avatar === '' ? (
-          // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
-              alt={rowData.name}
-              style={{ width: 30, height: 30, borderRadius: 99999 }}
-            />
-          ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={rowData.avatar}
-              alt={rowData.name}
-              style={{ width: 30, height: 30, borderRadius: 99999 }}
-            />
-          )),
+          render: (rowData: IUsers) =>
+            !rowData.avatar || rowData.avatar === "" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
+                alt={rowData.name}
+                style={{ width: 30, height: 30, borderRadius: 99999 }}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={rowData.avatar}
+                alt={rowData.name}
+                style={{ width: 30, height: 30, borderRadius: 99999 }}
+              />
+            ),
         });
       }
-      if (columnCampos[item] === 'name') {
-        tableFields.push(headerTableFactory('Nome', 'name'));
+      if (columnCampos[item] === "name") {
+        tableFields.push(headerTableFactory("Nome", "name"));
       }
 
-      if (columnCampos[item] === 'login') {
-        tableFields.push(headerTableFactory('Login', 'login'));
+      if (columnCampos[item] === "login") {
+        tableFields.push(headerTableFactory("Login", "login"));
       }
-      if (columnCampos[item] === 'tel') {
+      if (columnCampos[item] === "tel") {
         tableFields.push({
           title: 'Telefone',
           field: 'tel',
@@ -358,7 +357,7 @@ export default function Listagem({
           render: (rowData: IUsers) => handleFormatTel(rowData.tel),
         });
       }
-      if (columnCampos[item] === 'status') {
+      if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -367,26 +366,26 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any,
+    order: string | any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -406,14 +405,14 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
   }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -436,7 +435,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.usuario = {
         id: preferences.id,
@@ -447,7 +446,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -488,7 +487,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
+    if (!filterApplication.includes("paramSelect")) {
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -510,28 +509,28 @@ export default function Listagem({
           delete line.id;
 
           if (line.status === 0) {
-            line.status = 'Inativo';
+            line.status = "Inativo";
           } else {
-            line.status = 'Ativo';
+            line.status = "Ativo";
           }
         });
 
         const workSheet = XLSX.utils.json_to_sheet(dataExcel);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'usuarios');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
 
         // Buffer
         const buf = XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx || csv
-          type: 'buffer',
+          bookType: "xlsx", // xlsx || csv
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx || csv
-          type: 'binary',
+          bookType: "xlsx", // xlsx || csv
+          type: "binary",
         });
         // Download xlsx || csv
-        XLSX.writeFile(workBook, 'Usuários.xlsx');
+        XLSX.writeFile(workBook, "Usuários.xlsx");
       }
     });
   };
@@ -628,6 +627,7 @@ export default function Listagem({
                       selected="1"
                     />
                   </div>
+
                   {filterFieldFactory('filterName', 'Nome')}
                   {filterFieldFactory('filterLogin', 'login')}
                   <div style={{ width: 40 }} />
@@ -649,7 +649,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-auto d-mt-1366-768">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={users}
               options={{
@@ -658,7 +658,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: "#f9fafb" },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -685,16 +685,14 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          router.push('usuarios/cadastro');
+                          router.push("usuarios/cadastro");
                         }}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -741,7 +739,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -770,58 +768,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -834,9 +833,10 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -844,13 +844,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : "filterStatus=1";
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : "filterStatus=1";
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
@@ -859,8 +859,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
