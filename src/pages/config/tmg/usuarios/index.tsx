@@ -1,7 +1,6 @@
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -19,16 +18,18 @@ import {
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
+import * as XLSX from 'xlsx';
+
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { FiUserPlus } from 'react-icons/fi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { userPreferencesService, userService } from 'src/services';
-import { handleFormatTel } from 'src/shared/utils/tel';
-import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import getConfig from 'next/config';
+import { GetServerSideProps } from 'next';
+import { userPreferencesService, userService } from '../../../../services';
+import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
   AccordionFilter,
   Button,
@@ -38,6 +39,7 @@ import {
   Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 
 interface IUsers {
   id: number;
@@ -143,6 +145,7 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
+  console.log(generatesProps);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
@@ -150,6 +153,8 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  console.log(users);
 
   const columns = colums(camposGerenciados);
 
@@ -203,6 +208,27 @@ export default function Listagem({
     };
   }
 
+  async function handleStatus(id: number, status: any): Promise<void> {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+
+    await userService.update({ id, status });
+    const index = users.findIndex((user) => user.id === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    setUsers((oldUser) => {
+      const copy = [...oldUser];
+      copy[index].status = status;
+      return copy;
+    });
+  }
+
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
@@ -211,14 +237,13 @@ export default function Listagem({
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
         <div className="h-9 flex">
-
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
               <AiTwotoneStar size={20} color="#eba417" />
-
             </button>
           </div>
         </div>
@@ -226,11 +251,11 @@ export default function Listagem({
         <div className="h-9 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
-
             </button>
           </div>
         </div>
@@ -245,9 +270,8 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IUsers) => (rowData.status ? (
+      render: (rowData: IUsers) => (
         <div className="h-7 flex">
-          <div className="h-7" />
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -255,58 +279,40 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(
-                  `/config/tmg/usuarios/atualizar?id=${rowData.id}`,
-                );
+                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<FaRegThumbsUp size={14} />}
-              title="Ativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
-              bgColor="bg-green-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div
-            className="h-7"
-          />
-          <div className="h-7">
+          {rowData.status ? (
+            <div className="h-7">
+              <Button
+                icon={<FaRegThumbsUp size={14} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
 
-            <Button
-              icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.name}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(
-                  `/config/tmg/usuarios/atualizar?id=${rowData.id}`,
-                );
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<FaRegThumbsDown size={14} />}
-              title="Inativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
-              bgColor="bg-red-800"
-              textColor="white"
-            />
-          </div>
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-7">
+              <Button
+                icon={<FaRegThumbsDown size={14} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
         </div>
-      )),
+      ),
     };
   }
 
@@ -452,27 +458,6 @@ export default function Listagem({
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  }
-
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await userService.update({ id, status });
-    const index = users.findIndex((user) => user.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setUsers((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
   }
 
   function handleOnDragEnd(result: DropResult): void {
@@ -628,6 +613,7 @@ export default function Listagem({
                       selected="1"
                     />
                   </div>
+
                   {filterFieldFactory('filterName', 'Nome')}
                   {filterFieldFactory('filterLogin', 'login')}
                   <div style={{ width: 40 }} />

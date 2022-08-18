@@ -1,10 +1,12 @@
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -24,8 +26,6 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -33,8 +33,9 @@ import {
   Content,
   Input,
   Select,
-} from 'src/components';
+} from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+
 import { safraService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
@@ -100,6 +101,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
+  console.log(safras);
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
@@ -133,7 +135,6 @@ export default function Listagem({
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
-
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
   console.log(filterStatusBeforeEdit);
 
@@ -301,7 +302,6 @@ export default function Listagem({
         </div>
       ) : (
         <div className="h-9 flex">
-
           <div>
             <button
               type="button"
@@ -309,7 +309,6 @@ export default function Listagem({
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
-
             </button>
           </div>
         </div>
@@ -329,17 +328,18 @@ export default function Listagem({
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor="bg-blue-600"
-              textColor="white"
+              title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`);
+                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
+              bgColor="bg-blue-600"
+              textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
+          {rowData.status ? (
             <div className="h-7">
               <Button
                 icon={<FaRegThumbsUp size={14} />}
@@ -464,6 +464,10 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    if (!filterApplication.includes('paramSelect')) {
+      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
+    }
+
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = safras.map((row) => {
@@ -481,9 +485,11 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'safras');
 
         // Buffer
+
         XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
+
         });
         // Binary
         XLSX.write(workBook, {
@@ -752,7 +758,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -877,10 +883,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allSafras,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allSafras, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {

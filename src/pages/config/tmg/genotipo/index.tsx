@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,6 +28,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+
 import {
   AccordionFilter,
   Button,
@@ -226,6 +226,7 @@ export default function Listagem({
     },
   });
 
+  // esta functionando ordeação
   async function handleOrder(
     column: string,
     order: string | any,
@@ -328,7 +329,18 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-      title: 'Tecnologia',
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
       field: 'tecnologia',
       width: 0,
       sorting: true,
@@ -393,7 +405,9 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'tecnologia') {
         // tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia.cod_tec'));
+        tableFields.push(
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia.cod_tec'),
+        );
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -520,6 +534,7 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((row: any) => {
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
+
           delete row.id;
           delete row.id_tecnologia;
           delete row.tableData;
@@ -585,6 +600,7 @@ export default function Listagem({
     }
   }
 
+  // paginação certa
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter;
