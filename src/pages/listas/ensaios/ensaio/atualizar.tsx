@@ -590,7 +590,7 @@ export default function AtualizarTipoEnsaio({
   function updateFieldFactory(name: string, title: any) {
     return (
       <div className="w-full h-7">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
           {name}
         </label>
         <Input
@@ -622,11 +622,11 @@ export default function AtualizarTipoEnsaio({
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
-          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-1"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-0"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Lista de Ensaio</h1>
+            <h1 className="text-xl">Atualizar Lista de Ensaio</h1>
           </div>
 
           <div className="w-full
@@ -660,13 +660,13 @@ export default function AtualizarTipoEnsaio({
             justify-around
             gap-6
             mt-4
-            mb-4
+            mb-1
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-4">
+            <div className="w-full flex justify-between items-start gap-5 mt-3">
 
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-1">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
                   Projeto
                 </label>
                 <Input
@@ -678,9 +678,9 @@ export default function AtualizarTipoEnsaio({
               </div>
             </div>
 
-            <div className="w-full flex justify-between items-start gap-5 mt-4">
+            <div className="w-full flex justify-between items-start gap-5 mt-3">
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-1">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
                   Observações
                 </label>
                 <Input
@@ -697,7 +697,7 @@ export default function AtualizarTipoEnsaio({
             flex
             gap-3
             justify-center
-            mt-10
+            mt-8
           "
             >
               <div className="w-40">
