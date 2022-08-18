@@ -27,7 +27,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input
+  AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { loteService, userPreferencesService } from '../../../../services';
@@ -252,8 +252,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {console.log(rowData.genotipo)}
-            {/* {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.name_genotipo}`} */}
+            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
           </div>
         </div>
       ),

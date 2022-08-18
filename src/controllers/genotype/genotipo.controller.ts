@@ -11,6 +11,7 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log(options);
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }
@@ -64,6 +65,7 @@ export class GenotipoController {
           name_experiment: true,
           name_alter: true,
           elit_name: true,
+          tecnologia: true,
           type: true,
           gmr: true,
           bgm: true,
@@ -74,7 +76,6 @@ export class GenotipoController {
           progenitor_m_origem: true,
           progenitores_origem: true,
           parentesco_completo: true,
-          tecnologia: true,
           lote: true,
           dt_import: true,
         };
@@ -124,7 +125,7 @@ export class GenotipoController {
       }
       response.map((item: any) => {
         const newItem = item;
-        newItem.countChildren = functionsUtils
+        newItem.nDeLotes = functionsUtils
           .countChildrenForSafra(item.lote, Number(options.id_safra));
         return newItem;
       });

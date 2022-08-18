@@ -9,6 +9,7 @@ export class QuadraController {
     const parameters: object | any = {};
     let orderBy: object | any;
     let select: any = [];
+    console.log(options);
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -16,6 +17,10 @@ export class QuadraController {
 
       if (options.filterSearch) {
         parameters.cod_quadra = JSON.parse(`{"contains":"${options.filterSearch}"}`);
+      }
+
+      if (options.local_preparo) {
+        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.local_preparo}"} }`);
       }
 
       if (options.paramSelect) {
@@ -42,12 +47,9 @@ export class QuadraController {
           status: true,
         };
       }
+
       if (options.id_culture) {
         parameters.id_culture = Number(options.id_culture);
-      }
-
-      if (options.local_preparo) {
-        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.local_preparo}"} }`);
       }
 
       if (options.cod_quadra) {
@@ -70,7 +72,7 @@ export class QuadraController {
         skip,
         orderBy,
       );
-
+      console.log(response);
       if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
@@ -102,6 +104,7 @@ export class QuadraController {
 
   async create(data: any) {
     try {
+      console.log(data);
       const response = await this.quadraRepository.create(data);
       return { status: 200, message: 'Genealogia cadastrada', response };
     } catch (error: any) {
@@ -112,13 +115,19 @@ export class QuadraController {
 
   async update(data: any) {
     try {
+      console.log(data);
+      if (data.status === 0 || data.status === 1) {
+        const quadra = await this.quadraRepository.update(data.id, data);
+        if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
+        return { status: 200, message: 'Quadra atualizada' };
+      }
       const quadra = await this.quadraRepository.findOne(data.id);
 
-      if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
+      if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
 
       await this.quadraRepository.update(quadra.id, data);
 
-      return { status: 200, message: 'Genótipo atualizado' };
+      return { status: 200, message: 'Quadra atualizado' };
     } catch (error: any) {
       handleError('Quadra Controller', 'Update', error.message);
       throw new Error('[Controller] - Update Quadra erro');

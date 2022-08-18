@@ -21,11 +21,12 @@ import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { npeService, userPreferencesService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { removeCookies } from 'cookies-next';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+import { npeService, userPreferencesService } from '../../../services';
 import {
   AccordionFilter,
   Button,
@@ -215,7 +216,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterApplication.split('');
+  const filterStatusBeforeEdit = filterApplication.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -444,6 +445,7 @@ export default function Listagem({
     }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
       data.id_type_assay
     }&epoca=${String(data.epoca)}`;
+
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -625,7 +627,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -864,13 +866,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = `filterStatus=1&id_safra=${id_safra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&id_safra=${id_safra}`
+    : `filterStatus=1&id_safra=${id_safra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_safra=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);

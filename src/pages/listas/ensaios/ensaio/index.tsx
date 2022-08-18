@@ -728,15 +728,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = filterBeforeEdit
+  const filterApplication = req.cookies.filterBeforeEdit
     ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 

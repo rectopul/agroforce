@@ -98,10 +98,10 @@ export class ImportBlockController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response }: IReturnObject = await localController.getAll(
+                const { status, response }: IReturnObject = await localController.getAll(
                   { name_local_culture: spreadSheet[row][column] },
                 );
-                if (response[0]?.length === 0) {
+                if (status !== 200) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
                       (Number(column) + 1),
