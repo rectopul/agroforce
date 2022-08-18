@@ -177,6 +177,11 @@ export class NpeController {
 
   async update(data: any) {
     try {
+      if (data.status === 0 || data.status === 1) {
+        const npe = await this.npeRepository.update(data.id, data);
+        if (!npe) return { status: 400, message: 'Npe não encontrado' };
+        return { status: 200, message: 'Npe atualizada' };
+      }
       const npeExist = await this.getOne(data.id);
       if (!npeExist) return npeExist;
       const response = await this.npeRepository.update(data.id, data);

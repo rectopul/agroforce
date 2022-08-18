@@ -1065,14 +1065,24 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
+<<<<<<< Updated upstream
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
+=======
+>>>>>>> Stashed changes
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
+<<<<<<< Updated upstream
   const filterApplication = filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+=======
+  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+>>>>>>> Stashed changes
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 

@@ -121,7 +121,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -566,7 +566,7 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatusBeforeEdit[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -801,8 +801,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
-
   removeCookies('pageBeforeEdit', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 

@@ -95,16 +95,17 @@ export class LoteController {
       const select = {
         id: true,
         id_genotipo: true,
-        cod_lote: true,
         id_s2: true,
         id_dados: true,
         year: true,
+        cod_lote: true,
         ncc: true,
         fase: true,
         peso: true,
         quant_sementes: true,
         genotipo: {
           select: {
+            id: true,
             name_genotipo: true,
             name_main: true,
             gmr: true,

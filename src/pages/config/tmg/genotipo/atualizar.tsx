@@ -953,7 +953,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   );
 
   const { response: allLote, total: totalItems } = await response.json();
-
   return {
     props: {
       genotipo,

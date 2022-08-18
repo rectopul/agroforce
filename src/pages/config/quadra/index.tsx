@@ -139,7 +139,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -170,28 +170,25 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${
-      data.cod_quadra
-    }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        let statusEdit: number = 0;
-        if (response.response[response.total - 1].status === 0) {
-          statusEdit = 1;
-        } else {
-          statusEdit = 0;
-        }
-        const idEdit: number = response.response[response.total - 1].id;
-        const quadraEdit = quadraService.update({
-          id: idEdit,
-          status: statusEdit,
-        });
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${
+      data.cod_quadra
+    }&local_preparo=${data.local.name_local_culture}`;
+
+    await quadraService.getAll(parametersFilter).then(async ({ status }) => {
+      console.log(status, data.status);
+      if (status === 200 && data.status === 1) {
+        Swal.fire('Foco já ativado');
+        return;
       }
+      await quadraService.update({
+        id: idQuadra,
+        status: data.status,
+      });
     });
 
     const index = quadra.findIndex(
@@ -207,8 +204,6 @@ export default function Listagem({
       copy[index].status = data.status;
       return copy;
     });
-
-    const { id, status } = quadra[index];
   }
 
   async function handleOrder(
@@ -571,7 +566,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -811,10 +806,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+    : `filterStatus=1&id_culture=${cultureId}`;
+
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
-  const filterApplication = `filterStatus=2&id_culture=${cultureId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;

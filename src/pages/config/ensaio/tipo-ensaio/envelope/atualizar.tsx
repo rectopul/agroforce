@@ -1,25 +1,20 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
-import { envelopeService } from 'src/services';
 import Swal from 'sweetalert2';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { envelopeService } from '../../../../../services';
 import {
   Button,
   Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
-
-interface ICreateFoco {
-	safra: string;
-	group: number;
-	id_foco: number;
-	created_by: number;
-}
 
 export default function Cadastro({ envelope }: any) {
   const { TabsDropDowns } = ITabs.default;
@@ -33,10 +28,18 @@ export default function Cadastro({ envelope }: any) {
   ));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState('text-black');
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
+  function validateInputs(values: any) {
+    if (!values.seeds) {
+      const inputSeeds: any = document.getElementById('seeds');
+      inputSeeds.style.borderColor = 'red';
+    } else {
+      const inputSeeds: any = document.getElementById('seeds');
+      inputSeeds.style.borderColor = '';
+    }
+  }
   const formik = useFormik<any>({
     initialValues: {
       id_foco: Number(envelope.type_assay.id),
@@ -67,16 +70,6 @@ export default function Cadastro({ envelope }: any) {
     },
   });
 
-  function validateInputs(values: any) {
-    if (!values.seeds) {
-      const inputSeeds: any = document.getElementById('seeds');
-      inputSeeds.style.borderColor = 'red';
-    } else {
-      const inputSeeds: any = document.getElementById('seeds');
-      inputSeeds.style.borderColor = '';
-    }
-  }
-
   return (
     <>
       <Head>
@@ -86,7 +79,6 @@ export default function Cadastro({ envelope }: any) {
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
-
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar Envelope</h1>
@@ -101,7 +93,6 @@ export default function Cadastro({ envelope }: any) {
           >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-1">
-                <strong className={checkInput}>*</strong>
                 Safra
               </label>
               <Input
@@ -152,7 +143,7 @@ export default function Cadastro({ envelope }: any) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => router.back()}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -166,17 +157,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/envelope`;
   const { token } = context.req.cookies;
-  const id_envelope = context.query.id;
-
+  const idEnvelope = context.query.id;
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiEnvelope = await fetch(`${baseUrlShow}/${id_envelope}`, requestOptions);
+  const apiEnvelope = await fetch(`${baseUrlShow}/${idEnvelope}`, requestOptions);
 
   const envelope = await apiEnvelope.json();
+
   return {
     props: {
       envelope,

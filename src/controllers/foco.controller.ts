@@ -7,6 +7,7 @@ export class FocoController {
   focoRepository = new FocoRepository();
 
   async getAll(options: any) {
+    console.log(options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
@@ -38,8 +39,6 @@ export class FocoController {
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      console.log(parameters);
-
       const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
@@ -47,8 +46,6 @@ export class FocoController {
         skip,
         orderBy,
       );
-
-      console.log(response);
 
       if (response.total > 0) {
         response.map((item: any) => {
@@ -94,7 +91,7 @@ export class FocoController {
   async create(data: any) {
     try {
       const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture },
+        { name: data.name, id_culture: data.id_culture, status: 1 },
       );
 
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
@@ -112,13 +109,13 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      console.log(data);
       if (data.status === 0 || data.status === 1) {
-        const response = await this.focoRepository.update(data.id, data);
+        const foco = await this.focoRepository.update(data.id, data);
+        if (!foco) return { status: 400, message: 'Foco não encontrado' };
+        return { status: 200, message: 'Foco atualizada' };
       }
-
       const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture },
+        { name: data.name, id_culture: data.id_culture, status: 1 },
       );
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 
