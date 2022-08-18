@@ -17,21 +17,21 @@ model config_gerais {
 model culture {
   id                Int                 @id @default(autoincrement())
   name              String?             @unique(map: "Culture_name_key")
-  desc              String?
   created_at        DateTime            @default(now())
   created_by        Int
   status            Int                 @default(1)
-  safra             safra[]
-  users_cultures    users_cultures[]
-  genotipo          genotipo[]
-  users_permissions users_permissions[]
-  tecnologia        tecnologia[]
-  foco              foco[]
-  type_assay        type_assay[]
+  desc              String?
   delineamento      delineamento[]
   epoca             epoca[]
-  quadra            quadra[]
+  foco              foco[]
+  genotipo          genotipo[]
   layout_quadra     layout_quadra[]
+  quadra            quadra[]
+  safra             safra[]
+  tecnologia        tecnologia[]
+  type_assay        type_assay[]
+  users_cultures    users_cultures[]
+  users_permissions users_permissions[]
 }
 
 model department {
@@ -60,27 +60,28 @@ model profile {
 }
 
 model safra {
-  id                Int       @id @default(autoincrement())
-  id_culture        Int
-  culture           culture   @relation(fields: [id_culture], references: [id])
-  safraName         String?
-  year              Int
-  plantingStartTime String?
-  plantingEndTime   String?
-  main_safra        Int?      @default(0)
-  status            Int?      @default(1)
-  created_by        Int
-  created_at        DateTime? @default(now())
-
-  npe                npe[]
+  id                 Int                  @id @default(autoincrement())
+  id_culture         Int
+  year               Int
+  plantingStartTime  String?
+  plantingEndTime    String?
+  main_safra         Int?                 @default(0)
+  status             Int?                 @default(1)
+  created_by         Int
+  created_at         DateTime?            @default(now())
+  safraName          String?
+  culture            culture              @relation(fields: [id_culture], references: [id])
+  assay_list         assay_list[]
+  envelope           envelope[]
+  experiment         experiment[]
   genotipo           genotipo[]
-  quadra             quadra[]
+  genotype_treatment genotype_treatment[]
   group              group[]
   lote               lote[]
-  envelope           envelope[]
-  assay_list         assay_list[]
-  genotype_treatment genotype_treatment[]
-  experiment         experiment[]
+  npe                npe[]
+  quadra             quadra[]
+
+  @@index([id_culture], map: "safra_id_culture_fkey")
 }
 
 model uf {
@@ -92,7 +93,6 @@ model uf {
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
-  login             String?             @unique(map: "User_email_key")
   email             String?
   cpf               String              @unique(map: "User_cpf_key")
   tel               String?
@@ -103,11 +103,12 @@ model user {
   status            Int                 @default(1)
   created_at        DateTime            @default(now())
   created_by        Int
+  login             String?             @unique(map: "User_email_key")
   department        department          @relation(fields: [departmentId], references: [id], map: "User_departmentId_fkey")
+  log_import        log_import[]
   users_cultures    users_cultures[]
   users_permissions users_permissions[]
   users_preferences users_preferences[]
-  log_import        log_import[]
 
   @@index([departmentId], map: "User_departmentId_fkey")
 }
@@ -134,9 +135,9 @@ model users_permissions {
   created_at DateTime @default(now())
   created_by Int
   status     Int
+  culture    culture  @relation(fields: [cultureId], references: [id])
   profile    profile  @relation(fields: [profileId], references: [id], map: "Users_Permissions_profileId_fkey")
   user       user     @relation(fields: [userId], references: [id], map: "Users_Permissions_userId_fkey")
-  culture    culture  @relation(fields: [cultureId], references: [id])
 
   @@index([profileId], map: "Users_Permissions_profileId_fkey")
   @@index([cultureId], map: "Users_Permissions_cultureId_fkey")
@@ -157,32 +158,31 @@ model users_preferences {
 }
 
 model local {
-  id                 Int      @id @default(autoincrement())
-  id_local_culture   Int      @unique
-  name_local_culture String
-  label              String
-  mloc               String
-  adress             String
-  id_locality        Int
-  name_locality      String
-  id_region          Int
-  name_region        String
-  label_region       String
-  id_country         Int
-  name_country       String
-  label_country      String
+  id                 Int            @id @default(autoincrement())
   latitude           String?
   longitude          String?
   altitude           String?
-  created_at         DateTime @default(now())
-  dt_import          DateTime @default(now())
+  created_at         DateTime       @default(now())
   created_by         Int
-  status             Int      @default(1)
-
-  npe          npe[]
-  quadra       quadra[]
-  cultureUnity cultureUnity[]
-  experiment   experiment[]
+  status             Int            @default(1)
+  adress             String
+  id_country         Int
+  id_local_culture   Int            @unique
+  id_locality        Int
+  id_region          Int
+  label              String
+  label_country      String
+  label_region       String
+  mloc               String
+  name_country       String
+  name_local_culture String
+  name_locality      String
+  name_region        String
+  dt_import          DateTime       @default(now())
+  cultureUnity       cultureUnity[]
+  experiment         experiment[]
+  npe                npe[]
+  quadra             quadra[]
 }
 
 model cultureUnity {
@@ -191,14 +191,15 @@ model cultureUnity {
   id_unity_culture   Int
   year               Int
   name_unity_culture String    @unique
-  local              local     @relation(fields: [id_local], references: [id])
   created_by         Int
   created_at         DateTime? @default(now())
+  local              local     @relation(fields: [id_local], references: [id])
+
+  @@index([id_local], map: "cultureUnity_id_local_fkey")
 }
 
 model layout_quadra {
   id          Int               @id @default(autoincrement())
-  id_culture  Int
   esquema     String
   plantadeira String
   tiros       Int?
@@ -207,13 +208,15 @@ model layout_quadra {
   status      Int               @default(1)
   created_by  Int
   created_at  DateTime          @default(now())
+  id_culture  Int
   culture     culture           @relation(fields: [id_culture], references: [id])
   children    layout_children[]
+
+  @@index([id_culture], map: "layout_quadra_id_culture_fkey")
 }
 
 model layout_children {
   id           Int           @id @default(autoincrement())
-  id_layout    Int
   sl           Int
   sc           Int
   s_aloc       Int
@@ -227,32 +230,38 @@ model layout_children {
   tipo_parcela String
   created_by   Int
   created_at   DateTime      @default(now())
+  id_layout    Int
   Layout       layout_quadra @relation(fields: [id_layout], references: [id])
+
+  @@index([id_layout], map: "layout_children_id_layout_fkey")
 }
 
 model quadra {
-  id            Int      @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   cod_quadra    String
   id_culture    Int
-  id_safra      Int
-  id_local      Int
   local_plantio String?
   larg_q        Int
   comp_p        Int
   linha_p       Int
-  comp_c        Decimal  @db.Decimal(2, 1)
+  comp_c        Decimal    @db.Decimal(2, 1)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?
   q             String?
-  status        Int      @default(1)
+  status        Int        @default(1)
   created_by    Int
-  created_at    DateTime @default(now())
+  created_at    DateTime   @default(now())
+  id_safra      Int
+  id_local      Int
+  culture       culture    @relation(fields: [id_culture], references: [id])
+  local         local      @relation(fields: [id_local], references: [id])
+  safra         safra      @relation(fields: [id_safra], references: [id])
+  dividers      dividers[]
 
-  local    local      @relation(fields: [id_local], references: [id])
-  safra    safra      @relation(fields: [id_safra], references: [id])
-  culture  culture    @relation(fields: [id_culture], references: [id])
-  dividers dividers[]
+  @@index([id_culture], map: "quadra_id_culture_fkey")
+  @@index([id_local], map: "quadra_id_local_fkey")
+  @@index([id_safra], map: "quadra_id_safra_fkey")
 }
 
 model dividers {
@@ -267,144 +276,160 @@ model dividers {
   created_by Int
   created_at DateTime @default(now())
   quadra     quadra   @relation(fields: [id_quadra], references: [id])
+
+  @@index([id_quadra], map: "dividers_id_quadra_fkey")
 }
 
 model genotipo {
   id                  Int                  @id @default(autoincrement())
   id_culture          Int
+  cruza               String?
+  created_by          Int
+  created_at          DateTime             @default(now())
   id_tecnologia       Int
-  id_s1               Int
+  bgm                 Decimal?             @db.Decimal(12, 2)
+  elit_name           String?
+  gmr                 Decimal?             @db.Decimal(12, 2)
   id_dados            String
+  id_s1               Int
+  name_alter          String?
+  name_experiment     String?
   name_genotipo       String
   name_main           String?
   name_public         String?
-  name_experiment     String?
-  name_alter          String?
-  elit_name           String?
-  type                String?
-  gmr                 Decimal?             @db.Decimal(12, 2)
-  bgm                 Decimal?             @db.Decimal(12, 2)
-  cruza               String?
+  parentesco_completo String?              @db.MediumText
   progenitor_f_direto String?
-  progenitor_m_direto String?
   progenitor_f_origem String?
+  progenitor_m_direto String?
   progenitor_m_origem String?
   progenitores_origem String?
-  parentesco_completo String?              @db.MediumText
-  created_by          Int
-  created_at          DateTime             @default(now())
+  type                String?
+  safraId             Int?
   dt_import           DateTime             @default(now())
   culture             culture              @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia           @relation(fields: [id_tecnologia], references: [id])
-  lote                lote[]
   safra               safra?               @relation(fields: [safraId], references: [id])
-  safraId             Int?
   genotype_treatment  genotype_treatment[]
+  lote                lote[]
+
+  @@index([id_culture], map: "genotipo_id_culture_fkey")
+  @@index([id_tecnologia], map: "genotipo_id_tecnologia_fkey")
+  @@index([safraId], map: "genotipo_safraId_fkey")
 }
 
 model delineamento {
-  id             Int       @id @default(autoincrement())
-  id_culture     Int
-  name           String
-  repeticao      Int
-  trat_repeticao Int
-  status         Int       @default(1)
-  created_by     Int
-  created_at     DateTime? @default(now())
-
+  id                     Int                      @id @default(autoincrement())
+  id_culture             Int
+  name                   String
+  repeticao              Int
+  trat_repeticao         Int
+  status                 Int                      @default(1)
+  created_by             Int
+  created_at             DateTime?                @default(now())
   culture                culture                  @relation(fields: [id_culture], references: [id])
-  sequencia_delineamento sequencia_delineamento[]
   experiment             experiment[]
+  sequencia_delineamento sequencia_delineamento[]
+
+  @@index([id_culture], map: "delineamento_id_culture_fkey")
 }
 
 model foco {
-  id         Int       @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   id_culture Int
   name       String
-  status     Int?      @default(1)
+  status     Int?         @default(1)
   created_by Int
-  created_at DateTime? @default(now())
-
-  npe        npe[]
+  created_at DateTime?    @default(now())
   culture    culture      @relation(fields: [id_culture], references: [id])
-  group      group[]
   assay_list assay_list[]
+  group      group[]
+  npe        npe[]
+
+  @@index([id_culture], map: "foco_id_culture_fkey")
 }
 
 model group {
   id         Int       @id @default(autoincrement())
   id_safra   Int
   id_foco    Int
-  group      Int
   created_by Int
   created_at DateTime? @default(now())
+  group      Int
+  foco       foco      @relation(fields: [id_foco], references: [id])
+  safra      safra     @relation(fields: [id_safra], references: [id])
+  npe        npe[]
 
-  safra safra @relation(fields: [id_safra], references: [id])
-  foco  foco  @relation(fields: [id_foco], references: [id])
-  npe   npe[]
+  @@index([id_foco], map: "group_id_foco_fkey")
+  @@index([id_safra], map: "group_id_safra_fkey")
 }
 
 model type_assay {
-  id            Int       @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   id_culture    Int
   name          String
-  protocol_name String
-  status        Int       @default(1)
+  status        Int          @default(1)
   created_by    Int
-  created_at    DateTime? @default(now())
+  created_at    DateTime?    @default(now())
+  protocol_name String
+  culture       culture      @relation(fields: [id_culture], references: [id])
+  assay_list    assay_list[]
+  envelope      envelope[]
+  npe           npe[]
 
-  npe        npe[]
-  culture    culture      @relation(fields: [id_culture], references: [id])
-  envelope   envelope[]
-  assay_list assay_list[]
+  @@index([id_culture], map: "type_assay_id_culture_fkey")
 }
 
 model envelope {
-  id            Int       @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   id_safra      Int
   id_type_assay Int
   seeds         Int
   created_by    Int
-  created_at    DateTime? @default(now())
+  created_at    DateTime?  @default(now())
+  safra         safra      @relation(fields: [id_safra], references: [id])
+  type_assay    type_assay @relation(fields: [id_type_assay], references: [id])
 
-  safra      safra      @relation(fields: [id_safra], references: [id])
-  type_assay type_assay @relation(fields: [id_type_assay], references: [id])
+  @@index([id_safra], map: "envelope_id_safra_fkey")
+  @@index([id_type_assay], map: "envelope_id_type_assay_fkey")
 }
 
 model tecnologia {
-  id         Int       @id @default(autoincrement())
-  cod_tec    String    @default("")
+  id         Int          @id @default(autoincrement())
   id_culture Int
   name       String
-  desc       String?
   created_by Int
-  created_at DateTime? @default(now())
-  dt_import  DateTime  @default(now())
-
-  npe        npe[]
-  genotipo   genotipo[]
+  created_at DateTime?    @default(now())
+  desc       String?
+  cod_tec    String       @default("")
+  dt_import  DateTime     @default(now())
   culture    culture      @relation(fields: [id_culture], references: [id])
   assay_list assay_list[]
+  genotipo   genotipo[]
+  npe        npe[]
+
+  @@index([id_culture], map: "tecnologia_id_culture_fkey")
 }
 
 model lote {
-  id             Int      @id @default(autoincrement())
-  id_genotipo    Int
-  id_safra       Int
-  cod_lote       String
-  id_s2          Int
-  id_dados       Int      @unique
-  year           Int?
-  ncc            Decimal? @db.Decimal(12, 0)
-  fase           String?
-  peso           Decimal? @db.Decimal(5, 0)
-  quant_sementes Int?
-  created_by     Int
-  created_at     DateTime @default(now())
-
+  id                 Int                  @id @default(autoincrement())
+  created_by         Int
+  created_at         DateTime             @default(now())
+  id_genotipo        Int
+  cod_lote           String
+  fase               String?
+  id_dados           Int                  @unique
+  id_s2              Int
+  id_safra           Int
+  ncc                Decimal?             @db.Decimal(12, 0)
+  peso               Decimal?             @db.Decimal(5, 0)
+  quant_sementes     Int?
+  year               Int?
   genotipo           genotipo             @relation(fields: [id_genotipo], references: [id])
   safra              safra                @relation(fields: [id_safra], references: [id])
   genotype_treatment genotype_treatment[]
+
+  @@index([id_genotipo], map: "lote_id_genotipo_fkey")
+  @@index([id_safra], map: "lote_id_safra_fkey")
 }
 
 model epoca {
@@ -414,8 +439,9 @@ model epoca {
   status     Int      @default(1)
   created_by Int
   created_at DateTime @default(now())
+  culture    culture  @relation(fields: [id_culture], references: [id])
 
-  culture culture @relation(fields: [id_culture], references: [id])
+  @@index([id_culture], map: "epoca_id_culture_fkey")
 }
 
 model import_spreadsheet {
@@ -425,108 +451,124 @@ model import_spreadsheet {
 }
 
 model npe {
-  id            Int       @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   id_local      Int
   id_safra      Int
   id_foco       Int
   id_type_assay Int
   id_ogm        Int
-  epoca         String?
   npei          Int
   npef          Int?
   prox_npe      Int?
-  id_group      Int
-  status        Int       @default(1)
+  status        Int        @default(1)
   created_by    Int
-  created_at    DateTime? @default(now())
+  created_at    DateTime?  @default(now())
+  epoca         String?
+  id_group      Int
+  foco          foco       @relation(fields: [id_foco], references: [id])
+  group         group      @relation(fields: [id_group], references: [id])
+  local         local      @relation(fields: [id_local], references: [id])
+  tecnologia    tecnologia @relation(fields: [id_ogm], references: [id])
+  safra         safra      @relation(fields: [id_safra], references: [id])
+  type_assay    type_assay @relation(fields: [id_type_assay], references: [id])
 
-  local      local      @relation(fields: [id_local], references: [id])
-  safra      safra      @relation(fields: [id_safra], references: [id])
-  foco       foco       @relation(fields: [id_foco], references: [id])
-  group      group      @relation(fields: [id_group], references: [id])
-  type_assay type_assay @relation(fields: [id_type_assay], references: [id])
-  tecnologia tecnologia @relation(fields: [id_ogm], references: [id])
+  @@index([id_foco], map: "npe_id_foco_fkey")
+  @@index([id_group], map: "npe_id_group_fkey")
+  @@index([id_local], map: "npe_id_local_fkey")
+  @@index([id_ogm], map: "npe_id_ogm_fkey")
+  @@index([id_safra], map: "npe_id_safra_fkey")
+  @@index([id_type_assay], map: "npe_id_type_assay_fkey")
 }
 
 model sequencia_delineamento {
-  id              Int      @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   id_delineamento Int
   repeticao       Int
   sorteio         Int
   nt              Int
   bloco           Int
-  status          Int      @default(1)
+  status          Int          @default(1)
   created_by      Int
-  created_at      DateTime @default(now())
+  created_at      DateTime     @default(now())
+  delineamento    delineamento @relation(fields: [id_delineamento], references: [id])
 
-  delineamento delineamento @relation(fields: [id_delineamento], references: [id])
+  @@index([id_delineamento], map: "sequencia_delineamento_id_delineamento_fkey")
 }
 
 model experiment {
-  id                Int       @id @default(autoincrement())
-  idAssayList       Int
-  idLocal           Int
-  idDelineamento    Int
-  idSafra           Int
-  experimentName    String
+  id                Int          @id @default(autoincrement())
+  status            String       @default("IMPORTADO")
+  created_by        Int
+  created_at        DateTime?    @default(now())
+  clp               Decimal      @db.Decimal(5, 2)
+  comments          String       @db.LongText
   density           Int
+  eel               Decimal      @db.Decimal(5, 2)
+  experimentName    String
+  idAssayList       Int
+  idDelineamento    Int
+  idLocal           Int
+  idSafra           Int
+  nlp               Int
+  orderDraw         Int
   period            Int
   repetitionsNumber Int
-  nlp               Int
-  clp               Decimal   @db.Decimal(5, 2)
-  eel               Decimal   @db.Decimal(5, 2)
-  comments          String    @db.LongText
-  orderDraw         Int
-  status            String    @default("IMPORTADO")
-  created_by        Int
-  created_at        DateTime? @default(now())
+  assay_list        assay_list   @relation(fields: [idAssayList], references: [id])
+  delineamento      delineamento @relation(fields: [idDelineamento], references: [id])
+  local             local        @relation(fields: [idLocal], references: [id])
+  safra             safra        @relation(fields: [idSafra], references: [id])
 
-  assay_list   assay_list   @relation(fields: [idAssayList], references: [id])
-  local        local        @relation(fields: [idLocal], references: [id])
-  delineamento delineamento @relation(fields: [idDelineamento], references: [id])
-  safra        safra        @relation(fields: [idSafra], references: [id])
+  @@index([idAssayList], map: "experiment_idAssayList_fkey")
+  @@index([idDelineamento], map: "experiment_idDelineamento_fkey")
+  @@index([idLocal], map: "experiment_idLocal_fkey")
+  @@index([idSafra], map: "experiment_idSafra_fkey")
 }
 
 model log_import {
   id           Int       @id @default(autoincrement())
   user_id      Int
   table        String
-  state        String?
-  status       Int       @default(2) // 0 Inativo, 1 Ativo 2 - Planilha em execução (Sendo feito o upload do)
-  executeTime  String?
-  totalRecords Int?
+  status       Int       @default(2)
   created_at   DateTime? @default(now())
   updated_at   DateTime? @default(now())
+  state        String?
+  executeTime  String?
+  totalRecords Int?
+  user         user      @relation(fields: [user_id], references: [id])
 
-  user user @relation(fields: [user_id], references: [id])
+  @@index([user_id], map: "log_import_user_id_fkey")
 }
 
 model assay_list {
-  id            Int       @id @default(autoincrement())
-  id_safra      Int
-  id_foco       Int
-  id_type_assay Int
-  id_tecnologia Int
-  gli           String
-  period        Int
-  protocol_name String
-  bgm           Int
-  project       String
-  status        String    @default("IMPORTADO")
-  comments      String?
-  created_by    Int
-  created_at    DateTime? @default(now())
-
-  safra              safra                @relation(fields: [id_safra], references: [id])
+  id                 Int                  @id @default(autoincrement())
+  id_safra           Int
+  id_foco            Int
+  id_type_assay      Int
+  id_tecnologia      Int
+  gli                String
+  period             Int
+  protocol_name      String
+  bgm                Int
+  project            String
+  status             String               @default("IMPORTADO")
+  comments           String?
+  created_by         Int
+  created_at         DateTime?            @default(now())
   foco               foco                 @relation(fields: [id_foco], references: [id])
-  type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
+  safra              safra                @relation(fields: [id_safra], references: [id])
   tecnologia         tecnologia           @relation(fields: [id_tecnologia], references: [id])
-  genotype_treatment genotype_treatment[]
+  type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
   experiment         experiment[]
+  genotype_treatment genotype_treatment[]
+
+  @@index([id_foco], map: "assay_list_id_foco_fkey")
+  @@index([id_safra], map: "assay_list_id_safra_fkey")
+  @@index([id_tecnologia], map: "assay_list_id_tecnologia_fkey")
+  @@index([id_type_assay], map: "assay_list_id_type_assay_fkey")
 }
 
 model genotype_treatment {
-  id                Int     @id @default(autoincrement())
+  id                Int        @id @default(autoincrement())
   id_safra          Int
   id_assay_list     Int
   id_genotipo       Int
@@ -535,11 +577,15 @@ model genotype_treatment {
   comments          String?
   status            String
   created_by        Int
+  assay_list        assay_list @relation(fields: [id_assay_list], references: [id])
+  genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
+  lote              lote?      @relation(fields: [id_lote], references: [id])
+  safra             safra      @relation(fields: [id_safra], references: [id])
 
-  safra      safra      @relation(fields: [id_safra], references: [id])
-  assay_list assay_list @relation(fields: [id_assay_list], references: [id])
-  genotipo   genotipo   @relation(fields: [id_genotipo], references: [id])
-  lote       lote?      @relation(fields: [id_lote], references: [id])
+  @@index([id_assay_list], map: "genotype_treatment_id_assay_list_fkey")
+  @@index([id_genotipo], map: "genotype_treatment_id_genotipo_fkey")
+  @@index([id_lote], map: "genotype_treatment_id_lote_fkey")
+  @@index([id_safra], map: "genotype_treatment_id_safra_fkey")
 }
 
 model history_genotype_treatment {
