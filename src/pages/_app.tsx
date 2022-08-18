@@ -1,20 +1,35 @@
-import { useRouter } from "next/router";
-import NProgress from "nprogress";
-import { useEffect, useState } from "react";
-import Modal from "react-modal";
-import "../../public/nprogress.css";
-import { userService } from "../services";
-import "../shared/styles/App.css";
-import "../shared/styles/tailwind.css";
-import PermissionGate from "../shared/utils/PermissionUser";
+import { useRouter } from 'next/router';
+import NProgress from 'nprogress';
+import { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+import '../../public/nprogress.css';
+import { userService } from '../services';
+import '../shared/styles/App.css';
+import '../shared/styles/tailwind.css';
+import PermissionGate from '../shared/utils/PermissionUser';
 
-Modal.setAppElement("#__next");
+Modal.setAppElement('#__next');
 
-export default App;
-
-function App({ Component, pageProps, permissions, user }: any) {
+function App({
+  Component, pageProps, permissions, user,
+}: any) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
+
+  function authCheck(url: any) {
+    // redirect to login page if accessing a private page and not logged in
+    const publicPaths = ['/login', '/trocar-senha'];
+    const path = url.split('?')[0];
+    if (!userService.userValue && !publicPaths.includes(path)) {
+      setAuthorized(false);
+      router.push({
+        pathname: '/login',
+        query: { returnUrl: router.asPath },
+      });
+    } else {
+      setAuthorized(true);
+    }
+  }
 
   useEffect(() => {
     // run auth check on initial load
@@ -22,15 +37,15 @@ function App({ Component, pageProps, permissions, user }: any) {
 
     // set authorized to false to hide page content while changing routes
     const hideContent = () => setAuthorized(false);
-    router.events.on("routeChangeStart", hideContent);
+    router.events.on('routeChangeStart', hideContent);
 
     // run auth check on route change
-    router.events.on("routeChangeComplete", authCheck);
+    router.events.on('routeChangeComplete', authCheck);
 
     // unsubscribe from events in useEffect return function
     return () => {
-      router.events.off("routeChangeStart", hideContent);
-      router.events.off("routeChangeComplete", authCheck);
+      router.events.off('routeChangeStart', hideContent);
+      router.events.off('routeChangeComplete', authCheck);
     };
   }, []);
 
@@ -42,38 +57,25 @@ function App({ Component, pageProps, permissions, user }: any) {
       NProgress.done();
     };
 
-    router.events.on("routeChangeStart", handleStart);
-    router.events.on("routeChangeComplete", handleStop);
-    router.events.on("routeChangeError", handleStop);
+    router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleStop);
+    router.events.on('routeChangeError', handleStop);
 
     return () => {
-      router.events.off("routeChangeStart", handleStart);
-      router.events.off("routeChangeComplete", handleStop);
-      router.events.off("routeChangeError", handleStop);
+      router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeComplete', handleStop);
+      router.events.off('routeChangeError', handleStop);
     };
   }, [router]);
 
-  function authCheck(url: any) {
-    // redirect to login page if accessing a private page and not logged in
-    const publicPaths = ["/login", "/trocar-senha"];
-    const path = url.split("?")[0];
-    if (!userService.userValue && !publicPaths.includes(path)) {
-      setAuthorized(false);
-      router.push({
-        pathname: "/login",
-        query: { returnUrl: router.asPath },
-      });
-    } else {
-      setAuthorized(true);
-    }
-  }
-
   return (
     <PermissionGate
-      permissions={["canEdit", "canDelete", "canSave"]}
-      user={{ permissions: ["canSave"] }}
+      permissions={['canEdit', 'canDelete', 'canSave']}
+      user={{ permissions: ['canSave'] }}
     >
       {authorized && <Component {...pageProps} />}
     </PermissionGate>
   );
 }
+
+export default App;
