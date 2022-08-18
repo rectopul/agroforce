@@ -21,7 +21,7 @@ import {
   Input,
   Select,
 } from '../../../../components';
-import IDepartment from '../../../../components/props/departmentDTO';
+import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {

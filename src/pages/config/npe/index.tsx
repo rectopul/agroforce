@@ -23,6 +23,8 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { removeCookies } from 'cookies-next';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import { npeService, userPreferencesService } from '../../../services';
 import {
