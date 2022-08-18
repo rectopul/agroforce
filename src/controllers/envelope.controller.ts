@@ -1,8 +1,8 @@
-import { EnvelopeRepository } from "../repository/envelope.repository";
-import handleError from "../shared/utils/handleError";
+import { EnvelopeRepository } from '../repository/envelope.repository';
+import handleError from '../shared/utils/handleError';
 
 export class EnvelopeController {
-  public readonly required = "Campo obrigatório";
+  public readonly required = 'Campo obrigatório';
 
   envelopeRepository = new EnvelopeRepository();
 
@@ -10,31 +10,31 @@ export class EnvelopeController {
     try {
       const response = await this.envelopeRepository.findById(id);
 
-      if (!response) throw new Error("envelope não encontrado");
+      if (!response) throw new Error('envelope não encontrado');
 
       return { status: 200, response };
     } catch (error: any) {
-      handleError("Envelope controller", "GetOne", error.message);
-      throw new Error("[Controller] - GetOne Envelope erro");
+      handleError('Envelope controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Envelope erro');
     }
   }
 
   async create(data: any) {
     try {
       const envelopeAlreadyExists = await this.envelopeRepository.findByData(
-        data
+        data,
       );
 
       if (envelopeAlreadyExists) {
-        return { status: 400, message: "Envelope já cadastrado nessa safra" };
+        return { status: 400, message: 'Envelope já cadastrado nessa safra' };
       }
 
       await this.envelopeRepository.create(data);
 
-      return { status: 200, message: "envelope cadastrado" };
+      return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
-      handleError("Envelope controller", "Create", error.message);
-      throw new Error("[Controller] - Create Envelope erro");
+      handleError('Envelope controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Envelope erro');
     }
   }
 
@@ -42,14 +42,14 @@ export class EnvelopeController {
     try {
       const envelope: any = await this.envelopeRepository.findById(data.id);
 
-      if (!envelope) return { status: 400, message: "envelope não existente" };
+      if (!envelope) return { status: 400, message: 'envelope não existente' };
 
       await this.envelopeRepository.update(data.id, data);
 
-      return { status: 200, message: "envelope atualizado" };
+      return { status: 200, message: 'envelope atualizado' };
     } catch (error: any) {
-      handleError("Envelope controller", "Update", error.message);
-      throw new Error("[Controller] - Update Envelope erro");
+      handleError('Envelope controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Envelope erro');
     }
   }
 
@@ -58,6 +58,7 @@ export class EnvelopeController {
 
     try {
       const select = {
+        id: true,
         type_assay: { select: { name: true } },
         safra: { select: { safraName: true } },
         seeds: true,
@@ -80,15 +81,15 @@ export class EnvelopeController {
         select,
         take,
         skip,
-        orderBy
+        orderBy,
       );
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError("Envelope controller", "GetAll", error.message);
-      throw new Error("[Controller] - GetAll Envelope erro");
+      handleError('Envelope controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Envelope erro');
     }
   }
 }

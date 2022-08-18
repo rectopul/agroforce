@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import { RequestInit, RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
@@ -25,7 +25,6 @@ import {
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-
 import {
   envelopeService,
   userPreferencesService,
@@ -34,11 +33,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import {
-  AccordionFilter,
-  Button,
-  CheckBox,
-  Content,
-  Input,
+  AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 
 interface ITypeAssayProps {

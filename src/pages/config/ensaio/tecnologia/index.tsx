@@ -684,13 +684,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}`;
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
     : `&id_culture=${idCulture}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
