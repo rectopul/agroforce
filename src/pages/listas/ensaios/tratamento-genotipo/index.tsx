@@ -2,38 +2,49 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
+import { Checkbox as Checkbox1 } from '@mui/material';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Checkbox as Checkbox1 } from '@mui/material';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
-import {
-  BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { BsDownload } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Swal from 'sweetalert2';
-import { BsDownload } from 'react-icons/bs';
-import { ITreatment, ITreatmentFilter, ITreatmentGrid } from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import {
+  ITreatment,
+  ITreatmentFilter,
+  ITreatmentGrid,
+} from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
 import {
-  genotypeTreatmentService, importService, replaceTreatmentService, userPreferencesService,
-} from '../../../../services';
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
+} from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from '../../../../components';
+  genotypeTreatmentService,
+  userPreferencesService,
+} from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
@@ -45,20 +56,22 @@ export default function TipoEnsaio({
   filterBeforeEdit,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
+  const [isOpenModal, setIsOpenModal] = useState(true);
 
   const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'ENSAIO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment
-    || { id: 0, table_preferences: 'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action' };
+  const preferences = userLogado.preferences.genotypeTreatment || {
+    id: 0,
+    table_preferences:
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+  };
 
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
   const [treatments, setTreatments] = useState<ITreatment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
@@ -68,45 +81,84 @@ export default function TipoEnsaio({
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]', title: 'CheckBox ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+      name: 'CamposGerenciados[]',
+      title: 'CheckBox ',
+      value: 'id',
+      defaultChecked: () => camposGerenciados.includes('id'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
+      name: 'CamposGerenciados[]',
+      title: 'Foco',
+      value: 'foco',
+      defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
+      name: 'CamposGerenciados[]',
+      title: 'Ensaio',
+      value: 'type_assay',
+      defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome da Tec.', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome da Tec.',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
+      name: 'CamposGerenciados[]',
+      title: 'GLI',
+      value: 'gli',
+      defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm', defaultChecked: () => camposGerenciados.includes('bgm'),
+      name: 'CamposGerenciados[]',
+      title: 'BGM',
+      value: 'bgm',
+      defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'NT', value: 'treatments_number', defaultChecked: () => camposGerenciados.includes('treatments_number'),
+      name: 'CamposGerenciados[]',
+      title: 'NT',
+      value: 'treatments_number',
+      defaultChecked: () => camposGerenciados.includes('treatments_number'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status T', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: 'CamposGerenciados[]',
+      title: 'Status T',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status do Ensaio', value: 'statusAssay', defaultChecked: () => camposGerenciados.includes('statusAssay'),
+      name: 'CamposGerenciados[]',
+      title: 'Status do Ensaio',
+      value: 'statusAssay',
+      defaultChecked: () => camposGerenciados.includes('statusAssay'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome genótipo', value: 'genotipoName', defaultChecked: () => camposGerenciados.includes('genotipoName'),
+      name: 'CamposGerenciados[]',
+      title: 'Nome genótipo',
+      value: 'genotipoName',
+      defaultChecked: () => camposGerenciados.includes('genotipoName'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'NCA', value: 'nca', defaultChecked: () => camposGerenciados.includes('nca'),
+      name: 'CamposGerenciados[]',
+      title: 'NCA',
+      value: 'nca',
+      defaultChecked: () => camposGerenciados.includes('nca'),
     },
   ]);
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: 'StatusCheckbox', title: 'IMPORTADO ', value: 'importado', defaultChecked: () => camposGerenciados.includes('importado'),
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
-      name: 'StatusCheckbox', title: 'SORTEADO', value: 'sorteado', defaultChecked: () => camposGerenciados.includes('sorteado'),
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
   const [orderBy, setOrderBy] = useState<string>('');
@@ -114,7 +166,7 @@ export default function TipoEnsaio({
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const checkedItems: any = {};
   const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
@@ -145,7 +197,9 @@ export default function TipoEnsaio({
       filterGenotypeName,
       filterNca,
     }) => {
-      const allCheckBox: any = document.querySelectorAll("input[name='StatusCheckbox']");
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']",
+      );
       let selecionados = '';
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
@@ -156,7 +210,8 @@ export default function TipoEnsaio({
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
-      await genotypeTreatmentService.getAll(`${parametersFilter}`)
+      await genotypeTreatmentService
+        .getAll(`${parametersFilter}`)
         .then(({ response, total: allTotal }) => {
           setFilter(parametersFilter);
           setTreatments(response);
@@ -179,7 +234,7 @@ export default function TipoEnsaio({
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof (filter) !== 'undefined') {
+    if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
@@ -191,11 +246,13 @@ export default function TipoEnsaio({
       parametersFilter = filter;
     }
 
-    await genotypeTreatmentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
-      if (status === 200) {
-        setTreatments(response);
-      }
-    });
+    await genotypeTreatmentService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setTreatments(response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -208,18 +265,24 @@ export default function TipoEnsaio({
     return {
       title: (
         <div className="flex items-center">
-          <button type="button" className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
   const setCheck = (id: any) => {
-    checkedItems[id] = checkedItems[id] ? false : treatments[id - 1]?.genotipo.name_genotipo;
+    checkedItems[id] = checkedItems[id]
+      ? false
+      : treatments[id - 1]?.genotipo.name_genotipo;
     console.log('checkedItems');
     console.log(checkedItems);
   };
@@ -227,8 +290,9 @@ export default function TipoEnsaio({
   const setAllCheck = () => {
     setCheckedAllItems(!checkedAllItems);
     treatments?.forEach((item) => {
-      checkedItems[item.id] = (checkedItems[item.id])?.length > 0
-        ? false : item?.genotipo.name_genotipo;
+      checkedItems[item.id] = checkedItems[item.id]?.length > 0
+        ? false
+        : item?.genotipo.name_genotipo;
     });
     console.log('checkedItems');
     console.log(checkedItems);
@@ -236,27 +300,26 @@ export default function TipoEnsaio({
 
   function idHeaderFactory() {
     return {
-      title:
-  <div className="h-10 flex">
-    <Checkbox1
-      onChange={setAllCheck}
-      sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
-    />
-  </div>,
+      title: (
+        <div className="h-10 flex">
+          <Checkbox1
+            onChange={setAllCheck}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+          />
+        </div>
+      ),
       field: 'id',
       sorting: false,
       width: 0,
       render: (rowData: any) => (
-        (
-          <div className="h-10 flex">
-            <Checkbox1
-              checked={!!checkedItems[rowData.id]}
-              onChange={() => setCheck(rowData.id)}
-              sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
-            />
-            {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
-          </div>
-        )
+        <div className="h-10 flex">
+          <Checkbox1
+            checked={!!checkedItems[rowData.id]}
+            onChange={() => setCheck(rowData.id)}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+          />
+          {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
+        </div>
       ),
     };
   }
@@ -272,10 +335,14 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
       if (columnOrder[item] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'assay_list.type_assay.name'));
+        tableFields.push(
+          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+        );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'));
+        tableFields.push(
+          headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'),
+        );
       }
       if (columnOrder[item] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
@@ -290,10 +357,14 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Status T', 'status'));
       }
       if (columnOrder[item] === 'statusAssay') {
-        tableFields.push(headerTableFactory('Status do ensaio', 'assay_list.status'));
+        tableFields.push(
+          headerTableFactory('Status do ensaio', 'assay_list.status'),
+        );
       }
       if (columnOrder[item] === 'genotipoName') {
-        tableFields.push(headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'));
+        tableFields.push(
+          headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'),
+        );
       }
       if (columnOrder[item] === 'nca') {
         tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
@@ -315,18 +386,20 @@ export default function TipoEnsaio({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 27,
-      }).then((response) => {
-        userLogado.preferences.genotypeTreatment = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
+          userId: userLogado.id,
+          module_id: 27,
+        })
+        .then((response) => {
+          userLogado.preferences.genotypeTreatment = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.genotypeTreatment = {
@@ -334,7 +407,10 @@ export default function TipoEnsaio({
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -355,80 +431,84 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotypeTreatmentService.getAll(filter).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((item: any) => {
-          const newItem: any = {};
-          newItem.foco = item.assay_list.foco.name;
-          newItem.ensaio = item.assay_list.type_assay.name;
-          newItem.tecnologia = item.assay_list.tecnologia.name;
-          newItem.gli = item.assay_list.gli;
-          newItem.bgm = item.assay_list.bgm;
-          newItem.nt = item.treatments_number;
-          newItem.status_t = item.status;
-          newItem.status_ensaio = item.assay_list.status;
-          newItem.genotipo = item.genotipo.name_genotipo;
-          newItem.nca = item.lote.ncc;
-          return newItem;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+    await genotypeTreatmentService
+      .getAll(filter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+            newItem.foco = item.assay_list.foco.name;
+            newItem.ensaio = item.assay_list.type_assay.name;
+            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.gli = item.assay_list.gli;
+            newItem.bgm = item.assay_list.bgm;
+            newItem.nt = item.treatments_number;
+            newItem.status_t = item.status;
+            newItem.status_ensaio = item.assay_list.status;
+            newItem.genotipo = item.genotipo.name_genotipo;
+            newItem.nca = item.lote.ncc;
+            return newItem;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+        }
+      });
   };
 
   const replacementExcel = async (): Promise<void> => {
-    await genotypeTreatmentService.getAll(filter).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((item: any) => {
-          const newItem: any = {};
-          newItem.foco = item.assay_list.foco.name;
-          newItem.ensaio = item.assay_list.type_assay.name;
-          newItem.tecnologia = item.assay_list.tecnologia.name;
-          newItem.gli = item.assay_list.gli;
-          newItem.bgm = item.assay_list.bgm;
-          newItem.nt = item.treatments_number;
-          newItem.status_t = item.status;
-          newItem.status_ensaio = item.assay_list.status;
-          newItem.genotipo = item.genotipo.name_genotipo;
-          newItem.nca = item.lote.ncc;
-          newItem.novo_genotipo = '';
-          newItem.novo_status = '';
-          newItem.novo_nca = '';
-          return newItem;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+    await genotypeTreatmentService
+      .getAll(filter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+            newItem.foco = item.assay_list.foco.name;
+            newItem.ensaio = item.assay_list.type_assay.name;
+            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.gli = item.assay_list.gli;
+            newItem.bgm = item.assay_list.bgm;
+            newItem.nt = item.treatments_number;
+            newItem.status_t = item.status;
+            newItem.status_ensaio = item.assay_list.status;
+            newItem.genotipo = item.genotipo.name_genotipo;
+            newItem.nca = item.lote.ncc;
+            newItem.novo_genotipo = '';
+            newItem.novo_status = '';
+            newItem.novo_nca = '';
+            return newItem;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -451,11 +531,13 @@ export default function TipoEnsaio({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await genotypeTreatmentService.getAll(parametersFilter).then(({ status, response }) => {
-      if (status === 200) {
-        setTreatments(response);
-      }
-    });
+    await genotypeTreatmentService
+      .getAll(parametersFilter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setTreatments(response);
+        }
+      });
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -476,7 +558,6 @@ export default function TipoEnsaio({
   }
 
   function importValidate() {
-
     // const user = 23;
     // const id_safra = 2;
     // const id_culture = 1;
@@ -538,7 +619,6 @@ export default function TipoEnsaio({
     //     202120585417,
     //   ],
     // ];
-
     // importService.validate({
     //   spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, created_by: user, table: 'tratmento',
     // }).then(({ status, message }: any) => {
@@ -566,7 +646,6 @@ export default function TipoEnsaio({
   function replaceGenotipo() {
     // const selectedTreatments: any = treatments?.map((_, index) => (checkedItems[index]
     //   ? treatments[index] : null));
-
     // console.log('selectedTreatments');
     // console.log(selectedTreatments);
     // //let nameGenotipo = selectedTreatments[1].genotipo.name_genotipo;
@@ -582,6 +661,13 @@ export default function TipoEnsaio({
     // console.log(validateReplace);
   }
 
+  function handleOpenModal() {
+    setIsOpenModal(true);
+  }
+  function handleCloseModal() {
+    setIsOpenModal(false);
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -593,14 +679,54 @@ export default function TipoEnsaio({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
+      {/* .
+    .react-modal-close{
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        border: 0;
+        background-color: transparent;
+        transition: filter 0.2s;
+        &:hover{
+            filter: brightness(0.7);
+        }
+    }  */}
+
+      <Modal
+        isOpen={isOpenModal}
+        onRequestClose={handleCloseModal}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-start pt-10"
+        className="w-full max-w-sm bg-gray-300 rounded-t-lg pt-4 px-8 relative shadow-indigo-400/50 border-2"
+      >
+        <button type="button" onClick={handleCloseModal}>
+          <RiCloseCircleFill className="absolute top-3 right-4 text-lg  fill-red-600" />
+        </button>
+
+        <header className="h-20 w-full flex items-start justify-between">
+          <div className="text-blue-600">
+            <span className="text-blue-600 text-base  ">Ação</span>
+            <p className="border-l-4">Substituir</p>
+          </div>
+          <div className="text-blue-600">
+            <span className="text-base text-gray-900">
+              Total selecionado: 3
+            </span>
+            <p>
+              <div className="text-blue-600" />
+            </p>
+            <p className="border-l-4">Importar arquivo:</p>
+          </div>
+        </header>
+      </Modal>
+
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
           gap-4
         "
         >
-
           <AccordionFilter title="Filtrar ensaios">
             <div className="w-full flex gap-2">
               <form
@@ -612,7 +738,8 @@ export default function TipoEnsaio({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-8
@@ -637,7 +764,8 @@ export default function TipoEnsaio({
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
                   {filterFieldFactory('filterBgm', 'BMG')}
                 </div>
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pt-2
@@ -654,37 +782,37 @@ export default function TipoEnsaio({
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
-                          {
-                            (provided) => (
-                              <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                {
-                                  statusFilter.map((generate, index) => (
-                                    <Draggable
-                                      key={index}
-                                      draggableId={String(generate.title)}
-                                      index={index}
+                          {(provided) => (
+                            <ul
+                              className="w-full h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusFilter.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
                                     >
-                                      {(providers) => (
-                                        <li
-                                          ref={providers.innerRef}
-                                          {...providers.draggableProps}
-                                          {...providers.dragHandleProps}
-                                        >
-                                          <CheckBox
-                                            name={generate.name}
-                                            title={generate.title?.toString()}
-                                            value={generate.value}
-                                            defaultChecked={false}
-                                          />
-                                        </li>
-                                      )}
-                                    </Draggable>
-                                  ))
-                                }
-                                {provided.placeholder}
-                              </ul>
-                            )
-                          }
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
                         </Droppable>
                       </DragDropContext>
                     </AccordionFilter>
@@ -733,7 +861,8 @@ export default function TipoEnsaio({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
+                  // zIndex: 20, tava assim
                 },
                 rowStyle: { background: '#f9fafb' },
                 search: false,
@@ -755,91 +884,102 @@ export default function TipoEnsaio({
                     border-gray-200
                   "
                   >
+                    <div className="h-10 w-32 ml-9">
+                      <Button
+                        title="Ação"
+                        value="Ação"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={handleOpenModal}
+                      />
+                    </div>
 
-                    <div className="h-12 w-32">
-                      <Button
-                        title="NCA"
-                        value="NCA"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={replaceNca}
-                      />
-                    </div>
-                    <div className="h-12 w-32">
-                      <Button
-                        title="GENOTIPO"
-                        value="GENOTIPO"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={replaceGenotipo}
-                      />
-                    </div>
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
                       {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2
+                    <div
+                      className="h-full flex items-center gap-2
                     "
                     >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(providers) => (
+                                          <li
+                                            ref={providers.innerRef}
+                                            {...providers.draggableProps}
+                                            {...providers.dragHandleProps}
                                           >
-                                            {(providers) => (
-                                              <li
-                                                ref={providers.innerRef}
-                                                {...providers.draggableProps}
-                                                {...providers.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={
-                                                    camposGerenciados.includes(generate.value)
-                                                  }
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value,
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha para substituição" icon={<BsDownload size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { replacementExcel(); }} />
+                        <Button
+                          title="Exportar planilha para substituição"
+                          icon={<BsDownload size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            replacementExcel();
+                          }}
+                        />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de tratamentos" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de tratamentos"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -869,8 +1009,9 @@ export default function TipoEnsaio({
                       icon={<BiLeftArrow size={15} />}
                       disabled={currentPage <= 0}
                     />
-                    {
-                      Array(1).fill('').map((value, index) => (
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
                         <Button
                           key={index}
                           onClick={() => setCurrentPage(index)}
@@ -879,8 +1020,7 @@ export default function TipoEnsaio({
                           textColor="white"
                           disabled
                         />
-                      ))
-                    }
+                      ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
                       bgColor="bg-blue-600"
@@ -896,23 +1036,31 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
         </main>
       </Content>
-
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -937,14 +1085,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allTreatments,
-    total: totalItems,
-  } = await fetch(urlParametersTreatment.toString(), requestOptions)
-    .then((response) => response.json());
+  const { response: allTreatments, total: totalItems } = await fetch(
+    urlParametersTreatment.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
-  const { response: allAssay } = await fetch(urlParametersAssay.toString(), requestOptions)
-    .then((response) => response.json());
+  const { response: allAssay } = await fetch(
+    urlParametersAssay.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   const assaySelect = allAssay.map((item: any) => {
     const newItem: any = {};

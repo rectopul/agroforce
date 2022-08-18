@@ -135,7 +135,7 @@ export default function Cadastro() {
 
           <div
             className="
-            h-10
+            h-7
             w-full
             flex
             gap-3

@@ -86,14 +86,14 @@ export default function Importar({ idSafra, idCulture }: IData) {
             </div>
           </div>
           <div className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

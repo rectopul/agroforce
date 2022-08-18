@@ -5,8 +5,8 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext,
@@ -22,9 +22,8 @@ import {
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   tecnologiaService,
@@ -224,7 +223,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -680,12 +679,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
@@ -710,6 +705,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const response = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await response.json();
+
+  console.log(allItems);
 
   return {
     props: {

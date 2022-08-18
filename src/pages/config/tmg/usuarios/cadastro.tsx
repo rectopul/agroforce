@@ -455,11 +455,11 @@ export default function NovoUsuario({
 
           <div
             className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-2
+            mt-5
           "
           >
             <div className="w-40">

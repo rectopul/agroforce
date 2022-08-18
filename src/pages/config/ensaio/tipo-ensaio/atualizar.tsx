@@ -4,32 +4,28 @@
 /* eslint-disable no-return-assign */
 import { setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit, RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
 import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
 import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import {
+  MdFirstPage, MdLastPage,
+} from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import MaterialTable from 'material-table';
-import { FaSortAmountUpAlt } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+
 import {
   envelopeService,
   userPreferencesService,
@@ -225,7 +221,7 @@ export default function AtualizarTipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -277,7 +273,7 @@ export default function AtualizarTipoEnsaio({
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 router.push(`envelope/atualizar?id=${rowData.id}`);
               }}
-              bgColor="bg-blue-600"
+              bgColor="bg-red-600"
               textColor="white"
             />
           </div>
@@ -482,40 +478,40 @@ export default function AtualizarTipoEnsaio({
                 value={formik.values.protocol_name}
               />
             </div>
-          </div>
-
-          <div
-            className="
-            h-10 w-full
+            <div
+              className="
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-6
           "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => {
-                  router.back();
-                }}
-              />
-            </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<RiOrganizationChart size={18} />}
-                onClick={() => {}}
-              />
+            >
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => {
+                    router.back();
+                  }}
+                />
+              </div>
+              <div className="w-40">
+                <Button
+                  type="submit"
+                  value="Atualizar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<RiOrganizationChart size={18} />}
+                  onClick={() => {}}
+                />
+              </div>
             </div>
           </div>
+
         </form>
         <main
           className="w-full

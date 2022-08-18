@@ -221,7 +221,7 @@ export default function Atualizar({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -487,7 +487,7 @@ export default function Atualizar({
 
           <div
             className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
@@ -562,6 +562,7 @@ export default function Atualizar({
                       <Button
                         title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
                         value="Cadastrar grupo"
+                        value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
                         bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
 

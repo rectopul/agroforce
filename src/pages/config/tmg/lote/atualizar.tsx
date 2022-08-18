@@ -108,7 +108,7 @@ export default function Atualizar(lote: IUpdateLote) {
               />
             </div>
           </div>
-          <div className="h-10 w-full
+          <div className="h-7 w-full
             flex
             gap-3
             justify-center

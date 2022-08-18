@@ -1,20 +1,16 @@
-import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
-import InputMask from 'react-input-mask';
-import Swal from 'sweetalert2';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import { envelopeService } from 'src/services';
+import Swal from 'sweetalert2';
 import {
   Button,
-  Content,
-  Select,
-  Input,
+  Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -104,7 +100,7 @@ export default function Cadastro({ envelope }: any) {
                         "
           >
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Safra
               </label>
@@ -119,21 +115,10 @@ export default function Cadastro({ envelope }: any) {
               />
             </div>
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Quant. de sementes por envelope
               </label>
               <Input
-                className="shadow
-                                    appearance-none
-                                    bg-white bg-no-repeat
-                                    border border-solid border-gray-300
-                                    rounded
-                                    w-full
-                                    py-2 px-3
-                                    text-gray-900
-                                    leading-tight
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                                "
                 id="seeds"
                 name="seeds"
                 onChange={formik.handleChange}
@@ -143,14 +128,14 @@ export default function Cadastro({ envelope }: any) {
           </div>
 
           <div className="
-                            h-10 w-full
+                            h-7 w-full
                             flex
                             gap-3
                             justify-center
                             mt-10
                         "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -167,7 +152,7 @@ export default function Cadastro({ envelope }: any) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { }}
+                onClick={() => router.back()}
               />
             </div>
           </div>

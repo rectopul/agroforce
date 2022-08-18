@@ -230,7 +230,7 @@ export default function Import({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -247,27 +247,27 @@ export default function Import({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -444,8 +444,8 @@ export default function Import({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-7 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -556,7 +556,7 @@ export default function Import({
                       className="flex flex-col
                       w-full
                       items-center
-                      px-4
+                      px-2
                       bg-white
                     "
                       onSubmit={formik.handleSubmit}
@@ -564,13 +564,13 @@ export default function Import({
                       <div className="w-full h-full
                       flex
                       justify-center
-                      pb-2
+                      pb-0
                     "
                       >
                         {filterFieldFactory('filterUser', 'Usuário')}
                         {filterFieldFactory('filterTable', 'Tabela')}
                         <div className="h-10 w-1/2 ml-4">
-                          <label className="block text-gray-900 text-sm font-bold mb-2">
+                          <label className="block text-gray-900 text-sm font-bold mb-1">
                             De:
                           </label>
                           <Input
@@ -581,7 +581,7 @@ export default function Import({
                           />
                         </div>
                         <div className="h-10 w-1/2 ml-4">
-                          <label className="block text-gray-900 text-sm font-bold mb-2">
+                          <label className="block text-gray-900 text-sm font-bold mb-1">
                             Até:
                           </label>
                           <Input
@@ -592,17 +592,19 @@ export default function Import({
                           />
                         </div>
                         {filterFieldFactory('filterState', 'Status')}
+
+                        <div style={{ width: 40 }} />
+                        <div className="h-7 w-32 mt-6">
+                          <Button
+                            onClick={() => { }}
+                            value="Filtrar"
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            icon={<BiFilterAlt size={20} />}
+                          />
+                        </div>
                       </div>
 
-                      <div className="h-16 w-32 mt-3">
-                        <Button
-                          onClick={() => { }}
-                          value="Filtrar"
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiFilterAlt size={20} />}
-                        />
-                      </div>
                     </form>
                   </div>
                 </AccordionFilter>
