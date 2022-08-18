@@ -378,7 +378,7 @@ export default function Listagem({
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -450,7 +450,7 @@ export default function Listagem({
 
                 </div>
 
-                <div className="h-16 w-32 mt-3">
+                <div className="h-7 w-32 mt-6">
                   <Button
                     type="submit"
                     onClick={() => { }}

@@ -107,7 +107,7 @@ export default function Safra() {
 
           <div
             className="
-            h-10
+            h-7
             w-full
             flex
             gap-3

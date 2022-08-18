@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -27,9 +28,6 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { typeAssayService, userPreferencesService } from '../../../../services';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -38,6 +36,8 @@ import {
   Input,
   Select,
 } from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { typeAssayService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
@@ -180,7 +180,7 @@ export default function TipoEnsaio({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   async function handleOrder(
     column: string,
@@ -268,7 +268,7 @@ export default function TipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -560,7 +560,7 @@ export default function TipoEnsaio({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -816,15 +816,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -840,6 +840,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
+
+  console.log(allTypeAssay);
 
   return {
     props: {

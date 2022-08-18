@@ -134,13 +134,12 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+  console.log(filterStatusBeforeEdit);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -216,11 +215,60 @@ export default function Listagem({
     });
   }
 
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
+
+    await safraService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setSafras(response.response);
+        }
+      });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
+
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
           <button
+            type="button"
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
@@ -229,7 +277,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -243,6 +291,7 @@ export default function Listagem({
         <div className="h-9 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
@@ -255,6 +304,7 @@ export default function Listagem({
 
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
@@ -293,7 +343,7 @@ export default function Listagem({
             <div className="h-7">
               <Button
                 icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => await handleStatusSafra(rowData.id, {
+                onClick={async () => handleStatusSafra(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -305,7 +355,7 @@ export default function Listagem({
             <div className="h-7">
               <Button
                 icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => await handleStatusSafra(rowData.id, {
+                onClick={async () => handleStatusSafra(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -356,53 +406,7 @@ export default function Listagem({
     return tableFields;
   }
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await safraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setSafras(response.response);
-        }
-      });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -460,10 +464,6 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = safras.map((row) => {
@@ -481,7 +481,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'safras');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
         });
@@ -567,7 +567,7 @@ export default function Listagem({
                       name="filterStatus"
                       id="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -613,7 +613,10 @@ export default function Listagem({
                           py-2 px-3
                           text-gray-900
                           leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                          focus:text-gray-700
+                           focus:bg-white
+                            focus:border-blue-600
+                            focus:outline-none
                         "
                     />
                   </div> */}
@@ -636,7 +639,9 @@ export default function Listagem({
                           py-2 px-3
                           text-gray-900
                           leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                          focus:text-gray-700
+                           focus:bg-white
+                            focus:border-blue-600 focus:outline-none
                         "
                     />
                   </div> */}
@@ -663,6 +668,7 @@ export default function Listagem({
               columns={columns}
               data={safras}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -861,7 +867,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
-
   removeCookies('pageBeforeEdit', { req, res });
 
   const urlParameters: any = new URL(baseUrl);

@@ -125,6 +125,11 @@ export class LayoutQuadraController {
     const parameters: object | any = {};
 
     try {
+      if (data.status === 0 || data.status === 1) {
+        const layout = await this.Repository.update(data.id, data);
+        if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
+        return { status: 200, message: 'Layout de quadra atualizada' };
+      }
       if (typeof (data.status) === 'string') {
         parameters.status = Number(data.status);
       } else {

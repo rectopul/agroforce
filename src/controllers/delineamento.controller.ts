@@ -121,6 +121,11 @@ export class DelineamentoController {
   async update(data: any) {
     const parameters: object | any = {};
     try {
+      if (data.status === 0 || data.status === 1) {
+        const delineamento = await this.Repository.update(data.id, data);
+        if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
+        return { status: 200, message: 'Delineamento atualizada' };
+      }
       if (typeof (data.status) === 'string') {
         parameters.status = Number(data.status);
       } else {

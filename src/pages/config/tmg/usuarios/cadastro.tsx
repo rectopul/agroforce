@@ -21,7 +21,7 @@ import {
   Input,
   Select,
 } from '../../../../components';
-import IDepartment from '../../../../components/props/departmentDTO';
+import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {
@@ -455,11 +455,11 @@ export default function NovoUsuario({
 
           <div
             className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-2
+            mt-5
           "
           >
             <div className="w-40">

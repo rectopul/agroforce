@@ -62,7 +62,7 @@ export default function AtualizarLocal({
   const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LUGAR DE CULTURA'
+    tab.titleTab === 'LOCAL'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
@@ -470,10 +470,10 @@ export default function AtualizarLocal({
               />
             </div>
             <div
-              style={{ minWidth: 150, maxWidth: 150 }}
+              // style={{ minWidth: 150, maxWidth: 150 }}
               className="h-7 w-full flex gap-3 justify-center mt-6"
             >
-              <div className="w-30" />
+              <div className="w-20" />
               <Button
                 type="button"
                 value="Voltar"

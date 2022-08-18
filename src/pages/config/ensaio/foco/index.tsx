@@ -28,6 +28,7 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
@@ -54,7 +55,7 @@ export interface IFocos {
   name: string;
   group?: [];
   tableData?: [];
-  status?: number;
+  status?: any;
 }
 
 interface IGenerateProps {
@@ -67,6 +68,8 @@ interface IData {
   allFocos: IFocos[];
   totalItems: number;
   itensPerPage: number;
+  idCulture: number;
+  idSafra: number;
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
@@ -76,6 +79,8 @@ export default function Listagem({
   allFocos,
   totalItems,
   itensPerPage,
+  idCulture,
+  idSafra,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
@@ -135,13 +140,15 @@ export default function Listagem({
       const parametersFilter = `filterStatus=${
         filterStatus || 1
       }&filterSearch=${filterSearch}&id_culture=${
-        userLogado.userCulture.cultura_selecionada
-      }`;
+        idCulture
+      }&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await focoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
+          console.log('parametersFilter');
+          console.log(parametersFilter);
           setFilter(parametersFilter);
           setFocos(response.response);
           setTotalItems(response.total);
@@ -150,29 +157,33 @@ export default function Listagem({
     },
   });
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
-  async function handleStatus(idFoco: number, data: IFocos): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
+  async function handleStatus(idFoco: number, data: any): Promise<void> {
+    const parametersFilter = `filterStatus=${1}&id_culture=${idCulture}&filterSearch=${data.name}`;
+    if (data.status === 0) {
       data.status = 1;
+    } else {
+      data.status = 0;
     }
-    const index = focos.findIndex((foco) => foco.id === idFoco);
+    await focoService.getAll(parametersFilter).then(async ({ status }) => {
+      if (status === 200 && data.status === 1) {
+        Swal.fire('Foco já ativado');
+        return;
+      }
+      await focoService.update({ id: idFoco, status: data.status });
+      const index = focos.findIndex((foco) => foco.id === idFoco);
 
-    if (index === -1) {
-      return;
-    }
+      if (index === -1) {
+        return;
+      }
 
-    setFocos((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
+      setFocos((oldFocos) => {
+        const copy = [...oldFocos];
+        copy[index].status = data.status;
+        return copy;
+      });
     });
-
-    const { id, name, status } = focos[index];
-
-    await focoService.update({ id, name, status });
   }
 
   async function handleOrder(
@@ -236,7 +247,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -284,8 +295,9 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IFocos) => (
+      render: (rowData: any) => (rowData.status ? (
         <div className="h-7 flex">
+          <div className="h-7" />
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -293,40 +305,58 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
+                router.push(
+                  `/config/ensaio/foco/atualizar?id=${rowData.id}`,
+                );
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div>
+            <Button
+              icon={<FaRegThumbsUp size={14} />}
+              title="Ativo"
+              onClick={() => handleStatus(rowData.id, !rowData.status)}
+              bgColor="bg-green-600"
+              textColor="white"
+            />
+          </div>
         </div>
-      ),
+      ) : (
+        <div className="h-7 flex">
+          <div
+            className="h-7"
+          />
+          <div className="h-7">
+
+            <Button
+              icon={<BiEdit size={14} />}
+              title={`Atualizar ${rowData.name}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(
+                  `/config/ensaio/foco/atualizar?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<FaRegThumbsDown size={14} />}
+              title="Inativo"
+              onClick={() => handleStatus(rowData.id, !rowData.status)}
+              bgColor="bg-red-800"
+              textColor="white"
+            />
+          </div>
+        </div>
+      )),
     };
   }
 
@@ -464,6 +494,8 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+    console.log(parametersFilter);
+
     await focoService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
         setFocos(response);
@@ -515,7 +547,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -745,9 +777,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
@@ -755,6 +784,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -769,11 +801,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     requestOptions,
   ).then((response) => response.json());
 
+  console.log(filterBeforeEdit);
+
   return {
     props: {
       allFocos,
       totalItems,
       itensPerPage,
+      idCulture,
+      idSafra,
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,

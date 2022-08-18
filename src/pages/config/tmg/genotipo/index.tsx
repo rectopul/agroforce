@@ -288,7 +288,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -331,7 +331,7 @@ export default function Listagem({
       title: 'Tecnologia',
       field: 'tecnologia',
       width: 0,
-      sorting: false,
+      sorting: true,
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
@@ -402,7 +402,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
       if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
+        tableFields.push(headerTableFactory('Nº Lotes', 'nDeLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
@@ -516,15 +516,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
+    await genotipoService.getAll(filterApplication).then(({ response, status }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
+          delete row.id;
+          delete row.id_tecnologia;
+          delete row.tableData;
+          delete row.lote;
+          delete row.dt_import;
 
-    await genotipoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = genotipos.map((row: any) => {
-          row.cod_tec = row.tecnologia?.cod_tec;
-          row.tecnologia = row.tecnologia?.name;
           // row.DT = new Date();
 
           const dataExp = new Date();
@@ -553,6 +554,7 @@ export default function Listagem({
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
+
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
 
@@ -569,6 +571,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'Genótipos.xlsx');
       } else {
+        // eslint-disable-next-line no-undef
         Swal.fire(response);
       }
     });
@@ -586,9 +589,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -733,6 +736,7 @@ export default function Listagem({
               columns={columns}
               data={genotipos}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -932,9 +936,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : '';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
@@ -944,6 +945,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',

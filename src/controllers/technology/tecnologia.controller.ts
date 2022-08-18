@@ -1,11 +1,13 @@
-import handleError from '../../shared/utils/handleError';
 import { TecnologiaRepository } from '../../repository/tecnologia.repository';
+import handleError from '../../shared/utils/handleError';
 
 export class TecnologiaController {
   tecnologiaRepository = new TecnologiaRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    console.log('options');
+    console.log(options);
     try {
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
@@ -48,7 +50,7 @@ export class TecnologiaController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
+      console.log(parameters);
       const response = await this.tecnologiaRepository.findAll(
         parameters,
         select,
