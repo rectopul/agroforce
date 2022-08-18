@@ -1,14 +1,11 @@
 import { useRouter } from 'next/router';
 import NProgress from 'nprogress';
 import { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 import '../../public/nprogress.css';
 import { userService } from '../services';
 import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
 import PermissionGate from '../shared/utils/PermissionUser';
-
-Modal.setAppElement('#__next');
 
 function App({
   Component, pageProps, permissions, user,
