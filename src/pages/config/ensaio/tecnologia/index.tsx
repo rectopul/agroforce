@@ -124,7 +124,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Código Tecnologia ',
+      title: 'Cod. Tecnologia ',
       value: 'cod_tec',
       defaultChecked: () => camposGerenciados.includes('cod_tec'),
     },
@@ -275,7 +275,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Descrição', 'desc'));
       }
       if (columnCampos[item] === 'cod_tec') {
-        tableFields.push(headerTableFactory('Código tecnologia', 'cod_tec'));
+        tableFields.push(headerTableFactory('Cod. tecnologia', 'cod_tec'));
       }
     });
     return tableFields;
@@ -456,11 +456,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Código
+                      Cod. tecnologia
                     </label>
                     <Input
                       type="text"
-                      placeholder="Código"
+                      placeholder="Cod. tecnologia"
                       max="40"
                       id="filterCode"
                       name="filterCode"
@@ -514,6 +514,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div className="h-12" />
                     {/* <div className="h-12">
                       <Button
                         title="Importar planilha"

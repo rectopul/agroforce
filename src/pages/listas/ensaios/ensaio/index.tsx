@@ -580,6 +580,8 @@ export default function TipoEnsaio({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

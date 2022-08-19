@@ -776,8 +776,8 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    {/* <div className="h-12">
-                      <Button
+                    <div className="h-12">
+                      {/* <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
@@ -785,8 +785,8 @@ export default function Listagem({
                         onClick={() => { }}
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div> */}
+                      /> */}
+                    </div>
 
                     <strong className="text-blue-600">
                       Total registrado:

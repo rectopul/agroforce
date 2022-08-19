@@ -62,7 +62,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.safraName || !values.year) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 

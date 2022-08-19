@@ -618,6 +618,7 @@ export default function Listagem({
                       />
                     </div> */}
 
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

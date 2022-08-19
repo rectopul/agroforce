@@ -732,6 +732,7 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+                    <div className="h-12" />
 
                     <strong className="text-blue-600">
                       Total registrado:

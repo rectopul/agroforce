@@ -276,7 +276,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'delineamento') {
         tableFields.push(
-          headerTableFactory('Delineamento', 'delineamento.name'),
+          headerTableFactory('Nome', 'delineamento.name'),
         );
       }
       if (columnCampos[index] === 'repeticao') {
@@ -575,6 +575,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

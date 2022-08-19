@@ -51,7 +51,7 @@ export default function NovoLocal() {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.cod_tec || !values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 

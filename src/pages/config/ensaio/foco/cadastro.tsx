@@ -48,7 +48,7 @@ export default function Cadastro() {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 

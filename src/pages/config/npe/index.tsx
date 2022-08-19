@@ -784,6 +784,7 @@ export default function Listagem({
                         />
                         <div style={{ width: 20 }} />
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"

@@ -284,6 +284,7 @@ export default function Listagem({
 						"
           >
             <Button
+              title="Configurar Importação de Planilha"
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -299,6 +300,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Configurar Importação de Planilha"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, { ...rowData })}
               bgColor="bg-green-600"
@@ -827,6 +829,7 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"

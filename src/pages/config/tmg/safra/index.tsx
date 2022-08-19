@@ -332,7 +332,7 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
+                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -378,7 +378,7 @@ export default function Listagem({
         tableFields.push(idHeaderFactory());
       }
       if (columnCampos[index] === 'safraName') {
-        tableFields.push(headerTableFactory('Nome', 'safraName'));
+        tableFields.push(headerTableFactory('Safra', 'safraName'));
       }
       if (columnCampos[index] === 'year') {
         tableFields.push(headerTableFactory('Ano', 'year'));
