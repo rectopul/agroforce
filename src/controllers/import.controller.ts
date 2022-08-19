@@ -1696,7 +1696,7 @@ export class ImportController {
                     });
                     this.aux.id_layout = this.aux.id_layout_bd;
                   } else {
-                    const saveLayout: any = await this.layoutQuadraController.post({
+                    const saveLayout: any = await this.layoutQuadraController.create({
                       id_culture: Number(this.aux.id_culture),
                       esquema: this.aux.esquema,
                       plantadeira: String(this.aux.plantadeira),

@@ -3,20 +3,20 @@ import { LayoutQuadraController } from '../../../controllers/block-layout/layout
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const Controller = new LayoutQuadraController();
+  const layoutQuadraController = new LayoutQuadraController();
   switch (req.method) {
     case 'GET': {
-      const result = await Controller.getAll(req.query);
+      const result = await layoutQuadraController.getAll(req.query);
       res.status(200).json(result);
       break;
     }
     case 'POST': {
-      const resultPost = await Controller.post(req.body);
+      const resultPost = await layoutQuadraController.create(req.body);
       res.status(200).json(resultPost);
       break;
     }
     case 'PUT': {
-      const resultPut = await Controller.update(req.body);
+      const resultPut = await layoutQuadraController.update(req.body);
       res.status(200).json(resultPut);
       break;
     }
