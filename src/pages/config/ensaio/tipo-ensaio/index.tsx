@@ -337,6 +337,7 @@ export default function TipoEnsaio({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, !rowData.status)}
               bgColor="bg-green-600"
@@ -348,6 +349,7 @@ export default function TipoEnsaio({
         <div className="h-7 flex">
           <div className="h-7">
             <Button
+              title={`Atualizar ${rowData.name}`}
               icon={<BiEdit size={14} />}
               onClick={() => {}}
               bgColor="bg-blue-600"
@@ -358,6 +360,7 @@ export default function TipoEnsaio({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={() => handleStatus(rowData.id, !rowData.status)}
               bgColor="bg-red-800"

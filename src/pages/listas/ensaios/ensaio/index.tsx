@@ -266,6 +266,7 @@ export default function TipoEnsaio({
             <div style={{ width: 5 }} />
             <div>
               <Button
+                title={`Deletar ${rowData.gli}`}
                 icon={<BsTrashFill size={14} />}
                 onClick={() => deleteItem(rowData.id)}
                 bgColor="bg-red-600"

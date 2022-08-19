@@ -284,7 +284,7 @@ export default function Listagem({
 						"
           >
             <Button
-              title="Configurar Importação de Planilha"
+              title={`Atualizar ${rowData.esquema}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -300,7 +300,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
-              title="Configurar Importação de Planilha"
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, { ...rowData })}
               bgColor="bg-green-600"
@@ -316,6 +316,7 @@ export default function Listagem({
 						"
           >
             <Button
+              title={`Atualizar ${rowData.esquema}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -331,6 +332,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={() => handleStatus(rowData.id, { ...rowData })}
               bgColor="bg-red-800"

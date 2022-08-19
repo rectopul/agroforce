@@ -367,7 +367,7 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
-              title={`Editar ${rowData.genealogy}`}
+              title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);

@@ -280,6 +280,7 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, {
                 status: rowData.status,
@@ -295,6 +296,7 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => handleStatus(rowData.id, {
                 status: rowData.status,

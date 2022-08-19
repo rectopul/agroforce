@@ -305,6 +305,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={async () => handleStatus(rowData.id, rowData.status)}
               bgColor="bg-green-600"
@@ -334,6 +335,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => await handleStatus(rowData.id, rowData.status)}
               bgColor="bg-red-800"
