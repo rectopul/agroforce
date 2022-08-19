@@ -29,7 +29,11 @@ export default function Importar() {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'LAYOUT_BLOCK', spreadSheet: rows, moduleId: 5, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id,
+        table: 'LAYOUT_BLOCK',
+        spreadSheet: rows,
+        moduleId: 5,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({

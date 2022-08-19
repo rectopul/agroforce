@@ -36,13 +36,12 @@ export class ImportLayoutBlockController {
       const sl: any = {};
       const sc: any = {};
       const sAloc: any = {};
+      let tiro: any = 0;
+      const tiroXdisparo: any = {};
+      const parcelas: any = {};
+      let combinacao: any = '';
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          let codEsquema: any = '';
-          let codEsquemaAnterior: any = '';
-          let tiro: any = 0;
-          let combinacao: any = '';
-          let combinacaoAnterior: any = '';
           for (const column in spreadSheet[row]) {
             if (configModule.response[0]?.fields[column] === 'Esquema') {
               if (spreadSheet[row][column] === null) {
@@ -62,9 +61,6 @@ export class ImportLayoutBlockController {
                     spreadSheet[0][column],
                     'ja existe um esquema ativo com esse código',
                   );
-                } else {
-                  codEsquemaAnterior = codEsquema;
-                  codEsquema = spreadSheet[row][column];
                 }
               }
             }
@@ -76,7 +72,6 @@ export class ImportLayoutBlockController {
                   row,
                   spreadSheet[0][column],
                 );
-                console.log('teste');
               } else if (Number(spreadSheet[row][column]) !== 4
                && Number(spreadSheet[row][column]) !== 8
                && Number(spreadSheet[row][column] !== 12)) {
@@ -135,9 +130,11 @@ export class ImportLayoutBlockController {
                     'o campo tiro precisa vir antes que a campo disparo',
                   );
                 }
-                combinacaoAnterior = combinacao;
-                combinacao = `${tiro}x${spreadSheet[row][column]}`;
-                if (combinacao === combinacaoAnterior) {
+                if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
+                  tiroXdisparo[spreadSheet[row][0]] = [];
+                }
+                combinacao = `${spreadSheet[row][5]}x${spreadSheet[row][column]}`;
+                if (tiroXdisparo[spreadSheet[row][0]].includes(combinacao)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -145,6 +142,7 @@ export class ImportLayoutBlockController {
                     'a combinacao de tiros e disparos deve ser unica dentro do esquema',
                   );
                 }
+                tiroXdisparo[spreadSheet[row][0]].push(combinacao);
               }
             }
 
@@ -246,9 +244,9 @@ export class ImportLayoutBlockController {
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'A'
-              || spreadSheet[row][column] !== 'B'
-              || spreadSheet[row][column] !== 'C'
-              || spreadSheet[row][column] !== 'D') {
+              && spreadSheet[row][column] !== 'B'
+              && spreadSheet[row][column] !== 'C'
+              && spreadSheet[row][column] !== 'D') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -285,7 +283,7 @@ export class ImportLayoutBlockController {
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'A'
-              || spreadSheet[row][column] !== 'V') {
+              && spreadSheet[row][column] !== 'V') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -332,21 +330,24 @@ export class ImportLayoutBlockController {
             }
 
             if (configModule.response[0]?.fields[column] === 'TipoParcela') {
-              if (spreadSheet[row][column] === null || spreadSheet[row][column] === null) {
+              if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
                   row,
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'P'
-               || spreadSheet[row][column] !== 'V') {
+               && spreadSheet[row][column] !== 'V') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
                   spreadSheet[0][column],
                   'no tipo de parcela só é aceitado P ou V',
                 );
+              } else if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
+                parcelas[spreadSheet[row][0]] = [];
               }
+              parcelas[spreadSheet[row][0]].push(spreadSheet[row][column]);
             }
           }
         }
@@ -360,7 +361,7 @@ export class ImportLayoutBlockController {
             if (row !== '0') {
               for (const column in spreadSheet[row]) {
                 if (configModule.response[0]?.fields[column] === 'Esquema') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     if ((this.aux.esquema) && this.aux.esquema !== spreadSheet[row][column]) {
                       const layoutQuadra: any = await layoutQuadraController.getAll(
                         { status: 1, idCulture, esquema: spreadSheet[row][column] },
@@ -374,109 +375,105 @@ export class ImportLayoutBlockController {
                     } else {
                       delete this.aux.id_layout_bd;
                     }
-                    const teste = spreadSheet[row][column].split('');
-                    this.aux.tiroFixo = teste[0] + teste[1];
-                    this.aux.disparoFixo = teste[3] + teste[4];
-                    this.aux.parcelas = (Number(this.aux.tiroFixo) * Number(this.aux.disparoFixo));
+                    this.aux.parcelas = parcelas[spreadSheet[row][column]].length;
                     this.aux.esquema = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Plantadeiras') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.plantadeira = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Tiro') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.tiro = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Disparo') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.disparo = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'SL') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.sl = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'SC') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.sc = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'SALOC') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.sAloc = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'CJ') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.cj = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Dist') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.dist = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'ST') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.st = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'SPC') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.spc = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'SColheita') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.scolheita = spreadSheet[row][column];
                   }
                 }
 
                 if (configModule.response[0]?.fields[column] === 'TipoParcela') {
-                  if (spreadSheet[row][column] !== '') {
+                  if (spreadSheet[row][column] !== null) {
                     this.aux.tipo_parcela = spreadSheet[row][column];
                   }
                 }
-
-                if (spreadSheet[row].length === column && this.aux !== []) {
+                if (spreadSheet[row].length === (Number(column) + 1) && this.aux !== []) {
                   if (count === 1) {
                     if (this.aux.id_layout_bd) {
                       await layoutQuadraController.update({
                         id: Number(this.aux.id_layout_bd),
-                        idCulture: Number(idCulture),
+                        id_culture: Number(idCulture),
                         esquema: this.aux.esquema,
                         plantadeira: String(this.aux.plantadeira),
                         parcelas: this.aux.parcelas,
-                        tiros: Number(this.aux.tiroFixo),
-                        disparos: Number(this.aux.disparoFixo),
+                        tiros: 0,
+                        disparos: 0,
                         status: this.aux.status,
                         created_by: createdBy,
                       });
                       this.aux.id_layout = this.aux.id_layout_bd;
                     } else {
                       const saveLayout: any = await layoutQuadraController.create({
-                        idCulture: Number(idCulture),
+                        id_culture: Number(idCulture),
                         esquema: this.aux.esquema,
                         plantadeira: String(this.aux.plantadeira),
                         parcelas: this.aux.parcelas,
-                        tiros: Number(this.aux.tiroFixo),
-                        disparos: Number(this.aux.disparoFixo),
+                        tiros: 0,
+                        disparos: 0,
                         status: this.aux.status,
                         created_by: createdBy,
                       });
@@ -490,7 +487,7 @@ export class ImportLayoutBlockController {
                     id_layout: this.aux.id_layout,
                     sl: this.aux.sl,
                     sc: this.aux.sc,
-                    sAloc: this.aux.sAloc,
+                    s_aloc: this.aux.sAloc,
                     tiro: this.aux.tiro,
                     cj: String(this.aux.cj),
                     disparo: this.aux.disparo,
@@ -499,7 +496,6 @@ export class ImportLayoutBlockController {
                     spc: String(this.aux.spc),
                     scolheita: this.aux.scolheita,
                     tipo_parcela: this.aux.tipo_parcela,
-                    status: this.aux.status,
                     created_by: createdBy,
                   });
                 }
@@ -507,11 +503,11 @@ export class ImportLayoutBlockController {
             }
           }
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
-          return { status: 200, message: 'Experimento importado com sucesso' };
+          return { status: 200, message: 'Layout de quadra importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Layout de quadra controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de experimento' };
+          return { status: 500, message: 'Erro ao salvar planilha de Layout de quadra' };
         }
       }
       await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
@@ -520,7 +516,7 @@ export class ImportLayoutBlockController {
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Layout de quadra controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de experimento' };
+      return { status: 500, message: 'Erro ao validar planilha de Layout de quadra' };
     }
   }
 }
