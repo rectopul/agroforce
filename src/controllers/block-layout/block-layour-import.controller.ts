@@ -12,9 +12,8 @@ import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.in
 import { LogImportController } from '../log-import.controller';
 // eslint-disable-next-line import/no-cycle
 import { ImportController } from '../import.controller';
-import { LayoutQuadraController } from '../layout-quadra.controller';
+import { LayoutQuadraController } from './layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
-import { AZ } from '../../shared/utils/a-z';
 
 export class ImportLayoutBlockController {
   static aux: any = {};
@@ -77,7 +76,7 @@ export class ImportLayoutBlockController {
                   row,
                   spreadSheet[0][column],
                 );
-                console.log('teste')
+                console.log('teste');
               } else if (Number(spreadSheet[row][column]) !== 4
                && Number(spreadSheet[row][column]) !== 8
                && Number(spreadSheet[row][column] !== 12)) {
@@ -471,7 +470,7 @@ export class ImportLayoutBlockController {
                       });
                       this.aux.id_layout = this.aux.id_layout_bd;
                     } else {
-                      const saveLayout: any = await layoutQuadraController.post({
+                      const saveLayout: any = await layoutQuadraController.create({
                         idCulture: Number(idCulture),
                         esquema: this.aux.esquema,
                         plantadeira: String(this.aux.plantadeira),
