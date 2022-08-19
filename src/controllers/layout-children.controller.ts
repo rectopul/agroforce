@@ -1,18 +1,18 @@
-import { LayoutChildrenRepository } from 'src/repository/layout-children.repository';
+import { LayoutChildrenRepository } from '../repository/layout-children.repository';
+import { countBlock } from '../shared/utils/countBlock';
 import handleError from '../shared/utils/handleError';
-import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class LayoutChildrenController {
   public readonly required = 'Campo obrigatório';
 
   disparoRepository = new LayoutChildrenRepository();
 
-  async listAll(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
-    let orderBy: object | any;
     try {
       const select = {
         id: true,
+        id_layout: true,
         sl: true,
         sc: true,
         s_aloc: true,
@@ -38,10 +38,7 @@ export class LayoutChildrenController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy) {
-        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
-        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
-      }
+      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
       const response: object | any = await this.disparoRepository.findAll(
         parameters,
@@ -80,7 +77,9 @@ export class LayoutChildrenController {
 
   async create(data: any) {
     try {
-      const response = await this.disparoRepository.create(data);
+      await this.disparoRepository.create(data);
+      const { response } = await this.getAll({ id_layout: data.id_layout });
+      await countBlock(response);
       return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
       handleError('Layout children controller', 'Creat', error.message);

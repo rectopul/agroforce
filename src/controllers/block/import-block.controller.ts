@@ -11,7 +11,7 @@ import { CulturaController } from '../cultura.controller';
 import { DividersController } from '../dividers.controller';
 // eslint-disable-next-line import/no-cycle
 import { ImportController } from '../import.controller';
-import { LayoutQuadraController } from '../layout-quadra.controller';
+import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 import { LocalController } from '../local/local.controller';
 import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';

@@ -16,7 +16,7 @@ import { LoteController } from './lote.controller';
 import { QuadraController } from './block/quadra.controller';
 import { DividersController } from './dividers.controller';
 import { CulturaController } from './cultura.controller';
-import { LayoutQuadraController } from './layout-quadra.controller';
+import { LayoutQuadraController } from './block-layout/layout-quadra.controller';
 import { LayoutChildrenController } from './layout-children.controller';
 import { GroupController } from './group.controller';
 import { UnidadeCulturaController } from './local/unidade-cultura.controller';
@@ -38,7 +38,7 @@ import { ImportAssayListController } from './assay-list/import-assay-list.contro
 import handleError from '../shared/utils/handleError';
 import { ImportBlockController } from './block/import-block.controller';
 import calculatingExecutionTime from '../shared/utils/calculatingExecutionTime';
-import { ImportLayoutBlockController } from './block-layout/block-layour-import.controller';
+import { ImportLayoutBlockController } from './block-layout/block-layout-import.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();

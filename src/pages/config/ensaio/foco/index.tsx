@@ -168,7 +168,7 @@ export default function Listagem({
     }
     await focoService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {
-        Swal.fire('Foco já ativado');
+        Swal.fire('Já existe um registro ativo com esse nome na tabela foco. \n Favor inativar o registro antes de executar a ação.');
         return;
       }
       await focoService.update({ id: idFoco, status: data.status });
@@ -318,7 +318,10 @@ export default function Listagem({
             <Button
               icon={<FaRegThumbsUp size={14} />}
               title="Ativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
+              onClick={async () => handleStatus(rowData.id, {
+                status: rowData.status,
+                ...rowData,
+              })}
               bgColor="bg-green-600"
               textColor="white"
             />
@@ -350,7 +353,10 @@ export default function Listagem({
             <Button
               icon={<FaRegThumbsDown size={14} />}
               title="Inativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
+              onClick={async () => handleStatus(rowData.id, {
+                status: rowData.status,
+                ...rowData,
+              })}
               bgColor="bg-red-800"
               textColor="white"
             />
