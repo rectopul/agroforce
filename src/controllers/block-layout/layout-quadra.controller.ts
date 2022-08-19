@@ -1,8 +1,11 @@
-import handleError from '../../shared/utils/handleError';
 import { LayoutQuadraRepository } from '../../repository/layout-quadra.repository';
+import handleError from '../../shared/utils/handleError';
+import { LayoutChildrenController } from '../layout-children.controller';
 
 export class LayoutQuadraController {
-  Repository = new LayoutQuadraRepository();
+  layoutQuadraRepository = new LayoutQuadraRepository();
+
+  layoutChildrenController = new LayoutChildrenController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -64,61 +67,69 @@ export class LayoutQuadraController {
         id_culture: true,
       };
 
-      const response = await this.Repository.findAll(parameters, select, take, skip, orderBy);
+      const response = await this.layoutQuadraRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Layout de Quadra Controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Layout de Quadra erro');
+      handleError('Layout Controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Layout erro');
     }
   }
 
   async getOne(id: number) {
     try {
-      const response = await this.Repository.findOne(id);
+      const response = await this.layoutQuadraRepository.findOne(id);
       if (!response) {
         return { status: 400, response: [], message: 'Layout não encontrado' };
       }
       return { status: 200, response };
     } catch (error: any) {
-      handleError('Layout de Quadra Controller', 'GetOne', error.message);
-      throw new Error('[Controller] - GetAll Layout de Quadra erro');
+      handleError('Layout Controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Layout erro');
     }
   }
 
   async create(data: object | any) {
     try {
-      console.log(data);
-      const response = await this.Repository.create(data);
+      const response = await this.layoutQuadraRepository.create(data);
       if (response) {
         return { status: 200, message: 'Layout criado', response };
       }
-      return { status: 400, message: 'Erro ao criar layout' };
+      return { status: 400, message: 'Falha ao criar layout' };
     } catch (error: any) {
-      handleError('Layout de Quadra Controller', 'Create', error.message);
-      throw new Error('[Controller] - GetAll Layout de Quadra erro');
+      handleError('Layout Controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Layout erro');
     }
   }
 
   async update(data: any) {
     try {
+      console.log(data);
       if (data.status === 0 || data.status === 1) {
-        const layout = await this.Repository.update(data.id, data);
+        const layout = await this.layoutQuadraRepository.update(data.id, data);
+
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
         return { status: 200, message: 'Layout de quadra atualizada' };
       }
 
-      const response = await this.Repository.update(data.id, data);
+      const response = await this.layoutQuadraRepository.update(data.id, data);
       if (response) {
         return { status: 200, message: { message: 'Layout atualizado com sucesso' } };
       }
-      return { status: 400, message: { message: 'Erro ao atualizar layout' } };
+      return { status: 400, message: { message: 'erro ao tentar fazer o update' } };
     } catch (error: any) {
-      handleError('Layout de Quadra Controller', 'Update', error.message);
-      throw new Error('[Controller] - GetAll Layout de Quadra erro');
+      handleError('Layout Controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Layout erro');
+
     }
   }
 }
