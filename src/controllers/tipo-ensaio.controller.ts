@@ -1,12 +1,14 @@
 /* eslint-disable camelcase */
 import handleError from '../shared/utils/handleError';
 import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    let orderBy: object | any;
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -40,7 +42,10 @@ export class TypeAssayController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
 
       const response = await this.typeAssayRepository.findAll(
         parameters,

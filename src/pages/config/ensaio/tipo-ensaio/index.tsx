@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
@@ -503,9 +504,9 @@ export default function TipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -515,6 +516,7 @@ export default function TipoEnsaio({
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
+          console.log(response);
           setTypeAssay(response);
         }
       });
@@ -747,7 +749,6 @@ export default function TipoEnsaio({
                     {...props}
                   >
                     <Button
-
                       onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -781,7 +782,6 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-
                       onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -843,8 +843,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
-  console.log(allTypeAssay);
 
   return {
     props: {
