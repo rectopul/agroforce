@@ -73,7 +73,7 @@ export default function TipoEnsaio({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const [treatments, setTreatments] = useState<ITreatment[]>([]);
+  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -292,7 +292,7 @@ export default function TipoEnsaio({
 
   const setAllCheck = () => {
     setCheckedAllItems(!checkedAllItems);
-    treatments?.forEach((item) => {
+    treatments?.forEach((item: any) => {
       checkedItems[item.id] = checkedItems[item.id]?.length > 0
         ? false
         : item?.genotipo.name_genotipo;
@@ -750,7 +750,7 @@ export default function TipoEnsaio({
                 </h2>
               </div>
 
-              <h2>Excell</h2>
+              <h2>Excel</h2>
               <Input
                 id="import"
                 type="file"
