@@ -56,6 +56,7 @@ interface IFilter {
 export interface IGenotipos {
   id: number;
   idCulture: number;
+  name_genotipo: string;
   idSafra: number;
   genealogy: string;
   genotipo: string;
@@ -329,7 +330,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -530,66 +530,68 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotipoService.getAll(filterApplication).then(({ response, status }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
+    await genotipoService
+      .getAll(filterApplication)
+      .then(({ response, status }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
 
-          delete row.id;
-          delete row.id_tecnologia;
-          delete row.tableData;
-          delete row.lote;
-          delete row.dt_import;
+            delete row.id;
+            delete row.id_tecnologia;
+            delete row.tableData;
+            delete row.lote;
+            delete row.dt_import;
 
-          // row.DT = new Date();
+            // row.DT = new Date();
 
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            'pt-BR',
-          )} ${hours}:${minutes}:${seconds}`;
-          return row;
-        });
+            const dataExp = new Date();
+            let hours: string;
+            let minutes: string;
+            let seconds: string;
+            if (String(dataExp.getHours()).length === 1) {
+              hours = `0${String(dataExp.getHours())}`;
+            } else {
+              hours = String(dataExp.getHours());
+            }
+            if (String(dataExp.getMinutes()).length === 1) {
+              minutes = `0${String(dataExp.getMinutes())}`;
+            } else {
+              minutes = String(dataExp.getMinutes());
+            }
+            if (String(dataExp.getSeconds()).length === 1) {
+              seconds = `0${String(dataExp.getSeconds())}`;
+            } else {
+              seconds = String(dataExp.getSeconds());
+            }
+            row.DT = `${dataExp.toLocaleDateString(
+              'pt-BR',
+            )} ${hours}:${minutes}:${seconds}`;
+            return row;
+          });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workSheet = XLSX.utils.json_to_sheet(newData);
 
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Genótipos.xlsx');
-      } else {
-        // eslint-disable-next-line no-undef
-        Swal.fire(response);
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Genótipos.xlsx');
+        } else {
+          // eslint-disable-next-line no-undef
+          Swal.fire(response);
+        }
+      });
   };
 
   function handleTotalPages(): void {
