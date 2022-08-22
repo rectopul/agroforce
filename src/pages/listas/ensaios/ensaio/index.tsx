@@ -307,6 +307,33 @@ export default function TipoEnsaio({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -327,7 +354,9 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
+        tableFields.push(
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+        );
       }
       if (columnOrder[item] === 'countNT') {
         tableFields.push(headerTableFactory('Nº de trat.', 'countNT'));

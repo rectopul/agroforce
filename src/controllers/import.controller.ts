@@ -9,7 +9,7 @@ import { TypeAssayController } from './tipo-ensaio.controller';
 import { AssayListController } from './assay-list/assay-list.controller';
 import { TecnologiaController } from './technology/tecnologia.controller';
 import { NpeController } from './npe.controller';
-import { DelineamentoController } from './delineamento.controller';
+import { DelineamentoController } from './delimitation/delineamento.controller';
 import { SequenciaDelineamentoController } from './sequencia-delineamento.controller';
 import { GenotipoController } from './genotype/genotipo.controller';
 import { LoteController } from './lote.controller';
@@ -39,6 +39,7 @@ import handleError from '../shared/utils/handleError';
 import { ImportBlockController } from './block/import-block.controller';
 import calculatingExecutionTime from '../shared/utils/calculatingExecutionTime';
 import { ImportLayoutBlockController } from './block-layout/block-layout-import.controller';
+import { ImportDelimitationController } from './delimitation/delimitation-import.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -231,22 +232,17 @@ export class ImportController {
       }
 
       // Validação do modulo Delineamento
-      if (data.moduleId == 7) {
-        response = await this.validateDelineamentoNew(responseLog?.id, data);
-        if (response == 'save') {
-          response = 'Itens cadastrados com sucesso!';
-        } else {
-          erro = true;
-        }
+      if (data.moduleId === 7) {
+        return await ImportDelimitationController.validate(responseLog?.id, data);
       }
 
       // Validação do modulo Genotipo
-      if (data.moduleId == 10) {
+      if (data.moduleId === 10) {
         return await ImportGenotypeController.validate(responseLog?.id, data);
       }
 
       // Validação do modulo Lote
-      if (data.moduleId == 12) {
+      if (data.moduleId === 12) {
         response = await this.validateLote(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
@@ -256,7 +252,7 @@ export class ImportController {
       }
 
       // Validação do modulo NPE
-      if (data.moduleId == 14) {
+      if (data.moduleId === 14) {
         response = await this.validateNPE(responseLog?.id, data);
         if (response == 'save') {
           response = 'Itens cadastrados com sucesso!';
@@ -266,7 +262,7 @@ export class ImportController {
       }
 
       // Validação do modulo quadra
-      if (data.moduleId == 17) {
+      if (data.moduleId === 17) {
         return await ImportBlockController.validate(responseLog?.id, data);
       }
 
@@ -827,7 +823,7 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && aux != []) {
                 if (name_atual == name_anterior && delimit == 0) {
-                  const delineamento: any = await this.delineamentoController.post({
+                  const delineamento: any = await this.delineamentoController.create({
                     id_culture: data.id_culture, name: name_atual, repeticao, trat_repeticao: countTrat, status: 1, created_by: data.created_by,
                   });
                   aux.id_delineamento = delineamento.response.id;
@@ -1063,7 +1059,7 @@ export class ImportController {
 
               if (data.spreadSheet[keySheet].length == Column && aux != []) {
                 if (name_atual == name_anterior && delimit == 0) {
-                  const delineamento: any = await this.delineamentoController.post({
+                  const delineamento: any = await this.delineamentoController.create({
                     id_culture: data.id_culture, name: name_atual, repeticao, trat_repeticao: countTrat, status: 1, created_by: data.created_by,
                   });
                   aux.id_delineamento = delineamento.response.id;

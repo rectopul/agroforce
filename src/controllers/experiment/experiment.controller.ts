@@ -81,6 +81,7 @@ export class ExperimentController {
               tecnologia: {
                 select: {
                   name: true,
+                  cod_tec: true,
                 },
               },
               foco: {

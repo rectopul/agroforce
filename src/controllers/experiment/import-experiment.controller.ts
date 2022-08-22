@@ -13,7 +13,7 @@ import {
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
 import { LocalController } from '../local/local.controller';
-import { DelineamentoController } from '../delineamento.controller';
+import { DelineamentoController } from '../delimitation/delineamento.controller';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
@@ -90,7 +90,11 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.tecnologia?.name !== (spreadSheet[row][column].toString())) {
+              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+              }
+              if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }

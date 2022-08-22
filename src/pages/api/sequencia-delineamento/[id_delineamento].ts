@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SequenciaDelineamentoController } from 'src/controllers/sequencia-delineamento.controller';
-import { DelineamentoController } from '../../../controllers/delineamento.controller';
+import { DelineamentoController } from '../../../controllers/delimitation/delineamento.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);
