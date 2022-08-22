@@ -20,6 +20,7 @@ export default function Importar() {
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
 
+  // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'DELINEAMENTO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   function readExcel(value: any) {
@@ -27,7 +28,11 @@ export default function Importar() {
 
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
-        table: 'DELIMITATION', spreadSheet: rows, moduleId: 7, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id,
+        table: 'DELIMITATION',
+        spreadSheet: rows,
+        moduleId: 7,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
         if (response.message !== '') {
           Swal.fire({

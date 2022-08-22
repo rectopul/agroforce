@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { LayoutQuadraController } from '../../controllers/block-layout/layout-quadra.controller';
 
 export async function countBlock(response: any) {

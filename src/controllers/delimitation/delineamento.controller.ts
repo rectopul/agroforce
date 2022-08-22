@@ -98,7 +98,6 @@ export class DelineamentoController {
         if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
         return { status: 200, message: 'Delineamento atualizada' };
       }
-
       const response = await this.Repository.update(data.id, data);
       if (response) {
         return { status: 200, message: 'Delineamento atualizado com sucesso' };
