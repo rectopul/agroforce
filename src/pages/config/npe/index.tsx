@@ -280,6 +280,7 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, {
                 status: rowData.status,
@@ -295,6 +296,7 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => handleStatus(rowData.id, {
                 status: rowData.status,
@@ -784,6 +786,7 @@ export default function Listagem({
                         />
                         <div style={{ width: 20 }} />
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"

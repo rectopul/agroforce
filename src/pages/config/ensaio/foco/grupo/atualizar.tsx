@@ -56,7 +56,7 @@ export default function Cadastro({ grupo, safra }: any) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.group) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       const ifExistsUnderlineInGroup = values.group.split('');

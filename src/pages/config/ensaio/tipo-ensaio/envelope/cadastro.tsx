@@ -50,7 +50,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.seeds) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 

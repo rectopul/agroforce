@@ -521,6 +521,7 @@ export default function AtualizarLocal({
                     border-gray-200
                   "
                   >
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

@@ -50,7 +50,7 @@ export default function Cadastro({ envelope }: any) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.seeds) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       await envelopeService.update({

@@ -176,7 +176,7 @@ export default function AtualizarUsuario({
         || !values.password
         || !values.confirmPassword
       ) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       if (values.password !== values.confirmPassword) {
