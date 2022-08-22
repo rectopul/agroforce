@@ -33,9 +33,7 @@ export class SequenciaDelineamentoRepository {
     if (orderBy) {
       order = JSON.parse(orderBy);
     }
-
     const count = await prisma.sequencia_delineamento.count({ where });
-
     const result: object | any = await prisma.sequencia_delineamento.findMany({
       select,
       skip,
@@ -49,30 +47,15 @@ export class SequenciaDelineamentoRepository {
   }
 
   async create(data: ICreateSequenciaDelineamento) {
-    const culture = await prisma.sequencia_delineamento.create({ data });
-    return culture;
-  }
-
-  async update(id: number, data: IUpdateSequenciaDelineamento) {
-    const result = await prisma.culture.update({
-      where: { id },
-      data,
-    });
+    const result = await prisma.sequencia_delineamento.create({ data });
     return result;
   }
 
-  async list(id_delineamento: number) {
-    const result = await prisma.sequencia_delineamento.findMany({
-      where: { id_delineamento },
-      include: {
-        delineamento: {
-          select: {
-            name: true,
-          },
-        },
-      },
+  async update(id: number, data: IUpdateSequenciaDelineamento) {
+    const result = await prisma.sequencia_delineamento.update({
+      where: { id },
+      data,
     });
-
     return result;
   }
 }

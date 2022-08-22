@@ -36,6 +36,8 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'user':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'delineamento':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       default:
         return '';
     }

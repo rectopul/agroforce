@@ -9,7 +9,6 @@ export class QuadraController {
     const parameters: object | any = {};
     let orderBy: object | any;
     let select: any = [];
-    console.log(options);
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -72,7 +71,7 @@ export class QuadraController {
         skip,
         orderBy,
       );
-      console.log(response);
+
       if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
@@ -104,9 +103,8 @@ export class QuadraController {
 
   async create(data: any) {
     try {
-      console.log(data);
       const response = await this.quadraRepository.create(data);
-      return { status: 200, message: 'Genealogia cadastrada', response };
+      return { status: 200, message: 'Quadra cadastrada', response };
     } catch (error: any) {
       handleError('Quadra Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Quadra erro');
@@ -115,7 +113,6 @@ export class QuadraController {
 
   async update(data: any) {
     try {
-      console.log(data);
       if (data.status === 0 || data.status === 1) {
         const quadra = await this.quadraRepository.update(data.id, data);
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
