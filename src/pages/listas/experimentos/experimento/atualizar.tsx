@@ -137,7 +137,7 @@ export default function AtualizarLocal({
       id: experimento.id,
       foco: experimento.assay_list?.foco.name,
       ensaio: experimento.assay_list?.type_assay.name,
-      tecnologia: experimento.assay_list?.tecnologia.name,
+      tecnologia: `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
       bgm: experimento.assay_list?.bgm,
@@ -460,7 +460,7 @@ export default function AtualizarLocal({
 
               {fieldsFactory('Ensaio', 'type_assay', experimento.assay_list?.type_assay.name)}
 
-              {fieldsFactory('Nome Tecnologia', 'tecnologia', experimento.assay_list?.tecnologia.name)}
+              {fieldsFactory('Tecnologia', 'tecnologia', `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`)}
 
               {fieldsFactory('GLI', 'gli', experimento.assay_list?.gli)}
 

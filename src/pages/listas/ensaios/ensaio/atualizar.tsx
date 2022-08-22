@@ -124,7 +124,7 @@ export default function AtualizarTipoEnsaio({
       id: assayList.id,
       foco: assayList.foco.name,
       type_assay: assayList.type_assay.name,
-      tecnologia: assayList.tecnologia.name,
+      tecnologia: `${assayList.tecnologia.cod_tec} ${assayList.tecnologia.name}`,
       gli: assayList.gli,
       bgm: assayList.bgm,
       status: assayList.status,
@@ -643,7 +643,7 @@ export default function AtualizarTipoEnsaio({
 
               {updateFieldFactory('Ensaio', 'type_assay')}
 
-              {updateFieldFactory('Nome Tecnologia', 'tecnologia')}
+              {updateFieldFactory('Tecnologia', 'tecnologia')}
 
               {updateFieldFactory('GLI', 'gli')}
 

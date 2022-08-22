@@ -404,9 +404,8 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        // tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
         tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia.cod_tec'),
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
         );
       }
       if (columnCampos[index] === 'cruza') {
