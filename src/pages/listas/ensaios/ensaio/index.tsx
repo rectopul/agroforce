@@ -266,6 +266,7 @@ export default function TipoEnsaio({
             <div style={{ width: 5 }} />
             <div>
               <Button
+                title={`Deletar ${rowData.gli}`}
                 icon={<BsTrashFill size={14} />}
                 onClick={() => deleteItem(rowData.id)}
                 bgColor="bg-red-600"
@@ -580,6 +581,8 @@ export default function TipoEnsaio({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

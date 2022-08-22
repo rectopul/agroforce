@@ -279,7 +279,7 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
+                router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -289,6 +289,7 @@ export default function Listagem({
           {rowData.status ? (
             <div className="h-7">
               <Button
+                title="Ativo"
                 icon={<FaRegThumbsUp size={14} />}
                 onClick={async () => handleStatus(rowData.id, {
                   status: rowData.status,
@@ -301,6 +302,7 @@ export default function Listagem({
           ) : (
             <div className="h-7">
               <Button
+                title="Inativo"
                 icon={<FaRegThumbsDown size={14} />}
                 onClick={async () => handleStatus(rowData.id, {
                   status: rowData.status,

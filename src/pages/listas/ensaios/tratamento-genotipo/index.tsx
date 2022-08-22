@@ -25,6 +25,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
+import { FaEllipsisV, FaLevelUpAlt } from 'react-icons/fa';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -80,12 +81,12 @@ export default function TipoEnsaio({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'CheckBox ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'CheckBox ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Foco',
@@ -170,6 +171,8 @@ export default function TipoEnsaio({
   const pages = Math.ceil(total / take);
   const checkedItems: any = {};
   const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
+
+  const [rowsSelected, setRowsSelected] = useState([]);
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
@@ -304,7 +307,7 @@ export default function TipoEnsaio({
         <div className="h-10 flex">
           <Checkbox1
             onChange={setAllCheck}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 22 } }}
           />
         </div>
       ),
@@ -312,11 +315,11 @@ export default function TipoEnsaio({
       sorting: false,
       width: 0,
       render: (rowData: any) => (
-        <div className="h-10 flex">
+        <div className="h-7 flex">
           <Checkbox1
             checked={!!checkedItems[rowData.id]}
             onChange={() => setCheck(rowData.id)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 22 } }}
           />
           {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
         </div>
@@ -328,9 +331,9 @@ export default function TipoEnsaio({
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[item] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
@@ -664,6 +667,7 @@ export default function TipoEnsaio({
   function handleOpenModal() {
     setIsOpenModal(true);
   }
+
   function handleCloseModal() {
     setIsOpenModal(false);
   }
@@ -733,7 +737,11 @@ export default function TipoEnsaio({
             </header>
             <div>
               <div className="mb-2 text-blue-600 text-sm mt-2 font-medium">
-                <h2>Total selecionados: 3</h2>
+                <h2>
+                  Total selecionados:
+                  {' '}
+                  {rowsSelected?.length}
+                </h2>
               </div>
 
               <div className="border-l-8 border-l-blue-600">
@@ -782,7 +790,7 @@ export default function TipoEnsaio({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar ensaios">
+          <AccordionFilter title="Filtrar tratamento genótipo">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -834,6 +842,17 @@ export default function TipoEnsaio({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
                     </label>
+                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      {statusFilter.map((generate, index) => (
+                        <CheckBox
+                          key={index}
+                          name={generate.name}
+                          title={generate.title?.toString()}
+                          value={generate.value}
+                          defaultChecked={false}
+                        />
+                      ))}
+                    </div> */}
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
@@ -879,7 +898,7 @@ export default function TipoEnsaio({
                       Genótipo
                     </label>
                     <Select
-                      values={genotypeSelect}
+                      values={[{ id: '', name: 'Selecione' }, ...genotypeSelect]}
                       id="filterGenotypeName"
                       name="filterGenotypeName"
                       onChange={formik.handleChange}
@@ -914,6 +933,7 @@ export default function TipoEnsaio({
               columns={columns}
               data={afterFilter ? treatments : []}
               options={{
+                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -924,6 +944,7 @@ export default function TipoEnsaio({
                 filtering: false,
                 pageSize: itensPerPage,
               }}
+              onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
                   <div
@@ -939,13 +960,16 @@ export default function TipoEnsaio({
                     border-gray-200
                   "
                   >
-                    <div className="h-10 w-32 ml-9">
+                    <div className="h-12 w-32 ml-0">
                       <Button
                         title="Ação"
                         value="Ação"
-                        bgColor="bg-blue-600"
+                        bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
                         textColor="white"
                         onClick={handleOpenModal}
+                        disabled={rowsSelected?.length <= 0}
+                        // icon={<FaEllipsisV size={20} />}
+                        icon={<FaLevelUpAlt size={20} />}
                       />
                     </div>
 

@@ -235,6 +235,7 @@ export default function Listagem({
         <div className="h-7 flex">
           <div className="h-7">
             <Button
+              title={`Atualizar ${rowData.name}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -249,6 +250,7 @@ export default function Listagem({
           {rowData.status === 1 ? (
             <div className="h-7">
               <Button
+                title="Ativo"
                 icon={<FaRegThumbsUp size={14} />}
                 onClick={async () => await handleStatusItem(rowData.id, {
                   status: rowData.status,
@@ -261,6 +263,7 @@ export default function Listagem({
           ) : (
             <div className="h-7">
               <Button
+                title="Inativo"
                 icon={<FaRegThumbsDown size={14} />}
                 onClick={async () => await handleStatusItem(rowData.id, {
                   status: rowData.status,
@@ -584,6 +587,7 @@ export default function Listagem({
 
                     <strong className="text-blue-600">
                       Total registrado:
+                      {' '}
                       {itemsTotal}
                     </strong>
 
