@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -6,15 +6,13 @@ import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
-import { userService } from '../../services';
+import { userService } from '../services';
 
-import {
-  Container, Video, Content, Button, ContainerButton, TextButton, ContainerSocial, ContainerError, ImgQrCode,
-} from './styles';
+import Loading from '../components/Loading';
 
-import Loading from '../../components/Loading';
+export default Login;
 
-export default function Login() {
+function Login() {
   const router = useRouter();
 
   const [hoverButton, setHoverButton] = useState(false);
@@ -78,7 +76,14 @@ export default function Login() {
         }}
       />
 
-      <div style={Container}>
+      <div style={{
+        display: 'flex',
+        width: '100vw',
+        height: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      >
         <video
           autoPlay
           loop
@@ -119,7 +124,14 @@ export default function Login() {
           <img src="/images/logo.png" className="w-30 h-14 self-center" />
 
           {errors.apiError && (
-          <div style={ContainerError}>
+          <div style={{
+            display: 'flex',
+            backgroundColor: '#F66E84',
+            width: '100%',
+            justifyContent: 'center',
+            borderRadius: 2,
+          }}
+          >
             <span style={{ color: '#fff' }}>
               {errors.apiError?.message}
             </span>
@@ -162,18 +174,42 @@ export default function Login() {
 
               <button
                 className="shadow-lg"
-                style={{ ...Button, backgroundColor: hoverButton ? '#fff' : '#609f51' }}
+                style={{
+                  width: 100,
+                  height: 33,
+                  borderRadius: 20,
+                  marginTop: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: '#d3d3d3',
+                  backgroundColor: hoverButton ? '#fff' : '#609f51',
+                }}
                 onMouseEnter={() => setHoverButton(true)}
                 onMouseLeave={() => setHoverButton(false)}
               >
-                <span style={{ ...TextButton, color: hoverButton ? '#609f51' : '#fff' }}>Conectar</span>
+                <span style={{
+                  fontWeight: '500',
+                  fontSize: 15,
+                  color: hoverButton ? '#609f51' : '#fff',
+                }}
+                >
+                  Conectar
+
+                </span>
               </button>
 
               <a href="https://agroforce.com.br/" style={{ marginTop: 10 }} target="_blank" rel="noreferrer">
                 <img src="/images/agroforce2.png" className="w-30 h-10 self-center" />
               </a>
 
-              <div style={ContainerSocial}>
+              <div style={{
+                display: 'flex',
+                width: 120,
+                justifyContent: 'space-around',
+                marginTop: 10,
+              }}
+              >
                 <a
                   href="https://www.facebook.com/agroforcesoftware"
                   title="Facebook"
