@@ -74,3 +74,12 @@ export const ContainerError = {
   justifyContent: 'center',
   borderRadius: 2,
 };
+
+export const ImgQrCode = {
+  width: 100,
+  height: 100,
+  position: 'fixed',
+  zIndex: 3,
+  bottom: 30,
+  left: 30,
+};

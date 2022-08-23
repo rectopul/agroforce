@@ -9,7 +9,7 @@ import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import { userService } from '../../services';
 
 import {
-  Container, Video, Content, Button, ContainerButton, TextButton, ContainerSocial, ContainerError,
+  Container, Video, Content, Button, ContainerButton, TextButton, ContainerSocial, ContainerError, ImgQrCode,
 } from './styles';
 
 import Loading from '../../components/Loading';
@@ -66,6 +66,7 @@ export default function Login() {
       </Head>
 
       {loading && <Loading />}
+      <img src="/images/qrcode_tela_login.png" style={ImgQrCode} />
 
       <div style={Container}>
         <video autoPlay loop muted style={Video}>
@@ -155,7 +156,6 @@ export default function Login() {
                   <FaLinkedin color={hoverIconIN ? '#609f51' : '#fff'} size={25} />
                 </a>
               </div>
-
             </div>
           </form>
         </div>
