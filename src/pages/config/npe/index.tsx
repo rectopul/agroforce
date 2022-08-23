@@ -561,9 +561,9 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await npeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setNPE(response.response);
+    await npeService.getAll(parametersFilter).then(({ status, response }) => {
+      if (status === 200) {
+        setNPE(response);
       }
     });
   }
