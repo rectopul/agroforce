@@ -66,14 +66,56 @@ export default function Login() {
       </Head>
 
       {loading && <Loading />}
-      <img src="/images/qrcode_tela_login.png" style={ImgQrCode} />
+      <img
+        src="/images/qrcode_tela_login.png"
+        style={{
+          width: 100,
+          height: 100,
+          position: 'fixed',
+          zIndex: 3,
+          bottom: 30,
+          left: 30,
+        }}
+      />
 
       <div style={Container}>
-        <video autoPlay loop muted style={Video}>
+        <video
+          autoPlay
+          loop
+          muted
+          style={{
+            top: -50,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            position: 'fixed',
+            width: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
           <source src="/images/qrcode_login.webm" type="video/webm" />
         </video>
 
-        <div style={Content} className="shadow-lg">
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: 'rgba(150, 150, 150, 0.5)',
+            marginTop: 20,
+            paddingTop: 10,
+            paddingBottom: 20,
+            paddingLeft: 25,
+            paddingRight: 25,
+            width: '35%',
+            height: 380,
+            borderRadius: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1,
+          }}
+          className="shadow-lg"
+        >
           <img src="/images/logo.png" className="w-30 h-14 self-center" />
 
           {errors.apiError && (
@@ -106,7 +148,14 @@ export default function Login() {
               />
             </div>
 
-            <div style={ContainerButton}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            >
               <Link href="/trocar-senha">
                 <a className="text-blue-600">Esqueci minha senha - I forgot my password - Olvide mi contraseña</a>
               </Link>
