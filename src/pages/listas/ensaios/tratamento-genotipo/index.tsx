@@ -23,7 +23,7 @@ import { BsDownload } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-import Modal from 'react-modal';
+// import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import { FaLevelUpAlt } from 'react-icons/fa';
 import {
@@ -666,7 +666,7 @@ export default function Listagem({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
-      <Modal
+      {/* <Modal
         isOpen={isOpenModal}
         onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
         overlayClassName="fixed inset-0 flex bg-transparent  mt-12  justify-center"
@@ -766,7 +766,7 @@ export default function Listagem({
             confirmar
           </button>
         </form>
-      </Modal>
+      </Modal> */}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main
