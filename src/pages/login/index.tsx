@@ -9,7 +9,15 @@ import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import { userService } from '../../services';
 
 import {
-  Container, Video, Content, Button, ContainerButton, TextButton, ContainerSocial, ContainerError, ImgQrCode,
+  Container,
+  Video,
+  Content,
+  Button,
+  ContainerButton,
+  TextButton,
+  ContainerSocial,
+  ContainerError,
+  ImgQrCode,
 } from './styles';
 
 import Loading from '../../components/Loading';
@@ -161,6 +169,7 @@ export default function Login() {
               </Link>
 
               <button
+                type="button"
                 className="shadow-lg"
                 style={{ ...Button, backgroundColor: hoverButton ? '#fff' : '#609f51' }}
                 onMouseEnter={() => setHoverButton(true)}
