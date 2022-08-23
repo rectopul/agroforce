@@ -338,7 +338,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia.cod_tec'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia'));
       }
     });
     return tableFields;

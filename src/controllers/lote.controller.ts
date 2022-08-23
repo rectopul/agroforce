@@ -113,7 +113,7 @@ export class LoteController {
             tecnologia: {
               select:
               {
-                desc: true,
+                name: true,
                 cod_tec: true,
               },
             },

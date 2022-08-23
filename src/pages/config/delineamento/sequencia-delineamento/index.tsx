@@ -1,9 +1,12 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
 import {
   DragDropContext,
@@ -20,7 +23,8 @@ import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
   Button,
@@ -28,13 +32,13 @@ import {
   Content,
   Input,
   Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   sequenciaDelineamentoService,
   userPreferencesService,
-} from 'src/services';
-import * as XLSX from 'xlsx';
+} from '../../../../services';
+import { IReturnObject } from '../../../../interfaces/shared/Import.interface';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -66,7 +70,7 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  id_delineamento: number;
+  idDelineamento: number;
 }
 
 export default function Listagem({
@@ -74,7 +78,7 @@ export default function Listagem({
   totalItems,
   itensPerPage,
   filterApplication,
-  id_delineamento,
+  idDelineamento,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -84,7 +88,6 @@ export default function Listagem({
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
-  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.sequencia_delineamento || {
     id: 0,
@@ -94,7 +97,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
 
-  const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
+  const [seqDelineamento, setSeqDelineamento] = useState<ISequenciaDelineamento[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(0);
@@ -127,8 +130,6 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
@@ -137,13 +138,13 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_delineamento=${id_delineamento}`;
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_delineamento=${idDelineamento}`;
       await sequenciaDelineamentoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
+        .then(({ response, total: newTotal }: IReturnObject) => {
           setFilter(parametersFilter);
-          setItems(response.response);
-          setTotalItems(response.total);
+          setSeqDelineamento(response);
+          setTotalItems(newTotal);
           setCurrentPage(0);
         });
     },
@@ -159,21 +160,65 @@ export default function Listagem({
       data.status = 0;
     }
 
-    const index = items.findIndex((item) => item.id === idCulture);
+    const index = seqDelineamento.findIndex((item) => item.id === idCulture);
 
     if (index === -1) {
       return;
     }
 
-    setItems((oldCulture) => {
+    setSeqDelineamento((oldCulture) => {
       const copy = [...oldCulture];
       copy[index].status = data.status;
       return copy;
     });
+  }
 
-    // const { id, name, status }: any = items[index];
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-    // await sequenciaDelineamentoService.updateCulture({ id, name, status });
+    await sequenciaDelineamentoService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }: IReturnObject) => {
+        if (status === 200) {
+          setSeqDelineamento(response);
+        }
+      });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -181,6 +226,7 @@ export default function Listagem({
       title: (
         <div className="flex items-center">
           <button
+            type="button"
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
@@ -203,6 +249,7 @@ export default function Listagem({
         <div className="h-10 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
@@ -214,6 +261,7 @@ export default function Listagem({
         <div className="h-10 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
@@ -239,7 +287,7 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsUp size={14} />}
                 title="Ativo"
-                onClick={async () => await handleStatusCulture(rowData.id, {
+                onClick={async () => handleStatusCulture(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -252,7 +300,7 @@ export default function Listagem({
               <Button
                 icon={<FaRegThumbsDown size={14} />}
                 title="Inativo"
-                onClick={async () => await handleStatusCulture(rowData.id, {
+                onClick={async () => handleStatusCulture(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -266,8 +314,8 @@ export default function Listagem({
     };
   }
 
-  function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
+  function columnsOrder(columnOrder: string) {
+    const columnCampos: string[] = columnOrder.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
@@ -298,53 +346,7 @@ export default function Listagem({
     return tableFields;
   }
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof (filter) !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await sequenciaDelineamentoService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setItems(response.response);
-        }
-      });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -402,27 +404,20 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
-    }
-
     await sequenciaDelineamentoService
       .getAll(filterApplication)
-      .then((response) => {
-        if (response.status === 200) {
-          const newData = items.map((row) => {
+      .then(({ status, response }: IReturnObject) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
             if (row.status === 0) {
               row.status = 'Inativo' as any;
             } else {
               row.status = 'Ativo' as any;
             }
-
+            row.delineamento = row.delineamento?.name;
             return row;
           });
 
-          newData.map(
-            (item: any) => (item.delineamento = item.delineamento?.name),
-          );
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(
@@ -432,7 +427,7 @@ export default function Listagem({
           );
 
           // Buffer
-          const buf = XLSX.write(workBook, {
+          XLSX.write(workBook, {
             bookType: 'xlsx', // xlsx
             type: 'buffer',
           });
@@ -459,9 +454,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${id_delineamento}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${idDelineamento}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${id_delineamento}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${idDelineamento}`;
     }
 
     if (filter) {
@@ -469,9 +464,10 @@ export default function Listagem({
     }
     await sequenciaDelineamentoService
       .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200) {
-          setItems(response.response);
+      .then(({ status, response, total: allTotal }: IReturnObject) => {
+        if (status === 200) {
+          setSeqDelineamento(response);
+          setTotalItems(allTotal);
         }
       });
   }
@@ -550,7 +546,7 @@ export default function Listagem({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={items}
+              data={seqDelineamento}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -612,11 +608,11 @@ export default function Listagem({
                                         draggableId={String(generate.title)}
                                         index={index}
                                       >
-                                        {(provided) => (
+                                        {(provider) => (
                                           <li
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
                                           >
                                             <CheckBox
                                               name={generate.name}
@@ -721,12 +717,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   )?.response[0]?.itens_per_page) ?? 15;
 
   const { token } = context.req.cookies;
-  const id_delineamento: number = Number(context.query.id_delineamento);
+  const idDelineamento: number = Number(context.query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_delineamento=${idDelineamento}`;
   const filterApplication = 'filterStatus=1';
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -737,13 +733,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const api = await fetch(
-    `${baseUrl}/list?id_delineamento=${id_delineamento}`,
+  const { response: allItems, total: totalItems }: IReturnObject = await fetch(
+    `${baseUrl}`,
     requestOptions,
-  );
-  const data = await api.json();
-  const allItems = data.response;
-  const totalItems = data.total;
+  ).then((response) => response.json());
 
   return {
     props: {
@@ -751,7 +744,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      id_delineamento,
+      idDelineamento,
     },
   };
 };

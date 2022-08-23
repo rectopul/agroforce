@@ -30,6 +30,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { delineamentoService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import { number } from 'yup/lib/locale';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,

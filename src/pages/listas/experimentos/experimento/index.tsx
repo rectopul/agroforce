@@ -114,7 +114,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
-    { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
     { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
     { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
@@ -318,6 +318,33 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
@@ -339,7 +366,9 @@ export default function Listagem({
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Cód tec', 'assay_list.tecnologia.name'));
+        tableFields.push(
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+        );
       }
       if (columnCampos[index] === 'experimentName') {
         tableFields.push(headerTableFactory('Nome experimento', 'experimentName'));

@@ -123,6 +123,7 @@ export class ImportAssayListController {
               }
               const { response }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
+                id_safra: idSafra,
               });
               if (response[0]?.status === 'UTILIZADO') {
                 responseIfError[Number(column)]
