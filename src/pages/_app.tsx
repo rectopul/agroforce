@@ -5,10 +5,10 @@ import '../../public/nprogress.css';
 import { userService } from '../services';
 import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
-import Modal from 'react-modal';
+// import Modal from 'react-modal';
 import PermissionGate from '../shared/utils/PermissionUser';
 
-Modal.setAppElement('#__next');
+// Modal.setAppElement('#__next');
 
 function App({
   Component, pageProps, permissions, user,
