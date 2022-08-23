@@ -23,9 +23,9 @@ import { BsDownload } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-import Modal from 'react-modal';
+// import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import { FaEllipsisV, FaLevelUpAlt } from 'react-icons/fa';
+import { FaLevelUpAlt } from 'react-icons/fa';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -48,7 +48,7 @@ import {
 } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-export default function TipoEnsaio({
+export default function Listagem({
   assaySelect,
   genotypeSelect,
   itensPerPage,
@@ -171,7 +171,8 @@ export default function TipoEnsaio({
   const pages = Math.ceil(total / take);
   const checkedItems: any = {};
   const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
-
+  const [nccIsValid, setNccIsValid] = useState<boolean>(false);
+  const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
 
   const formik = useFormik<ITreatmentFilter>({
@@ -301,39 +302,10 @@ export default function TipoEnsaio({
     console.log(checkedItems);
   };
 
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="h-10 flex">
-          <Checkbox1
-            onChange={setAllCheck}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 22 } }}
-          />
-        </div>
-      ),
-      field: 'id',
-      sorting: false,
-      width: 0,
-      render: (rowData: any) => (
-        <div className="h-7 flex">
-          <Checkbox1
-            checked={!!checkedItems[rowData.id]}
-            onChange={() => setCheck(rowData.id)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 22 } }}
-          />
-          {/* <input type="checkbox" onChange={() => setCheck(rowData.id)} /> */}
-        </div>
-      ),
-    };
-  }
-
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      // if (columnOrder[item] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnOrder[item] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
@@ -526,9 +498,9 @@ export default function TipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -664,12 +636,23 @@ export default function TipoEnsaio({
     // console.log(validateReplace);
   }
 
-  function handleOpenModal() {
-    setIsOpenModal(true);
+  async function handleSubmit() {
+    console.log(rowsSelected);
   }
 
-  function handleCloseModal() {
-    setIsOpenModal(false);
+  async function setRadioStatus() {
+    const selectedGenotype: any = {};
+    rowsSelected.forEach((item: any) => {
+      selectedGenotype[item.genotipo.name_genotipo] = true;
+    });
+    const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
+    if (rowsSelected.length <= 0) {
+      setNccIsValid(true);
+      setGenotypeIsValid(true);
+    }
+    if (checkedLength.length > 1) {
+      setNccIsValid(true);
+    }
   }
 
   useEffect(() => {
@@ -683,9 +666,9 @@ export default function TipoEnsaio({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
-      <Modal
+      {/* <Modal
         isOpen={isOpenModal}
-        onRequestClose={handleCloseModal}
+        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
         overlayClassName="fixed inset-0 flex bg-transparent  mt-12  justify-center"
         className="flex
           flex-col
@@ -707,7 +690,10 @@ export default function TipoEnsaio({
           <button
             type="button"
             className="flex absolute top-4 right-3 justify-end"
-            onClick={handleCloseModal}
+            onClick={() => {
+              setRadioStatus();
+              setIsOpenModal(!isOpenModal);
+            }}
           >
             <RiCloseCircleFill className="fill-red-600 text-lg hover:fill-red-800" />
           </button>
@@ -722,14 +708,14 @@ export default function TipoEnsaio({
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input type="radio" name="substituir" id="genotipo" />
+                  <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
                   <label htmlFor="genotipo" className="font-normal">
                     Genótipo
                   </label>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <input type="radio" name="substituir" id="nca" />
+                <input type="radio" name="substituir" id="nca" disabled={nccIsValid} />
                 <label htmlFor="nca" className="font-normal">
                   NCA
                 </label>
@@ -775,12 +761,12 @@ export default function TipoEnsaio({
             type="submit"
             value="Cadastrar"
             className="ml-auto mt-6 bg-green-600 text-white px-4   rounded-lg text-sm hover:bg-green-800"
-            onClick={() => {}}
+            onClick={() => handleSubmit()}
           >
             confirmar
           </button>
         </form>
-      </Modal>
+      </Modal> */}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main
@@ -966,7 +952,7 @@ export default function TipoEnsaio({
                         value="Ação"
                         bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
                         textColor="white"
-                        onClick={handleOpenModal}
+                        onClick={() => { setIsOpenModal(!isOpenModal); }}
                         disabled={rowsSelected?.length <= 0}
                         // icon={<FaEllipsisV size={20} />}
                         icon={<FaLevelUpAlt size={20} />}
