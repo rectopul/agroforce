@@ -34,7 +34,7 @@ export class ImportGenotypeTreatmentController {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           const { status: code, response: assayList } = await assayListController.getAll({
-            gli: spreadSheet[row][0],
+            gli: spreadSheet[row][4],
           });
           if (code !== 400) {
             if ((assayList[0]?.status) !== 'IMPORTADO') {
@@ -43,49 +43,49 @@ export class ImportGenotypeTreatmentController {
             }
           }
           const treatments: any = await genotypeTreatmentController.getAll({
-            gli: spreadSheet[row][0],
+            gli: spreadSheet[row][4],
             treatments_number: spreadSheet[row][6],
-            name_genotipo: spreadSheet[row][7],
-            nca: spreadSheet[row][8],
+            name_genotipo: spreadSheet[row][8],
+            nca: spreadSheet[row][9],
           });
           if (treatments.status === 400) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
           }
-          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][2]
-            || treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][3]
-            || treatments.response[0]?.assay_list.tecnologia.name !== spreadSheet[row][4]
+          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][1]
+            || treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][2]
+            || treatments.response[0]?.assay_list.tecnologia.name !== spreadSheet[row][3]
             || treatments.response[0]?.assay_list.bgm !== spreadSheet[row][5]
           ) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, as informações são diferentes das cadastradas. </li> <br>`;
           }
           for (const column in spreadSheet[row]) {
-            if (column === '0') { // GLI
+            if (column === '0') { // SAFRA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '1') { // SAFRA
+            if (column === '1') { // FOCO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '2') { // FOCO
+            if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '3') { // ENSAIO
+            if (column === '3') { // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '4') { // TECNOLOGIA
+            if (column === '4') { // GLI
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -103,7 +103,13 @@ export class ImportGenotypeTreatmentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '7') { // GENOTIPO
+            if (column === '7') { // STATUS_T
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              }
+            }
+            if (column === '8') { // GENOTIPO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -117,7 +123,7 @@ export class ImportGenotypeTreatmentController {
                 }
               }
             }
-            if (column === '8') { // NCA
+            if (column === '9') { // NCA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -131,7 +137,7 @@ export class ImportGenotypeTreatmentController {
                 }
               }
             }
-            if (column === '9') { // GENOTIPO NOVO
+            if (column === '10') { // GENOTIPO NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -145,7 +151,7 @@ export class ImportGenotypeTreatmentController {
                 }
               }
             }
-            if (column === '10') { // STATUS T NOVO
+            if (column === '11') { // STATUS T NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -154,7 +160,7 @@ export class ImportGenotypeTreatmentController {
                   += responseGenericFactory((Number(column) + 1), row, spreadSheet[0][column], 'Valor só pode ser  "T" ou "L"');
               }
             }
-            if (column === '11') { // NCA NOVO
+            if (column === '12') { // NCA NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -177,16 +183,16 @@ export class ImportGenotypeTreatmentController {
           for (const row in spreadSheet) {
             if (row !== '0') {
               const { response: treatment } = await genotypeTreatmentController.getAll({
-                gli: spreadSheet[row][0],
+                gli: spreadSheet[row][4],
                 treatments_number: spreadSheet[row][6],
-                name_genotipo: spreadSheet[row][7],
-                nca: spreadSheet[row][8],
+                name_genotipo: spreadSheet[row][8],
+                nca: spreadSheet[row][9],
               });
               const { response: genotipo } = await genotipoController.getAll({
-                name_genotipo: spreadSheet[row][9],
+                name_genotipo: spreadSheet[row][10],
               });
               const { response: lote } = await loteController.getAll({
-                ncc: spreadSheet[row][11],
+                ncc: spreadSheet[row][12],
               });
               await genotypeTreatmentController.update(
                 {
@@ -196,15 +202,16 @@ export class ImportGenotypeTreatmentController {
                 },
               );
               await historyGenotypeTreatmentController.create({
-                gli: spreadSheet[row][0],
-                safra: spreadSheet[row][1],
-                foco: spreadSheet[row][2],
-                ensaio: spreadSheet[row][3],
-                tecnologia: spreadSheet[row][4],
+                gli: spreadSheet[row][4],
+                safra: spreadSheet[row][0],
+                foco: spreadSheet[row][1],
+                ensaio: spreadSheet[row][2],
+                tecnologia: spreadSheet[row][3],
                 bgm: Number(spreadSheet[row][5]),
                 nt: Number(spreadSheet[row][6]),
-                genotipo: spreadSheet[row][7],
-                nca: Number(spreadSheet[row][8]),
+                status: spreadSheet[row][7],
+                genotipo: spreadSheet[row][8],
+                nca: Number(spreadSheet[row][9]),
                 created_by: createdBy,
               });
             }

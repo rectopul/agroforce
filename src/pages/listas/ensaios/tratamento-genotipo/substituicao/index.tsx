@@ -64,12 +64,13 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
+  idSafra: number;
   itensPerPage: number;
   filterApplication: object | any;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication,
+  allLote, idSafra, totalItems, itensPerPage, filterApplication,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -369,9 +370,9 @@ export default function Listagem({
       }
     });
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${tempParams}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}`;
     }
 
     if (filter) {
@@ -635,6 +636,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 
   const { token } = req.cookies;
   const { checked }: any = query;
+  const idSafra = req.cookies.safraId;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -658,6 +660,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
     props: {
       allLote,
       totalItems,
+      idSafra,
       itensPerPage,
       filterApplication,
     },

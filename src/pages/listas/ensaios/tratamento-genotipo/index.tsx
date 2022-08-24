@@ -396,10 +396,10 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.gli = item.assay_list.gli;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
             newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
@@ -435,13 +435,14 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.gli = item.assay_list.gli;
             newItem.safra = item.safra.safraName;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
             newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
+            newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
             newItem.nca = item.lote.ncc;
             newItem.novo_genotipo = '';
@@ -464,7 +465,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
         }
       });
   };
@@ -537,12 +538,6 @@ export default function Listagem({
     const ncaButton = document.querySelector("input[id='nca']:checked");
     const inputFile: any = document.getElementById('import');
     event.preventDefault();
-    console.log('genotypeButton');
-    console.log(genotypeButton);
-    console.log('ncaButton');
-    console.log(ncaButton);
-    console.log('inputFile');
-    console.log(inputFile);
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
         { id: item.id }

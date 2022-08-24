@@ -2,22 +2,37 @@ import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment
 import { LoteRepository } from '../../repository/lote.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
+import { IReturnObject } from '../../interfaces/shared/Import.interface';
+import { LoteController } from '../lote.controller';
 
 export class ReplaceTreatmentController {
   loteRepository = new LoteRepository();
 
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
 
-  async replace({ id: idLote, checkedTreatments }: any) {
+  loteController = new LoteController();
+
+  async replace({ id, checkedTreatments }: any) {
     try {
       const idList: any = checkedTreatments.map(
         (row: any) => (row.id ? Number(row.id) : undefined),
       );
-      const response = await this.genotypeTreatmentRepository.replace(idList, idLote);
-      if (response) {
-        return { status: 200, response, message: 'Substituído com sucesso' };
+      if (checkedTreatments[0]?.genotipo) {
+        const response = await this.genotypeTreatmentRepository.replaceLote(idList, id);
+        if (response) {
+          return { status: 200, response, message: 'NCA Substituído com sucesso' };
+        }
+        return { status: 400, response, message: 'Erro ao substituir NCA' };
       }
-      return { status: 400, response, message: 'Erro ao substituir' };
+      const { response: lote }: IReturnObject = await this.loteController.getOne(id);
+      const response = await this.genotypeTreatmentRepository.replaceGenotype(
+        idList,
+        lote.id_genotipo,
+      );
+      if (response) {
+        return { status: 200, response, message: 'Genótipo Substituído com sucesso' };
+      }
+      return { status: 400, response, message: 'Erro ao substituir Genótipo' };
     } catch (error: any) {
       handleError('Substituição do genótipo do genótipo controller', 'Replace', error.message);
       throw new Error('[Controller] - Substituição do genótipo do genótipo erro');
@@ -87,6 +102,10 @@ export class ReplaceTreatmentController {
         },
       };
 
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
+
       if (options.checkedTreatments) {
         const checkedParams = options.checkedTreatments.split(',');
         parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
@@ -99,6 +118,14 @@ export class ReplaceTreatmentController {
       if (options.orderBy) {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+
+      if (parameters.OR.length === 0) {
+        delete parameters.OR;
+      }
+
+      if (parameters.AND.length === 0) {
+        delete parameters.AND;
       }
 
       const response: object | any = await this.loteRepository.findAll(
