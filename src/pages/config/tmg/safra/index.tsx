@@ -466,18 +466,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = safras.map((row) => {
+        const newData = safras.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativos' as any;
           } else {
             row.status = 'Ativos' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });

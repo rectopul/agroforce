@@ -415,6 +415,9 @@ export default function Listagem({
               row.status = 'Ativo' as any;
             }
             row.delineamento = row.delineamento?.name;
+            delete row.id
+            delete row.id_delineamento
+            
             return row;
           });
 

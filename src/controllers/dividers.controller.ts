@@ -13,12 +13,12 @@ export class DividersController {
     try {
       const select = {
         id: true,
+        divisor: true,
+        sem_metros: true,
         t4_i: true,
         t4_f: true,
-        divisor: true,
         di: true,
         df: true,
-        sem_metros: true,
         quadra: { select: { esquema: true } },
       };
 

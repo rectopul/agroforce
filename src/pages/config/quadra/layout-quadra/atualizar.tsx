@@ -314,10 +314,6 @@ export default function Atualizarquadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
-    }
-
     await layoutChildrenService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
@@ -326,7 +322,8 @@ export default function Atualizarquadra({
           } else {
             row.status = 'Ativo';
           }
-
+          delete row.id;
+          delete row.id_layout;
           return row;
         });
 
@@ -345,7 +342,7 @@ export default function Atualizarquadra({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'disparos.xlsx');
+        XLSX.writeFile(workBook, 'Disparos.xlsx');
       }
     });
   };

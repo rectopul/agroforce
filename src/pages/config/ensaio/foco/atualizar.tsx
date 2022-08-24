@@ -386,6 +386,7 @@ export default function Atualizar({
             const newRow = row;
             delete newRow.npe;
             newRow.group = Number(row.group);
+            delete newRow.id;
             return newRow;
           });
 

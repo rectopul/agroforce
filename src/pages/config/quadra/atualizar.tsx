@@ -353,10 +353,6 @@ export default function AtualizarQuadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_quadra=${idQuadra}`;
-    }
-
     await dividersService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: { status: any }) => {
@@ -365,6 +361,9 @@ export default function AtualizarQuadra({
           } else {
             row.status = 'Ativo';
           }
+
+          delete row.id;
+          delete row.quadra;
 
           return row;
         });
@@ -725,7 +724,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   urlParameters.search = new URLSearchParams(param).toString();
   const idQuadra = Number(context.query.id);
 
-  const filterApplication = '';
+  const filterApplication = `id_quadra=${idQuadra}`;
 
   const {
     response: allDividers,

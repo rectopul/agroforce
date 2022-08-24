@@ -356,12 +356,14 @@ export default function Listagem({
 
     await loteService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
+          delete row.id;
+          delete row.genotipo;
 
           return row;
         });

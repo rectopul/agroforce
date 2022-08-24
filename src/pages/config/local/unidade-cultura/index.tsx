@@ -432,6 +432,14 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+            newRow.nome_lugar_cultura = newRow.local?.name_local_culture;
+            newRow.rotulo = newRow.local?.label;
+            newRow.mloc = newRow.local?.mloc;
+            newRow.fazenda = newRow.local?.adress;
+            newRow.pais = newRow.local?.label_country;
+            newRow.regiao = newRow.local?.label_region;
+            newRow.localidade = newRow.local?.name_locality;
+
             newRow.DT = new Date();
             delete newRow.id;
             delete newRow.id_unity_culture;

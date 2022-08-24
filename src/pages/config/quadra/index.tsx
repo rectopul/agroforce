@@ -457,19 +457,19 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
     await quadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = quadra.map((row) => {
+        const newData = quadra.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
-
+          row.local = row.local?.name_local_culture;
+          delete row.id;
+          delete row.safra;
+          delete row.tableData;
+          delete row.local_plantio;
           return row;
         });
 

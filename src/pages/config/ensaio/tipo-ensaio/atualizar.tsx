@@ -363,9 +363,10 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.type_assay = row.type_assay?.name;
+            row.tipo_ensaio = row.type_assay?.name;
             row.safra = row.safra?.safraName;
-
+            delete row.id;
+            delete row.type_assay;
             return row;
           });
 

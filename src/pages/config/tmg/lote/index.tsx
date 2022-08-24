@@ -353,8 +353,9 @@ export default function Listagem({
           newItem.name_main = item.genotipo.name_main;
           newItem.gmr = item.genotipo.gmr;
           newItem.bgm = item.genotipo.bgm;
-          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.desc}`;
+          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
           delete newItem.id;
+          delete newItem.id_genotipo;
           delete newItem.genotipo;
           return newItem;
         });

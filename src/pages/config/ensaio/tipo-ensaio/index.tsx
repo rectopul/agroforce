@@ -469,6 +469,7 @@ export default function TipoEnsaio({
             const newRow = row;
             newRow.envelope = row.envelope.seeds;
             newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
+            delete newRow.id;
             return newRow;
           });
 

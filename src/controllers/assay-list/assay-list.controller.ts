@@ -41,18 +41,18 @@ export class AssayListController {
       const select = {
         id: true,
         id_safra: true,
+        protocol_name: true,
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
-        genotype_treatment: true,
-        experiment: true,
         gli: true,
-        period: true,
-        protocol_name: true,
         bgm: true,
-        project: true,
+        genotype_treatment: true,
         status: true,
+        project: true,
         comments: true,
+        experiment: true,
+        period: true,
       };
 
       if (options.id_safra) {
