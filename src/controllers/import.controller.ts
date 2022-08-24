@@ -100,7 +100,6 @@ export class ImportController {
       }
       return { status: 200, message: 'ainda não há configuração de planilha para esse modulo!' };
     } catch (err) {
-      console.log(err);
       return 'Houve um erro, tente novamente mais tarde!1';
     }
   }
@@ -117,7 +116,6 @@ export class ImportController {
       }
       return { status: 400, message: 'erro' };
     } catch (err) {
-      console.log(err);
       return 'Houve um erro, tente novamente mais tarde!2';
     }
   }
@@ -287,8 +285,6 @@ export class ImportController {
     try {
       const configModule: object | any = await this.getAll(Number(data.moduleId));
 
-      // console.log("ini npe");
-      // console.log(data);
       if (data != null && data != undefined) {
         let Line: number;
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
@@ -305,7 +301,6 @@ export class ImportController {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const local: any = await this.localController.getAll({ name_local_culture: data.spreadSheet[keySheet][sheet] });
                     if (local.total == 0) {
-                      // console.log('aqui Local');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o local não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_local = local.response[0]?.id;
@@ -318,8 +313,6 @@ export class ImportController {
                 }
               }
 
-              // console.log("local npe ok");
-
               if (configModule.response[0]?.fields[sheet] == 'Safra') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
@@ -329,7 +322,6 @@ export class ImportController {
                     }
                     const safras: any = await this.safraController.getAll({ safraName: data.spreadSheet[keySheet][sheet] });
                     if (safras.total == 0) {
-                      // console.log('aqui Safra');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a safra não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_safra = safras.response[0]?.id;
@@ -342,19 +334,15 @@ export class ImportController {
                 }
               }
 
-              // console.log("safra npe ok");
-
               if (configModule.response[0]?.fields[sheet] == 'OGM') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if ((typeof (data.spreadSheet[keySheet][sheet])) === 'number' && data.spreadSheet[keySheet][sheet].toString().length < 2) {
                     data.spreadSheet[keySheet][sheet] = `0${data.spreadSheet[keySheet][sheet].toString()}`;
                   }
                   const cod_tec_input = String(data.spreadSheet[keySheet][sheet]);
-                  // console.log("cod_tec");
-                  // console.log(cod_tec_input);
+
                   const ogm: any = await this.ogmController.getAll({ cod_tec: cod_tec_input });
                   if (ogm.total == 0) {
-                    // console.log('aqui OGM');
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, a tecnologia informada não existe no sistema.</li><br>`;
                   } else {
                     this.aux.id_ogm = ogm.response[0]?.id;
@@ -364,14 +352,11 @@ export class ImportController {
                 }
               }
 
-              // console.log("ogm ok npe");
-
               if (configModule.response[0]?.fields[sheet] == 'Foco') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const foco: any = await this.focoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
                     if (foco.total == 0) {
-                      // console.log('aqui Foco');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o foco não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_foco = foco.response[0]?.id;
@@ -384,14 +369,11 @@ export class ImportController {
                 }
               }
 
-              // console.log("foco ok npe");
-
               if (configModule.response[0]?.fields[sheet] == 'Ensaio') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) === 'string') {
                     const ensaio: any = await this.typeAssayController.getAll({ name: data.spreadSheet[keySheet][sheet] });
                     if (ensaio.total == 0) {
-                      // console.log('aqui Ensaio');
                       responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta,o tipo de ensaio não existe no sistema.</li><br>`;
                     } else {
                       this.aux.id_type_assay = ensaio.response[0]?.id;
@@ -403,8 +385,6 @@ export class ImportController {
                   responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, campo com nome do tipo de ensaio é obrigatorio.</li><br>`;
                 }
               }
-
-              // console.log("ensaio ok npe");
 
               if (configModule.response[0]?.fields[sheet] == 'NPEI') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
@@ -429,8 +409,6 @@ export class ImportController {
                 }
               }
 
-              // console.log("npei npe ok");
-
               if (configModule.response[0]?.fields[sheet] == 'Epoca') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
@@ -443,10 +421,7 @@ export class ImportController {
                 }
               }
 
-              // console.log("epoca ok npe");
-
               if (Column == configModule.lenght) {
-                // console.log('chogu aqui');
                 const npe: any = await this.npeController.getAll({
                   id_safra: data.safra,
                   id_foco: this.aux.id_foco,
@@ -454,7 +429,7 @@ export class ImportController {
                   id_ogm: this.aux.id_ogm,
                   epoca: this.aux.epoca,
                 });
-                // console.log(npe);
+
                 if (npe.total > 0) {
                   responseIfError[Column - 1] = `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, dados já cadastrado no banco, para atualizar inative o que já está cadastrado`;
                 }
@@ -465,7 +440,6 @@ export class ImportController {
       }
 
       if (responseIfError == '') {
-        // console.log('AQUI R');
         for (const [keySheet, lines] of data.spreadSheet.entries()) {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
@@ -475,7 +449,6 @@ export class ImportController {
               this.aux.npef = 0;
               this.aux.prox_npe = 0;
               if (configModule.response[0]?.fields[sheet] == 'Local') {
-                // console.log("Local R");
                 const local: any = await this.localController.getAll(
                   { name_local_culture: data.spreadSheet[keySheet][sheet] },
                 );
@@ -483,12 +456,10 @@ export class ImportController {
               }
 
               if (configModule.response[0]?.fields[sheet] == 'Safra') {
-                // console.log("Safra R");
                 this.aux.id_safra = Number(data.safra);
               }
 
               if (configModule.response[0]?.fields[sheet] == 'OGM') {
-                // console.log("OGM R");
                 const ogm: any = await this.ogmController.getAll(
                   { cod_tec: String(data.spreadSheet[keySheet][sheet]) },
                 );
@@ -496,7 +467,6 @@ export class ImportController {
               }
 
               if (configModule.response[0]?.fields[sheet] == 'Foco') {
-                // console.log("FOCO R");
                 const foco: any = await this.focoController.getAll(
                   { name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture },
                 );
@@ -504,7 +474,6 @@ export class ImportController {
               }
 
               if (configModule.response[0]?.fields[sheet] == 'Ensaio') {
-                // console.log("Ensaio R");
                 const ensaio: any = await this.typeAssayController.getAll(
                   { name: data.spreadSheet[keySheet][sheet] },
                 );
@@ -537,8 +506,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-      // console.log('Erro geral import NPE: ');
-      // console.log(err);
+
       return 'Erro ao validar';
     }
   }
@@ -576,9 +544,6 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              // console.log(configModule.response[0]?.fields[sheet]);
-              // console.log(sheet);
-
               if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   const delineamento: any = await this.delineamentoController.getAll({ name: data.spreadSheet[keySheet][sheet], id_culture: data.id_culture });
@@ -616,10 +581,6 @@ export class ImportController {
                     // repeticoes_tratamento.push(repeticao_atual);
                     if (repeticoes_tratamento.length > 0) {
                       for (let i2 = 0; i2 < repeticoes_tratamento.length; i2++) {
-                        // console.log('procurando');
-                        // console.log(repeticoes_tratamento[i2].repeticao);
-                        // console.log(repeticao_atual);
-                        // console.log(repeticoes_tratamento);
                         if (repeticoes_tratamento[i2].repeticao == repeticao_atual) {
                           verifica_repeticao = true;
                           verifica_repeticao_indice = i2;
@@ -645,10 +606,6 @@ export class ImportController {
                   }
                 } else if (repeticoes_tratamento.length > 0) {
                   for (let i2 = 0; i2 < repeticoes_tratamento.length; i2++) {
-                    // console.log('procurando2');
-                    // console.log(repeticoes_tratamento[i2].repeticao);
-                    // console.log(repeticao_atual);
-                    // console.log(repeticoes_tratamento);
                     if (repeticoes_tratamento[i2].repeticao == repeticao_atual) {
                       verifica_repeticao = true;
                       verifica_repeticao_indice = i2;
@@ -663,11 +620,6 @@ export class ImportController {
                   verifica_repeticao_indice = 0;
                 }
                 if (repeticao_atual > 1) {
-                  console.log('repeticao');
-                  console.log(repeticao_atual);
-                  console.log(tratamentos);
-                  console.log('tratamentos');
-                  console.log(data.spreadSheet[keySheet][sheet]);
                   if (tratamentos.includes(data.spreadSheet[keySheet][sheet])) {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, tratamento não pode ser duplicado na repetição.</li><br>`;
                   } else {
@@ -676,14 +628,7 @@ export class ImportController {
                 }
               }
 
-              // console.log("repeticao anterior:");
-              // console.log(repeticao_anterior);
-              // console.log("repeticao atual:");
-              // console.log(repeticao_atual);
-
               if (configModule.response[0]?.fields[sheet] == 'Sorteio') {
-                // console.log("sorteio:");
-                // console.log(data.spreadSheet[keySheet][sheet]);
                 if (data.spreadSheet[keySheet][sheet] != '') {
                   if (typeof (data.spreadSheet[keySheet][sheet]) !== 'number') {
                     responseIfError[Column - 1] += `<li style="text-align:left"> A ${Column}º coluna da ${Line}º linha está incorreta, o campo sorteio tem que ser um numero.</li><br>`;
@@ -748,14 +693,6 @@ export class ImportController {
         }
       }
 
-      // console.log("errors");
-      // console.log(responseIfError.length);
-      // console.log(responseIfError[0]);
-      // console.log(responseIfError);
-
-      // console.log("repetições arr:");
-      // console.log(repeticoes_tratamento);
-
       if (responseIfError == '' && responseIfError.length == 0) {
         let name_anterior: string = '';
         let name_atual: string = '';
@@ -773,7 +710,6 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              // console.log
               if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
                   name_anterior = data.spreadSheet[keySheet][sheet];
@@ -838,12 +774,12 @@ export class ImportController {
         return 'save';
       }
       await this.logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
-      console.log(responseIfError);
+
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
       await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-      console.log(err);
+
       return 'Houve um erro, tente novamente mais tarde!5';
     }
     // return 'save';
@@ -1009,7 +945,6 @@ export class ImportController {
           for (const [sheet, columns] of data.spreadSheet[keySheet].entries()) {
             Column = Number(sheet) + 1;
             if (keySheet != '0') {
-              // console.log
               if (configModule.response[0]?.fields[sheet] == 'Nome') {
                 if (name_anterior == '' && name_atual == '') {
                   name_anterior = data.spreadSheet[keySheet][sheet];
@@ -1075,7 +1010,6 @@ export class ImportController {
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (err) {
-      console.log(err);
       return 'Houve um erro, tente novamente mais tarde!5';
     }
     return 'save';
@@ -1176,7 +1110,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-      console.log(err);
+
       return 'Houve um erro, tente novamente mais tarde!7';
     }
   }
@@ -1186,8 +1120,6 @@ export class ImportController {
   }: object | any) {
     const responseIfError: any = [];
     try {
-      console.log('spreadsheet');
-      console.log(spreadSheet);
       const configModule: object | any = await this.getAll(Number(moduleId));
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
@@ -1349,8 +1281,6 @@ export class ImportController {
                 await this.unidadeCulturaController.create(unityCultureDTO);
               }
             } catch (err) {
-              console.log('Error save import local');
-              console.log(err);
               return 'Erro ao salvar local no banco';
             }
           }
@@ -1361,8 +1291,6 @@ export class ImportController {
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return responseStringError;
     } catch (error) {
-      console.log('Erro na validação do local');
-      console.log(error);
       return 'Erro na validação do local';
     }
   }
@@ -1736,7 +1664,7 @@ export class ImportController {
       return responseStringError;
     } catch (err) {
       await this.logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-      console.log(err);
+
       return 'Houve um erro, tente novamente mais tarde!9';
     }
   }

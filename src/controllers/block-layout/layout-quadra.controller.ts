@@ -113,7 +113,6 @@ export class LayoutQuadraController {
 
   async update(data: any) {
     try {
-      console.log(data);
       if (data.status === 0 || data.status === 1) {
         const layout = await this.layoutQuadraRepository.update(data.id, data);
 

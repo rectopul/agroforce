@@ -147,8 +147,6 @@ export default function Listagem({
       await focoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
-          console.log('parametersFilter');
-          console.log(parametersFilter);
           setFilter(parametersFilter);
           setFocos(response.response);
           setTotalItems(response.total);
@@ -500,7 +498,6 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    console.log(parametersFilter);
 
     await focoService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
@@ -806,8 +803,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
-  console.log(filterBeforeEdit);
 
   return {
     props: {

@@ -594,7 +594,7 @@ model history_genotype_treatment {
   safra      String
   foco       String
   ensaio     String
-  tecnologia Int
+  tecnologia String
   bgm        Int
   nt         Int
   genotipo   String

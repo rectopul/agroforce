@@ -707,8 +707,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const response = await fetch(urlParameters.toString(), requestOptions);
   const { response: allItems, total: totalItems } = await response.json();
 
-  console.log(allItems);
-
   return {
     props: {
       allItems,

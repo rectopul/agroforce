@@ -37,7 +37,7 @@ export class ImportGenotypeTreatmentController {
             gli: spreadSheet[row][0],
           });
           if (code !== 400) {
-            if ((assayList?.status.toUpperCase()) !== 'IMPORTADO') {
+            if ((assayList[0]?.status) !== 'IMPORTADO') {
               responseIfError[0]
                 += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
             }
@@ -45,7 +45,6 @@ export class ImportGenotypeTreatmentController {
           const treatments: any = await genotypeTreatmentController.getAll({
             gli: spreadSheet[row][0],
             treatments_number: spreadSheet[row][6],
-            status: 'IMPORTADO',
             name_genotipo: spreadSheet[row][7],
             nca: spreadSheet[row][8],
           });
@@ -53,10 +52,10 @@ export class ImportGenotypeTreatmentController {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
           }
-          if (treatments[0]?.assay_list.foco.name !== spreadSheet[row][2]
-            || treatments[0]?.assay_list.type_assay.name !== spreadSheet[row][3]
-            || treatments[0]?.assay_list.tecnologia.name !== spreadSheet[row][4]
-            || treatments[0]?.assay_list.bgm !== spreadSheet[row][5]
+          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][2]
+            || treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][3]
+            || treatments.response[0]?.assay_list.tecnologia.name !== spreadSheet[row][4]
+            || treatments.response[0]?.assay_list.bgm !== spreadSheet[row][5]
           ) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, as informações são diferentes das cadastradas. </li> <br>`;
@@ -153,14 +152,6 @@ export class ImportGenotypeTreatmentController {
               } else if (spreadSheet[row][column] !== 'L' && spreadSheet[row][column] !== 'T') {
                 responseIfError[Number(column)]
                   += responseGenericFactory((Number(column) + 1), row, spreadSheet[0][column], 'Valor só pode ser  "T" ou "L"');
-              } else {
-                const { status } = await genotypeTreatmentController.getAll({
-                  status: spreadSheet[row][column],
-                });
-                if (status === 400) {
-                  responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
-                }
               }
             }
             if (column === '11') { // NCA NOVO
@@ -169,7 +160,7 @@ export class ImportGenotypeTreatmentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { status } = await loteController.getAll({
-                  ncc: spreadSheet[row][column],
+                  ncc: Number(spreadSheet[row][column]),
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
@@ -185,6 +176,12 @@ export class ImportGenotypeTreatmentController {
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
+              const { response: treatment } = await genotypeTreatmentController.getAll({
+                gli: spreadSheet[row][0],
+                treatments_number: spreadSheet[row][6],
+                name_genotipo: spreadSheet[row][7],
+                nca: spreadSheet[row][8],
+              });
               const { response: genotipo } = await genotipoController.getAll({
                 name_genotipo: spreadSheet[row][9],
               });
@@ -193,8 +190,9 @@ export class ImportGenotypeTreatmentController {
               });
               await genotypeTreatmentController.update(
                 {
-                  id_genotipo: genotipo.id,
-                  nca: lote.id,
+                  id: treatment[0]?.id,
+                  id_genotipo: genotipo[0]?.id,
+                  id_lote: lote[0]?.id,
                 },
               );
               await historyGenotypeTreatmentController.create({
@@ -203,10 +201,10 @@ export class ImportGenotypeTreatmentController {
                 foco: spreadSheet[row][2],
                 ensaio: spreadSheet[row][3],
                 tecnologia: spreadSheet[row][4],
-                bgm: spreadSheet[row][5],
-                nt: spreadSheet[row][6],
+                bgm: Number(spreadSheet[row][5]),
+                nt: Number(spreadSheet[row][6]),
                 genotipo: spreadSheet[row][7],
-                nca: spreadSheet[row][8],
+                nca: Number(spreadSheet[row][8]),
                 created_by: createdBy,
               });
             }

@@ -180,7 +180,6 @@ export default function Listagem({
     }&local_preparo=${data.local.name_local_culture}`;
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
-      console.log(status, data.status);
       if (status === 200 && data.status === 1) {
         Swal.fire('Foco já ativado');
         return;

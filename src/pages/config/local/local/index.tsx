@@ -518,8 +518,6 @@ export default function Listagem({
     if (!filterApplication.includes('paramSelect')) {
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
-    console.log(filterApplication);
-
     await localService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {

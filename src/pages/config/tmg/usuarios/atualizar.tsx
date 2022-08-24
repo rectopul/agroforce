@@ -166,7 +166,6 @@ export default function AtualizarUsuario({
       cultures: [],
     },
     onSubmit: async (values) => {
-      console.log(values);
       validateInputs(values);
       if (
         !values.name

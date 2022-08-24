@@ -145,7 +145,6 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
-  console.log(generatesProps);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
@@ -153,8 +152,6 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-
-  console.log(users);
 
   const columns = colums(camposGerenciados);
 

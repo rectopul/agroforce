@@ -6,15 +6,18 @@ import handleError from '../../shared/utils/handleError';
 export class ReplaceTreatmentController {
   loteRepository = new LoteRepository();
 
-  genotypeTratmentRepository = new GenotypeTreatmentRepository();
+  genotypeTreatmentRepository = new GenotypeTreatmentRepository();
 
   async replace({ id: idLote, checkedTreatments }: any) {
     try {
-      const idList: any = [];
-      Object.keys(checkedTreatments).forEach((item: any) => {
-        checkedTreatments[item] ? idList.push(Number(item)) : undefined;
-      });
-      await this.genotypeTratmentRepository.replace(idList, idLote);
+      const idList: any = checkedTreatments.map(
+        (row: any) => (row.id ? Number(row.id) : undefined),
+      );
+      const response = await this.genotypeTreatmentRepository.replace(idList, idLote);
+      if (response) {
+        return { status: 200, response, message: 'Substituído com sucesso' };
+      }
+      return { status: 400, response, message: 'Erro ao substituir' };
     } catch (error: any) {
       handleError('Substituição do genótipo do genótipo controller', 'Replace', error.message);
       throw new Error('[Controller] - Substituição do genótipo do genótipo erro');
@@ -73,7 +76,6 @@ export class ReplaceTreatmentController {
         fase: true,
         peso: true,
         quant_sementes: true,
-        status: true,
         genotipo: {
           select: {
             name_genotipo: true,
@@ -87,7 +89,6 @@ export class ReplaceTreatmentController {
 
       if (options.checkedTreatments) {
         const checkedParams = options.checkedTreatments.split(',');
-        console.log(checkedParams);
         parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
       }
 
@@ -107,6 +108,7 @@ export class ReplaceTreatmentController {
         skip,
         orderBy,
       );
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

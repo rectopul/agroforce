@@ -516,7 +516,6 @@ export default function TipoEnsaio({
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
-          console.log(response);
           setTypeAssay(response);
         }
       });

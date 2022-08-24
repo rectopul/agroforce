@@ -92,7 +92,6 @@ export class QuadraController {
 
       if (!response) throw new Error('Item não encontrado');
       response.tf = response.dividers[response.dividers.length - 1].t4_f;
-      console.log(response);
 
       return { status: 200, response };
     } catch (error: any) {

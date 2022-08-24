@@ -7,7 +7,6 @@ export class FocoController {
   focoRepository = new FocoRepository();
 
   async getAll(options: any) {
-    console.log(options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
