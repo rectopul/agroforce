@@ -414,6 +414,9 @@ export default function Listagem({
             row.status = 'Ativo' as any;
           }
 
+          delete row.id;
+          delete row.tableData;
+
           return row;
         });
 

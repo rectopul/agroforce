@@ -43,10 +43,10 @@ export class UserController {
         select = {
           id: true,
           name: true,
+          tel: true,
+          login: true,
           cpf: true,
           email: true,
-          login: true,
-          tel: true,
           avatar: true,
           status: true,
         };

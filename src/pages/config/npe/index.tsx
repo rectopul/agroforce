@@ -95,7 +95,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,status',
+      'id,safra,foco,ensaio,tecnologia,local,npei,epoca,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -114,12 +114,6 @@ export default function Listagem({
       title: 'Favorito ',
       value: 'id',
       defaultChecked: () => camposGerenciados.includes('id'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Local ',
-      value: 'local',
-      defaultChecked: () => camposGerenciados.includes('local'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -147,15 +141,21 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
-      value: 'epoca',
-      defaultChecked: () => camposGerenciados.includes('epoca'),
+      title: 'Local ',
+      value: 'local',
+      defaultChecked: () => camposGerenciados.includes('local'),
     },
     {
       name: 'CamposGerenciados[]',
       title: 'NPE Inicial ',
       value: 'npei',
       defaultChecked: () => camposGerenciados.includes('npei'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Epoca ',
+      value: 'epoca',
+      defaultChecked: () => camposGerenciados.includes('epoca'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -492,32 +492,27 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await npeService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map(
-          (row: { avatar: any; status: any }) => {
+    await npeService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map(
+          (row: any) => {
             delete row.avatar;
             if (row.status === 0) {
               row.status = 'Inativo';
             } else {
               row.status = 'Ativo';
             }
+            row.safra = row.safra?.safraName;
+            row.foco = row.foco?.name;
+            row.type_assay = row.type_assay?.name;
+            row.tecnologia = row.tecnologia?.name;
+            row.local = row.local?.name_local_culture;
 
+            delete row.npef;
+            delete row.id;
             return row;
           },
         );
-
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.local = item.local?.name_local_culture;
-          item.safra = item.safra?.safraName;
-          item.tecnologia = item.tecnologia?.name;
-          item.type_assay = item.type_assay?.name;
-        });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();

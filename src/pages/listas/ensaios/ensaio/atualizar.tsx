@@ -482,12 +482,26 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_assay_list=${idAssayList}`;
-    }
     await genotypeTreatmentService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
-        const workSheet = XLSX.utils.json_to_sheet(response);
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          newRow.fase = newRow.lote?.fase;
+          newRow.cod_tec = newRow.genotipo?.tecnologia?.cod_tec;
+          newRow.nome_genotipo = newRow.genotipo?.name_genotipo;
+          newRow.gmr_genotipo = newRow.genotipo?.gmr;
+          newRow.bgm_genotipo = newRow.genotipo?.bgm;
+          newRow.nca = newRow.lote?.ncc;
+          newRow.cod_lote = newRow.lote?.cod_lote;
+
+          delete row.genotipo;
+          delete row.lote;
+          delete row.id;
+          delete row.id_safra;
+          delete row.assay_list;
+          return newRow;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotypeTreatments');
 
@@ -508,12 +522,17 @@ export default function AtualizarTipoEnsaio({
   };
 
   const downloadExcelExperiments = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${experimentsCamposGerenciados}&id_assay_list=${idAssayList}`;
-    }
     await experimentService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
-        const workSheet = XLSX.utils.json_to_sheet(response);
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          newRow.local = newRow.local?.name_local_culture;
+          newRow.delineamento = newRow.delineamento?.name;
+          delete newRow.id;
+          delete newRow.assay_list;
+          return newRow;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
 

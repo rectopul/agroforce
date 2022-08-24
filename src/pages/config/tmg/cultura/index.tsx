@@ -449,7 +449,7 @@ export default function Listagem({
             } else {
               row.status = 'Ativo' as any;
             }
-
+            delete row.id;
             return row;
           });
 
