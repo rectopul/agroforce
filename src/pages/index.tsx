@@ -14,7 +14,7 @@ import { AiOutlineContainer } from 'react-icons/ai';
 //   Legend,
 //   ArcElement,
 // } from 'chart.js';
-import { Bubble, PolarArea } from 'react-chartjs-2';
+// import { Bubble, PolarArea } from 'react-chartjs-2';
 // import { faker } from '@faker-js/faker';
 
 import { Content } from '../components/Content';
