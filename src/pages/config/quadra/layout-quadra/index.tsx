@@ -556,15 +556,15 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await layoutQuadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = quadras.map((row) => {
+        const newData = quadras.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
-          delete row.id
-          delete row.id_culture
-          delete row.tableData
+          delete row.id;
+          delete row.id_culture;
+          delete row.tableData;
 
           return row;
         });
