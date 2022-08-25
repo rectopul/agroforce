@@ -21,7 +21,6 @@ export class SafraController {
   safraRepository = new SafraRepository();
 
   async getAll(options: any) {
-    console.log(options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
@@ -140,7 +139,6 @@ export class SafraController {
 
   async update(data: UpdateSafra) {
     try {
-      console.log(data);
       if (data.status === 0 || data.status === 1) {
         const safraAlreadyExists = await this.getOne(data.id);
         if (safraAlreadyExists.status !== 200) {

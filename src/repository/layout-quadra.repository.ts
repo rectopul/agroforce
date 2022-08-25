@@ -29,10 +29,6 @@ export class LayoutQuadraRepository {
   }
 
   async update(id: number, data: any) {
-    console.log('id');
-    console.log(id);
-    console.log('data');
-    console.log(data);
     const result = await prisma.layout_quadra.update({
       where: {
         id,

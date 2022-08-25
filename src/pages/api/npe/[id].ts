@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { NpeController } from '../../../controllers/npe.controller';
+import { NpeController } from '../../../controllers/npe/npe.controller';
 import { apiHandler } from '../../../helpers/api';
 
 export default apiHandler(handler);

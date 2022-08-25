@@ -87,7 +87,6 @@ export class ReplaceTreatmentController {
 
       if (options.checkedTreatments) {
         const checkedParams = options.checkedTreatments.split(',');
-        console.log(checkedParams);
         parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
       }
 
