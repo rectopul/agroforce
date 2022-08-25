@@ -1,14 +1,16 @@
+import React, { useState } from 'react';
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { importService } from '../../../../services';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+
+import ComponentLoading from '../../../../components/Loading';
 
 export default function Importar() {
   const { TabsDropDowns } = ITabs.default;
@@ -18,9 +20,13 @@ export default function Importar() {
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
+  const [loading, setLoading] = useState(false);
+
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
         table: 'NPE',
         spreadSheet: rows,
@@ -29,6 +35,8 @@ export default function Importar() {
         safra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -40,6 +48,8 @@ export default function Importar() {
         }
       });
     });
+
+    document.getElementById('inputFile').value = null;
   }
 
   const formik = useFormik<any>({
@@ -51,8 +61,11 @@ export default function Importar() {
       readExcel(inputFile.files);
     },
   });
+
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação NPE</title>
       </Head>
