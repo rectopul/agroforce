@@ -7,7 +7,6 @@ export class FocoController {
   focoRepository = new FocoRepository();
 
   async getAll(options: any) {
-    console.log(options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
@@ -24,6 +23,7 @@ export class FocoController {
 
       const select = {
         id: true,
+        id_culture: true,
         name: true,
         group: true,
         status: true,
