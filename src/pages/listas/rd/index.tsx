@@ -117,7 +117,7 @@ export default function Import({
       }
     });
 
-    document.getElementById(`inputFile-${moduleId}`).value = null;
+    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);

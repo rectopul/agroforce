@@ -49,7 +49,7 @@ export default function Importar() {
       });
     });
 
-    document.getElementById('inputFile').value = null;
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
