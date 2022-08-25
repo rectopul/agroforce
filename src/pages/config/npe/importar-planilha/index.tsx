@@ -31,8 +31,8 @@ export default function Importar() {
         table: 'NPE',
         spreadSheet: rows,
         moduleId: 14,
-        id_culture: userLogado.userCulture.cultura_selecionada,
-        safra: userLogado.safras.safra_selecionada,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        idSafra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
         setLoading(false);

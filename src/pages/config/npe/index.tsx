@@ -159,6 +159,12 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
+      title: 'Grupo ',
+      value: 'group',
+      defaultChecked: () => camposGerenciados.includes('group'),
+    },
+    {
+      name: 'CamposGerenciados[]',
       title: 'Status',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
@@ -337,6 +343,9 @@ export default function Listagem({
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
+      }
+      if (columnCampos[item] === 'group') {
+        tableFields.push(headerTableFactory('Grupo', 'group.group'));
       }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
