@@ -2,19 +2,19 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { setCookie } from 'nookies';
 import { AiOutlineContainer } from 'react-icons/ai';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from 'chart.js';
+// import {
+//   Chart as ChartJS,
+//   CategoryScale,
+//   LinearScale,
+//   RadialLinearScale,
+//   PointElement,
+//   LineElement,
+//   BarElement,
+//   Title,
+//   Tooltip,
+//   Legend,
+//   ArcElement,
+// } from 'chart.js';
 import {
   Bubble, PolarArea, Radar, Bar,
 } from 'react-chartjs-2';
@@ -22,18 +22,18 @@ import { faker } from '@faker-js/faker';
 
 import { Content } from '../components/Content';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+// ChartJS.register(
+//   CategoryScale,
+//   LinearScale,
+//   LineElement,
+//   BarElement,
+//   ArcElement,
+//   RadialLinearScale,
+//   PointElement,
+//   Title,
+//   Tooltip,
+//   Legend,
+// );
 
 export const options1 = {
   scales: {
