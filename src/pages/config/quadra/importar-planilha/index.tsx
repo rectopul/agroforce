@@ -5,7 +5,7 @@ import readXlsxFile from 'read-excel-file';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
+import React, { useState } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
@@ -17,6 +17,8 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
+import ComponentLoading from '../../../../components/Loading';
+
 export default function Importar({ safra }: any) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -24,6 +26,8 @@ export default function Importar({ safra }: any) {
   const router = useRouter();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS' ? (tab.statusTab = true) : (tab.statusTab = false)));
+
+  const [loading, setLoading] = useState(false);
 
   const safras: object | any = [];
   safra.forEach((value: string | object | any) => {
@@ -34,6 +38,8 @@ export default function Importar({ safra }: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
         table: 'BLOCK',
         spreadSheet: rows,
@@ -42,6 +48,8 @@ export default function Importar({ safra }: any) {
         idCulture: userLogado.userCulture.cultura_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -53,6 +61,8 @@ export default function Importar({ safra }: any) {
         }
       });
     });
+
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
@@ -67,6 +77,8 @@ export default function Importar({ safra }: any) {
   });
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação Genótipo</title>
       </Head>

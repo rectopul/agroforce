@@ -111,10 +111,10 @@ export default function Listagem({
       value: 'delineamento',
     },
     { name: 'CamposGerenciados[]', title: 'Repetição', value: 'repeticao' },
-    { name: 'CamposGerenciados[]', title: 'Sorteio', value: 'sorteio' },
+    { name: 'CamposGerenciados[]', title: 'Ordem', value: 'sorteio' },
     { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
     { name: 'CamposGerenciados[]', title: 'Bloco', value: 'bloco' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    // { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -331,7 +331,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Repetição', 'repeticao'));
       }
       if (columnCampos[index] === 'sorteio') {
-        tableFields.push(headerTableFactory('Sorteio', 'sorteio'));
+        tableFields.push(headerTableFactory('Ordem', 'sorteio'));
       }
       if (columnCampos[index] === 'nt') {
         tableFields.push(headerTableFactory('NT', 'nt'));
@@ -339,9 +339,9 @@ export default function Listagem({
       if (columnCampos[index] === 'bloco') {
         tableFields.push(headerTableFactory('Bloco', 'bloco'));
       }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
+      // if (columnCampos[index] === 'status') {
+      //   tableFields.push(statusHeaderFactory());
+      // }
     });
     return tableFields;
   }
@@ -415,9 +415,9 @@ export default function Listagem({
               row.status = 'Ativo' as any;
             }
             row.delineamento = row.delineamento?.name;
-            delete row.id
-            delete row.id_delineamento
-            
+            delete row.id;
+            delete row.id_delineamento;
+
             return row;
           });
 
