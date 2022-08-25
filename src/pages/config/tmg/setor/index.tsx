@@ -407,12 +407,15 @@ export default function Listagem({
 
     await departmentService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = items.map((row) => {
+        const newData = items.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });

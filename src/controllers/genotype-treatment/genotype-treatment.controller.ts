@@ -65,6 +65,8 @@ export class GenotypeTreatmentController {
             },
           },
         },
+        treatments_number: true,
+        status: true,
         lote: {
           select: {
             ncc: true,
@@ -82,8 +84,6 @@ export class GenotypeTreatmentController {
             status: true,
           },
         },
-        treatments_number: true,
-        status: true,
         comments: true,
       };
       if (options.id_safra) {

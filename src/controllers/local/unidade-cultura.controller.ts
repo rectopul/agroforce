@@ -51,8 +51,8 @@ export class UnidadeCulturaController {
         id: true,
         id_unity_culture: true,
         id_local: true,
-        year: true,
         name_unity_culture: true,
+        year: true,
         local: true,
       };
 

@@ -88,14 +88,14 @@ export class NpeController {
       } else {
         select = {
           id: true,
-          local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true } },
-          epoca: true,
-          tecnologia: { select: { name: true } },
           type_assay: { select: { name: true } },
+          tecnologia: { select: { name: true } },
+          local: { select: { name_local_culture: true } },
           npei: true,
           npef: true,
+          epoca: true,
           status: true,
         };
       }

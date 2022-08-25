@@ -515,15 +515,13 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-    console.log(filterApplication);
-
     await localService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = row.status === 0 ? 'Inativo' : 'Ativo';
+          delete row.dt_import;
+          delete row.id;
+          delete row.cultureUnity;
           const dataExp = new Date();
           let hours: string;
           let minutes: string;

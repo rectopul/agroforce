@@ -424,27 +424,20 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    let newFilter;
-    if (!filterApplication.includes('paramSelect')) {
-      newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
-    }
-
-    await assayListService.getAll(newFilter).then(({ status, response }) => {
+    await assayListService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
-          if (newItem.foco) {
-            newItem.foco = newItem.foco.name;
-          }
-          if (newItem.type_assay) {
-            newItem.type_assay = newItem.type_assay.name;
-          }
-          if (newItem.tecnologia) {
-            newItem.tecnologia = newItem.tecnologia.name;
-          }
-          if (newItem.genotype_treatment) {
-            newItem.genotype_treatment = newItem.genotype_treatment[0]?.treatments_number;
-          }
+
+          newItem.foco = newItem.foco?.name;
+          newItem.type_assay = newItem.type_assay?.name;
+          newItem.tecnologia = newItem.tecnologia?.name;
+
+          delete newItem.id;
+          delete newItem.id_safra;
+          delete newItem.experiment;
+          delete newItem.genotype_treatment;
+
           return newItem;
         });
         const workSheet = XLSX.utils.json_to_sheet(response);

@@ -495,6 +495,7 @@ export default function Listagem({
         dataExcel.forEach((line: any) => {
           delete line.avatar;
           delete line.id;
+          delete line.email;
 
           if (line.status === 0) {
             line.status = 'Inativo';
