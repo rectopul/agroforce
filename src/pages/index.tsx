@@ -18,7 +18,8 @@ import { AiOutlineContainer } from 'react-icons/ai';
 // import {
 //   Bubble, PolarArea, Radar, Bar,
 // } from 'react-chartjs-2';
-// import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
+
 
 import { Content } from '../components/Content';
 
@@ -180,9 +181,9 @@ export default function Listagem() {
           <div style={{ width: '40%', marginTop: 20 }}>
             <PolarArea data={data2} />
           </div>
-        </div>
+        </div> */}
 
-        <div className="flex flex-row justify-around">
+        {/* <div className="flex flex-row justify-around">
           <div style={{
             display: 'flex',
             flex: 1,

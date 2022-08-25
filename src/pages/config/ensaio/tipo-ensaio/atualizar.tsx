@@ -268,7 +268,7 @@ export default function AtualizarTipoEnsaio({
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 router.push(`envelope/atualizar?id=${rowData.id}`);
               }}
-              bgColor="bg-red-600"
+              bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
@@ -552,8 +552,9 @@ export default function AtualizarTipoEnsaio({
                       <Button
                         title="Cadastrar Quant. de sementes por envelope"
                         value="Cadastrar Quant. de sementes por envelope"
-                        bgColor="bg-blue-600"
+                        bgColor={seeds.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+                        disabled={seeds.length}
                         onClick={() => {
                           router.push(
                             `envelope/cadastro?id_type_assay=${idTypeAssay}`,

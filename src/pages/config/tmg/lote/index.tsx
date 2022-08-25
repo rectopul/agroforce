@@ -98,7 +98,7 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
