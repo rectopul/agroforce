@@ -9,39 +9,50 @@ import { AiOutlineContainer } from 'react-icons/ai';
 //   LinearScale,
 //   RadialLinearScale,
 //   PointElement,
+//   LineElement,
+//   BarElement,
 //   Title,
 //   Tooltip,
 //   Legend,
 //   ArcElement,
 // } from 'chart.js';
-// import { Bubble, PolarArea } from 'react-chartjs-2';
+// import {
+//   Bubble, PolarArea, Radar, Bar,
+// } from 'react-chartjs-2';
 // import { faker } from '@faker-js/faker';
 
 import { Content } from '../components/Content';
 
-// ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, ArcElement, RadialLinearScale, PointElement);
-
-// export const options = {
-//   responsive: true,
-//   plugins: {
-//     legend: {
-//       display: false,
-//       position: 'top' as const,
-//     },
-//     title: {
-//       display: false,
-//       text: 'Chart.js Bar Chart',
-//     },
-//     tooltip: {
-//       enabled: true,
-//     },
-//   },
-// };
+// ChartJS.register(
+//   CategoryScale,
+//   LinearScale,
+//   LineElement,
+//   BarElement,
+//   ArcElement,
+//   RadialLinearScale,
+//   PointElement,
+//   Title,
+//   Tooltip,
+//   Legend,
+// );
 
 // export const options1 = {
 //   scales: {
 //     y: {
 //       beginAtZero: true,
+//     },
+//   },
+// };
+
+// export const options3 = {
+//   responsive: true,
+//   plugins: {
+//     legend: {
+//       position: 'top' as const,
+//     },
+//     title: {
+//       display: false,
+//       text: 'Chart.js Bar Chart',
 //     },
 //   },
 // };
@@ -83,6 +94,36 @@ import { Content } from '../components/Content';
 //         'rgba(153, 102, 255, 0.5)',
 //         'rgba(255, 159, 64, 0.5)',
 //       ],
+//       borderWidth: 1,
+//     },
+//   ],
+// };
+
+// const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+// export const data3 = {
+//   labels,
+//   datasets: [
+//     {
+//       label: 'Dataset 1',
+//       data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+//       backgroundColor: 'rgba(255, 99, 132, 0.5)',
+//     },
+//     {
+//       label: 'Dataset 2',
+//       data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+//       backgroundColor: 'rgba(53, 162, 235, 0.5)',
+//     },
+//   ],
+// };
+
+// export const data4 = {
+//   labels: ['Thing 1', 'Thing 2', 'Thing 3', 'Thing 4', 'Thing 5', 'Thing 6'],
+//   datasets: [
+//     {
+//       label: '# of Votes',
+//       data: [2, 9, 3, 5, 2, 3],
+//       backgroundColor: 'rgba(255, 99, 132, 0.2)',
+//       borderColor: 'rgba(255, 99, 132, 1)',
 //       borderWidth: 1,
 //     },
 //   ],
@@ -139,6 +180,23 @@ export default function Listagem() {
           </div>
           <div style={{ width: '40%', marginTop: 20 }}>
             <PolarArea data={data2} />
+          </div>
+        </div> */}
+
+        {/* <div className="flex flex-row justify-around">
+          <div style={{
+            display: 'flex',
+            flex: 1,
+            maxWidth: '50%',
+            marginTop: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          >
+            <Bar options={options3} data={data3} />
+          </div>
+          <div style={{ width: '40%', marginTop: 20 }}>
+            <Radar data={data4} />
           </div>
         </div> */}
       </Content>
