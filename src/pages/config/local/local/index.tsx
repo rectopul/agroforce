@@ -562,7 +562,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Locais.xlsx');
+        XLSX.writeFile(workBook, 'Lugar de Cultura.xlsx');
       }
     });
   };

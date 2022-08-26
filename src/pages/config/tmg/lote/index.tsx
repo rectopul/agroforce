@@ -345,7 +345,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await loteService.getAll(filter).then(({ status, response }) => {
+    await loteService.getAll(`${filter}&id_safra=${idSafra}`).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;

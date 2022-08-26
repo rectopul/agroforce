@@ -180,7 +180,6 @@ export default function Listagem({
     }&local_preparo=${data.local.name_local_culture}`;
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
-      console.log(status, data.status);
       if (status === 200 && data.status === 1) {
         Swal.fire('Foco já ativado');
         return;
@@ -457,9 +456,10 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await quadraService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = quadra.map((row: any) => {
+    await quadraService.getAll(filterApplication).then(({ status, response }) => {
+      console.log(response);
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
