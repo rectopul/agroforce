@@ -88,6 +88,8 @@ export class NpeController {
       } else {
         select = {
           id: true,
+          id_safra: true,
+          id_local: true,
           local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true } },

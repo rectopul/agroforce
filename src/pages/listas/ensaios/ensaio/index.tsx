@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -33,14 +33,14 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
-  allAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IAssayListGrid) {
+      allAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -739,6 +739,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
+  console.log(allAssay.genotype_treatment);
   return {
     props: {
       allAssay,

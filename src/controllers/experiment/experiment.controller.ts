@@ -2,6 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListController } from '../assay-list/assay-list.controller';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -62,6 +63,7 @@ export class ExperimentController {
       } else {
         select = {
           id: true,
+          idSafra: true,
           density: true,
           period: true,
           repetitionsNumber: true,
@@ -78,6 +80,7 @@ export class ExperimentController {
               bgm: true,
               protocol_name: true,
               status: true,
+              genotype_treatment: true,
               tecnologia: {
                 select: {
                   name: true,
@@ -145,6 +148,14 @@ export class ExperimentController {
         skip,
         orderBy,
       );
+
+      response.map((item: any) => {
+        const newItem = item;
+        newItem.countNT = functionsUtils
+          .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
+        newItem.npeQT = item.countNT * item.repetitionsNumber;
+        return newItem;
+      });
 
       if (!response && response.total <= 0) {
         return {

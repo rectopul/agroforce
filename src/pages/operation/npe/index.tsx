@@ -3,7 +3,7 @@ import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -17,7 +17,7 @@ import {
 } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { useRouter } from 'next/router';
+import { Router, useRouter } from 'next/router';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
@@ -94,8 +94,9 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,status',
+      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef',
   };
+  preferences.table_preferences = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef';
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -106,7 +107,7 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [selectedNPE, setSelectedNPE] = useState<INpeProps[]>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
@@ -158,9 +159,9 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      title: 'NPE Final',
+      value: 'npef',
+      defaultChecked: () => camposGerenciados.includes('npef'),
     },
   ]);
 
@@ -231,34 +232,31 @@ export default function Listagem({
     };
   }
 
+  function handleCheckBoxClick(data: any) {
+    if (selectedNPE?.includes(data)) {
+      setSelectedNPE(selectedNPE.filter((item) => item != data))
+    } else {
+      setSelectedNPE([...selectedNPE, data])
+    }
+    console.log(selectedNPE)
+  }
+
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
+      render: (rowData: INpeProps) => (rowData ? (
         <div className="h-10 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={25} color="#eba417" />
-            </button>
+          <div >
+            <input type='checkbox' onClick={() => handleCheckBoxClick(rowData)}></input>
           </div>
         </div>
       ) : (
         <div className="h-10 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={25} />
-            </button>
+          <div >
+            <input type='checkbox' onClick={() => handleCheckBoxClick(rowData)}></input>
           </div>
         </div>
       )),
@@ -336,8 +334,8 @@ export default function Listagem({
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
       }
-      if (columnCampos[item] === 'status') {
-        tableFields.push(statusHeaderFactory());
+      if (columnCampos[item] === 'npef') {
+        tableFields.push(headerTableFactory('NPE Final', 'npef'));
       }
     });
     return tableFields;
@@ -582,7 +580,7 @@ export default function Listagem({
       <Head>
         <title>Listagem dos NPEs</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="operation">
         <main
           className="h-full w-full
           flex flex-col
@@ -682,13 +680,16 @@ export default function Listagem({
                   >
                     <div className="h-12">
                       <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Gerar sorteio"
+                        value="Gerar sorteio"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="npe/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
+                        onClick={() => {
+                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE))
+                          router.push({
+                            pathname: "/operation/npe/experimento"
+                          })
+                        }}
                       />
                     </div>
 
@@ -873,6 +874,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
   console.log(allNpe)
+
   return {
     props: {
       allNpe,
