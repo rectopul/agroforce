@@ -18,7 +18,8 @@ import {
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiSettingsFill } from 'react-icons/ri';
+import { RiArrowUpDownLine, RiSettingsFill } from 'react-icons/ri';
+
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
@@ -233,13 +234,15 @@ export default function Listagem({
       sorting: false,
       width: 0,
       render: (rowData: any) => (
-        <div className="h-12 w-12">
+        <div className="h-10 w-12">
           <Button
+            title="Substituir genótipo/nca"
             type="button"
             onClick={() => { replaceTreatmentButton(rowData.id); }}
             rounder="rounded-full"
             bgColor="bg-green-600"
             textColor="white"
+            icon={<RiArrowUpDownLine size={20} />}
           />
         </div>
       ),

@@ -20,10 +20,10 @@ import {
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload } from 'react-icons/bs';
+import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-// import Modal from 'react-modal';
+import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import { FaLevelUpAlt } from 'react-icons/fa';
 import {
@@ -666,19 +666,22 @@ export default function Listagem({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
-      {/* <Modal
+      <Modal
         isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
         onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
-        overlayClassName="fixed inset-0 flex bg-transparent  mt-12  justify-center"
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
           w-full h-36
-          h-52
+          h-64
           max-w-xl
           bg-gray-50
           rounded-tl-2xl
           rounded-tr-2xl
           rounded-br-2xl
+          rounded-bl-2xl
           pt-2
           pb-4
           px-8
@@ -695,34 +698,34 @@ export default function Listagem({
               setIsOpenModal(!isOpenModal);
             }}
           >
-            <RiCloseCircleFill className="fill-red-600 text-lg hover:fill-red-800" />
+            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
           </button>
 
           <div className="flex px-4  justify-between">
             <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-sm font-medium">Ação</h2>
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">Ação</h2>
               <div>
                 <div className="border-l-8 border-l-blue-600 mt-4">
-                  <h2 className="mb-2 font-normal text-base ml-2 text-gray-900">
+                  <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900">
                     Substituir
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
-                  <label htmlFor="genotipo" className="font-normal">
+                  <label htmlFor="genotipo" className="font-normal text-base">
                     Genótipo
                   </label>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <input type="radio" name="substituir" id="nca" disabled={nccIsValid} />
-                <label htmlFor="nca" className="font-normal">
+                <label htmlFor="nca" className="font-normal text-base">
                   NCA
                 </label>
               </div>
             </header>
             <div>
-              <div className="mb-2 text-blue-600 text-sm mt-2 font-medium">
+              <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
                 <h2>
                   Total selecionados:
                   {' '}
@@ -731,7 +734,7 @@ export default function Listagem({
               </div>
 
               <div className="border-l-8 border-l-blue-600">
-                <h2 className="mb-2 font-normal text-base ml-2 text-gray-900 mt-6">
+                <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-6">
                   Importa Arquivo:
                 </h2>
               </div>
@@ -741,7 +744,6 @@ export default function Listagem({
                 id="import"
                 type="file"
                 className="
-
               shadow
               appearance-none
               bg-white bg-no-repeat
@@ -757,16 +759,20 @@ export default function Listagem({
             </div>
           </div>
 
-          <button
-            type="submit"
-            value="Cadastrar"
-            className="ml-auto mt-6 bg-green-600 text-white px-4   rounded-lg text-sm hover:bg-green-800"
-            onClick={() => handleSubmit()}
-          >
-            confirmar
-          </button>
+          <div className="flex justify-end py-0">
+            <div className="h-10 w-40">
+              <button
+                type="submit"
+                value="Cadastrar"
+                className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
+                onClick={() => handleSubmit()}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
         </form>
-      </Modal> */}
+      </Modal>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main
@@ -920,6 +926,7 @@ export default function Listagem({
               data={afterFilter ? treatments : []}
               options={{
                 selection: true,
+                selectionProps: (rowData) => (isOpenModal && { disabled: rowData }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -948,14 +955,15 @@ export default function Listagem({
                   >
                     <div className="h-12 w-32 ml-0">
                       <Button
-                        title="Ação"
-                        value="Ação"
-                        bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
+                        title="Substituir"
+                        value="Substituir"
                         textColor="white"
                         onClick={() => { setIsOpenModal(!isOpenModal); }}
-                        disabled={rowsSelected?.length <= 0}
+                        bgColor="bg-blue-600"
+                        // bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
+                        // disabled={rowsSelected?.length <= 0}
                         // icon={<FaEllipsisV size={20} />}
-                        icon={<FaLevelUpAlt size={20} />}
+                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
