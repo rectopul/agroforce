@@ -78,15 +78,15 @@ export default function AtualizarQuadra({
       cod_quadra: quadra.cod_quadra,
       id_culture: quadra.id_culture,
       id_safra: quadra.id_safra,
-      local: quadra.local.name_local_culture,
+      local: quadra.local?.name_local_culture,
       local_plantio: quadra.local_plantio,
       larg_q: quadra.larg_q,
       comp_p: quadra.comp_p,
       linha_p: quadra.linha_p,
       comp_c: quadra.comp_c,
       esquema: quadra.esquema,
-      tiro_fixo: quadra.tf,
-      disparo_fixo: quadra.dividers[0]?.df,
+      tiro_fixo: quadra.tiro_fixo,
+      disparo_fixo: quadra.disparo_fixo,
       q: quadra.q,
     },
     onSubmit: async (values) => {
@@ -353,9 +353,10 @@ export default function AtualizarQuadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await dividersService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
+    await dividersService.getAll(filterApplication).then(({ status, response }) => {
+      console.log(response);
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
@@ -400,9 +401,9 @@ export default function AtualizarQuadra({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_quadra=${idQuadra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_quadra=${idQuadra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -462,7 +463,7 @@ export default function AtualizarQuadra({
                 required
                 id="local"
                 name="local"
-                value={quadra.local.name_local_culture}
+                value={quadra.local?.name_local_culture}
               />
             </div>
 
@@ -481,19 +482,7 @@ export default function AtualizarQuadra({
 
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Disparo fixo
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                disabled
-                required
-                id="df"
-                name="df"
-                value={quadra.dividers[0]?.df}
-              />
-            </div>
+            {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
 
           </div>
           <div className="w-2/4 flex justify-between items-start gap-5 mt-10">

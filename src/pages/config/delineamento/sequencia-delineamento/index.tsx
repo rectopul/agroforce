@@ -405,7 +405,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await sequenciaDelineamentoService
-      .getAll(filterApplication)
+      .getAll(`${filterApplication}&id_delineamento=${idDelineamento}`)
       .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
           const newData = response.map((row: any) => {

@@ -275,6 +275,7 @@ export class ImportLocalController {
               }
               localCultureDTO.created_by = Number(createdBy);
               unityCultureDTO.created_by = Number(createdBy);
+              unityCultureDTO.id_safra = Number(idSafra);
               const localAlreadyExists = await localController.getAll(
                 { id_local_culture: localCultureDTO.id_local_culture },
               );
