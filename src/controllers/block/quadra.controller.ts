@@ -10,6 +10,8 @@ export class QuadraController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log(options);
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -71,7 +73,6 @@ export class QuadraController {
         skip,
         orderBy,
       );
-
       if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
@@ -89,7 +90,6 @@ export class QuadraController {
       if (!id) throw new Error('Dados inválidos');
 
       const response: any = await this.quadraRepository.findOne(id);
-
       if (!response) throw new Error('Item não encontrado');
       response.tf = response.dividers[response.dividers.length - 1].t4_f;
 
