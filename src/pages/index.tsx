@@ -18,8 +18,7 @@ import { AiOutlineContainer } from 'react-icons/ai';
 // import {
 //   Bubble, PolarArea, Radar, Bar,
 // } from 'react-chartjs-2';
-import { faker } from '@faker-js/faker';
-
+// import { faker } from '@faker-js/faker';
 
 import { Content } from '../components/Content';
 
