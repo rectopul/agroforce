@@ -366,11 +366,11 @@ export class ImportGenotypeController {
                       ? item.dt_import.getTime()
                       : lastDtImport;
                   });
-                  console.log('lastDtImport');
+                  console.log('lastDtImport genotype');
                   console.log(lastDtImport);
-                  console.log('spreadSheet[row][column]');
+                  console.log('spreadSheet[row][column] genotype');
                   console.log(spreadSheet[row][column]);
-                  console.log('getTime()');
+                  console.log('getTime() genotype');
                   console.log(spreadSheet[row][column].getTime());
                   if (
                     lastDtImport
