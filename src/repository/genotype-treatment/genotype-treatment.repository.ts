@@ -25,7 +25,7 @@ export class GenotypeTreatmentRepository {
     return result;
   }
 
-  async replace(idList: any, idLote: number) {
+  async replaceLote(idList: any, idLote: number) {
     const result = await prisma.genotype_treatment.updateMany({
       where: {
         id: {
@@ -34,6 +34,20 @@ export class GenotypeTreatmentRepository {
       },
       data: {
         id_lote: idLote,
+      },
+    });
+    return result;
+  }
+
+  async replaceGenotype(idList: any, idGenotype: number) {
+    const result = await prisma.genotype_treatment.updateMany({
+      where: {
+        id: {
+          in: idList,
+        },
+      },
+      data: {
+        id_genotipo: idGenotype,
       },
     });
     return result;

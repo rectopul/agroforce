@@ -52,7 +52,7 @@ export class GenotypeTreatmentController {
 
       const select = {
         id: true,
-        id_safra: true,
+        safra: { select: { safraName: true } },
         genotipo: {
           select: {
             name_genotipo: true,

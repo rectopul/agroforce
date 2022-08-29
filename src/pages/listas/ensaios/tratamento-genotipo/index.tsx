@@ -2,7 +2,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { Checkbox as Checkbox1 } from '@mui/material';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -20,12 +19,13 @@ import {
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload } from 'react-icons/bs';
+import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-// import Modal from 'react-modal';
+import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import { FaLevelUpAlt } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import readXlsxFile from 'read-excel-file';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -44,6 +44,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   genotypeTreatmentService,
+  importService,
   userPreferencesService,
 } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
@@ -169,8 +170,6 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const checkedItems: any = {};
-  const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -282,25 +281,6 @@ export default function Listagem({
       sorting: true,
     };
   }
-
-  const setCheck = (id: any) => {
-    checkedItems[id] = checkedItems[id]
-      ? false
-      : treatments[id - 1]?.genotipo.name_genotipo;
-    console.log('checkedItems');
-    console.log(checkedItems);
-  };
-
-  const setAllCheck = () => {
-    setCheckedAllItems(!checkedAllItems);
-    treatments?.forEach((item: any) => {
-      checkedItems[item.id] = checkedItems[item.id]?.length > 0
-        ? false
-        : item?.genotipo.name_genotipo;
-    });
-    console.log('checkedItems');
-    console.log(checkedItems);
-  };
 
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
@@ -451,6 +431,7 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
+            newItem.safra = item.safra.safraName;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
             newItem.tecnologia = item.assay_list.tecnologia.name;
@@ -458,7 +439,6 @@ export default function Listagem({
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
-            newItem.status_ensaio = item.assay_list.status;
             newItem.genotipo = item.genotipo.name_genotipo;
             newItem.nca = item.lote.ncc;
             newItem.novo_genotipo = '';
@@ -481,7 +461,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
         }
       });
   };
@@ -532,112 +512,47 @@ export default function Listagem({
     );
   }
 
-  function importValidate() {
-    // const user = 23;
-    // const id_safra = 2;
-    // const id_culture = 1;
-    // const rows = [
-    //   [
-    //     'GLI (Grupo de linhagem)',
-    //     'SAFRA',
-    //     'FOCO',
-    //     'ENSAIO',
-    //     'Código da tecnologia',
-    //     'BGM',
-    //     'NT',
-    //     'Nome do genótipo',
-    //     'NCA',
-    //     'Novo Nome do genótipo',
-    //     'T',
-    //     'Novo NCA',
-    //   ],
-    //   [
-    //     'BKF2RL(0)/001',
-    //     '2021_22',
-    //     'CO',
-    //     'F2',
-    //     0,
-    //     13,
-    //     1,
-    //     'TMGC21-0-61301_05',
-    //     202120585414,
-    //     'T',
-    //     'TMGC21-0-61301_05',
-    //     202120585415,
-    //   ],
-    //   [
-    //     'BKF2RL(0)/001',
-    //     '2021_22',
-    //     'CO',
-    //     'F2',
-    //     0,
-    //     13,
-    //     2,
-    //     'TMGC21-0-61301_07',
-    //     202120585416,
-    //     'TMGC21-0-61301_07',
-    //     'L',
-    //     202120585413,
-    //   ],
-    //   [
-    //     'BKF2RL(0)/001',
-    //     '2021_22',
-    //     'CO',
-    //     'F2',
-    //     0,
-    //     5,
-    //     3,
-    //     'TMGC21-0-61301_04',
-    //     202120585412,
-    //     'TMGC21-0-61301_04',
-    //     'T',
-    //     202120585417,
-    //   ],
-    // ];
-    // importService.validate({
-    //   spreadSheet: rows, moduleId: 27, idSafra: id_safra, idCulture: id_culture, created_by: user, table: 'tratmento',
-    // }).then(({ status, message }: any) => {
-    //   if (status !== 200) {
-    //     Swal.fire({
-    //       html: message,
-    //       width: '900',
-    //     });
-    //   }
-    //   if (status === 200) {
-    //     Swal.fire({
-    //       html: message,
-    //       width: '800',
-    //     });
-    //   }
-    // });
+  function readExcel(value: any) {
+    readXlsxFile(value[0]).then((rows) => {
+      importService.validate({
+        table: 'REPLACEMENT_GENOTYPE ',
+        spreadSheet: rows,
+        moduleId: 27,
+        idSafra: userLogado.safras.safra_selecionada,
+        created_by: userLogado.id,
+      }).then(({ message }) => {
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+      });
+    });
   }
 
-  async function replaceNca() {
-    const checkedTreatments = JSON.stringify(checkedItems);
-    localStorage.setItem('checkedTreatments', checkedTreatments);
-    router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
-  }
-
-  function replaceGenotipo() {
-    // const selectedTreatments: any = treatments?.map((_, index) => (checkedItems[index]
-    //   ? treatments[index] : null));
-    // console.log('selectedTreatments');
-    // console.log(selectedTreatments);
-    // //let nameGenotipo = selectedTreatments[1].genotipo.name_genotipo;
-    // const validateReplace = selectedTreatments.map((item: any) => {
-    //   if (item?.genotipo.name_genotipo === nameGenotipo) {
-    //     nameGenotipo = item.genotipo.name_genotipo;
-    //     return true;
-    //   }
-    //   nameGenotipo = item.genotipo.name_genotipo;
-    //   return false;
-    // });
-    // console.log('validateReplace');
-    // console.log(validateReplace);
-  }
-
-  async function handleSubmit() {
-    console.log(rowsSelected);
+  async function handleSubmit(event: any) {
+    const genotypeButton = document.querySelector("input[id='genotipo']:checked");
+    const ncaButton = document.querySelector("input[id='nca']:checked");
+    const inputFile: any = document.getElementById('import');
+    event.preventDefault();
+    if (genotypeButton) {
+      const checkedTreatments: any = rowsSelected.map((item: any) => (
+        { id: item.id }
+      ));
+      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
+      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+    } else if (ncaButton) {
+      const checkedTreatments: any = rowsSelected.map((item: any) => (
+        { id: item.id, genotipo: item.genotipo.name_genotipo }
+      ));
+      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
+      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+    } else if (inputFile?.files.length !== 0) {
+      readExcel(inputFile.files);
+    } else {
+      Swal.fire('Selecione alguma opção ou import');
+    }
   }
 
   async function setRadioStatus() {
@@ -646,12 +561,12 @@ export default function Listagem({
       selectedGenotype[item.genotipo.name_genotipo] = true;
     });
     const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
+    if (checkedLength.length > 1) {
+      setNccIsValid(true);
+    }
     if (rowsSelected.length <= 0) {
       setNccIsValid(true);
       setGenotypeIsValid(true);
-    }
-    if (checkedLength.length > 1) {
-      setNccIsValid(true);
     }
   }
 
@@ -666,19 +581,22 @@ export default function Listagem({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
-      {/* <Modal
+      <Modal
         isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
         onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
-        overlayClassName="fixed inset-0 flex bg-transparent  mt-12  justify-center"
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
           w-full h-36
-          h-52
+          h-64
           max-w-xl
           bg-gray-50
           rounded-tl-2xl
           rounded-tr-2xl
           rounded-br-2xl
+          rounded-bl-2xl
           pt-2
           pb-4
           px-8
@@ -691,38 +609,39 @@ export default function Listagem({
             type="button"
             className="flex absolute top-4 right-3 justify-end"
             onClick={() => {
-              setRadioStatus();
               setIsOpenModal(!isOpenModal);
+              setNccIsValid(false);
+              setGenotypeIsValid(false);
             }}
           >
-            <RiCloseCircleFill className="fill-red-600 text-lg hover:fill-red-800" />
+            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
           </button>
 
           <div className="flex px-4  justify-between">
             <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-sm font-medium">Ação</h2>
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">Ação</h2>
               <div>
                 <div className="border-l-8 border-l-blue-600 mt-4">
-                  <h2 className="mb-2 font-normal text-base ml-2 text-gray-900">
+                  <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900">
                     Substituir
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
-                  <label htmlFor="genotipo" className="font-normal">
+                  <label htmlFor="genotipo" className="font-normal text-base">
                     Genótipo
                   </label>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <input type="radio" name="substituir" id="nca" disabled={nccIsValid} />
-                <label htmlFor="nca" className="font-normal">
+                <label htmlFor="nca" className="font-normal text-base">
                   NCA
                 </label>
               </div>
             </header>
             <div>
-              <div className="mb-2 text-blue-600 text-sm mt-2 font-medium">
+              <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
                 <h2>
                   Total selecionados:
                   {' '}
@@ -731,7 +650,7 @@ export default function Listagem({
               </div>
 
               <div className="border-l-8 border-l-blue-600">
-                <h2 className="mb-2 font-normal text-base ml-2 text-gray-900 mt-6">
+                <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-6">
                   Importa Arquivo:
                 </h2>
               </div>
@@ -741,7 +660,6 @@ export default function Listagem({
                 id="import"
                 type="file"
                 className="
-
               shadow
               appearance-none
               bg-white bg-no-repeat
@@ -756,17 +674,20 @@ export default function Listagem({
               />
             </div>
           </div>
-
-          <button
-            type="submit"
-            value="Cadastrar"
-            className="ml-auto mt-6 bg-green-600 text-white px-4   rounded-lg text-sm hover:bg-green-800"
-            onClick={() => handleSubmit()}
-          >
-            confirmar
-          </button>
+          <div className="flex justify-end py-0">
+            <div className="h-10 w-40">
+              <button
+                type="submit"
+                value="Cadastrar"
+                className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
+                onClick={(e) => handleSubmit(e)}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
         </form>
-      </Modal> */}
+      </Modal>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main
@@ -920,10 +841,10 @@ export default function Listagem({
               data={afterFilter ? treatments : []}
               options={{
                 selection: true,
+                selectionProps: (rowData: any) => (isOpenModal && { disabled: rowData }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
-                  // zIndex: 20, tava assim
                 },
                 rowStyle: { background: '#f9fafb' },
                 search: false,
@@ -948,14 +869,15 @@ export default function Listagem({
                   >
                     <div className="h-12 w-32 ml-0">
                       <Button
-                        title="Ação"
-                        value="Ação"
-                        bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
+                        title="Substituir"
+                        value="Substituir"
                         textColor="white"
-                        onClick={() => { setIsOpenModal(!isOpenModal); }}
-                        disabled={rowsSelected?.length <= 0}
-                        // icon={<FaEllipsisV size={20} />}
-                        icon={<FaLevelUpAlt size={20} />}
+                        onClick={() => {
+                          setRadioStatus();
+                          setIsOpenModal(!isOpenModal);
+                        }}
+                        bgColor="bg-blue-600"
+                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
