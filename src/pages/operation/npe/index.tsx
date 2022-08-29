@@ -3,8 +3,7 @@ import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -18,15 +17,15 @@ import {
 } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { Router, useRouter } from 'next/router';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { removeCookies } from 'cookies-next';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import { npeService, userPreferencesService } from '../../../services';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -47,6 +46,7 @@ interface INpeProps {
   epoca: number;
   npei: number;
   npef: number;
+  consumedQT: number;
   prox_npe: number;
   status?: number;
   created_by: number;
@@ -78,11 +78,11 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -95,8 +95,9 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,safra,foco,ensaio,tecnologia,local,npei,epoca,status',
+      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef',
   };
+  preferences.table_preferences = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef';
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -107,13 +108,19 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [selectedNPE, setSelectedNPE] = useState<INpeProps[]>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
       title: 'Favorito ',
       value: 'id',
       defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Local ',
+      value: 'local',
+      defaultChecked: () => camposGerenciados.includes('local'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -141,9 +148,9 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
-      value: 'local',
-      defaultChecked: () => camposGerenciados.includes('local'),
+      title: 'Epoca ',
+      value: 'epoca',
+      defaultChecked: () => camposGerenciados.includes('epoca'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -153,26 +160,12 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
-      value: 'epoca',
-      defaultChecked: () => camposGerenciados.includes('epoca'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Grupo ',
-      value: 'group',
-      defaultChecked: () => camposGerenciados.includes('group'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Status',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      title: 'NPE Final',
+      value: 'npef',
+      defaultChecked: () => camposGerenciados.includes('npef'),
     },
   ]);
 
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -201,8 +194,8 @@ export default function Listagem({
       filterNPE,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
-      }`;
+        }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
+        }`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -220,7 +213,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatusBeforeEdit = filterApplication.split('');
+  const filterStatus = filterApplication.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -236,8 +229,17 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: true,
+      sorting: false,
     };
+  }
+
+  function handleCheckBoxClick(data: any) {
+    if (selectedNPE?.includes(data)) {
+      setSelectedNPE(selectedNPE.filter((item) => item != data))
+    } else {
+      setSelectedNPE([...selectedNPE, data])
+    }
+    console.log(selectedNPE)
   }
 
   function idHeaderFactory() {
@@ -246,26 +248,16 @@ export default function Listagem({
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: (rowData: INpeProps) => (rowData ? (
+        <div className="h-10 flex">
+          <div >
+            <input type='checkbox' onClick={() => handleCheckBoxClick(rowData)}></input>
           </div>
         </div>
       ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        <div className="h-10 flex">
+          <div >
+            <input type='checkbox' onClick={() => handleCheckBoxClick(rowData)}></input>
           </div>
         </div>
       )),
@@ -284,7 +276,6 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
-              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, {
                 status: rowData.status,
@@ -300,7 +291,6 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
-              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => handleStatus(rowData.id, {
                 status: rowData.status,
@@ -342,14 +332,11 @@ export default function Listagem({
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
       }
-      if (columnCampos[item] === 'group') {
-        tableFields.push(headerTableFactory('Grupo', 'group.group'));
-      }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
       }
-      if (columnCampos[item] === 'status') {
-        tableFields.push(statusHeaderFactory());
+      if (columnCampos[item] === 'npef') {
+        tableFields.push(headerTableFactory('NPE Final', 'npef'));
       }
     });
     return tableFields;
@@ -370,8 +357,7 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-    setOrderBy(column);
-    setOrderType(typeOrder);
+
     if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -450,8 +436,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
+      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+      }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -496,27 +482,32 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await npeService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map(
-          (row: any) => {
+    if (!filterApplication.includes('paramSelect')) {
+      filterApplication += `&paramSelect=${camposGerenciados}`;
+    }
+
+    await npeService.getAll(filterApplication).then((response) => {
+      if (response.status === 200) {
+        const newData = response.response.map(
+          (row: { avatar: any; status: any }) => {
             delete row.avatar;
             if (row.status === 0) {
               row.status = 'Inativo';
             } else {
               row.status = 'Ativo';
             }
-            row.safra = row.safra?.safraName;
-            row.foco = row.foco?.name;
-            row.type_assay = row.type_assay?.name;
-            row.tecnologia = row.tecnologia?.name;
-            row.local = row.local?.name_local_culture;
 
-            delete row.npef;
-            delete row.id;
             return row;
           },
         );
+
+        newData.map((item: any) => {
+          item.foco = item.foco?.name;
+          item.local = item.local?.name_local_culture;
+          item.safra = item.safra?.safraName;
+          item.tecnologia = item.tecnologia?.name;
+          item.type_assay = item.type_assay?.name;
+        });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
@@ -550,27 +541,22 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await npeService.getAll(parametersFilter).then(({ status, response }) => {
-      if (status === 200) {
-        setNPE(response);
+    await npeService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setNPE(response.response);
       }
     });
   }
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-4 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+      <div className="h-10 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
           {name}
         </label>
         <Input
@@ -595,12 +581,12 @@ export default function Listagem({
       <Head>
         <title>Listagem dos NPEs</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="operation">
         <main
           className="h-full w-full
           flex flex-col
           items-start
-          gap-4
+          gap-8
         "
         >
           <AccordionFilter title="Filtrar npe's">
@@ -621,14 +607,14 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
+                      defaultValue={filterStatus[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -649,18 +635,15 @@ export default function Listagem({
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
                 </div>
 
-                <div style={{ width: 40 }}>
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => { }}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -698,13 +681,16 @@ export default function Listagem({
                   >
                     <div className="h-12">
                       <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Gerar sorteio"
+                        value="Gerar sorteio"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="npe/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
+                        onClick={() => {
+                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE))
+                          router.push({
+                            pathname: "/operation/npe/experimento"
+                          })
+                        }}
                       />
                     </div>
 
@@ -784,9 +770,7 @@ export default function Listagem({
                             downloadExcel();
                           }}
                         />
-                        <div style={{ width: 20 }} />
                         <Button
-                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -809,11 +793,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => setCurrentPage(currentPage - 10)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
+                      disabled={currentPage <= 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -842,8 +826,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(currentPage + 10)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -860,7 +843,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
@@ -869,15 +852,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
 
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_safra=${id_safra}`
-    : `filterStatus=1&id_safra=${id_safra}`;
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  const filterApplication = `filterStatus=1&id_safra=${id_safra}`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_safra=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
@@ -893,7 +874,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
-  console.log(allNpe);
   return {
     props: {
       allNpe,

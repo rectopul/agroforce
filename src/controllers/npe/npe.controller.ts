@@ -94,11 +94,13 @@ export class NpeController {
       } else {
         select = {
           id: true,
+          id_safra: true,
+          id_local: true,
+          local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true } },
           type_assay: { select: { name: true } },
           tecnologia: { select: { name: true } },
-          local: { select: { name_local_culture: true } },
           group: { select: { group: true } },
           npei: true,
           npef: true,
@@ -114,6 +116,19 @@ export class NpeController {
         skip,
         orderBy,
       );
+
+      response.map((value: any, index: any, elements: any) => {
+        const newItem = value;
+        const next = elements[index + 1];
+        if (next) {
+          newItem.consumedQT = next.npei - newItem.npei;
+          newItem.nextNPE = next.npei;
+        } else {
+          newItem.consumedQT = 0;
+          newItem.nextNPE = 0;
+        }
+        return newItem;
+      });
 
       if (!response || response.total <= 0) {
         return {
