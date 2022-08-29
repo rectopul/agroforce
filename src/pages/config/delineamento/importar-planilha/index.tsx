@@ -133,7 +133,7 @@ export default function Importar() {
   );
 }
 
-// export const getServerSideProps:GetServerSideProps = async ({req}) => {
+// export const getServerSideProps:GetServerSideProps = async ({req}: any) => {
 //     const { publicRuntimeConfig } = getConfig();
 //     const  token  =  req.cookies.token;
 //     const  cultureId  =  req.cookies.cultureId;
