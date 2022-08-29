@@ -2,7 +2,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { Checkbox as Checkbox1 } from '@mui/material';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -23,11 +22,8 @@ import { BsDownload } from 'react-icons/bs';
 import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-
 import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import { FaLevelUpAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
 import {
@@ -174,8 +170,6 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const checkedItems: any = {};
-  const [checkedAllItems, setCheckedAllItems] = useState<boolean>(true);
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -847,11 +841,10 @@ export default function Listagem({
               data={afterFilter ? treatments : []}
               options={{
                 selection: true,
-                selectionProps: (rowData) => (isOpenModal && { disabled: rowData }),
+                selectionProps: (rowData: any) => (isOpenModal && { disabled: rowData }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
-                  // zIndex: 20, tava assim
                 },
                 rowStyle: { background: '#f9fafb' },
                 search: false,
@@ -884,9 +877,6 @@ export default function Listagem({
                           setIsOpenModal(!isOpenModal);
                         }}
                         bgColor="bg-blue-600"
-                        // bgColor={rowsSelected?.length > 0 ? 'bg-blue-600' : 'bg-gray-600'}
-                        // disabled={rowsSelected?.length <= 0}
-                        // icon={<FaEllipsisV size={20} />}
                         icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
