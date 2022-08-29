@@ -489,7 +489,7 @@ export default function NovoUsuario({
   );
 }
 
-export const  = async ({ req }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const { token } = req.cookies;
