@@ -268,7 +268,7 @@ export default function AtualizarTipoEnsaio({
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 router.push(`envelope/atualizar?id=${rowData.id}`);
               }}
-              bgColor="bg-red-600"
+              bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
@@ -363,9 +363,10 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.type_assay = row.type_assay?.name;
+            row.tipo_ensaio = row.type_assay?.name;
             row.safra = row.safra?.safraName;
-
+            delete row.id;
+            delete row.type_assay;
             return row;
           });
 
@@ -551,8 +552,9 @@ export default function AtualizarTipoEnsaio({
                       <Button
                         title="Cadastrar Quant. de sementes por envelope"
                         value="Cadastrar Quant. de sementes por envelope"
-                        bgColor="bg-blue-600"
+                        bgColor={seeds.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+                        disabled={seeds.length}
                         onClick={() => {
                           router.push(
                             `envelope/cadastro?id_type_assay=${idTypeAssay}`,
@@ -701,7 +703,7 @@ export default function AtualizarTipoEnsaio({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

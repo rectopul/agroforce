@@ -386,6 +386,7 @@ export default function Atualizar({
             const newRow = row;
             delete newRow.npe;
             newRow.group = Number(row.group);
+            delete newRow.id;
             return newRow;
           });
 
@@ -715,7 +716,7 @@ export default function Atualizar({
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   query,
-}) => {
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

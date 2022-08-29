@@ -529,7 +529,7 @@ export default function AtualizarUsuario({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   // Fetch data from external API
   const response = await prisma.user.findFirst({
     where: {

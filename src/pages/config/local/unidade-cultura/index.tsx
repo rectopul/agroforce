@@ -75,6 +75,7 @@ interface IGenerateProps {
 interface IData {
   allCultureUnity: IUnityCultureProps[];
   totalItems: number;
+  idSafra: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;
@@ -87,6 +88,7 @@ export default function Listagem({
   itensPerPage,
   filterApplication,
   totalItems,
+  idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
 }: IData) {
@@ -214,7 +216,7 @@ export default function Listagem({
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await unidadeCulturaService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&id_safra=${idSafra}`)
         .then((response) => {
           setFilter(parametersFilter);
           setTotalItems(response.total);
@@ -432,6 +434,14 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+            newRow.nome_lugar_cultura = newRow.local?.name_local_culture;
+            newRow.rotulo = newRow.local?.label;
+            newRow.mloc = newRow.local?.mloc;
+            newRow.fazenda = newRow.local?.adress;
+            newRow.pais = newRow.local?.label_country;
+            newRow.regiao = newRow.local?.label_region;
+            newRow.localidade = newRow.local?.name_locality;
+
             newRow.DT = new Date();
             delete newRow.id;
             delete newRow.id_unity_culture;
@@ -472,9 +482,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
     }
 
     if (filter) {
@@ -766,7 +776,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (
@@ -774,6 +784,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
+  const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -789,7 +800,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
-  const param = `skip=0&take=${itensPerPage}`;
+  const param = `skip=0&take=${itensPerPage}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -808,6 +819,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     props: {
       allCultureUnity,
       totalItems,
+      idSafra,
       itensPerPage,
       filterApplication,
       pageBeforeEdit,

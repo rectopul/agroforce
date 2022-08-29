@@ -1,8 +1,8 @@
-import handleOrderForeign from 'src/shared/utils/handleOrderForeign';
-import handleError from 'src/shared/utils/handleError';
-import { NpeRepository } from '../repository/npe.repository';
-import { GroupController } from './group.controller';
-import { prisma } from '../pages/api/db/db';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import handleError from '../../shared/utils/handleError';
+import { NpeRepository } from '../../repository/npe.repository';
+import { GroupController } from '../group.controller';
+import { prisma } from '../../pages/api/db/db';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -66,6 +66,10 @@ export class NpeController {
         parameters.epoca = String(options.epoca);
       }
 
+      if (options.id_local) {
+        parameters.id_local = Number(options.id_local);
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -73,6 +77,8 @@ export class NpeController {
       if (options.orderBy) {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      } else {
+        orderBy = '{"npei":"asc"}';
       }
 
       if (options.paramSelect) {
@@ -88,14 +94,15 @@ export class NpeController {
       } else {
         select = {
           id: true,
-          local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true } },
-          epoca: true,
-          tecnologia: { select: { name: true } },
           type_assay: { select: { name: true } },
+          tecnologia: { select: { name: true } },
+          local: { select: { name_local_culture: true } },
+          group: { select: { group: true } },
           npei: true,
           npef: true,
+          epoca: true,
           status: true,
         };
       }
@@ -139,13 +146,16 @@ export class NpeController {
   async validateNpeiDBA(data: any) {
     try {
       if (data.safra) {
-        const group: any = await this.groupController.getAll({ id_safra: data.safra, id_foco: data.foco });
+        const group: any = await this.groupController.getAll(
+          { id_safra: data.safra, id_foco: data.foco },
+        );
         if (group.response.length > 0) {
           const safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
                                                   WHERE n.id_safra = ${data.safra}
                                                   AND n.id_group = ${group.response[0]?.id}
                                                   AND n.npei = ${data.npei}
+                                                  AND n.status = ${1}
                                                   ORDER BY npei DESC 
                                                   LIMIT 1`;
           if ((safra[0])) {

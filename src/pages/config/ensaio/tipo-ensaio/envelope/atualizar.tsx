@@ -153,7 +153,7 @@ export default function Cadastro({ envelope }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/envelope`;
   const { token } = context.req.cookies;

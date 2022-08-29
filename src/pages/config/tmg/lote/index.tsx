@@ -98,7 +98,7 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
@@ -345,7 +345,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await loteService.getAll(filter).then(({ status, response }) => {
+    await loteService.getAll(`${filter}&id_safra=${idSafra}`).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
@@ -353,8 +353,9 @@ export default function Listagem({
           newItem.name_main = item.genotipo.name_main;
           newItem.gmr = item.genotipo.gmr;
           newItem.bgm = item.genotipo.bgm;
-          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.desc}`;
+          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
           delete newItem.id;
+          delete newItem.id_genotipo;
           delete newItem.genotipo;
           return newItem;
         });
@@ -736,7 +737,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

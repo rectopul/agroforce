@@ -60,8 +60,8 @@ export class LayoutQuadraController {
         id: true,
         esquema: true,
         plantadeira: true,
-        disparos: true,
         tiros: true,
+        disparos: true,
         parcelas: true,
         status: true,
         id_culture: true,
@@ -128,7 +128,6 @@ export class LayoutQuadraController {
     } catch (error: any) {
       handleError('Layout Controller', 'Update', error.message);
       throw new Error('[Controller] - Update Layout erro');
-
     }
   }
 }

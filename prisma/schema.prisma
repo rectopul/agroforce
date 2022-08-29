@@ -80,6 +80,7 @@ model safra {
   lote               lote[]
   npe                npe[]
   quadra             quadra[]
+  cultureUnity       cultureUnity[]
 
   @@index([id_culture], map: "safra_id_culture_fkey")
 }
@@ -187,13 +188,15 @@ model local {
 
 model cultureUnity {
   id                 Int       @id @default(autoincrement())
+  id_safra           Int
   id_local           Int
   id_unity_culture   Int
   year               Int
-  name_unity_culture String    @unique
+  name_unity_culture String
   created_by         Int
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
+  safra              safra     @relation(fields: [id_safra], references: [id])
 
   @@index([id_local], map: "cultureUnity_id_local_fkey")
 }

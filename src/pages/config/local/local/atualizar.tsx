@@ -14,10 +14,10 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { localService, unidadeCulturaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { localService, unidadeCulturaService, userPreferencesService } from '../../../../services';
 import {
   AccordionFilter,
   Button, CheckBox, Content,
@@ -280,25 +280,16 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados},foco&id_local=${id_local}`;
-    }
     await unidadeCulturaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
+        const newData = response.response.map((row: any) => {
+          delete row.id;
+          delete row.id_unity_culture;
+          delete row.id_local;
+          delete row.local;
+          delete row.id_unity_culture;
 
           return row;
-        });
-
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.safra = item.safra?.safraName;
-          return item;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -640,7 +631,7 @@ export default function AtualizarLocal({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;

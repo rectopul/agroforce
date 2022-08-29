@@ -180,7 +180,7 @@ export default function NovoLocal({ delineamentoEdit }: IData) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
   const { token } = context.req.cookies;

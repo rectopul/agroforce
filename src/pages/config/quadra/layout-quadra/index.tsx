@@ -554,18 +554,17 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
     await layoutQuadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = quadras.map((row) => {
+        const newData = quadras.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+          delete row.id;
+          delete row.id_culture;
+          delete row.tableData;
 
           return row;
         });
@@ -904,7 +903,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

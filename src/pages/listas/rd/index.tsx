@@ -116,6 +116,8 @@ export default function Import({
         setExecuteUpload(0);
       }
     });
+
+    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -754,7 +756,7 @@ export default function Import({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 15;

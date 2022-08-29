@@ -517,19 +517,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-    filterApplication += `&id_culture=${cultureId}`;
-
     await delineamentoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = delineamento.map((row) => {
+        const newData = delineamento.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });
@@ -888,7 +885,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

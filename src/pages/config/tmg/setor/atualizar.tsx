@@ -132,7 +132,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlList = `${publicRuntimeConfig.apiUrl}/department`;
   const { token } = context.req.cookies;

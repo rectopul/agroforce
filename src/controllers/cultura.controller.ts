@@ -33,8 +33,7 @@ export class CulturaController {
       }
 
       if (options.filterSearch) {
-        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
-        parameters.desc = JSON.parse(options.filterSearch);
+        parameters.desc = JSON.parse(`{"contains":"${options.filterSearch}"}`);
       }
 
       if (options.paramSelect) {

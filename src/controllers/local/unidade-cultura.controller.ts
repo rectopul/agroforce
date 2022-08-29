@@ -49,10 +49,11 @@ export class UnidadeCulturaController {
 
       const select = {
         id: true,
+        id_safra: true,
         id_unity_culture: true,
         id_local: true,
-        year: true,
         name_unity_culture: true,
+        year: true,
         local: true,
       };
 
@@ -66,6 +67,10 @@ export class UnidadeCulturaController {
 
       if (options.id_local) {
         parameters.id_local = Number(options.id_local);
+      }
+
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

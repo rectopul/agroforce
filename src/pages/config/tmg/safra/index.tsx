@@ -464,18 +464,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = safras.map((row) => {
+        const newData = safras.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativos' as any;
           } else {
             row.status = 'Ativos' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });
@@ -849,7 +847,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()

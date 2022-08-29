@@ -531,7 +531,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
   const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;

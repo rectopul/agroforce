@@ -63,8 +63,8 @@ export class ExperimentController {
         select = {
           id: true,
           density: true,
-          period: true,
           repetitionsNumber: true,
+          period: true,
           nlp: true,
           clp: true,
           eel: true,
@@ -114,7 +114,6 @@ export class ExperimentController {
               trat_repeticao: true,
             },
           },
-          created_at: true,
         };
       }
 

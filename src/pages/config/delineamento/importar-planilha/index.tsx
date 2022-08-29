@@ -1,10 +1,10 @@
+import React, { useState } from 'react';
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
 import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -14,11 +14,15 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
+import ComponentLoading from '../../../../components/Loading';
+
 export default function Importar() {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'DELINEAMENTO' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -27,6 +31,8 @@ export default function Importar() {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
         table: 'DELIMITATION',
         spreadSheet: rows,
@@ -34,6 +40,8 @@ export default function Importar() {
         idCulture: userLogado.userCulture.cultura_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -45,6 +53,8 @@ export default function Importar() {
         }
       });
     });
+
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
@@ -58,6 +68,8 @@ export default function Importar() {
   });
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação Delineamento</title>
       </Head>
@@ -121,7 +133,7 @@ export default function Importar() {
   );
 }
 
-// export const getServerSideProps:GetServerSideProps = async ({req}) => {
+// export const getServerSideProps:GetServerSideProps = async ({req}: any) => {
 //     const { publicRuntimeConfig } = getConfig();
 //     const  token  =  req.cookies.token;
 //     const  cultureId  =  req.cookies.cultureId;

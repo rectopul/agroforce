@@ -314,19 +314,16 @@ export default function Atualizarquadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
-    }
-
     await layoutChildrenService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
-
+          delete row.id;
+          delete row.id_layout;
           return row;
         });
 
@@ -345,7 +342,7 @@ export default function Atualizarquadra({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'disparos.xlsx');
+        XLSX.writeFile(workBook, 'Disparos.xlsx');
       }
     });
   };
@@ -589,9 +586,10 @@ export default function Atualizarquadra({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = context.req.cookies;
 

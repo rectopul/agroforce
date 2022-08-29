@@ -8,7 +8,7 @@ import { FocoController } from './foco.controller';
 import { TypeAssayController } from './tipo-ensaio.controller';
 import { AssayListController } from './assay-list/assay-list.controller';
 import { TecnologiaController } from './technology/tecnologia.controller';
-import { NpeController } from './npe.controller';
+import { NpeController } from './npe/npe.controller';
 import { DelineamentoController } from './delimitation/delineamento.controller';
 import { SequenciaDelineamentoController } from './sequencia-delineamento.controller';
 import { GenotipoController } from './genotype/genotipo.controller';
@@ -40,6 +40,7 @@ import { ImportBlockController } from './block/import-block.controller';
 import calculatingExecutionTime from '../shared/utils/calculatingExecutionTime';
 import { ImportLayoutBlockController } from './block-layout/block-layout-import.controller';
 import { ImportDelimitationController } from './delimitation/delimitation-import.controller';
+import { ImportNpeController } from './npe/import-npe.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -251,12 +252,7 @@ export class ImportController {
 
       // Validação do modulo NPE
       if (data.moduleId === 14) {
-        response = await this.validateNPE(responseLog?.id, data);
-        if (response == 'save') {
-          response = 'Itens cadastrados com sucesso!';
-        } else {
-          erro = true;
-        }
+        return await ImportNpeController.validate(responseLog?.id, data);
       }
 
       // Validação do modulo quadra

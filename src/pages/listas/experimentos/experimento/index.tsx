@@ -447,26 +447,20 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    const excelFilters = `${filterApplication}&paramSelect=${camposGerenciados}`;
-    // if (!filterApplication.includes('paramSelect')) {
-    //   filterApplication +=
-    // }
-
-    await experimentService.getAll(excelFilters).then(({ status, response, message }: any) => {
+    await experimentService.getAll(filterApplication).then(({ status, response, message }: any) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
-          if (item.assay_list) {
-            newItem.gli = item.assay_list.gli;
-            newItem.protocol_name = item.assay_list.protocol_name;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.type_assay = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
-          }
-          if (item.delineamento) {
-            newItem.repeticao = item.delineamento.repeticao;
-            newItem.delineamento = item.delineamento.name;
-          }
+          newItem.gli = item.assay_list?.gli;
+          newItem.protocol_name = item.assay_list?.protocol_name;
+          newItem.foco = item.assay_list?.foco.name;
+          newItem.type_assay = item.assay_list?.type_assay.name;
+          newItem.tecnologia = item.assay_list?.tecnologia.name;
+          newItem.local = newItem.local?.name_local_culture;
+          newItem.repeticao = item.delineamento?.repeticao;
+          newItem.delineamento = item.delineamento?.name;
+
+          delete newItem.id;
           delete newItem.assay_list;
           return newItem;
         });
@@ -782,7 +776,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;

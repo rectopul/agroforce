@@ -515,13 +515,13 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
     await localService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = row.status === 0 ? 'Inativo' : 'Ativo';
+          delete row.dt_import;
+          delete row.id;
+          delete row.cultureUnity;
           const dataExp = new Date();
           let hours: string;
           let minutes: string;
@@ -562,7 +562,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Locais.xlsx');
+        XLSX.writeFile(workBook, 'Lugar de Cultura.xlsx');
       }
     });
   };
@@ -884,7 +884,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

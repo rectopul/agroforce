@@ -492,6 +492,7 @@ export default function Listagem({
         dataExcel.forEach((line: any) => {
           delete line.avatar;
           delete line.id;
+          delete line.email;
 
           if (line.status === 0) {
             line.status = 'Inativo';
@@ -817,7 +818,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
