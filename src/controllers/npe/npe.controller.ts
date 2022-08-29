@@ -101,7 +101,6 @@ export class NpeController {
           foco: { select: { name: true } },
           type_assay: { select: { name: true } },
           tecnologia: { select: { name: true } },
-          local: { select: { name_local_culture: true } },
           group: { select: { group: true } },
           npei: true,
           npef: true,
@@ -129,7 +128,7 @@ export class NpeController {
           newItem.nextNPE = 0;
         }
         return newItem;
-      })
+      });
 
       if (!response || response.total <= 0) {
         return {

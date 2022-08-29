@@ -78,11 +78,11 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -201,8 +201,8 @@ export default function Listagem({
       filterNPE,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
-        }`;
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
+      }`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -450,8 +450,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-      }&epoca=${String(data.epoca)}`;
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -649,7 +649,7 @@ export default function Listagem({
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
                 </div>
 
-                  <div style={{ width: 40 }} />
+                <div style={{ width: 40 }}>
                   <div className="h-7 w-32 mt-6">
                     <Button
                       onClick={() => { }}
@@ -893,7 +893,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
-  console.log(allNpe)
+  console.log(allNpe);
   return {
     props: {
       allNpe,
