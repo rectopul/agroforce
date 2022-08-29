@@ -572,7 +572,7 @@ export default function Listagem({
           const workSheet = XLSX.utils.json_to_sheet(newData);
 
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
 
           // Buffer
           XLSX.write(workBook, {
