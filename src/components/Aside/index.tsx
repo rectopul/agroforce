@@ -1,4 +1,5 @@
 import { HiOutlineClipboardList, HiOutlineMail } from 'react-icons/hi';
+import { RiUserSettingsFill } from 'react-icons/ri';
 import { IoFingerPrintSharp } from 'react-icons/io5';
 import { BiSearchAlt } from 'react-icons/bi';
 import { GiThreeLeaves } from 'react-icons/gi';
@@ -31,6 +32,12 @@ export function Aside({ moduloActive }: any) {
           icon={<HiOutlineClipboardList size={32} />}
           href="/listas/rd"
           active={moduloActive === 'listas'}
+        />
+        <ButtonAside
+          title="Operação"
+          icon={<RiUserSettingsFill size={32} />}
+          href="/operation/npe"
+          active={moduloActive === 'operation'}
         />
         {/*
 
