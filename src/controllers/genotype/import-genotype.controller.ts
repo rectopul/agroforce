@@ -54,7 +54,8 @@ export class ImportGenotypeController {
           message: 'O numero de colunas e maior do que o esperado',
         };
       }
-
+      console.log('spreadSheet genotype');
+      console.log(spreadSheet);
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
