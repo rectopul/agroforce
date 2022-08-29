@@ -10,7 +10,6 @@ export class QuadraController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log(options);
 
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);

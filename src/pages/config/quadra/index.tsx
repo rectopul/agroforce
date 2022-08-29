@@ -457,7 +457,6 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await quadraService.getAll(filterApplication).then(({ status, response }) => {
-      console.log(response);
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {

@@ -42,8 +42,10 @@ export class ImportExperimentController {
             filterExperimentName: experimentName,
           });
           if (experiment?.length > 0) {
+            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado no sistema` };
           } if (experimentNameTemp.includes(experimentName)) {
+            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             experimentNameTemp[row] = experimentName;
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
           }
