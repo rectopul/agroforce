@@ -56,6 +56,7 @@ interface INpeProps {
     epoca: number;
     npei: number;
     npef: number;
+    consumedQT: number;
     prox_npe: number;
     status?: number;
     created_by: number;
@@ -71,6 +72,8 @@ export interface IExperimento {
     ensaio: string;
     cod_tec: number;
     epoca: number;
+    npeQT: number;
+    npef: number;
     status?: number;
 }
 
@@ -138,13 +141,13 @@ export default function Listagem({
     ]);
 
     const [colorStar, setColorStar] = useState<string>('');
-    const [NPESelectedRow, setNPESelectedRow] = useState(null);
+    const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
 
     const take: number = itensPerPage;
     const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
     const pages = Math.ceil(total / take);
 
-    const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string)
+    let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string)
 
     const formik = useFormik<IFilter>({
         initialValues: {
@@ -530,6 +533,7 @@ export default function Listagem({
         { title: "Epoca", field: "epoca" },
         { title: "NPE Inicial", field: "npei" },
         { title: "NPE Final", field: "npef" },
+        { title: "NPE Quantity", field: "consumedQT" },
     ]
 
     const handleNPERowSelection = (rowData: any) => {
@@ -555,10 +559,24 @@ export default function Listagem({
                         item.npef = i + item.npeQT;
                         i = item.npef + 1;
                     })
+                    selectedNPE.filter((x: any) => x == NPESelectedRow).npef = i;
                     setExperimento(response);
                 }
             });
         }
+    }
+
+    function validateConsumedData() {
+        let total_consumed = 0;
+        let lastNPE = 0;
+        let nextNPE = NPESelectedRow?.nextNPE;
+        experimentos.map(item => {
+            total_consumed += item.npeQT;
+            lastNPE = item?.npef;
+        })
+        let test = 'To be Consumed - ' + NPESelectedRow?.consumedQT + '\nTotal Consumned - ' + total_consumed + '\n';
+        test += 'Last NPE - ' + lastNPE + '\n' + 'Next NPE - ' + nextNPE;
+        alert(test);
     }
 
     useEffect(() => {
@@ -581,7 +599,7 @@ export default function Listagem({
                             style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '20px' }}
                             columns={columnNPE}
                             data={selectedNPE}
-                            onRowClick={(evt, selectedRow) => {
+                            onRowClick={(evt, selectedRow: any) => {
                                 setNPESelectedRow(selectedRow);
                                 selectedRow.tableData.checked = true;
                             }}
@@ -705,11 +723,11 @@ export default function Listagem({
 
                                                 <div className="h-12 flex items-center justify-center w-full">
                                                     <Button
-                                                        title="Exportar planilha de experimentos"
-                                                        icon={<RiFileExcel2Line size={20} />}
+                                                        title="Draw"
+                                                        value="Draw"
                                                         bgColor="bg-blue-600"
                                                         textColor="white"
-                                                        onClick={() => { downloadExcel(); }}
+                                                        onClick={validateConsumedData}
                                                     />
                                                 </div>
                                             </div>

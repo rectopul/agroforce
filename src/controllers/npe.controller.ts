@@ -110,6 +110,19 @@ export class NpeController {
         orderBy,
       );
 
+      response.map((value, index, elements) => {
+        const newItem = value;
+        const next = elements[index + 1];
+        if (next) {
+          newItem.consumedQT = next.npei - newItem.npei;
+          newItem.nextNPE = next.npei;
+        } else {
+          newItem.consumedQT = 0;
+          newItem.nextNPE = 0;
+        }
+        return newItem;
+      })
+
       if (!response || response.total <= 0) {
         return {
           status: 404, response: [], total: 0, message: 'Nenhuma NPE cadastrada',

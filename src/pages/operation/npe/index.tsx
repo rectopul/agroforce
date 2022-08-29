@@ -46,6 +46,7 @@ interface INpeProps {
   epoca: number;
   npei: number;
   npef: number;
+  consumedQT: number;
   prox_npe: number;
   status?: number;
   created_by: number;
@@ -872,8 +873,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     response: allNpe,
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
-
-  console.log(allNpe)
 
   return {
     props: {
