@@ -110,7 +110,7 @@ export class NpeController {
         orderBy,
       );
 
-      response.map((value, index, elements) => {
+      response.map((value: any, index: any, elements: any) => {
         const newItem = value;
         const next = elements[index + 1];
         if (next) {
