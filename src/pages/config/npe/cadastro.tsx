@@ -324,7 +324,7 @@ export default function NovoNPE({ local }: IData) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const requestOptions: RequestInit | undefined = {

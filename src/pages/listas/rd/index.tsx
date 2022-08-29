@@ -758,7 +758,7 @@ export default function Import({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 15;

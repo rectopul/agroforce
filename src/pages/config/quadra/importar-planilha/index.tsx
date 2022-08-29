@@ -142,7 +142,7 @@ export default function Importar({ safra }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const { cultureId } = req.cookies;

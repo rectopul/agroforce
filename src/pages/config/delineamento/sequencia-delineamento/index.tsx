@@ -713,7 +713,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

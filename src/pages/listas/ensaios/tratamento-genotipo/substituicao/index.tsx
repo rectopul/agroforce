@@ -619,9 +619,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
   const { checked }: any = query;

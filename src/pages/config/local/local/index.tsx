@@ -884,7 +884,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

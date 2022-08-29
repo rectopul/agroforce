@@ -917,7 +917,7 @@ export default function Atualizargenotipo({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

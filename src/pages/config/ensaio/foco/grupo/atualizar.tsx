@@ -182,7 +182,7 @@ export default function Cadastro({ grupo, safra }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, query }: any) => {
   const idGroup = query.id;
   const { token } = req.cookies;
 
