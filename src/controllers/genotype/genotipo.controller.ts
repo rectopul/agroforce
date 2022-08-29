@@ -25,14 +25,12 @@ export class GenotipoController {
       }
 
       if (options.filterGmrRangeFrom || options.filterGmrRangeTo) {
-        if(options.filterGmrRangeFrom && options.filterGmrRangeTo){
+        if (options.filterGmrRangeFrom && options.filterGmrRangeTo) {
           parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}", "lte": "${Number(options.filterGmrRangeTo)}" }`);
-        }else{
-          if (options.filterGmrRangeFrom) {
-            parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}" }`);
-          }else if (options.filterGmrRangeTo) {
-            parameters.gmr = JSON.parse(`{"lte": "${Number(options.filterGmrRangeTo)}" }`);
-          }
+        } else if (options.filterGmrRangeFrom) {
+          parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}" }`);
+        } else if (options.filterGmrRangeTo) {
+          parameters.gmr = JSON.parse(`{"lte": "${Number(options.filterGmrRangeTo)}" }`);
         }
       }
 

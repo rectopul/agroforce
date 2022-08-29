@@ -34,9 +34,20 @@ export class SafraController {
           `{"contains":"${options.filterSafra}"}`,
         );
       }
-
+      /*
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
+      }
+      */
+
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
       }
 
       const select = {
