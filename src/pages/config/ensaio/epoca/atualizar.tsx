@@ -148,7 +148,7 @@ export default function NovoLocal(epoca: IEpocaProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
   const { token } = context.req.cookies;

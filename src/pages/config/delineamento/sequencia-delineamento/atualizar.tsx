@@ -226,7 +226,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
   const { token } = context.req.cookies;

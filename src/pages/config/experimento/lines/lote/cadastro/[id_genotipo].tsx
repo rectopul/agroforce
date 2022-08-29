@@ -148,7 +148,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, params }: any) => {
   const { id_genotipo } = params as any;
 
   return {

@@ -231,7 +231,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, params }: any) => {
   const { id_delineamento } = params as any;
 
   return {

@@ -164,7 +164,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/safra`;
   const { token } = context.req.cookies;

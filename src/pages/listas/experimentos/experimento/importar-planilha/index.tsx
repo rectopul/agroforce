@@ -120,7 +120,7 @@ export default function Importar({ idSafra, idCulture }: IData) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
 
