@@ -145,11 +145,7 @@ export default function Listagem({
     const pages = Math.ceil(total / take);
 
     const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string)
-    console.log(selectedNPE);
 
-    useEffect(() => {
-        console.log(NPESelectedRow)
-    }, [NPESelectedRow])
     const formik = useFormik<IFilter>({
         initialValues: {
             filterFoco: '',
@@ -368,10 +364,10 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Number of Treatment', 'countNT'));
 
 
-        tableFields.push(headerTableFactory('NPE Inicial', '0'));
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
 
 
-        tableFields.push(headerTableFactory('NPE Final', '0'));
+        tableFields.push(headerTableFactory('NPE Final', 'npef'));
 
 
         tableFields.push(headerTableFactory('QT. NPE', 'npeQT'));
@@ -544,20 +540,30 @@ export default function Listagem({
         }
     }
 
-    const getExperiments = async () => {
-        console.log(NPESelectedRow);
+    async function getExperiments(): Promise<void> {
+        if (NPESelectedRow) {
+            let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&idLocal=${NPESelectedRow?.id_local}`;
 
-        let parametersFilter = `idSafra=${NPESelectedRow.id_safra}&idLocal=${NPESelectedRow.id_local}`;
-
-        if (filter) {
-            parametersFilter = `${parametersFilter}&${filter}`;
-        }
-        await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-            if (status === 200) {
-                setExperimento(response);
+            if (filter) {
+                parametersFilter = `${parametersFilter}&${filter}`;
             }
-        });
+            await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+                if (status === 200) {
+                    let i = NPESelectedRow.npei;
+                    response.map((item: any) => {
+                        item.npei = i;
+                        item.npef = i + item.npeQT;
+                        i = item.npef + 1;
+                    })
+                    setExperimento(response);
+                }
+            });
+        }
     }
+
+    useEffect(() => {
+        getExperiments();
+    }, [NPESelectedRow])
 
     return (
         <>
@@ -578,7 +584,6 @@ export default function Listagem({
                             onRowClick={(evt, selectedRow) => {
                                 setNPESelectedRow(selectedRow);
                                 selectedRow.tableData.checked = true;
-                                getExperiments;
                             }}
                             options={{
                                 showTitle: false,
@@ -800,10 +805,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     } as RequestInit | undefined;
 
     const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
-    console.log(allExperiments)
-    allExperiments.map((item: any) => {
-        console.log(item)
-    })
+
     return {
         props: {
             allExperiments,
