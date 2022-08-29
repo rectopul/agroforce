@@ -120,11 +120,11 @@ export class ImportExperimentController {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
-                const { response: responseSafra } = await safraController.getAll({
-                  safraName: spreadSheet[row][0],
-                });
+                const {
+                  response: responseSafra,
+                }: IReturnObject = await safraController.getOne(idSafra);
                 const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
-                  if (item?.year === responseSafra[0]?.year) return true;
+                  if (item?.year === responseSafra?.year) return true;
                   return false;
                 });
                 if (!cultureUnityValidate?.includes(true)) {
@@ -278,7 +278,7 @@ export class ImportExperimentController {
               const { response: delineamento } = await delineamentoController.getAll({
                 id_culture: idCulture, name: spreadSheet[row][9],
               });
-              const comments = spreadSheet[row][14].substr(0, 255) ? spreadSheet[row][14].substr(0, 255) : '';
+              const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
               const { status }: IReturnObject = await experimentController.create(
                 {
