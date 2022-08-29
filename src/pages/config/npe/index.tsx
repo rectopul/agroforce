@@ -893,8 +893,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
-  console.log(allNpe);
-  return {
+ return {
     props: {
       allNpe,
       totalItems,

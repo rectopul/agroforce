@@ -42,7 +42,8 @@ import ITabs from '../../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
-  filterYear: string | number;
+  filterYearFrom: string | number;
+  filterYearTo: string | number;
   filterStartDate: string | any;
   filterEndDate: string | any;
   orderBy: object | any;
@@ -144,7 +145,8 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
-      filterYear: '',
+      filterYearTo: '',
+      filterYearFrom: '',
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',
@@ -153,13 +155,14 @@ export default function Listagem({
     onSubmit: async ({
       filterStatus,
       filterSafra,
-      filterYear,
+      filterYearTo,
+      filterYearFrom,
       filterStartDate,
       filterEndDate,
     }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+      }&filterSafra=${filterSafra}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await safraService
@@ -592,9 +595,15 @@ export default function Listagem({
                       Ano
                     </label>
                     <Input
-                      placeholder="Ano"
-                      id="filterYear"
-                      name="filterYear"
+                      placeholder="De"
+                      id="filterYearFrom"
+                      name="filterYearFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterYearTo"
+                      name="filterYearTo"
                       onChange={formik.handleChange}
                     />
                   </div>

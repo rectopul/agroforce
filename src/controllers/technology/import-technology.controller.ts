@@ -116,6 +116,12 @@ export class ImportTechnologyController {
                       ? item.dt_import.getTime()
                       : lastDtImport;
                   });
+                  console.log('lastDtImport tec');
+                  console.log(lastDtImport);
+                  console.log('spreadSheet[row][column] tec');
+                  console.log(spreadSheet[row][column]);
+                  console.log('getTime() tec');
+                  console.log(spreadSheet[row][column].getTime());
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()

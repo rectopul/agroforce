@@ -239,7 +239,6 @@ export default function Listagem({
     } else {
       setSelectedNPE([...selectedNPE, data]);
     }
-    console.log(selectedNPE);
   }
 
   function idHeaderFactory() {
