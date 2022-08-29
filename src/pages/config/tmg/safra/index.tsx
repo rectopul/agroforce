@@ -101,7 +101,6 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
-  console.log(safras);
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
@@ -136,7 +135,6 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
-  console.log(filterStatusBeforeEdit);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;

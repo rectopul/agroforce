@@ -572,9 +572,9 @@ export default function AtualizarTipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -591,9 +591,9 @@ export default function AtualizarTipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {

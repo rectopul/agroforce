@@ -16,11 +16,14 @@ import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 import {
   BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
+import { useRouter } from 'next/router';
+
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiArrowUpDownLine, RiSettingsFill } from 'react-icons/ri';
 
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Swal from 'sweetalert2';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../../components';
@@ -62,12 +65,13 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
+  idSafra: number;
   itensPerPage: number;
   filterApplication: object | any;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication,
+  allLote, idSafra, totalItems, itensPerPage, filterApplication,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
@@ -85,6 +89,7 @@ export default function Listagem({
     id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const router = useRouter();
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -144,12 +149,11 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      Object.keys(checkedTreatments).forEach((item) => {
-        tempParams.push(checkedTreatments[item]);
+      checkedTreatments.forEach((item:any) => {
+        tempParams.push(item.genotipo);
       });
-      const checkedParams = tempParams.join();
       const parametersFilter = `filterStatus=${1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
-      await replaceTreatmentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${checkedParams}`).then(({ response, total: allTotal }) => {
+      await replaceTreatmentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${tempParams}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
         setLotes(response);
         setTotalItems(allTotal);
@@ -220,7 +224,12 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-    await replaceTreatmentService.replace({ id, checkedTreatments });
+    const { message } = await replaceTreatmentService.replace({ id, checkedTreatments });
+    Swal.fire({
+      html: message,
+      width: '800',
+    });
+    router.back();
   }
 
   function replaceFactory(name: string, title: string) {
@@ -355,17 +364,18 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const tempParams: any = [];
-    Object.keys(checkedTreatments).forEach((item) => {
-      tempParams.push(checkedTreatments[item]);
-    });
-    const checkedParams = tempParams.join();
     const skip = currentPage * Number(take);
     let parametersFilter;
+    const tempParams: any = [];
+    checkedTreatments.forEach((item:any) => {
+      if (item.genotipo) {
+        tempParams.push(item.genotipo);
+      }
+    });
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${checkedParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${checkedParams}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}`;
     }
 
     if (filter) {
@@ -629,6 +639,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 
   const { token } = req.cookies;
   const { checked }: any = query;
+  const idSafra = req.cookies.safraId;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -652,6 +663,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
     props: {
       allLote,
       totalItems,
+      idSafra,
       itensPerPage,
       filterApplication,
     },
