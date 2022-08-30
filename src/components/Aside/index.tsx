@@ -36,7 +36,7 @@ export function Aside({ moduloActive }: any) {
         <ButtonAside
           title="Operação"
           icon={<RiUserSettingsFill size={32} />}
-          href="/operation/npe"
+          href="/operacao/ambiente"
           active={moduloActive === 'operation'}
         />
         {/*
