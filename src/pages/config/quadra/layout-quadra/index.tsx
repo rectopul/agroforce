@@ -66,6 +66,10 @@ interface IFilter {
   filterEsquema: string | any;
   filterTiros: string | any;
   filterDisparos: string | any;
+  filterShotsFrom: string | any;
+  filterShotsTo: string | any;
+  filterPopFrom: string | any;
+  filterPopTo: string | any;
   filterPlantadeira: string | any;
   filterParcelas: string | any;
   orderBy: object | any;
@@ -179,6 +183,10 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
+      filterShotsFrom: '',
+      filterShotsTo: '',
+      filterPopFrom: '',
+      filterPopTo: '',
       filterStatus: '',
       filterCodigo: '',
       filterEsquema: '',
@@ -196,10 +204,14 @@ export default function Listagem({
       filterTiros,
       filterPlantadeira,
       filterParcelas,
+      filterShotsTo,
+      filterShotsFrom,
+      filterPopTo,
+      filterPopFrom,
     }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
+      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await layoutQuadraService
@@ -687,9 +699,41 @@ export default function Listagem({
 
                   {filterFieldFactory('filterPlantadeira', 'Plantadeiras')}
 
-                  {filterFieldFactory('filterTiros', 'Tiros')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Tiros
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterPopFrom"
+                      name="filterPopFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterPopTo"
+                      name="filterPopTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
-                  {filterFieldFactory('filterDisparos', 'Disparos')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Disparos
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterShotsFrom"
+                      name="filterShotsFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterShotsTo"
+                      name="filterShotsTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   {filterFieldFactory('filterParcelas', 'Numero Parcelas')}
 
