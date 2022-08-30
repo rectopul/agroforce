@@ -40,10 +40,11 @@ export class AssayListRepository {
     return result;
   }
 
-  async findByName({ gli }: any) {
+  async findByName({ gli, id_safra }: any) {
     const result = await prisma.assay_list.findFirst({
       where: {
         gli,
+        id_safra,
       },
     });
 
