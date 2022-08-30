@@ -359,14 +359,15 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                     'a data e maior que a data atual',
                   );
-                  if (spreadSheet[row][column].getTime() < 100000) {
-                    responseIfError[Number(column)] += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'o campo DT precisa ser no formato data',
-                    );
-                  }
+                }
+                console.log(spreadSheet[row][column].getTime() < 100000);
+                if (spreadSheet[row][column].getTime() < 100000) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'o campo DT precisa ser no formato data',
+                  );
                 }
                 if (status === 200) {
                   let lastDtImport = response[0]?.dt_import?.getTime();
