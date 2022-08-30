@@ -83,21 +83,27 @@ export class ImportLocalController {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             } else {
-              const { status, response } = await unidadeCulturaController.getAll(
-                { name_unity_culture: String(spreadSheet[row][column]) },
+              const { response } = await localController.getAll(
+                { id_local_culture: Number(spreadSheet[row][3]) },
               );
-
-              if (status === 200) {
-                if (response[0]?.length > 0) {
-                  responseIfError[Number(column)]
-                    += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o campo Nome da unidade de cultura já esta cadastrado',
-                    );
-                }
+              const {
+                response: unityExist,
+              }: IReturnObject = await unidadeCulturaController.getAll({
+                name_unity_culture: spreadSheet[row][column],
+              });
+              if (unityExist[0]?.id_local !== response[0]?.id) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
+                );
               }
+              console.log('unityExist');
+              console.log(unityExist);
+
+              console.log('response');
+              console.log(response);
             }
           } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
@@ -284,19 +290,37 @@ export class ImportLocalController {
               localCultureDTO.created_by = Number(createdBy);
               unityCultureDTO.created_by = Number(createdBy);
               unityCultureDTO.id_safra = Number(idSafra);
-              const localAlreadyExists = await localController.getAll(
+              const { response } = await localController.getAll(
                 { id_local_culture: localCultureDTO.id_local_culture },
               );
-              if (localAlreadyExists.response?.length > 0) {
-                localCultureDTO.id = localAlreadyExists.response[0]?.id;
-                unityCultureDTO.id_local = localAlreadyExists.response[0]?.id;
+              const {
+                response: unityExist,
+              }: IReturnObject = await unidadeCulturaController.getAll({
+                name_unity_culture: unityCultureDTO.name_unity_culture,
+                id_local: response[0]?.id,
+              });
+              if (response.total > 0) {
+                localCultureDTO.id = response[0]?.id;
+                unityCultureDTO.id_local = response[0]?.id;
                 await localController.update(localCultureDTO);
-                await unidadeCulturaController.create(unityCultureDTO);
+                if (unityExist.total > 0) {
+                  unityCultureDTO.id = unityExist[0]?.id;
+                  await unidadeCulturaController.update(unityCultureDTO);
+                } else {
+                  delete unityCultureDTO.id;
+                  await unidadeCulturaController.create(unityCultureDTO);
+                }
               } else {
                 delete localCultureDTO.id;
-                const response = await localController.create(localCultureDTO);
-                unityCultureDTO.id_local = response?.response?.id;
-                await unidadeCulturaController.create(unityCultureDTO);
+                const { response: newLocal } = await localController.create(localCultureDTO);
+                unityCultureDTO.id_local = newLocal?.id;
+                if (unityExist.total > 0) {
+                  unityCultureDTO.id = unityExist[0]?.id;
+                  await unidadeCulturaController.update(unityCultureDTO);
+                } else {
+                  delete unityCultureDTO.id;
+                  await unidadeCulturaController.create(unityCultureDTO);
+                }
               }
             }
           }
