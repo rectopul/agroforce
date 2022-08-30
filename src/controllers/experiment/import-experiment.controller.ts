@@ -195,10 +195,11 @@ export class ImportExperimentController {
                 const { response } = await delineamentoController.getAll({
                   id_culture: idCulture, name: spreadSheet[row][column],
                 });
+
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
-                } else if (response?.repeticao >= spreadSheet[row][10]) {
+                } else if (response[0]?.repeticao < spreadSheet[row][10]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -206,7 +207,7 @@ export class ImportExperimentController {
                       spreadSheet[0][column],
                       'Número de repetições e maior que o do delineamento informado',
                     );
-                } else if (response?.trat_repeticao >= assayList?.genotype_treatment) {
+                } else if (response[0]?.trat_repeticao < assayList?.countNT) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
