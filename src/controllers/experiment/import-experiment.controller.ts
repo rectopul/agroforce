@@ -40,6 +40,7 @@ export class ImportExperimentController {
           const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
+            idSafra,
           });
           if (experiment?.length > 0) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
@@ -57,6 +58,7 @@ export class ImportExperimentController {
           } else {
             const { response } = await assayListController.getAll({
               gli: spreadSheet[row][3],
+              id_safra: idSafra,
             });
             assayList = response.length > 0 ? response[0] : [];
           }
@@ -65,9 +67,24 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (idSafra !== assayList?.id_safra) {
-                responseIfError[Number(column)]
-                  += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else {
+                const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+
+                if (status === 200) {
+                  if (response?.safraName !== spreadSheet[row][column]) {
+                    responseIfError[Number(column)]
+                    += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'safra informada e diferente da selecionada',
+                      );
+                  }
+                }
+                if (idSafra !== assayList?.id_safra) {
+                  responseIfError[Number(column)]
+                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             if (column === '1') { // ENSAIO
@@ -117,6 +134,7 @@ export class ImportExperimentController {
               } else {
                 const { response } = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
+                  id_safra: idSafra,
                 });
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
@@ -276,6 +294,7 @@ export class ImportExperimentController {
               });
               const { response: assayList } = await assayListController.getAll({
                 gli: spreadSheet[row][3],
+                id_safra: idSafra,
               });
               const { response: delineamento } = await delineamentoController.getAll({
                 id_culture: idCulture, name: spreadSheet[row][9],
