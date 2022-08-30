@@ -21,6 +21,18 @@ export class FocoController {
         parameters.id_culture = Number(options.id_culture);
       }
 
+      if (options.filterGroupFrom || options.filterGroupTo) {
+        if (options.filterGroupFrom && options.filterGroupTo) {
+          parameters.AND.push(JSON.parse(`{ "group": {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} }}}`));
+        } else if (options.filterGroupFrom) {
+          parameters.AND.push(JSON.parse(`{ "group": {"group": {"gte": ${Number(options.filterGroupFrom)} }}}`));
+        } else if (options.filterGroupTo) {
+          parameters.AND.push(JSON.parse(`{ "group": {"group": {"lte": ${Number(options.filterGroupTo)} }}}`));
+        }
+      }
+      console.log(parameters);
+      console.log(options);
+
       const select = {
         id: true,
         id_culture: true,

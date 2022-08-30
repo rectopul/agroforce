@@ -70,6 +70,8 @@ interface IFilter {
   filterShotsTo: string | any;
   filterPopFrom: string | any;
   filterPopTo: string | any;
+  filterParcelFrom: string | any;
+  filterParcelTo: string | any;
   filterPlantadeira: string | any;
   filterParcelas: string | any;
   orderBy: object | any;
@@ -187,6 +189,8 @@ export default function Listagem({
       filterShotsTo: '',
       filterPopFrom: '',
       filterPopTo: '',
+      filterParcelFrom: '',
+      filterParcelTo: '',
       filterStatus: '',
       filterCodigo: '',
       filterEsquema: '',
@@ -208,10 +212,12 @@ export default function Listagem({
       filterShotsFrom,
       filterPopTo,
       filterPopFrom,
+      filterParcelTo,
+      filterParcelFrom,
     }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}`;
+      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await layoutQuadraService
@@ -735,7 +741,23 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterParcelas', 'Numero Parcelas')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Número Parcelas
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterParcelFrom"
+                      name="filterParcelFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterParcelTo"
+                      name="filterParcelTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">

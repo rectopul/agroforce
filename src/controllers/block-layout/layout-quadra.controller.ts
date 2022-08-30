@@ -30,6 +30,16 @@ export class LayoutQuadraController {
         }
       }
 
+      if (options.filterParcelFrom || options.filterParcelTo) {
+        if (options.filterParcelFrom && options.filterParcelTo) {
+          parameters.parcelas = JSON.parse(`{"gte": ${Number(options.filterParcelFrom)}, "lte": ${Number(options.filterParcelTo)} }`);
+        } else if (options.filterParcelFrom) {
+          parameters.parcelas = JSON.parse(`{"gte": ${Number(options.filterParcelFrom)} }`);
+        } else if (options.filterParcelTo) {
+          parameters.parcelas = JSON.parse(`{"lte": ${Number(options.filterParcelTo)} }`);
+        }
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
