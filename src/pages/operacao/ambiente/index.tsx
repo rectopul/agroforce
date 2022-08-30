@@ -83,13 +83,11 @@ export default function Listagem({
   filterApplication,
   totalItems,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs.default;
+  const { tabsOperation } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns();
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
+
   const router = useRouter();
-
-  // eslint-disable-next-line no-return-assign, no-param-reassign
-  tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.npe || {
@@ -110,12 +108,12 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [selectedNPE, setSelectedNPE] = useState<INpeProps[]>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Local ',
@@ -239,7 +237,6 @@ export default function Listagem({
     } else {
       setSelectedNPE([...selectedNPE, data]);
     }
-    console.log(selectedNPE);
   }
 
   function idHeaderFactory() {
@@ -309,9 +306,9 @@ export default function Listagem({
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
           headerTableFactory('Local', 'local.name_local_culture'),
@@ -555,8 +552,8 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-7 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -571,6 +568,11 @@ export default function Listagem({
     );
   }
 
+  function handleSelectionRow(data: any) {
+    const selectedRow = data?.map((e) => ({ ...e, tableData: { id: e.tableData.id, checked: false } }));
+    setSelectedNPE(selectedRow);
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -581,12 +583,12 @@ export default function Listagem({
       <Head>
         <title>Listagem dos NPEs</title>
       </Head>
-      <Content contentHeader={tabsDropDowns} moduloActive="operation">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
         <main
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar npe's">
@@ -595,7 +597,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -604,11 +606,11 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-1">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
@@ -633,17 +635,18 @@ export default function Listagem({
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
+
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -655,6 +658,7 @@ export default function Listagem({
               columns={columns}
               data={npe}
               options={{
+                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -664,6 +668,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: itensPerPage,
               }}
+              onSelectionChange={setSelectedNPE}
               components={{
                 Toolbar: () => (
                   <div
@@ -688,7 +693,7 @@ export default function Listagem({
                         onClick={() => {
                           localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
                           router.push({
-                            pathname: '/operation/npe/experimento',
+                            pathname: '/operacao/ambiente/experimento',
                           });
                         }}
                       />
@@ -770,13 +775,13 @@ export default function Listagem({
                             downloadExcel();
                           }}
                         />
-                        <Button
+                        {/* <Button
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => { }}
                           href="npe/importar-planilha/config-planilha"
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>

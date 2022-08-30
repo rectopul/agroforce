@@ -98,7 +98,7 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
@@ -243,7 +243,7 @@ export default function Listagem({
       sorting: false,
       width: 0,
       render: (rowData: any) => (
-        <div className="h-10 w-12">
+        <div className="h-10 w-10">
           <Button
             title="Substituir genótipo/nca"
             type="button"
@@ -388,10 +388,10 @@ export default function Listagem({
     });
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+      <div className="h-10 w-full ml-2" style={small ? { maxWidth: 65 } : {}}>
+        <label className="block text-gray-900 text-sm mb-1">
           {name}
         </label>
         <Input
@@ -419,7 +419,7 @@ export default function Listagem({
         <main className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar lotes">
@@ -428,7 +428,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -439,15 +439,15 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano')}
+                  {filterFieldFactory('filterYear', 'Ano', true)}
 
                   {filterFieldFactory('filterCodLote', 'Cód lote')}
 
                   {filterFieldFactory('filterNcc', 'NCC')}
 
-                  {filterFieldFactory('filterFase', 'Fase')}
+                  {filterFieldFactory('filterFase', 'Fase', true)}
 
-                  {filterFieldFactory('filterPeso', 'Peso')}
+                  {filterFieldFactory('filterPeso', 'Peso', true)}
 
                   {filterFieldFactory('filterSeeds', 'Quant. sementes')}
 
@@ -455,24 +455,24 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterGmr', 'GMR')}
+                  {filterFieldFactory('filterGmr', 'GMR', true)}
 
-                  {filterFieldFactory('filterBgm', 'BGM')}
+                  {filterFieldFactory('filterBgm', 'BGM', true)}
 
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
+                  <div className="h-7 w-32 mt-6 ml-2">
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -506,6 +506,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

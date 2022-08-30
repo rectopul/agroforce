@@ -192,11 +192,24 @@ const configPlanilhasDropDown = [
   { labelDropDown: 'Teste', hrefDropDown: '#' },
 ];
 
+const tabsOperation = [
+  {
+    titleTab: 'AMBIENTE',
+    valueTab: <BsCheckLg />,
+    statusTab: false,
+    hrefTab: '/operacao/ambiente',
+    data: [
+      { labelDropDown: 'Ambiente', hrefDropDown: '/operacao/ambiente', iconDropDown: <AiOutlineFileSearch /> },
+    ],
+  },
+];
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   TabsDropDowns,
   tabsConfig,
   tabsListas,
+  tabsOperation,
   tmgDropDown,
   ensaiosDropDown,
   localsDropDown,

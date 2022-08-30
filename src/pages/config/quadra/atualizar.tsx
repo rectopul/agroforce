@@ -354,7 +354,6 @@ export default function AtualizarQuadra({
 
   const downloadExcel = async (): Promise<void> => {
     await dividersService.getAll(filterApplication).then(({ status, response }) => {
-      console.log(response);
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
@@ -423,8 +422,8 @@ export default function AtualizarQuadra({
 
   function updateFieldFactory(title: string, name: string) {
     return (
-      <div className="w-2/4 h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-2/4 h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -444,17 +443,17 @@ export default function AtualizarQuadra({
       <Head><title>Atualizar quadra</title></Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-4"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar quadra</h1>
+          <h1 className="text-xl">Atualizar quadra</h1>
 
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-5">
+          <div className="w-full flex justify-between items-start gap-5 mt-1">
 
             {updateFieldFactory('cod_quadra', 'Código Quadra')}
 
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-2/4 h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Local Preparo
               </label>
               <Input
@@ -469,9 +468,6 @@ export default function AtualizarQuadra({
 
             {updateFieldFactory('esquema', 'Esquema')}
 
-          </div>
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
-
             {updateFieldFactory('larg_q', 'Largura Q')}
 
             {updateFieldFactory('comp_p', 'Comp P.')}
@@ -483,9 +479,8 @@ export default function AtualizarQuadra({
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 
             {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
-
           </div>
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
+          <div className="w-full flex justify-between items-start gap-5 mt-8">
 
             {updateFieldFactory('local_plantio', 'Local realizado')}
 
@@ -493,45 +488,34 @@ export default function AtualizarQuadra({
 
             {updateFieldFactory('cruza', 'Status quadra')}
 
-          </div>
-          <div className="h-7 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
-            </div>
-            <div className="w-40">
-              <Button
+            <div className="h-7 w-full flex gap-3 justify-end mt-6">
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => router.back()}
+                />
+              </div>
+              <div className="w-40">
+                <Button
                 // type="submit"
-                value="Mapa"
-                bgColor="bg-blue-600"
-                disabled
-                textColor="white"
-                icon={<SiMicrogenetics size={18} />}
-                onClick={() => { }}
-              />
+                  value="Mapa"
+                  bgColor="bg-blue-600"
+                  disabled
+                  textColor="white"
+                  icon={<SiMicrogenetics size={18} />}
+                  onClick={() => { }}
+                />
+              </div>
             </div>
           </div>
         </form>
-        <main className="h-3/6 w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
 
-          <div style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+        <main className="w-full flex flex-col items-start gap-8">
+          <div style={{ marginTop: '1%' }} className="w-full h-full">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}

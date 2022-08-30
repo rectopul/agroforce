@@ -54,7 +54,6 @@ export class ImportGenotypeController {
           message: 'O numero de colunas e maior do que o esperado',
         };
       }
-
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
@@ -349,6 +348,7 @@ export class ImportGenotypeController {
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await genotipoController.getAll({
                   id_dados: spreadSheet[row][1],
+                  id_culture: idCulture,
                 });
                 const dateNow = new Date();
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
@@ -359,6 +359,14 @@ export class ImportGenotypeController {
                     'a data e maior que a data atual',
                   );
                 }
+                if (spreadSheet[row][column].getTime() < 100000) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'o campo DT precisa ser no formato data',
+                  );
+                }
                 if (status === 200) {
                   let lastDtImport = response[0]?.dt_import?.getTime();
                   response.forEach((item: any) => {
@@ -366,12 +374,6 @@ export class ImportGenotypeController {
                       ? item.dt_import.getTime()
                       : lastDtImport;
                   });
-                  console.log('lastDtImport');
-                  console.log(lastDtImport);
-                  console.log('spreadSheet[row][column]');
-                  console.log(spreadSheet[row][column]);
-                  console.log('getTime()');
-                  console.log(spreadSheet[row][column].getTime());
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()
