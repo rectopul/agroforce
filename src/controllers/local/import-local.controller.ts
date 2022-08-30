@@ -222,12 +222,6 @@ export class ImportLocalController {
                   ? item.dt_import.getTime()
                   : lastDtImport;
               });
-              console.log('lastDtImport local');
-              console.log(lastDtImport);
-              console.log('spreadSheet[row][column] local');
-              console.log(spreadSheet[row][column]);
-              console.log('getTime() local');
-              console.log(spreadSheet[row][column].getTime());
               if (
                 lastDtImport
                 > spreadSheet[row][column].getTime()
