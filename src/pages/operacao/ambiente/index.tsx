@@ -569,7 +569,8 @@ export default function Listagem({
   }
 
   function handleSelectionRow(data: any) {
-    const selectedRow = data?.map((e) => ({ ...e, tableData: { id: e.tableData.id, checked: false } }));
+    const selectedRow = data?.map((e: any) => (
+      { ...e, tableData: { id: e.tableData.id, checked: false } }));
     setSelectedNPE(selectedRow);
   }
 
