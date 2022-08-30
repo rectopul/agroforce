@@ -61,6 +61,8 @@ interface IFilter {
   filterTecnologia: string | any;
   filterEpoca: string | any;
   filterNPE: string | any;
+  filterNpeFrom: string | any;
+  filterNpeTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -187,6 +189,8 @@ export default function Listagem({
       filterTecnologia: '',
       filterEpoca: '',
       filterNPE: '',
+      filterNpeTo: '',
+      filterNpeFrom: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -199,10 +203,11 @@ export default function Listagem({
       filterTecnologia,
       filterEpoca,
       filterNPE,
+      filterNpeTo,
+      filterNpeFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
-      }`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -646,7 +651,23 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
-                  {filterFieldFactory('filterNPE', 'NPE Inicial')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE Inicial
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterNpeFrom"
+                      name="filterNpeFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterNpeTo"
+                      name="filterNpeTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
                 </div>
 
                 <div style={{ width: 40 }}>
