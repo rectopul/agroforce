@@ -102,15 +102,9 @@ export default function Listagem({
   pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs;
+  const { tabsOperation } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('listas');
-
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'EXPERIMENTOS'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -126,7 +120,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
@@ -229,7 +223,7 @@ export default function Listagem({
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
-        <div className="flex items-center">
+        <div className="h-7 flex items-center">
           <button
             type="button"
             className="font-medium text-gray-900"
@@ -264,7 +258,7 @@ export default function Listagem({
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
@@ -277,7 +271,7 @@ export default function Listagem({
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -337,9 +331,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'protocolName') {
         tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
@@ -505,7 +499,7 @@ export default function Listagem({
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -583,33 +577,34 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive="operation">
-        <main className="h-full w-full
-                        flex flex-col
-                        items-start
-                        gap-8
-                        "
-        >
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
+        <main className="h-full w-full flex flex-col items-start gap-0">
           <div className="w-full">
             <MaterialTable
-              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '20px' }}
+              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
               columns={columnNPE}
               data={selectedNPE}
-              onRowClick={(evt, selectedRow: any) => {
-                setNPESelectedRow(selectedRow);
-                selectedRow.tableData.checked = true;
-              }}
+              // onRowClick={(evt, selectedRow: any) => {
+              //   setNPESelectedRow(selectedRow);
+              //   selectedRow.tableData.checked = true;
+              // }}
               options={{
+                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
-                selection: true,
-                showSelectAllCheckbox: false,
+                // showSelectAllCheckbox: false,
                 paging: false,
-                selectionProps: handleNPERowSelection,
+                // selectionProps: handleNPERowSelection,
+              }}
+              onSelectionChange={setNPESelectedRow}
+              components={{
+                Toolbar: () => null,
+                Pagination: () => null,
               }}
             />
           </div>
@@ -720,8 +715,8 @@ export default function Listagem({
 
                           <div className="h-12 flex items-center justify-center w-full">
                             <Button
-                              title="Draw"
-                              value="Draw"
+                              title="Sortear"
+                              value="Sortear"
                               bgColor="bg-blue-600"
                               textColor="white"
                               onClick={validateConsumedData}

@@ -57,6 +57,8 @@ interface IUnityCultureProps {
 interface IFilter {
   filterNameUnityCulture: string | any;
   filterYear: string | any;
+  filterYearFrom: string | number;
+  filterYearTo: string | number;
   filterNameLocalCulture: string | any;
   filterLabel: string | any;
   filterMloc: string | any;
@@ -191,6 +193,8 @@ export default function Listagem({
     initialValues: {
       filterNameUnityCulture: '',
       filterYear: '',
+      filterYearTo: '',
+      filterYearFrom: '',
       filterNameLocalCulture: '',
       filterLabel: '',
       filterMloc: '',
@@ -204,6 +208,8 @@ export default function Listagem({
     onSubmit: async ({
       filterNameUnityCulture,
       filterYear,
+      filterYearTo,
+      filterYearFrom,
       filterNameLocalCulture,
       filterLabel,
       filterMloc,
@@ -212,7 +218,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await unidadeCulturaService
@@ -557,8 +563,6 @@ export default function Listagem({
                     'Nome Un. de Cult.',
                   )}
 
-                  {filterFieldFactory('filterYear', 'Ano')}
-
                   {filterFieldFactory(
                     'filterNameLocalCulture',
                     'Nome do L. de Cult.',
@@ -567,6 +571,24 @@ export default function Listagem({
                   {filterFieldFactory('filterLabel', 'Rótulo')}
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
+                </div>
+
+                <div className="h-6 w-1/2 ml-4">
+                  <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Ano
+                  </label>
+                  <Input
+                    placeholder="De"
+                    id="filterYearFrom"
+                    name="filterYearFrom"
+                    onChange={formik.handleChange}
+                  />
+                  <Input
+                    placeholder="Até"
+                    id="filterYearTo"
+                    name="filterYearTo"
+                    onChange={formik.handleChange}
+                  />
                 </div>
 
                 <div

@@ -10,6 +10,36 @@ export class LayoutQuadraController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     try {
+      if (options.filterShotsFrom || options.filterShotsTo) {
+        if (options.filterShotsFrom && options.filterShotsTo) {
+          parameters.disparos = JSON.parse(`{"gte": ${Number(options.filterShotsFrom)}, "lte": ${Number(options.filterShotsTo)} }`);
+        } else if (options.filterShotsFrom) {
+          parameters.disparos = JSON.parse(`{"gte": ${Number(options.filterShotsFrom)} }`);
+        } else if (options.filterShotsTo) {
+          parameters.disparos = JSON.parse(`{"lte": ${Number(options.filterShotsTo)} }`);
+        }
+      }
+
+      if (options.filterPopFrom || options.filterPopTo) {
+        if (options.filterPopFrom && options.filterPopTo) {
+          parameters.tiros = JSON.parse(`{"gte": ${Number(options.filterPopFrom)}, "lte": ${Number(options.filterPopTo)} }`);
+        } else if (options.filterPopFrom) {
+          parameters.tiros = JSON.parse(`{"gte": ${Number(options.filterPopFrom)} }`);
+        } else if (options.filterPopTo) {
+          parameters.tiros = JSON.parse(`{"lte": ${Number(options.filterPopTo)} }`);
+        }
+      }
+
+      if (options.filterParcelFrom || options.filterParcelTo) {
+        if (options.filterParcelFrom && options.filterParcelTo) {
+          parameters.parcelas = JSON.parse(`{"gte": ${Number(options.filterParcelFrom)}, "lte": ${Number(options.filterParcelTo)} }`);
+        } else if (options.filterParcelFrom) {
+          parameters.parcelas = JSON.parse(`{"gte": ${Number(options.filterParcelFrom)} }`);
+        } else if (options.filterParcelTo) {
+          parameters.parcelas = JSON.parse(`{"lte": ${Number(options.filterParcelTo)} }`);
+        }
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

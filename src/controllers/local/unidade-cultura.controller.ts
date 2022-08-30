@@ -19,6 +19,16 @@ export class UnidadeCulturaController {
         parameters.year = Number(options.filterYear);
       }
 
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
+      }
+
       if (options.filterNameLocalCulture) {
         parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
       }
@@ -114,6 +124,7 @@ export class UnidadeCulturaController {
 
   async create(data: any) {
     try {
+      console.log(data);
       const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
 
       if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
