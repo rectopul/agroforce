@@ -34,6 +34,16 @@ import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
+  filterYearFrom: string | number;
+  filterYearTo: string | number;
+  filterSeedFrom: string | number;
+  filterSeedTo: string | number;
+  filterWeightFrom: string | any;
+  filterWeightTo: string | any;
+  filterGmrFrom: string | any;
+  filterGmrTo: string | any;
+  filterBgmFrom: string | any;
+  filterBgmTo: string | any;
   filterYear: string;
   filterCodLote: string;
   filterNcc: string;
@@ -132,6 +142,16 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
+      filterYearTo: '',
+      filterYearFrom: '',
+      filterSeedTo: '',
+      filterSeedFrom: '',
+      filterWeightTo: '',
+      filterWeightFrom: '',
+      filterGmrTo: '',
+      filterGmrFrom: '',
+      filterBgmTo: '',
+      filterBgmFrom: '',
       filterYear: '',
       filterCodLote: '',
       filterNcc: '',
@@ -148,6 +168,16 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({
+      filterYearTo,
+      filterYearFrom,
+      filterSeedTo,
+      filterSeedFrom,
+      filterWeightTo,
+      filterWeightFrom,
+      filterGmrTo,
+      filterGmrFrom,
+      filterBgmTo,
+      filterBgmFrom,
       filterYear,
       filterCodLote,
       filterNcc,
@@ -161,7 +191,7 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
     }) => {
-      const parametersFilter = `&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}`;
+      const parametersFilter = `&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
       await loteService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -521,7 +551,23 @@ export default function Listagem({
                   pb-7
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Ano
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterYearFrom"
+                      name="filterYearFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterYearTo"
+                      name="filterYearTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   {filterFieldFactory('filterCodLote', 'Cód lote')}
 
@@ -529,9 +575,41 @@ export default function Listagem({
 
                   {filterFieldFactory('filterFase', 'Fase')}
 
-                  {filterFieldFactory('filterPeso', 'Peso')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Peso
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterWeightFrom"
+                      name="filterWeightFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterWeightTo"
+                      name="filterWeightTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
-                  {filterFieldFactory('filterSeeds', 'Sementes')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Sementes
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterSeedFrom"
+                      name="filterSeedFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterSeedTo"
+                      name="filterSeedTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   {filterFieldFactory('filterGenotipo', 'Genótipo')}
 
@@ -545,9 +623,41 @@ export default function Listagem({
                   pb-0
                 "
                 >
-                  {filterFieldFactory('filterGmr', 'GMR')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GMR
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterGmrFrom"
+                      name="filterGmrFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterGmrTo"
+                      name="filterGmrTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
-                  {filterFieldFactory('filterBgm', 'BGM')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      BGM
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterBgmFrom"
+                      name="filterBgmFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterBgmTo"
+                      name="filterBgmTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
 
