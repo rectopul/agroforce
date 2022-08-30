@@ -130,7 +130,7 @@ export class ImportNpeController {
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }
                 const ogm: any = await tecnologiaController.getAll(
-                  { cod_tec: spreadSheet[row][column] },
+                  { cod_tec: String(spreadSheet[row][column]) },
                 );
                 if (ogm.total === 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
