@@ -114,6 +114,7 @@ export class UnidadeCulturaController {
 
   async create(data: any) {
     try {
+      console.log(data);
       const unidadeCulturaAlreadyExist = await this.unidadeCulturaRepository.findByName(data);
 
       if (unidadeCulturaAlreadyExist) return { status: 409, message: 'Dados já cadastrados' };
