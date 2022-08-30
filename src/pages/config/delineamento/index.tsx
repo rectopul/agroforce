@@ -57,6 +57,10 @@ interface IFilter {
   filterTreatment: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterTratRepetitionFrom: string | any;
+  filterTratRepetitionTo: string | any;
 }
 interface IGenerateProps {
   name: string | undefined;
@@ -162,6 +166,10 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      filterTratRepetitionTo: '',
+      filterTratRepetitionFrom: '',
       filterStatus: '',
       filterName: '',
       filterRepeat: '',
@@ -174,10 +182,14 @@ export default function Listagem({
       filterName,
       filterRepeat,
       filterTreatment,
+      filterRepetitionTo,
+      filterRepetitionFrom,
+      filterTratRepetitionTo,
+      filterTratRepetitionFrom,
     }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
+      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await delineamentoService
@@ -643,10 +655,15 @@ export default function Listagem({
                       Repetição
                     </label>
                     <Input
-                      type="number"
-                      placeholder="repetição"
-                      id="filterRepeat"
-                      name="filterRepeat"
+                      placeholder="De"
+                      id="filterRepetitionFrom"
+                      name="filterRepetitionFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterRepetitionTo"
+                      name="filterRepetitionTo"
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -655,10 +672,15 @@ export default function Listagem({
                       Trat. Repetição
                     </label>
                     <Input
-                      type="number"
-                      placeholder="trat. Repetição"
-                      id="filterTreatment"
-                      name="filterTreatment"
+                      placeholder="De"
+                      id="filterTratRepetitionFrom"
+                      name="filterTratRepetitionFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterTratRepetitionTo"
+                      name="filterTratRepetitionTo"
                       onChange={formik.handleChange}
                     />
                   </div>
