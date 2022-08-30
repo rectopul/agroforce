@@ -834,7 +834,7 @@ export default function Listagem({
                         { id: 200, name: 200 },
                       ]}
                       selected={take}
-                      onChange={(e) => setTake(e.target.value)}
+                      onChange={(e: any) => setTake(e.target.value)}
                     />
                   </div>
 
