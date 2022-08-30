@@ -70,6 +70,16 @@ export class NpeController {
         parameters.id_local = Number(options.id_local);
       }
 
+      if (options.filterNpeFrom || options.filterNpeTo) {
+        if (options.filterNpeFrom && options.filterNpeTo) {
+          parameters.npei = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(options.filterNpeTo)} }`);
+        } else if (options.filterNpeFrom) {
+          parameters.npei = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)} }`);
+        } else if (options.filterNpeTo) {
+          parameters.npei = JSON.parse(`{"lte": ${Number(options.filterNpeTo)} }`);
+        }
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;

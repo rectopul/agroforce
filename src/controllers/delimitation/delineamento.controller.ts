@@ -8,6 +8,28 @@ export class DelineamentoController {
     const parameters: object | any = {};
 
     try {
+      if (options.filterRepetitionFrom || options.filterRepetitionTo) {
+        if (options.filterRepetitionFrom && options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
+        } else if (options.filterRepetitionFrom) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)} }`);
+        } else if (options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
+        }
+      }
+
+      if (options.filterTratRepetitionFrom || options.filterTratRepetitionTo) {
+        if (options.filterTratRepetitionFrom && options.filterTratRepetitionTo) {
+          parameters.trat_repeticao = JSON.parse(`{"gte": ${Number(options.filterTratRepetitionFrom)}, "lte": ${Number(options.filterTratRepetitionTo)} }`);
+        } else if (options.filterTratRepetitionFrom) {
+          parameters.trat_repeticao = JSON.parse(`{"gte": ${Number(options.filterTratRepetitionFrom)} }`);
+        } else if (options.filterTratRepetitionTo) {
+          parameters.trat_repeticao = JSON.parse(`{"lte": ${Number(options.filterTratRepetitionTo)} }`);
+        }
+      }
+
+      console.log(parameters);
+      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

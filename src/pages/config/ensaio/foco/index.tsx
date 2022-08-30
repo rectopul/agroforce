@@ -48,6 +48,8 @@ interface IFilter {
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterGroupFrom: string | number;
+  filterGroupTo: string | number;
 }
 
 export interface IFocos {
@@ -135,13 +137,15 @@ export default function Listagem({
       filterSearch: '',
       orderBy: '',
       typeOrder: '',
+      filterGroupTo: '',
+      filterGroupFrom: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
+    onSubmit: async ({
+      filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
+    }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${
-        idCulture
-      }&id_safra=${idSafra}`;
+      }&filterSearch=${filterSearch}&id_culture=${idCulture}&id_safra=${idSafra}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await focoService
@@ -565,6 +569,24 @@ export default function Listagem({
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Grupo
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterGroupFrom"
+                      name="filterGroupFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterGroupTo"
+                      name="filterGroupTo"
                       onChange={formik.handleChange}
                     />
                   </div>
