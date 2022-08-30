@@ -327,8 +327,8 @@ export class ImportAssayListController {
               });
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
+                id_safra: idSafra,
               });
-
               let savedAssayList: any;
               if (assayList.length === 0) {
                 savedAssayList = await assayListController.create({
