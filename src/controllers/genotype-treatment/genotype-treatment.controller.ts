@@ -49,7 +49,6 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
-
       const select = {
         id: true,
         safra: { select: { safraName: true } },

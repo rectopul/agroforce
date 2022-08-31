@@ -35,10 +35,12 @@ import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterFoco: string
+  filterProtocol: string
   filterTypeAssay: string
   filterGli: string
   filterExperimentName: string
   filterTecnologia: string
+  filterCod: string
   filterPeriod: string
   filterDelineamento: string
   filterRepetition: string
@@ -76,14 +78,14 @@ interface IData {
 }
 
 export default function Listagem({
-      allExperiments,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -130,13 +132,30 @@ export default function Listagem({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
+    },
+  ]);
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
+      filterProtocol: '',
       filterGli: '',
       filterExperimentName: '',
       filterTecnologia: '',
+      filterCod: '',
       filterPeriod: '',
       filterDelineamento: '',
       filterRepetition: '',
@@ -146,14 +165,26 @@ export default function Listagem({
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
+      filterProtocol,
       filterGli,
       filterExperimentName,
       filterTecnologia,
+      filterCod,
       filterPeriod,
       filterDelineamento,
       filterRepetition,
     }) => {
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}`;
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']",
+      );
+      let selecionados = '';
+      for (let i = 0; i < allCheckBox.length; i += 1) {
+        if (allCheckBox[i].checked) {
+          selecionados += `${allCheckBox[i].value},`;
+        }
+      }
+      const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
       await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -567,9 +598,11 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
 
                 </div>
@@ -580,6 +613,59 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status do Experimento
+                    </label>
+                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      {statusFilter.map((generate, index) => (
+                        <CheckBox
+                          key={index}
+                          name={generate.name}
+                          title={generate.title?.toString()}
+                          value={generate.value}
+                          defaultChecked={false}
+                        />
+                      ))}
+                    </div> */}
+                    <AccordionFilter>
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="characters">
+                          {(provided) => (
+                            <ul
+                              className="w-full h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusFilter.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
+                                    >
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </AccordionFilter>
+                  </div>
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
                   {filterFieldFactory('filterRepetition', 'Repetição')}
 
@@ -804,7 +890,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   } as RequestInit | undefined;
 
   const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
-  console.log(allExperiments)
   return {
     props: {
       allExperiments,

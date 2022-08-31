@@ -366,12 +366,6 @@ export class ImportGenotypeController {
                       ? item.dt_import.getTime()
                       : lastDtImport;
                   });
-                  console.log('lastDtImport');
-                  console.log(lastDtImport);
-                  console.log('spreadSheet[row][column]');
-                  console.log(spreadSheet[row][column]);
-                  console.log('getTime()');
-                  console.log(spreadSheet[row][column].getTime());
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()

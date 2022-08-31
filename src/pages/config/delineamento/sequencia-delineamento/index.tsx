@@ -46,6 +46,14 @@ interface IFilter {
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterOrderFrom: string | any;
+  filterOrderTo: string | any;
+  filterNtFrom: string | any;
+  filterNtTo: string | any;
+  filterBlockFrom: string | any;
+  filterBlockTo: string | any;
 }
 
 interface ISequenciaDelineamento {
@@ -136,9 +144,20 @@ export default function Listagem({
       filterSearch: '',
       orderBy: '',
       typeOrder: '',
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      filterOrderTo: '',
+      filterOrderFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
+      filterBlockTo: '',
+      filterBlockFrom: '',
     },
-    onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_delineamento=${idDelineamento}`;
+    onSubmit: async ({
+      // eslint-disable-next-line max-len
+      filterSearch, filterRepetitionTo, filterRepetitionFrom, filterOrderTo, filterOrderFrom, filterNtTo, filterNtFrom, filterBlockTo, filterBlockFrom,
+    }) => {
+      const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}`;
       await sequenciaDelineamentoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then(({ response, total: newTotal }: IReturnObject) => {
@@ -517,18 +536,92 @@ export default function Listagem({
                       selected="1"
                     />
                   </div>
+
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
                     <Input
                       type="text"
-                      placeholder="name"
+                      placeholder="Nome"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
                     />
                   </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterRepetitionFrom"
+                      name="filterRepetitionFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterRepetitionTo"
+                      name="filterRepetitionTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Ordem
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterOrderFrom"
+                      name="filterOrderFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterOrderTo"
+                      name="filterOrderTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterNtFrom"
+                      name="filterNtFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterNtTo"
+                      name="filterNtTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Bloco
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterBlockFrom"
+                      name="filterBlockFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterBlockTo"
+                      name="filterBlockTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
                   <div style={{ width: 20 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
