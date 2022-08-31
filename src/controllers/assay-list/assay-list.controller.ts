@@ -134,7 +134,7 @@ export class AssayListController {
     try {
       const assayListAlreadyExist = await this.assayListRepository.findByName(data);
 
-      if (assayListAlreadyExist) return { status: 409, message: 'Lista de ensaio já cadastrados' };
+      if (assayListAlreadyExist) return { status: 400, message: 'Lista de ensaio já cadastrados' };
 
       const response = await this.assayListRepository.create(data);
 

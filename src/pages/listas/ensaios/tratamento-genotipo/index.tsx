@@ -2,6 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
+import React, { useRef } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -59,6 +60,8 @@ export default function Listagem({
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const tableRef = useRef<any>(null);
 
   const tabsDropDowns = TabsDropDowns('listas');
 
@@ -167,7 +170,8 @@ export default function Listagem({
   const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const take: number = itensPerPage;
+  // const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
@@ -209,8 +213,9 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
+
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
+      const parametersFilter = `skip=0&take=${take}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
@@ -221,6 +226,7 @@ export default function Listagem({
           setTotalItems(allTotal);
           setAfterFilter(true);
           setCurrentPage(0);
+          tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
         });
     },
   });
@@ -816,6 +822,22 @@ export default function Listagem({
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
                   {filterFieldFactory('filterNca', 'NCA')}
 
+                  <div className="h-7 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Itens por página
+                    </label>
+                    <Select
+                      values={[
+                        { id: 10, name: 10 },
+                        { id: 50, name: 50 },
+                        { id: 100, name: 100 },
+                        { id: 200, name: 200 },
+                      ]}
+                      selected={take}
+                      onChange={(e: any) => setTake(e.target.value)}
+                    />
+                  </div>
+
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -836,6 +858,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={afterFilter ? treatments : []}
@@ -849,8 +872,15 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                // pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
+              localization={{
+                body: {
+                  emptyDataSourceMessage: 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                },
+              }}
+              onChangeRowsPerPage={(e) => console.log({ e })}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
