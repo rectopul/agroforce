@@ -164,16 +164,16 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              }
-              if ((typeof (spreadSheet[row][column])) !== 'number'
-                || spreadSheet[row][column].toString().length > 2
-                || spreadSheet[row][column] < 0) {
+              } else if (typeof spreadSheet[row][column] !== 'number'
+                || (spreadSheet[row][column]).toString().length > 2
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
                 responseIfError[Number(column)]
-                  += responseGenericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'deve ser um numero de ate 2 dígitos',
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -182,12 +182,15 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if ((typeof (spreadSheet[row][column])) !== 'number' || spreadSheet[row][column] < 0) {
+              } else if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
                 responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
                   );
               }
             }

@@ -531,7 +531,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await delineamentoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = delineamento.map((row: any) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {

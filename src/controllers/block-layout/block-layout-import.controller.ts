@@ -134,7 +134,7 @@ export class ImportLayoutBlockController {
                   tiroXdisparo[spreadSheet[row][0]] = [];
                 }
                 combinacao = `${spreadSheet[row][5]}x${spreadSheet[row][column]}`;
-                if (tiroXdisparo[spreadSheet[row][0]].includes(combinacao)) {
+                if (tiroXdisparo[spreadSheet[row][0]]?.includes(combinacao)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -142,7 +142,7 @@ export class ImportLayoutBlockController {
                     'a combinacao de tiros e disparos deve ser unica dentro do esquema',
                   );
                 }
-                tiroXdisparo[spreadSheet[row][0]].push(combinacao);
+                tiroXdisparo[spreadSheet[row][0]]?.push(combinacao);
               }
             }
 
@@ -161,7 +161,7 @@ export class ImportLayoutBlockController {
                     spreadSheet[0][column],
                   );
               } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sl[spreadSheet[row][0]].includes(spreadSheet[row][column])) {
+                if (sl[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -173,7 +173,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
                 sl[spreadSheet[row][0]] = [];
               }
-              sl[spreadSheet[row][0]].push(Number(spreadSheet[row][column]));
+              sl[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'SC') {
@@ -191,7 +191,7 @@ export class ImportLayoutBlockController {
                     spreadSheet[0][column],
                   );
               } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sc[spreadSheet[row][0]].includes(spreadSheet[row][column])) {
+                if (sc[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -203,7 +203,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
                 sc[spreadSheet[row][0]] = [];
               }
-              sc[spreadSheet[row][0]].push(Number(spreadSheet[row][column]));
+              sc[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'SALOC') {
@@ -221,7 +221,7 @@ export class ImportLayoutBlockController {
                     spreadSheet[0][column],
                   );
               } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sAloc[spreadSheet[row][0]].includes(spreadSheet[row][column])) {
+                if (sAloc[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -233,7 +233,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
                 sAloc[spreadSheet[row][0]] = [];
               }
-              sAloc[spreadSheet[row][0]].push(Number(spreadSheet[row][column]));
+              sAloc[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'CJ') {
@@ -313,7 +313,7 @@ export class ImportLayoutBlockController {
                 );
               } else {
                 if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                  if (sColheita[spreadSheet[row][0]].includes(spreadSheet[row][column])) {
+                  if (sColheita[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
@@ -325,7 +325,7 @@ export class ImportLayoutBlockController {
                 if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
                   sColheita[spreadSheet[row][0]] = [];
                 }
-                sColheita[spreadSheet[row][0]].push(Number(spreadSheet[row][column]));
+                sColheita[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
               }
             }
 
@@ -347,7 +347,7 @@ export class ImportLayoutBlockController {
               } else if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
                 parcelas[spreadSheet[row][0]] = [];
               }
-              parcelas[spreadSheet[row][0]].push(spreadSheet[row][column]);
+              parcelas[spreadSheet[row][0]]?.push(spreadSheet[row][column]);
             }
           }
         }
