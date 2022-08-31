@@ -26,7 +26,7 @@ import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { userPreferencesService } from '../../../../services';
+import { npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
     AccordionFilter, Button, CheckBox, Content, Input,
@@ -128,6 +128,8 @@ export default function Listagem({
     const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
         { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
         { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
+        { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
+        { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
         { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
         { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
         { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
@@ -135,8 +137,8 @@ export default function Listagem({
         { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
         { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
         { name: 'CamposGerenciados[]', title: 'Number of treatment', value: 'countNT' },
-        { name: 'CamposGerenciados[]', title: 'NPE Inicial', value: 'repetitionsNumber' },
-        { name: 'CamposGerenciados[]', title: 'NPE Final', value: 'repetitionsNumber' },
+        { name: 'CamposGerenciados[]', title: 'NPE Inicial', value: 'npei' },
+        { name: 'CamposGerenciados[]', title: 'NPE Final', value: 'npef' },
         { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
     ]);
 
@@ -343,6 +345,12 @@ export default function Listagem({
             if (columnCampos[index] === 'protocolName') {
                 tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
             }
+            if (columnCampos[index] === 'foco') {
+                tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+            }
+            if (columnCampos[index] === 'type_assay') {
+                tableFields.push(headerTableFactory('Ensaio', 'assay_list.type_assay.name'));
+            }
             if (columnCampos[index] === 'gli') {
                 tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
             }
@@ -533,7 +541,7 @@ export default function Listagem({
         { title: "Epoca", field: "epoca" },
         { title: "NPE Inicial", field: "npei" },
         { title: "NPE Final", field: "npef" },
-        { title: "NPE Quantity", field: "consumedQT" },
+        { title: "NPE Quantity", field: "npeQT" },
     ]
 
     const handleNPERowSelection = (rowData: any) => {
@@ -546,7 +554,7 @@ export default function Listagem({
 
     async function getExperiments(): Promise<void> {
         if (NPESelectedRow) {
-            let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&idLocal=${NPESelectedRow?.id_local}`;
+            let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
 
             if (filter) {
                 parametersFilter = `${parametersFilter}&${filter}`;
@@ -566,7 +574,7 @@ export default function Listagem({
         }
     }
 
-    function validateConsumedData() {
+    async function validateConsumedData() {
         let total_consumed = 0;
         let lastNPE = 0;
         let nextNPE = NPESelectedRow?.nextNPE;
@@ -576,7 +584,16 @@ export default function Listagem({
         })
         let test = 'To be Consumed - ' + NPESelectedRow?.consumedQT + '\nTotal Consumned - ' + total_consumed + '\n';
         test += 'Last NPE - ' + lastNPE + '\n' + 'Next NPE - ' + nextNPE;
-        alert(test);
+        if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNPE < nextNPE) {
+            await npeService.update({ id: NPESelectedRow?.id, npef: lastNPE, npeQT: NPESelectedRow?.npeQT - total_consumed }).then(({ status, resposne }: any) => {
+                if (status === 200) {
+                    alert('Data Validated');
+                    router.push('/operation/npe');
+                }
+            })
+        } else {
+            alert('Validation Failed');
+        }
     }
 
     useEffect(() => {
@@ -612,6 +629,7 @@ export default function Listagem({
                                 filtering: false,
                                 selection: true,
                                 showSelectAllCheckbox: false,
+                                showTextRowsSelected: false,
                                 paging: false,
                                 selectionProps: handleNPERowSelection
                             }}

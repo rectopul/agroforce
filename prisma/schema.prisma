@@ -435,6 +435,7 @@ model npe {
   npei          Int
   npef          Int?
   prox_npe      Int?
+  npeQT         Int?
   id_group      Int
   status        Int       @default(1)
   created_by    Int

@@ -84,16 +84,19 @@ export class ExperimentController {
               tecnologia: {
                 select: {
                   name: true,
+                  id: true,
                 },
               },
               foco: {
                 select: {
                   name: true,
+                  id: true,
                 },
               },
               type_assay: {
                 select: {
                   name: true,
+                  id: true,
                 },
               },
               safra: {
@@ -130,6 +133,18 @@ export class ExperimentController {
 
       if (options.experimentName) {
         parameters.experimentName = options.idSafra;
+      }
+      if (options.Foco) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"id": ${Number(options.Foco)} } } }`));
+      }
+      if (options.TypeAssay) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"id": ${Number(options.TypeAssay)} } } }`));
+      }
+      if (options.Tecnologia) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": {"id": ${Number(options.Tecnologia)} } }`));
+      }
+      if (options.Epoca) {
+        parameters.period = Number(options.Epoca);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

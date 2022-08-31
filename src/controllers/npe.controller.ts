@@ -92,13 +92,14 @@ export class NpeController {
           id_local: true,
           local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
-          foco: { select: { name: true } },
+          foco: { select: { name: true, id: true } },
           epoca: true,
-          tecnologia: { select: { name: true } },
-          type_assay: { select: { name: true } },
+          tecnologia: { select: { name: true, id: true } },
+          type_assay: { select: { name: true, id: true } },
           npei: true,
           npef: true,
           status: true,
+          npeQT: true,
         };
       }
 
@@ -114,10 +115,12 @@ export class NpeController {
         const newItem = value;
         const next = elements[index + 1];
         if (next) {
-          newItem.consumedQT = next.npei - newItem.npei;
+          if (!newItem.npeQT) {
+            newItem.npeQT = next.npei - newItem.npei;
+          }
           newItem.nextNPE = next.npei;
         } else {
-          newItem.consumedQT = 0;
+          newItem.npeQT = 'N/A';
           newItem.nextNPE = 0;
         }
         return newItem;
