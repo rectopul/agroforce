@@ -28,8 +28,6 @@ export class DelineamentoController {
         }
       }
 
-      console.log(parameters);
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

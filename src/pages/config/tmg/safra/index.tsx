@@ -469,7 +469,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = safras.map((row: any) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativos' as any;
           } else {

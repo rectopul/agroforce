@@ -473,7 +473,7 @@ export default function Listagem({
 
     await genotipoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = genotipos.map((row) => {
+        const newData = response.response.map((row) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {

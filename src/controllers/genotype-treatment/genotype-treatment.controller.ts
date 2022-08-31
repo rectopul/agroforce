@@ -49,7 +49,6 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
-
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -122,7 +121,7 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
+      console.log(parameters.OR[0]);
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,

@@ -346,7 +346,7 @@ export default function Listagem({
 
     await epocaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = epoca.map((row) => {
+        const newData = response.response.map((row) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {

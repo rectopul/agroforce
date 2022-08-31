@@ -45,6 +45,10 @@ import ITabs from '../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
+  filterSchema: string | any;
+  filterPreparation: string | any;
+  filterPFrom: string | any;
+  filterPTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -149,13 +153,19 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
+      filterSchema: '',
+      filterPTo: '',
+      filterPFrom: '',
+      filterPreparation: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
+    onSubmit: async ({
+      filterStatus, filterSearch, filterPreparation, filterPTo, filterPFrom, filterSchema,
+    }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+      }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterPreparation=${filterPreparation}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}&filterSchema=${filterSchema}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -572,14 +582,59 @@ export default function Listagem({
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome
+                      Local Preparo
                     </label>
                     <Input
                       type="text"
-                      placeholder="código quadra"
+                      placeholder="Local Preparo"
+                      max="40"
+                      id="filterPreparation"
+                      name="filterPreparation"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Código Quadra
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Código quadra"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Linha P
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterPFrom"
+                      name="filterPFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterPTo"
+                      name="filterPTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Esquema
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Esquema"
+                      max="40"
+                      id="filterSchema"
+                      name="filterSchema"
                       onChange={formik.handleChange}
                     />
                   </div>

@@ -18,8 +18,22 @@ export class QuadraController {
         parameters.cod_quadra = JSON.parse(`{"contains":"${options.filterSearch}"}`);
       }
 
-      if (options.local_preparo) {
-        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.local_preparo}"} }`);
+      if (options.filterPreparation) {
+        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.filterPreparation}"} }`);
+      }
+
+      if (options.filterSchema) {
+        parameters.esquema = JSON.parse(`{"contains":"${options.filterSchema}"}`);
+      }
+
+      if (options.filterPFrom || options.filterPTo) {
+        if (options.filterPFrom && options.filterPTo) {
+          parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)}, "lte": ${Number(options.filterPTo)} }`);
+        } else if (options.filterPFrom) {
+          parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)} }`);
+        } else if (options.filterPTo) {
+          parameters.linha_p = JSON.parse(`{"lte": ${Number(options.filterPTo)} }`);
+        }
       }
 
       if (options.paramSelect) {

@@ -58,14 +58,57 @@ export class SequenciaDelineamentoController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     try {
+      if (options.filterRepetitionFrom || options.filterRepetitionTo) {
+        if (options.filterRepetitionFrom && options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
+        } else if (options.filterRepetitionFrom) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)} }`);
+        } else if (options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
+        }
+      }
+
+      if (options.filterOrderFrom || options.filterOrderTo) {
+        if (options.filterOrderFrom && options.filterOrderTo) {
+          parameters.sorteio = JSON.parse(`{"gte": ${Number(options.filterOrderFrom)}, "lte": ${Number(options.filterOrderTo)} }`);
+        } else if (options.filterOrderFrom) {
+          parameters.sorteio = JSON.parse(`{"gte": ${Number(options.filterOrderFrom)} }`);
+        } else if (options.filterOrderTo) {
+          parameters.sorteio = JSON.parse(`{"lte": ${Number(options.filterOrderTo)} }`);
+        }
+      }
+
+      if (options.filterNtFrom || options.filterNtTo) {
+        if (options.filterNtFrom && options.filterNtTo) {
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
+        } else if (options.filterNtFrom) {
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
+        } else if (options.filterNtTo) {
+          parameters.nt = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
+        }
+      }
+
+      if (options.filterBlockFrom || options.filterBlockTo) {
+        if (options.filterBlockFrom && options.filterBlockTo) {
+          parameters.bloco = JSON.parse(`{"gte": ${Number(options.filterBlockFrom)}, "lte": ${Number(options.filterBlockTo)} }`);
+        } else if (options.filterBlockFrom) {
+          parameters.bloco = JSON.parse(`{"gte": ${Number(options.filterBlockFrom)} }`);
+        } else if (options.filterBlockTo) {
+          parameters.bloco = JSON.parse(`{"lte": ${Number(options.filterBlockTo)} }`);
+        }
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
+      // Ta com erro de push aqui
+
       if (options.filterSearch) {
-        parameters.volume = JSON.parse(`{"contains":"${options.filterSearch}"}`);
+        parameters.AND.push(JSON.parse(`{ "delineamento": {"name": "${options.filterSearch}" } }`));
       }
 
       const select = {

@@ -33,14 +33,14 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function TipoEnsaio({
-      allAssay,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -101,24 +101,32 @@ export default function TipoEnsaio({
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
+      filterTratFrom: '',
+      filterTratTo: '',
       filterFoco: '',
+      filterProtocol: '',
       filterTypeAssay: '',
       filterGli: '',
       filterTechnology: '',
+      filterCod: '',
       filterTreatmentNumber: '',
       filterStatusAssay: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
+      filterCod,
+      filterTratFrom,
+      filterTratTo,
       filterFoco,
+      filterProtocol,
       filterTypeAssay,
       filterGli,
       filterTechnology,
       filterTreatmentNumber,
       filterStatusAssay,
     }) => {
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterProtocol=${filterProtocol}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
@@ -538,11 +546,40 @@ export default function TipoEnsaio({
                   pb-0
                 "
                 >
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Protocolo
+                    </label>
+                    <Input
+                      placeholder="Protocolo"
+                      id="filterProtocol"
+                      name="filterProtocol"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterTechnology', 'Tecnologia')}
-                  {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nº de trat.
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterTratFrom"
+                      name="filterTratFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterTratTo"
+                      name="filterTratTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
                   {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
 
                   <div style={{ width: 40 }} />

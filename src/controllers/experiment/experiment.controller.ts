@@ -15,8 +15,20 @@ export class ExperimentController {
     let select: any = [];
     parameters.AND = [];
     try {
+      if (options.filterStatus) {
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[0]}" } } `));
+        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[1]}" } } `));
+      }
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
+      }
+      if (options.filterProtocol) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"protocol_name": {"contains": "${options.filterProtocol}" } } }`));
+      }
+      if (options.filterCod) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
@@ -39,7 +51,6 @@ export class ExperimentController {
       if (options.filterDelineamento) {
         parameters.delineamento = JSON.parse(`{ "name": {"contains": "${options.filterDelineamento}" } }`);
       }
-
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         select.assay_list = {};
