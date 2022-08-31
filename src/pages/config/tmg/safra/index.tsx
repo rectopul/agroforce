@@ -111,7 +111,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safraName' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     {
@@ -325,7 +325,7 @@ export default function Listagem({
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: ISafra) => (
-        <div className="h-7 flex">
+        <div className="h-8 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -377,9 +377,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'safraName') {
         tableFields.push(headerTableFactory('Safra', 'safraName'));
       }
@@ -389,7 +389,7 @@ export default function Listagem({
       if (columnCampos[index] === 'plantingStartTime') {
         tableFields.push(
           headerTableFactory(
-            'Período ideal de início de plantio',
+            'Período ideal início de plantio',
             'plantingStartTime',
           ),
         );
@@ -397,7 +397,7 @@ export default function Listagem({
       if (columnCampos[index] === 'plantingEndTime') {
         tableFields.push(
           headerTableFactory(
-            'Período ideal do fim do plantio',
+            'Período ideal fim do plantio',
             'plantingEndTime',
           ),
         );
@@ -594,18 +594,26 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterYearFrom"
-                      name="filterYearFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterYearTo"
-                      name="filterYearTo"
-                      onChange={formik.handleChange}
-                    />
+
+                    <div className="flex flex-row">
+                      <div className="h-6 w-1/2">
+                        <Input
+                          placeholder="De"
+                          id="filterYearFrom"
+                          name="filterYearFrom"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                      <div className="h-6 w-1/2 ml-4">
+                        <Input
+                          placeholder="Até"
+                          id="filterYearTo"
+                          name="filterYearTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                    </div>
+
                   </div>
 
                   {/* <div className="h-10 w-1/2 ml-4">
