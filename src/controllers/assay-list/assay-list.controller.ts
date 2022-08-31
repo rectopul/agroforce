@@ -13,6 +13,9 @@ export class AssayListController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
+      if (options.filterProtocol) {
+        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocol}"}`);
+      }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -21,6 +24,12 @@ export class AssayListController {
       }
       if (options.filterTechnology) {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTechnology}" } }`);
+      }
+      if (options.filterCod) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCod}" } }`);
+      }
+      if (options.filterGenotipo) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));
       }
       if (options.filterGli) {
         parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
@@ -37,6 +46,17 @@ export class AssayListController {
       if (options.filterStatusAssay) {
         parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
       }
+      /*
+      if (options.filterTratFrom || options.filterTratTo) {
+        if (options.filterTratFrom && options.filterTratTo) {
+          parameters.project = JSON.parse(`{"gte": "${Number(options.filterTratFrom)}", "lte": "${Number(options.filterTratTo)}" }`);
+        } else if (options.filterTratFrom) {
+          parameters.peso = JSON.parse(`{"gte": "${Number(options.filterTratFrom)}" }`);
+        } else if (options.filterTratTo) {
+          parameters.peso = JSON.parse(`{"lte": "${Number(options.filterTratTo)}" }`);
+        }
+      }
+      */
 
       const select = {
         id: true,
