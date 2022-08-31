@@ -682,7 +682,7 @@ export default function AtualizarTipoEnsaio({
             mb-1
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-3">
+            <div className="w-full flex justify-between items-start gap-5 mt-10">
 
               <div className="w-full h-10">
                 <label className="block text-gray-900 text-sm font-bold mb-0">
@@ -702,12 +702,30 @@ export default function AtualizarTipoEnsaio({
                 <label className="block text-gray-900 text-sm font-bold mb-0">
                   Observações
                 </label>
-                <Input
+                <textarea
+                  className="shadow
+                              appearance-none
+                              bg-white bg-no-repeat
+                              border border-solid border-gray-300
+                              rounded
+                              w-full
+                              py-1 px-2
+                              text-gray-900
+                              text-xs
+                              leading-tight
+                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  rows={3}
                   id="comments"
                   name="comments"
                   onChange={formik.handleChange}
                   value={formik.values.comments}
                 />
+                {/* <Input
+                  id="comments"
+                  name="comments"
+                  onChange={formik.handleChange}
+                  value={formik.values.comments}
+                /> */}
               </div>
             </div>
 
@@ -715,8 +733,8 @@ export default function AtualizarTipoEnsaio({
             h-7 w-full
             flex
             gap-3
-            justify-center
-            mt-8
+            justify-end
+            mt-16
           "
             >
               <div className="w-40">
