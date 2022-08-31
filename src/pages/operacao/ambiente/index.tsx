@@ -669,7 +669,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: itensPerPage,
               }}
-              onSelectionChange={setSelectedNPE}
+              onSelectionChange={handleSelectionRow}
               components={{
                 Toolbar: () => (
                   <div

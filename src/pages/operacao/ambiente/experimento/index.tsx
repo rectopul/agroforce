@@ -134,14 +134,14 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
   ]);
 
-  const [colorStar, setColorStar] = useState<string>('');
+  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+
+  const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -527,7 +527,7 @@ export default function Listagem({
   ];
 
   const handleNPERowSelection = (rowData: any) => {
-    if (NPESelectedRow?.tableData.id != rowData.tableData.id) {
+    if (NPESelectedRow?.tableData?.id != rowData?.tableData?.id) {
       rowData.tableData.checked = false;
     } else {
       rowData.tableData.checked = true;
@@ -584,24 +584,28 @@ export default function Listagem({
               style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
               columns={columnNPE}
               data={selectedNPE}
-              // onRowClick={(evt, selectedRow: any) => {
-              //   setNPESelectedRow(selectedRow);
-              //   selectedRow.tableData.checked = true;
-              // }}
+              onRowClick={(evt, selectedRow: any) => {
+                setNPESelectedRow(selectedRow);
+                selectedRow.tableData.checked = true;
+              }}
               options={{
-                selection: true,
+                // selection: true,
+                // selectionProps: handleNPERowSelection,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
+                  height: 50,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: (rowData) => ({
+                  backgroundColor:
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                  height: 40,
+                }),
                 search: false,
                 filtering: false,
-                // showSelectAllCheckbox: false,
+                showSelectAllCheckbox: false,
                 paging: false,
-                // selectionProps: handleNPERowSelection,
               }}
-              onSelectionChange={setNPESelectedRow}
               components={{
                 Toolbar: () => null,
                 Pagination: () => null,

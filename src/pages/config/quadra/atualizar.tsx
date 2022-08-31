@@ -468,6 +468,14 @@ export default function AtualizarQuadra({
 
             {updateFieldFactory('esquema', 'Esquema')}
 
+            {updateFieldFactory('local_plantio', 'Local realizado')}
+
+            {updateFieldFactory('q', 'Q')}
+
+            {updateFieldFactory('cruza', 'Status quadra')}
+          </div>
+          <div className="w-full flex justify-between items-start gap-5 mt-8">
+
             {updateFieldFactory('larg_q', 'Largura Q')}
 
             {updateFieldFactory('comp_p', 'Comp P.')}
@@ -479,14 +487,6 @@ export default function AtualizarQuadra({
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 
             {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
-          </div>
-          <div className="w-full flex justify-between items-start gap-5 mt-8">
-
-            {updateFieldFactory('local_plantio', 'Local realizado')}
-
-            {updateFieldFactory('q', 'Q')}
-
-            {updateFieldFactory('cruza', 'Status quadra')}
 
             <div className="h-7 w-full flex gap-3 justify-end mt-6">
               <div className="w-40">
