@@ -1,7 +1,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -64,8 +64,8 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
-}: IData) {
+      allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();

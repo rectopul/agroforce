@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -29,6 +29,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -91,7 +92,7 @@ export default function Listagem({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -213,9 +214,12 @@ export default function Listagem({
       filterGmrRangeTo,
       filterGmrRangeFrom,
     }) => {
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
-      setFiltersParams(parametersFilter);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
+
+      setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
+
       await genotipoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -232,34 +236,15 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setGenotipo(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
 
@@ -328,7 +313,7 @@ export default function Listagem({
     };
   }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
+  function tecnologiaHeaderFactory(title: string, name: string) {
     return {
       title: (
         <div className="flex items-center">
@@ -371,6 +356,10 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
+
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -603,20 +592,14 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
-    }
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
       }
     });
   }
@@ -671,9 +654,16 @@ export default function Listagem({
     );
   }
 
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
+    removestate(); // Remove State
   }, [currentPage]);
 
   return (
@@ -731,17 +721,17 @@ export default function Listagem({
                   }
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                </div>
+
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>
@@ -928,7 +918,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -963,9 +953,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
 
   const requestOptions = {
     method: 'GET',

@@ -1,12 +1,12 @@
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import Swal from 'sweetalert2';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import router from 'next/router';
-import { useEffect, useState } from 'react';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import Swal from "sweetalert2";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import router from "next/router";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -79,14 +79,14 @@ interface Idata {
 }
 
 export default function Listagem({
-  delineamentos,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      delineamentos,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -187,9 +187,8 @@ export default function Listagem({
       filterTratRepetitionTo,
       filterTratRepetitionFrom,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await delineamentoService
@@ -684,16 +683,16 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                </div>
+
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>
@@ -746,7 +745,7 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="delineamento/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
@@ -836,7 +835,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="delineamento/importar-planilha/config-planilha"
                         />
                       </div>

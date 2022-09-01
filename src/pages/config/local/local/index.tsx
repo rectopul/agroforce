@@ -1,12 +1,12 @@
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import router from 'next/router';
-import { useEffect, useState } from 'react';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import router from "next/router";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -78,13 +78,13 @@ interface Idata {
 }
 
 export default function Listagem({
-  locais,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      locais,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -198,9 +198,8 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
 
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -660,30 +659,28 @@ export default function Listagem({
 
                   )}
 
-                  {filterFieldFactory('filterLabel', 'Rótulo')}
+                  {filterFieldFactory("filterLabel", "Rótulo")}
 
-                  {filterFieldFactory('filterMloc', 'MLOC')}
+                  {filterFieldFactory("filterMloc", "MLOC")}
 
-                  {filterFieldFactory('filterAdress', 'Nome da fazenda')}
+                  {filterFieldFactory("filterAdress", "Nome da fazenda")}
 
-                  {filterFieldFactory('filterLabelCountry', 'País')}
+                  {filterFieldFactory("filterLabelCountry", "País")}
 
-                  {filterFieldFactory('filterLabelRegion', 'Região')}
+                  {filterFieldFactory("filterLabelRegion", "Região")}
 
-                  {filterFieldFactory('filterNameLocality', 'Localidade')}
-
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                  {filterFieldFactory("filterNameLocality", "Localidade")}
                 </div>
 
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
               </form>
             </div>
           </AccordionFilter>

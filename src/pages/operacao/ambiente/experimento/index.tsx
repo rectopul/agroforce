@@ -102,9 +102,15 @@ export default function Listagem({
   pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { tabsOperation } = ITabs;
+  const { TabsDropDowns } = ITabs;
 
-  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
+  const tabsDropDowns = TabsDropDowns('listas');
+
+  tabsDropDowns.map((tab) => (
+    tab.titleTab === 'EXPERIMENTOS'
+      ? tab.statusTab = true
+      : tab.statusTab = false
+  ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -120,7 +126,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
@@ -134,14 +140,14 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
   ]);
 
-  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
-  const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
-
   const [colorStar, setColorStar] = useState<string>('');
+  const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
+
+  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -223,7 +229,7 @@ export default function Listagem({
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
-        <div className="h-7 flex items-center">
+        <div className="flex items-center">
           <button
             type="button"
             className="font-medium text-gray-900"
@@ -258,7 +264,7 @@ export default function Listagem({
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={20} color="#eba417" />
+                  <AiTwotoneStar size={25} color="#eba417" />
                 </button>
               </div>
             </div>
@@ -271,7 +277,7 @@ export default function Listagem({
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={20} />
+                  <AiTwotoneStar size={25} />
                 </button>
               </div>
             </div>
@@ -331,9 +337,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      // if (columnCampos[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
+      if (columnCampos[index] === 'id') {
+        tableFields.push(idHeaderFactory());
+      }
       if (columnCampos[index] === 'protocolName') {
         tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
@@ -499,7 +505,7 @@ export default function Listagem({
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+        <label className="block text-gray-900 text-sm font-bold mb-2">
           {name}
         </label>
         <Input
@@ -527,7 +533,7 @@ export default function Listagem({
   ];
 
   const handleNPERowSelection = (rowData: any) => {
-    if (NPESelectedRow?.tableData?.id != rowData?.tableData?.id) {
+    if (NPESelectedRow?.tableData.id != rowData.tableData.id) {
       rowData.tableData.checked = false;
     } else {
       rowData.tableData.checked = true;
@@ -577,11 +583,16 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
-        <main className="h-full w-full flex flex-col items-start gap-0">
+      <Content contentHeader={tabsDropDowns} moduloActive="operation">
+        <main className="h-full w-full
+                        flex flex-col
+                        items-start
+                        gap-8
+                        "
+        >
           <div className="w-full">
             <MaterialTable
-              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
+              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '20px' }}
               columns={columnNPE}
               data={selectedNPE}
               onRowClick={(evt, selectedRow: any) => {
@@ -589,26 +600,16 @@ export default function Listagem({
                 selectedRow.tableData.checked = true;
               }}
               options={{
-                // selection: true,
-                // selectionProps: handleNPERowSelection,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
-                  height: 50,
                 },
-                rowStyle: (rowData) => ({
-                  backgroundColor:
-                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
-                  height: 40,
-                }),
                 search: false,
                 filtering: false,
+                selection: true,
                 showSelectAllCheckbox: false,
                 paging: false,
-              }}
-              components={{
-                Toolbar: () => null,
-                Pagination: () => null,
+                selectionProps: handleNPERowSelection,
               }}
             />
           </div>
@@ -672,46 +673,46 @@ export default function Listagem({
                                 <DragDropContext onDragEnd={handleOnDragEnd}>
                                   <Droppable droppableId="characters">
                                     {
-                                                                        (provided) => (
-                                                                          <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                                                            <div className="h-8 mb-3">
-                                                                              <Button
-                                                                                value="Atualizar"
-                                                                                bgColor="bg-blue-600"
-                                                                                textColor="white"
-                                                                                onClick={getValuesColumns}
-                                                                                icon={<IoReloadSharp size={20} />}
-                                                                              />
-                                                                            </div>
-                                                                            {
-                                                                                    generatesProps.map((generate, index) => (
-                                                                                      <Draggable
-                                                                                        key={index}
-                                                                                        draggableId={String(generate.title)}
-                                                                                        index={index}
-                                                                                      >
-                                                                                        {(provider) => (
-                                                                                          <li
-                                                                                            ref={provider.innerRef}
-                                                                                            {...provider.draggableProps}
-                                                                                            {...provider.dragHandleProps}
-                                                                                          >
-                                                                                            <CheckBox
-                                                                                              name={generate.name}
-                                                                                              title={generate.title?.toString()}
-                                                                                              value={generate.value}
-                                                                                              defaultChecked={camposGerenciados
-                                                                                                .includes(String(generate.value))}
-                                                                                            />
-                                                                                          </li>
-                                                                                        )}
-                                                                                      </Draggable>
-                                                                                    ))
-                                                                                }
-                                                                            {provided.placeholder}
-                                                                          </ul>
-                                                                        )
-                                                                    }
+                                      (provided) => (
+                                        <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
+                                          <div className="h-8 mb-3">
+                                            <Button
+                                              value="Atualizar"
+                                              bgColor="bg-blue-600"
+                                              textColor="white"
+                                              onClick={getValuesColumns}
+                                              icon={<IoReloadSharp size={20} />}
+                                            />
+                                          </div>
+                                          {
+                                                  generatesProps.map((generate, index) => (
+                                                    <Draggable
+                                                      key={index}
+                                                      draggableId={String(generate.title)}
+                                                      index={index}
+                                                    >
+                                                      {(provider) => (
+                                                        <li
+                                                          ref={provider.innerRef}
+                                                          {...provider.draggableProps}
+                                                          {...provider.dragHandleProps}
+                                                        >
+                                                          <CheckBox
+                                                            name={generate.name}
+                                                            title={generate.title?.toString()}
+                                                            value={generate.value}
+                                                            defaultChecked={camposGerenciados
+                                                              .includes(String(generate.value))}
+                                                          />
+                                                        </li>
+                                                      )}
+                                                    </Draggable>
+                                                  ))
+                                              }
+                                          {provided.placeholder}
+                                        </ul>
+                                      )
+                                  }
                                   </Droppable>
                                 </DragDropContext>
                               </AccordionFilter>
@@ -720,8 +721,8 @@ export default function Listagem({
 
                           <div className="h-12 flex items-center justify-center w-full">
                             <Button
-                              title="Sortear"
-                              value="Sortear"
+                              title="Draw"
+                              value="Draw"
                               bgColor="bg-blue-600"
                               textColor="white"
                               onClick={validateConsumedData}
@@ -793,7 +794,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;

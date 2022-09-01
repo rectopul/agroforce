@@ -1,16 +1,16 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
-import { ReactNode, useEffect, useState } from 'react';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { setCookie } from "nookies";
+import { ReactNode, useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -72,13 +72,13 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultures,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -154,9 +154,8 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await cultureService
@@ -562,18 +561,17 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
+                </div>
 
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>

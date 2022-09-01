@@ -3,7 +3,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -68,14 +68,14 @@ interface Idata {
 }
 
 export default function Listagem({
-  allItems,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      allItems,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');

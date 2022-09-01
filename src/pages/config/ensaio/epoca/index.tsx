@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import router from 'next/router';
@@ -52,8 +52,8 @@ interface Idata {
 }
 
 export default function Listagem({
-  allItems, itensPerPage, filterApplication, totalItems, cultureId,
-}: Idata) {
+      allItems, itensPerPage, filterApplication, totalItems, cultureId,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
