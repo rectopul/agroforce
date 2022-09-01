@@ -217,16 +217,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -234,16 +231,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -346,16 +340,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -363,16 +354,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
               if (cod_quadra === cod_quadra_anterior) {
                 if (t4_i === 0) {
@@ -416,16 +404,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
               if (cod_quadra === cod_quadra_anterior) {
                 if (t4_i === 0) {
@@ -476,18 +461,15 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } elseif (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
-                        += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
-               if (spreadSheet[row][column] !== 1) {
+              if (spreadSheet[row][column] !== 1) {
                 responseIfError[Number(column)]
                       += responseGenericFactory(
                     (Number(column) + 1),
@@ -508,14 +490,14 @@ export class ImportBlockController {
                 if (typeof spreadSheet[row][column] !== 'number'
                 || Number(spreadSheet[row][column]) <= 0
                 || !Number.isInteger(Number(spreadSheet[row][column]))) {
-                responseIfError[Number(column)]
+                  responseIfError[Number(column)]
                         += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
-                  );
-              }
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'precisa ser um numero inteiro e positivo',
+                    );
+                }
                 if (Number(spreadSheet[row][column]) <= Number(spreadSheet[row][13])) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(

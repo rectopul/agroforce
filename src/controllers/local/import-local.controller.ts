@@ -67,7 +67,7 @@ export class ImportLocalController {
             } else {
               const { status, response }: IReturnObject = await safraController.getOne(idSafra);
               if (status === 200) {
-                if (response?.year !== spreadSheet[row][column]) {
+                if (Number(response?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -99,11 +99,6 @@ export class ImportLocalController {
                   'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
                 );
               }
-              console.log('unityExist');
-              console.log(unityExist);
-
-              console.log('response');
-              console.log(response);
             }
           } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
