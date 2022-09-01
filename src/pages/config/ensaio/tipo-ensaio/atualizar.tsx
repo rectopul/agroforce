@@ -402,9 +402,9 @@ export default function AtualizarTipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -726,7 +726,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
 
   const idTypeAssay = Number(context.query.id);
 
-  const filterApplication = `1&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
+  const filterApplication = `&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
 
   const param = `skip=0&take=${itensPerPage}`;
   const baseUrlEnvelope = `${publicRuntimeConfig.apiUrl}/envelope`;
@@ -734,7 +734,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   urlParameters.search = new URLSearchParams(param).toString();
 
   const { response: allEnvelopes, total: totalItens } = await fetch(
-    `${baseUrlEnvelope}?id_type_assay=${idTypeAssay}`,
+    `${baseUrlEnvelope}?&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`,
     requestOptions,
   ).then((response) => response.json());
 

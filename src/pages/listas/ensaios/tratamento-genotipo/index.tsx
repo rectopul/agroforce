@@ -880,7 +880,7 @@ export default function Listagem({
                   emptyDataSourceMessage: 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
-              onChangeRowsPerPage={(e) => console.log({ e })}
+              onChangeRowsPerPage={(e: any) => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (

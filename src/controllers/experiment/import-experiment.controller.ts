@@ -261,7 +261,6 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
-              console.log();
               if (!validateDouble(spreadSheet[row][column])
                   || !validateDecimal(spreadSheet[row][column])
                   || Number(spreadSheet[row][column]) < 0

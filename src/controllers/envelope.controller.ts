@@ -59,6 +59,7 @@ export class EnvelopeController {
     try {
       const select = {
         id: true,
+        id_safra: true,
         type_assay: { select: { name: true } },
         safra: { select: { safraName: true } },
         seeds: true,
@@ -66,6 +67,10 @@ export class EnvelopeController {
 
       if (options.id_type_assay) {
         parameters.id_type_assay = Number(options.id_type_assay);
+      }
+
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
       }
 
       const take = options.take ? Number(options.take) : undefined;
