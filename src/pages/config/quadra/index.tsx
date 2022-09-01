@@ -3,7 +3,7 @@
 /* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -79,14 +79,14 @@ interface IData {
 }
 
 export default function Listagem({
-  quadras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      quadras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -152,9 +152,8 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -169,9 +168,8 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${
-      data.cod_quadra
-    }&local_preparo=${data.local.name_local_culture}`;
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
+      }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -588,7 +586,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -634,7 +632,7 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
@@ -719,7 +717,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -778,7 +776,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -788,7 +786,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

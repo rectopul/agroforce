@@ -1,7 +1,7 @@
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -64,13 +64,13 @@ interface IData {
 }
 
 export default function Listagem({
-  allDepartments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allDepartments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -128,9 +128,8 @@ export default function Listagem({
       typeOrder: "",
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await departmentService
@@ -523,7 +522,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -714,7 +713,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()

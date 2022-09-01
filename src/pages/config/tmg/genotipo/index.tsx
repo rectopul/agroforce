@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -82,15 +82,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idCulture,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allGenotipos,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idCulture,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -711,7 +711,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -901,7 +901,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -911,7 +911,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

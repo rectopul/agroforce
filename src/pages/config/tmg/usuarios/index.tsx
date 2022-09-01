@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -69,20 +69,20 @@ interface IData {
 }
 
 export default function Listagem({
-  allUsers,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allUsers,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns("config");
 
   tabsDropDowns.map((tab) =>
     tab.titleTab === "TMG" &&
-    tab.data.map((i) => i.labelDropDown === "Usuários")
+      tab.data.map((i) => i.labelDropDown === "Usuários")
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
@@ -161,9 +161,8 @@ export default function Listagem({
       typeOrder: "",
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterLogin=${filterLogin}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await userService
@@ -835,7 +834,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage =
     (await (

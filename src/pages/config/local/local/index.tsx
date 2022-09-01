@@ -2,7 +2,7 @@
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import router from "next/router";
@@ -76,13 +76,13 @@ interface Idata {
 }
 
 export default function Listagem({
-  locais,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      locais,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns("config");
   tabsDropDowns.map((tab) =>
@@ -197,9 +197,8 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
 
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
@@ -673,7 +672,7 @@ export default function Listagem({
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -878,7 +877,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage =

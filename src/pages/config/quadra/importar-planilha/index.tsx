@@ -8,7 +8,7 @@ import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { importService } from '../../../../services';
@@ -17,7 +17,7 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-export default function Importar({ safra }: any) {
+export default function Importar({ safra }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const router = useRouter();
   const safras: object | any = [];
@@ -132,7 +132,7 @@ export default function Importar({ safra }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const { cultureId } = req.cookies;

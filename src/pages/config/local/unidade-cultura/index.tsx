@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -71,8 +71,8 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
-}: IData) {
+      allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (
@@ -676,7 +676,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await userPreferenceController.getConfigGerais())?.response[0]?.itens_per_page ?? 10;

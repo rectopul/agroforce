@@ -2,7 +2,7 @@ import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import router from "next/router";
@@ -72,14 +72,14 @@ interface Idata {
 }
 
 export default function Listagem({
-  delineamentos,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      delineamentos,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -173,9 +173,8 @@ export default function Listagem({
       filterRepeat,
       filterTreatment,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await delineamentoService
@@ -660,7 +659,7 @@ export default function Listagem({
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -718,7 +717,7 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="delineamento/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
@@ -805,7 +804,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="delineamento/importar-planilha/config-planilha"
                         />
                       </div>
@@ -875,7 +874,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage =
     (await (

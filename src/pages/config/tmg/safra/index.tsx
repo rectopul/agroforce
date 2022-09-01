@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -72,14 +72,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allSafras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allSafras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -157,9 +157,8 @@ export default function Listagem({
       filterStartDate,
       filterEndDate,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await safraService
@@ -657,7 +656,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -847,7 +846,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
