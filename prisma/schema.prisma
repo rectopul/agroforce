@@ -454,40 +454,28 @@ model import_spreadsheet {
 }
 
 model npe {
-  id            Int         @id @default(autoincrement())
-  id_local      Int
-  id_safra      Int
-  id_foco       Int
-  id_type_assay Int
-  id_ogm        Int
-  npei          Int
-  npef          Int?
-  prox_npe      Int?
-  npeQT         Int?
-  id_group      Int
-  status        Int         @default(1)
-  created_by    Int
-  epoca         String?
-  created_at    DateTime?   @default(now())
-  safra         safra?      @relation(fields: [safraId], references: [id])
-  safraId       Int?
-  local         local?      @relation(fields: [localId], references: [id])
-  localId       Int?
-  foco          foco?       @relation(fields: [focoId], references: [id])
-  focoId        Int?
-  group         group?      @relation(fields: [groupId], references: [id])
-  groupId       Int?
-  type_assay    type_assay? @relation(fields: [type_assayId], references: [id])
-  type_assayId  Int?
-  tecnologia    tecnologia? @relation(fields: [tecnologiaId], references: [id])
-  tecnologiaId  Int?
+  id           Int       @id @default(autoincrement())
+  npei         Int
+  npef         Int?
+  prox_npe     Int?
+  npeQT        Int?
+  created_by   Int
+  epoca        String?
+  focoId       Int?
+  localId      Int?
+  safraId      Int?
+  groupId      Int?
+  typeAssayId  Int?
+  tecnologiaId Int?
+  status       Int       @default(1)
+  created_at   DateTime? @default(now())
 
-  @@index([id_foco], map: "npe_id_foco_fkey")
-  @@index([id_group], map: "npe_id_group_fkey")
-  @@index([id_local], map: "npe_id_local_fkey")
-  @@index([id_ogm], map: "npe_id_ogm_fkey")
-  @@index([id_safra], map: "npe_id_safra_fkey")
-  @@index([id_type_assay], map: "npe_id_type_assay_fkey")
+  foco       foco?       @relation(fields: [focoId], references: [id])
+  local      local?      @relation(fields: [localId], references: [id])
+  safra      safra?      @relation(fields: [safraId], references: [id])
+  group      group?      @relation(fields: [groupId], references: [id])
+  type_assay type_assay? @relation(fields: [typeAssayId], references: [id])
+  tecnologia tecnologia? @relation(fields: [tecnologiaId], references: [id])
 }
 
 model sequencia_delineamento {

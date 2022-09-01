@@ -44,12 +44,14 @@ export class ImportNpeController {
       const configModule: object | any = await importController.getAll(14);
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][6]}_${spreadSheet[row][7]}`;
+          const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][6]}`;
+
           if (npeTemp.includes(npeName)) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             npeTemp[row] = npeName;
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. NPE's duplicados na tabela` };
           }
+          npeTemp[row] = npeName;
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
@@ -69,7 +71,7 @@ export class ImportNpeController {
                       'o local não existe no sistema',
                     );
                   } else {
-                    this.aux.id_local = local.response[0]?.id;
+                    this.aux.localId = local.response[0]?.id;
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -111,7 +113,7 @@ export class ImportNpeController {
                       'a safra não existe no sistema',
                     );
                   } else {
-                    this.aux.id_safra = safras.response[0]?.id;
+                    this.aux.safraId = safras.response[0]?.id;
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -147,7 +149,7 @@ export class ImportNpeController {
                     'a tecnologia informada não existe no sistema',
                   );
                 } else {
-                  this.aux.id_ogm = ogm.response[0]?.id;
+                  this.aux.tecnologiaId = ogm.response[0]?.id;
                 }
               } else {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -176,7 +178,7 @@ export class ImportNpeController {
                       'o foco não existe no sistema',
                     );
                   } else {
-                    this.aux.id_foco = foco.response[0]?.id;
+                    this.aux.focoId = foco.response[0]?.id;
                     const { status }: IReturnObject = await groupController.getAll({
                       id_safra: idSafra,
                       id_foco: this.aux.id_foco,
@@ -221,7 +223,7 @@ export class ImportNpeController {
                       'o tipo de ensaio não existe no sistema',
                     );
                   } else {
-                    this.aux.id_type_assay = ensaio.response[0]?.id;
+                    this.aux.typeAssayId = ensaio.response[0]?.id;
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -243,7 +245,7 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'NPEI') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) === 'number' || spreadSheet[row][column] > 0) {
-                  if (typeof (this.aux.id_foco) === 'undefined') {
+                  if (typeof (this.aux.focoId) === 'undefined') {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
@@ -315,18 +317,18 @@ export class ImportNpeController {
                   const local: any = await localController.getAll(
                     { name_local_culture: spreadSheet[row][column] },
                   );
-                  this.aux.id_local = local.response[0]?.id;
+                  this.aux.localId = local.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Safra') {
-                  this.aux.id_safra = Number(idSafra);
+                  this.aux.safraId = Number(idSafra);
                 }
 
                 if (configModule.response[0]?.fields[column] === 'OGM') {
                   const ogm: any = await tecnologiaController.getAll(
                     { cod_tec: String(spreadSheet[row][column]) },
                   );
-                  this.aux.id_ogm = ogm.response[0]?.id;
+                  this.aux.tecnologiaId = ogm.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Foco') {
@@ -337,14 +339,14 @@ export class ImportNpeController {
                       filterStatus: 1,
                     },
                   );
-                  this.aux.id_foco = Number(foco.response[0]?.id);
+                  this.aux.focoId = Number(foco.response[0]?.id);
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Ensaio') {
                   const ensaio: any = await typeAssayController.getAll(
                     { name: spreadSheet[row][column] },
                   );
-                  this.aux.id_type_assay = ensaio.response[0]?.id;
+                  this.aux.typeAssayId = ensaio.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Epoca') {
@@ -355,11 +357,11 @@ export class ImportNpeController {
                   this.aux.npei = spreadSheet[row][column];
                 }
 
-                if (spreadSheet[row].length === (Number(column) + 1) && this.aux !== []) {
+                if (spreadSheet[row].length === (Number(column) + 1)) {
                   const { response: groupResponse }: any = await groupController.getAll(
                     { id_safra: idSafra, id_foco: this.aux.id_foco },
                   );
-                  this.aux.id_group = Number(groupResponse[0]?.id);
+                  this.aux.groupId = Number(groupResponse[0]?.id);
                   await npeController.create(this.aux);
                 }
               }

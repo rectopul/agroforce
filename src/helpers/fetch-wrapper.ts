@@ -76,33 +76,28 @@ async function deleted(url: any, body: any) {
   return handleResponse(response);
 }
 
+// For global pagination
+async function handlePaginationGlobal(currentPages: any, take: any, filter: any) {
+  if (localStorage.getItem('filterValueEdit')) {
+    filter = localStorage.getItem('filterValueEdit');
+  } else {
+    filter = filter;
+  }
 
-// For global pagination 
-async function handlePaginationGlobal(currentPages: any, take: any,filter: any){
-   
-      
-      if(localStorage.getItem("filterValueEdit")){
-        filter=localStorage.getItem("filterValueEdit");
-      }
-      else{
-        filter=filter;
-      }
+  if (localStorage.getItem('pageBeforeEdit') != null) {
+    currentPages = Number(localStorage.getItem('pageBeforeEdit'));
+  } else {
+    currentPages = currentPages;
+  }
 
-      if(localStorage.getItem("pageBeforeEdit")!=null){
-        currentPages=Number(localStorage.getItem("pageBeforeEdit"));       
-      }
-      else{
-        currentPages=currentPages;    
-      }
+  const skip = currentPages * Number(take);
+  let parametersFilter = `skip=${skip}&take=${take}`;
 
-    const skip = currentPages * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+  if (filter) {
+    parametersFilter = `${parametersFilter}&${filter}`;
+  }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-
-    return {parametersFilter , currentPages};
+  return { parametersFilter, currentPages };
 }
 
 // async function RemoveExtraCultureId(parametersFilter){
@@ -119,78 +114,84 @@ async function handlePaginationGlobal(currentPages: any, take: any,filter: any){
 
 // }
 
-//Total pages global function 
-function handleTotalGlobal(currentPage: any ,pages: any){
-   
+// Total pages global function
+function handleTotalGlobal(currentPage: any, pages: any) {
   let value = 0;
   if (currentPage < 0) {
-   value=0;
+    value = 0;
   } else if (currentPage >= pages) {
-    value=pages - 1;
+    value = pages - 1;
   }
 
   return value;
 }
 
-
-// Manage filter parameters 
-async function handleFilterParameter(...theArgs: any){
-  
+// Manage filter parameters
+async function handleFilterParameter(...theArgs: any) {
   let parametersFilter;
 
-  const [key]=theArgs;
+  const [key] = theArgs;
 
-  switch(key) {
-
-    case "safra":
-
-      const [key1,filterStatus,filterSafra,filterYear,filterStartDate,filterEndDate,cultureId]=theArgs;
+  switch (key) {
+    case 'safra': {
+      const [
+        key1,
+        filterStatus,
+        filterSafra,
+        filterYear,
+        filterStartDate,
+        filterEndDate,
+        cultureId,
+      ] = theArgs;
 
       parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+    }
 
       break;
 
-    case "genotipo":
-
-      const [key2,filterGenotipo,filterMainName,filterCruza,filterTecnologiaCod,filterTecnologiaDesc,filterGmr,idCulture,idSafra,filterGmrRangeTo,filterGmrRangeFrom]=theArgs;
-
-      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;        
+    case 'genotipo': {
+      const [
+        key2,
+        filterGenotipo,
+        filterMainName,
+        filterCruza,
+        filterTecnologiaCod,
+        filterTecnologiaDesc,
+        filterGmr,
+        idCulture,
+        idSafra,
+        filterGmrRangeTo,
+        filterGmrRangeFrom,
+      ] = theArgs;
+      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
+    }
       break;
-
-
     default:
-      parametersFilter="";
+      parametersFilter = '';
   }
 
-return parametersFilter;
-
+  return parametersFilter;
 }
 
-
-
-//Handle orders global  
-function handleOrderGlobal(column: any,order: any,filter : any){
-
+// Handle orders global
+function handleOrderGlobal(column: any, order: any, filter : any) {
   let typeOrder: any;
   let parametersFilter: any;
   if (order === 1) {
-    typeOrder = "asc";
+    typeOrder = 'asc';
   } else if (order === 2) {
-    typeOrder = "desc";
+    typeOrder = 'desc';
   } else {
-    typeOrder = "";
+    typeOrder = '';
   }
 
-    
-  if (filter && typeof filter !== undefined) {
-    
-    if (typeOrder !== "") {
+  if (filter && typeof filter !== 'undefined') {
+    if (typeOrder !== '') {
       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    }    
-    else {
+    } else {
       parametersFilter = filter;
     }
-  } else if (typeOrder !== "") {
+  } else if (typeOrder !== '') {
     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
   } else {
     parametersFilter = filter;
@@ -202,34 +203,31 @@ function handleOrderGlobal(column: any,order: any,filter : any){
   return parametersFilter;
 }
 
+function removeExtraValues(parametersFilter : any) {
+  const myArray = parametersFilter.split('&id_culture');
 
-function removeExtraValues(parametersFilter : any){
-
-  const myArray = parametersFilter.split("&id_culture");
-
-  if(myArray.length > 2){
-    parametersFilter = "";
-    parametersFilter = myArray[0]+"&id_culture"+myArray[2]
+  if (myArray.length > 2) {
+    parametersFilter = '';
+    parametersFilter = `${myArray[0]}&id_culture${myArray[2]}`;
   }
 
   return parametersFilter;
 }
 
-//Get Values from Url
-function getValueParams(ParameterString : any){
+// Get Values from Url
+function getValueParams(ParameterString : any) {
 
-  // var c='';  
+  // var c='';
   // if(localStorage.getItem("filterValueEdit")){
 
   //   var convert=localStorage.getItem("filterValueEdit");
-  //   var url_string = `http://www.example.com/t.html?${convert}`; 
+  //   var url_string = `http://www.example.com/t.html?${convert}`;
   //   var url = new URL(url_string);
   //   c = url.searchParams.get(ParameterString);
   // }
- 
+
   //  return c;
 }
-
 
 // helper functions
 
@@ -242,5 +240,5 @@ export const fetchWrapper = {
   handleTotalGlobal,
   handleFilterParameter,
   handleOrderGlobal,
-  getValueParams
+  getValueParams,
 };
