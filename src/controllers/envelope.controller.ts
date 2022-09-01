@@ -65,6 +65,10 @@ export class EnvelopeController {
         seeds: true,
       };
 
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
+
       if (options.id_type_assay) {
         parameters.id_type_assay = Number(options.id_type_assay);
       }

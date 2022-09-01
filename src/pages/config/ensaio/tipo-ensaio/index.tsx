@@ -110,12 +110,12 @@ export default function TipoEnsaio({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome',
@@ -377,9 +377,9 @@ export default function TipoEnsaio({
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[item] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -625,7 +625,7 @@ export default function TipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

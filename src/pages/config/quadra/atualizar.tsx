@@ -125,7 +125,7 @@ export default function AtualizarQuadra({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Divisor', value: 'divisor' },
     { name: 'CamposGerenciados[]', title: 'Sem metro', value: 'sem_metros' },
     { name: 'CamposGerenciados[]', title: 'T4I', value: 't4_i' },
@@ -266,9 +266,9 @@ export default function AtualizarQuadra({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'divisor') {
         tableFields.push(headerTableFactory('Divisor', 'divisor'));
       }
@@ -525,6 +525,7 @@ export default function AtualizarQuadra({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

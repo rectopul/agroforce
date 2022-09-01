@@ -96,7 +96,7 @@ export default function AtualizarTipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
       title: 'Quant. de sementes por envelope',
@@ -282,9 +282,9 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'seeds') {
         tableFields.push(
           headerTableFactory('Quant. de sementes por envelope', 'seeds'),
@@ -410,6 +410,7 @@ export default function AtualizarTipoEnsaio({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await envelopeService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSeeds(response.response);
@@ -479,7 +480,7 @@ export default function AtualizarTipoEnsaio({
             h-7 w-full
             flex
             gap-3
-            justify-center
+            justify-end
             mt-6
           "
             >
@@ -529,6 +530,7 @@ export default function AtualizarTipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -725,7 +727,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
 
   const idTypeAssay = Number(context.query.id);
 
-  const filterApplication = `&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
+  const filterApplication = `id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
 
   const param = `skip=0&take=${itensPerPage}`;
   const baseUrlEnvelope = `${publicRuntimeConfig.apiUrl}/envelope`;

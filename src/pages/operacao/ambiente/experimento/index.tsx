@@ -625,6 +625,7 @@ export default function Listagem({
                     headerStyle: {
                       zIndex: 20,
                     },
+                    rowStyle: { background: '#f9fafb', height: 35 },
                     search: false,
                     filtering: false,
                     pageSize: itensPerPage,
