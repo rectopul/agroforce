@@ -16,6 +16,7 @@ import { LocalController } from '../local/local.controller';
 import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';
 import { QuadraController } from './quadra.controller';
+import { validateInteger } from '../../shared/utils/numberValidate';
 
 export class ImportBlockController {
   static async validate(
