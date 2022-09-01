@@ -235,7 +235,6 @@ export default function Listagem({
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-
       if (columnCampos[item] === 'local') {
         tableFields.push(
           headerTableFactory('Local', 'local.name_local_culture'),
@@ -509,12 +508,12 @@ export default function Listagem({
   const handleRowSelection = (rowData: any) => {
     if (selectedNPE?.includes(rowData)) {
       rowData.tableData.checked = false;
-      setSelectedNPE(selectedNPE.filter((item) => item != rowData))
+      setSelectedNPE(selectedNPE.filter((item) => item != rowData));
     } else {
       rowData.tableData.checked = true;
-      setSelectedNPE([...selectedNPE, rowData])
+      setSelectedNPE([...selectedNPE, rowData]);
     }
-  }
+  };
 
   return (
     <>
@@ -599,7 +598,6 @@ export default function Listagem({
                 handleRowSelection(selectedRow);
               }}
               options={{
-                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -635,8 +633,8 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          selectedNPE.sort((a, b) => a.npei - b.npei)
-                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE))
+                          selectedNPE.sort((a, b) => a.npei - b.npei);
+                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
                           router.push({
                             pathname: '/operacao/ambiente/experimento',
                           });

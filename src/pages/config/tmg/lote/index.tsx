@@ -82,8 +82,11 @@ interface IData {
 }
 
 export default function Listagem({
-      allLote, totalItems, itensPerPage,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  idSafra,
+  itensPerPage,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();

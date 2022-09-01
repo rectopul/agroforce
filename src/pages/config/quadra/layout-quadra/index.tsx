@@ -1,11 +1,11 @@
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState } from "react";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -94,14 +94,14 @@ interface Idata {
 }
 
 export default function Listagem({
-      layouts,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      local,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  layouts,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  local,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -216,7 +216,7 @@ export default function Listagem({
       filterParcelFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
+      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await layoutQuadraService
@@ -495,7 +495,7 @@ export default function Listagem({
     data: any,
   ): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_culture=${userLogado.userCulture.cultura_selecionada
-      }&esquema=${data.esquema}&status=${1}`;
+    }&esquema=${data.esquema}&status=${1}`;
     if (data.status == 0) {
       await layoutQuadraService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -756,7 +756,7 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-
+                </div>
                 <div className="h-16 w-32 mt-3">
                   <Button
                     onClick={() => { }}

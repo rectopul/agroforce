@@ -96,6 +96,7 @@ export class ExperimentController {
                 select: {
                   name: true,
                   id: true,
+                  cod_tec: true,
                 },
               },
               foco: {

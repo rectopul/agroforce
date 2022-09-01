@@ -1,10 +1,10 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   DragDropContext,
   Draggable,
@@ -24,6 +24,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   AccordionFilter,
   Button,
@@ -31,15 +32,11 @@ import {
   Content,
   Input,
   Select,
-} from "src/components";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { safraService, userPreferencesService } from "src/services";
-import * as XLSX from "xlsx";
-import { removeCookies, setCookies } from "cookies-next";
-import ITabs from "../../../../shared/utils/dropdown";
-import {fetchWrapper} from "src/helpers";
-
-
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { safraService, userPreferencesService } from '../../../../services';
+import { fetchWrapper } from '../../../../helpers';
+import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
@@ -79,14 +76,14 @@ interface IData {
 }
 
 export default function Listagem({
-      allSafras,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      cultureId,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allSafras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -107,7 +104,7 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); //Set filter Parameter 
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -138,22 +135,21 @@ export default function Listagem({
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
-
-  const filterStatus = filtersParams.split("");
-
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: "",
-      filterSafra:"",
-      filterYear: "",
-      filterStartDate: "",
-      filterEndDate: "",
-      orderBy: "",
-      typeOrder: "",
+      filterStatus: '',
+      filterSafra: '',
+      filterYearFrom: '',
+      filterYearTo: '',
+      filterStartDate: '',
+      filterEndDate: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterStatus,
@@ -162,13 +158,12 @@ export default function Listagem({
       filterYearFrom,
       filterStartDate,
       filterEndDate,
-    }) => {      
-     
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("safra",filterStatus,filterSafra,filterYear,filterStartDate,filterEndDate,cultureId);
+    }) => {
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
-      setCookies("filterBeforeEdit", filtersParams);
+      setCookies('filterBeforeEdit', filtersParams);
 
       await safraService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -222,53 +217,53 @@ export default function Listagem({
     });
   }
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+  // async function handleOrder(
+  //   column: string,
+  //   order: string | any,
+  // ): Promise<void> {
+  //   let typeOrder: any;
+  //   let parametersFilter: any;
+  //   if (order === 1) {
+  //     typeOrder = 'asc';
+  //   } else if (order === 2) {
+  //     typeOrder = 'desc';
+  //   } else {
+  //     typeOrder = '';
+  //   }
+  //   setOrderBy(column);
+  //   setOrderType(typeOrder);
+  //   if (filter && typeof filter !== 'undefined') {
+  //     if (typeOrder !== '') {
+  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+  //     } else {
+  //       parametersFilter = filter;
+  //     }
+  //   } else if (typeOrder !== '') {
+  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+  //   } else {
+  //     parametersFilter = filter;
+  //   }
 
-    await safraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setSafras(response.response);
-        }
-      });
+  //   await safraService
+  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
+  //     .then((response) => {
+  //       if (response.status === 200) {
+  //         setSafras(response.response);
+  //       }
+  //     });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-  }
+  //   if (orderList === 2) {
+  //     setOrder(0);
+  //     setArrowOrder(<AiOutlineArrowDown />);
+  //   } else {
+  //     setOrder(orderList + 1);
+  //     if (orderList === 1) {
+  //       setArrowOrder(<AiOutlineArrowUp />);
+  //     } else {
+  //       setArrowOrder('');
+  //     }
+  //   }
+  // }
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -336,10 +331,10 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filtersParams);
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
 
                 router.push(`/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`);
               }}
@@ -417,14 +412,14 @@ export default function Listagem({
     return tableFields;
   }
 
+  const columns = columnsOrder(camposGerenciados);
   async function handleOrder(
     column: string,
-    order: string | any
-  ): Promise<void> {   
-   
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter);
-   
+    order: string | any,
+  ): Promise<void> {
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
+
     await safraService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
@@ -442,7 +437,7 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder("");
+        setArrowOrder('');
       }
     }
   }
@@ -539,42 +534,39 @@ export default function Listagem({
     });
   };
 
-
   async function handleTotalPages() {
-
     if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
     }
-
   }
 
+  async function handlePagination(): Promise<void> {
+    // manage using comman function
+    const {
+      parametersFilter,
+      currentPages,
+    } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
-  async function handlePagination(): Promise<void> {  
-
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
-    
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
       }
     });
-
   }
 
-  //remove states
-   function removestate(){
-      localStorage.removeItem("filterValueEdit");  
-      localStorage.removeItem("pageBeforeEdit");    
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
   }
 
-  //Checkingdefualt values
+  // Checkingdefualt values
 
-   function checkValue(value : any){
+  function checkValue(value : any) {
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;
   }
@@ -582,7 +574,7 @@ export default function Listagem({
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); //Remove State
+    removestate(); // Remove State
   }, [currentPage]);
 
   return (
@@ -633,12 +625,12 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Safra
                     </label>
-                    
+
                     <Input
                       placeholder="Nome da Safra"
                       id="filterSafra"
-                      name="filterSafra"                     
-                      //defaultValue={checkValue("filterSafra")}
+                      name="filterSafra"
+                      // defaultValue={checkValue("filterSafra")}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -651,7 +643,7 @@ export default function Listagem({
                       id="filterYear"
                       name="filterYear"
                       onChange={formik.handleChange}
-                      //defaultValue={checkValue("filterYear")}
+                      // defaultValue={checkValue("filterYear")}
                       className="shadow
                           appearance-none
                           bg-white bg-no-repeat
@@ -932,7 +924,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
-  
+
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
     : `filterStatus=1&id_culture=${cultureId}`;

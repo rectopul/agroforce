@@ -1,10 +1,10 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -27,8 +27,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import getConfig from 'next/config';
-import { GetServerSideProps } from 'next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { userPreferencesService, userService } from '../../../../services';
 import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
@@ -74,23 +73,21 @@ interface IData {
 }
 
 export default function Listagem({
-      allUsers,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allUsers,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" &&
-      tab.data.map((i) => i.labelDropDown === "Usuários")
-      ? (tab.statusTab = true)
-      : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
+      && tab.data.map((i) => i.labelDropDown === 'Usuários')
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.usuario || {
@@ -168,7 +165,7 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterName=${filterName}&filterLogin=${filterLogin}`;
+      }&filterName=${filterName}&filterLogin=${filterLogin}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await userService

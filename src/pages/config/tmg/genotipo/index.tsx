@@ -29,6 +29,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -39,7 +40,6 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
-import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterGenotipo: string | any;
@@ -84,15 +84,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allGenotipos,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idCulture,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -214,9 +214,8 @@ export default function Listagem({
       filterGmrRangeTo,
       filterGmrRangeFrom,
     }) => {
-      
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("genotipo", filterGenotipo,filterMainName,filterCruza,filterTecnologiaCod,filterTecnologiaDesc,filterGmr,idCulture,idSafra,filterGmrRangeTo,filterGmrRangeFrom,);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
@@ -237,9 +236,8 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-
-     //Manage orders of colunms 
-     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter);
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -315,8 +313,7 @@ export default function Listagem({
     };
   }
 
-  
-  function tecnologiaHeaderFactory() {
+  function tecnologiaHeaderFactory(title: string, name: string) {
     return {
       title: (
         <div className="flex items-center">
@@ -360,8 +357,8 @@ export default function Listagem({
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
 
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
 
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
@@ -595,15 +592,14 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
       }
     });
   }
@@ -658,16 +654,16 @@ export default function Listagem({
     );
   }
 
-    //remove states
-  function removestate(){
-      localStorage.removeItem("filterValueEdit");  
-      localStorage.removeItem("pageBeforeEdit");    
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); //Remove State
+    removestate(); // Remove State
   }, [currentPage]);
 
   return (
@@ -956,7 +952,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-    
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',

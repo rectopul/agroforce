@@ -86,8 +86,14 @@ interface IData {
 }
 
 export default function Listagem({
-      allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allCultureUnity,
+  totalItems,
+  idSafra,
+  itensPerPage,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));

@@ -16,8 +16,11 @@ import {
   Button, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
-export default function Importar({ safra }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Importar(
+  { safra }: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();

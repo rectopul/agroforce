@@ -83,14 +83,14 @@ interface IData {
 }
 
 export default function Listagem({
-      quadras,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      cultureId,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  quadras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -162,7 +162,7 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+      }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -178,15 +178,12 @@ export default function Listagem({
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
-      }&local_preparo=${data.local.name_local_culture}`;
+    }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${
-      data.cod_quadra
-    }&local_preparo=${data.local.name_local_culture}`;
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {

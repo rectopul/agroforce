@@ -1,15 +1,15 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import router from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import router from 'next/router';
+import { ReactNode, useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -78,13 +78,14 @@ interface IData {
 }
 
 export default function Listagem({
-      allFocos,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allFocos,
+  totalItems,
+  itensPerPage,
+  idCulture,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -140,8 +141,8 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada
-        }`;
+      }filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada
+      }`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await focoService

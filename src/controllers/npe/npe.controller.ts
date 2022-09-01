@@ -112,9 +112,9 @@ export class NpeController {
           epoca: true,
           tecnologia: { select: { name: true, id: true } },
           type_assay: { select: { name: true, id: true } },
+          group: true,
           npei: true,
           npef: true,
-          epoca: true,
           status: true,
           npeQT: true,
         };
