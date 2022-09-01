@@ -5,6 +5,7 @@
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
+import { validateInteger } from '../../shared/utils/numberValidate';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
 import { FocoController } from '../foco.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';

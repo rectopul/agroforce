@@ -20,7 +20,7 @@ export function InputMoney({ value, onChange, ...rest }: ITypeInputProps) {
         "
       {...rest}
       defaultValue={value}
-      onChange={(e, mask) => onChange(mask)}
+      onChange={(e: any, mask: any) => onChange?.(mask)}
     />
   );
 }
