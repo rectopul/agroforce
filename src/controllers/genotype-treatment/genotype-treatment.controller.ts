@@ -121,7 +121,6 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-      console.log(parameters.OR[0]);
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
