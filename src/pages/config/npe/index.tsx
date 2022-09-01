@@ -207,7 +207,7 @@ export default function Listagem({
       filterNpeFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada}`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -454,7 +454,7 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
+    const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
     }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
@@ -888,19 +888,19 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   )?.response[0]?.itens_per_page;
 
   const { token } = req.cookies;
-  const id_safra: any = req.cookies.safraId;
+  const { safraId } = req.cookies;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_safra=${id_safra}`
-    : `filterStatus=1&id_safra=${id_safra}`;
+    ? `${req.cookies.filterBeforeEdit}&safraId=${safraId}`
+    : `filterStatus=1&safraId=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

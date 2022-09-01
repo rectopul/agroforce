@@ -413,6 +413,7 @@ export default function Listagem({
   }
 
   const columns = columnsOrder(camposGerenciados);
+
   async function handleOrder(
     column: string,
     order: string | any,

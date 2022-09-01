@@ -46,28 +46,28 @@ export class NpeController {
         parameters.npei = Number(options.filterNPE);
       }
 
-      if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
+      if (options.safraId) {
+        parameters.safraId = Number(options.safraId);
       }
 
-      if (options.id_foco) {
-        parameters.id_foco = Number(options.id_foco);
+      if (options.focoId) {
+        parameters.focoId = Number(options.focoId);
       }
 
-      if (options.id_type_assay) {
-        parameters.id_type_assay = Number(options.id_type_assay);
+      if (options.typeAssayId) {
+        parameters.typeAssayId = Number(options.typeAssayId);
       }
 
-      if (options.id_ogm) {
-        parameters.id_ogm = Number(options.id_ogm);
+      if (options.tecnologiaId) {
+        parameters.tecnologiaId = Number(options.tecnologiaId);
       }
 
       if (options.epoca) {
         parameters.epoca = String(options.epoca);
       }
 
-      if (options.id_local) {
-        parameters.id_local = Number(options.id_local);
+      if (options.localId) {
+        parameters.localId = Number(options.localId);
       }
 
       if (options.filterNpeFrom || options.filterNpeTo) {
@@ -104,8 +104,8 @@ export class NpeController {
       } else {
         select = {
           id: true,
-          id_safra: true,
-          id_local: true,
+          safraId: true,
+          localId: true,
           local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true, id: true } },
@@ -180,8 +180,8 @@ export class NpeController {
         if (group.response.length > 0) {
           const safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
-                                                  WHERE n.id_safra = ${data.safra}
-                                                  AND n.id_group = ${group.response[0]?.id}
+                                                  WHERE n.safraId = ${data.safra}
+                                                  AND n.groupId = ${group.response[0]?.id}
                                                   AND n.npei = ${data.npei}
                                                   AND n.status = ${1}
                                                   ORDER BY npei DESC 
@@ -202,6 +202,8 @@ export class NpeController {
 
   async create(data: object | any) {
     try {
+      console.log('data');
+      console.log(data);
       const response = await this.npeRepository.create(data);
       if (response) {
         return { status: 200, response, message: 'NPE criada' };
