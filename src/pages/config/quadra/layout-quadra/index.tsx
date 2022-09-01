@@ -1,7 +1,7 @@
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import router from "next/router";
@@ -86,14 +86,14 @@ interface Idata {
 }
 
 export default function Listagem({
-  layouts,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  local,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      layouts,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      local,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -196,9 +196,8 @@ export default function Listagem({
       filterPlantadeira,
       filterParcelas,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await layoutQuadraService
@@ -473,9 +472,8 @@ export default function Listagem({
     idLayoutQuadra: number,
     data: any
   ): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${
-      userLogado.userCulture.cultura_selecionada
-    }&esquema=${data.esquema}&status=${1}`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${userLogado.userCulture.cultura_selecionada
+      }&esquema=${data.esquema}&status=${1}`;
     if (data.status == 0) {
       await layoutQuadraService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -688,7 +686,7 @@ export default function Listagem({
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
@@ -736,7 +734,7 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="layout-quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
@@ -821,7 +819,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="layout-quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -891,7 +889,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage =
     (await (
