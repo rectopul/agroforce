@@ -17,6 +17,7 @@ import { DelineamentoController } from '../delimitation/delineamento.controller'
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
+import { validateDecimal, validateDouble, validateInteger } from '../../shared/utils/numberValidate';
 
 export class ImportExperimentController {
   static async validate(
@@ -43,8 +44,10 @@ export class ImportExperimentController {
             idSafra,
           });
           if (experiment?.length > 0) {
-            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
-            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado no sistema` };
+            if (experiment[0].status !== 'IMPORTADO') {
+              await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+              return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema` };
+            }
           } if (experimentNameTemp.includes(experimentName)) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             experimentNameTemp[row] = experimentName;
@@ -122,7 +125,15 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.bgm !== spreadSheet[row][column]) {
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
+              }
+              if (assayList?.bgm !== spreadSheet[row][column]) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -163,13 +174,13 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if ((spreadSheet[row][column]).toString().length > 2
-                || Number(spreadSheet[row][column]) < 0) {
+                || !validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
-                  += responseGenericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'deve ser um numero de ate 2 dígitos',
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -178,12 +189,13 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if ((spreadSheet[row][column]).toString().length > 2
-                || Number(spreadSheet[row][column]) < 0) {
+                || !validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -222,65 +234,74 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
             if (column === '11') { // NPL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
             if (column === '12') { // CLP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              }
+              console.log();
+              if (!validateDouble(spreadSheet[row][column])
+                  || !validateDecimal(spreadSheet[row][column])
+                  || Number(spreadSheet[row][column]) < 0
+                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                );
               }
             }
             if (column === '13') { // EEL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              }
+
+              if (!validateDouble(spreadSheet[row][column])
+                  || Number(spreadSheet[row][column]) < 0
+                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                );
               }
             }
             if (column === '15') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
           }
@@ -302,29 +323,55 @@ export class ImportExperimentController {
               });
               const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
-              const { status }: IReturnObject = await experimentController.create(
-                {
-                  idAssayList: assayList[0]?.id,
-                  idLocal: local[0]?.id,
-                  idDelineamento: delineamento[0]?.id,
-                  idSafra,
-                  experimentName,
-                  density: spreadSheet[row][7],
-                  period: spreadSheet[row][8],
-                  repetitionsNumber: spreadSheet[row][10],
-                  nlp: spreadSheet[row][11],
-                  clp: spreadSheet[row][12],
-                  eel: spreadSheet[row][13],
-                  comments,
-                  orderDraw: spreadSheet[row][15],
-                  created_by: createdBy,
-                },
-              );
-              if (status === 200) {
-                await assayListController.update({
-                  id: assayList[0]?.id,
-                  status: 'UTILIZADO',
-                });
+              const { response: experiment } = await experimentController.getAll({
+                filterExperimentName: experimentName,
+                idSafra,
+              });
+              if (experiment.total > 0) {
+                await experimentController.update(
+                  {
+                    id: experiment[0]?.id,
+                    idAssayList: assayList[0]?.id,
+                    idLocal: local[0]?.id,
+                    idDelineamento: delineamento[0]?.id,
+                    idSafra,
+                    experimentName,
+                    density: spreadSheet[row][7],
+                    period: spreadSheet[row][8],
+                    repetitionsNumber: spreadSheet[row][10],
+                    nlp: spreadSheet[row][11],
+                    clp: spreadSheet[row][12],
+                    eel: spreadSheet[row][13],
+                    comments,
+                    orderDraw: spreadSheet[row][15],
+                    created_by: createdBy,
+                  },
+                );
+              } else {
+                const { status }: IReturnObject = await experimentController.create(
+                  {
+                    idAssayList: assayList[0]?.id,
+                    idLocal: local[0]?.id,
+                    idDelineamento: delineamento[0]?.id,
+                    idSafra,
+                    experimentName,
+                    density: spreadSheet[row][7],
+                    period: spreadSheet[row][8],
+                    repetitionsNumber: spreadSheet[row][10],
+                    nlp: spreadSheet[row][11],
+                    clp: spreadSheet[row][12],
+                    eel: spreadSheet[row][13],
+                    comments,
+                    orderDraw: spreadSheet[row][15],
+                    created_by: createdBy,
+                  },
+                );
+                if (status === 200) {
+                  await assayListController.update({
+                    id: assayList[0]?.id,
+                    status: 'UTILIZADO',
+                  });
+                }
               }
             }
           }

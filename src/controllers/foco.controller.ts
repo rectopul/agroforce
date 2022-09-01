@@ -8,6 +8,7 @@ export class FocoController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
+    parameters.AND = [];
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -23,15 +24,13 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.AND.push(JSON.parse(`{ "group": {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} }}}`));
+          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} }}`);
         } else if (options.filterGroupFrom) {
-          parameters.AND.push(JSON.parse(`{ "group": {"group": {"gte": ${Number(options.filterGroupFrom)} }}}`));
+          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGroupFrom)} }}`);
         } else if (options.filterGroupTo) {
-          parameters.AND.push(JSON.parse(`{ "group": {"group": {"lte": ${Number(options.filterGroupTo)} }}}`));
+          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGroupTo)} }}`);
         }
       }
-      console.log(parameters);
-      console.log(options);
 
       const select = {
         id: true,

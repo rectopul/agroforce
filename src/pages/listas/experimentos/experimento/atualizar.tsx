@@ -25,7 +25,7 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import {
   AccordionFilter,
   Button, CheckBox, Content,
-  Input,
+  Input, InputMoney,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -417,13 +417,30 @@ export default function AtualizarLocal({
     );
   }
 
-  function updateFieldsFactory(name: string, title: string, values: any) {
+  function updateFieldsFactory(name: string, title: string, values: any, type: string = 'text') {
     return (
-      <div className="w-full h-7">
+      <div className="w-1/4 h-7 mt-7">
         <label className="block text-gray-900 text-sm font-bold mb-0">
           {name}
         </label>
         <Input
+          type={type}
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+          value={values}
+        />
+      </div>
+    );
+  }
+
+  function updateFieldMoney(name: string, title: string, values: any) {
+    return (
+      <div className="w-1/4 h-7 mt-7">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
+          {name}
+        </label>
+        <InputMoney
           id={title}
           name={title}
           onChange={formik.handleChange}
@@ -514,18 +531,61 @@ export default function AtualizarLocal({
           "
           >
             <div className="w-full h-f10 flex justify-between items-start gap-5">
+              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp, 'number')}
+              {updateFieldMoney('EEL', 'eel', formik.values.eel)}
+              {updateFieldMoney('CLP', 'clp', formik.values.clp)}
 
-              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp)}
-              {updateFieldsFactory('EEL', 'eel', formik.values.eel)}
-              {updateFieldsFactory('CLP', 'clp', formik.values.clp)}
-              {updateFieldsFactory('Observações', 'comments', formik.values.comments)}
+              {/* <input
+                style={{ border: 1, borderColor: '#000', width: 200 }}
+                className="shadow
+        appearance-none
+        bg-white bg-no-repeat
+        border border-solid border-gray-300
+        rounded
+        w-full
+        py-1 px-2
+        text-gray-900
+        text-xs
+        leading-tight
+        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+        "
+                id="eel"
+                name="eel"
+                value={formik.values.clp}
+                onChange={formik.handleChange}
+                onKeyUp={formatarMoeda}
+              /> */}
+
+              <div className="w-full flex flex-col h-20">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
+                  Observações
+                </label>
+                <textarea
+                  className="shadow
+                              appearance-none
+                              bg-white bg-no-repeat
+                              border border-solid border-gray-300
+                              rounded
+                              w-full
+                              py-1 px-2
+                              text-gray-900
+                              text-xs
+                              leading-tight
+                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  rows={3}
+                  id="comments"
+                  name="comments"
+                  onChange={formik.handleChange}
+                  value={formik.values.comments}
+                />
+              </div>
 
               <div className="
             h-7 w-full
             flex
             gap-3
-            justify-center
-            mt-5
+            justify-end
+            mt-12
           "
               >
                 <div className="w-40">
