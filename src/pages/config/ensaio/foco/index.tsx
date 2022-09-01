@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -82,11 +82,10 @@ export default function Listagem({
   totalItems,
   itensPerPage,
   idCulture,
-  idSafra,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -140,12 +139,10 @@ export default function Listagem({
       filterGroupTo: '',
       filterGroupFrom: '',
     },
-    onSubmit: async ({
-      filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
-    }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${idCulture}&id_safra=${idSafra}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1
+      }filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada
+      }`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await focoService
@@ -572,35 +569,16 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
+                </div>
 
-                  {/* <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Grupo
-                    </label>
-                    <Input
-                      placeholder="De"
-                      id="filterGroupFrom"
-                      name="filterGroupFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterGroupTo"
-                      name="filterGroupTo"
-                      onChange={formik.handleChange}
-                    />
-                  </div> */}
-
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-5">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>
@@ -641,7 +619,7 @@ export default function Listagem({
                         value="Cadastrar Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="foco/cadastro"
                         icon={<FaSearchPlus size={20} />}
                       />

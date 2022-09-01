@@ -463,17 +463,11 @@ model npe {
   npei          Int
   npef          Int?
   prox_npe      Int?
-  status        Int        @default(1)
-  created_by    Int
-  created_at    DateTime?  @default(now())
-  epoca         String?
+  npeQT         Int?
   id_group      Int
-  foco          foco       @relation(fields: [id_foco], references: [id])
-  group         group      @relation(fields: [id_group], references: [id])
-  local         local      @relation(fields: [id_local], references: [id])
-  tecnologia    tecnologia @relation(fields: [id_ogm], references: [id])
-  safra         safra      @relation(fields: [id_safra], references: [id])
-  type_assay    type_assay @relation(fields: [id_type_assay], references: [id])
+  status        Int       @default(1)
+  created_by    Int
+  created_at    DateTime? @default(now())
 
   @@index([id_foco], map: "npe_id_foco_fkey")
   @@index([id_group], map: "npe_id_group_fkey")

@@ -1,6 +1,7 @@
-import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -26,8 +27,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import getConfig from 'next/config';
-import { GetServerSideProps } from 'next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { userPreferencesService, userService } from '../../../../services';
 import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
@@ -79,13 +79,13 @@ export default function Listagem({
   totalItems,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
-    && tab.data.map((i) => i.labelDropDown === 'Usuários')
+      && tab.data.map((i) => i.labelDropDown === 'Usuários')
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
@@ -164,8 +164,7 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
+      const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterName=${filterName}&filterLogin=${filterLogin}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
