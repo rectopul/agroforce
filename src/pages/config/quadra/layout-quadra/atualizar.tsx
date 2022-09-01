@@ -110,7 +110,7 @@ export default function Atualizarquadra({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'SL', value: 'sl' },
     { name: 'CamposGerenciados[]', title: 'sSCc', value: 'sc' },
     { name: 'CamposGerenciados[]', title: 'S Aloc', value: 's_aloc' },
@@ -192,9 +192,9 @@ export default function Atualizarquadra({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'sl') {
         tableFields.push(headerTableFactory('SL', 'sl'));
       }
@@ -449,6 +449,7 @@ export default function Atualizarquadra({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

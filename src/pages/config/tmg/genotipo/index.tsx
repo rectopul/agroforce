@@ -117,7 +117,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome genótipo',
@@ -394,11 +394,11 @@ export default function Listagem({
     // }
     // })
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'name_genotipo'));
+        tableFields.push(headerTableFactory('Nome genótipo', 'name_genotipo'));
       }
       if (columnCampos[index] === 'name_main') {
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
@@ -707,7 +707,7 @@ export default function Listagem({
                   justify-center
                 "
                 >
-                  {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
@@ -758,6 +758,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

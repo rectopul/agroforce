@@ -173,7 +173,7 @@ export default function Atualizargenotipo({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
@@ -317,9 +317,9 @@ export default function Atualizargenotipo({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'year') {
         tableFields.push(headerTableFactory('Ano', 'year'));
       }
@@ -527,6 +527,29 @@ export default function Atualizargenotipo({
                   value={formik.values.name_public}
                 />
               </div>
+            </div>
+            <div className="w-2/4 flex justify-end">
+              <div className="w-2/4 flex flex-wrap gap-2">
+                <div className="flex-1">
+                  <label className="block text-gray-900 text-xs font-bold mb-1">
+                    Tecnologia
+                  </label>
+                  <Input
+                    style={{ background: '#e5e7eb' }}
+                    disabled
+                    id="cod_tec"
+                    name="cod_tec"
+                    onChange={formik.handleChange}
+                    value={formik.values.cod_tec}
+                  />
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full flex justify-between items-start gap-5 mt-3">
+            <div className="w-2/4 grid grid-cols-3 gap-2">
               <div className="w-full ">
                 <label className="block text-gray-900 text-xs font-bold mb-1">
                   Nome experimental
@@ -569,21 +592,9 @@ export default function Atualizargenotipo({
                 />
               </div>
             </div>
+
             <div className="w-2/4 flex justify-end">
               <div className="w-2/4 flex flex-wrap gap-2">
-                <div className="flex-1">
-                  <label className="block text-gray-900 text-xs font-bold mb-1">
-                    Tecnologia
-                  </label>
-                  <Input
-                    style={{ background: '#e5e7eb' }}
-                    disabled
-                    id="cod_tec"
-                    name="cod_tec"
-                    onChange={formik.handleChange}
-                    value={formik.values.cod_tec}
-                  />
-                </div>
                 <div className="w-1/4">
                   <label className="block text-gray-900 text-xs font-bold mb-1">
                     Tipo
@@ -758,6 +769,7 @@ export default function Atualizargenotipo({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

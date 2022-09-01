@@ -118,15 +118,15 @@ export default function Listagem({
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local Preparo',
+      title: 'Local preparo',
       value: 'local_preparo',
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Código Quadra',
+      title: 'Código quadra',
       value: 'cod_quadra',
     },
     { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
@@ -375,9 +375,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'cod_quadra') {
         tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
       }
@@ -398,7 +398,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'local_preparo') {
         tableFields.push(
-          headerTableFactory('Local Preparo', 'local.name_local_culture'),
+          headerTableFactory('Local preparo', 'local.name_local_culture'),
         );
       }
       if (columnCampos[index] === 'status') {
@@ -582,7 +582,7 @@ export default function Listagem({
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Local Preparo
+                      Local preparo
                     </label>
                     <Input
                       type="text"
@@ -595,7 +595,7 @@ export default function Listagem({
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Código Quadra
+                      Código quadra
                     </label>
                     <Input
                       type="text"
@@ -666,6 +666,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

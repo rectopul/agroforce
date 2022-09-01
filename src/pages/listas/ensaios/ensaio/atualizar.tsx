@@ -100,7 +100,7 @@ export default function AtualizarTipoEnsaio({
     generatesPropsExperiments,
     setGeneratesPropsExperiments,
   ] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName' },
     { name: 'CamposGerenciados[]', title: 'Lugar de Cultura', value: 'local' },
     { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
@@ -297,9 +297,9 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'lote.fase'));
       }
@@ -777,6 +777,7 @@ export default function AtualizarTipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

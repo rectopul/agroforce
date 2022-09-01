@@ -104,12 +104,12 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome',
@@ -118,13 +118,13 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Rótulo ',
+      title: 'Descrição ',
       value: 'desc',
       defaultChecked: () => camposGerenciados.includes('desc'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Cod. Tecnologia ',
+      title: 'Cod. tec.',
       value: 'cod_tec',
       defaultChecked: () => camposGerenciados.includes('cod_tec'),
     },
@@ -265,9 +265,9 @@ export default function Listagem({
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -275,7 +275,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Descrição', 'desc'));
       }
       if (columnCampos[item] === 'cod_tec') {
-        tableFields.push(headerTableFactory('Cod. tecnologia', 'cod_tec'));
+        tableFields.push(headerTableFactory('Cod. tec.', 'cod_tec'));
       }
     });
     return tableFields;
@@ -483,7 +483,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod. tecnologia
+                      Cod. tec.
                     </label>
                     <Input
                       type="text"
@@ -521,7 +521,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

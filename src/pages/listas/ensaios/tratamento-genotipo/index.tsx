@@ -703,7 +703,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamento genótipo">
+          <AccordionFilter title="Filtrar tratamentos genótipos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -869,7 +869,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 // pageSize: itensPerPage,

@@ -161,9 +161,9 @@ export default function Listagem() {
           <AiOutlineContainer className="mr-2" />
           Dashboard
         </div>
-        <div className="flex items-end m-auto">
+        {/* <div className="flex items-end m-auto">
           <Image src="/images/logo.png" alt="GOM" width={150} height={150} />
-        </div>
+        </div> */}
 
         <div className="flex flex-row justify-around">
           <div style={{

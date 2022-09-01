@@ -132,7 +132,7 @@ export default function Import({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
@@ -282,9 +282,9 @@ export default function Import({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'user_id') {
         tableFields.push(headerTableFactory('Usuário', 'user.name'));
       }
@@ -617,6 +617,7 @@ export default function Import({
                   headerStyle: {
                     zIndex: 20,
                   },
+                  rowStyle: { background: '#f9fafb', height: 35 },
                   search: false,
                   filtering: false,
                   pageSize: itensPerPage,

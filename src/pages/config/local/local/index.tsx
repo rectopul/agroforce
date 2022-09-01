@@ -109,12 +109,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome do L. de Cult.',
@@ -135,7 +135,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome Fazenda',
+      title: 'Nome da fazenda',
       value: 'adress',
       defaultChecked: () => camposGerenciados.includes('adress'),
     },
@@ -292,7 +292,7 @@ export default function Listagem({
           >
             <Button
               icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.adress}`}
+              title={`Atualizar ${rowData.name_local_culture}`}
               onClick={() => {
                 setCookies('filterBeforeEdit', filtersParams);
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -322,7 +322,7 @@ export default function Listagem({
           >
             <Button
               icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.adress}`}
+              title={`Atualizar ${rowData.name_local_culture}`}
               onClick={() => {
                 setCookies('filterBeforeEdit', filtersParams);
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -351,9 +351,9 @@ export default function Listagem({
     const objectCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
     Object.keys(objectCampos).forEach((item) => {
-      if (objectCampos[item] === 'id') {
-        arrOb.push(idHeaderFactory());
-      }
+      // if (objectCampos[item] === 'id') {
+      //   arrOb.push(idHeaderFactory());
+      // }
       if (objectCampos[item] === 'name_local_culture') {
         arrOb.push(
           headerTableFactory('Nome do L. de cult.', 'name_local_culture'),
@@ -664,7 +664,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
 
-                  {filterFieldFactory('filterAdress', 'Nome Fazenda')}
+                  {filterFieldFactory('filterAdress', 'Nome da fazenda')}
 
                   {filterFieldFactory('filterLabelCountry', 'País')}
 
@@ -701,10 +701,12 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
-                rowStyle: (rowData: ILocalProps) => ({
-                  backgroundColor:
-                    selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
-                }),
+                // rowStyle: (rowData: ILocalProps) => ({
+                //   backgroundColor:
+                //     selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
+                //   height: 35,
+                // }),
+                rowStyle: { background: '#f9fafb', height: 35 },
               }}
               components={{
                 Toolbar: () => (
