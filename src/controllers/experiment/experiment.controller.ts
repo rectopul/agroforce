@@ -85,6 +85,7 @@ export class ExperimentController {
                 select: {
                   name: true,
                   id: true,
+                  cod_tec: true,
                 },
               },
               foco: {
@@ -141,7 +142,7 @@ export class ExperimentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"id": ${Number(options.TypeAssay)} } } }`));
       }
       if (options.Tecnologia) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": {"id": ${Number(options.Tecnologia)} } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": {"cod_tec": "${options.Tecnologia}" } } }`));
       }
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
