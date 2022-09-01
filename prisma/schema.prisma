@@ -467,6 +467,7 @@ model npe {
   id_group      Int
   status        Int         @default(1)
   created_by    Int
+  epoca         String?
   created_at    DateTime?   @default(now())
   safra         safra?      @relation(fields: [safraId], references: [id])
   safraId       Int?

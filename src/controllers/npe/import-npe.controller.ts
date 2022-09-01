@@ -38,11 +38,18 @@ export class ImportNpeController {
     const focoController = new FocoController();
     const typeAssayController = new TypeAssayController();
 
+    const npeTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
     try {
       const configModule: object | any = await importController.getAll(14);
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
+          const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][6]}_${spreadSheet[row][7]}`;
+          if (npeTemp.includes(npeName)) {
+            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+            npeTemp[row] = npeName;
+            return { status: 200, message: `Erro na linha ${Number(row) + 1}. NPE's duplicados na tabela` };
+          }
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
