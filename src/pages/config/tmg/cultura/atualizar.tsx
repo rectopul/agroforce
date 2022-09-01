@@ -157,7 +157,7 @@ export default function Cultura(culture: IUpdateCulture) {
             <div className="w-40">
               <Button
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}

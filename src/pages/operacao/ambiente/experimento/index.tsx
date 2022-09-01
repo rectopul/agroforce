@@ -625,6 +625,7 @@ export default function Listagem({
                     headerStyle: {
                       zIndex: 20,
                     },
+                    rowStyle: { background: '#f9fafb', height: 35 },
                     search: false,
                     filtering: false,
                     pageSize: itensPerPage,
@@ -793,7 +794,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;

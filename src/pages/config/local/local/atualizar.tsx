@@ -82,7 +82,7 @@ export default function AtualizarLocal({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome de Unidade de Cultura', value: 'name_unity_culture' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
   ]);
@@ -186,9 +186,9 @@ export default function AtualizarLocal({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'name_unity_culture') {
         tableFields.push(headerTableFactory('Nome da Unidade de Cultura', 'name_unity_culture'));
       }
@@ -493,6 +493,7 @@ export default function AtualizarLocal({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

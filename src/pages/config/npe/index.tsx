@@ -111,12 +111,12 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Safra ',
@@ -137,7 +137,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
+      title: 'Nome tec.',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -324,9 +324,9 @@ export default function Listagem({
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
           headerTableFactory('Local', 'local.name_local_culture'),
@@ -342,7 +342,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
+        tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
@@ -647,7 +647,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome tec.')}
 
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
@@ -697,7 +697,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,

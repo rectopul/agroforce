@@ -119,12 +119,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome un. cultura',
@@ -336,9 +336,9 @@ export default function Listagem({
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'name_unity_culture') {
         tableFields.push(
           headerTableFactory('Nome un. cultura', 'name_unity_culture'),
@@ -638,6 +638,7 @@ export default function Listagem({
                 rowStyle: (rowData: IUnityCultureProps) => ({
                   backgroundColor:
                     selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
+                  height: 35,
                 }),
               }}
               components={{

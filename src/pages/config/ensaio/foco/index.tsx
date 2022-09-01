@@ -111,7 +111,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome', value: 'name' },
     { name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
@@ -370,9 +370,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -594,6 +594,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
