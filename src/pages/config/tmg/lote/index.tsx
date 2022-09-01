@@ -110,7 +110,7 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
@@ -331,9 +331,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'year') {
         tableFields.push(headerTableFactory('Ano', 'year'));
       }
@@ -347,7 +347,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Fase', 'fase'));
       }
       if (columnCampos[index] === 'peso') {
-        tableFields.push(headerTableFactory('Peso', 'peso'));
+        tableFields.push(headerTableFactory('Peso (kg)', 'peso'));
       }
       if (columnCampos[index] === 'quant_sementes') {
         tableFields.push(
@@ -572,7 +572,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterCodLote', 'Cód lote')}
+                  {filterFieldFactory('filterCodLote', 'Cód. lote')}
 
                   {filterFieldFactory('filterNcc', 'NCC')}
 
@@ -580,7 +580,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Peso
+                      Peso (kg)
                     </label>
                     <Input
                       placeholder="De"
@@ -598,7 +598,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Sementes
+                      Quant. Sementes
                     </label>
                     <Input
                       placeholder="De"
@@ -692,6 +692,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
