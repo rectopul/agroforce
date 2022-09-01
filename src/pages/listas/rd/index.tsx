@@ -5,7 +5,7 @@ import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
 import Swal from 'sweetalert2';
 import React, { useState, ReactNode, useEffect } from 'react';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
 import MaterialTable from 'material-table';
@@ -55,8 +55,8 @@ interface IData {
   idCulture: number
 }
 export default function Import({
-  allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,
-}: IData) {
+      allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');

@@ -231,84 +231,11 @@ export default function Listagem({
     };
   }
 
-  function handleCheckBoxClick(data: any) {
-    if (selectedNPE?.includes(data)) {
-      setSelectedNPE(selectedNPE.filter((item) => item != data));
-    } else {
-      setSelectedNPE([...selectedNPE, data]);
-    }
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: (rowData: INpeProps) => (rowData ? (
-        <div className="h-10 flex">
-          <div>
-            <input type="checkbox" onClick={() => handleCheckBoxClick(rowData)} />
-          </div>
-        </div>
-      ) : (
-        <div className="h-10 flex">
-          <div>
-            <input type="checkbox" onClick={() => handleCheckBoxClick(rowData)} />
-          </div>
-        </div>
-      )),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: INpeProps) => (rowData.status ? (
-        <div className="h-7 flex">
-          <div className="h-7" />
-          <div>
-            <Button
-              icon={<FaRegThumbsUp size={14} />}
-              onClick={() => handleStatus(rowData.id, {
-                status: rowData.status,
-                ...rowData,
-              })}
-              bgColor="bg-green-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div className="h-7" />
-          <div>
-            <Button
-              icon={<FaRegThumbsDown size={14} />}
-              onClick={async () => handleStatus(rowData.id, {
-                status: rowData.status,
-                ...rowData,
-              })}
-              bgColor="bg-red-800"
-              textColor="white"
-            />
-          </div>
-        </div>
-      )),
-    };
-  }
-
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      // if (columnCampos[item] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
+
       if (columnCampos[item] === 'local') {
         tableFields.push(
           headerTableFactory('Local', 'local.name_local_culture'),
@@ -579,6 +506,16 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  const handleRowSelection = (rowData: any) => {
+    if (selectedNPE?.includes(rowData)) {
+      rowData.tableData.checked = false;
+      setSelectedNPE(selectedNPE.filter((item) => item != rowData))
+    } else {
+      rowData.tableData.checked = true;
+      setSelectedNPE([...selectedNPE, rowData])
+    }
+  }
+
   return (
     <>
       <Head>
@@ -658,6 +595,9 @@ export default function Listagem({
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={npe}
+              onRowClick={(evt, selectedRow: any) => {
+                handleRowSelection(selectedRow);
+              }}
               options={{
                 selection: true,
                 showTitle: false,
@@ -668,6 +608,9 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
+                selection: true,
+                showSelectAllCheckbox: false,
+                showTextRowsSelected: false,
               }}
               onSelectionChange={handleSelectionRow}
               components={{
@@ -692,7 +635,8 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
+                          selectedNPE.sort((a, b) => a.npei - b.npei)
+                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE))
                           router.push({
                             pathname: '/operacao/ambiente/experimento',
                           });

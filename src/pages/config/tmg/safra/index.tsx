@@ -1,12 +1,10 @@
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   DragDropContext,
   Draggable,
@@ -33,11 +31,15 @@ import {
   Content,
   Input,
   Select,
-} from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+} from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { safraService, userPreferencesService } from "src/services";
+import * as XLSX from "xlsx";
+import { removeCookies, setCookies } from "cookies-next";
+import ITabs from "../../../../shared/utils/dropdown";
+import {fetchWrapper} from "src/helpers";
 
-import { safraService, userPreferencesService } from '../../../../services';
-import ITabs from '../../../../shared/utils/dropdown';
+
 
 interface IFilter {
   filterStatus: object | any;
@@ -77,14 +79,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allSafras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allSafras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -105,11 +107,12 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); //Set filter Parameter 
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safraName' },
@@ -135,7 +138,8 @@ export default function Listagem({
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+
+  const filterStatus = filtersParams.split("");
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -143,14 +147,13 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSafra: '',
-      filterYearTo: '',
-      filterYearFrom: '',
-      filterStartDate: '',
-      filterEndDate: '',
-      orderBy: '',
-      typeOrder: '',
+      filterStatus: "",
+      filterSafra:"",
+      filterYear: "",
+      filterStartDate: "",
+      filterEndDate: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterStatus,
@@ -159,12 +162,14 @@ export default function Listagem({
       filterYearFrom,
       filterStartDate,
       filterEndDate,
-    }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSafra=${filterSafra}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+    }) => {      
+     
+      // Call filter with there parameter   
+      const parametersFilter = await fetchWrapper.handleFilterParameter("safra",filterStatus,filterSafra,filterYear,filterStartDate,filterEndDate,cultureId);
+
+      setFiltersParams(parametersFilter); // Set filter pararameters
+      setCookies("filterBeforeEdit", filtersParams);
+
       await safraService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -331,9 +336,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+
+                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -409,7 +417,35 @@ export default function Listagem({
     return tableFields;
   }
 
-  const columns = columnsOrder(camposGerenciados);
+  async function handleOrder(
+    column: string,
+    order: string | any
+  ): Promise<void> {   
+   
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter);
+   
+    await safraService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setSafras(response.response);
+          setFiltersParams(parametersFilter);
+        }
+      });
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder("");
+      }
+    }
+  }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -503,36 +539,50 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+
+  async function handleTotalPages() {
+
     if (currentPage < 0) {
       setCurrentPage(0);
     } else if (currentPage >= pages) {
       setCurrentPage(pages - 1);
     }
+
   }
 
-  async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
+  async function handlePagination(): Promise<void> {  
+
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
+    
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
       }
     });
+
+  }
+
+  //remove states
+   function removestate(){
+      localStorage.removeItem("filterValueEdit");  
+      localStorage.removeItem("pageBeforeEdit");    
+  }
+
+  //Checkingdefualt values
+
+   function checkValue(value : any){
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
+    removestate(); //Remove State
   }, [currentPage]);
 
   return (
@@ -576,17 +626,19 @@ export default function Listagem({
                       onChange={formik.handleChange}
                       defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
-                      selected="1"
+                      selected="2"
                     />
                   </div>
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Safra
                     </label>
+                    
                     <Input
                       placeholder="Nome da Safra"
                       id="filterSafra"
-                      name="filterSafra"
+                      name="filterSafra"                     
+                      //defaultValue={checkValue("filterSafra")}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -594,26 +646,24 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
-
-                    <div className="flex flex-row">
-                      <div className="h-6 w-1/2">
-                        <Input
-                          placeholder="De"
-                          id="filterYearFrom"
-                          name="filterYearFrom"
-                          onChange={formik.handleChange}
-                        />
-                      </div>
-                      <div className="h-6 w-1/2 ml-4">
-                        <Input
-                          placeholder="Até"
-                          id="filterYearTo"
-                          name="filterYearTo"
-                          onChange={formik.handleChange}
-                        />
-                      </div>
-                    </div>
-
+                    <Input
+                      placeholder="Ano"
+                      id="filterYear"
+                      name="filterYear"
+                      onChange={formik.handleChange}
+                      //defaultValue={checkValue("filterYear")}
+                      className="shadow
+                          appearance-none
+                          bg-white bg-no-repeat
+                          border border-solid border-gray-300
+                          rounded
+                          w-full
+                          py-2 px-3
+                          text-gray-900
+                          leading-tight
+                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                        "
+                    />
                   </div>
 
                   {/* <div className="h-10 w-1/2 ml-4">
@@ -666,18 +716,17 @@ export default function Listagem({
                         "
                     />
                   </div> */}
+                </div>
 
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
               </form>
             </div>
@@ -883,6 +932,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
     : `filterStatus=1&id_culture=${cultureId}`;

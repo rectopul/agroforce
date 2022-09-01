@@ -3,7 +3,7 @@
 /* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -83,14 +83,14 @@ interface IData {
 }
 
 export default function Listagem({
-  quadras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      quadras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -160,12 +160,9 @@ export default function Listagem({
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({
-      filterStatus, filterSearch, filterPreparation, filterPTo, filterPFrom, filterSchema,
-    }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterPreparation=${filterPreparation}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}&filterSchema=${filterSchema}`;
+    onSubmit: async ({ filterStatus, filterSearch }) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -180,6 +177,8 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
+      }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -606,52 +605,18 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Linha P
-                    </label>
-                    <Input
-                      placeholder="De"
-                      id="filterPFrom"
-                      name="filterPFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterPTo"
-                      name="filterPTo"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Esquema
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Esquema"
-                      max="40"
-                      id="filterSchema"
-                      name="filterSchema"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => {}}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
                 </div>
 
+                <div className="h-16 w-32 mt-3">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -691,7 +656,7 @@ export default function Listagem({
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
@@ -777,7 +742,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -836,7 +801,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

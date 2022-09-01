@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
 import React from 'react';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import {
@@ -17,7 +17,7 @@ interface IData {
   idSafra: number;
   idCulture: number;
 }
-export default function Importar({ idSafra, idCulture }: IData) {
+export default function Importar({ idSafra, idCulture }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const router = useRouter();
   function readExcel(value: any) {

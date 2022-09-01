@@ -4,7 +4,7 @@
 import { removeCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
@@ -71,8 +71,8 @@ interface IData {
 }
 
 export default function Listagem({
-  allLote, idSafra, totalItems, itensPerPage, filterApplication,
-}: IData) {
+      allLote, totalItems, itensPerPage, filterApplication,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');

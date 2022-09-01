@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -86,14 +86,8 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultureUnity,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: IData) {
+      allCultureUnity, itensPerPage, filterApplication, totalItems, pageBeforeEdit, filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
