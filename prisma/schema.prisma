@@ -454,7 +454,7 @@ model import_spreadsheet {
 }
 
 model npe {
-  id            Int        @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   id_local      Int
   id_safra      Int
   id_foco       Int
@@ -465,9 +465,21 @@ model npe {
   prox_npe      Int?
   npeQT         Int?
   id_group      Int
-  status        Int       @default(1)
+  status        Int         @default(1)
   created_by    Int
-  created_at    DateTime? @default(now())
+  created_at    DateTime?   @default(now())
+  safra         safra?      @relation(fields: [safraId], references: [id])
+  safraId       Int?
+  local         local?      @relation(fields: [localId], references: [id])
+  localId       Int?
+  foco          foco?       @relation(fields: [focoId], references: [id])
+  focoId        Int?
+  group         group?      @relation(fields: [groupId], references: [id])
+  groupId       Int?
+  type_assay    type_assay? @relation(fields: [type_assayId], references: [id])
+  type_assayId  Int?
+  tecnologia    tecnologia? @relation(fields: [tecnologiaId], references: [id])
+  tecnologiaId  Int?
 
   @@index([id_foco], map: "npe_id_foco_fkey")
   @@index([id_group], map: "npe_id_group_fkey")
