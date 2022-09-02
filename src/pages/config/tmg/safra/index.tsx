@@ -366,7 +366,7 @@ export default function Listagem({
   ): Promise<void> {   
    
     //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter);
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
    
     await safraService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -498,12 +498,14 @@ export default function Listagem({
 
     //manage using comman function
     const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
-    
+   
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
         setTotalItems(response.total); //Set new total records
         setCurrentPage(currentPages); //Set new current page
+        // setTimeout(removestate, 5000); //Remove State  
+        removestate();       
       }
     });
 
@@ -513,10 +515,10 @@ export default function Listagem({
    function removestate(){
       localStorage.removeItem("filterValueEdit");  
       localStorage.removeItem("pageBeforeEdit");    
+      setTimeout(()=>{}, 5000)
   }
 
   //Checkingdefualt values
-
    function checkValue(value : any){
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;
@@ -525,7 +527,7 @@ export default function Listagem({
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); //Remove State
+    // removestate(); //Remove State
   }, [currentPage]);
 
   return (
@@ -582,7 +584,7 @@ export default function Listagem({
                       placeholder="Nome da Safra"
                       id="filterSafra"
                       name="filterSafra"                     
-                      //defaultValue={checkValue("filterSafra")}
+                      defaultValue={checkValue("filterSafra")}
                       onChange={formik.handleChange}
                       className="shadow
                           appearance-none
@@ -606,7 +608,7 @@ export default function Listagem({
                       id="filterYear"
                       name="filterYear"
                       onChange={formik.handleChange}
-                      //defaultValue={checkValue("filterYear")}
+                      defaultValue={checkValue("filterYear")}
                       className="shadow
                           appearance-none
                           bg-white bg-no-repeat
@@ -881,9 +883,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
   
+  // const filterApplication = req.cookies.filterBeforeEdit
+  //   ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+  //   : `filterStatus=1&id_culture=${cultureId}`;
+
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
-    : `filterStatus=1&id_culture=${cultureId}`;
+  ? `${req.cookies.filterBeforeEdit}`
+  : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies("filterBeforeEdit", { req, res });
 

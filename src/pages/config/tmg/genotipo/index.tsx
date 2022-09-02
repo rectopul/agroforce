@@ -237,7 +237,7 @@ export default function Listagem({
   ): Promise<void> {
 
      //Manage orders of colunms 
-     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter);
+     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"genotipo");
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -584,11 +584,13 @@ export default function Listagem({
         setGenotipo(response.response);
         setTotalItems(response.total); //Set new total records
         setCurrentPage(currentPages); //Set new current page
+        // setTimeout(removestate, 8000); //Remove State    
+        removestate();
       }
-    });
+    });  
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any,) {
     return (
       <div className="h-10 w-1/2 ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -600,6 +602,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -620,6 +623,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
+              defaultValue={checkValue("filterGmrRangeFrom")}
               onChange={formik.handleChange}
             />
           </div>
@@ -630,6 +634,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
+              defaultValue={checkValue("filterGmrRangeTo")}
               onChange={formik.handleChange}
             />
           </div>
@@ -641,13 +646,19 @@ export default function Listagem({
     //remove states
   function removestate(){
       localStorage.removeItem("filterValueEdit");  
-      localStorage.removeItem("pageBeforeEdit");    
+      localStorage.removeItem("pageBeforeEdit");  
+      setTimeout(()=>{}, 5000)  
+  }
+
+   //Checkingdefualt values
+   function checkValue(value : any){
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); //Remove State
   }, [currentPage]);
 
   return (
@@ -939,7 +950,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-    
+  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',

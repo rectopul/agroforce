@@ -78,8 +78,7 @@ async function deleted(url: any, body: any) {
 
 
 // For global pagination 
-async function handlePaginationGlobal(currentPages: any, take: any,filter: any){
-   
+async function handlePaginationGlobal(currentPages: any, take: any,filter: any){   
       
       if(localStorage.getItem("filterValueEdit")){
         filter=localStorage.getItem("filterValueEdit");
@@ -143,21 +142,31 @@ async function handleFilterParameter(...theArgs: any){
   switch(key) {
 
     case "safra":
-
-      const [key1,filterStatus,filterSafra,filterYear,filterStartDate,filterEndDate,cultureId]=theArgs;
-
-      parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
-
+      parametersFilter = await safra(theArgs);
       break;
 
     case "genotipo":
-
-      const [key2,filterGenotipo,filterMainName,filterCruza,filterTecnologiaCod,filterTecnologiaDesc,filterGmr,idCulture,idSafra,filterGmrRangeTo,filterGmrRangeFrom]=theArgs;
-
-      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;        
+      parametersFilter = await genotipo(theArgs) ;        
       break;
 
+    case "lote":
+      parametersFilter = await lote(theArgs);
+      break;
+    
+    case "setor":    
+      parametersFilter = await setor(theArgs);
+      break;
 
+    case "usuarios":
+      parametersFilter = await usuarios(theArgs);
+      break;
+
+    case "cultura":
+      parametersFilter = await cultura(theArgs);
+      break;
+  
+
+      
     default:
       parametersFilter="";
   }
@@ -166,10 +175,63 @@ return parametersFilter;
 
 }
 
+function safra(theArgs : any){
+
+  const [key1,filterStatus,filterSafra,filterYear,filterStartDate,filterEndDate,cultureId]=theArgs;      
+  const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+
+  return parametersFilter;
+}
+
+function genotipo(theArgs : any){
+  
+  const [key2,filterGenotipo,filterMainName,filterCruza,filterTecnologiaCod,filterTecnologiaDesc,filterGmr,idCulture,idSafra,filterGmrRangeTo,filterGmrRangeFrom]=theArgs;
+
+  const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;        
+ 
+  return parametersFilter;
+}
+
+
+function lote(theArgs : any){
+  
+  const [key3,filterYear1,filterCodLote,filterNcc,filterFase,filterPeso,filterSeeds,filterGenotipo1,filterMainName1,filterGmr1,filterBgm,filterTecnologiaCod1,filterTecnologiaDesc1,]=theArgs;
+
+  const parametersFilter = `&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}`;    
+ 
+  return parametersFilter;
+}
+
+
+function setor(theArgs : any){
+  
+  const [key4,filterStatus2, filterSearch]=theArgs;
+  const parametersFilter =  `filterStatus=${filterStatus2 || 1 }&filterSearch=${filterSearch}`;
+
+  return parametersFilter;
+}
+
+function usuarios(theArgs : any){
+
+  const [key,filterStatus, filterName, filterLogin] = theArgs;
+  const parametersFilter = `filterStatus=${filterStatus || 1
+      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+
+  return parametersFilter;
+}
+
+function cultura(theArgs : any){
+
+  const [key,filterStatus, filterSearch] = theArgs;
+  const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}`;
+
+  return parametersFilter;
+}
 
 
 //Handle orders global  
-function handleOrderGlobal(column: any,order: any,filter : any){
+function handleOrderGlobal(column: any,order: any,filter : any, from : any){
 
   let typeOrder: any;
   let parametersFilter: any;
@@ -196,38 +258,44 @@ function handleOrderGlobal(column: any,order: any,filter : any){
     parametersFilter = filter;
   }
 
-  // Remove extra values here
-  parametersFilter = removeExtraValues(parametersFilter);
-
-  return parametersFilter;
-}
-
-
-function removeExtraValues(parametersFilter : any){
-
-  const myArray = parametersFilter.split("&id_culture");
-
-  if(myArray.length > 2){
-    parametersFilter = "";
-    parametersFilter = myArray[0]+"&id_culture"+myArray[2]
+  if(from == "safra" || from == "setor"){
+    // Remove extra values here
+    parametersFilter = removeExtraValues(parametersFilter,from);
+    return parametersFilter;
   }
+  else if(from == "genotipo"){
+    return parametersFilter;
+  }
+  else{
+    return parametersFilter;
+  }
+  
+}
+  
+function removeExtraValues(parametersFilter : any, from : any){
 
-  return parametersFilter;
+    const myArray = parametersFilter.split("&orderBy");
+
+    if(myArray.length > 2){
+      parametersFilter = "";
+      parametersFilter = myArray[0]+"&orderBy"+myArray[2]
+    }
+  
+    return parametersFilter;
 }
 
 //Get Values from Url
 function getValueParams(ParameterString : any){
 
-  // var c='';  
-  // if(localStorage.getItem("filterValueEdit")){
-
-  //   var convert=localStorage.getItem("filterValueEdit");
-  //   var url_string = `http://www.example.com/t.html?${convert}`; 
-  //   var url = new URL(url_string);
-  //   c = url.searchParams.get(ParameterString);
-  // }
+  let c;  
+  if(localStorage.getItem("filterValueEdit")){
+    let convert=localStorage.getItem("filterValueEdit");
+    let url_string = `http://www.example.com/t.html?${convert}`; 
+    let url = new URL(url_string);
+    c = url.searchParams.get(ParameterString)?.toString();
+  }
  
-  //  return c;
+   return c;
 }
 
 
