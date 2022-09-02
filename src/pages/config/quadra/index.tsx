@@ -160,9 +160,11 @@ export default function Listagem({
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
+    onSubmit: async ({
+      filterStatus, filterSearch, filterSchema, filterPTo, filterPFrom,
+    }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+      }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -599,6 +601,36 @@ export default function Listagem({
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Linha P
+                    </label>
+                    <Input
+                      placeholder="De"
+                      id="filterPFrom"
+                      name="filterPFrom"
+                      onChange={formik.handleChange}
+                    />
+                    <Input
+                      placeholder="Até"
+                      id="filterPTo"
+                      name="filterPTo"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Esquema
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Esquema"
+                      max="40"
+                      id="filterSchema"
+                      name="filterSchema"
                       onChange={formik.handleChange}
                     />
                   </div>
