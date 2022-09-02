@@ -504,8 +504,7 @@ export default function Listagem({
         setSafras(response.response);
         setTotalItems(response.total); //Set new total records
         setCurrentPage(currentPages); //Set new current page
-        // setTimeout(removestate, 5000); //Remove State  
-        removestate();       
+        setTimeout(removestate, 1000); //Remove State         
       }
     });
 
@@ -515,7 +514,6 @@ export default function Listagem({
    function removestate(){
       localStorage.removeItem("filterValueEdit");  
       localStorage.removeItem("pageBeforeEdit");    
-      setTimeout(()=>{}, 5000)
   }
 
   //Checkingdefualt values
@@ -811,14 +809,15 @@ export default function Listagem({
                         bg-gray-50
                       "
                       {...props}
+                      
                     >
-                      <Button
+                      {/* <Button
                         onClick={() => setCurrentPage(currentPage - 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
-                      />
+                      /> */}
                       <Button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         bgColor="bg-blue-600"
@@ -845,13 +844,13 @@ export default function Listagem({
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
-                      <Button
+                      {/* <Button
                         onClick={() => setCurrentPage(currentPage + 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
+                        disabled={currentPage + 1 >= pages} 
+                      />*/}
                     </div>
                   ) as any,
               }}
