@@ -522,7 +522,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
                   <div className="h-6 w-1/2 ml-4">
@@ -554,72 +554,84 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterRepetitionFrom"
-                      name="filterRepetitionFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterRepetitionTo"
-                      name="filterRepetitionTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ordem
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterOrderFrom"
-                      name="filterOrderFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterOrderTo"
-                      name="filterOrderTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterOrderFrom"
+                        name="filterOrderFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterOrderTo"
+                        name="filterOrderTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterNtFrom"
-                      name="filterNtFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterNtTo"
-                      name="filterNtTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Bloco
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterBlockFrom"
-                      name="filterBlockFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterBlockTo"
-                      name="filterBlockTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterBlockFrom"
+                        name="filterBlockFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterBlockTo"
+                        name="filterBlockTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div style={{ width: 20 }} />
