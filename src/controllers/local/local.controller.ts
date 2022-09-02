@@ -9,7 +9,7 @@ export class LocalController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterNameLocalCulture) {
@@ -66,10 +66,10 @@ export class LocalController {
           name_local_culture: true,
           label: true,
           mloc: true,
+          adress: true,
           label_country: true,
           label_region: true,
           name_locality: true,
-          adress: true,
           status: true,
           cultureUnity: true,
           dt_import: true,

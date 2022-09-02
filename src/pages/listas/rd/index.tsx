@@ -29,6 +29,7 @@ import {
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import { userPreferencesService, logImportService, importService } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../components/Loading';
 
 export interface LogData {
   id: number;
@@ -115,6 +116,8 @@ export default function Import({
         setExecuteUpload(0);
       }
     });
+
+    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -129,13 +132,15 @@ export default function Import({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
     { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>('');
 
   const take: number = itensPerPage || 10;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -168,24 +173,27 @@ export default function Import({
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
+    let orderType: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      orderType = 'asc';
     } else if (order === 2) {
-      typeOrder = 'desc';
+      orderType = 'desc';
     } else {
-      typeOrder = '';
+      orderType = '';
     }
 
+    setOrderBy(column);
+    setTypeOrder(orderType);
+
     if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      if (orderType !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${orderType}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else if (orderType !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${orderType}`;
     } else {
       parametersFilter = filter;
     }
@@ -223,7 +231,7 @@ export default function Import({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -240,27 +248,27 @@ export default function Import({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -274,9 +282,9 @@ export default function Import({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'user_id') {
         tableFields.push(headerTableFactory('Usuário', 'user.name'));
       }
@@ -311,7 +319,7 @@ export default function Import({
         userId: userLogado.id,
         module_id: 25,
       }).then((response) => {
-        userLogado.preferences.lote = {
+        userLogado.preferences.rd = {
           id: response.response.id,
           userId: preferences.userId,
           table_preferences: campos,
@@ -320,7 +328,7 @@ export default function Import({
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = {
+      userLogado.preferences.rd = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -418,7 +426,12 @@ export default function Import({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (typeOrder) {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -432,8 +445,8 @@ export default function Import({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-7 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -451,183 +464,183 @@ export default function Import({
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
+
   return (
-    loading ? (
-      <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
-    )
-      : (
-        <>
-          <Head>
-            <title>Importação planilhas</title>
-          </Head>
-          <Content contentHeader={tabsDropDowns} moduloActive="listas">
-            <div className="grid grid-cols-3 gap-4 h-screen">
-              <div className="bg-white rounded-lg">
-                <div className="mt-2 justify-center flex">
-                  <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
-                </div>
-                <hr />
+    <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
 
-                <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
-                  <div className="h-20 w-20 flex items-center mr-1">
-                    <Button
-                      textColor="white"
-                      bgColor={bgColor}
-                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(0, '')}
-                      icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
-                      type="button"
-                    />
-                  </div>
-                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                    <span className="font-bold">Cadastros RD</span>
-                    <p>ultimo update 28/06/22</p>
-                    <Input type="file" required id="inputFile-0" name="inputFile-0" />
-                  </div>
-                </div>
+      <Head>
+        <title>Importação planilhas</title>
+      </Head>
+      <Content contentHeader={tabsDropDowns} moduloActive="listas">
+        <div className="grid grid-cols-3 gap-4 h-screen">
+          <div className="bg-white rounded-lg">
+            <div className="mt-2 justify-center flex">
+              <span className="text-xl" style={{ marginLeft: '5%' }}>IMPORTAÇÃO DE PLANILHAS</span>
+            </div>
+            <hr />
 
-                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                  <div className=" h-20 w-20 flex items-center mr-1">
-                    <Button
-                      textColor="white"
-                      bgColor={bgColor}
-                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(26, 'ASSAY_LIST')}
-                      icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
-                      type="button"
-                    />
-                  </div>
-                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                    <span className="font-bold">Importar Lista de Ensaio</span>
-                    <p>ultimo update 28/06/22</p>
-                    <Input type="file" required id="inputFile-26" name="inputFile-26" />
-                  </div>
-                </div>
-
-                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                  <div className=" h-20 w-20 flex items-center mr-1">
-                    <Button
-                      textColor="white"
-                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                      bgColor={bgColor}
-                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(22, 'EXPERIMENT')}
-                      icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
-                      type="button"
-                    />
-                  </div>
-                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                    <span className="font-bold">Importar Lista de Experimento</span>
-                    <p>ultimo update 28/06/22</p>
-                    <Input type="file" required id="inputFile-22" name="inputFile-22" />
-                  </div>
-                </div>
-
+            <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
+              <div className="h-20 w-20 flex items-center mr-1">
+                <Button
+                  textColor="white"
+                  bgColor={bgColor}
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(0, '')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
               </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Cadastros RD</span>
+                <p>ultimo update 28/06/22</p>
+                <Input type="file" required id="inputFile-0" name="inputFile-0" />
+              </div>
+            </div>
 
-              <div className="bg-white rounded-lg col-span-2">
-                <div className="mt-2 justify-center flex">
-                  <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
-                </div>
-                <hr />
+            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+              <div className=" h-20 w-20 flex items-center mr-1">
+                <Button
+                  textColor="white"
+                  bgColor={bgColor}
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(26, 'ASSAY_LIST')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
+              </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Importar Lista de Ensaio</span>
+                <p>ultimo update 28/06/22</p>
+                <Input type="file" required id="inputFile-26" name="inputFile-26" />
+              </div>
+            </div>
 
-                <AccordionFilter title="Filtrar log de importação">
-                  <div className="w-full flex gap-2">
-                    <form
-                      className="flex flex-col
+            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+              <div className=" h-20 w-20 flex items-center mr-1">
+                <Button
+                  textColor="white"
+                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                  bgColor={bgColor}
+                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                  onClick={() => readExcel(22, 'EXPERIMENT')}
+                  icon={<IoIosCloudUpload size={40} />}
+                  disabled={disabledButton}
+                  type="button"
+                />
+              </div>
+              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                <span className="font-bold">Importar Lista de Experimento</span>
+                <p>ultimo update 28/06/22</p>
+                <Input type="file" required id="inputFile-22" name="inputFile-22" />
+              </div>
+            </div>
+
+          </div>
+
+          <div className="bg-white rounded-lg col-span-2">
+            <div className="mt-2 justify-center flex">
+              <span className="text-xl" style={{ marginLeft: '5%' }}>HISTÓRICO DE IMPORTAÇÕES</span>
+            </div>
+            <hr />
+
+            <AccordionFilter title="Filtrar log de importação">
+              <div className="w-full flex gap-2">
+                <form
+                  className="flex flex-col
                       w-full
                       items-center
-                      px-4
+                      px-2
                       bg-white
                     "
-                      onSubmit={formik.handleSubmit}
-                    >
-                      <div className="w-full h-full
+                  onSubmit={formik.handleSubmit}
+                >
+                  <div className="w-full h-full
                       flex
                       justify-center
-                      pb-2
+                      pb-0
                     "
-                      >
-                        {filterFieldFactory('filterUser', 'Usuário')}
-                        {filterFieldFactory('filterTable', 'Tabela')}
-                        <div className="h-10 w-1/2 ml-4">
-                          <label className="block text-gray-900 text-sm font-bold mb-2">
-                            De:
-                          </label>
-                          <Input
-                            type="date"
-                            id="filterStartDate"
-                            name="filterStartDate"
-                            onChange={formik.handleChange}
-                          />
-                        </div>
-                        <div className="h-10 w-1/2 ml-4">
-                          <label className="block text-gray-900 text-sm font-bold mb-2">
-                            Até:
-                          </label>
-                          <Input
-                            type="date"
-                            id="filterEndDate"
-                            name="filterEndDate"
-                            onChange={formik.handleChange}
-                          />
-                        </div>
-                        {filterFieldFactory('filterState', 'Status')}
-                      </div>
+                  >
+                    {filterFieldFactory('filterUser', 'Usuário')}
+                    {filterFieldFactory('filterTable', 'Tabela')}
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        De:
+                      </label>
+                      <Input
+                        type="date"
+                        id="filterStartDate"
+                        name="filterStartDate"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                    <div className="h-10 w-1/2 ml-4">
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        Até:
+                      </label>
+                      <Input
+                        type="date"
+                        id="filterEndDate"
+                        name="filterEndDate"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                    {filterFieldFactory('filterState', 'Status')}
 
-                      <div className="h-16 w-32 mt-3">
-                        <Button
-                          onClick={() => { }}
-                          value="Filtrar"
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiFilterAlt size={20} />}
-                        />
-                      </div>
-                    </form>
+                    <div style={{ width: 40 }} />
+                    <div className="h-7 w-32 mt-6">
+                      <Button
+                        onClick={() => { }}
+                        value="Filtrar"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiFilterAlt size={20} />}
+                      />
+                    </div>
                   </div>
-                </AccordionFilter>
 
-                <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
-                  <MaterialTable
-                    style={{ background: '#f9fafb' }}
-                    columns={columns}
-                    data={logs}
-                    options={{
-                      showTitle: false,
-                      headerStyle: {
-                        zIndex: 20,
-                      },
-                      search: false,
-                      filtering: false,
-                      pageSize: itensPerPage,
-                    }}
-                    components={{
-                      Toolbar: () => (
-                        <div
-                          className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200"
-                        >
+                </form>
+              </div>
+            </AccordionFilter>
 
-                          <strong className="text-blue-600">
-                            Total registrado:
-                            {' '}
-                            {itemsTotal}
-                          </strong>
+            <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+              <MaterialTable
+                style={{ background: '#f9fafb' }}
+                columns={columns}
+                data={logs}
+                options={{
+                  showTitle: false,
+                  headerStyle: {
+                    zIndex: 20,
+                  },
+                  rowStyle: { background: '#f9fafb', height: 35 },
+                  search: false,
+                  filtering: false,
+                  pageSize: itensPerPage,
+                }}
+                components={{
+                  Toolbar: () => (
+                    <div
+                      className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200"
+                    >
 
-                          <div className="h-full flex items-center gap-2">
-                            <div className="border-solid border-2 border-blue-600 rounded">
-                              <div className="w-72">
-                                <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
-                                  <DragDropContext onDragEnd={handleOnDragEnd}>
-                                    <Droppable droppableId="characters">
-                                      {
+                      <strong className="text-blue-600">
+                        Total registrado:
+                        {' '}
+                        {itemsTotal}
+                      </strong>
+
+                      <div className="h-full flex items-center gap-2">
+                        <div className="border-solid border-2 border-blue-600 rounded">
+                          <div className="w-72">
+                            <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                              <DragDropContext onDragEnd={handleOnDragEnd}>
+                                <Droppable droppableId="characters">
+                                  {
                                         (provided) => (
                                           <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
                                             <div className="h-8 mb-3">
@@ -668,44 +681,44 @@ export default function Import({
                                           </ul>
                                         )
                                       }
-                                    </Droppable>
-                                  </DragDropContext>
-                                </AccordionFilter>
-                              </div>
-                            </div>
-
-                            <div className="h-12 flex items-center justify-center w-full">
-                              <Button
-                                title="Exportar planilha de logs"
-                                icon={<RiFileExcel2Line size={20} />}
-                                bgColor="bg-blue-600"
-                                textColor="white"
-                                onClick={() => { downloadExcel(); }}
-                              />
-                            </div>
+                                </Droppable>
+                              </DragDropContext>
+                            </AccordionFilter>
                           </div>
                         </div>
-                      ),
-                      Pagination: (props) => (
-                        <div
-                          className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
-                          {...props}
-                        >
+
+                        <div className="h-12 flex items-center justify-center w-full">
                           <Button
-                            onClick={() => setCurrentPage(currentPage - 10)}
+                            title="Exportar planilha de logs"
+                            icon={<RiFileExcel2Line size={20} />}
                             bgColor="bg-blue-600"
                             textColor="white"
-                            icon={<MdFirstPage size={18} />}
-                            disabled={currentPage <= 1}
+                            onClick={() => { downloadExcel(); }}
                           />
-                          <Button
-                            onClick={() => setCurrentPage(currentPage - 1)}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            icon={<BiLeftArrow size={15} />}
-                            disabled={currentPage <= 0}
-                          />
-                          {
+                        </div>
+                      </div>
+                    </div>
+                  ),
+                  Pagination: (props) => (
+                    <div
+                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {
                             Array(1).fill('').map((value, index) => (
                               <Button
                                 key={index}
@@ -717,30 +730,30 @@ export default function Import({
                               />
                             ))
                           }
-                          <Button
-                            onClick={() => setCurrentPage(currentPage + 1)}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            icon={<BiRightArrow size={15} />}
-                            disabled={currentPage + 1 >= pages}
-                          />
-                          <Button
-                            onClick={() => setCurrentPage(currentPage + 10)}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            icon={<MdLastPage size={18} />}
-                            disabled={currentPage + 1 >= pages}
-                          />
-                        </div>
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                       ) as any,
-                    }}
-                  />
-                </div>
-              </div>
+                }}
+              />
             </div>
-          </Content>
-        </>
-      )
+          </div>
+        </div>
+      </Content>
+    </>
+  // )
   );
 }
 

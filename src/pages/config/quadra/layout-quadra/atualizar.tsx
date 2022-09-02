@@ -110,7 +110,7 @@ export default function Atualizarquadra({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'SL', value: 'sl' },
     { name: 'CamposGerenciados[]', title: 'sSCc', value: 'sc' },
     { name: 'CamposGerenciados[]', title: 'S Aloc', value: 's_aloc' },
@@ -125,7 +125,8 @@ export default function Atualizarquadra({
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -159,25 +160,25 @@ export default function Atualizarquadra({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -191,9 +192,9 @@ export default function Atualizarquadra({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'sl') {
         tableFields.push(headerTableFactory('SL', 'sl'));
       }
@@ -241,7 +242,8 @@ export default function Atualizarquadra({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -312,19 +314,16 @@ export default function Atualizarquadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_layout=${id_layout}`;
-    }
-
     await layoutChildrenService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
-
+          delete row.id;
+          delete row.id_layout;
           return row;
         });
 
@@ -343,7 +342,7 @@ export default function Atualizarquadra({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'disparos.xlsx');
+        XLSX.writeFile(workBook, 'Disparos.xlsx');
       }
     });
   };
@@ -358,7 +357,12 @@ export default function Atualizarquadra({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -371,14 +375,14 @@ export default function Atualizarquadra({
   }
 
   useEffect(() => {
-    handlePagination(); '';
+    handlePagination();
     handleTotalPages();
   }, [currentPage]);
 
   function updateFieldFactory(title: any, name: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-6">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           *
           {name}
         </label>
@@ -399,12 +403,12 @@ export default function Atualizarquadra({
       <Head><title>Atualizar layout quadra</title></Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-2"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar layout quadra</h1>
+          <h1 className="text-xl">Atualizar layout quadra</h1>
 
-          <div className="w-full flex justify-between items-start gap-5 mt-5">
+          <div className="w-full flex justify-between items-start gap-5 mt-2">
 
             {updateFieldFactory('esquema', 'Código esquema')}
 
@@ -419,16 +423,8 @@ export default function Atualizarquadra({
 
             {updateFieldFactory('parcelas', 'Parcelas')}
 
-          </div>
-
-          <div className="h-10 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          "
-          >
-            <div className="w-30">
+            <div style={{ minWidth: 150, maxWidth: 150 }} className="h-7 flex gap-3 justify-center mt-6">
+              <div className="w-30" />
               <Button
                 type="button"
                 value="Voltar"
@@ -439,13 +435,9 @@ export default function Atualizarquadra({
               />
             </div>
           </div>
+
         </form>
-        <main className="h-3/5 w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
+        <main className="w-full flex flex-col items-start gap-8">
 
           <div style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
             <MaterialTable
@@ -457,6 +449,7 @@ export default function Atualizarquadra({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -476,7 +469,7 @@ export default function Atualizarquadra({
                     border-gray-200
                   "
                   >
-
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {itemsTotal}
@@ -544,11 +537,11 @@ export default function Atualizarquadra({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -577,7 +570,7 @@ export default function Atualizarquadra({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -594,9 +587,10 @@ export default function Atualizarquadra({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = context.req.cookies;
 

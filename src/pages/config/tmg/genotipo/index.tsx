@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,6 +28,8 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -39,7 +40,6 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
-import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterGenotipo: string | any;
@@ -57,6 +57,7 @@ interface IFilter {
 export interface IGenotipos {
   id: number;
   idCulture: number;
+  name_genotipo: string;
   idSafra: number;
   genealogy: string;
   genotipo: string;
@@ -93,7 +94,6 @@ export default function Listagem({
       filterBeforeEdit,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
-
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -118,7 +118,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome genótipo',
@@ -185,7 +185,8 @@ export default function Listagem({
 
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -213,9 +214,8 @@ export default function Listagem({
       filterGmrRangeTo,
       filterGmrRangeFrom,
     }) => {
-      
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("genotipo", filterGenotipo,filterMainName,filterCruza,filterTecnologiaCod,filterTecnologiaDesc,filterGmr,idCulture,idSafra,filterGmrRangeTo,filterGmrRangeFrom,);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
@@ -231,13 +231,14 @@ export default function Listagem({
     },
   });
 
+  // esta functionando ordeação
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
 
-     //Manage orders of colunms 
-     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"genotipo");
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "genotipo");
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -275,7 +276,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -286,26 +287,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
             </button>
           </div>
         </div>
@@ -313,17 +314,26 @@ export default function Listagem({
     };
   }
 
-  
-  function tecnologiaHeaderFactory() {
+  function tecnologiaHeaderFactory(title: string, name: string) {
     return {
-      title: 'Tecnologia',
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
       field: 'tecnologia',
       width: 0,
-      sorting: false,
+      sorting: true,
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
           </div>
         </div>
       ),
@@ -343,13 +353,13 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
-              title={`Editar ${rowData.genealogy}`}
+              title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
 
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
 
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
@@ -374,18 +384,19 @@ export default function Listagem({
     // }
     // })
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'name_genotipo'));
+        tableFields.push(headerTableFactory('Nome genótipo', 'name_genotipo'));
       }
       if (columnCampos[index] === 'name_main') {
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        // tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
-        tableFields.push(tecnologiaHeaderFactory());
+        tableFields.push(
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+        );
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -394,7 +405,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
       if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
+        tableFields.push(headerTableFactory('Nº Lotes', 'nDeLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
@@ -508,62 +519,68 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
+    await genotipoService
+      .getAll(filterApplication)
+      .then(({ response, status }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
 
-    await genotipoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = genotipos.map((row: any) => {
-          row.cod_tec = row.tecnologia?.cod_tec;
-          row.tecnologia = row.tecnologia?.name;
-          // row.DT = new Date();
+            delete row.id;
+            delete row.id_tecnologia;
+            delete row.tableData;
+            delete row.lote;
+            delete row.dt_import;
 
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            'pt-BR',
-          )} ${hours}:${minutes}:${seconds}`;
-          return row;
-        });
+            // row.DT = new Date();
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
+            const dataExp = new Date();
+            let hours: string;
+            let minutes: string;
+            let seconds: string;
+            if (String(dataExp.getHours()).length === 1) {
+              hours = `0${String(dataExp.getHours())}`;
+            } else {
+              hours = String(dataExp.getHours());
+            }
+            if (String(dataExp.getMinutes()).length === 1) {
+              minutes = `0${String(dataExp.getMinutes())}`;
+            } else {
+              minutes = String(dataExp.getMinutes());
+            }
+            if (String(dataExp.getSeconds()).length === 1) {
+              seconds = `0${String(dataExp.getSeconds())}`;
+            } else {
+              seconds = String(dataExp.getSeconds());
+            }
+            row.DT = `${dataExp.toLocaleDateString(
+              'pt-BR',
+            )} ${hours}:${minutes}:${seconds}`;
+            return row;
+          });
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Genótipos.xlsx');
-      } else {
-        Swal.fire(response);
-      }
-    });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
+
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Genótipos.xlsx');
+        } else {
+          // eslint-disable-next-line no-undef
+          Swal.fire(response);
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -574,10 +591,10 @@ export default function Listagem({
     }
   }
 
+  // paginação certa
   async function handlePagination(): Promise<void> {
-
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
@@ -587,13 +604,13 @@ export default function Listagem({
         // setTimeout(removestate, 8000); //Remove State    
         removestate();
       }
-    });  
+    });
   }
 
   function filterFieldFactory(title: any, name: any,) {
     return (
       <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -611,8 +628,8 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <div className="grid grid-cols-3 gap-4">
@@ -643,15 +660,15 @@ export default function Listagem({
     );
   }
 
-    //remove states
-  function removestate(){
-      localStorage.removeItem("filterValueEdit");  
-      localStorage.removeItem("pageBeforeEdit");  
-      setTimeout(()=>{}, 5000)  
+  //remove states
+  function removestate() {
+    localStorage.removeItem("filterValueEdit");
+    localStorage.removeItem("pageBeforeEdit");
+    setTimeout(() => { }, 5000)
   }
 
-   //Checkingdefualt values
-   function checkValue(value : any){
+  //Checkingdefualt values
+  function checkValue(value: any) {
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;
   }
@@ -672,7 +689,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-5
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar genótipos">
@@ -681,7 +698,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -690,10 +707,9 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
                 "
                 >
-                  {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
@@ -704,8 +720,8 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
-                  pt-2
+                  pb-0
+                  pt-6
                 "
                 >
                   {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
@@ -739,10 +755,12 @@ export default function Listagem({
               columns={columns}
               data={genotipos}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -762,8 +780,8 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    {/* <div className="h-12">
-                      <Button
+                    <div className="h-12">
+                      {/* <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
@@ -771,8 +789,8 @@ export default function Listagem({
                         onClick={() => { }}
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div> */}
+                      /> */}
+                    </div>
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -837,10 +855,10 @@ export default function Listagem({
                         </div>
                       </div>
 
-                      <div className="h-10 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de genótipos"
-                          icon={<RiFileExcel2Line size={16} />}
+                          icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {
@@ -909,8 +927,8 @@ export default function Listagem({
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages} 
-                    />*/}
+                      disabled={currentPage + 1 >= pages}
+                    />
                   </div>
                 ) as any,
               }}
@@ -937,9 +955,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;

@@ -7,11 +7,11 @@ export class FocoController {
   focoRepository = new FocoRepository();
 
   async getAll(options: any) {
-    //console.log(options);
     const parameters: object | any = {};
+    parameters.AND = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== 2) parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
@@ -22,8 +22,19 @@ export class FocoController {
         parameters.id_culture = Number(options.id_culture);
       }
 
+      if (options.filterGroupFrom || options.filterGroupTo) {
+        if (options.filterGroupFrom && options.filterGroupTo) {
+          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} }}`);
+        } else if (options.filterGroupFrom) {
+          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGroupFrom)} }}`);
+        } else if (options.filterGroupTo) {
+          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGroupTo)} }}`);
+        }
+      }
+
       const select = {
         id: true,
+        id_culture: true,
         name: true,
         group: true,
         status: true,
@@ -39,10 +50,6 @@ export class FocoController {
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
 
-      //console.log("select");
-
-      //console.log(select);
-
       const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
@@ -51,7 +58,7 @@ export class FocoController {
         orderBy,
       );
 
-      if(response.total > 0){
+      if (response.total > 0) {
         response.map((item: any) => {
           item.group.map((group: any) => {
             if (group.id_safra === Number(options.id_safra)) {
@@ -65,8 +72,6 @@ export class FocoController {
           });
         });
       }
-
-      
 
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };
@@ -97,7 +102,7 @@ export class FocoController {
   async create(data: any) {
     try {
       const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture },
+        { name: data.name, id_culture: data.id_culture, status: 1 },
       );
 
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
@@ -115,11 +120,13 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      const focoExist: any = await this.focoRepository.findOne(data.id);
-      if (!focoExist) return { status: 404, message: 'Foco não encontrado' };
-
+      if (data.status === 0 || data.status === 1) {
+        const foco = await this.focoRepository.update(data.id, data);
+        if (!foco) return { status: 400, message: 'Foco não encontrado' };
+        return { status: 200, message: 'Foco atualizada' };
+      }
       const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture },
+        { name: data.name, id_culture: data.id_culture, status: 1 },
       );
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 

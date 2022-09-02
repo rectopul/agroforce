@@ -1,6 +1,6 @@
-import { InputHTMLAttributes, ReactNode } from 'react';
+import { InputHTMLAttributes } from 'react';
 
-type ITypeInputProps = InputHTMLAttributes<HTMLInputElement>
+type ITypeInputProps = InputHTMLAttributes<HTMLInputElement>;
 
 export function Input({ ...rest }: ITypeInputProps) {
   return (
@@ -11,11 +11,12 @@ export function Input({ ...rest }: ITypeInputProps) {
         border border-solid border-gray-300
         rounded
         w-full
-        py-2 px-3
+        py-1 px-2
         text-gray-900
+        text-xs
         leading-tight
         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-      "
+        "
       {...rest}
     />
   );

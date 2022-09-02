@@ -7,10 +7,7 @@ import { MdDateRange } from 'react-icons/md';
 import { safraService } from 'src/services';
 import Swal from 'sweetalert2';
 import {
-  Button,
-  Content,
-  Input,
-  Radio,
+  Button, Content, Input, Radio,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -37,11 +34,7 @@ export default function Safra() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
@@ -66,15 +59,12 @@ export default function Safra() {
       const { main_safra, ...data } = values;
 
       const {
-        created_by,
-        id_culture,
-        status,
-        ...inputs
+        created_by, id_culture, status, ...inputs
       } = data;
 
       validateInputs(inputs);
       if (!values.safraName || !values.year) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       let plantingStartTime;
@@ -92,22 +82,24 @@ export default function Safra() {
         );
       }
 
-      await safraService.create({
-        id_culture: Number(culture),
-        safraName: formik.values.safraName,
-        year: Number(formik.values.year),
-        plantingStartTime,
-        plantingEndTime,
-        status: formik.values.status,
-        created_by: Number(userLogado.id),
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Safra cadastrada com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      });
+      await safraService
+        .create({
+          id_culture: Number(culture),
+          safraName: formik.values.safraName,
+          year: Number(formik.values.year),
+          plantingStartTime,
+          plantingEndTime,
+          status: formik.values.status,
+          created_by: Number(userLogado.id),
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Safra cadastrada com sucesso!');
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
@@ -133,14 +125,14 @@ export default function Safra() {
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova safra</h1>
 
           <div className="w-full flex justify-between items-start gap-5 mt-4">
-            <div className="w-4/12 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-4/12 h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Safra
               </label>
@@ -152,26 +144,11 @@ export default function Safra() {
                 placeholder="___________"
                 onChange={formik.handleChange}
                 value={formik.values.safraName}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
-            <div className="w-4/12 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-4/12 h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Ano
               </label>
@@ -183,27 +160,11 @@ export default function Safra() {
                 placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
-                className="
-                  shadow
-                  appearance-none
-                  bg-white bg-no-repeat
-                  border border-solid border-gray-300
-                  rounded
-                  w-full
-                  py-2 px-3
-                  text-gray-900
-                  leading-tight
-                  focus:text-gray-700
-                  focus:bg-white
-                  focus:border-blue-600
-                  focus:outline-none
-                "
               />
             </div>
 
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Período ideal de início de plantio
               </label>
               <Input
@@ -216,8 +177,7 @@ export default function Safra() {
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Período ideal do fim do plantio
               </label>
               <Input
@@ -230,14 +190,15 @@ export default function Safra() {
             </div>
           </div>
 
-          <div className="h-10 w-full
+          <div
+            className="h-7 w-full
             flex
             gap-3
             justify-center
             mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -254,7 +215,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<MdDateRange size={18} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>

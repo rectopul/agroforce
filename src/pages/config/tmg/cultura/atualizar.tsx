@@ -10,11 +10,7 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
 import { cultureService } from 'src/services';
 import Swal from 'sweetalert2';
-import {
-  Button,
-  Content,
-  Input,
-} from '../../../../components';
+import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IUpdateCulture {
@@ -29,11 +25,7 @@ export default function Cultura(culture: IUpdateCulture) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
   const [checkInput, setCheckInput] = useState('text-black');
@@ -48,25 +40,28 @@ export default function Cultura(culture: IUpdateCulture) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
-      await cultureService.updateCulture({
-        id: culture.id,
-        name: capitalize(formik.values.name),
-        desc: capitalize(formik.values.desc),
-        status: formik.values.status,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Cultura atualizada com sucesso');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      }).finally(() => {
-        formik.values.name = culture.name;
-      });
+      await cultureService
+        .updateCulture({
+          id: culture.id,
+          name: capitalize(formik.values.name),
+          desc: capitalize(formik.values.desc),
+          status: formik.values.status,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Cultura atualizada com sucesso');
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        })
+        .finally(() => {
+          formik.values.name = culture.name;
+        });
     },
   });
 
@@ -92,13 +87,13 @@ export default function Cultura(culture: IUpdateCulture) {
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
-
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Atualizar cultura</h1>
 
-          <div className="w-full
+          <div
+            className="w-full
           flex
           justify-around
           gap-2
@@ -107,7 +102,7 @@ export default function Cultura(culture: IUpdateCulture) {
         "
           >
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Código Reduzido
               </label>
@@ -124,12 +119,11 @@ export default function Cultura(culture: IUpdateCulture) {
               />
             </div>
             <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong className={checkInput}>*</strong>
                 Nome
               </label>
               <Input
-
                 id="desc"
                 name="desc"
                 type="text"
@@ -141,15 +135,16 @@ export default function Cultura(culture: IUpdateCulture) {
             </div>
           </div>
 
-          <div className="
-            h-10 w-full
+          <div
+            className="
+            h-7 w-full
             flex
             gap-3
             justify-center
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -162,11 +157,11 @@ export default function Cultura(culture: IUpdateCulture) {
             <div className="w-40">
               <Button
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -176,7 +171,7 @@ export default function Cultura(culture: IUpdateCulture) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
   const { token } = context.req.cookies;
@@ -187,7 +182,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiCulture = await fetch(`${baseUrl}/${context.query.id}`, requestOptions);
+  const apiCulture = await fetch(
+    `${baseUrl}/${context.query.id}`,
+    requestOptions,
+  );
 
   const culture = await apiCulture.json();
 

@@ -6,6 +6,7 @@ export { CheckBox } from './CheckBox';
 export { Content } from './Content';
 export { DropDown } from './DropDown';
 export { Input } from './Input';
+export { InputMoney } from './InputMoney';
 export { MainHeader } from './MainHeader';
 export { ModelHeader } from './MainHeader/ModelHeader';
 export { TabHeader } from './MainHeader/TabHeader';

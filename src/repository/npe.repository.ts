@@ -39,6 +39,6 @@ export class NpeRepository {
   }
 
   async queryRaw(query: any) {
-    return await prisma.$queryRaw`${query}`;
+    return prisma.$queryRaw`${query}`;
   }
 }

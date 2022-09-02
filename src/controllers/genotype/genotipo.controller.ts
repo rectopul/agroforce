@@ -25,14 +25,12 @@ export class GenotipoController {
       }
 
       if (options.filterGmrRangeFrom || options.filterGmrRangeTo) {
-        if(options.filterGmrRangeFrom && options.filterGmrRangeTo){
+        if (options.filterGmrRangeFrom && options.filterGmrRangeTo) {
           parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}", "lte": "${Number(options.filterGmrRangeTo)}" }`);
-        }else{
-          if (options.filterGmrRangeFrom) {
-            parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}" }`);
-          }else if (options.filterGmrRangeTo) {
-            parameters.gmr = JSON.parse(`{"lte": "${Number(options.filterGmrRangeTo)}" }`);
-          }
+        } else if (options.filterGmrRangeFrom) {
+          parameters.gmr = JSON.parse(`{"gte": "${Number(options.filterGmrRangeFrom)}" }`);
+        } else if (options.filterGmrRangeTo) {
+          parameters.gmr = JSON.parse(`{"lte": "${Number(options.filterGmrRangeTo)}" }`);
         }
       }
 
@@ -72,6 +70,7 @@ export class GenotipoController {
           name_experiment: true,
           name_alter: true,
           elit_name: true,
+          tecnologia: true,
           type: true,
           gmr: true,
           bgm: true,
@@ -82,7 +81,6 @@ export class GenotipoController {
           progenitor_m_origem: true,
           progenitores_origem: true,
           parentesco_completo: true,
-          tecnologia: true,
           lote: true,
           dt_import: true,
         };
@@ -132,7 +130,7 @@ export class GenotipoController {
       }
       response.map((item: any) => {
         const newItem = item;
-        newItem.countChildren = functionsUtils
+        newItem.nDeLotes = functionsUtils
           .countChildrenForSafra(item.lote, Number(options.id_safra));
         return newItem;
       });

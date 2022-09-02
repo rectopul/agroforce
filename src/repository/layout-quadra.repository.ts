@@ -2,12 +2,12 @@ import { prisma } from '../pages/api/db/db';
 
 export class LayoutQuadraRepository {
   async findOne(id: number) {
-    const Result = await prisma.layout_quadra.findUnique({
+    const result = await prisma.layout_quadra.findUnique({
       where: {
         id,
       },
     });
-    return Result;
+    return result;
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
@@ -16,31 +16,25 @@ export class LayoutQuadraRepository {
       order = JSON.parse(orderBy);
     }
     const count = await prisma.layout_quadra.count({ where });
-    const Result: object | any = await prisma.layout_quadra.findMany({
+    const result: object | any = await prisma.layout_quadra.findMany({
       select, skip, take, where, orderBy: order,
     });
-    Result.total = count;
-    return Result;
+    result.total = count;
+    return result;
   }
 
   async create(Local: object | any) {
-    Local.created_at = new Date();
-    const Result = await prisma.layout_quadra.create({ data: Local });
-    return Result;
+    const result = await prisma.layout_quadra.create({ data: Local });
+    return result;
   }
 
-  async update(id: number, Local: Object) {
-    const ExisLocal = await this.findOne(id);
-    if (ExisLocal !== null) {
-      const Result = await prisma.layout_quadra.update({
-        where: {
-          id,
-        },
-        data: Local,
-      });
-
-      return Result;
-    }
-    return false;
+  async update(id: number, data: any) {
+    const result = await prisma.layout_quadra.update({
+      where: {
+        id,
+      },
+      data,
+    });
+    return result;
   }
 }

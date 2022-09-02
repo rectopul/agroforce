@@ -513,7 +513,7 @@ export default function Listagem({
 
     await layoutQuadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = quadras.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
@@ -750,11 +750,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -783,7 +783,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -802,7 +802,8 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
   const { token } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;

@@ -1,25 +1,44 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+import {
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
-import {
-  AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { sequenciaDelineamentoService, userPreferencesService } from 'src/services';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
+import {
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import {
+  sequenciaDelineamentoService,
+  userPreferencesService,
+} from '../../../../services';
+import { IReturnObject } from '../../../../interfaces/shared/Import.interface';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -27,6 +46,14 @@ interface IFilter {
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterOrderFrom: string | any;
+  filterOrderTo: string | any;
+  filterNtFrom: string | any;
+  filterNtTo: string | any;
+  filterBlockFrom: string | any;
+  filterBlockTo: string | any;
 }
 
 interface ISequenciaDelineamento {
@@ -51,45 +78,56 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  id_delineamento: number;
+  idDelineamento: number;
 }
 
 export default function Listagem({
-  allItems, totalItems, itensPerPage, filterApplication, id_delineamento,
+  allItems,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idDelineamento,
 }: IData) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'DELINEAMENTO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'DELINEAMENTO'
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
-  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.sequencia_delineamento || { id: 0, table_preferences: 'id,delineamento,repeticao,sorteio,nt,bloco,status' };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const preferences = userLogado.preferences.sequencia_delineamento || {
+    id: 0,
+    table_preferences: 'id,delineamento,repeticao,sorteio,nt,bloco,status',
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
 
-  const [items, setItems] = useState<ISequenciaDelineamento[]>(() => allItems);
+  const [seqDelineamento, setSeqDelineamento] = useState<ISequenciaDelineamento[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Delineamento',
+      value: 'delineamento',
+    },
     { name: 'CamposGerenciados[]', title: 'Repetição', value: 'repeticao' },
-    { name: 'CamposGerenciados[]', title: 'Sorteio', value: 'sorteio' },
+    { name: 'CamposGerenciados[]', title: 'Ordem', value: 'sorteio' },
     { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
     { name: 'CamposGerenciados[]', title: 'Bloco', value: 'bloco' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    // { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
     { id: 1, name: 'Ativos' },
@@ -97,10 +135,8 @@ export default function Listagem({
   ];
 
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -108,168 +144,58 @@ export default function Listagem({
       filterSearch: '',
       orderBy: '',
       typeOrder: '',
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      filterOrderTo: '',
+      filterOrderFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
+      filterBlockTo: '',
+      filterBlockFrom: '',
     },
-    onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_delineamento=${id_delineamento}`;
-      await sequenciaDelineamentoService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setItems(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+    onSubmit: async ({
+      // eslint-disable-next-line max-len
+      filterSearch, filterRepetitionTo, filterRepetitionFrom, filterOrderTo, filterOrderFrom, filterNtTo, filterNtFrom, filterBlockTo, filterBlockFrom,
+    }) => {
+      const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}`;
+      await sequenciaDelineamentoService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then(({ response, total: newTotal }: IReturnObject) => {
+          setFilter(parametersFilter);
+          setSeqDelineamento(response);
+          setTotalItems(newTotal);
+          setCurrentPage(0);
+        });
     },
   });
 
-  async function handleStatusCulture(idCulture: number, data: ISequenciaDelineamento): Promise<void> {
+  async function handleStatusCulture(
+    idCulture: number,
+    data: ISequenciaDelineamento,
+  ): Promise<void> {
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
 
-    const index = items.findIndex((item) => item.id === idCulture);
+    const index = seqDelineamento.findIndex((item) => item.id === idCulture);
 
     if (index === -1) {
       return;
     }
 
-    setItems((oldCulture) => {
+    setSeqDelineamento((oldCulture) => {
       const copy = [...oldCulture];
       copy[index].status = data.status;
       return copy;
     });
-
-    // const { id, name, status }: any = items[index];
-
-    // await sequenciaDelineamentoService.updateCulture({ id, name, status });
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Status',
-      field: 'status',
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: 'Filtrar por status',
-      render: (rowData: ISequenciaDelineamento) => (
-        <div className="h-10 flex">
-          {rowData.status ? (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsUp size={16} />}
-                title="Ativo"
-                onClick={async () => await handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-10">
-              <Button
-                icon={<FaRegThumbsDown size={16} />}
-                title="Inativo"
-                onClick={async () => await handleStatusCulture(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[index] === 'delineamento') {
-        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
-      }
-      if (columnCampos[index] === 'repeticao') {
-        tableFields.push(headerTableFactory('Repetição', 'repeticao'));
-      }
-      if (columnCampos[index] === 'sorteio') {
-        tableFields.push(headerTableFactory('Sorteio', 'sorteio'));
-      }
-      if (columnCampos[index] === 'nt') {
-        tableFields.push(headerTableFactory('NT', 'nt'));
-      }
-      if (columnCampos[index] === 'bloco') {
-        tableFields.push(headerTableFactory('Bloco', 'bloco'));
-      }
-      if (columnCampos[index] === 'status') {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
-  }
-
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -279,8 +205,9 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
-    if (filter && typeof (filter) !== undefined) {
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
@@ -292,11 +219,13 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await sequenciaDelineamentoService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setItems(response.response);
-      }
-    });
+    await sequenciaDelineamentoService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }: IReturnObject) => {
+        if (status === 200) {
+          setSeqDelineamento(response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -311,6 +240,133 @@ export default function Listagem({
     }
   }
 
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
+
+  function idHeaderFactory() {
+    return {
+      title: <div className="flex items-center">{arrowOrder}</div>,
+      field: 'id',
+      width: 0,
+      sorting: false,
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={25} color="#eba417" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={25} />
+            </button>
+          </div>
+        </div>
+      )),
+    };
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Status',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: ISequenciaDelineamento) => (
+        <div className="h-7 flex">
+          {rowData.status ? (
+            <div className="h-7">
+              <Button
+                icon={<FaRegThumbsUp size={14} />}
+                title="Ativo"
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-7">
+              <Button
+                icon={<FaRegThumbsDown size={14} />}
+                title="Inativo"
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
+        </div>
+      ),
+    };
+  }
+
+  function columnsOrder(columnOrder: string) {
+    const columnCampos: string[] = columnOrder.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnCampos).forEach((item, index) => {
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
+      if (columnCampos[index] === 'delineamento') {
+        tableFields.push(
+          headerTableFactory('Nome', 'delineamento.name'),
+        );
+      }
+      if (columnCampos[index] === 'repeticao') {
+        tableFields.push(headerTableFactory('Repetição', 'repeticao'));
+      }
+      if (columnCampos[index] === 'sorteio') {
+        tableFields.push(headerTableFactory('Ordem', 'sorteio'));
+      }
+      if (columnCampos[index] === 'nt') {
+        tableFields.push(headerTableFactory('NT', 'nt'));
+      }
+      if (columnCampos[index] === 'bloco') {
+        tableFields.push(headerTableFactory('Bloco', 'bloco'));
+      }
+      // if (columnCampos[index] === 'status') {
+      //   tableFields.push(statusHeaderFactory());
+      // }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
+
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = '';
@@ -322,14 +378,31 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 16 }).then((response) => {
-        userLogado.preferences.sequencia_delineamento = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
-        preferences.id = response.response.id;
-      });
+      await userPreferencesService
+        .create({
+          table_preferences: campos,
+          userId: userLogado.id,
+          module_id: 16,
+        })
+        .then((response) => {
+          userLogado.preferences.sequencia_delineamento = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.sequencia_delineamento = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
+      userLogado.preferences.sequencia_delineamento = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -350,41 +423,45 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_delineamento=${id_delineamento}`;
-    }
+    await sequenciaDelineamentoService
+      .getAll(`${filterApplication}&id_delineamento=${idDelineamento}`)
+      .then(({ status, response }: IReturnObject) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            if (row.status === 0) {
+              row.status = 'Inativo' as any;
+            } else {
+              row.status = 'Ativo' as any;
+            }
+            row.delineamento = row.delineamento?.name;
+            delete row.id;
+            delete row.id_delineamento;
 
-    await sequenciaDelineamentoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = items.map((row) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
+            return row;
+          });
 
-          return row;
-        });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(
+            workBook,
+            workSheet,
+            'Sequencia de delineamento',
+          );
 
-        newData.map((item: any) => item.delineamento = item.delineamento?.name);
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Sequencia de delineamento');
-
-        // Buffer
-        const buf = XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Sequencia de delineamento.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Sequencia de delineamento.xlsx');
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -397,16 +474,24 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${id_delineamento}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${idDelineamento}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&id_delineamento=${idDelineamento}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await sequenciaDelineamentoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setItems(response.response);
-      }
-    });
+    await sequenciaDelineamentoService
+      .getAll(parametersFilter)
+      .then(({ status, response, total: allTotal }: IReturnObject) => {
+        if (status === 200) {
+          setSeqDelineamento(response);
+          setTotalItems(allTotal);
+        }
+      });
   }
 
   useEffect(() => {
@@ -416,15 +501,12 @@ export default function Listagem({
 
   return (
     <>
-      <Head><title>Listagem de sequência de delineamento</title></Head>
+      <Head>
+        <title>Listagem de sequência de delineamento</title>
+      </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
+        <main className="h-full w-full flex flex-col items-start gap-4">
           <AccordionFilter title="Filtrar sequências de delineamento">
             <div className="w-full flex gap-2">
               <form
@@ -436,41 +518,133 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select
+                      name="filterStatus"
+                      onChange={formik.handleChange}
+                      values={filtersStatusItem.map((id) => id)}
+                      selected="1"
+                    />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
                     <Input
                       type="text"
-                      placeholder="name"
+                      placeholder="Nome"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
                     />
                   </div>
-                </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Ordem
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterOrderFrom"
+                        name="filterOrderFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterOrderTo"
+                        name="filterOrderTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Bloco
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterBlockFrom"
+                        name="filterBlockFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterBlockTo"
+                        name="filterBlockTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ width: 20 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={18} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -480,12 +654,13 @@ export default function Listagem({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={items}
+              data={seqDelineamento}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -505,7 +680,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -515,48 +690,69 @@ export default function Listagem({
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-72">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable key={index} draggableId={String(generate.title)} index={index}>
-                                            {(provided) => (
-                                              <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
+                                          >
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value as string,
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de delineamento" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button
+                          title="Exportar planilha de delineamento"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -573,11 +769,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -606,7 +802,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -623,17 +819,19 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 15;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 15;
 
   const { token } = context.req.cookies;
-  const id_delineamento: number = Number(context.query.id_delineamento);
+  const idDelineamento: number = Number(context.query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_delineamento=${idDelineamento}`;
   const filterApplication = 'filterStatus=1';
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -644,10 +842,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const api = await fetch(`${baseUrl}/list?id_delineamento=${id_delineamento}`, requestOptions);
-  const data = await api.json();
-  const allItems = data.response;
-  const totalItems = data.total;
+  const { response: allItems, total: totalItems }: IReturnObject = await fetch(
+    `${baseUrl}`,
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {
@@ -655,7 +853,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       totalItems,
       itensPerPage,
       filterApplication,
-      id_delineamento,
+      idDelineamento,
     },
   };
 };

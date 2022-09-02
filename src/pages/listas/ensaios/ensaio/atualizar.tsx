@@ -100,7 +100,7 @@ export default function AtualizarTipoEnsaio({
     generatesPropsExperiments,
     setGeneratesPropsExperiments,
   ] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName' },
     { name: 'CamposGerenciados[]', title: 'Lugar de Cultura', value: 'local' },
     { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
@@ -112,7 +112,8 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -123,7 +124,7 @@ export default function AtualizarTipoEnsaio({
       id: assayList.id,
       foco: assayList.foco.name,
       type_assay: assayList.type_assay.name,
-      tecnologia: assayList.tecnologia.name,
+      tecnologia: `${assayList.tecnologia.cod_tec} ${assayList.tecnologia.name}`,
       gli: assayList.gli,
       bgm: assayList.bgm,
       status: assayList.status,
@@ -156,7 +157,8 @@ export default function AtualizarTipoEnsaio({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -261,27 +263,27 @@ export default function AtualizarTipoEnsaio({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   type="button"
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -295,9 +297,9 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'lote.fase'));
       }
@@ -480,12 +482,26 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_assay_list=${idAssayList}`;
-    }
     await genotypeTreatmentService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
-        const workSheet = XLSX.utils.json_to_sheet(response);
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          newRow.fase = newRow.lote?.fase;
+          newRow.cod_tec = newRow.genotipo?.tecnologia?.cod_tec;
+          newRow.nome_genotipo = newRow.genotipo?.name_genotipo;
+          newRow.gmr_genotipo = newRow.genotipo?.gmr;
+          newRow.bgm_genotipo = newRow.genotipo?.bgm;
+          newRow.nca = newRow.lote?.ncc;
+          newRow.cod_lote = newRow.lote?.cod_lote;
+
+          delete row.genotipo;
+          delete row.lote;
+          delete row.id;
+          delete row.id_safra;
+          delete row.assay_list;
+          return newRow;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotypeTreatments');
 
@@ -506,12 +522,17 @@ export default function AtualizarTipoEnsaio({
   };
 
   const downloadExcelExperiments = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${experimentsCamposGerenciados}&id_assay_list=${idAssayList}`;
-    }
     await experimentService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
-        const workSheet = XLSX.utils.json_to_sheet(response);
+        const newData = response.map((row: any) => {
+          const newRow = row;
+          newRow.local = newRow.local?.name_local_culture;
+          newRow.delineamento = newRow.delineamento?.name;
+          delete newRow.id;
+          delete newRow.assay_list;
+          return newRow;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
 
@@ -549,7 +570,12 @@ export default function AtualizarTipoEnsaio({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -563,7 +589,12 @@ export default function AtualizarTipoEnsaio({
 
   async function handlePaginationExperiments(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -577,8 +608,8 @@ export default function AtualizarTipoEnsaio({
 
   function updateFieldFactory(name: string, title: any) {
     return (
-      <div className="w-full h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-full h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
           {name}
         </label>
         <Input
@@ -610,28 +641,28 @@ export default function AtualizarTipoEnsaio({
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-0"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Lista de Ensaio</h1>
+            <h1 className="text-xl">Atualizar Lista de Ensaio</h1>
           </div>
 
           <div className="w-full
             flex
             justify-around
-            gap-6
-            mt-4
-            mb-4
+            gap-0
+            mt-0
+            mb-0
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-1">
 
               {updateFieldFactory('Foco', 'foco')}
 
               {updateFieldFactory('Ensaio', 'type_assay')}
 
-              {updateFieldFactory('Nome Tecnologia', 'tecnologia')}
+              {updateFieldFactory('Tecnologia', 'tecnologia')}
 
               {updateFieldFactory('GLI', 'gli')}
 
@@ -648,13 +679,13 @@ export default function AtualizarTipoEnsaio({
             justify-around
             gap-6
             mt-4
-            mb-4
+            mb-1
           "
           >
             <div className="w-full flex justify-between items-start gap-5 mt-10">
 
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
                   Projeto
                 </label>
                 <Input
@@ -666,48 +697,66 @@ export default function AtualizarTipoEnsaio({
               </div>
             </div>
 
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-3">
               <div className="w-full h-10">
-                <label className="block text-gray-900 text-sm font-bold mb-2">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
                   Observações
                 </label>
-                <Input
+                <textarea
+                  className="shadow
+                              appearance-none
+                              bg-white bg-no-repeat
+                              border border-solid border-gray-300
+                              rounded
+                              w-full
+                              py-1 px-2
+                              text-gray-900
+                              text-xs
+                              leading-tight
+                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  rows={3}
                   id="comments"
                   name="comments"
                   onChange={formik.handleChange}
                   value={formik.values.comments}
                 />
+                {/* <Input
+                  id="comments"
+                  name="comments"
+                  onChange={formik.handleChange}
+                  value={formik.values.comments}
+                /> */}
               </div>
             </div>
 
-          </div>
-          <div className="
-            h-10 w-full
+            <div className="
+            h-7 w-full
             flex
             gap-3
-            justify-center
-            mt-10
+            justify-end
+            mt-16
           "
-          >
-            <div className="w-30">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => { router.back(); }}
-              />
-            </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<RiOrganizationChart size={18} />}
-                onClick={() => { }}
-              />
+            >
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => { router.back(); }}
+                />
+              </div>
+              <div className="w-40">
+                <Button
+                  type="submit"
+                  value="Atualizar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<RiOrganizationChart size={18} />}
+                  onClick={() => { }}
+                />
+              </div>
             </div>
           </div>
         </form>
@@ -718,7 +767,7 @@ export default function AtualizarTipoEnsaio({
         "
         >
 
-          <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={table === 'genotipo' ? columns : experimentColumns}
@@ -728,6 +777,7 @@ export default function AtualizarTipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -752,23 +802,23 @@ export default function AtualizarTipoEnsaio({
                     >
                       <div className="h-12">
                         <Button
-                          title="Genótipo"
-                          value="Genótipo"
-                          bgColor="bg-blue-600"
+                          title="GENÓTIPOS"
+                          value="GENÓTIPOS"
+                          bgColor={table == 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
-                          onClick={() => { setTable('genotipo'); }}
-                          icon={<FaSortAmountUpAlt size={20} />}
+                          onClick={() => setTable('genotipo')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
-
+                      <div style={{ width: 10 }} />
                       <div className="h-12">
                         <Button
-                          title="Experimentos"
-                          value="Experimentos"
-                          bgColor="bg-blue-600"
+                          title="EXPERIMENTOS"
+                          value="EXPERIMENTOS"
+                          bgColor={table == 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
-                          onClick={() => { setTable('experimentos'); }}
-                          icon={<FaSortAmountUpAlt size={20} />}
+                          onClick={() => setTable('experimentos')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                     </div>
@@ -894,11 +944,11 @@ export default function AtualizarTipoEnsaio({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -927,7 +977,7 @@ export default function AtualizarTipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -944,7 +994,7 @@ export default function AtualizarTipoEnsaio({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;

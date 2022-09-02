@@ -18,6 +18,24 @@ export class QuadraController {
         parameters.cod_quadra = JSON.parse(`{"contains":"${options.filterSearch}"}`);
       }
 
+      if (options.filterPreparation) {
+        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.filterPreparation}"} }`);
+      }
+
+      if (options.filterSchema) {
+        parameters.esquema = JSON.parse(`{"contains":"${options.filterSchema}"}`);
+      }
+
+      if (options.filterPFrom || options.filterPTo) {
+        if (options.filterPFrom && options.filterPTo) {
+          parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)}, "lte": ${Number(options.filterPTo)} }`);
+        } else if (options.filterPFrom) {
+          parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)} }`);
+        } else if (options.filterPTo) {
+          parameters.linha_p = JSON.parse(`{"lte": ${Number(options.filterPTo)} }`);
+        }
+      }
+
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         Object.keys(objSelect).forEach((item) => {
@@ -28,26 +46,23 @@ export class QuadraController {
         select = {
           id: true,
           cod_quadra: true,
-          local_plantio: true,
+          local: { select: { name_local_culture: true } },
+          esquema: true,
           larg_q: true,
           comp_p: true,
           linha_p: true,
           comp_c: true,
-          esquema: true,
           tiro_fixo: true,
           disparo_fixo: true,
+          local_plantio: true,
           q: true,
-          local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           status: true,
         };
       }
+
       if (options.id_culture) {
         parameters.id_culture = Number(options.id_culture);
-      }
-
-      if (options.local_preparo) {
-        parameters.local = JSON.parse(`{ "name_local_culture": { "contains":"${options.local_preparo}"} }`);
       }
 
       if (options.cod_quadra) {
@@ -70,7 +85,6 @@ export class QuadraController {
         skip,
         orderBy,
       );
-
       if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
@@ -88,10 +102,8 @@ export class QuadraController {
       if (!id) throw new Error('Dados inválidos');
 
       const response: any = await this.quadraRepository.findOne(id);
-
       if (!response) throw new Error('Item não encontrado');
       response.tf = response.dividers[response.dividers.length - 1].t4_f;
-      console.log(response);
 
       return { status: 200, response };
     } catch (error: any) {
@@ -103,7 +115,7 @@ export class QuadraController {
   async create(data: any) {
     try {
       const response = await this.quadraRepository.create(data);
-      return { status: 200, message: 'Genealogia cadastrada', response };
+      return { status: 200, message: 'Quadra cadastrada', response };
     } catch (error: any) {
       handleError('Quadra Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Quadra erro');
@@ -112,13 +124,18 @@ export class QuadraController {
 
   async update(data: any) {
     try {
+      if (data.status === 0 || data.status === 1) {
+        const quadra = await this.quadraRepository.update(data.id, data);
+        if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
+        return { status: 200, message: 'Quadra atualizada' };
+      }
       const quadra = await this.quadraRepository.findOne(data.id);
 
-      if (!quadra) return { status: 400, message: 'Genótipo não encontrado' };
+      if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
 
       await this.quadraRepository.update(quadra.id, data);
 
-      return { status: 200, message: 'Genótipo atualizado' };
+      return { status: 200, message: 'Quadra atualizado' };
     } catch (error: any) {
       handleError('Quadra Controller', 'Update', error.message);
       throw new Error('[Controller] - Update Quadra erro');

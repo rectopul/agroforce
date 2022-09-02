@@ -49,10 +49,9 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
-
       const select = {
         id: true,
-        id_safra: true,
+        safra: { select: { safraName: true } },
         genotipo: {
           select: {
             name_genotipo: true,
@@ -65,6 +64,8 @@ export class GenotypeTreatmentController {
             },
           },
         },
+        treatments_number: true,
+        status: true,
         lote: {
           select: {
             ncc: true,
@@ -82,8 +83,6 @@ export class GenotypeTreatmentController {
             status: true,
           },
         },
-        treatments_number: true,
-        status: true,
         comments: true,
       };
       if (options.id_safra) {
@@ -122,7 +121,6 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,

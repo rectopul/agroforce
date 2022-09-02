@@ -29,17 +29,11 @@ export class CulturaController {
 
     try {
       if (options.filterStatus) {
-        if (typeof (options.status) === 'string') {
-          options.filterStatus = Number(options.filterStatus);
-          if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-        } else if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
-      } else {
-        parameters.status = 1;
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterSearch) {
-        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
-        parameters.desc = JSON.parse(options.filterSearch);
+        parameters.desc = JSON.parse(`{"contains":"${options.filterSearch}"}`);
       }
 
       if (options.paramSelect) {

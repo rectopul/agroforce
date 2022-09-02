@@ -45,6 +45,10 @@ import ITabs from '../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
+  filterSchema: string | any;
+  filterPreparation: string | any;
+  filterPFrom: string | any;
+  filterPTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -79,14 +83,14 @@ interface IData {
 }
 
 export default function Listagem({
-      quadras,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      cultureId,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  quadras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -114,15 +118,15 @@ export default function Listagem({
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local Preparo',
+      title: 'Local preparo',
       value: 'local_preparo',
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Código Quadra',
+      title: 'Código quadra',
       value: 'cod_quadra',
     },
     { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
@@ -131,14 +135,15 @@ export default function Listagem({
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -148,12 +153,16 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
+      filterSchema: '',
+      filterPTo: '',
+      filterPFrom: '',
+      filterPreparation: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
+      }&filterSearch=${filterSearch}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await quadraService
@@ -169,27 +178,22 @@ export default function Listagem({
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
-      }&local_preparo=${data.local.name_local_culture}`;
+    }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
       data.status = 0;
     }
 
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        let statusEdit: number = 0;
-        if (response.response[response.total - 1].status === 0) {
-          statusEdit = 1;
-        } else {
-          statusEdit = 0;
-        }
-        const idEdit: number = response.response[response.total - 1].id;
-        const quadraEdit = quadraService.update({
-          id: idEdit,
-          status: statusEdit,
-        });
+    await quadraService.getAll(parametersFilter).then(async ({ status }) => {
+      if (status === 200 && data.status === 1) {
+        Swal.fire('Foco já ativado');
+        return;
       }
+      await quadraService.update({
+        id: idQuadra,
+        status: data.status,
+      });
     });
 
     const index = quadra.findIndex(
@@ -205,8 +209,6 @@ export default function Listagem({
       copy[index].status = data.status;
       return copy;
     });
-
-    const { id, status } = quadra[index];
   }
 
   async function handleOrder(
@@ -222,7 +224,8 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -270,7 +273,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -281,26 +284,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
             </button>
           </div>
         </div>
@@ -368,9 +371,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'cod_quadra') {
         tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
       }
@@ -391,7 +394,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'local_preparo') {
         tableFields.push(
-          headerTableFactory('Local Preparo', 'local.name_local_culture'),
+          headerTableFactory('Local preparo', 'local.name_local_culture'),
         );
       }
       if (columnCampos[index] === 'status') {
@@ -459,19 +462,19 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
-    await quadraService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = quadra.map((row) => {
+    await quadraService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
-
+          row.local = row.local?.name_local_culture;
+          delete row.id;
+          delete row.safra;
+          delete row.tableData;
+          delete row.local_plantio;
           return row;
         });
 
@@ -507,7 +510,12 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
@@ -535,7 +543,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar quadras">
@@ -544,7 +552,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -553,45 +561,93 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-7 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
-                      Nome
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Local preparo
                     </label>
                     <Input
                       type="text"
-                      placeholder="código quadra"
+                      placeholder="Local Preparo"
+                      max="40"
+                      id="filterPreparation"
+                      name="filterPreparation"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Código quadra
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Código quadra"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
                     />
                   </div>
-                </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Linha P
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterPFrom"
+                        name="filterPFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterPTo"
+                        name="filterPTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Esquema
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Esquema"
+                      max="40"
+                      id="filterSchema"
+                      name="filterSchema"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -607,6 +663,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -714,6 +771,7 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -736,11 +794,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -769,7 +827,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -801,10 +859,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+    : `filterStatus=1&id_culture=${cultureId}`;
+
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
-  const filterApplication = `filterStatus=2&id_culture=${cultureId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;

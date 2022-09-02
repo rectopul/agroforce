@@ -5,7 +5,8 @@
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
+import { validateInteger } from '../../shared/utils/numberValidate';
+import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
 import { FocoController } from '../foco.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
@@ -123,6 +124,7 @@ export class ImportAssayListController {
               }
               const { response }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
+                id_safra: idSafra,
               });
               if (response[0]?.status === 'UTILIZADO') {
                 responseIfError[Number(column)]
@@ -163,16 +165,14 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              }
-              if ((typeof (spreadSheet[row][column])) !== 'number'
-                || spreadSheet[row][column].toString().length > 2
-                || spreadSheet[row][column] < 0) {
+              } else if ((spreadSheet[row][column]).toString().length > 2
+                || !validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
-                  += responseGenericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'deve ser um numero de ate 2 dígitos',
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -181,13 +181,13 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if ((typeof (spreadSheet[row][column])) !== 'number' || spreadSheet[row][column] < 0) {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
             // Validação do campo PRJ
@@ -326,8 +326,8 @@ export class ImportAssayListController {
               });
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
+                id_safra: idSafra,
               });
-
               let savedAssayList: any;
               if (assayList.length === 0) {
                 savedAssayList = await assayListController.create({
@@ -385,13 +385,15 @@ export class ImportAssayListController {
                 });
               }
               if (savedAssayList.status === 200) {
-                if (spreadSheet[row][0] === 'PRODUTIVIDADE') {
-                  productivity += 1;
+                if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]) {
+                  if (spreadSheet[row][0] === 'PRODUTIVIDADE') {
+                    productivity += 1;
+                  }
+                  if (spreadSheet[row][0] === 'AVANÇO') {
+                    advance += 1;
+                  }
+                  register += 1;
                 }
-                if (spreadSheet[row][0] === 'AVANÇO') {
-                  advance += 1;
-                }
-                register += 1;
               }
             }
           }

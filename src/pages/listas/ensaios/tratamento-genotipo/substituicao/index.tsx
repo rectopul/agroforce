@@ -12,14 +12,18 @@ import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
-//import { TbArrowsDownUp } from 'react-icons/tb';
+// import { TbArrowsDownUp } from 'react-icons/tb';
 import {
   BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
+import { useRouter } from 'next/router';
+
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiSettingsFill } from 'react-icons/ri';
+import { RiArrowUpDownLine, RiSettingsFill } from 'react-icons/ri';
+
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Swal from 'sweetalert2';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../../components';
@@ -61,13 +65,18 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
+  idSafra: number;
   itensPerPage: number;
   filterApplication: object | any;
 }
 
 export default function Listagem({
-      allLote, totalItems, itensPerPage, filterApplication,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  idSafra,
+  itensPerPage,
+  filterApplication,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -84,6 +93,7 @@ export default function Listagem({
     id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const router = useRouter();
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -92,7 +102,7 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
@@ -107,7 +117,8 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
@@ -142,12 +153,11 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      Object.keys(checkedTreatments).forEach((item) => {
-        tempParams.push(checkedTreatments[item]);
+      checkedTreatments.forEach((item:any) => {
+        tempParams.push(item.genotipo);
       });
-      const checkedParams = tempParams.join();
       const parametersFilter = `filterStatus=${1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
-      await replaceTreatmentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${checkedParams}`).then(({ response, total: allTotal }) => {
+      await replaceTreatmentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${tempParams}`).then(({ response, total: allTotal }) => {
         setFilter(parametersFilter);
         setLotes(response);
         setTotalItems(allTotal);
@@ -166,7 +176,8 @@ export default function Listagem({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -217,7 +228,12 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-    await replaceTreatmentService.replace({ id, checkedTreatments });
+    const { message } = await replaceTreatmentService.replace({ id, checkedTreatments });
+    Swal.fire({
+      html: message,
+      width: '800',
+    });
+    router.back();
   }
 
   function replaceFactory(name: string, title: string) {
@@ -231,13 +247,15 @@ export default function Listagem({
       sorting: false,
       width: 0,
       render: (rowData: any) => (
-        <div className="h-12 w-12">
+        <div className="h-10 w-10">
           <Button
+            title="Substituir genótipo/nca"
             type="button"
             onClick={() => { replaceTreatmentButton(rowData.id); }}
             rounder="rounded-full"
             bgColor="bg-green-600"
             textColor="white"
+            icon={<RiArrowUpDownLine size={20} />}
           />
         </div>
       ),
@@ -350,15 +368,19 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const tempParams: any = [];
-    Object.keys(checkedTreatments).forEach((item) => {
-      tempParams.push(checkedTreatments[item]);
-    });
-    console.log('tempParams');
-    console.log(tempParams);
-    const checkedParams = tempParams.join();
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${checkedParams}`;
+    let parametersFilter;
+    const tempParams: any = [];
+    checkedTreatments.forEach((item:any) => {
+      if (item.genotipo) {
+        tempParams.push(item.genotipo);
+      }
+    });
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -370,10 +392,10 @@ export default function Listagem({
     });
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-10 w-full ml-2" style={small ? { maxWidth: 65 } : {}}>
+        <label className="block text-gray-900 text-sm mb-1">
           {name}
         </label>
         <Input
@@ -401,7 +423,7 @@ export default function Listagem({
         <main className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar lotes">
@@ -410,7 +432,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -421,15 +443,15 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano')}
+                  {filterFieldFactory('filterYear', 'Ano', true)}
 
                   {filterFieldFactory('filterCodLote', 'Cód lote')}
 
                   {filterFieldFactory('filterNcc', 'NCC')}
 
-                  {filterFieldFactory('filterFase', 'Fase')}
+                  {filterFieldFactory('filterFase', 'Fase', true)}
 
-                  {filterFieldFactory('filterPeso', 'Peso')}
+                  {filterFieldFactory('filterPeso', 'Peso', true)}
 
                   {filterFieldFactory('filterSeeds', 'Quant. sementes')}
 
@@ -437,24 +459,24 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterGmr', 'GMR')}
+                  {filterFieldFactory('filterGmr', 'GMR', true)}
 
-                  {filterFieldFactory('filterBgm', 'BGM')}
+                  {filterFieldFactory('filterBgm', 'BGM', true)}
 
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
+                  <div className="h-7 w-32 mt-6 ml-2">
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -488,6 +510,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -564,11 +587,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -597,7 +620,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -616,10 +639,12 @@ export default function Listagem({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const { token } = req.cookies;
   const { checked }: any = query;
+  const idSafra = req.cookies.safraId;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -643,6 +668,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
     props: {
       allLote,
       totalItems,
+      idSafra,
       itensPerPage,
       filterApplication,
     },

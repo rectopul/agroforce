@@ -17,7 +17,7 @@ export class AssayListRepository {
         id_safra: true,
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
-        tecnologia: { select: { name: true } },
+        tecnologia: { select: { name: true, cod_tec: true } },
         experiment: true,
         gli: true,
         period: true,
@@ -40,10 +40,11 @@ export class AssayListRepository {
     return result;
   }
 
-  async findByName({ gli }: any) {
+  async findByName({ gli, id_safra }: any) {
     const result = await prisma.assay_list.findFirst({
       where: {
         gli,
+        id_safra,
       },
     });
 
@@ -54,7 +55,6 @@ export class AssayListRepository {
     if (orderBy) {
       orderBy = JSON.parse(orderBy);
     }
-
     const count = await prisma.assay_list.count({ where });
 
     const result: object | any = await prisma.assay_list.findMany({

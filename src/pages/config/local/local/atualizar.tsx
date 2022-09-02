@@ -14,10 +14,10 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { localService, unidadeCulturaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { localService, unidadeCulturaService, userPreferencesService } from '../../../../services';
 import {
   AccordionFilter,
   Button, CheckBox, Content,
@@ -62,7 +62,7 @@ export default function AtualizarLocal({
   const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'LUGAR DE CULTURA'
+    tab.titleTab === 'LOCAL'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
@@ -82,10 +82,12 @@ export default function AtualizarLocal({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome de Unidade de Cultura', value: 'name_unity_culture' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
   ]);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -152,25 +154,25 @@ export default function AtualizarLocal({
       render: () => (
         colorStar === '#eba417'
           ? (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('')}
                 >
-                  <AiTwotoneStar size={25} color="#eba417" />
+                  <AiTwotoneStar size={20} color="#eba417" />
                 </button>
               </div>
             </div>
           )
           : (
-            <div className="h-10 flex">
+            <div className="h-7 flex">
               <div>
                 <button
                   className="w-full h-full flex items-center justify-center border-0"
                   onClick={() => setColorStar('#eba417')}
                 >
-                  <AiTwotoneStar size={25} />
+                  <AiTwotoneStar size={20} />
                 </button>
               </div>
             </div>
@@ -184,9 +186,9 @@ export default function AtualizarLocal({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'name_unity_culture') {
         tableFields.push(headerTableFactory('Nome da Unidade de Cultura', 'name_unity_culture'));
       }
@@ -207,7 +209,8 @@ export default function AtualizarLocal({
     } else {
       typeOrder = '';
     }
-
+    setOrderBy(column);
+    setOrderType(typeOrder);
     if (filter && typeof (filter) !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
@@ -277,25 +280,16 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados},foco&id_local=${id_local}`;
-    }
     await unidadeCulturaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
+        const newData = response.response.map((row: any) => {
+          delete row.id;
+          delete row.id_unity_culture;
+          delete row.id_local;
+          delete row.local;
+          delete row.id_unity_culture;
 
           return row;
-        });
-
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.safra = item.safra?.safraName;
-          return item;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -328,7 +322,12 @@ export default function AtualizarLocal({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
@@ -351,23 +350,16 @@ export default function AtualizarLocal({
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-2"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Local</h1>
+            <h1 className="text-xl">Atualizar Local</h1>
           </div>
 
-          <div className="w-full
-            flex
-            justify-around
-            gap-6
-            mt-4
-            mb-4
-          "
-          >
+          <div className="w-full flex justify-around gap-5 mt-2 mb-3">
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome do lugar de cultura
               </label>
               <Input
@@ -380,8 +372,8 @@ export default function AtualizarLocal({
               />
             </div>
 
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Rótulo
               </label>
               <Input
@@ -394,8 +386,8 @@ export default function AtualizarLocal({
               />
             </div>
 
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *MLOC
               </label>
               <Input
@@ -416,8 +408,8 @@ export default function AtualizarLocal({
             mb-4
           "
           >
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome da Fazenda
               </label>
               <Input
@@ -429,8 +421,8 @@ export default function AtualizarLocal({
                 value={formik.values.adress}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *País
               </label>
               <Input
@@ -442,8 +434,8 @@ export default function AtualizarLocal({
                 value={formik.values.label_country}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Região
               </label>
               <Input
@@ -455,8 +447,8 @@ export default function AtualizarLocal({
                 value={formik.values.label_region}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Localidade
               </label>
               <Input
@@ -468,16 +460,11 @@ export default function AtualizarLocal({
                 value={formik.values.name_locality}
               />
             </div>
-          </div>
-          <div className="
-            h-10 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          "
-          >
-            <div className="w-30">
+            <div
+              // style={{ minWidth: 150, maxWidth: 150 }}
+              className="h-7 w-full flex gap-3 justify-center mt-6"
+            >
+              <div className="w-20" />
               <Button
                 type="button"
                 value="Voltar"
@@ -489,7 +476,7 @@ export default function AtualizarLocal({
             </div>
           </div>
         </form>
-        <main className="h-4/6 w-full
+        <main className="w-full
           flex flex-col
           items-start
           gap-8
@@ -506,6 +493,7 @@ export default function AtualizarLocal({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -525,6 +513,7 @@ export default function AtualizarLocal({
                     border-gray-200
                   "
                   >
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -593,11 +582,11 @@ export default function AtualizarLocal({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -626,7 +615,7 @@ export default function AtualizarLocal({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -643,7 +632,7 @@ export default function AtualizarLocal({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;
