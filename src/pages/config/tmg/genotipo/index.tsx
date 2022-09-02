@@ -928,7 +928,7 @@ export default function Listagem({
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
-                    />
+                    /> */}
                   </div>
                 ) as any,
               }}
@@ -965,7 +965,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-  
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
