@@ -34,6 +34,15 @@ export class GenotipoController {
         }
       }
 
+      if (options.filterLotsFrom || options.filterLotsTo) {
+        if (options.filterLotsFrom && options.filterLotsTo) {
+          parameters.numberLotes = JSON.parse(`{"gte": ${Number(options.filterLotsFrom)}, "lte": ${Number(options.filterLotsTo)} }`);
+        } else if (options.filterLotsFrom) {
+          parameters.numberLotes = JSON.parse(`{"gte": ${Number(options.filterLotsFrom)} }`);
+        } else if (options.filterLotsTo) {
+          parameters.numberLotes = JSON.parse(`{"lte": ${Number(options.filterLotsTo)} }`);
+        }
+      }
       if (options.filterTecnologiaCod) {
         parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
       }
