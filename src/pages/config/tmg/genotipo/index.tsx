@@ -102,7 +102,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      'id,name_genotipo,name_main,tecnologia,cruza,gmr,number_lotes',
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -132,7 +132,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome publico',
@@ -403,8 +403,8 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
-      if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'nDeLotes'));
+      if (columnCampos[index] === 'numberLotes') {
+        tableFields.push(headerTableFactory('Nº Lotes', 'numberLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));

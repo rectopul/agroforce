@@ -20,6 +20,7 @@ export class GenotipoRepository {
         name_experiment: true,
         name_alter: true,
         elit_name: true,
+        numberLotes: true,
         type: true,
         gmr: true,
         bgm: true,

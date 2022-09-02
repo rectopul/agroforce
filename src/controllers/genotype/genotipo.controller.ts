@@ -71,6 +71,7 @@ export class GenotipoController {
           name_alter: true,
           elit_name: true,
           tecnologia: true,
+          numberLotes: true,
           type: true,
           gmr: true,
           bgm: true,
@@ -128,12 +129,7 @@ export class GenotipoController {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
       }
-      response.map((item: any) => {
-        const newItem = item;
-        newItem.nDeLotes = functionsUtils
-          .countChildrenForSafra(item.lote, Number(options.id_safra));
-        return newItem;
-      });
+
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Genotipo Controller', 'GetAll', error.message);

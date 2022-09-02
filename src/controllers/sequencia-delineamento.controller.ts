@@ -1,5 +1,5 @@
 import { SequenciaDelineamentoRepository } from '../repository/sequencia-delineamento.repository';
-import { countDelimitation } from '../shared/utils/countDelimitation';
+import { countDelimitation } from '../shared/utils/counts';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
