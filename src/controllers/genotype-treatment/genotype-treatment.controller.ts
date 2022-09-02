@@ -1,6 +1,7 @@
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
+import { countTreatmentsNumber } from '../../shared/utils/counts';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -155,7 +156,7 @@ export class GenotypeTreatmentController {
   async create(data: any) {
     try {
       await this.genotypeTreatmentRepository.create(data);
-
+      await countTreatmentsNumber(data.id_assay_list);
       return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'Create', error.message);

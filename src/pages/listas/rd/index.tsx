@@ -55,8 +55,8 @@ interface IData {
   idCulture: number
 }
 export default function Import({
-      allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');

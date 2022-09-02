@@ -1,5 +1,5 @@
 import { LayoutChildrenRepository } from '../repository/layout-children.repository';
-import { countBlock } from '../shared/utils/countBlock';
+import { countBlock } from '../shared/utils/counts';
 import handleError from '../shared/utils/handleError';
 
 export class LayoutChildrenController {
@@ -82,8 +82,8 @@ export class LayoutChildrenController {
       await countBlock(response);
       return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
-      handleError('Layout children controller', 'Creat', error.message);
-      throw new Error('[Controller] - Creat Layout children erro');
+      handleError('Layout children controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Layout children erro');
     }
   }
 

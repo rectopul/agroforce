@@ -1,9 +1,13 @@
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
+import { GenotipoController } from './genotype/genotipo.controller';
+import { countLotesNumber } from '../shared/utils/counts';
 
 export class LoteController {
   loteRepository = new LoteRepository();
+
+  genotipoController = new GenotipoController();
 
   async getOne(id: number) {
     try {
@@ -22,6 +26,8 @@ export class LoteController {
   async create(data: any) {
     try {
       const response = await this.loteRepository.create(data);
+      const genotype = await this.genotipoController.getOne(data.id_genotipo);
+      await countLotesNumber(genotype);
       if (response) {
         return { status: 200, response, message: 'Lote cadastrado' };
       }
@@ -37,6 +43,9 @@ export class LoteController {
       const lote = await this.loteRepository.findById(data.id);
 
       if (!lote) return { status: 404, message: 'Lote não existente' };
+
+      const genotype = await this.genotipoController.getOne(data.id_genotipo);
+      await countLotesNumber(genotype);
 
       const response = await this.loteRepository.update(data.id, data);
       if (response) {
