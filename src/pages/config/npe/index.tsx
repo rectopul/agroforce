@@ -574,7 +574,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-4 w-1/2 ml-4">
+      <div className="h-4 w-1/4 ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -619,14 +619,8 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-2
-                "
-                >
-                  <div className="h-6 w-1/2 ml-4">
+                <div className="w-full h-full flex justify-center pb-0">
+                  <div className="h-6 w-1/4 ml-0">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
@@ -651,26 +645,28 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/3 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE Inicial
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterNpeFrom"
-                      name="filterNpeFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterNpeTo"
-                      name="filterNpeTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFrom"
+                        name="filterNpeFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeTo"
+                        name="filterNpeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div style={{ width: 40 }}>
+                  <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       onClick={() => { }}
