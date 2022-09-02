@@ -764,18 +764,16 @@ export default function Listagem({
                   {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => { }}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-7 w-32 mt-6">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
