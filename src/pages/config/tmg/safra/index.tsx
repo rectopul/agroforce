@@ -144,8 +144,8 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
-      filterYearFrom: '',
       filterYearTo: '',
+      filterYearFrom: '',
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',
@@ -639,24 +639,21 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
-                    <Input
-                      placeholder="Ano"
-                      id="filterYear"
-                      name="filterYear"
-                      onChange={formik.handleChange}
-                      // defaultValue={checkValue("filterYear")}
-                      className="shadow
-                          appearance-none
-                          bg-white bg-no-repeat
-                          border border-solid border-gray-300
-                          rounded
-                          w-full
-                          py-2 px-3
-                          text-gray-900
-                          leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                        "
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterYearFrom"
+                        name="filterYearFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterYearTo"
+                        name="filterYearTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   {/* <div className="h-10 w-1/2 ml-4">

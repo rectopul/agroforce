@@ -50,6 +50,8 @@ interface IFilter {
   filterGmr: string | any;
   filterGmrRangeTo: string | any;
   filterGmrRangeFrom: string | any;
+  filterLotsTo: string | any;
+  filterLotsFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -201,6 +203,8 @@ export default function Listagem({
       filterGmr: '',
       filterGmrRangeFrom: '',
       filterGmrRangeTo: '',
+      filterLotsFrom: '',
+      filterLotsTo: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -213,10 +217,12 @@ export default function Listagem({
       filterGmr,
       filterGmrRangeTo,
       filterGmrRangeFrom,
+      filterLotsTo,
+      filterLotsFrom,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
-
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
+      console.log(parametersFilter);
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -651,9 +657,42 @@ export default function Listagem({
           </div>
         </div>
       </div>
+
     );
   }
 
+  function filterLotRange(title: any, name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterLotsFrom"
+              name="filterLotsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterLotsTo"
+              name="filterLotsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+
+    );
+  }
   // remove states
   function removestate() {
     localStorage.removeItem('filterValueEdit');
@@ -721,6 +760,8 @@ export default function Listagem({
                   }
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+
+                  {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
                 <div className="h-16 w-32 mt-3">

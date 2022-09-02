@@ -46,17 +46,16 @@ export class AssayListController {
       if (options.filterStatusAssay) {
         parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
       }
-      /*
+
       if (options.filterTratFrom || options.filterTratTo) {
         if (options.filterTratFrom && options.filterTratTo) {
-          parameters.project = JSON.parse(`{"gte": "${Number(options.filterTratFrom)}", "lte": "${Number(options.filterTratTo)}" }`);
+          parameters.treatmentsNumber = JSON.parse(`{"gte": ${Number(options.filterTratFrom)}, "lte": ${Number(options.filterTratTo)} }`);
         } else if (options.filterTratFrom) {
-          parameters.peso = JSON.parse(`{"gte": "${Number(options.filterTratFrom)}" }`);
+          parameters.treatmentsNumber = JSON.parse(`{"gte": ${Number(options.filterTratFrom)} }`);
         } else if (options.filterTratTo) {
-          parameters.peso = JSON.parse(`{"lte": "${Number(options.filterTratTo)}" }`);
+          parameters.treatmentsNumber = JSON.parse(`{"lte": ${Number(options.filterTratTo)} }`);
         }
       }
-      */
 
       const select = {
         id: true,
