@@ -53,6 +53,8 @@ interface IFilter {
   filterStatus: string;
   filterName: string;
   filterProtocolName: string;
+  filterSeedsTo: string,
+  filterSeedsFrom: string,
   orderBy: string;
   typeOrder: string;
 }
@@ -155,13 +157,17 @@ export default function TipoEnsaio({
       filterStatus: '',
       filterName: '',
       filterProtocolName: '',
+      filterSeedsTo: '',
+      filterSeedsFrom: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterName, filterProtocolName }) => {
+    onSubmit: async ({
+      filterStatus, filterName, filterProtocolName, filterSeedsTo, filterSeedsFrom,
+    }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&id_culture=${idCulture}&id_safra=${idSafra}`;
+      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await typeAssayService
@@ -522,6 +528,38 @@ export default function TipoEnsaio({
       });
   }
 
+  function filterFieldFactorySeeds(name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterSeedsFrom"
+              name="filterSeedsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterSeedsTo"
+              name="filterSeedsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -598,6 +636,8 @@ export default function TipoEnsaio({
                       onChange={formik.handleChange}
                     />
                   </div>
+
+                  {filterFieldFactorySeeds('Faixa de envelope')}
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">

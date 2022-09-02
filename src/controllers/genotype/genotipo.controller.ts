@@ -115,7 +115,6 @@ export class GenotipoController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
       const response: object | any = await this.genotipoRepository.findAll(
         parameters,
         select,
