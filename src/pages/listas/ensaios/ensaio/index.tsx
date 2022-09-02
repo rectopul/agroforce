@@ -567,18 +567,21 @@ export default function TipoEnsaio({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nº de trat.
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterTratFrom"
-                      name="filterTratFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterTratTo"
-                      name="filterTratTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTratFrom"
+                        name="filterTratFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTratTo"
+                        name="filterTratTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
                   {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
 

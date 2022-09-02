@@ -123,17 +123,17 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do genotipo',
+      title: 'Nome genótipo',
       value: 'name_genotipo',
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Mome principal',
+      title: 'Nome principal',
       value: 'name_main',
     },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
   ]);
   const [filter, setFilter] = useState<any>();
   const [colorStar, setColorStar] = useState<string>('');
@@ -356,7 +356,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'name_genotipo') {
         tableFields.push(
-          headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'),
         );
       }
       if (columnCampos[index] === 'name_main') {
@@ -371,7 +371,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia'));
+        tableFields.push(tecnologiaHeaderFactory('Nome Tec.', 'genotipo.tecnologia'));
       }
     });
     return tableFields;
@@ -558,18 +558,21 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterYearFrom"
-                      name="filterYearFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterYearTo"
-                      name="filterYearTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterYearFrom"
+                        name="filterYearFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterYearTo"
+                        name="filterYearTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   {filterFieldFactory('filterCodLote', 'Cód. lote')}
@@ -582,41 +585,47 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Peso (kg)
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterWeightFrom"
-                      name="filterWeightFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterWeightTo"
-                      name="filterWeightTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterWeightFrom"
+                        name="filterWeightFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterWeightTo"
+                        name="filterWeightTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Quant. Sementes
+                      Quant. sementes
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterSeedFrom"
-                      name="filterSeedFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterSeedTo"
-                      name="filterSeedTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterSeedFrom"
+                        name="filterSeedFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterSeedTo"
+                        name="filterSeedTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
-                  {filterFieldFactory('filterGenotipo', 'Genótipo')}
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
-                  {filterFieldFactory('filterMainName', 'Principal')}
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
                 </div>
 
                 <div
@@ -630,36 +639,42 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       GMR
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterGmrFrom"
-                      name="filterGmrFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterGmrTo"
-                      name="filterGmrTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterGmrFrom"
+                        name="filterGmrFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterGmrTo"
+                        name="filterGmrTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       BGM
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterBgmFrom"
-                      name="filterBgmFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterBgmTo"
-                      name="filterBgmTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterBgmFrom"
+                        name="filterBgmFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterBgmTo"
+                        name="filterBgmTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
