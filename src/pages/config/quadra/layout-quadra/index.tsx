@@ -683,7 +683,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
                   <div className="h-6 w-1/2 ml-4">
@@ -707,64 +707,73 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Tiros
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterPopFrom"
-                      name="filterPopFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterPopTo"
-                      name="filterPopTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterPopFrom"
+                        name="filterPopFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterPopTo"
+                        name="filterPopTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Disparos
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterShotsFrom"
-                      name="filterShotsFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterShotsTo"
-                      name="filterShotsTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterShotsFrom"
+                        name="filterShotsFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterShotsTo"
+                        name="filterShotsTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Parcelas
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterParcelFrom"
-                      name="filterParcelFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterParcelTo"
-                      name="filterParcelTo"
-                      onChange={formik.handleChange}
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterParcelFrom"
+                        name="filterParcelFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterParcelTo"
+                        name="filterParcelTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
                     />
                   </div>
-                </div>
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
                 </div>
               </form>
             </div>
