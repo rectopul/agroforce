@@ -139,9 +139,11 @@ export default function Listagem({
       filterGroupTo: '',
       filterGroupFrom: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
+    onSubmit: async ({
+      filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
+    }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }filterSearch=${filterSearch}&id_culture=${userLogado.userCulture.cultura_selecionada
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${userLogado.userCulture.cultura_selecionada
       }`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -377,7 +379,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
       if (columnOrder[index] === 'group') {
-        tableFields.push(headerTableFactory('Grupo', 'group.group'));
+        tableFields.push(headerTableFactory('Grupo', 'group[0].group'));
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -507,6 +509,38 @@ export default function Listagem({
     });
   }
 
+  function filterFieldFactoryGroup(name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterGroupFrom"
+              name="filterGroupFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterGroupTo"
+              name="filterGroupTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -569,6 +603,9 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
+
+                  {filterFieldFactoryGroup('Faixa de grupos')}
+
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       onClick={() => { }}

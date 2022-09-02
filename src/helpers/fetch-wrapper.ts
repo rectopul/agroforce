@@ -138,13 +138,14 @@ async function handleFilterParameter(...theArgs: any) {
         key1,
         filterStatus,
         filterSafra,
-        filterYear,
+        filterYearTo,
+        filterYearFrom,
         filterStartDate,
         filterEndDate,
         cultureId,
       ] = theArgs;
 
-      parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+      parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}`;
     }
 
       break;
@@ -162,8 +163,10 @@ async function handleFilterParameter(...theArgs: any) {
         idSafra,
         filterGmrRangeTo,
         filterGmrRangeFrom,
+        filterLotsTo,
+        filterLotsFrom,
       ] = theArgs;
-      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
+      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&&filterLotsFrom=${filterLotsFrom}&filterLotsTo=${filterLotsTo}&`;
     }
       break;
     default:

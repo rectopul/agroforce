@@ -9,7 +9,10 @@ export class TypeAssayController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     let orderBy: object | any;
+    parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -20,6 +23,21 @@ export class TypeAssayController {
 
       if (options.filterProtocolName) {
         parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
+      }
+
+      if (options.id_safra) {
+        parameters.AND.push(JSON.parse(`{ "envelope": { "some": {"id_safra": ${Number(options.id_safra)} } } }`));
+      }
+
+      if (options.filterSeedsFrom || options.filterSeedsTo) {
+        if (options.filterSeedsFrom && options.filterSeedsTo) {
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
+        } else if (options.filterSeedsFrom) {
+          parameters.AND.push(JSON.parse(`{ "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)} } } } }`));
+        } else if (options.filterSeedsTo) {
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "lte": ${Number(options.filterSeedsTo)} } } } }`));
+        }
       }
 
       const select = {
@@ -47,6 +65,9 @@ export class TypeAssayController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
+      console.log('parameters');
+      console.log(parameters);
+
       const response = await this.typeAssayRepository.findAll(
         parameters,
         select,
@@ -55,6 +76,8 @@ export class TypeAssayController {
         orderBy,
       );
 
+      console.log('response');
+      console.log(response);
       response.map((item: any) => {
         item.envelope.map((envelope: any) => {
           if (envelope.id_safra === Number(options.id_safra)) {

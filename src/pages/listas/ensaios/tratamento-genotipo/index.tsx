@@ -105,7 +105,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome da Tec.',
+      title: 'Nome da tecnologia',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -141,7 +141,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome genótipo',
+      title: 'Nome do genótipo',
       value: 'genotipoName',
       defaultChecked: () => camposGerenciados.includes('genotipoName'),
     },
@@ -324,7 +324,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome genótipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
         );
       }
       if (columnOrder[item] === 'nca') {
@@ -546,6 +546,8 @@ export default function Listagem({
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
+      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
+
       router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
@@ -553,6 +555,8 @@ export default function Listagem({
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
+      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
+
       router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
@@ -635,7 +639,7 @@ export default function Listagem({
                 <div className="flex items-center gap-2">
                   <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
                   <label htmlFor="genotipo" className="font-normal text-base">
-                    Genótipo
+                    Nome do genótipo
                   </label>
                 </div>
               </div>
@@ -723,7 +727,7 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       GLI
@@ -738,7 +742,7 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  {filterFieldFactory('filterBgm', 'BMG')}
+                  {filterFieldFactory('filterBgm', 'BGM')}
                 </div>
                 <div
                   className="w-full h-full
@@ -808,7 +812,7 @@ export default function Listagem({
 
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Genótipo
+                      Nome do genótipo
                     </label>
                     <Select
                       values={[{ id: '', name: 'Selecione' }, ...genotypeSelect]}

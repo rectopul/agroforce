@@ -52,7 +52,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,countNT,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
@@ -81,7 +81,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'countNT', defaultChecked: () => camposGerenciados.includes('countNT'),
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'treatmentsNumber', defaultChecked: () => camposGerenciados.includes('treatmentsNumber'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
@@ -366,8 +366,8 @@ export default function TipoEnsaio({
           tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
         );
       }
-      if (columnOrder[item] === 'countNT') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'countNT'));
+      if (columnOrder[item] === 'treatmentsNumber') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'treatmentsNumber'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(headerTableFactory('Status do ensaio', 'status'));

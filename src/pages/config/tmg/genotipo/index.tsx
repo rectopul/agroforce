@@ -50,6 +50,8 @@ interface IFilter {
   filterGmr: string | any;
   filterGmrRangeTo: string | any;
   filterGmrRangeFrom: string | any;
+  filterLotsTo: string | any;
+  filterLotsFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -102,7 +104,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      'id,name_genotipo,name_main,tecnologia,cruza,gmr,number_lotes',
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -132,7 +134,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome publico',
@@ -201,6 +203,8 @@ export default function Listagem({
       filterGmr: '',
       filterGmrRangeFrom: '',
       filterGmrRangeTo: '',
+      filterLotsFrom: '',
+      filterLotsTo: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -213,10 +217,12 @@ export default function Listagem({
       filterGmr,
       filterGmrRangeTo,
       filterGmrRangeFrom,
+      filterLotsTo,
+      filterLotsFrom,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
-
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
+      console.log(parametersFilter);
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -403,8 +409,8 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
-      if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'nDeLotes'));
+      if (columnCampos[index] === 'numberLotes') {
+        tableFields.push(headerTableFactory('Nº Lotes', 'numberLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
@@ -651,9 +657,42 @@ export default function Listagem({
           </div>
         </div>
       </div>
+
     );
   }
 
+  function filterLotRange(title: any, name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterLotsFrom"
+              name="filterLotsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterLotsTo"
+              name="filterLotsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+
+    );
+  }
   // remove states
   function removestate() {
     localStorage.removeItem('filterValueEdit');
@@ -721,18 +760,22 @@ export default function Listagem({
                   }
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+
+                  {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
+
               </form>
             </div>
           </AccordionFilter>

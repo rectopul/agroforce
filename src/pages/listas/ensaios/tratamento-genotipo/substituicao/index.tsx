@@ -89,6 +89,8 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const checkedTreatments = JSON.parse(localStorage.getItem('checkedTreatments') as string);
+  const treatmentsOptionSelected = JSON.parse(localStorage.getItem('treatmentsOptionSelected') as string);
+
   const preferences = userLogado.preferences.lote || {
     id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
   };
@@ -104,16 +106,16 @@ export default function Listagem({
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
-    { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
+    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'Peso (kg)', value: 'peso' },
-    { name: 'CamposGerenciados[]', title: 'Quant sementes', value: 'quant_sementes' },
+    { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
+    { name: 'CamposGerenciados[]', title: 'Qtd. sementes', value: 'quant_sementes' },
     { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'name_genotipo' },
-    { name: 'CamposGerenciados[]', title: 'Mome principal', value: 'name_main' },
+    { name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -268,13 +270,13 @@ export default function Listagem({
 
     Object.keys(columnCampos).forEach((item, index) => {
       if (columnCampos[index] === 'year') {
-        tableFields.push(headerTableFactory('Ano', 'year'));
+        tableFields.push(headerTableFactory('Ano lote', 'year'));
       }
       if (columnCampos[index] === 'cod_lote') {
         tableFields.push(headerTableFactory('Cód. lote', 'cod_lote'));
       }
       if (columnCampos[index] === 'ncc') {
-        tableFields.push(headerTableFactory('NCC', 'ncc'));
+        tableFields.push(headerTableFactory('NCA', 'ncc'));
       }
       if (columnCampos[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'fase'));
@@ -283,7 +285,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Peso', 'peso'));
       }
       if (columnCampos[index] === 'quant_sementes') {
-        tableFields.push(headerTableFactory('Quant. sementes', 'quant_sementes'));
+        tableFields.push(headerTableFactory('Qtd. sementes', 'quant_sementes'));
       }
       if (columnCampos[index] === 'name_genotipo') {
         tableFields.push(headerTableFactory('Nome genotipo', 'genotipo.name_genotipo'));
@@ -298,10 +300,10 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'genotipo.tecnologia.name'));
+        tableFields.push(headerTableFactory('Nome tecnologia', 'genotipo.tecnologia.name'));
       }
       if (columnCampos[index] === 'action') {
-        tableFields.push(replaceFactory('Substituição', 'action'));
+        tableFields.push(replaceFactory('Substituir', 'action'));
       }
     });
     return tableFields;
@@ -426,7 +428,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar lotes">
+          <AccordionFilter title={treatmentsOptionSelected === 'genotipo' ? 'Filtrar genótipos' : 'Filtrar lotes'}>
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -443,17 +445,17 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano', true)}
+                  {filterFieldFactory('filterYear', 'Ano lote', true)}
 
-                  {filterFieldFactory('filterCodLote', 'Cód lote')}
+                  {filterFieldFactory('filterCodLote', 'Cód. lote')}
 
-                  {filterFieldFactory('filterNcc', 'NCC')}
+                  {filterFieldFactory('filterNcc', 'NCA')}
 
                   {filterFieldFactory('filterFase', 'Fase', true)}
 
                   {filterFieldFactory('filterPeso', 'Peso', true)}
 
-                  {filterFieldFactory('filterSeeds', 'Quant. sementes')}
+                  {filterFieldFactory('filterSeeds', 'Qtd. sementes')}
 
                   {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
@@ -463,7 +465,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterBgm', 'BGM', true)}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome tecnologia')}
 
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
@@ -569,9 +571,9 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
+                      {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ),

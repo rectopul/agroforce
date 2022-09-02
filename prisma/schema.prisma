@@ -81,8 +81,6 @@ model safra {
   npe                npe[]
   quadra             quadra[]
   cultureUnity       cultureUnity[]
-
-  @@index([id_culture], map: "safra_id_culture_fkey")
 }
 
 model uf {
@@ -110,8 +108,6 @@ model user {
   users_cultures    users_cultures[]
   users_permissions users_permissions[]
   users_preferences users_preferences[]
-
-  @@index([departmentId], map: "User_departmentId_fkey")
 }
 
 model users_cultures {
@@ -123,9 +119,6 @@ model users_cultures {
   status     Int      @default(0)
   culture    culture  @relation(fields: [cultureId], references: [id], map: "Users_Cultures_cultureId_fkey")
   user       user     @relation(fields: [userId], references: [id], map: "Users_Cultures_userId_fkey")
-
-  @@index([cultureId], map: "Users_Cultures_cultureId_fkey")
-  @@index([userId], map: "Users_Cultures_userId_fkey")
 }
 
 model users_permissions {
@@ -139,10 +132,6 @@ model users_permissions {
   culture    culture  @relation(fields: [cultureId], references: [id])
   profile    profile  @relation(fields: [profileId], references: [id], map: "Users_Permissions_profileId_fkey")
   user       user     @relation(fields: [userId], references: [id], map: "Users_Permissions_userId_fkey")
-
-  @@index([profileId], map: "Users_Permissions_profileId_fkey")
-  @@index([cultureId], map: "Users_Permissions_cultureId_fkey")
-  @@index([userId], map: "Users_Permissions_userId_fkey")
 }
 
 model users_preferences {
@@ -153,9 +142,6 @@ model users_preferences {
   updated_at        DateTime @default(now())
   modules           modules  @relation(fields: [module_id], references: [id], map: "Users_Preferences_module_id_fkey")
   user              user     @relation(fields: [userId], references: [id], map: "Users_Preferences_userId_fkey")
-
-  @@index([module_id], map: "Users_Preferences_module_id_fkey")
-  @@index([userId], map: "Users_Preferences_userId_fkey")
 }
 
 model local {
@@ -197,8 +183,6 @@ model cultureUnity {
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
   safra              safra     @relation(fields: [id_safra], references: [id])
-
-  @@index([id_local], map: "cultureUnity_id_local_fkey")
 }
 
 model layout_quadra {
@@ -214,8 +198,6 @@ model layout_quadra {
   id_culture  Int
   culture     culture           @relation(fields: [id_culture], references: [id])
   children    layout_children[]
-
-  @@index([id_culture], map: "layout_quadra_id_culture_fkey")
 }
 
 model layout_children {
@@ -235,8 +217,6 @@ model layout_children {
   created_at   DateTime      @default(now())
   id_layout    Int
   Layout       layout_quadra @relation(fields: [id_layout], references: [id])
-
-  @@index([id_layout], map: "layout_children_id_layout_fkey")
 }
 
 model quadra {
@@ -261,10 +241,6 @@ model quadra {
   local         local      @relation(fields: [id_local], references: [id])
   safra         safra      @relation(fields: [id_safra], references: [id])
   dividers      dividers[]
-
-  @@index([id_culture], map: "quadra_id_culture_fkey")
-  @@index([id_local], map: "quadra_id_local_fkey")
-  @@index([id_safra], map: "quadra_id_safra_fkey")
 }
 
 model dividers {
@@ -279,8 +255,6 @@ model dividers {
   created_by Int
   created_at DateTime @default(now())
   quadra     quadra   @relation(fields: [id_quadra], references: [id])
-
-  @@index([id_quadra], map: "dividers_id_quadra_fkey")
 }
 
 model genotipo {
@@ -293,6 +267,7 @@ model genotipo {
   bgm                 Decimal?             @db.Decimal(12, 2)
   elit_name           String?
   gmr                 Decimal?             @db.Decimal(12, 2)
+  numberLotes         Int?
   id_dados            String
   id_s1               Int
   name_alter          String?
@@ -314,10 +289,6 @@ model genotipo {
   safra               safra?               @relation(fields: [safraId], references: [id])
   genotype_treatment  genotype_treatment[]
   lote                lote[]
-
-  @@index([id_culture], map: "genotipo_id_culture_fkey")
-  @@index([id_tecnologia], map: "genotipo_id_tecnologia_fkey")
-  @@index([safraId], map: "genotipo_safraId_fkey")
 }
 
 model delineamento {
@@ -332,8 +303,6 @@ model delineamento {
   culture                culture                  @relation(fields: [id_culture], references: [id])
   experiment             experiment[]
   sequencia_delineamento sequencia_delineamento[]
-
-  @@index([id_culture], map: "delineamento_id_culture_fkey")
 }
 
 model foco {
@@ -347,8 +316,6 @@ model foco {
   assay_list assay_list[]
   group      group[]
   npe        npe[]
-
-  @@index([id_culture], map: "foco_id_culture_fkey")
 }
 
 model group {
@@ -361,9 +328,6 @@ model group {
   foco       foco      @relation(fields: [id_foco], references: [id])
   safra      safra     @relation(fields: [id_safra], references: [id])
   npe        npe[]
-
-  @@index([id_foco], map: "group_id_foco_fkey")
-  @@index([id_safra], map: "group_id_safra_fkey")
 }
 
 model type_assay {
@@ -378,8 +342,6 @@ model type_assay {
   assay_list    assay_list[]
   envelope      envelope[]
   npe           npe[]
-
-  @@index([id_culture], map: "type_assay_id_culture_fkey")
 }
 
 model envelope {
@@ -391,9 +353,6 @@ model envelope {
   created_at    DateTime?  @default(now())
   safra         safra      @relation(fields: [id_safra], references: [id])
   type_assay    type_assay @relation(fields: [id_type_assay], references: [id])
-
-  @@index([id_safra], map: "envelope_id_safra_fkey")
-  @@index([id_type_assay], map: "envelope_id_type_assay_fkey")
 }
 
 model tecnologia {
@@ -409,8 +368,6 @@ model tecnologia {
   assay_list assay_list[]
   genotipo   genotipo[]
   npe        npe[]
-
-  @@index([id_culture], map: "tecnologia_id_culture_fkey")
 }
 
 model lote {
@@ -430,9 +387,6 @@ model lote {
   genotipo           genotipo             @relation(fields: [id_genotipo], references: [id])
   safra              safra                @relation(fields: [id_safra], references: [id])
   genotype_treatment genotype_treatment[]
-
-  @@index([id_genotipo], map: "lote_id_genotipo_fkey")
-  @@index([id_safra], map: "lote_id_safra_fkey")
 }
 
 model epoca {
@@ -443,8 +397,6 @@ model epoca {
   created_by Int
   created_at DateTime @default(now())
   culture    culture  @relation(fields: [id_culture], references: [id])
-
-  @@index([id_culture], map: "epoca_id_culture_fkey")
 }
 
 model import_spreadsheet {
@@ -489,8 +441,6 @@ model sequencia_delineamento {
   created_by      Int
   created_at      DateTime     @default(now())
   delineamento    delineamento @relation(fields: [id_delineamento], references: [id])
-
-  @@index([id_delineamento], map: "sequencia_delineamento_id_delineamento_fkey")
 }
 
 model experiment {
@@ -515,11 +465,6 @@ model experiment {
   delineamento      delineamento @relation(fields: [idDelineamento], references: [id])
   local             local        @relation(fields: [idLocal], references: [id])
   safra             safra        @relation(fields: [idSafra], references: [id])
-
-  @@index([idAssayList], map: "experiment_idAssayList_fkey")
-  @@index([idDelineamento], map: "experiment_idDelineamento_fkey")
-  @@index([idLocal], map: "experiment_idLocal_fkey")
-  @@index([idSafra], map: "experiment_idSafra_fkey")
 }
 
 model log_import {
@@ -533,8 +478,6 @@ model log_import {
   executeTime  String?
   totalRecords Int?
   user         user      @relation(fields: [user_id], references: [id])
-
-  @@index([user_id], map: "log_import_user_id_fkey")
 }
 
 model assay_list {
@@ -546,6 +489,7 @@ model assay_list {
   gli                String
   period             Int
   protocol_name      String
+  treatmentsNumber   Int?
   bgm                Int
   project            String
   status             String               @default("IMPORTADO")
@@ -558,11 +502,6 @@ model assay_list {
   type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
   experiment         experiment[]
   genotype_treatment genotype_treatment[]
-
-  @@index([id_foco], map: "assay_list_id_foco_fkey")
-  @@index([id_safra], map: "assay_list_id_safra_fkey")
-  @@index([id_tecnologia], map: "assay_list_id_tecnologia_fkey")
-  @@index([id_type_assay], map: "assay_list_id_type_assay_fkey")
 }
 
 model genotype_treatment {
@@ -579,11 +518,6 @@ model genotype_treatment {
   genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
   lote              lote?      @relation(fields: [id_lote], references: [id])
   safra             safra      @relation(fields: [id_safra], references: [id])
-
-  @@index([id_assay_list], map: "genotype_treatment_id_assay_list_fkey")
-  @@index([id_genotipo], map: "genotype_treatment_id_genotipo_fkey")
-  @@index([id_lote], map: "genotype_treatment_id_lote_fkey")
-  @@index([id_safra], map: "genotype_treatment_id_safra_fkey")
 }
 
 model history_genotype_treatment {
