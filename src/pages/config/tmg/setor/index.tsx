@@ -32,11 +32,13 @@ import {
   Content,
   Input,
   Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { departmentService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
-import ITabs from '../../../../shared/utils/dropdown';
+} from "src/components";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
+import { departmentService, userPreferencesService } from "src/services";
+import * as XLSX from "xlsx";
+import ITabs from "../../../../shared/utils/dropdown";
+import {fetchWrapper} from "src/helpers";
+
 
 interface IFilter {
   filterStatus: object | any;
@@ -129,10 +131,13 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterSearch=${filterSearch}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+   
+      // Call filter with there parameter   
+      const parametersFilter = await fetchWrapper.handleFilterParameter("setor",filterStatus, filterSearch );
+
+      setFiltersParams(parametersFilter); // Set filter pararameters
+      setCookies("filterBeforeEdit", filtersParams);
+      
       await departmentService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -239,8 +244,10 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
                 router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
               }}
             />
@@ -300,34 +307,16 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+ 
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"setor");
 
     await departmentService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setItems(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
 
@@ -442,29 +431,38 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
+    //  else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = Number(currentPage) * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
+   
     await departmentService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setItems(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 5000); //Remove State     
       }
     });
   }
+
+  //remove states
+ function removestate(){
+    localStorage.removeItem("filterValueEdit");  
+    localStorage.removeItem("pageBeforeEdit");    
+ }
+
+//Checkingdefualt values
+ function checkValue(value : any){
+  const parameter = fetchWrapper.getValueParams(value);
+  return parameter;
+}
 
   useEffect(() => {
     handlePagination();
@@ -522,6 +520,7 @@ export default function Listagem({
                       type="text"
                       placeholder="setor"
                       max="40"
+                      defaultValue={checkValue("filterSearch")}
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -709,7 +708,7 @@ export default function Listagem({
                     />
                     <Button
 
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
