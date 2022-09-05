@@ -148,7 +148,6 @@ export default function Listagem({
       filterSafra: '',
       filterYear: '',
       filterYearFrom: '',
-      filterYearTo: '',
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',

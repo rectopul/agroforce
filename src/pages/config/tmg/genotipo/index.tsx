@@ -50,6 +50,8 @@ interface IFilter {
   filterGmr: string | any;
   filterGmrRangeTo: string | any;
   filterGmrRangeFrom: string | any;
+  filterLotsTo: string | any;
+  filterLotsFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -102,7 +104,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      'id,name_genotipo,name_main,tecnologia,cruza,gmr,number_lotes',
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -132,7 +134,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome publico',
@@ -201,6 +203,8 @@ export default function Listagem({
       filterGmr: '',
       filterGmrRangeFrom: '',
       filterGmrRangeTo: '',
+      filterLotsFrom: '',
+      filterLotsTo: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -213,11 +217,13 @@ export default function Listagem({
       filterGmr,
       filterGmrRangeTo,
       filterGmrRangeFrom,
+      filterLotsTo,
+      filterLotsFrom,
     }) => {
 
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
-
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
+      console.log(parametersFilter);
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -405,8 +411,8 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
-      if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'nDeLotes'));
+      if (columnCampos[index] === 'numberLotes') {
+        tableFields.push(headerTableFactory('Nº Lotes', 'numberLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
@@ -658,127 +664,153 @@ export default function Listagem({
           </div>
         </div>
       </div>
+
     );
   }
 
-  //remove states
+  function filterLotRange(title: any, name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterLotsFrom"
+              name="filterLotsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterLotsTo"
+              name="filterLotsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+
+    );
+  }
+  // remove states
   function removestate() {
     localStorage.removeItem("filterValueEdit");
     localStorage.removeItem("pageBeforeEdit");
     setTimeout(() => { }, 5000)
   }
 
-    );
-}
-// remove states
-function removestate() {
-  localStorage.removeItem("filterValueEdit");
-  localStorage.removeItem("pageBeforeEdit");
-  setTimeout(() => { }, 5000)
-}
+  //Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
+  }
 
-//Checkingdefualt values
-function checkValue(value: any) {
-  const parameter = fetchWrapper.getValueParams(value);
-  return parameter;
-}
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
-useEffect(() => {
-  handlePagination();
-  handleTotalPages();
-}, [currentPage]);
+  return (
+    <>
+      <Head>
+        <title>Listagem de genótipos</title>
+      </Head>
 
-return (
-  <>
-    <Head>
-      <title>Listagem de genótipos</title>
-    </Head>
-
-    <Content contentHeader={tabsDropDowns} moduloActive="config">
-      <main
-        className="h-full w-full
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
           gap-4
         "
-      >
-        <AccordionFilter title="Filtrar genótipos">
-          <div className="w-full flex gap-2">
-            <form
-              className="flex flex-col
+        >
+          <AccordionFilter title="Filtrar genótipos">
+            <div className="w-full flex gap-2">
+              <form
+                className="flex flex-col
                   w-full
                   items-center
                   px-2
                   bg-white
                 "
-              onSubmit={formik.handleSubmit}
-            >
-              <div
-                className="w-full h-full
+                onSubmit={formik.handleSubmit}
+              >
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                 "
-              >
-                {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+                >
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
-                {filterFieldFactory('filterMainName', 'Nome principal')}
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
-              </div>
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+                </div>
 
-              <div
-                className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-0
                   pt-6
                 "
-              >
-                {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+                >
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
-                {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
+                  {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                {
-                  // filterFieldFactory('filterGmr', 'GMR')
-                }
+                  {
+                    // filterFieldFactory('filterGmr', 'GMR')
+                  }
 
-                {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-              </div>
+                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
 
-              <div className="h-16 w-32 mt-3">
-                <Button
-                  type="submit"
-                  onClick={() => { }}
-                  value="Filtrar"
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<BiFilterAlt size={20} />}
-                />
-              </div>
-            </form>
-          </div>
-        </AccordionFilter>
+                  {filterLotRange('filterLots', 'Nº Lotes')}
+                </div>
 
-        <div className="w-full h-full overflow-y-scroll">
-          <MaterialTable
-            style={{ background: '#f9fafb', width: '100%' }}
-            columns={columns}
-            data={genotipos}
-            options={{
-              sorting: true,
-              showTitle: false,
-              headerStyle: {
-                zIndex: 20,
-              },
-              rowStyle: { background: '#f9fafb', height: 35 },
-              search: false,
-              filtering: false,
-              pageSize: itensPerPage,
-            }}
-            components={{
-              Toolbar: () => (
-                <div
-                  className="w-full max-h-96
+                <div className="h-7 w-32 mt-6">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
+                </div>
+              </form>
+            </div>
+          </AccordionFilter>
+
+          <div className="w-full h-full overflow-y-scroll">
+            <MaterialTable
+              style={{ background: '#f9fafb', width: '100%' }}
+              columns={columns}
+              data={genotipos}
+              options={{
+                sorting: true,
+                showTitle: false,
+                headerStyle: {
+                  zIndex: 20,
+                },
+                rowStyle: { background: '#f9fafb', height: 35 },
+                search: false,
+                filtering: false,
+                pageSize: itensPerPage,
+              }}
+              components={{
+                Toolbar: () => (
+                  <div
+                    className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -789,9 +821,9 @@ return (
                     border-solid border-b
                     border-gray-200
                   "
-                >
-                  <div className="h-12">
-                    {/* <Button
+                  >
+                    <div className="h-12">
+                      {/* <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
@@ -800,83 +832,83 @@ return (
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       /> */}
-                  </div>
+                    </div>
 
-                  <strong className="text-blue-600">
-                    Total registrado:
-                    {' '}
-                    {itemsTotal}
-                  </strong>
+                    <strong className="text-blue-600">
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
+                    </strong>
 
-                  <div className="h-full flex items-center gap-2">
-                    <div className="border-solid border-2 border-blue-600 rounded">
-                      <div className="w-72">
-                        <AccordionFilter
-                          title="Gerenciar Campos"
-                          grid={statusAccordion}
-                        >
-                          <DragDropContext onDragEnd={handleOnDragEnd}>
-                            <Droppable droppableId="characters">
-                              {(provided) => (
-                                <ul
-                                  className="w-full h-full characters"
-                                  {...provided.droppableProps}
-                                  ref={provided.innerRef}
-                                >
-                                  <div className="h-8 mb-3">
-                                    <Button
-                                      value="Atualizar"
-                                      bgColor="bg-blue-600"
-                                      textColor="white"
-                                      onClick={getValuesColumns}
-                                      icon={<IoReloadSharp size={20} />}
-                                    />
-                                  </div>
-                                  {generatesProps.map((generate, index) => (
-                                    <Draggable
-                                      key={index}
-                                      draggableId={String(generate.title)}
-                                      index={index}
-                                    >
-                                      {(provider) => (
-                                        <li
-                                          ref={provider.innerRef}
-                                          {...provider.draggableProps}
-                                          {...provider.dragHandleProps}
-                                        >
-                                          <CheckBox
-                                            name={generate.name}
-                                            title={generate.title?.toString()}
-                                            value={generate.value}
-                                            defaultChecked={camposGerenciados.includes(
-                                              String(generate.value),
-                                            )}
-                                          />
-                                        </li>
-                                      )}
-                                    </Draggable>
-                                  ))}
-                                  {provided.placeholder}
-                                </ul>
-                              )}
-                            </Droppable>
-                          </DragDropContext>
-                        </AccordionFilter>
+                    <div className="h-full flex items-center gap-2">
+                      <div className="border-solid border-2 border-blue-600 rounded">
+                        <div className="w-72">
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                              <Droppable droppableId="characters">
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(provider) => (
+                                          <li
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                            {...provider.dragHandleProps}
+                                          >
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                String(generate.value),
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
+                              </Droppable>
+                            </DragDropContext>
+                          </AccordionFilter>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="h-12 flex items-center justify-center w-full">
-                      <Button
-                        title="Exportar planilha de genótipos"
-                        icon={<RiFileExcel2Line size={20} />}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => {
-                          downloadExcel();
-                        }}
-                      />
-                    </div>
-                    {/* <div className="h-12 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          title="Exportar planilha de genótipos"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
+                      </div>
+                      {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
@@ -885,69 +917,69 @@ return (
                           href="genotipo/importar-planilha/config-planilha"
                         />
                       </div> */}
+                    </div>
                   </div>
-                </div>
-              ),
-              Pagination: (props) => (
-                <div
-                  className="flex
+                ),
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                  {...props}
-                >
-                  <Button
-                    onClick={() => setCurrentPage(0)}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<MdFirstPage size={18} />}
-                    disabled={currentPage <= 1}
-                  />
-                  <Button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiLeftArrow size={15} />}
-                    disabled={currentPage <= 0}
-                  />
-                  {Array(1)
-                    .fill('')
-                    .map((value, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => setCurrentPage(index)}
-                        value={`${currentPage + 1}`}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        disabled
-                      />
-                    ))}
-                  <Button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiRightArrow size={15} />}
-                    disabled={currentPage + 1 >= pages}
-                  />
-                  <Button
-                    onClick={() => setCurrentPage(pages - 1)}
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<MdLastPage size={18} />}
-                    disabled={currentPage + 1 >= pages}
-                  />
-                </div>
-              ) as any,
-            }}
-          />
-        </div>
-      </main>
-    </Content>
-  </>
-);
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
+              }}
+            />
+          </div>
+        </main>
+      </Content>
+    </>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {

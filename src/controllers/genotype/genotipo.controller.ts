@@ -34,6 +34,15 @@ export class GenotipoController {
         }
       }
 
+      if (options.filterLotsFrom || options.filterLotsTo) {
+        if (options.filterLotsFrom && options.filterLotsTo) {
+          parameters.numberLotes = JSON.parse(`{"gte": ${Number(options.filterLotsFrom)}, "lte": ${Number(options.filterLotsTo)} }`);
+        } else if (options.filterLotsFrom) {
+          parameters.numberLotes = JSON.parse(`{"gte": ${Number(options.filterLotsFrom)} }`);
+        } else if (options.filterLotsTo) {
+          parameters.numberLotes = JSON.parse(`{"lte": ${Number(options.filterLotsTo)} }`);
+        }
+      }
       if (options.filterTecnologiaCod) {
         parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
       }
@@ -71,6 +80,7 @@ export class GenotipoController {
           name_alter: true,
           elit_name: true,
           tecnologia: true,
+          numberLotes: true,
           type: true,
           gmr: true,
           bgm: true,
@@ -114,7 +124,6 @@ export class GenotipoController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
       const response: object | any = await this.genotipoRepository.findAll(
         parameters,
         select,
@@ -128,12 +137,7 @@ export class GenotipoController {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
       }
-      response.map((item: any) => {
-        const newItem = item;
-        newItem.nDeLotes = functionsUtils
-          .countChildrenForSafra(item.lote, Number(options.id_safra));
-        return newItem;
-      });
+
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Genotipo Controller', 'GetAll', error.message);

@@ -141,8 +141,6 @@ async function handleFilterParameter(...theArgs: any) {
       parametersFilter = await safra(theArgs);
       break;
 
-    case "genotipo":
-      parametersFilter = await genotipo(theArgs);
       break;
 
     case "lote":
