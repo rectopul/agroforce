@@ -128,7 +128,7 @@ export class ExperimentController {
             select: {
               name: true,
               repeticao: true,
-              trat_repeticao: true,
+              id: true,
             },
           },
         };
