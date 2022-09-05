@@ -11,8 +11,6 @@ export class TypeAssayController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -65,9 +63,6 @@ export class TypeAssayController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('parameters');
-      console.log(parameters);
-
       const response = await this.typeAssayRepository.findAll(
         parameters,
         select,
@@ -76,8 +71,6 @@ export class TypeAssayController {
         orderBy,
       );
 
-      console.log('response');
-      console.log(response);
       response.map((item: any) => {
         item.envelope.map((envelope: any) => {
           if (envelope.id_safra === Number(options.id_safra)) {

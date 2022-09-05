@@ -78,6 +78,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
+  const [message, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -226,6 +227,7 @@ export default function Listagem({
           setTotalItems(allTotal);
           setAfterFilter(true);
           setCurrentPage(0);
+          setMessage(true);
           tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
         });
     },
@@ -845,7 +847,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -881,7 +883,7 @@ export default function Listagem({
               }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                  emptyDataSourceMessage: message ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
               onChangeRowsPerPage={(e: any) => { }}
@@ -1066,7 +1068,6 @@ export default function Listagem({
     </>
   );
 }
-
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
