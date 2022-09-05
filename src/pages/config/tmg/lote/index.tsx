@@ -483,10 +483,9 @@ export default function Listagem({
     });
   }
 
-
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
-      <div className="h-8 w-1/2 ml-4">
+      <div className={small ? 'h-8 w-full ml-4' : 'h-8 w-full ml-4'}>
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -539,7 +538,7 @@ export default function Listagem({
                   pb-7
                 "
                 >
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
@@ -551,7 +550,7 @@ export default function Listagem({
                         onChange={formik.handleChange}
                       />
                       <Input
-                        style={{ marginLeft: 8 }}
+                        style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
@@ -564,9 +563,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterNcc', 'NCC')}
 
-                  {filterFieldFactory('filterFase', 'Fase')}
+                  {filterFieldFactory('filterFase', 'Fase', true)}
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Peso (kg)
                     </label>
@@ -578,7 +577,7 @@ export default function Listagem({
                         onChange={formik.handleChange}
                       />
                       <Input
-                        style={{ marginLeft: 8 }}
+                        style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterWeightTo"
                         name="filterWeightTo"
@@ -587,7 +586,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Quant. sementes
                     </label>
@@ -599,7 +598,7 @@ export default function Listagem({
                         onChange={formik.handleChange}
                       />
                       <Input
-                        style={{ marginLeft: 8 }}
+                        style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterSeedTo"
                         name="filterSeedTo"
@@ -607,58 +606,55 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-
-                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
-
-                  {filterFieldFactory('filterMainName', 'Nome principal')}
                 </div>
 
                 <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                "
+                  className="w-full h-full flex justify-center pb-0"
                 >
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GMR
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterGmrFrom"
-                        name="filterGmrFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterGmrTo"
-                        name="filterGmrTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterBgmFrom"
-                        name="filterBgmFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterBgmTo"
-                        name="filterBgmTo"
-                        onChange={formik.handleChange}
-                      />
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
+
+                  <div className="h-6 w-full ml-4 flex">
+                    <div>
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        GMR
+                      </label>
+                      <div className="flex">
+                        <Input
+                          placeholder="De"
+                          id="filterGmrFrom"
+                          name="filterGmrFrom"
+                          onChange={formik.handleChange}
+                        />
+                        <Input
+                          style={{ marginLeft: 5 }}
+                          placeholder="Até"
+                          id="filterGmrTo"
+                          name="filterGmrTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ marginLeft: 10 }}>
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        BGM
+                      </label>
+                      <div className="flex">
+                        <Input
+                          placeholder="De"
+                          id="filterBgmFrom"
+                          name="filterBgmFrom"
+                          onChange={formik.handleChange}
+                        />
+                        <Input
+                          style={{ marginLeft: 5 }}
+                          placeholder="Até"
+                          id="filterBgmTo"
+                          name="filterBgmTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -666,7 +662,8 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
-                  <div style={{ width: 40 }} />
+                  <div className="w-full" style={{ marginLeft: -80 }} />
+
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"

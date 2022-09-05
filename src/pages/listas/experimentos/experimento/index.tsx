@@ -552,7 +552,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-7 w-1/2 ml-4">
+      <div className="h-7 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -602,8 +602,6 @@ export default function Listagem({
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Epoca')}
 
                 </div>
 
@@ -613,7 +611,10 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  <div className="h-10 w-1/2 ml-4">
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterPeriod', 'Epoca')}
+
+                  <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Experimento
                     </label>
@@ -633,7 +634,7 @@ export default function Listagem({
                         <Droppable droppableId="characters">
                           {(provided) => (
                             <ul
-                              className="w-full h-full characters"
+                              className="w-1/2 h-full characters"
                               {...provided.droppableProps}
                               ref={provided.innerRef}
                             >
@@ -669,7 +670,8 @@ export default function Listagem({
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
                   {filterFieldFactory('filterRepetition', 'Repetição')}
 
-                  <div style={{ width: 40 }} />
+                  <div className="w-full" style={{ marginLeft: -80 }} />
+
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"

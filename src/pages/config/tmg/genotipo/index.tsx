@@ -131,7 +131,7 @@ export default function Listagem({
       title: 'Nome principal',
       value: 'name_main',
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
@@ -220,7 +220,6 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
-
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
       console.log(parametersFilter);
@@ -330,7 +329,7 @@ export default function Listagem({
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
-            {name}
+            {title}
           </button>
         </div>
       ),
@@ -402,7 +401,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+          tecnologiaHeaderFactory('Nome Tec.', 'tecnologia'),
         );
       }
       if (columnCampos[index] === 'cruza') {
@@ -616,7 +615,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any,) {
     return (
-      <div className="h-10 w-1/2 ml-4">
+      <div className="h-10 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -635,7 +634,7 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -754,6 +753,8 @@ export default function Listagem({
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
                 </div>
 
                 <div
@@ -761,19 +762,12 @@ export default function Listagem({
                   flex
                   justify-center
                   pb-0
-                  pt-6
+                  pt-5
                 "
                 >
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
-
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {
-                    // filterFieldFactory('filterGmr', 'GMR')
-                  }
-
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-
                   {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
@@ -787,6 +781,7 @@ export default function Listagem({
                     icon={<BiFilterAlt size={20} />}
                   />
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -1016,7 +1011,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allGenotipos, total: totalItems } = await fetch(
+  const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
+  // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
