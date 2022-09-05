@@ -9,8 +9,6 @@ export class FocoController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -50,8 +48,7 @@ export class FocoController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-      console.log('parameters');
-      console.log(parameters);
+
       const response: object | any = await this.focoRepository.findAll(
         parameters,
         select,
@@ -59,9 +56,6 @@ export class FocoController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response);
       if (response.total > 0) {
         response.map((item: any) => {
           item.group.map((group: any) => {
@@ -78,9 +72,6 @@ export class FocoController {
       }
 
       // response.group = response.group ? response.group[0] : response.group;
-
-      console.log('pos response0');
-      console.log(response[0]);
 
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };
