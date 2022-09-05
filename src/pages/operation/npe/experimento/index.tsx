@@ -554,7 +554,7 @@ export default function Listagem({
 
     async function getExperiments(): Promise<void> {
         if (NPESelectedRow) {
-            let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
+            let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
 
             if (filter) {
                 parametersFilter = `${parametersFilter}&${filter}`;
