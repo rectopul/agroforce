@@ -214,7 +214,7 @@ export default function Listagem({
       filterGmrRangeTo,
       filterGmrRangeFrom,
     }) => {
-      
+
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
 
@@ -596,7 +596,7 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
 
     //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
@@ -668,108 +668,117 @@ export default function Listagem({
     setTimeout(() => { }, 5000)
   }
 
-  //Checkingdefualt values
-  function checkValue(value: any) {
-    const parameter = fetchWrapper.getValueParams(value);
-    return parameter;
-  }
+    );
+}
+// remove states
+function removestate() {
+  localStorage.removeItem("filterValueEdit");
+  localStorage.removeItem("pageBeforeEdit");
+  setTimeout(() => { }, 5000)
+}
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+//Checkingdefualt values
+function checkValue(value: any) {
+  const parameter = fetchWrapper.getValueParams(value);
+  return parameter;
+}
 
-  return (
-    <>
-      <Head>
-        <title>Listagem de genótipos</title>
-      </Head>
+useEffect(() => {
+  handlePagination();
+  handleTotalPages();
+}, [currentPage]);
 
-      <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main
-          className="h-full w-full
+return (
+  <>
+    <Head>
+      <title>Listagem de genótipos</title>
+    </Head>
+
+    <Content contentHeader={tabsDropDowns} moduloActive="config">
+      <main
+        className="h-full w-full
           flex flex-col
           items-start
           gap-4
         "
-        >
-          <AccordionFilter title="Filtrar genótipos">
-            <div className="w-full flex gap-2">
-              <form
-                className="flex flex-col
+      >
+        <AccordionFilter title="Filtrar genótipos">
+          <div className="w-full flex gap-2">
+            <form
+              className="flex flex-col
                   w-full
                   items-center
                   px-2
                   bg-white
                 "
-                onSubmit={formik.handleSubmit}
-              >
-                <div
-                  className="w-full h-full
+              onSubmit={formik.handleSubmit}
+            >
+              <div
+                className="w-full h-full
                   flex
                   justify-center
                 "
-                >
-                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+              >
+                {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
-                  {filterFieldFactory('filterMainName', 'Nome principal')}
+                {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
-                </div>
+                {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+              </div>
 
-                <div
-                  className="w-full h-full
+              <div
+                className="w-full h-full
                   flex
                   justify-center
                   pb-0
                   pt-6
                 "
-                >
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+              >
+                {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
 
-                  {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
+                {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {
-                    // filterFieldFactory('filterGmr', 'GMR')
-                  }
+                {
+                  // filterFieldFactory('filterGmr', 'GMR')
+                }
 
-                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-                </div>
+                {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+              </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
-              </form>
-            </div>
-          </AccordionFilter>
+              <div className="h-16 w-32 mt-3">
+                <Button
+                  type="submit"
+                  onClick={() => { }}
+                  value="Filtrar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<BiFilterAlt size={20} />}
+                />
+              </div>
+            </form>
+          </div>
+        </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
-            <MaterialTable
-              style={{ background: '#f9fafb', width: '100%' }}
-              columns={columns}
-              data={genotipos}
-              options={{
-                sorting: true,
-                showTitle: false,
-                headerStyle: {
-                  zIndex: 20,
-                },
-                rowStyle: { background: '#f9fafb', height: 35 },
-                search: false,
-                filtering: false,
-                pageSize: itensPerPage,
-              }}
-              components={{
-                Toolbar: () => (
-                  <div
-                    className="w-full max-h-96
+        <div className="w-full h-full overflow-y-scroll">
+          <MaterialTable
+            style={{ background: '#f9fafb', width: '100%' }}
+            columns={columns}
+            data={genotipos}
+            options={{
+              sorting: true,
+              showTitle: false,
+              headerStyle: {
+                zIndex: 20,
+              },
+              rowStyle: { background: '#f9fafb', height: 35 },
+              search: false,
+              filtering: false,
+              pageSize: itensPerPage,
+            }}
+            components={{
+              Toolbar: () => (
+                <div
+                  className="w-full max-h-96
                     flex
                     items-center
                     justify-between
@@ -780,9 +789,9 @@ export default function Listagem({
                     border-solid border-b
                     border-gray-200
                   "
-                  >
-                    <div className="h-12">
-                      {/* <Button
+                >
+                  <div className="h-12">
+                    {/* <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
@@ -791,83 +800,83 @@ export default function Listagem({
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       /> */}
+                  </div>
+
+                  <strong className="text-blue-600">
+                    Total registrado:
+                    {' '}
+                    {itemsTotal}
+                  </strong>
+
+                  <div className="h-full flex items-center gap-2">
+                    <div className="border-solid border-2 border-blue-600 rounded">
+                      <div className="w-72">
+                        <AccordionFilter
+                          title="Gerenciar Campos"
+                          grid={statusAccordion}
+                        >
+                          <DragDropContext onDragEnd={handleOnDragEnd}>
+                            <Droppable droppableId="characters">
+                              {(provided) => (
+                                <ul
+                                  className="w-full h-full characters"
+                                  {...provided.droppableProps}
+                                  ref={provided.innerRef}
+                                >
+                                  <div className="h-8 mb-3">
+                                    <Button
+                                      value="Atualizar"
+                                      bgColor="bg-blue-600"
+                                      textColor="white"
+                                      onClick={getValuesColumns}
+                                      icon={<IoReloadSharp size={20} />}
+                                    />
+                                  </div>
+                                  {generatesProps.map((generate, index) => (
+                                    <Draggable
+                                      key={index}
+                                      draggableId={String(generate.title)}
+                                      index={index}
+                                    >
+                                      {(provider) => (
+                                        <li
+                                          ref={provider.innerRef}
+                                          {...provider.draggableProps}
+                                          {...provider.dragHandleProps}
+                                        >
+                                          <CheckBox
+                                            name={generate.name}
+                                            title={generate.title?.toString()}
+                                            value={generate.value}
+                                            defaultChecked={camposGerenciados.includes(
+                                              String(generate.value),
+                                            )}
+                                          />
+                                        </li>
+                                      )}
+                                    </Draggable>
+                                  ))}
+                                  {provided.placeholder}
+                                </ul>
+                              )}
+                            </Droppable>
+                          </DragDropContext>
+                        </AccordionFilter>
+                      </div>
                     </div>
 
-                    <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
-                    </strong>
-
-                    <div className="h-full flex items-center gap-2">
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provider) => (
-                                          <li
-                                            ref={provider.innerRef}
-                                            {...provider.draggableProps}
-                                            {...provider.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                String(generate.value),
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
-
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
-                          title="Exportar planilha de genótipos"
-                          icon={<RiFileExcel2Line size={20} />}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {
-                            downloadExcel();
-                          }}
-                        />
-                      </div>
-                      {/* <div className="h-12 flex items-center justify-center w-full">
+                    <div className="h-12 flex items-center justify-center w-full">
+                      <Button
+                        title="Exportar planilha de genótipos"
+                        icon={<RiFileExcel2Line size={20} />}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => {
+                          downloadExcel();
+                        }}
+                      />
+                    </div>
+                    {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
@@ -876,69 +885,69 @@ export default function Listagem({
                           href="genotipo/importar-planilha/config-planilha"
                         />
                       </div> */}
-                    </div>
                   </div>
-                ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                </div>
+              ),
+              Pagination: (props) => (
+                <div
+                  className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages-1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages} 
-                    />
-                  </div>
-                ) as any,
-              }}
-            />
-          </div>
-        </main>
-      </Content>
-    </>
-  );
+                  {...props}
+                >
+                  <Button
+                    onClick={() => setCurrentPage(0)}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<MdFirstPage size={18} />}
+                    disabled={currentPage <= 1}
+                  />
+                  <Button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiLeftArrow size={15} />}
+                    disabled={currentPage <= 0}
+                  />
+                  {Array(1)
+                    .fill('')
+                    .map((value, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => setCurrentPage(index)}
+                        value={`${currentPage + 1}`}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        disabled
+                      />
+                    ))}
+                  <Button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiRightArrow size={15} />}
+                    disabled={currentPage + 1 >= pages}
+                  />
+                  <Button
+                    onClick={() => setCurrentPage(pages - 1)}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<MdLastPage size={18} />}
+                    disabled={currentPage + 1 >= pages}
+                  />
+                </div>
+              ) as any,
+            }}
+          />
+        </div>
+      </main>
+    </Content>
+  </>
+);
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {

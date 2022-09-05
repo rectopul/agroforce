@@ -41,7 +41,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
-  filterYear:string | any;
+  filterYear: string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterStartDate: string | any;
@@ -163,13 +163,13 @@ export default function Listagem({
       filterStartDate,
       filterEndDate,
     }) => {
-      
-     
+
+
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra,filterYear, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYear, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
 
-      console.log("parametersFilter  ",parametersFilter)
+      console.log("parametersFilter  ", parametersFilter)
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -549,8 +549,8 @@ export default function Listagem({
       setCurrentPage(0);
     }
 
-    
-    
+
+
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
     //   console.log("inside....")
@@ -559,12 +559,12 @@ export default function Listagem({
   }
 
 
-  async function handlePagination(): Promise<void> {  
+  async function handlePagination(): Promise<void> {
 
     //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
-       
-      await safraService.getAll(parametersFilter).then((response) => {
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+
+    await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
         setTotalItems(response.total); //Set new total records
@@ -867,50 +867,50 @@ export default function Listagem({
                         py-5
                         bg-gray-50
                       "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                     <Button
-                        onClick={() => setCurrentPage(pages-1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
-                  ) as any,
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill("")
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
+                ) as any,
               }}
             />
           </div>

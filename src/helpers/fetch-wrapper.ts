@@ -78,14 +78,14 @@ async function deleted(url: any, body: any) {
 
 
 // For global pagination 
-async function handlePaginationGlobal(currentPages: any, take: any,filter: any){   
-      
-      if(localStorage.getItem("filterValueEdit")){
-        filter = localStorage.getItem("filterValueEdit");
-      }
-      else{
-        filter = filter;
-      }
+async function handlePaginationGlobal(currentPages: any, take: any, filter: any) {
+
+  if (localStorage.getItem("filterValueEdit")) {
+    filter = localStorage.getItem("filterValueEdit");
+  }
+  else {
+    filter = filter;
+  }
 
   if (localStorage.getItem('pageBeforeEdit') != null) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
@@ -219,7 +219,7 @@ function usuarios(theArgs: any) {
 
 function cultura(theArgs: any) {
 
-  const [key,filterStatus, filterSearch] = theArgs;
+  const [key, filterStatus, filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
@@ -253,13 +253,13 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
 
   if (from == "safra" || from == "setor") {
     // Remove extra values here
-    parametersFilter = removeExtraValues(parametersFilter, from,"&orderBy");
+    parametersFilter = removeExtraValues(parametersFilter, from, "&orderBy");
     return parametersFilter;
   }
   else if (from == "genotipo") {
-   // Remove extra values here
-   parametersFilter = removeExtraValues(parametersFilter, from,"&id_culture");
-   return parametersFilter;
+    // Remove extra values here
+    parametersFilter = removeExtraValues(parametersFilter, from, "&id_culture");
+    return parametersFilter;
   }
   else {
     return parametersFilter;
@@ -267,7 +267,7 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
 
 }
 
-function removeExtraValues(parametersFilter: any, from: any,remove : any) {
+function removeExtraValues(parametersFilter: any, from: any, remove: any) {
 
   const myArray = parametersFilter.split(remove);
 
