@@ -86,15 +86,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idCulture,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allGenotipos,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idCulture,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -242,8 +242,9 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
+
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "genotipo");
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -598,19 +599,21 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+
+    //manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 5000); //Remove State    
       }
     });
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any,) {
     return (
       <div className="h-10 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -622,6 +625,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -634,23 +638,29 @@ export default function Listagem({
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          <Input
-            type="text"
-            placeholder="De"
-            max="40"
-            id="filterGmrRangeFrom"
-            name="filterGmrRangeFrom"
-            onChange={formik.handleChange}
-          />
-          <Input
-            type="text"
-            placeholder="Até"
-            max="40"
-            id="filterGmrRangeTo"
-            name="filterGmrRangeTo"
-            onChange={formik.handleChange}
-          />
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterGmrRangeFrom"
+              name="filterGmrRangeFrom"
+              defaultValue={checkValue("filterGmrRangeFrom")}
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterGmrRangeTo"
+              name="filterGmrRangeTo"
+              defaultValue={checkValue("filterGmrRangeTo")}
+              onChange={formik.handleChange}
+            />
+          </div>
         </div>
       </div>
 
@@ -659,27 +669,31 @@ export default function Listagem({
 
   function filterLotRange(title: any, name: any) {
     return (
-      <div className="h-6 w-full ml-4">
+      <div className="h-6 w-1/2 ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          <Input
-            type="text"
-            placeholder="De"
-            max="40"
-            id="filterLotsFrom"
-            name="filterLotsFrom"
-            onChange={formik.handleChange}
-          />
-          <Input
-            type="text"
-            placeholder="Até"
-            max="40"
-            id="filterLotsTo"
-            name="filterLotsTo"
-            onChange={formik.handleChange}
-          />
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterLotsFrom"
+              name="filterLotsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterLotsTo"
+              name="filterLotsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
         </div>
       </div>
 
@@ -687,14 +701,20 @@ export default function Listagem({
   }
   // remove states
   function removestate() {
-    localStorage.removeItem('filterValueEdit');
-    localStorage.removeItem('pageBeforeEdit');
+    localStorage.removeItem("filterValueEdit");
+    localStorage.removeItem("pageBeforeEdit");
+    setTimeout(() => { }, 5000)
+  }
+
+  //Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); // Remove State
   }, [currentPage]);
 
   return (
@@ -748,21 +768,18 @@ export default function Listagem({
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-
                   {filterLotRange('filterLots', 'Nº Lotes')}
+                </div>
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      type="submit"
-                      onClick={() => { }}
-                      value="Filtrar"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div className="h-7 w-32 mt-6">
+                  <Button
+                    type="submit"
+                    onClick={() => { }}
+                    value="Filtrar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
 
               </form>
@@ -914,7 +931,7 @@ export default function Listagem({
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
+                      disabled={currentPage <= 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -943,7 +960,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -979,12 +996,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+
   urlParameters.search = new URLSearchParams(param).toString();
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
-    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    : `&id_culture=${idCulture}`;
 
   const requestOptions = {
     method: 'GET',

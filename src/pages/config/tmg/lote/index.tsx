@@ -32,6 +32,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
+import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterYearFrom: string | number;
@@ -109,6 +110,8 @@ export default function Listagem({
   const [orderList, setOrder] = useState<number>(1);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [filtersParams, setFiltersParams] = useState<any>(""); //Set filter Parameter 
+
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
@@ -194,45 +197,30 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
     }) => {
-      const parametersFilter = `&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
-      await loteService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setLotes(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+
+        // Call filter with there parameter   
+        const parametersFilter = await fetchWrapper.handleFilterParameter("lote",filterYear,filterCodLote,filterNcc,filterFase,filterPeso,filterSeeds,filterGenotipo,filterMainName,filterGmr,filterBgm,filterTecnologiaCod,filterTecnologiaDesc,);
+
+        setFiltersParams(parametersFilter); // Set filter pararameters       
+
+      await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
+        setLotes(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0);
+      });
     },
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
-    const skip = currentPage * Number(take);
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    } setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+ 
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"lote");
 
-    await loteService.getAll(`${parametersFilter}&skip=${skip}&take=${take}`).then((response) => {
+    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
+        setFiltersParams(parametersFilter);
       }
     });
     if (orderList === 2) {
@@ -475,26 +463,22 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
+    //  else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
-    }
+   
+     //manage using comman function
+     const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
     await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
       }
     });
   }
@@ -847,7 +831,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

@@ -34,75 +34,76 @@ import {
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-    filterFoco: string
-    filterTypeAssay: string
-    filterGli: string
-    filterExperimentName: string
-    filterTecnologia: string
-    filterPeriod: string
-    filterDelineamento: string
-    filterRepetition: string
-    orderBy: object | any;
-    typeOrder: object | any;
+  filterFoco: string
+  filterTypeAssay: string
+  filterGli: string
+  filterExperimentName: string
+  filterTecnologia: string
+  filterPeriod: string
+  filterDelineamento: string
+  filterRepetition: string
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 
 interface INpeProps {
-    id: number | any;
-    local: number;
-    safra: number;
-    foco: number;
-    type_assay: number;
-    ogm: number;
-    epoca: number;
-    npei: number;
-    npef: number;
-    consumedQT: number;
-    prox_npe: number;
-    status?: number;
-    created_by: number;
+  id: number | any;
+  local: number;
+  safra: number;
+  foco: number;
+  type_assay: number;
+  ogm: number;
+  epoca: number;
+  npei: number;
+  npef: number;
+  consumedQT: number;
+  prox_npe: number;
+  status?: number;
+  created_by: number;
 }
 
 export interface IExperimento {
-    id: number;
-    protocol_name: string;
-    experiment_name: string;
-    year: number;
-    rotulo: string;
-    foco: string;
-    ensaio: string;
-    cod_tec: number;
-    epoca: number;
-    npeQT: number;
-    npef: number;
-    status?: number;
+  id: number;
+  protocol_name: string;
+  experiment_name: string;
+  year: number;
+  rotulo: string;
+  foco: string;
+  ensaio: string;
+  cod_tec: number;
+  epoca: number;
+  npeQT: number;
+  npef: number;
+  status?: number;
 }
 
 interface IGenerateProps {
-    name: string | undefined;
-    title: string | number | readonly string[] | undefined;
-    value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 
 interface IData {
-    allExperiments: IExperimento[];
-    totalItems: number;
-    itensPerPage: number;
-    filterApplication: object | any;
-    idSafra: number
-    pageBeforeEdit: string | any;
-    filterBeforeEdit: string | any
+  allExperiments: IExperimento[];
+  totalItems: number;
+  itensPerPage: number;
+  filterApplication: object | any;
+  idSafra: number
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { tabsOperation } = ITabs;
+      allExperiments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { TabsDropDowns } = ITabs;
+
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
@@ -536,7 +537,7 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&idLocal=${NPESelectedRow?.id_local}`;
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
@@ -608,6 +609,7 @@ export default function Listagem({
                 filtering: false,
                 selection: false,
                 showSelectAllCheckbox: false,
+                showTextRowsSelected: false,
                 paging: false,
                 // selectionProps: handleNPERowSelection,
               }}
@@ -688,34 +690,34 @@ export default function Listagem({
                                             />
                                           </div>
                                           {
-                                                  generatesProps.map((generate, index) => (
-                                                    <Draggable
-                                                      key={index}
-                                                      draggableId={String(generate.title)}
-                                                      index={index}
-                                                    >
-                                                      {(provider) => (
-                                                        <li
-                                                          ref={provider.innerRef}
-                                                          {...provider.draggableProps}
-                                                          {...provider.dragHandleProps}
-                                                        >
-                                                          <CheckBox
-                                                            name={generate.name}
-                                                            title={generate.title?.toString()}
-                                                            value={generate.value}
-                                                            defaultChecked={camposGerenciados
-                                                              .includes(String(generate.value))}
-                                                          />
-                                                        </li>
-                                                      )}
-                                                    </Draggable>
-                                                  ))
-                                              }
+                                            generatesProps.map((generate, index) => (
+                                              <Draggable
+                                                key={index}
+                                                draggableId={String(generate.title)}
+                                                index={index}
+                                              >
+                                                {(provider) => (
+                                                  <li
+                                                    ref={provider.innerRef}
+                                                    {...provider.draggableProps}
+                                                    {...provider.dragHandleProps}
+                                                  >
+                                                    <CheckBox
+                                                      name={generate.name}
+                                                      title={generate.title?.toString()}
+                                                      value={generate.value}
+                                                      defaultChecked={camposGerenciados
+                                                        .includes(String(generate.value))}
+                                                    />
+                                                  </li>
+                                                )}
+                                              </Draggable>
+                                            ))
+                                          }
                                           {provided.placeholder}
                                         </ul>
                                       )
-                                  }
+                                    }
                                   </Droppable>
                                 </DragDropContext>
                               </AccordionFilter>
@@ -760,17 +762,17 @@ export default function Listagem({
                           disabled={currentPage <= 0}
                         />
                         {
-                                                Array(1).fill('').map((value, index) => (
-                                                  <Button
-                                                    key={index}
-                                                    onClick={() => setCurrentPage(index)}
-                                                    value={`${currentPage + 1}`}
-                                                    bgColor="bg-blue-600"
-                                                    textColor="white"
-                                                    disabled
-                                                  />
-                                                ))
-                                            }
+                          Array(1).fill('').map((value, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled
+                            />
+                          ))
+                        }
                         <Button
                           onClick={() => setCurrentPage(currentPage + 1)}
                           bgColor="bg-blue-600"
@@ -786,7 +788,7 @@ export default function Listagem({
                           disabled={currentPage + 1 >= pages}
                         />
                       </div>
-                                    ) as any,
+                    ) as any,
                   }}
                 />
               </div>

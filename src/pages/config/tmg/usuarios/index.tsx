@@ -40,6 +40,7 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import {fetchWrapper} from "src/helpers";
 
 interface IUsers {
   id: number;
@@ -164,10 +165,16 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+
+      // const parametersFilter = `filterStatus=${filterStatus || 1
+      //   }&filterName=${filterName}&filterLogin=${filterLogin}`;
+
+      // Call filter with there parameter   
+      const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus, filterName, filterLogin );
+
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
+      
       await userService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -275,7 +282,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
+                  localStorage.setItem("filterValueEdit", filtersParams);
+                  localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                router.push(                    `/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -373,33 +382,16 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+   
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
+
     await userService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setUsers(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
     if (orderList === 2) {
@@ -523,29 +515,39 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
+    } 
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = Number(currentPage) * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+   
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);  
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setUsers(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 7000); //Remove State   
       }
     });
   }
+
+    //remove states
+  function removestate(){
+      localStorage.removeItem("filterValueEdit");  
+      localStorage.removeItem("pageBeforeEdit");    
+  }
+
+  //Checkingdefualt values
+   function checkValue(value : any){
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
+  }
+
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -558,6 +560,7 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -800,7 +803,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

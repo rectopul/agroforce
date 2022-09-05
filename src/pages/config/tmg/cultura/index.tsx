@@ -37,10 +37,11 @@ import {
   Content,
   Input,
   Select,
-} from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { cultureService, userPreferencesService } from '../../../../services';
-import ITabs from '../../../../shared/utils/dropdown';
+} from "../../../../components";
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import { cultureService, userPreferencesService } from "../../../../services";
+import ITabs from "../../../../shared/utils/dropdown";
+import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterStatus: object | any;
@@ -154,10 +155,13 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterSearch=${filterSearch}`;
+
+      // Call filter with there parameter   
+      const parametersFilter = await fetchWrapper.handleFilterParameter("cultura",filterStatus || 2 , filterSearch);
+
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
+
       await cultureService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -207,34 +211,16 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
 
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
+   
     await cultureService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
-          setCultures(response.response);
+          setCultures(response.response);        
+          setFiltersParams(parametersFilter);
         }
       });
 
@@ -317,8 +303,10 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -475,28 +463,41 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
+    } 
+    
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
+
     await cultureService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setCultures(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 3000); //Remove State
+     
       }
     });
+  }
+
+
+  //remove states
+  function removestate(){
+    localStorage.removeItem("filterValueEdit");  
+    localStorage.removeItem("pageBeforeEdit"); 
+    setTimeout(()=>{}, 5000)   
+  }
+
+  //Checkingdefualt values
+  function checkValue(value : any){
+  const parameter = fetchWrapper.getValueParams(value);
+  return parameter;
   }
 
   useEffect(() => {
@@ -556,6 +557,7 @@ export default function Listagem({
                       type="text"
                       placeholder="cultura"
                       max="40"
+                      defaultValue={checkValue("filterSearch")}
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -707,49 +709,49 @@ export default function Listagem({
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />

@@ -110,7 +110,7 @@ export class NpeController {
           safra: { select: { safraName: true } },
           foco: { select: { name: true, id: true } },
           epoca: true,
-          tecnologia: { select: { name: true, id: true } },
+          tecnologia: { select: { name: true, id: true, cod_tec: true } },
           type_assay: { select: { name: true, id: true } },
           group: true,
           npei: true,
