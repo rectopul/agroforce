@@ -548,6 +548,8 @@ export default function Listagem({
     if (currentPage < 0) {
       setCurrentPage(0);
     }
+
+    
     
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
