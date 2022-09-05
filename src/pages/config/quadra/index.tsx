@@ -634,6 +634,7 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
+                </div>
 
                 <div className="h-6 w-1/2 ml-4">
                   <label className="block text-gray-900 text-sm font-bold mb-1">
