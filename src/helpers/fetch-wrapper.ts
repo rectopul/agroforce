@@ -76,13 +76,16 @@ async function deleted(url: any, body: any) {
   return handleResponse(response);
 }
 
-// For global pagination
-async function handlePaginationGlobal(currentPages: any, take: any, filter: any) {
-  if (localStorage.getItem('filterValueEdit')) {
-    filter = localStorage.getItem('filterValueEdit');
-  } else {
-    filter = filter;
-  }
+
+// For global pagination 
+async function handlePaginationGlobal(currentPages: any, take: any,filter: any){   
+      
+      if(localStorage.getItem("filterValueEdit")){
+        filter = localStorage.getItem("filterValueEdit");
+      }
+      else{
+        filter = filter;
+      }
 
   if (localStorage.getItem('pageBeforeEdit') != null) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
@@ -179,7 +182,9 @@ function genotipo(theArgs: any) {
 
   const [key2, filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom] = theArgs;
 
-  const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
+  // const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
+
+  const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
 
   return parametersFilter;
 }
@@ -214,9 +219,8 @@ function usuarios(theArgs: any) {
 
 function cultura(theArgs: any) {
 
-  const [key, filterStatus, filterSearch] = theArgs;
-  const parametersFilter = `filterStatus=${filterStatus || 1
-    }&filterSearch=${filterSearch}`;
+  const [key,filterStatus, filterSearch] = theArgs;
+  const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
@@ -249,11 +253,13 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
 
   if (from == "safra" || from == "setor") {
     // Remove extra values here
-    parametersFilter = removeExtraValues(parametersFilter, from);
+    parametersFilter = removeExtraValues(parametersFilter, from,"&orderBy");
     return parametersFilter;
   }
   else if (from == "genotipo") {
-    return parametersFilter;
+   // Remove extra values here
+   parametersFilter = removeExtraValues(parametersFilter, from,"&id_culture");
+   return parametersFilter;
   }
   else {
     return parametersFilter;
@@ -261,13 +267,13 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
 
 }
 
-function removeExtraValues(parametersFilter: any, from: any) {
+function removeExtraValues(parametersFilter: any, from: any,remove : any) {
 
-  const myArray = parametersFilter.split("&orderBy");
+  const myArray = parametersFilter.split(remove);
 
   if (myArray.length > 2) {
     parametersFilter = "";
-    parametersFilter = myArray[0] + "&orderBy" + myArray[2]
+    parametersFilter = myArray[0] + remove + myArray[2]
   }
 
   return parametersFilter;

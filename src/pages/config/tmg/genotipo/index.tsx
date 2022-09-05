@@ -593,16 +593,16 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
         setTotalItems(response.total); //Set new total records
         setCurrentPage(currentPages); //Set new current page
-        // setTimeout(removestate, 8000); //Remove State    
-        removestate();
+        setTimeout(removestate, 5000); //Remove State    
       }
     });
   }
@@ -889,13 +889,13 @@ export default function Listagem({
                     "
                     {...props}
                   >
-                    {/* <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                    <Button
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
                       disabled={currentPage <= 1}
-                    /> */}
+                    />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
                       bgColor="bg-blue-600"
@@ -922,13 +922,13 @@ export default function Listagem({
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
-                    {/* <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                    <Button
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    /> */}
+                      disabled={currentPage + 1 >= pages} 
+                    />
                   </div>
                 ) as any,
               }}
@@ -959,12 +959,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+
   urlParameters.search = new URLSearchParams(param).toString();
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
-    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    : `&id_culture=${idCulture}`;
 
   const requestOptions = {
     method: 'GET',

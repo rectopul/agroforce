@@ -41,6 +41,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
+  filterYear:string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterStartDate: string | any;
@@ -104,7 +105,8 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
+
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); //Set filter Parameter 
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -144,6 +146,7 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
+      filterYear: '',
       filterYearFrom: '',
       filterYearTo: '',
       filterStartDate: '',
@@ -154,14 +157,19 @@ export default function Listagem({
     onSubmit: async ({
       filterStatus,
       filterSafra,
+      filterYear,
       filterYearTo,
       filterYearFrom,
       filterStartDate,
       filterEndDate,
     }) => {
+      
+     
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra,filterYear, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
+
+      console.log("parametersFilter  ",parametersFilter)
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -539,24 +547,27 @@ export default function Listagem({
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
+    
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    //   console.log("inside....")
+    // }
+
   }
 
-  async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const {
-      parametersFilter,
-      currentPages,
-    } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
-    await safraService.getAll(parametersFilter).then((response) => {
+  async function handlePagination(): Promise<void> {  
+
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
+       
+      await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
         setTotalItems(response.total); //Set new total records
         setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 1000); //Remove State         
+        setTimeout(removestate, 5000); //Remove State         
       }
     });
   }
@@ -854,51 +865,50 @@ export default function Listagem({
                         py-5
                         bg-gray-50
                       "
-                    {...props}
-
-                  >
-                    {/* <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
-                      /> */}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill("")
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    {/* <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                     <Button
+                        onClick={() => setCurrentPage(pages-1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages} 
-                      />*/}
-                  </div>
-                ) as any,
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
