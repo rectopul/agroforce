@@ -71,8 +71,6 @@ export class FocoController {
         });
       }
 
-      // response.group = response.group ? response.group[0] : response.group;
-
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };
       }
