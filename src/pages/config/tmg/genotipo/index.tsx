@@ -131,7 +131,7 @@ export default function Listagem({
       title: 'Nome principal',
       value: 'name_main',
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
@@ -328,7 +328,7 @@ export default function Listagem({
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
-            {name}
+            {title}
           </button>
         </div>
       ),
@@ -400,7 +400,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+          tecnologiaHeaderFactory('Nome Tec.', 'tecnologia'),
         );
       }
       if (columnCampos[index] === 'cruza') {
@@ -612,7 +612,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
+      <div className="h-10 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -630,31 +630,27 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Input
-              type="text"
-              placeholder="De"
-              max="40"
-              id="filterGmrRangeFrom"
-              name="filterGmrRangeFrom"
-              onChange={formik.handleChange}
-            />
-          </div>
-          <div>
-            <Input
-              type="text"
-              placeholder="Até"
-              max="40"
-              id="filterGmrRangeTo"
-              name="filterGmrRangeTo"
-              onChange={formik.handleChange}
-            />
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          <Input
+            type="text"
+            placeholder="De"
+            max="40"
+            id="filterGmrRangeFrom"
+            name="filterGmrRangeFrom"
+            onChange={formik.handleChange}
+          />
+          <Input
+            type="text"
+            placeholder="Até"
+            max="40"
+            id="filterGmrRangeTo"
+            name="filterGmrRangeTo"
+            onChange={formik.handleChange}
+          />
         </div>
       </div>
 
@@ -663,31 +659,27 @@ export default function Listagem({
 
   function filterLotRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Input
-              type="text"
-              placeholder="De"
-              max="40"
-              id="filterLotsFrom"
-              name="filterLotsFrom"
-              onChange={formik.handleChange}
-            />
-          </div>
-          <div>
-            <Input
-              type="text"
-              placeholder="Até"
-              max="40"
-              id="filterLotsTo"
-              name="filterLotsTo"
-              onChange={formik.handleChange}
-            />
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          <Input
+            type="text"
+            placeholder="De"
+            max="40"
+            id="filterLotsFrom"
+            name="filterLotsFrom"
+            onChange={formik.handleChange}
+          />
+          <Input
+            type="text"
+            placeholder="Até"
+            max="40"
+            id="filterLotsTo"
+            name="filterLotsTo"
+            onChange={formik.handleChange}
+          />
         </div>
       </div>
 
@@ -741,6 +733,8 @@ export default function Listagem({
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
                 </div>
 
                 <div
@@ -748,32 +742,29 @@ export default function Listagem({
                   flex
                   justify-center
                   pb-0
-                  pt-6
+                  pt-5
                 "
                 >
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
-
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
-
-                  {
-                    // filterFieldFactory('filterGmr', 'GMR')
-                  }
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
 
                   {filterLotRange('filterLots', 'Nº Lotes')}
+
+                  <div className="w-full" style={{ marginLeft: -80 }} />
+
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -1001,7 +992,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allGenotipos, total: totalItems } = await fetch(
+  const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
+  // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

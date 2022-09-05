@@ -630,8 +630,9 @@ export default function Listagem({
                       <Button
                         title="Gerar sorteio"
                         value="Gerar sorteio"
-                        bgColor="bg-blue-600"
+                        bgColor={selectedNPE?.length <= 0 ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+                        disabled={selectedNPE.length <= 0}
                         onClick={() => {
                           selectedNPE.sort((a, b) => a.npei - b.npei);
                           localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
@@ -818,8 +819,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   } as RequestInit | undefined;
 
   const {
-    response: allNpe,
-    total: totalItems,
+    response: allNpe = [],
+    total: totalItems = 0,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
   return {

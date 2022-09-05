@@ -102,15 +102,9 @@ export default function Listagem({
   pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs;
+  const { tabsOperation } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('listas');
-
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'EXPERIMENTOS'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -126,7 +120,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
@@ -337,9 +331,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'protocolName') {
         tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
@@ -583,16 +577,16 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive="operation">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
         <main className="h-full w-full
                         flex flex-col
                         items-start
-                        gap-8
+                        gap-0
                         "
         >
           <div className="w-full">
             <MaterialTable
-              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '20px' }}
+              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
               columns={columnNPE}
               data={selectedNPE}
               onRowClick={(evt, selectedRow: any) => {
@@ -603,13 +597,22 @@ export default function Listagem({
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
+                  height: 40,
                 },
+                rowStyle: (rowData) => ({
+                  backgroundColor:
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                  height: 40,
+                }),
                 search: false,
                 filtering: false,
-                selection: true,
+                selection: false,
                 showSelectAllCheckbox: false,
                 paging: false,
-                selectionProps: handleNPERowSelection,
+                // selectionProps: handleNPERowSelection,
+              }}
+              components={{
+                Toolbar: () => null,
               }}
             />
           </div>
@@ -721,8 +724,8 @@ export default function Listagem({
 
                           <div className="h-12 flex items-center justify-center w-full">
                             <Button
-                              title="Draw"
-                              value="Draw"
+                              title="Sortear"
+                              value="Sortear"
                               bgColor="bg-blue-600"
                               textColor="white"
                               onClick={validateConsumedData}
