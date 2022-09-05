@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, RiCloseCircleFill } from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 // import { TbArrowsDownUp } from 'react-icons/tb';
 import {
   BiFilterAlt, BiLeftArrow, BiRightArrow,
@@ -20,12 +20,11 @@ import { useRouter } from 'next/router';
 
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiArrowUpDownLine, RiSettingsFill } from 'react-icons/ri';
+import { RiArrowUpDownLine } from 'react-icons/ri';
 
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
 import Modal from 'react-modal';
-import { number } from 'yup';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../../components';

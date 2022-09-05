@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
@@ -94,18 +95,19 @@ interface IData {
 }
 
 export default function Listagem({
-      allExperiments,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
+  const tabsDropDowns = TabsDropDowns('operacao');
 
-  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
+  tabsDropDowns.map((i: any) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -528,7 +530,7 @@ export default function Listagem({
   ];
 
   const handleNPERowSelection = (rowData: any) => {
-    if (NPESelectedRow?.tableData.id != rowData.tableData.id) {
+    if (NPESelectedRow?.tableData.id !== rowData.tableData.id) {
       rowData.tableData.checked = false;
     } else {
       rowData.tableData.checked = true;
@@ -550,7 +552,7 @@ export default function Listagem({
             item.npef = i + item.npeQT;
             i = item.npef + 1;
           });
-          selectedNPE.filter((x: any) => x == NPESelectedRow).npef = i;
+          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
           setExperimento(response);
         }
       });
@@ -558,15 +560,15 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
-    let total_consumed = 0;
+    let totalConsumed = 0;
     let lastNPE = 0;
     const nextNPE = NPESelectedRow?.nextNPE;
     experimentos.map((item) => {
-      total_consumed += item.npeQT;
+      totalConsumed += item.npeQT;
       lastNPE = item?.npef;
     });
-    let test = `To be Consumed - ${NPESelectedRow?.consumedQT}\nTotal Consumned - ${total_consumed}\n`;
-    test += `Last NPE - ${lastNPE}\n` + `Next NPE - ${nextNPE}`;
+    let test = `To be Consumed - ${NPESelectedRow?.consumedQT}\nTotal Consumned - ${totalConsumed}\n`;
+    test += `Last NPE - ${lastNPE}\n Next NPE - ${nextNPE}`;
     alert(test);
   }
 
@@ -578,7 +580,7 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
+      <Content contentHeader={tabsDropDowns} moduloActive="operation">
         <main className="h-full w-full
                         flex flex-col
                         items-start
