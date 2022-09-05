@@ -41,6 +41,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
+  filterYear: string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterStartDate: string | any;
@@ -76,14 +77,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allSafras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allSafras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -104,7 +105,8 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
+
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); //Set filter Parameter 
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -154,14 +156,19 @@ export default function Listagem({
     onSubmit: async ({
       filterStatus,
       filterSafra,
+      filterYear,
       filterYearTo,
       filterYearFrom,
       filterStartDate,
       filterEndDate,
     }) => {
-      // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
+
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYear, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+
+
+      console.log("parametersFilter  ", parametersFilter)
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -416,10 +423,11 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any,
+    order: string | any
   ): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
+
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "safra");
 
     await safraService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -538,23 +546,29 @@ export default function Listagem({
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
+
+
+
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    //   console.log("inside....")
+    // }
+
   }
 
+
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const {
-      parametersFilter,
-      currentPages,
-    } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+
+    //manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 5000); //Remove State         
       }
     });
   }
@@ -565,9 +579,8 @@ export default function Listagem({
     localStorage.removeItem('pageBeforeEdit');
   }
 
-  // Checkingdefualt values
-
-  function checkValue(value : any) {
+  //Checkingdefualt values
+  function checkValue(value: any) {
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;
   }
@@ -575,7 +588,7 @@ export default function Listagem({
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); // Remove State
+    // removestate(); //Remove State
   }, [currentPage]);
 
   return (
@@ -631,7 +644,7 @@ export default function Listagem({
                       placeholder="Nome da Safra"
                       id="filterSafra"
                       name="filterSafra"
-                      // defaultValue={checkValue("filterSafra")}
+                      defaultValue={checkValue("filterSafra")}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -857,7 +870,7 @@ export default function Listagem({
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
+                      disabled={currentPage <= 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -867,7 +880,7 @@ export default function Listagem({
                       disabled={currentPage <= 0}
                     />
                     {Array(1)
-                      .fill('')
+                      .fill("")
                       .map((value, index) => (
                         <Button
                           key={index}
@@ -886,14 +899,14 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -923,8 +936,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
 
+  // const filterApplication = req.cookies.filterBeforeEdit
+  //   ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+  //   : `filterStatus=1&id_culture=${cultureId}`;
+
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+    ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });

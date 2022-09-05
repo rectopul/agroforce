@@ -34,83 +34,78 @@ import {
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-    filterFoco: string
-    filterTypeAssay: string
-    filterGli: string
-    filterExperimentName: string
-    filterTecnologia: string
-    filterPeriod: string
-    filterDelineamento: string
-    filterRepetition: string
-    orderBy: object | any;
-    typeOrder: object | any;
+  filterFoco: string
+  filterTypeAssay: string
+  filterGli: string
+  filterExperimentName: string
+  filterTecnologia: string
+  filterPeriod: string
+  filterDelineamento: string
+  filterRepetition: string
+  orderBy: object | any;
+  typeOrder: object | any;
 }
 
 interface INpeProps {
-    id: number | any;
-    local: number;
-    safra: number;
-    foco: number;
-    type_assay: number;
-    ogm: number;
-    epoca: number;
-    npei: number;
-    npef: number;
-    consumedQT: number;
-    prox_npe: number;
-    status?: number;
-    created_by: number;
+  id: number | any;
+  local: number;
+  safra: number;
+  foco: number;
+  type_assay: number;
+  ogm: number;
+  epoca: number;
+  npei: number;
+  npef: number;
+  consumedQT: number;
+  prox_npe: number;
+  status?: number;
+  created_by: number;
 }
 
 export interface IExperimento {
-    id: number;
-    protocol_name: string;
-    experiment_name: string;
-    year: number;
-    rotulo: string;
-    foco: string;
-    ensaio: string;
-    cod_tec: number;
-    epoca: number;
-    npeQT: number;
-    npef: number;
-    status?: number;
+  id: number;
+  protocol_name: string;
+  experiment_name: string;
+  year: number;
+  rotulo: string;
+  foco: string;
+  ensaio: string;
+  cod_tec: number;
+  epoca: number;
+  npeQT: number;
+  npef: number;
+  status?: number;
 }
 
 interface IGenerateProps {
-    name: string | undefined;
-    title: string | number | readonly string[] | undefined;
-    value: string | number | readonly string[] | undefined;
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
 }
 
 interface IData {
-    allExperiments: IExperimento[];
-    totalItems: number;
-    itensPerPage: number;
-    filterApplication: object | any;
-    idSafra: number
-    pageBeforeEdit: string | any;
-    filterBeforeEdit: string | any
+  allExperiments: IExperimento[];
+  totalItems: number;
+  itensPerPage: number;
+  filterApplication: object | any;
+  idSafra: number
+  pageBeforeEdit: string | any;
+  filterBeforeEdit: string | any
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperiments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'EXPERIMENTOS'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -126,7 +121,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
@@ -337,9 +332,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'protocolName') {
         tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
@@ -542,7 +537,7 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      let parametersFilter = `idSafra=${NPESelectedRow?.id_safra}&idLocal=${NPESelectedRow?.id_local}`;
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
@@ -583,16 +578,16 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive="operation">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
         <main className="h-full w-full
                         flex flex-col
                         items-start
-                        gap-8
+                        gap-0
                         "
         >
           <div className="w-full">
             <MaterialTable
-              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '20px' }}
+              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
               columns={columnNPE}
               data={selectedNPE}
               onRowClick={(evt, selectedRow: any) => {
@@ -603,13 +598,23 @@ export default function Listagem({
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
+                  height: 40,
                 },
+                rowStyle: (rowData) => ({
+                  backgroundColor:
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                  height: 40,
+                }),
                 search: false,
                 filtering: false,
-                selection: true,
+                selection: false,
                 showSelectAllCheckbox: false,
+                showTextRowsSelected: false,
                 paging: false,
-                selectionProps: handleNPERowSelection,
+                // selectionProps: handleNPERowSelection,
+              }}
+              components={{
+                Toolbar: () => null,
               }}
             />
           </div>
@@ -685,34 +690,34 @@ export default function Listagem({
                                             />
                                           </div>
                                           {
-                                                  generatesProps.map((generate, index) => (
-                                                    <Draggable
-                                                      key={index}
-                                                      draggableId={String(generate.title)}
-                                                      index={index}
-                                                    >
-                                                      {(provider) => (
-                                                        <li
-                                                          ref={provider.innerRef}
-                                                          {...provider.draggableProps}
-                                                          {...provider.dragHandleProps}
-                                                        >
-                                                          <CheckBox
-                                                            name={generate.name}
-                                                            title={generate.title?.toString()}
-                                                            value={generate.value}
-                                                            defaultChecked={camposGerenciados
-                                                              .includes(String(generate.value))}
-                                                          />
-                                                        </li>
-                                                      )}
-                                                    </Draggable>
-                                                  ))
-                                              }
+                                            generatesProps.map((generate, index) => (
+                                              <Draggable
+                                                key={index}
+                                                draggableId={String(generate.title)}
+                                                index={index}
+                                              >
+                                                {(provider) => (
+                                                  <li
+                                                    ref={provider.innerRef}
+                                                    {...provider.draggableProps}
+                                                    {...provider.dragHandleProps}
+                                                  >
+                                                    <CheckBox
+                                                      name={generate.name}
+                                                      title={generate.title?.toString()}
+                                                      value={generate.value}
+                                                      defaultChecked={camposGerenciados
+                                                        .includes(String(generate.value))}
+                                                    />
+                                                  </li>
+                                                )}
+                                              </Draggable>
+                                            ))
+                                          }
                                           {provided.placeholder}
                                         </ul>
                                       )
-                                  }
+                                    }
                                   </Droppable>
                                 </DragDropContext>
                               </AccordionFilter>
@@ -721,8 +726,8 @@ export default function Listagem({
 
                           <div className="h-12 flex items-center justify-center w-full">
                             <Button
-                              title="Draw"
-                              value="Draw"
+                              title="Sortear"
+                              value="Sortear"
                               bgColor="bg-blue-600"
                               textColor="white"
                               onClick={validateConsumedData}
@@ -757,17 +762,17 @@ export default function Listagem({
                           disabled={currentPage <= 0}
                         />
                         {
-                                                Array(1).fill('').map((value, index) => (
-                                                  <Button
-                                                    key={index}
-                                                    onClick={() => setCurrentPage(index)}
-                                                    value={`${currentPage + 1}`}
-                                                    bgColor="bg-blue-600"
-                                                    textColor="white"
-                                                    disabled
-                                                  />
-                                                ))
-                                            }
+                          Array(1).fill('').map((value, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled
+                            />
+                          ))
+                        }
                         <Button
                           onClick={() => setCurrentPage(currentPage + 1)}
                           bgColor="bg-blue-600"
@@ -783,7 +788,7 @@ export default function Listagem({
                           disabled={currentPage + 1 >= pages}
                         />
                       </div>
-                                    ) as any,
+                    ) as any,
                   }}
                 />
               </div>

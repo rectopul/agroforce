@@ -86,15 +86,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idCulture,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allGenotipos,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idCulture,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -131,7 +131,7 @@ export default function Listagem({
       title: 'Nome principal',
       value: 'name_main',
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
@@ -242,8 +242,9 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter);
+
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "genotipo");
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -328,7 +329,7 @@ export default function Listagem({
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
-            {name}
+            {title}
           </button>
         </div>
       ),
@@ -400,7 +401,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+          tecnologiaHeaderFactory('Nome Tec.', 'tecnologia'),
         );
       }
       if (columnCampos[index] === 'cruza') {
@@ -598,21 +599,23 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+
+    //manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 5000); //Remove State    
       }
     });
   }
 
-  function filterFieldFactory(title: any, name: any) {
+  function filterFieldFactory(title: any, name: any,) {
     return (
-      <div className="h-10 w-1/2 ml-4">
+      <div className="h-10 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -622,6 +625,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -630,7 +634,7 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -642,6 +646,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
+              defaultValue={checkValue("filterGmrRangeFrom")}
               onChange={formik.handleChange}
             />
           </div>
@@ -652,6 +657,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
+              defaultValue={checkValue("filterGmrRangeTo")}
               onChange={formik.handleChange}
             />
           </div>
@@ -695,14 +701,20 @@ export default function Listagem({
   }
   // remove states
   function removestate() {
-    localStorage.removeItem('filterValueEdit');
-    localStorage.removeItem('pageBeforeEdit');
+    localStorage.removeItem("filterValueEdit");
+    localStorage.removeItem("pageBeforeEdit");
+    setTimeout(() => { }, 5000)
+  }
+
+  //Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-    removestate(); // Remove State
   }, [currentPage]);
 
   return (
@@ -741,6 +753,8 @@ export default function Listagem({
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
                 </div>
 
                 <div
@@ -748,19 +762,12 @@ export default function Listagem({
                   flex
                   justify-center
                   pb-0
-                  pt-6
+                  pt-5
                 "
                 >
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
-
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {
-                    // filterFieldFactory('filterGmr', 'GMR')
-                  }
-
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-
                   {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
@@ -774,6 +781,7 @@ export default function Listagem({
                     icon={<BiFilterAlt size={20} />}
                   />
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -923,7 +931,7 @@ export default function Listagem({
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
+                      disabled={currentPage <= 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -952,7 +960,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -988,12 +996,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+
   urlParameters.search = new URLSearchParams(param).toString();
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
-    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    : `&id_culture=${idCulture}`;
 
   const requestOptions = {
     method: 'GET',
@@ -1001,7 +1011,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allGenotipos, total: totalItems } = await fetch(
+  const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
+  // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

@@ -24,7 +24,7 @@ export class SafraController {
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') {
+        if (options.filterStatus != '2') {
           parameters.status = Number(options.filterStatus);
         }
       }
@@ -34,11 +34,11 @@ export class SafraController {
           `{"contains":"${options.filterSafra}"}`,
         );
       }
-      /*
+      
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
-      */
+      
 
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {
