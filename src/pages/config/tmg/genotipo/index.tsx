@@ -214,6 +214,7 @@ export default function Listagem({
       filterGmrRangeTo,
       filterGmrRangeFrom,
     }) => {
+      
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom);
 
