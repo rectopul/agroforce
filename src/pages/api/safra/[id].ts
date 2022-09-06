@@ -2,15 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { SafraController } from '../../../controllers/safra.controller';
 import { apiHandler } from '../../../helpers/api';
 
-/**
- * @swagger
- * /api/safras/[id]:
- *   get:
- *     description: Retorna todas safras da base
- *     responses:
- *       200:
- *         description: safras
-*/
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new SafraController();
