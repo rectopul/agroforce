@@ -24,9 +24,8 @@ import { RiArrowUpDownLine } from 'react-icons/ri';
 
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
-import Modal from 'react-modal';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
+  AccordionFilter, Button, CheckBox, Content, Input, ModalConfirmation,
 } from '../../../../../components';
 import { loteService, replaceTreatmentService, userPreferencesService } from '../../../../../services';
 import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
@@ -91,7 +90,6 @@ export default function Listagem({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const checkedTreatments = JSON.parse(localStorage.getItem('checkedTreatments') as string);
   const treatmentsOptionSelected = JSON.parse(localStorage.getItem('treatmentsOptionSelected') as string);
-  let replaceName;
 
   const preferences = userLogado.preferences.lote || {
     id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
@@ -433,68 +431,15 @@ export default function Listagem({
     <>
       <Head><title>Listagem de Lotes</title></Head>
 
-      <Modal
+      <ModalConfirmation
         isOpen={isOpenModal}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
-        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
-        className="flex
-        flex-col
-        w-full h-36
-        h-64
-        max-w-xl
-        bg-gray-50
-        rounded-tl-2xl
-        rounded-tr-2xl
-        rounded-br-2xl
-        rounded-bl-2xl
-        pt-2
-        pb-4
-        px-8
-        relative
-        shadow-lg
-        shadow-gray-900/50"
-      >
-        <div className="flex flex-col">
-          <div className="flex">
-            <h1>
-              Você tem certeza que deseja substituir os
-              {' '}
-              {checkedTreatments.length}
-              {' '}
-              selecionados por
-              {' '}
-              {nameReplace}
-            </h1>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-          </div>
-          <div className="flex justify-center">
-            <button type="button" onClick={() => replaceTreatmentButton(isReplaceGenotypeId)}>
-              <h1>SIM</h1>
-            </button>
-            <div style={{ width: 150 }} />
-            <button type="button" onClick={() => setIsOpenModal(false)}>
-              <h1>NÃO</h1>
-            </button>
-          </div>
-
-        </div>
-      </Modal>
+        text={`Você tem certeza de que quer substituir os ${checkedTreatments?.length} ${treatmentsOptionSelected}(s) selecionados por ${nameReplace}?`}
+        onPress={() => replaceTreatmentButton(isReplaceGenotypeId)}
+        onCancel={() => setIsOpenModal(false)}
+      />
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <main className="h-full w-full
-          flex flex-col
-          items-start
-          gap-4
-        "
-        >
+        <main className="h-full w-full flex flex-col items-start gap-4">
           <AccordionFilter title={treatmentsOptionSelected === 'genotipo' ? 'Filtrar genótipos' : 'Filtrar lotes'}>
             <div className="w-full flex gap-2">
               <form
@@ -558,8 +503,9 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
