@@ -61,6 +61,7 @@ export class GenotypeTreatmentController {
             tecnologia: {
               select: {
                 cod_tec: true,
+                name: true,
               },
             },
           },
@@ -78,7 +79,7 @@ export class GenotypeTreatmentController {
           select: {
             foco: { select: { name: true } },
             type_assay: { select: { name: true } },
-            tecnologia: { select: { name: true } },
+            tecnologia: { select: { name: true, cod_tec: true } },
             gli: true,
             bgm: true,
             status: true,
