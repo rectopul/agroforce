@@ -17,6 +17,25 @@ export class GenotypeTreatmentController {
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[1]}" } } }`));
       }
+      if (options.filterBgmFrom || options.filterBgmTo) {
+        if (options.filterBgmFrom && options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} }}}`));
+        } else if (options.filterBgmFrom) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} }}}`));
+        } else if (options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
+        }
+      }
+      if (options.filterNtFrom || options.filterNtTo) {
+        if (options.filterNtFrom && options.filterNtTo) {
+          parameters.treatments_number = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
+        } else if (options.filterNtFrom) {
+          parameters.treatments_number = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
+        } else if (options.filterNtTo) {
+          parameters.treatments_number = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
+        }
+      }
+
       if (options.filterNca) {
         parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
       }

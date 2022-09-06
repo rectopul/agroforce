@@ -15,6 +15,15 @@ export class ExperimentController {
     let select: any = [];
     parameters.AND = [];
     try {
+      if (options.filterRepetitionFrom || options.filterRepetitionTo) {
+        if (options.filterRepetitionFrom && options.filterRepetitionTo) {
+          parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
+        } else if (options.filterRepetitionFrom) {
+          parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)} }`);
+        } else if (options.filterRepetitionTo) {
+          parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
+        }
+      }
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
