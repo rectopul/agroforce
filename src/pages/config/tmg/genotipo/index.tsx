@@ -86,15 +86,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allGenotipos,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idCulture,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -954,14 +954,14 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600 rrinky"
+                      bgColor="bg-blue-600 rrinky123"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
                       onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600" 
+                      bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
@@ -1012,7 +1012,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   } as RequestInit | undefined;
 
   const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
-  // const { response: allGenotipos, total: totalItems } = await fetch(
+    // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
