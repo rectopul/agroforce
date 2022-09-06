@@ -2,15 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { CulturaController } from '../../../controllers/cultura.controller';
 import { apiHandler } from '../../../helpers/api';
 
-/**
- * @swagger
- * /api/cultura:
- *   get:
- *     description: Retorna todas culturas da base
- *     responses:
- *       200:
- *         description: culturas
- */
 
 export default apiHandler(handler);
 

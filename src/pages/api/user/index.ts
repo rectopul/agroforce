@@ -2,15 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { UserController } from '../../../controllers/user.controller';
 import { apiHandler } from '../../../helpers/api';
 
-/**
- * @swagger
- * /api/user:
- *   get:
- *     description: Retorna todos usuarios
- *     responses:
- *       200:
- *         description: Users
- */
 export default apiHandler(handler);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
