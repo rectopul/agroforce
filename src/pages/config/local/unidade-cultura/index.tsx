@@ -563,6 +563,26 @@ export default function Listagem({
                     'Nome Un. de Cult.',
                   )}
 
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Ano
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="De"
+                        id="filterYearFrom"
+                        name="filterYearFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        placeholder="Até"
+                        id="filterYearTo"
+                        name="filterYearTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                   {filterFieldFactory(
                     'filterNameLocalCulture',
                     'Nome do L. de Cult.',
@@ -571,33 +591,16 @@ export default function Listagem({
                   {filterFieldFactory('filterLabel', 'Rótulo')}
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
-                </div>
 
-                <div className="h-6 w-1/2 ml-4">
-                  <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Ano
-                  </label>
-                  <Input
-                    placeholder="De"
-                    id="filterYearFrom"
-                    name="filterYearFrom"
-                    onChange={formik.handleChange}
-                  />
-                  <Input
-                    placeholder="Até"
-                    id="filterYearTo"
-                    name="filterYearTo"
-                    onChange={formik.handleChange}
-                  />
                 </div>
 
                 <div
                   className="w-full h-full
-                flex
-                justify-center
-                pt-2
-                pb-2
-                "
+                  flex
+                  justify-center
+                  pt-2
+                  pb-0
+                  "
                 >
                   {filterFieldFactory('filterAdress', 'Nome da Fazenda')}
 

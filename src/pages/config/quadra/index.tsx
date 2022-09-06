@@ -608,18 +608,20 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Linha P
                     </label>
-                    <Input
-                      placeholder="De"
-                      id="filterPFrom"
-                      name="filterPFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      placeholder="Até"
-                      id="filterPTo"
-                      name="filterPTo"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="De"
+                        id="filterPFrom"
+                        name="filterPFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        placeholder="Até"
+                        id="filterPTo"
+                        name="filterPTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -634,53 +636,19 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                </div>
 
-                <div className="h-6 w-1/2 ml-4">
-                  <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Linha P
-                  </label>
-                  <div className="flex">
-                    <Input
-                      placeholder="De"
-                      id="filterPFrom"
-                      name="filterPFrom"
-                      onChange={formik.handleChange}
-                    />
-                    <Input
-                      style={{ marginLeft: 8 }}
-                      placeholder="Até"
-                      id="filterPTo"
-                      name="filterPTo"
-                      onChange={formik.handleChange}
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
                     />
                   </div>
                 </div>
 
-                <div className="h-10 w-1/2 ml-4">
-                  <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Esquema
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Esquema"
-                    max="40"
-                    id="filterSchema"
-                    name="filterSchema"
-                    onChange={formik.handleChange}
-                  />
-                </div>
-
-                <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>

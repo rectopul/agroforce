@@ -103,11 +103,9 @@ export default function Listagem({
   pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs;
+  const { tabsOperation } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('operacao');
-
-  tabsDropDowns.map((i: any) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
@@ -544,6 +542,7 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
           let i = NPESelectedRow.npei;
@@ -580,7 +579,7 @@ export default function Listagem({
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsDropDowns} moduloActive="operation">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
         <main className="h-full w-full
                         flex flex-col
                         items-start

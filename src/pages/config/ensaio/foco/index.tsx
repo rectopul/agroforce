@@ -515,7 +515,7 @@ export default function Listagem({
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="flex gap-2">
           <div>
             <Input
               type="text"
