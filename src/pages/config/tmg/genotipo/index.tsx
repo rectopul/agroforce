@@ -700,7 +700,6 @@ export default function Listagem({
   function removestate() {
     localStorage.removeItem('filterValueEdit');
     localStorage.removeItem('pageBeforeEdit');
-    setTimeout(() => { }, 5000);
   }
 
   // Checkingdefualt values
@@ -951,7 +950,7 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 rrinky123"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
@@ -994,7 +993,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
   // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
   urlParameters.search = new URLSearchParams(param).toString();
 
@@ -1009,7 +1008,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   } as RequestInit | undefined;
 
   const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
-  // const { response: allGenotipos, total: totalItems } = await fetch(
+    // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

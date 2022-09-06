@@ -133,41 +133,13 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-    case 'safra': {
-      const [
-        key1,
-        filterStatus,
-        filterSafra,
-        filterYearTo,
-        filterYearFrom,
-        filterStartDate,
-        filterEndDate,
-        cultureId,
-      ] = theArgs;
-
-      parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}`;
-    }
+   
     case 'safra':
       parametersFilter = await safra(theArgs);
       break;
-    case 'genotipo': {
-      const [
-        key2,
-        filterGenotipo,
-        filterMainName,
-        filterCruza,
-        filterTecnologiaCod,
-        filterTecnologiaDesc,
-        filterGmr,
-        idCulture,
-        idSafra,
-        filterGmrRangeTo,
-        filterGmrRangeFrom,
-        filterLotsTo,
-        filterLotsFrom,
-      ] = theArgs;
-      parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&&filterLotsFrom=${filterLotsFrom}&filterLotsTo=${filterLotsTo}&`;
-    }
+
+    case 'genotipo':
+      parametersFilter = await genotipo(theArgs);  
       break;
 
     case 'lote':
