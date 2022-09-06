@@ -23,7 +23,7 @@ export class ImportGenotypeTreatmentController {
   ): Promise<IReturnObject> {
     const loteController = new LoteController();
     const genotipoController = new GenotipoController();
-    const assayListController = new AssayListController();
+    // const assayListController = new AssayListController();
     const logImportController = new LogImportController();
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const historyGenotypeTreatmentController = new HistoryGenotypeTreatmentController();
@@ -33,33 +33,50 @@ export class ImportGenotypeTreatmentController {
     try {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const { status: code, response: assayList } = await assayListController.getAll({
-            gli: spreadSheet[row][4],
-          });
-          if (code !== 400) {
-            if ((assayList[0]?.status) !== 'IMPORTADO') {
-              responseIfError[0]
-                += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
-            }
-          }
+          // const { status: code, response: assayList } = await assayListController.getAll({
+          //   gli: spreadSheet[row][4],
+          // });
+          // RELAÇÃO AINDA NÃO EXISTE
+          // if (code !== 400) {
+          //   if ((assayList[0]?.status) !== 'IMPORTADO') {
+          //     responseIfError[0]
+          //       +=
+          // eslint-disable-next-line max-len
+          // `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
+          //   }
+          // }
           const treatments: any = await genotypeTreatmentController.getAll({
             gli: spreadSheet[row][4],
             treatments_number: spreadSheet[row][6],
             name_genotipo: spreadSheet[row][8],
             nca: spreadSheet[row][9],
           });
+
           if (treatments.status === 400) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
           }
-          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][1]
-            || treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][2]
-            || treatments.response[0]?.assay_list.tecnologia.name !== spreadSheet[row][3]
-            || treatments.response[0]?.assay_list.bgm !== spreadSheet[row][5]
-          ) {
+
+          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][1]) {
             responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, as informações são diferentes das cadastradas. </li> <br>`;
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o foco e diferente do cadastrado no ensaio. </li> <br>`;
           }
+
+          if (treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][2]) {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
+          }
+
+          if (treatments.response[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;
+          }
+
+          if (treatments.response[0]?.assay_list.bgm !== spreadSheet[row][5]) {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
+          }
+
           for (const column in spreadSheet[row]) {
             if (column === '0') { // SAFRA
               if (spreadSheet[row][column] === null) {
@@ -139,8 +156,12 @@ export class ImportGenotypeTreatmentController {
             }
             if (column === '10') { // GENOTIPO NOVO
               if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'o campo é obrigatório, caso queira substituir apenas nca apenas replique os genotipos',
+                );
               } else {
                 const { status } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][column],
@@ -199,6 +220,7 @@ export class ImportGenotypeTreatmentController {
                   id: treatment[0]?.id,
                   id_genotipo: genotipo[0]?.id,
                   id_lote: lote[0]?.id,
+                  status: spreadSheet[row][11],
                 },
               );
               await historyGenotypeTreatmentController.create({

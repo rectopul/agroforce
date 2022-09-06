@@ -78,7 +78,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
-  const [message, setMessage] = useState<boolean>(false);
+  const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -298,6 +298,33 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -312,7 +339,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'),
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
         );
       }
       if (columnOrder[item] === 'gli') {
@@ -410,7 +437,7 @@ export default function Listagem({
             const newItem: any = {};
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
             newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
@@ -450,7 +477,7 @@ export default function Listagem({
             newItem.safra = item.safra.safraName;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
             newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
@@ -536,7 +563,7 @@ export default function Listagem({
         moduleId: 27,
         idSafra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
-      }).then(({ message }) => {
+      }).then(({ message }: any) => {
         Swal.fire({
           html: message,
           width: '800',
@@ -928,7 +955,7 @@ export default function Listagem({
               }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: message ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                  emptyDataSourceMessage: tableMessage ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
               onChangeRowsPerPage={(e: any) => { }}
@@ -1141,7 +1168,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);

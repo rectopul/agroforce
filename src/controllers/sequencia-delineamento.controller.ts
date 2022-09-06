@@ -83,13 +83,10 @@ export class SequenciaDelineamentoController {
 
       if (options.filterNtFrom || options.filterNtTo) {
         if (options.filterNtFrom && options.filterNtTo) {
-          console.log('In range : ', options.filterNtFrom, ' To ', options.filterNtTo)
           parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
         } else if (options.filterNtFrom) {
-          console.log('greater than : ', options.filterNtFrom)
           parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
         } else if (options.filterNtTo) {
-          console.log('less than : ', options.filterNtTo)
           parameters.nt = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
         }
       }
