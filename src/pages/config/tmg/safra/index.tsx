@@ -41,6 +41,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
+  filterYear: string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterStartDate: string | any;
@@ -145,6 +146,7 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
+      filterYear: '',
       filterYearTo: '',
       filterYearFrom: '',
       filterStartDate: '',
@@ -881,7 +883,7 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 test"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
