@@ -146,6 +146,7 @@ export default function Listagem({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
+      filterYear: '',
       filterYearTo: '',
       filterYearFrom: '',
       filterStartDate: '',
@@ -167,8 +168,6 @@ export default function Listagem({
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYear, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
-
-      console.log("parametersFilter  ", parametersFilter)
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 

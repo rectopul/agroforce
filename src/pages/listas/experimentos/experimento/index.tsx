@@ -32,6 +32,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
+import { fetchWrapper } from '../../../../helpers';
 
 interface IFilter {
   filterFoco: string
@@ -131,6 +132,7 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); //Set filter Parameter 
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
@@ -184,9 +186,14 @@ export default function Listagem({
         }
       }
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
+
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('experimento', filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod,filterDelineamento,filterRepetition,filterStatus,idSafra);
+
+      setFiltersParams(parametersFilter);
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
+
       await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
         setExperimento(response.response);
@@ -197,34 +204,14 @@ export default function Listagem({
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
 
-    setOrderBy(column);
-    setOrderType(typeOrder);
-
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "experimento");
 
     await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
+        setFiltersParams(parametersFilter);
       }
     });
 
@@ -521,26 +508,19 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
+    } 
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&idSafra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}&idSafra=${idSafra}`;
-    }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
+    //manage using comman function
+     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+
     await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
+        // setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
       }
     });
   }
@@ -842,13 +822,13 @@ export default function Listagem({
                     }
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 RR"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

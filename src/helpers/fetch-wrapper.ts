@@ -161,6 +161,9 @@ async function handleFilterParameter(...theArgs: any) {
       parametersFilter = await cultura(theArgs);
       break;
 
+    case "experimento":
+      parametersFilter = await experimento(theArgs);
+      break;
 
     default:
       parametersFilter = '';
@@ -224,6 +227,16 @@ function cultura(theArgs: any) {
   return parametersFilter;
 }
 
+
+// experimento in list
+function experimento(theArgs: any) {
+
+  const [key, filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod,filterDelineamento,filterRepetition,filterStatus,idSafra] = theArgs;
+
+  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
+
+  return parametersFilter;
+}
 
 //Handle orders global  
 function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
