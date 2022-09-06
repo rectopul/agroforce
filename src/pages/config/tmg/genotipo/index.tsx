@@ -220,6 +220,7 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
+
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
       console.log(parametersFilter);
@@ -703,7 +704,6 @@ export default function Listagem({
   function removestate() {
     localStorage.removeItem("filterValueEdit");
     localStorage.removeItem("pageBeforeEdit");
-    setTimeout(() => { }, 5000)
   }
 
   //Checkingdefualt values
@@ -997,7 +997,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
   // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
   urlParameters.search = new URLSearchParams(param).toString();
 
