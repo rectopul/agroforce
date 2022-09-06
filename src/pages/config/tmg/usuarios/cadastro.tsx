@@ -15,10 +15,13 @@ import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2';
 import { userService } from '../../../../services/user.service';
 import {
-  Button, CheckBox, Content,
-  Input, Select,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  Select,
 } from '../../../../components';
-import IDepartment from '../../../../components/props/departmentDTO';
+import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {
@@ -52,16 +55,16 @@ export interface IData {
   Cultures: ICulture[];
 }
 
-export default function NovoUsuario({ departments, profiles, Cultures }: IData) {
+export default function NovoUsuario({
+  departments,
+  profiles,
+  Cultures,
+}: IData) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
@@ -136,13 +139,15 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.name
+      if (
+        !values.name
         || !values.login
         || !values.cpf
         || !values.departmentId
         || !values.password
-        || !values.confirmPassword) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        || !values.confirmPassword
+      ) {
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       if (values.password !== values.confirmPassword) {
@@ -156,7 +161,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
       let auxObject2: any = [];
 
       Object.keys(values.cultures).forEach((item) => {
-        input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
+        input = document.querySelector(
+          `select[name="profiles_${values.cultures[item]}"]`,
+        );
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i += 1) {
           if (input.options[i].selected) {
@@ -170,27 +177,30 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
         auxObject.push(ObjProfiles);
       });
 
-      await userService.create({
-        avatar: 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
-        name: capitalize(values.name),
-        login: values.login,
-        cpf: values.cpf,
-        email: values.email,
-        tel: values.tel,
-        password: values.password,
-        registration: values.registration,
-        departmentId: values.departmentId,
-        status: values.status,
-        created_by: values.created_by,
-        cultures: auxObject,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Usuário cadastrado com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      });
+      await userService
+        .create({
+          avatar:
+            'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
+          name: capitalize(values.name),
+          login: values.login,
+          cpf: values.cpf,
+          email: values.email,
+          tel: values.tel,
+          password: values.password,
+          registration: values.registration,
+          departmentId: values.departmentId,
+          status: values.status,
+          created_by: values.created_by,
+          cultures: auxObject,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Usuário cadastrado com sucesso!');
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
@@ -202,14 +212,15 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
             <h1 className="text-2xl">Novo usuário</h1>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-around
             gap-6
@@ -218,7 +229,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Nome
               </label>
               <Input
@@ -233,7 +244,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Login
               </label>
               <Input
@@ -246,7 +257,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
               />
             </div>
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *CPF
               </label>
               <InputMask
@@ -263,8 +274,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                   border border-solid border-gray-300
                   rounded
                   w-full
-                  py-2 px-3
+                  py-1 px-2
                   text-gray-900
+                  text-xs
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
@@ -272,7 +284,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-around
             gap-6
@@ -280,7 +293,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Email
               </label>
               <Input
@@ -294,7 +307,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Matricula
               </label>
               <Input
@@ -306,8 +319,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 value={formik.values.registration}
               />
             </div>
-            <div className="w-full h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-full h-6">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Setor
               </label>
               <Select
@@ -321,7 +334,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Telefone
               </label>
               <InputMask
@@ -338,8 +351,9 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                   border border-solid border-gray-300
                   rounded
                   w-full
-                  py-2 px-3
+                  py-1 px-2
                   text-gray-900
+                  text-xs
                   leading-tight
                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                 "
@@ -347,7 +361,8 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-between
             gap-6
@@ -355,7 +370,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Senha
               </label>
               <Input
@@ -369,7 +384,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
 
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 *Confirmar senha
               </label>
               <Input
@@ -383,66 +398,71 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
             flex
             justify-between
             gap-6
             mb-4
           "
           />
-          <div className="w-full mt-6">
+          <div className="w-full">
             <h2 className="text-gray-900 text-2xl mb-4">
               Permissões de Culturas
             </h2>
-            <div className="w-full grid grid-cols-3 gap-6">
-              {
-                Cultures.map((culture, index) => (
-                  <div key={index} className="flex items-center p-4 border border-solid border-gray-200 rounded shadow">
-                    <div className="w-full text-xl">
-                      <CheckBox
-                        key={culture.id}
-                        title={culture.name}
-                        id={`culture_${culture.id}`}
-                        name="cultures"
+            <div className="w-full grid grid-cols-3 gap-2">
+              {Cultures.map((culture, index) => (
+                <div
+                  key={index}
+                  className="flex items-center p-2 border border-solid border-gray-200 rounded shadow"
+                >
+                  <div className="w-full text-xl">
+                    <CheckBox
+                      key={culture.id}
+                      title={culture.name}
+                      id={`culture_${culture.id}`}
+                      name="cultures"
+                      onChange={formik.handleChange}
+                      value={culture.id}
+                    />
+                  </div>
+
+                  <div className="w-full">
+                    <h4 className="block text-gray-900 text-sm font-bold mb-1">
+                      Permissões
+                    </h4>
+                    <div>
+                      <MultiSelectComponent
+                        id={`profiles_${culture.id}`}
+                        name={`profiles_${culture.id}`}
                         onChange={formik.handleChange}
-                        value={culture.id}
+                        dataSource={profiles as any}
+                        mode="Box"
+                        fields={{
+                          text: 'name',
+                          value: 'id',
+                        }}
+                        placeholder={`Permissões de culturas para ${
+                          !formik.values.name ? 'Usuário' : formik.values.name
+                        }`}
                       />
                     </div>
-
-                    <div className="w-full">
-                      <h4 className="block text-gray-900 text-sm font-bold mb-2">
-                        Permissões
-                      </h4>
-                      <div>
-                        <MultiSelectComponent
-                          id={`profiles_${culture.id}`}
-                          name={`profiles_${culture.id}`}
-                          onChange={formik.handleChange}
-                          dataSource={profiles as any}
-                          mode="Box"
-                          fields={{
-                            text: 'name',
-                            value: 'id',
-                          }}
-                          placeholder={`Permissões de culturas para ${!formik.values.name ? 'Usuário' : formik.values.name}`}
-                        />
-                      </div>
-                    </div>
                   </div>
-                ))
-              }
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="
-            h-10 w-full
+          <div
+            className="
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-5
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -459,7 +479,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<FiUserPlus size={18} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -469,7 +489,7 @@ export default function NovoUsuario({ departments, profiles, Cultures }: IData) 
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const { token } = req.cookies;
@@ -481,7 +501,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
   const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
-  const apiCulture = await fetch(`${publicRuntimeConfig.apiUrl}/culture`, requestOptions);
+  const apiCulture = await fetch(
+    `${publicRuntimeConfig.apiUrl}/culture`,
+    requestOptions,
+  );
 
   const departments = await apiDepartment.json();
   const profiles = await apiProfile.json();

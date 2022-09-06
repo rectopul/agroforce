@@ -1,31 +1,42 @@
+import React, { useState } from 'react';
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
-import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
+import { importService } from '../../../../services';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
-interface Idata {
-  safra: any;
-  foco: any;
-}
+import ComponentLoading from '../../../../components/Loading';
+
 export default function Importar() {
-  const { TabsDropDowns } = ITabs;
+  const { TabsDropDowns } = ITabs.default;
+
+  const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
+
+  tabsDropDowns.map((tab) => (tab.titleTab === 'NPE' ? (tab.statusTab = true) : (tab.statusTab = false)));
+
+  const [loading, setLoading] = useState(false);
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    //console.log("cultura selecionada:");
-    //console.log(userLogado);
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
-        table: 'npe', spreadSheet: rows, moduleId: 14, id_culture:  userLogado.userCulture.cultura_selecionada, safra: userLogado.safras.safra_selecionada, created_by: userLogado.id,
+        table: 'NPE',
+        spreadSheet: rows,
+        moduleId: 14,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        idSafra: userLogado.safras.safra_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -37,6 +48,8 @@ export default function Importar() {
         }
       });
     });
+
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
@@ -48,14 +61,17 @@ export default function Importar() {
       readExcel(inputFile.files);
     },
   });
+
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação NPE</title>
       </Head>
-      <Content contentHeader={TabsDropDowns()} moduloActive="config">
+      <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
@@ -81,14 +97,14 @@ export default function Importar() {
           </div>
           {/* <input type="file" id="inptesteut"  onChange={e => readExcel(e.target.files)} /> */}
           <div className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
               mt-10
             "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

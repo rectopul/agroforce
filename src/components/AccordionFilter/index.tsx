@@ -1,10 +1,10 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Typography from "@mui/material/Typography";
-import * as React from "react";
-import { ReactNode } from "react";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import { ReactNode } from 'react';
 
 interface IAccordionFilterProps {
   title?: string;
@@ -29,7 +29,7 @@ export function AccordionFilter({
         >
           <Typography>{title}</Typography>
         </AccordionSummary>
-        <AccordionDetails className="max-h-72 overflow-y-scroll">
+        <AccordionDetails className="max-h-72 overflow-y-auto">
           <Typography className="flex flex-col">{children}</Typography>
         </AccordionDetails>
       </Accordion>

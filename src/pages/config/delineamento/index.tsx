@@ -1,33 +1,36 @@
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import Swal from "sweetalert2";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState } from "react";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import Swal from 'sweetalert2';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiOutlineTable,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { delineamentoService, userPreferencesService } from "src/services";
-import * as XLSX from "xlsx";
-import { number } from "yup/lib/locale";
+} from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { delineamentoService, userPreferencesService } from 'src/services';
+import * as XLSX from 'xlsx';
+import { number } from 'yup/lib/locale';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -35,8 +38,8 @@ import {
   Content,
   Input,
   Select,
-} from "../../../components";
-import * as ITabs from "../../../shared/utils/dropdown";
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -54,6 +57,10 @@ interface IFilter {
   filterTreatment: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterTratRepetitionFrom: string | any;
+  filterTratRepetitionTo: string | any;
 }
 interface IGenerateProps {
   name: string | undefined;
@@ -79,79 +86,78 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
-}: Idata) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "DELINEAMENTO"
-      ? (tab.statusTab = true)
-      : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'DELINEAMENTO'
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.delineamento || {
     id: 0,
-    table_preferences: "id,name,repeticao,trat_repeticao,sequencia,status",
+    table_preferences: 'id,name,repeticao,trat_repeticao,sequencia,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   const [delineamento, setDelineamento] = useState<IDelineamentoProps[]>(
-    () => delineamentos
+    () => delineamentos,
   );
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
-      name: "CamposGerenciados[]",
-      title: "Favorito ",
-      value: "id",
-      defaultChecked: () => camposGerenciados.includes("id"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome',
+      value: 'name',
+      defaultChecked: () => camposGerenciados.includes('name'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome",
-      value: "name",
-      defaultChecked: () => camposGerenciados.includes("name"),
+      name: 'CamposGerenciados[]',
+      title: 'Repetiçao ',
+      value: 'repeticao',
+      defaultChecked: () => camposGerenciados.includes('repeticao'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Repetiçao ",
-      value: "repeticao",
-      defaultChecked: () => camposGerenciados.includes("repeticao"),
+      name: 'CamposGerenciados[]',
+      title: 'Trat. Repetição',
+      value: 'trat_repeticao',
+      defaultChecked: () => camposGerenciados.includes('trat_repeticao'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Trat. Repetição",
-      value: "trat_repeticao",
-      defaultChecked: () => camposGerenciados.includes("trat_repeticao"),
+      name: 'CamposGerenciados[]',
+      title: 'Sequência',
+      value: 'sequencia',
+      defaultChecked: () => camposGerenciados.includes('sequencia'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Sequência",
-      value: "sequencia",
-      defaultChecked: () => camposGerenciados.includes("sequencia"),
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "Status",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Status',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>("");
-
+  const [colorStar, setColorStar] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -160,24 +166,31 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: "",
-      filterName: "",
-      filterRepeat: "",
-      filterTreatment: "",
-      orderBy: "",
-      typeOrder: "",
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      filterTratRepetitionTo: '',
+      filterTratRepetitionFrom: '',
+      filterStatus: '',
+      filterName: '',
+      filterRepeat: '',
+      filterTreatment: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterStatus,
       filterName,
       filterRepeat,
       filterTreatment,
+      filterRepetitionTo,
+      filterRepetitionFrom,
+      filterTratRepetitionTo,
+      filterTratRepetitionFrom,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
+      const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
-      setCookies("filterBeforeEdit", filtersParams);
+      setCookies('filterBeforeEdit', filtersParams);
       await delineamentoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -190,12 +203,12 @@ export default function Listagem({
   });
 
   const filters = [
-    { id: 2, name: "Todos" },
-    { id: 1, name: "Ativos" },
-    { id: 0, name: "Inativos" },
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split("");
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -210,110 +223,111 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-10 flex">
-            <div>
-              <button
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={25} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+
+            </button>
           </div>
-        ) : (
-          <div className="h-10 flex">
-            <div>
-              <button
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={25} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+
+          <div>
+            <button
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
-      field: "status",
+      title: 'Status',
+      field: 'status',
       sorting: false,
       searchable: false,
-      filterPlaceholder: "Filtrar por status",
-      render: (rowData: IDelineamentoProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                title="Ativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: IDelineamentoProps) => (rowData.status ? (
+        <div className="h-7 flex">
+          <div>
+            <Button
+              icon={<FaRegThumbsUp size={14} />}
+              title="Ativo"
+              onClick={async () => await handleStatus(rowData.id, rowData)}
+              bgColor="bg-green-600"
+              textColor="white"
+            />
           </div>
-        ) : (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                title="Inativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
+        </div>
+      ) : (
+        <div className="h-7 flex">
+          <div>
+            <Button
+              icon={<FaRegThumbsDown size={14} />}
+              title="Inativo"
+              onClick={async () => await handleStatus(rowData.id, rowData)}
+              bgColor="bg-red-800"
+              textColor="white"
+            />
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(",");
+    const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === "id") {
-        tableFields.push(idHeaderFactory());
-      }
-      if (columnCampos[item] === "name") {
-        tableFields.push(headerTableFactory("Nome", "name"));
-      }
-
-      if (columnCampos[item] === "repeticao") {
-        tableFields.push(headerTableFactory("Repetição", "repeticao"));
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
+      if (columnCampos[item] === 'name') {
+        tableFields.push(headerTableFactory('Nome', 'name'));
       }
 
-      if (columnCampos[item] === "trat_repeticao") {
+      if (columnCampos[item] === 'repeticao') {
+        tableFields.push(headerTableFactory('Repetição', 'repeticao'));
+      }
+
+      if (columnCampos[item] === 'trat_repeticao') {
         tableFields.push(
-          headerTableFactory("Trat. Repetição", "trat_repeticao")
+          headerTableFactory('Trat. Repetição', 'trat_repeticao'),
         );
       }
 
-      if (columnCampos[item] === "status") {
+      if (columnCampos[item] === 'status') {
         tableFields.push(statusHeaderFactory());
       }
-      if (columnCampos[item] === "sequencia") {
+      if (columnCampos[item] === 'sequencia') {
         tableFields.push({
-          title: "Sequência",
-          field: "sequencia",
+          title: 'Sequência',
+          field: 'sequencia',
           sorting: false,
           searchable: false,
-          filterPlaceholder: "Filtrar por status",
+          filterPlaceholder: 'Filtrar por status',
           render: (rowData: IDelineamentoProps) => (
             <div className="h-7 flex">
               <div
@@ -325,7 +339,7 @@ export default function Listagem({
                   icon={<AiOutlineTable size={14} />}
                   onClick={() => {
                     router.push(
-                      `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
+                      `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`,
                     );
                   }}
                   bgColor="bg-yellow-500"
@@ -343,25 +357,26 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
-
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -383,14 +398,14 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder("");
+        setArrowOrder('');
       }
     }
   }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -413,7 +428,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.delineamento = {
         id: preferences.id,
@@ -424,7 +439,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -433,7 +448,7 @@ export default function Listagem({
 
   async function handleStatus(
     idDelineamento: number,
-    data: IDelineamentoProps
+    data: IDelineamentoProps,
   ): Promise<void> {
     const parametersFilter = `filterStatus=${1}&name=${data.name}`;
 
@@ -446,7 +461,7 @@ export default function Listagem({
         }
         if (response.total > 0) {
           Swal.fire(
-            "Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!"
+            'Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!',
           );
         } else {
           delineamentoService.update({
@@ -454,7 +469,7 @@ export default function Listagem({
             status: data.status,
           });
           const index = delineamento.findIndex(
-            (delineamento) => delineamento.id === idDelineamento
+            (delineamento) => delineamento.id === idDelineamento,
           );
 
           if (index === -1) {
@@ -483,7 +498,7 @@ export default function Listagem({
       });
 
       const index = delineamento.findIndex(
-        (delineamento) => delineamento.id === idDelineamento
+        (delineamento) => delineamento.id === idDelineamento,
       );
 
       if (index === -1) {
@@ -513,39 +528,36 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes("paramSelect")) {
-      //filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-    filterApplication += `&id_culture=${cultureId}`;
-
     await delineamentoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = delineamento.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = 'Inativo' as any;
           } else {
-            row.status = "Ativo" as any;
+            row.status = 'Ativo' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "delineamento");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'delineamento');
 
         // Buffer
         const buf = XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Delineamento.xlsx");
+        XLSX.writeFile(workBook, 'Delineamento.xlsx');
       }
     });
   };
@@ -553,7 +565,12 @@ export default function Listagem({
   useEffect(() => {
     async function handlePagination(): Promise<void> {
       const skip = currentPage * Number(take);
-      let parametersFilter = `skip=${skip}&take=${take}`;
+      let parametersFilter;
+      if (orderType) {
+        parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      } else {
+        parametersFilter = `skip=${skip}&take=${take}`;
+      }
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
@@ -586,7 +603,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-8
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar delineamentos">
@@ -604,24 +621,24 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
                     <Input
@@ -632,41 +649,57 @@ export default function Listagem({
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="repetição"
-                      id="filterRepeat"
-                      name="filterRepeat"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-2">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Trat. Repetição
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="trat. Repetição"
-                      id="filterTreatment"
-                      name="filterTreatment"
-                      onChange={formik.handleChange}
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTratRepetitionFrom"
+                        name="filterTratRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTratRepetitionTo"
+                        name="filterTratRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
                     />
                   </div>
                 </div>
 
-                <div className="h-16 w-32 mt-3">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -674,7 +707,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={delineamento}
               options={{
@@ -682,7 +715,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: "#f9fafb" },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -712,20 +745,22 @@ export default function Listagem({
                         icon={<FiUserPlus size={20} />}
                       />
                     </div> */}
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="delineamento/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div
@@ -772,7 +807,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -802,69 +837,71 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="delineamento/importar-planilha/config-planilha"
                         />
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+
+                      onClick={() => setCurrentPage(pages)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -875,12 +912,11 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 15;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 15;
 
   const { token } = req.cookies;
   const { cultureId } = req.cookies;
@@ -889,14 +925,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "filterStatus=1";
-
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
+    : 'filterStatus=1';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
     : `filterStatus=1&id_culture=${cultureId}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
@@ -905,8 +941,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   urlParameters.search = new URLSearchParams(param).toString();
 
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 

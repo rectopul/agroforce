@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import { ReactNode } from "react";
-import { ModelHeader } from "./ModelHeader";
+import Image from 'next/image';
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import { ModelHeader } from './ModelHeader';
 
 interface IMainHeaderProps {
   headerSelects: ReactNode;

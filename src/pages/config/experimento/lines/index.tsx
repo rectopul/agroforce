@@ -1,7 +1,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -64,8 +64,8 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
-}: IData) {
+      allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -121,7 +121,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -375,7 +375,7 @@ export default function Listagem({
                   <div className="h-10">
                     <Button
                       icon={<FaRegThumbsUp size={16} />}
-                      onClick={async () => await handleStatus(rowData.id, {
+                      onClick={async () => handleStatus(rowData.id, {
                         status: rowData.status,
                         ...rowData,
                       })}
@@ -389,7 +389,7 @@ export default function Listagem({
                   <div className="h-10">
                     <Button
                       icon={<FaRegThumbsDown size={16} />}
-                      onClick={async () => await handleStatus(rowData.id, {
+                      onClick={async () => handleStatus(rowData.id, {
                         status: rowData.status,
                         ...rowData,
                       })}
@@ -473,7 +473,7 @@ export default function Listagem({
 
     await genotipoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = genotipos.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
@@ -566,7 +566,7 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatus[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select name="filterStatus" onChange={formik.handleChange} defaultValue={filterStatusBeforeEdit[13]} values={filtersStatusItem.map((id) => id)} selected="1" />
                   </div>
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
@@ -734,11 +734,11 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
+                      disabled={currentPage < 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -767,7 +767,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -784,9 +784,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = await (
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : 'filterStatus=1';
@@ -801,8 +802,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}` : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
-
   removeCookies('pageBeforeEdit', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 

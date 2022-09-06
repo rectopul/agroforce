@@ -67,7 +67,7 @@ export class ImportLocalController {
             } else {
               const { status, response }: IReturnObject = await safraController.getOne(idSafra);
               if (status === 200) {
-                if (response?.year !== spreadSheet[row][column]) {
+                if (Number(response?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -83,20 +83,21 @@ export class ImportLocalController {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             } else {
-              const { status, response } = await unidadeCulturaController.getAll(
-                { name_unity_culture: String(spreadSheet[row][column]) },
+              const { response } = await localController.getAll(
+                { id_local_culture: Number(spreadSheet[row][3]) },
               );
-
-              if (status === 200) {
-                if (response[0]?.length > 0) {
-                  responseIfError[Number(column)]
-                    += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o campo Nome da unidade de cultura já esta cadastrado',
-                    );
-                }
+              const {
+                response: unityExist,
+              }: IReturnObject = await unidadeCulturaController.getAll({
+                name_unity_culture: spreadSheet[row][column],
+              });
+              if (unityExist[0]?.id_local !== response[0]?.id) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
+                );
               }
             }
           } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
@@ -195,18 +196,43 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column].includes('DT')) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-            const { status, response }: IReturnObject = await localController.getAll(
-              { name_local_culture: spreadSheet[row][4] },
-            );
+            const { status, response }: IReturnObject = await localController.getAll({
+              filterNameLocalCulture: spreadSheet[row][4],
+            });
+            const dateNow = new Date();
+            if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+              responseIfError[Number(column)] += responseGenericFactory(
+                Number(column) + 1,
+                row,
+                spreadSheet[0][column],
+                'a data e maior que a data atual',
+              );
+            }
+            if (spreadSheet[row][column].getTime() < 100000) {
+              responseIfError[Number(column)] += responseGenericFactory(
+                Number(column) + 1,
+                row,
+                spreadSheet[0][column],
+                'o campo DT precisa ser no formato data',
+              );
+            }
             if (status === 200) {
-              if ((response[0]?.dt_import)?.getTime() > (spreadSheet[row][column].getTime())) {
-                responseIfError[Number(column)]
-                  += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'essa informação é mais antiga do que a informação do software',
-                  );
+              let lastDtImport = response[0]?.dt_import?.getTime();
+              response.forEach((item: any) => {
+                lastDtImport = item.dt_import.getTime() > lastDtImport
+                  ? item.dt_import.getTime()
+                  : lastDtImport;
+              });
+              if (
+                lastDtImport
+                > spreadSheet[row][column].getTime()
+              ) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'essa informação é mais antiga do que a informação do software',
+                );
               }
             }
           }
@@ -258,19 +284,38 @@ export class ImportLocalController {
               }
               localCultureDTO.created_by = Number(createdBy);
               unityCultureDTO.created_by = Number(createdBy);
-              const localAlreadyExists = await localController.getAll(
+              unityCultureDTO.id_safra = Number(idSafra);
+              const { response } = await localController.getAll(
                 { id_local_culture: localCultureDTO.id_local_culture },
               );
-              if (localAlreadyExists.response?.length > 0) {
-                localCultureDTO.id = localAlreadyExists.response[0]?.id;
-                unityCultureDTO.id_local = localAlreadyExists.response[0]?.id;
+              const {
+                response: unityExist,
+              }: IReturnObject = await unidadeCulturaController.getAll({
+                name_unity_culture: unityCultureDTO.name_unity_culture,
+                id_local: response[0]?.id,
+              });
+              if (response.total > 0) {
+                localCultureDTO.id = response[0]?.id;
+                unityCultureDTO.id_local = response[0]?.id;
                 await localController.update(localCultureDTO);
-                await unidadeCulturaController.create(unityCultureDTO);
+                if (unityExist.total > 0) {
+                  unityCultureDTO.id = unityExist[0]?.id;
+                  await unidadeCulturaController.update(unityCultureDTO);
+                } else {
+                  delete unityCultureDTO.id;
+                  await unidadeCulturaController.create(unityCultureDTO);
+                }
               } else {
                 delete localCultureDTO.id;
-                const response = await localController.create(localCultureDTO);
-                unityCultureDTO.id_local = response?.response?.id;
-                await unidadeCulturaController.create(unityCultureDTO);
+                const { response: newLocal } = await localController.create(localCultureDTO);
+                unityCultureDTO.id_local = newLocal?.id;
+                if (unityExist.total > 0) {
+                  unityCultureDTO.id = unityExist[0]?.id;
+                  await unidadeCulturaController.update(unityCultureDTO);
+                } else {
+                  delete unityCultureDTO.id;
+                  await unidadeCulturaController.create(unityCultureDTO);
+                }
               }
             }
           }

@@ -1,29 +1,22 @@
-import { capitalize } from '@mui/material';
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
 import InputMask from 'react-input-mask';
-import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
+import { groupService } from '../../../../../services/group.service';
 import {
   Button,
-  Content,
-  Select,
-  Input,
+  Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
-
-interface ICreateFoco {
-	safra: string;
-	group: number;
-	id_foco: number;
-	created_by: number;
-}
 
 export default function Cadastro({ grupo, safra }: any) {
   const { TabsDropDowns } = ITabs.default;
@@ -41,21 +34,37 @@ export default function Cadastro({ grupo, safra }: any) {
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
-  const culture = userLogado.userCulture.cultura_selecionada as string;
+  const formattedNumber = String(grupo.group).padStart(2, '0');
+
+  function validateInputs(values: any) {
+    if (!values.group) {
+      const inputGroup: any = document.getElementById('group');
+      inputGroup.style.borderColor = 'red';
+    } else {
+      const inputGroup: any = document.getElementById('group');
+      inputGroup.style.borderColor = '';
+    }
+  }
 
   const formik = useFormik<any>({
     initialValues: {
       id_foco: Number(grupo.id_foco),
-      safra: grupo.id_safra,
-      group: grupo.group,
+      safra: grupo.safra.safraName,
+      group: formattedNumber,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.group) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
+      const ifExistsUnderlineInGroup = values.group.split('');
+      if (ifExistsUnderlineInGroup.includes('_')) {
+        Swal.fire('O campo grupo deve ter 2 caracteres');
+        return;
+      }
+
       await groupService.update({
         id: Number(grupo.id),
         id_safra: Number(grupo.safra.id),
@@ -76,16 +85,6 @@ export default function Cadastro({ grupo, safra }: any) {
     },
   });
 
-  function validateInputs(values: any) {
-    if (!values.group) {
-      const inputGroup: any = document.getElementById('group');
-      inputGroup.style.borderColor = 'red';
-    } else {
-      const inputGroup: any = document.getElementById('group');
-      inputGroup.style.borderColor = '';
-    }
-  }
-
   return (
     <>
       <Head>
@@ -95,7 +94,6 @@ export default function Cadastro({ grupo, safra }: any) {
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
-
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Novo</h1>
@@ -120,7 +118,7 @@ export default function Cadastro({ grupo, safra }: any) {
                 type="text"
                 disabled
                 max="50"
-                value={safra.safraName}
+                value={grupo.safra.safraName}
               />
             </div>
             <div className="w-full h-10">
@@ -134,8 +132,9 @@ export default function Cadastro({ grupo, safra }: any) {
                     border border-solid border-gray-300
                     rounded
                     w-full
-                    py-2 px-3
+                    py-1 px-2
                     text-gray-900
+                    text-xs
                     leading-tight
                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                   "
@@ -149,14 +148,14 @@ export default function Cadastro({ grupo, safra }: any) {
           </div>
 
           <div className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -183,8 +182,8 @@ export default function Cadastro({ grupo, safra }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
-  const id_group = query.id;
+export const getServerSideProps: GetServerSideProps = async ({ req, query }: any) => {
+  const idGroup = query.id;
   const { token } = req.cookies;
 
   const { publicRuntimeConfig } = getConfig();
@@ -195,16 +194,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const grupos = await fetch(`${baseUrlShow}/${id_group}`, requestOptions);
+  const grupos = await fetch(`${baseUrlShow}/${idGroup}`, requestOptions);
 
   const grupo = await grupos.json();
 
   const baseUrlShow2 = `${publicRuntimeConfig.apiUrl}/`;
-  let id_safra = grupo.id_safra;
+  const { idSafra } = grupo;
 
-  const safras = await fetch(`${baseUrlShow2}safra/${id_safra}`, requestOptions);
+  const safras = await fetch(`${baseUrlShow2}safra/${idSafra}`, requestOptions);
   const safra = await safras.json();
-
   return {
     props: {
       grupo,

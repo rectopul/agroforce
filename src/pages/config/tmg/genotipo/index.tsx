@@ -4,9 +4,8 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,6 +28,8 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -49,6 +50,8 @@ interface IFilter {
   filterGmr: string | any;
   filterGmrRangeTo: string | any;
   filterGmrRangeFrom: string | any;
+  filterLotsTo: string | any;
+  filterLotsFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -56,6 +59,7 @@ interface IFilter {
 export interface IGenotipos {
   id: number;
   idCulture: number;
+  name_genotipo: string;
   idSafra: number;
   genealogy: string;
   genotipo: string;
@@ -90,9 +94,8 @@ export default function Listagem({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
-
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -101,7 +104,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      'id,name_genotipo,name_main,tecnologia,cruza,gmr,number_lotes',
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -117,7 +120,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome genótipo',
@@ -128,10 +131,10 @@ export default function Listagem({
       title: 'Nome principal',
       value: 'name_main',
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'number_lotes' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome publico',
@@ -184,7 +187,8 @@ export default function Listagem({
 
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -199,6 +203,8 @@ export default function Listagem({
       filterGmr: '',
       filterGmrRangeFrom: '',
       filterGmrRangeTo: '',
+      filterLotsFrom: '',
+      filterLotsTo: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -211,10 +217,14 @@ export default function Listagem({
       filterGmr,
       filterGmrRangeTo,
       filterGmrRangeFrom,
+      filterLotsTo,
+      filterLotsFrom,
     }) => {
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
-      setFiltersParams(parametersFilter);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
+      setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
+
       await genotipoService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -226,37 +236,20 @@ export default function Listagem({
     },
   });
 
+  // esta functionando ordeação
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'genotipo');
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setGenotipo(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
 
@@ -287,7 +280,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -298,26 +291,26 @@ export default function Listagem({
       width: 0,
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
-              <AiTwotoneStar size={25} color="#eba417" />
+              <AiTwotoneStar size={20} color="#eba417" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-10 flex">
+        <div className="h-9 flex">
           <div>
             <button
               type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
-              <AiTwotoneStar size={25} />
+              <AiTwotoneStar size={20} />
             </button>
           </div>
         </div>
@@ -325,16 +318,26 @@ export default function Listagem({
     };
   }
 
-  function tecnologiaHeaderFactory() {
+  function tecnologiaHeaderFactory(title: string, name: string) {
     return {
-      title: 'Tecnologia',
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {title}
+          </button>
+        </div>
+      ),
       field: 'tecnologia',
       width: 0,
-      sorting: false,
+      sorting: true,
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.desc}`}
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
           </div>
         </div>
       ),
@@ -354,10 +357,14 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
-              title={`Editar ${rowData.genealogy}`}
+              title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
+
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -381,18 +388,19 @@ export default function Listagem({
     // }
     // })
     Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genotipo', 'name_genotipo'));
+        tableFields.push(headerTableFactory('Nome genótipo', 'name_genotipo'));
       }
       if (columnCampos[index] === 'name_main') {
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        // tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.cod_tec'));
-        tableFields.push(tecnologiaHeaderFactory());
+        tableFields.push(
+          tecnologiaHeaderFactory('Nome Tec.', 'tecnologia'),
+        );
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -400,8 +408,8 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'gmr'));
       }
-      if (columnCampos[index] === 'number_lotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'countChildren'));
+      if (columnCampos[index] === 'numberLotes') {
+        tableFields.push(headerTableFactory('Nº Lotes', 'numberLotes'));
       }
       if (columnCampos[index] === 'name_public') {
         tableFields.push(headerTableFactory('Nome publico', 'name_public'));
@@ -515,62 +523,68 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
+    await genotipoService
+      .getAll(filterApplication)
+      .then(({ response, status }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
-    await genotipoService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = genotipos.map((row: any) => {
-          row.cod_tec = row.tecnologia?.cod_tec;
-          row.tecnologia = row.tecnologia?.name;
-          // row.DT = new Date();
+            delete row.id;
+            delete row.id_tecnologia;
+            delete row.tableData;
+            delete row.lote;
+            delete row.dt_import;
 
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            'pt-BR',
-          )} ${hours}:${minutes}:${seconds}`;
-          return row;
-        });
+            // row.DT = new Date();
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'genotipos');
+            const dataExp = new Date();
+            let hours: string;
+            let minutes: string;
+            let seconds: string;
+            if (String(dataExp.getHours()).length === 1) {
+              hours = `0${String(dataExp.getHours())}`;
+            } else {
+              hours = String(dataExp.getHours());
+            }
+            if (String(dataExp.getMinutes()).length === 1) {
+              minutes = `0${String(dataExp.getMinutes())}`;
+            } else {
+              minutes = String(dataExp.getMinutes());
+            }
+            if (String(dataExp.getSeconds()).length === 1) {
+              seconds = `0${String(dataExp.getSeconds())}`;
+            } else {
+              seconds = String(dataExp.getSeconds());
+            }
+            row.DT = `${dataExp.toLocaleDateString(
+              'pt-BR',
+            )} ${hours}:${minutes}:${seconds}`;
+            return row;
+          });
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Genótipos.xlsx');
-      } else {
-        Swal.fire(response);
-      }
-    });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
+
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Genótipos.xlsx');
+        } else {
+          // eslint-disable-next-line no-undef
+          Swal.fire(response);
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -581,24 +595,25 @@ export default function Listagem({
     }
   }
 
+  // paginação certa
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${idCulture}`;
-    }
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 5000); // Remove State
       }
     });
   }
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-10 w-full ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -607,6 +622,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -615,8 +631,8 @@ export default function Listagem({
 
   function filterFieldFactoryGmrRange(title: any, name: any) {
     return (
-      <div className="h-10 w-1/2 ml-4">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="h-6 w-full ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <div className="grid grid-cols-3 gap-4">
@@ -627,6 +643,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
+              defaultValue={checkValue('filterGmrRangeFrom')}
               onChange={formik.handleChange}
             />
           </div>
@@ -637,12 +654,58 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
+              defaultValue={checkValue('filterGmrRangeTo')}
               onChange={formik.handleChange}
             />
           </div>
         </div>
       </div>
+
     );
+  }
+
+  function filterLotRange(title: any, name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterLotsFrom"
+              name="filterLotsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterLotsTo"
+              name="filterLotsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+
+    );
+  }
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+  }
+
+  // Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
@@ -661,7 +724,7 @@ export default function Listagem({
           className="h-full w-full
           flex flex-col
           items-start
-          gap-5
+          gap-4
         "
         >
           <AccordionFilter title="Filtrar genótipos">
@@ -670,7 +733,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -679,45 +742,42 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
                 "
                 >
-                  {filterFieldFactory('filterGenotipo', 'Nome genotipo')}
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
                 </div>
 
                 <div
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
-                  pt-2
+                  pb-0
+                  pt-5
                 "
                 >
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
-
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {
-                    // filterFieldFactory('filterGmr', 'GMR')
-                  }
-
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+                  {filterLotRange('filterLots', 'Nº Lotes')}
                 </div>
 
-                <div className="h-16 w-32 mt-3">
+                <div className="h-7 w-32 mt-6">
                   <Button
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<BiFilterAlt size={20} />}
                   />
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -728,10 +788,12 @@ export default function Listagem({
               columns={columns}
               data={genotipos}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -751,8 +813,8 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    {/* <div className="h-12">
-                      <Button
+                    <div className="h-12">
+                      {/* <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
@@ -760,8 +822,8 @@ export default function Listagem({
                         onClick={() => { }}
                         href="genotipo/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div> */}
+                      /> */}
+                    </div>
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -826,10 +888,10 @@ export default function Listagem({
                         </div>
                       </div>
 
-                      <div className="h-10 flex items-center justify-center w-full">
+                      <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de genótipos"
-                          icon={<RiFileExcel2Line size={16} />}
+                          icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {
@@ -861,7 +923,7 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
+                      onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
@@ -888,20 +950,20 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 rrinky123"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -911,7 +973,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
@@ -927,25 +989,26 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : '';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+
   urlParameters.search = new URLSearchParams(param).toString();
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
-    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    : `&id_culture=${idCulture}`;
+
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allGenotipos, total: totalItems } = await fetch(
+  const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
+    // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

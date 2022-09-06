@@ -2,6 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListController } from '../assay-list/assay-list.controller';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -14,8 +15,29 @@ export class ExperimentController {
     let select: any = [];
     parameters.AND = [];
     try {
+      if (options.filterRepetitionFrom || options.filterRepetitionTo) {
+        if (options.filterRepetitionFrom && options.filterRepetitionTo) {
+          parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
+        } else if (options.filterRepetitionFrom) {
+          parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)} }`);
+        } else if (options.filterRepetitionTo) {
+          parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
+        }
+      }
+      if (options.filterStatus) {
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[0]}" } } `));
+        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[1]}" } } `));
+      }
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
+      }
+      if (options.filterProtocol) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"protocol_name": {"contains": "${options.filterProtocol}" } } }`));
+      }
+      if (options.filterCod) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
@@ -38,7 +60,6 @@ export class ExperimentController {
       if (options.filterDelineamento) {
         parameters.delineamento = JSON.parse(`{ "name": {"contains": "${options.filterDelineamento}" } }`);
       }
-
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         select.assay_list = {};
@@ -62,9 +83,10 @@ export class ExperimentController {
       } else {
         select = {
           id: true,
+          idSafra: true,
           density: true,
-          period: true,
           repetitionsNumber: true,
+          period: true,
           nlp: true,
           clp: true,
           eel: true,
@@ -78,19 +100,24 @@ export class ExperimentController {
               bgm: true,
               protocol_name: true,
               status: true,
+              genotype_treatment: true,
               tecnologia: {
                 select: {
                   name: true,
+                  id: true,
+                  cod_tec: true,
                 },
               },
               foco: {
                 select: {
                   name: true,
+                  id: true,
                 },
               },
               type_assay: {
                 select: {
                   name: true,
+                  id: true,
                 },
               },
               safra: {
@@ -110,10 +137,9 @@ export class ExperimentController {
             select: {
               name: true,
               repeticao: true,
-              trat_repeticao: true,
+              id: true,
             },
           },
-          created_at: true,
         };
       }
 
@@ -127,6 +153,18 @@ export class ExperimentController {
 
       if (options.experimentName) {
         parameters.experimentName = options.idSafra;
+      }
+      if (options.Foco) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"id": ${Number(options.Foco)} } } }`));
+      }
+      if (options.TypeAssay) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"id": ${Number(options.TypeAssay)} } } }`));
+      }
+      if (options.Tecnologia) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": {"cod_tec": "${options.Tecnologia}" } } }`));
+      }
+      if (options.Epoca) {
+        parameters.period = Number(options.Epoca);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -145,6 +183,14 @@ export class ExperimentController {
         skip,
         orderBy,
       );
+
+      response.map((item: any) => {
+        const newItem = item;
+        newItem.countNT = functionsUtils
+          .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
+        newItem.npeQT = item.countNT * item.repetitionsNumber;
+        return newItem;
+      });
 
       if (!response && response.total <= 0) {
         return {

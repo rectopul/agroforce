@@ -13,6 +13,9 @@ export class AssayListController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
+      if (options.filterProtocol) {
+        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocol}"}`);
+      }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -21,6 +24,12 @@ export class AssayListController {
       }
       if (options.filterTechnology) {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTechnology}" } }`);
+      }
+      if (options.filterCod) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCod}" } }`);
+      }
+      if (options.filterGenotipo) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));
       }
       if (options.filterGli) {
         parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
@@ -38,21 +47,32 @@ export class AssayListController {
         parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
       }
 
+      if (options.filterTratFrom || options.filterTratTo) {
+        if (options.filterTratFrom && options.filterTratTo) {
+          parameters.treatmentsNumber = JSON.parse(`{"gte": ${Number(options.filterTratFrom)}, "lte": ${Number(options.filterTratTo)} }`);
+        } else if (options.filterTratFrom) {
+          parameters.treatmentsNumber = JSON.parse(`{"gte": ${Number(options.filterTratFrom)} }`);
+        } else if (options.filterTratTo) {
+          parameters.treatmentsNumber = JSON.parse(`{"lte": ${Number(options.filterTratTo)} }`);
+        }
+      }
+
       const select = {
         id: true,
         id_safra: true,
+        protocol_name: true,
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
-        tecnologia: { select: { name: true } },
+        tecnologia: { select: { name: true, cod_tec: true } },
         genotype_treatment: true,
-        experiment: true,
+        treatmentsNumber: true,
         gli: true,
-        period: true,
-        protocol_name: true,
         bgm: true,
-        project: true,
         status: true,
+        project: true,
         comments: true,
+        experiment: true,
+        period: true,
       };
 
       if (options.id_safra) {
@@ -114,7 +134,7 @@ export class AssayListController {
     try {
       const assayListAlreadyExist = await this.assayListRepository.findByName(data);
 
-      if (assayListAlreadyExist) return { status: 409, message: 'Lista de ensaio já cadastrados' };
+      if (assayListAlreadyExist) return { status: 400, message: 'Lista de ensaio já cadastrados' };
 
       const response = await this.assayListRepository.create(data);
 

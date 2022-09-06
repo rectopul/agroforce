@@ -51,7 +51,7 @@ export default function NovoLocal() {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.cod_tec || !values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -152,14 +152,14 @@ export default function NovoLocal() {
           </div>
 
           <div className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"

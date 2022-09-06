@@ -1,18 +1,26 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
-// import { Input } from '../components/Input';
-import { Button } from '../components/Button';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import { userService } from '../services';
+
+import Loading from '../components/Loading';
 
 export default Login;
 
 function Login() {
   const router = useRouter();
+
+  const [hoverButton, setHoverButton] = useState(false);
+  const [hoverIconFB, setHoverIconFB] = useState(false);
+  const [hoverIconIG, setHoverIconIG] = useState(false);
+  const [hoverIconIN, setHoverIconIN] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // redirect to home if already logged in
@@ -35,6 +43,8 @@ function Login() {
   const { errors }: any = formState;
 
   async function onSubmit({ login, password }: any) {
+    setLoading(true);
+
     await userService.login(login, password).then(() => {
       // get return url from query parameters or default to '/'
       const returnUrl = router.query.returnUrl || '/';
@@ -43,116 +53,196 @@ function Login() {
       .catch((error) => {
         setError('apiError', { message: error });
       });
+
+    setLoading(false);
   }
 
   return (
-
     <>
       <Head>
         <title>Home</title>
       </Head>
 
-      <div className="w-screen h-screen flex items-stretch bg-gray-200">
-        <main className="flex bg-light">
-          <div className="flex flex-col gap-8 w-full items-center justify-center px-24
-              "
+      {loading && <Loading />}
+      <img
+        src="/images/qrcode_tela_login.png"
+        style={{
+          width: 100,
+          height: 100,
+          position: 'fixed',
+          zIndex: 3,
+          bottom: 30,
+          left: 30,
+        }}
+      />
+
+      <div style={{
+        display: 'flex',
+        width: '100vw',
+        height: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      >
+        <video
+          autoPlay
+          loop
+          muted
+          style={{
+            top: -50,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            position: 'fixed',
+            width: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src="/images/qrcode_login.webm" type="video/webm" />
+        </video>
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: 'rgba(150, 150, 150, 0.5)',
+            marginTop: 20,
+            paddingTop: 10,
+            paddingBottom: 20,
+            paddingLeft: 25,
+            paddingRight: 25,
+            width: '35%',
+            height: 380,
+            borderRadius: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1,
+          }}
+          className="shadow-lg"
+        >
+          <img src="/images/logo.png" className="w-30 h-14 self-center" />
+
+          {errors.apiError && (
+          <div style={{
+            display: 'flex',
+            backgroundColor: '#F66E84',
+            width: '100%',
+            justifyContent: 'center',
+            borderRadius: 2,
+          }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Nuseed" className="w-80 h-44 self-center" />
-
-            <form
-              className="w-80
-                  flex
-                  flex-col
-                  justify-between
-                  gap-4
-                  mt-24"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <div className="
-                    h-40
-                    flex
-                    flex-col
-                    justify-start
-                    gap-10
-                  "
-              >
-                <div className="h-10">
-                  <span className="block text-sm font-medium text-blue-600">Usuário</span>
-                  <input
-                    {...register('login')}
-                    placeholder="Usuário"
-                    type="login"
-                    name="login"
-                    required
-                    className="h-full w-full
-                          px-2
-                          flex-1
-                          block
-                          text-gray-900
-                          rounded
-                          bg-white
-                          border-blue-600
-                          focus:ring-indigo-500
-                          focus:border-indigo-500
-                      "
-                  />
-                </div>
-
-                <div className="h-10">
-                  <span className="block text-sm font-medium text-blue-600">Senha</span>
-                  <input
-                    {...register('password')}
-                    placeholder="Senha"
-                    type="password"
-                    name="password"
-                    required
-                    className="h-full w-full
-                          px-2
-                          flex-1
-                          block
-                          text-gray-900
-                          rounded
-                          bg-white
-                          border-blue-600
-                          focus:ring-indigo-500
-                          focus:border-indigo-500
-                        "
-                  />
-                </div>
-              </div>
-
-              <div className="h-10
-                    w-2/4
-                    flex
-                  "
-              >
-                <Button
-                  type="submit"
-                  disabled={formState.isSubmitting}
-                  value="Conectar"
-                  onClick={() => { }}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                />
-              </div>
-              {errors.apiError && <div className="alert alert-danger mt-3 mb-0">{errors.apiError?.message}</div>}
-            </form>
-
-            <Link href="/trocar-senha">
-              <a className="text-blue-600 mb-64
-                  "
-              >
-                Esqueci minha senha - I forgot my password - Olvide mi contraseña
-              </a>
-            </Link>
+            <span style={{ color: '#fff' }}>
+              {errors.apiError?.message}
+            </span>
           </div>
-        </main>
+          )}
 
-        <aside className="flex-initial">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/agroforce.png" alt="Agroforce" className="w-screen h-screen" />
-        </aside>
+          <form style={{ width: '100%', marginTop: 10 }} onSubmit={handleSubmit(onSubmit)}>
+            <div style={{ height: 35 }}>
+              <input
+                {...register('login')}
+                placeholder="Usuário"
+                type="login"
+                name="login"
+                required
+                className="h-full w-full px-2 flex-1 block text-gray-900 rounded bg-white border-blue-600 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div style={{ height: 35, marginTop: 10, marginBottom: 10 }}>
+              <input
+                {...register('password')}
+                placeholder="Senha"
+                type="password"
+                name="password"
+                required
+                className="h-full w-full px-2 flex-1 block text-gray-900 rounded bg-white border-blue-600 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            >
+              <Link href="/trocar-senha">
+                <a className="text-blue-600">Esqueci minha senha - I forgot my password - Olvide mi contraseña</a>
+              </Link>
+
+              <button
+                className="shadow-lg"
+                style={{
+                  width: 100,
+                  height: 33,
+                  borderRadius: 20,
+                  marginTop: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: '#d3d3d3',
+                  backgroundColor: hoverButton ? '#fff' : '#609f51',
+                }}
+                onMouseEnter={() => setHoverButton(true)}
+                onMouseLeave={() => setHoverButton(false)}
+              >
+                <span style={{
+                  fontWeight: '500',
+                  fontSize: 15,
+                  color: hoverButton ? '#609f51' : '#fff',
+                }}
+                >
+                  Conectar
+                </span>
+              </button>
+
+              <a href="https://agroforce.com.br/" style={{ marginTop: 10 }} target="_blank" rel="noreferrer">
+                <img src="/images/agroforce2.png" className="w-30 h-10 self-center" />
+              </a>
+
+              <div style={{
+                display: 'flex',
+                width: 120,
+                justifyContent: 'space-around',
+                marginTop: 10,
+              }}
+              >
+                <a
+                  href="https://www.facebook.com/agroforcesoftware"
+                  title="Facebook"
+                  target="_blank"
+                  rel="noreferrer"
+                  onMouseEnter={() => setHoverIconFB(true)}
+                  onMouseLeave={() => setHoverIconFB(false)}
+                >
+                  <FaFacebook color={hoverIconFB ? '#609f51' : '#fff'} size={25} />
+                </a>
+                <a
+                  href="https://www.instagram.com/agroforcesoftware/"
+                  title="Instagram"
+                  target="_blank"
+                  rel="noreferrer"
+                  onMouseEnter={() => setHoverIconIG(true)}
+                  onMouseLeave={() => setHoverIconIG(false)}
+                >
+                  <FaInstagram color={hoverIconIG ? '#609f51' : '#fff'} size={25} />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/agroforce-tecnologia/"
+                  title="Linkedin"
+                  target="_blank"
+                  rel="noreferrer"
+                  onMouseEnter={() => setHoverIconIN(true)}
+                  onMouseLeave={() => setHoverIconIN(false)}
+                >
+                  <FaLinkedin color={hoverIconIN ? '#609f51' : '#fff'} size={25} />
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </>
   );

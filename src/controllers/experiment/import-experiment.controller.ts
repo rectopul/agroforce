@@ -13,10 +13,11 @@ import {
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
 import { LocalController } from '../local/local.controller';
-import { DelineamentoController } from '../delineamento.controller';
+import { DelineamentoController } from '../delimitation/delineamento.controller';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
+import { validateDecimal, validateDouble, validateInteger } from '../../shared/utils/numberValidate';
 
 export class ImportExperimentController {
   static async validate(
@@ -40,10 +41,16 @@ export class ImportExperimentController {
           const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
+            idSafra,
           });
           if (experiment?.length > 0) {
-            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado no sistema` };
-          } if (experimentNameTemp.includes(experimentName)) {
+            if (experiment[0].status !== 'IMPORTADO') {
+              await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+              return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema` };
+            }
+          }
+          if (experimentNameTemp.includes(experimentName)) {
+            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             experimentNameTemp[row] = experimentName;
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
           }
@@ -55,6 +62,7 @@ export class ImportExperimentController {
           } else {
             const { response } = await assayListController.getAll({
               gli: spreadSheet[row][3],
+              id_safra: idSafra,
             });
             assayList = response.length > 0 ? response[0] : [];
           }
@@ -63,9 +71,24 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (idSafra !== assayList?.id_safra) {
-                responseIfError[Number(column)]
-                  += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else {
+                const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+
+                if (status === 200) {
+                  if (response?.safraName !== spreadSheet[row][column]) {
+                    responseIfError[Number(column)]
+                    += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'safra informada e diferente da selecionada',
+                      );
+                  }
+                }
+                if (idSafra !== assayList?.id_safra) {
+                  responseIfError[Number(column)]
+                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             if (column === '1') { // ENSAIO
@@ -90,7 +113,11 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.tecnologia?.name !== (spreadSheet[row][column].toString())) {
+              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+              }
+              if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -99,7 +126,15 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.bgm !== spreadSheet[row][column]) {
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
+              }
+              if (assayList?.bgm !== spreadSheet[row][column]) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -111,16 +146,17 @@ export class ImportExperimentController {
               } else {
                 const { response } = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
+                  id_safra: idSafra,
                 });
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
-                const { response: responseSafra } = await safraController.getAll({
-                  safraName: spreadSheet[row][0],
-                });
+                const {
+                  response: responseSafra,
+                }: IReturnObject = await safraController.getOne(idSafra);
                 const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
-                  if (item?.year === responseSafra[0]?.year) return true;
+                  if (item?.year === responseSafra?.year) return true;
                   return false;
                 });
                 if (!cultureUnityValidate?.includes(true)) {
@@ -139,13 +175,13 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if ((spreadSheet[row][column]).toString().length > 2
-                || Number(spreadSheet[row][column]) < 0) {
+                || !validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
-                  += responseGenericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'deve ser um numero de ate 2 dígitos',
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -154,12 +190,13 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if ((spreadSheet[row][column]).toString().length > 2
-                || Number(spreadSheet[row][column]) < 0) {
+                || !validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                        += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
             }
@@ -171,10 +208,11 @@ export class ImportExperimentController {
                 const { response } = await delineamentoController.getAll({
                   id_culture: idCulture, name: spreadSheet[row][column],
                 });
+
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
-                } else if (response?.repeticao >= spreadSheet[row][10]) {
+                } else if (response[0]?.repeticao < spreadSheet[row][10]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -182,7 +220,7 @@ export class ImportExperimentController {
                       spreadSheet[0][column],
                       'Número de repetições e maior que o do delineamento informado',
                     );
-                } else if (response?.trat_repeticao >= assayList?.genotype_treatment) {
+                } else if (response[0]?.trat_repeticao < assayList?.countNT) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -197,65 +235,73 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
             if (column === '11') { // NPL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
             if (column === '12') { // CLP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              }
+              if (!validateDouble(spreadSheet[row][column])
+                  || !validateDecimal(spreadSheet[row][column])
+                  || Number(spreadSheet[row][column]) < 0
+                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                );
               }
             }
             if (column === '13') { // EEL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              }
+
+              if (!validateDouble(spreadSheet[row][column])
+                  || Number(spreadSheet[row][column]) < 0
+                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                );
               }
             }
             if (column === '15') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] < 0 || (typeof spreadSheet[row][column]) !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
           }
@@ -270,35 +316,62 @@ export class ImportExperimentController {
               });
               const { response: assayList } = await assayListController.getAll({
                 gli: spreadSheet[row][3],
+                id_safra: idSafra,
               });
               const { response: delineamento } = await delineamentoController.getAll({
                 id_culture: idCulture, name: spreadSheet[row][9],
               });
-              const comments = spreadSheet[row][14].substr(0, 255) ? spreadSheet[row][14].substr(0, 255) : '';
+              const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
-              const { status }: IReturnObject = await experimentController.create(
-                {
-                  idAssayList: assayList[0]?.id,
-                  idLocal: local[0]?.id,
-                  idDelineamento: delineamento[0]?.id,
-                  idSafra,
-                  experimentName,
-                  density: spreadSheet[row][7],
-                  period: spreadSheet[row][8],
-                  repetitionsNumber: spreadSheet[row][10],
-                  nlp: spreadSheet[row][11],
-                  clp: spreadSheet[row][12],
-                  eel: spreadSheet[row][13],
-                  comments,
-                  orderDraw: spreadSheet[row][15],
-                  created_by: createdBy,
-                },
-              );
-              if (status === 200) {
-                await assayListController.update({
-                  id: assayList[0]?.id,
-                  status: 'UTILIZADO',
-                });
+              const { response: experiment } = await experimentController.getAll({
+                filterExperimentName: experimentName,
+                idSafra,
+              });
+              if (experiment.total > 0) {
+                await experimentController.update(
+                  {
+                    id: experiment[0]?.id,
+                    idAssayList: assayList[0]?.id,
+                    idLocal: local[0]?.id,
+                    idDelineamento: delineamento[0]?.id,
+                    idSafra,
+                    experimentName,
+                    density: spreadSheet[row][7],
+                    period: spreadSheet[row][8],
+                    repetitionsNumber: spreadSheet[row][10],
+                    nlp: spreadSheet[row][11],
+                    clp: spreadSheet[row][12],
+                    eel: spreadSheet[row][13],
+                    comments,
+                    orderDraw: spreadSheet[row][15],
+                    created_by: createdBy,
+                  },
+                );
+              } else {
+                const { status }: IReturnObject = await experimentController.create(
+                  {
+                    idAssayList: assayList[0]?.id,
+                    idLocal: local[0]?.id,
+                    idDelineamento: delineamento[0]?.id,
+                    idSafra,
+                    experimentName,
+                    density: spreadSheet[row][7],
+                    period: spreadSheet[row][8],
+                    repetitionsNumber: spreadSheet[row][10],
+                    nlp: spreadSheet[row][11],
+                    clp: spreadSheet[row][12],
+                    eel: spreadSheet[row][13],
+                    comments,
+                    orderDraw: spreadSheet[row][15],
+                    created_by: createdBy,
+                  },
+                );
+                if (status === 200) {
+                  await assayListController.update({
+                    id: assayList[0]?.id,
+                    status: 'UTILIZADO',
+                  });
+                }
               }
             }
           }

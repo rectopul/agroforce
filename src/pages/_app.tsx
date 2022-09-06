@@ -5,15 +5,31 @@ import '../../public/nprogress.css';
 import { userService } from '../services';
 import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
+import Modal from 'react-modal';
 import PermissionGate from '../shared/utils/PermissionUser';
 
-export default App;
+Modal.setAppElement('#__next');
 
 function App({
   Component, pageProps, permissions, user,
 }: any) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
+
+  function authCheck(url: any) {
+    // redirect to login page if accessing a private page and not logged in
+    const publicPaths = ['/login', '/trocar-senha'];
+    const path = url.split('?')[0];
+    if (!userService.userValue && !publicPaths.includes(path)) {
+      setAuthorized(false);
+      router.push({
+        pathname: '/login',
+        query: { returnUrl: router.asPath },
+      });
+    } else {
+      setAuthorized(true);
+    }
+  }
 
   useEffect(() => {
     // run auth check on initial load
@@ -52,32 +68,15 @@ function App({
     };
   }, [router]);
 
-  function authCheck(url: any) {
-    // redirect to login page if accessing a private page and not logged in
-    const publicPaths = ['/login', '/trocar-senha'];
-    const path = url.split('?')[0];
-    if (!userService.userValue && !publicPaths.includes(path)) {
-      setAuthorized(false);
-      router.push({
-        pathname: '/login',
-        query: { returnUrl: router.asPath },
-      });
-    } else {
-      setAuthorized(true);
-    }
-  }
-
   return (
     <PermissionGate
-      permissions={[
-        'canEdit',
-        'canDelete',
-        'canSave',
-      ]}
+      permissions={['canEdit', 'canDelete', 'canSave']}
       user={{ permissions: ['canSave'] }}
     >
-      {authorized
-                    && <Component {...pageProps} />}
+
+      {authorized && <Component {...pageProps} />}
     </PermissionGate>
   );
 }
+
+export default App;

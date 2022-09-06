@@ -7,11 +7,7 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
 import { cultureService } from 'src/services';
 import Swal from 'sweetalert2';
-import {
-  Button,
-  Content,
-  Input,
-} from '../../../../components';
+import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICreateCulture {
@@ -26,11 +22,7 @@ export default function Cadastro() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
@@ -46,23 +38,25 @@ export default function Cadastro() {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire('Preencha os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
-      await cultureService.createCulture({
-        name: (formik.values.name).toUpperCase(),
-        desc: capitalize(formik.values.desc),
-        status: formik.values.status,
-        created_by: formik.values.created_by,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Cultura cadastrada com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      });
+      await cultureService
+        .createCulture({
+          name: formik.values.name.toUpperCase(),
+          desc: capitalize(formik.values.desc),
+          status: formik.values.status,
+          created_by: formik.values.created_by,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Cultura cadastrada com sucesso!');
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
@@ -93,15 +87,13 @@ export default function Cadastro() {
             bg-white
             shadow-md
             rounded
-            px-8
-            pt-6
-            pb-8
-            mt-2"
+            p-8"
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Nova cultura</h1>
 
-          <div className="
+          <div
+            className="
             w-full
             flex
             gap-2
@@ -110,7 +102,7 @@ export default function Cadastro() {
           "
           >
             <div className="w-2/4 h-10 mt-2">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong>*</strong>
                 Código Reduzido
               </label>
@@ -125,7 +117,7 @@ export default function Cadastro() {
               />
             </div>
             <div className="w-2/4 h-10 mt-2">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 <strong>*</strong>
                 Nome
               </label>
@@ -141,8 +133,9 @@ export default function Cadastro() {
             </div>
           </div>
 
-          <div className="
-            h-10
+          <div
+            className="
+            h-7
             w-full
             flex
             gap-3
@@ -150,7 +143,7 @@ export default function Cadastro() {
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -167,7 +160,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>

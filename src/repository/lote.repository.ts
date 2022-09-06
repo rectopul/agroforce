@@ -33,7 +33,6 @@ export class LoteRepository {
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
-
     if (orderBy) {
       order = JSON.parse(orderBy);
     }

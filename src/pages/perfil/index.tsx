@@ -159,8 +159,16 @@ export default function Perfil({ user }: User) {
             </div>
 
             <div className={styles.containerContent}>
-              <h2 className={commonStyles.titlePage}>Dados pessoais</h2>
-              <div className={styles.content}>
+              <h2
+                className={commonStyles.titlePage}
+                style={{
+                  fontSize: 20, marginTop: 0,
+                }}
+              >
+                Dados pessoais
+
+              </h2>
+              <div className={styles.content} style={{ padding: 10 }}>
                 <div>
                   <label>Login: </label>
                   <span>{user.login}</span>
@@ -192,9 +200,16 @@ export default function Perfil({ user }: User) {
                 </div>
               </div>
 
-              <h2 className={commonStyles.titlePage}>Cultura e permissões</h2>
+              <h2
+                className={commonStyles.titlePage}
+                style={{
+                  fontSize: 20, marginTop: 5,
+                }}
+              >
+                Cultura e permissões
+              </h2>
 
-              <div className={styles.content}>
+              <div className={styles.content} style={{ padding: 10 }}>
                 {user.cultures.map((item) => (
                   <div key={item.culture_id}>
                     <label>
@@ -232,7 +247,7 @@ export default function Perfil({ user }: User) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/profile-user`;
 
