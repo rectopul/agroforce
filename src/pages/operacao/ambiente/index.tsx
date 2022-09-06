@@ -776,7 +776,7 @@ export default function Listagem({
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 testing"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
