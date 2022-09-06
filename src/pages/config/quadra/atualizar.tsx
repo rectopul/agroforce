@@ -78,15 +78,15 @@ export default function AtualizarQuadra({
       cod_quadra: quadra.cod_quadra,
       id_culture: quadra.id_culture,
       id_safra: quadra.id_safra,
-      local: quadra.local.name_local_culture,
+      local: quadra.local?.name_local_culture,
       local_plantio: quadra.local_plantio,
       larg_q: quadra.larg_q,
       comp_p: quadra.comp_p,
       linha_p: quadra.linha_p,
       comp_c: quadra.comp_c,
       esquema: quadra.esquema,
-      tiro_fixo: quadra.tf,
-      disparo_fixo: quadra.dividers[0]?.df,
+      tiro_fixo: quadra.tiro_fixo,
+      disparo_fixo: quadra.disparo_fixo,
       q: quadra.q,
     },
     onSubmit: async (values) => {
@@ -125,7 +125,7 @@ export default function AtualizarQuadra({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Divisor', value: 'divisor' },
     { name: 'CamposGerenciados[]', title: 'Sem metro', value: 'sem_metros' },
     { name: 'CamposGerenciados[]', title: 'T4I', value: 't4_i' },
@@ -266,9 +266,9 @@ export default function AtualizarQuadra({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'divisor') {
         tableFields.push(headerTableFactory('Divisor', 'divisor'));
       }
@@ -353,18 +353,17 @@ export default function AtualizarQuadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_quadra=${idQuadra}`;
-    }
-
-    await dividersService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+    await dividersService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
+
+          delete row.id;
+          delete row.quadra;
 
           return row;
         });
@@ -401,9 +400,9 @@ export default function AtualizarQuadra({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_quadra=${idQuadra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_quadra=${idQuadra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -423,8 +422,8 @@ export default function AtualizarQuadra({
 
   function updateFieldFactory(title: string, name: string) {
     return (
-      <div className="w-2/4 h-10">
-        <label className="block text-gray-900 text-sm font-bold mb-2">
+      <div className="w-2/4 h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
@@ -444,17 +443,17 @@ export default function AtualizarQuadra({
       <Head><title>Atualizar quadra</title></Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded p-4"
           onSubmit={formik.handleSubmit}
         >
-          <h1 className="text-2xl">Atualizar quadra</h1>
+          <h1 className="text-xl">Atualizar quadra</h1>
 
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-5">
+          <div className="w-full flex justify-between items-start gap-5 mt-1">
 
             {updateFieldFactory('cod_quadra', 'Código Quadra')}
 
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-2/4 h-7">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Local Preparo
               </label>
               <Input
@@ -463,14 +462,19 @@ export default function AtualizarQuadra({
                 required
                 id="local"
                 name="local"
-                value={quadra.local.name_local_culture}
+                value={quadra.local?.name_local_culture}
               />
             </div>
 
             {updateFieldFactory('esquema', 'Esquema')}
 
+            {updateFieldFactory('local_plantio', 'Local realizado')}
+
+            {updateFieldFactory('q', 'Q')}
+
+            {updateFieldFactory('cruza', 'Status quadra')}
           </div>
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
+          <div className="w-full flex justify-between items-start gap-5 mt-8">
 
             {updateFieldFactory('larg_q', 'Largura Q')}
 
@@ -482,68 +486,36 @@ export default function AtualizarQuadra({
 
             {updateFieldFactory('tiro_fixo', 'Tiro fixo')}
 
-            <div className="w-2/4 h-10">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Disparo fixo
-              </label>
-              <Input
-                style={{ background: '#e5e7eb' }}
-                disabled
-                required
-                id="df"
-                name="df"
-                value={quadra.dividers[0]?.df}
-              />
-            </div>
+            {updateFieldFactory('disparo_fixo', 'Disparo fixo')}
 
-          </div>
-          <div className="w-2/4 flex justify-between items-start gap-5 mt-10">
-
-            {updateFieldFactory('local_plantio', 'Local realizado')}
-
-            {updateFieldFactory('q', 'Q')}
-
-            {updateFieldFactory('cruza', 'Status quadra')}
-
-          </div>
-          <div className="h-10 w-full
-            flex
-            gap-3
-            justify-center
-            mt-10
-          "
-          >
-            <div className="w-30">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
-            </div>
-            <div className="w-40">
-              <Button
+            <div className="h-7 w-full flex gap-3 justify-end mt-6">
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => router.back()}
+                />
+              </div>
+              <div className="w-40">
+                <Button
                 // type="submit"
-                value="Mapa"
-                bgColor="bg-blue-600"
-                disabled
-                textColor="white"
-                icon={<SiMicrogenetics size={18} />}
-                onClick={() => { }}
-              />
+                  value="Mapa"
+                  bgColor="bg-blue-600"
+                  disabled
+                  textColor="white"
+                  icon={<SiMicrogenetics size={18} />}
+                  onClick={() => { }}
+                />
+              </div>
             </div>
           </div>
         </form>
-        <main className="h-3/6 w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
 
-          <div style={{ marginTop: '1%' }} className="w-full h-full overflow-y-scroll">
+        <main className="w-full flex flex-col items-start gap-8">
+          <div style={{ marginTop: '1%' }} className="w-full h-full">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -553,6 +525,7 @@ export default function AtualizarQuadra({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -572,7 +545,7 @@ export default function AtualizarQuadra({
                     border-gray-200
                   "
                   >
-
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -700,7 +673,7 @@ export default function AtualizarQuadra({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
@@ -725,7 +698,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   urlParameters.search = new URLSearchParams(param).toString();
   const idQuadra = Number(context.query.id);
 
-  const filterApplication = '';
+  const filterApplication = `id_quadra=${idQuadra}`;
 
   const {
     response: allDividers,

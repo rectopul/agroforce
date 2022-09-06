@@ -25,7 +25,7 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import {
   AccordionFilter,
   Button, CheckBox, Content,
-  Input,
+  Input, InputMoney,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
@@ -79,7 +79,7 @@ export default function AtualizarLocal({
   const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'EXPERIMENTO'
+    tab.titleTab === 'EXPERIMENTOS'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
@@ -135,14 +135,14 @@ export default function AtualizarLocal({
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
       id: experimento.id,
-      foco: experimento.assay_list.foco.name,
-      ensaio: experimento.assay_list.type_assay.name,
-      tecnologia: experimento.assay_list.tecnologia.name,
-      gli: experimento.assay_list.gli,
-      experimentName: experimento.experimentName,
-      bgm: experimento.assay_list.bgm,
-      local: experimento.local.name_local_culture,
-      delineamento: experimento.delineamento.name,
+      foco: experimento.assay_list?.foco.name,
+      ensaio: experimento.assay_list?.type_assay.name,
+      tecnologia: `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`,
+      gli: experimento.assay_list?.gli,
+      experimentName: experimento?.experimentName,
+      bgm: experimento.assay_list?.bgm,
+      local: experimento.local?.name_local_culture,
+      delineamento: experimento.delineamento?.name,
       repetition: experimento.repetition,
       density: experimento.density,
       drawOrder: experimento.drawOrder,
@@ -402,7 +402,7 @@ export default function AtualizarLocal({
   function fieldsFactory(name: string, title: string, values: any) {
     return (
       <div className="w-full h-7">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
           {name}
         </label>
         <Input
@@ -417,13 +417,30 @@ export default function AtualizarLocal({
     );
   }
 
-  function updateFieldsFactory(name: string, title: string, values: any) {
+  function updateFieldsFactory(name: string, title: string, values: any, type: string = 'text') {
     return (
-      <div className="w-full h-7">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
+      <div className="w-1/4 h-7 mt-7">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
           {name}
         </label>
         <Input
+          type={type}
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+          value={values}
+        />
+      </div>
+    );
+  }
+
+  function updateFieldMoney(name: string, title: string, values: any) {
+    return (
+      <div className="w-1/4 h-7 mt-7">
+        <label className="block text-gray-900 text-sm font-bold mb-0">
+          {name}
+        </label>
+        <InputMoney
           id={title}
           name={title}
           onChange={formik.handleChange}
@@ -439,36 +456,36 @@ export default function AtualizarLocal({
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
-          className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
+          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-0"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full flex justify-between items-start">
-            <h1 className="text-2xl">Atualizar Lista de Experimento</h1>
+            <h1 className="text-xl">Atualizar Lista de Experimento</h1>
           </div>
 
           <div className="w-full
             flex
             justify-around
-            gap-6
+            gap-0
             mt-0
             mb-4
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-1">
 
-              {fieldsFactory('Foco', 'foco', experimento.assay_list.foco.name)}
+              {fieldsFactory('Foco', 'foco', experimento.assay_list?.foco.name)}
 
-              {fieldsFactory('Ensaio', 'type_assay', experimento.assay_list.type_assay.name)}
+              {fieldsFactory('Ensaio', 'type_assay', experimento.assay_list?.type_assay.name)}
 
-              {fieldsFactory('Nome Tecnologia', 'tecnologia', experimento.assay_list.tecnologia.name)}
+              {fieldsFactory('Tecnologia', 'tecnologia', `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`)}
 
-              {fieldsFactory('GLI', 'gli', experimento.assay_list.gli)}
+              {fieldsFactory('GLI', 'gli', experimento.assay_list?.gli)}
 
               {fieldsFactory('Experimento', 'experimentName', experimento.experimentName)}
 
-              {fieldsFactory('BGM', 'bgm', experimento.assay_list.bgm)}
+              {fieldsFactory('BGM', 'bgm', experimento.assay_list?.bgm)}
 
-              {fieldsFactory('Status do ensaio', 'status', experimento.assay_list.status)}
+              {fieldsFactory('Status do ensaio', 'status', experimento.assay_list?.status)}
 
             </div>
 
@@ -477,16 +494,16 @@ export default function AtualizarLocal({
           <div className="w-full
             flex
             justify-around
-            gap-6
-            mt-4
-            mb-4
+            gap-0
+            mt-0
+            mb-0
           "
           >
-            <div className="w-full flex justify-between items-start gap-5 mt-10">
+            <div className="w-full flex justify-between items-start gap-5 mt-3">
 
-              {fieldsFactory('Lugar plantio', 'local', experimento.local.name_local_culture)}
+              {fieldsFactory('Lugar plantio', 'local', experimento.local?.name_local_culture)}
 
-              {fieldsFactory('Delineamento', 'delineamento', experimento.delineamento.name)}
+              {fieldsFactory('Delineamento', 'delineamento', experimento.delineamento?.name)}
 
               {fieldsFactory('Repetições', 'repetitionsNumber', experimento.repetitionsNumber)}
 
@@ -500,7 +517,7 @@ export default function AtualizarLocal({
 
           </div>
 
-          <div className="rounded border-inherit" style={{ marginTop: '3%' }}>
+          <div className="rounded border-inherit" style={{ marginTop: 25 }}>
             <span>Características da quadra</span>
             <hr />
           </div>
@@ -509,48 +526,91 @@ export default function AtualizarLocal({
             flex
             justify-around
             gap-6
-            mt-4
-            mb-4
+            mt-2
+            mb-0
           "
           >
             <div className="w-full h-f10 flex justify-between items-start gap-5">
+              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp, 'number')}
+              {updateFieldMoney('EEL', 'eel', formik.values.eel)}
+              {updateFieldMoney('CLP', 'clp', formik.values.clp)}
 
-              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp)}
-              {updateFieldsFactory('EEL', 'eel', formik.values.eel)}
-              {updateFieldsFactory('CLP', 'clp', formik.values.clp)}
-              {updateFieldsFactory('Observações', 'comments', formik.values.comments)}
+              {/* <input
+                style={{ border: 1, borderColor: '#000', width: 200 }}
+                className="shadow
+        appearance-none
+        bg-white bg-no-repeat
+        border border-solid border-gray-300
+        rounded
+        w-full
+        py-1 px-2
+        text-gray-900
+        text-xs
+        leading-tight
+        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+        "
+                id="eel"
+                name="eel"
+                value={formik.values.clp}
+                onChange={formik.handleChange}
+                onKeyUp={formatarMoeda}
+              /> */}
 
-            </div>
+              <div className="w-full flex flex-col h-20">
+                <label className="block text-gray-900 text-sm font-bold mb-0">
+                  Observações
+                </label>
+                <textarea
+                  className="shadow
+                              appearance-none
+                              bg-white bg-no-repeat
+                              border border-solid border-gray-300
+                              rounded
+                              w-full
+                              py-1 px-2
+                              text-gray-900
+                              text-xs
+                              leading-tight
+                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  rows={3}
+                  id="comments"
+                  name="comments"
+                  onChange={formik.handleChange}
+                  value={formik.values.comments}
+                />
+              </div>
 
-          </div>
-          <div className="
-            h-10 w-full
+              <div className="
+            h-7 w-full
             flex
             gap-3
-            justify-center
-            mt-16
+            justify-end
+            mt-12
           "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => { router.back(); }}
-              />
+              >
+                <div className="w-40">
+                  <Button
+                    type="button"
+                    value="Voltar"
+                    bgColor="bg-red-600"
+                    textColor="white"
+                    icon={<IoMdArrowBack size={18} />}
+                    onClick={() => { router.back(); }}
+                  />
+                </div>
+                <div className="w-40">
+                  <Button
+                    type="submit"
+                    value="Atualizar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<RiOrganizationChart size={18} />}
+                    onClick={() => { }}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<RiOrganizationChart size={18} />}
-                onClick={() => { }}
-              />
-            </div>
+
           </div>
         </form>
         <main className="h-4/6 w-full
@@ -722,7 +782,7 @@ export default function AtualizarLocal({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 5;

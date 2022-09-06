@@ -21,7 +21,7 @@ import {
   Input,
   Select,
 } from '../../../../components';
-import IDepartment from '../../../../components/props/departmentDTO';
+import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ICulture {
@@ -147,7 +147,7 @@ export default function NovoUsuario({
         || !values.password
         || !values.confirmPassword
       ) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       if (values.password !== values.confirmPassword) {
@@ -455,11 +455,11 @@ export default function NovoUsuario({
 
           <div
             className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-2
+            mt-5
           "
           >
             <div className="w-40">
@@ -489,7 +489,7 @@ export default function NovoUsuario({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const { token } = req.cookies;

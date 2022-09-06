@@ -109,6 +109,14 @@ export class ImportTechnologyController {
                     'a data e maior que a data atual',
                   );
                 }
+                if (spreadSheet[row][column].getTime() < 100000) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'o campo DT precisa ser no formato data',
+                  );
+                }
                 if (status === 200) {
                   let lastDtImport = response[0]?.dt_import?.getTime();
                   response.forEach((item: any) => {

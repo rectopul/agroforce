@@ -2,7 +2,7 @@ import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import Swal from 'sweetalert2';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import router from 'next/router';
@@ -30,6 +30,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { delineamentoService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import { number } from 'yup/lib/locale';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -56,6 +57,10 @@ interface IFilter {
   filterTreatment: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterTratRepetitionFrom: string | any;
+  filterTratRepetitionTo: string | any;
 }
 interface IGenerateProps {
   name: string | undefined;
@@ -81,7 +86,7 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
-}: Idata) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -112,12 +117,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome',
@@ -161,6 +166,10 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      filterTratRepetitionTo: '',
+      filterTratRepetitionFrom: '',
       filterStatus: '',
       filterName: '',
       filterRepeat: '',
@@ -173,9 +182,12 @@ export default function Listagem({
       filterName,
       filterRepeat,
       filterTreatment,
+      filterRepetitionTo,
+      filterRepetitionFrom,
+      filterTratRepetitionTo,
+      filterTratRepetitionFrom,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
+      const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -196,7 +208,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -211,7 +223,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -289,9 +301,9 @@ export default function Listagem({
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -516,19 +528,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-    filterApplication += `&id_culture=${cultureId}`;
-
     await delineamentoService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = delineamento.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });
@@ -612,7 +621,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
                   <div className="h-6 w-1/2 ml-4">
@@ -622,7 +631,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -644,30 +653,45 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="repetição"
-                      id="filterRepeat"
-                      name="filterRepeat"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Trat. Repetição
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="trat. Repetição"
-                      id="filterTreatment"
-                      name="filterTreatment"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTratRepetitionFrom"
+                        name="filterTratRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTratRepetitionTo"
+                        name="filterTratRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -675,6 +699,7 @@ export default function Listagem({
                     />
                   </div>
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -690,7 +715,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -720,17 +745,17 @@ export default function Listagem({
                         icon={<FiUserPlus size={20} />}
                       />
                     </div> */}
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="delineamento/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -812,10 +837,11 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="delineamento/importar-planilha/config-planilha"
                         />
                       </div>
@@ -886,7 +912,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
@@ -901,12 +927,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
     : `filterStatus=1&id_culture=${cultureId}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;

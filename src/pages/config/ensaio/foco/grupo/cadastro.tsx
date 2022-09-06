@@ -11,7 +11,7 @@ import { groupService } from 'src/services/group.service';
 import Swal from 'sweetalert2';
 import {
   Button,
-  Content, Input
+  Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
 
@@ -42,13 +42,13 @@ export default function Cadastro({ safra, id_foco }: any) {
     initialValues: {
       id_foco: Number(id_foco),
       safra: safra.id,
-      group: '',
+      group: '0',
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.group) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -126,7 +126,7 @@ export default function Cadastro({ safra, id_foco }: any) {
                 value={safra.safraName}
               />
             </div>
-            <div className="w-full h-10">
+            <div className="w-full h-7">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 *Grupos
               </label>
@@ -137,8 +137,9 @@ export default function Cadastro({ safra, id_foco }: any) {
                     border border-solid border-gray-300
                     rounded
                     w-full
-                    py-2 px-3
+                    py-1 px-2
                     text-gray-900
+                    text-xs
                     leading-tight
                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                   "
@@ -152,14 +153,14 @@ export default function Cadastro({ safra, id_foco }: any) {
           </div>
 
           <div className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-12
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -186,7 +187,7 @@ export default function Cadastro({ safra, id_foco }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/safra`;
   const { token } = context.req.cookies;

@@ -1,33 +1,12 @@
-import { SequenciaDelineamentoRepository } from 'src/repository/sequencia-delineamento.repository';
-import {
-  number, object, SchemaOf, string,
-} from 'yup';
-
-interface ISequenciaDelineamento {
-  id: number;
-  id_delineamento: number;
-  repeticao: number;
-  sorteio: number;
-  nt: number;
-  bloco: number;
-  status?: number;
-  created_by: number;
-}
-
-type ICreateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, 'id' | 'status'
->;
-
-type IUpdateSequenciaDelineamento = Omit<
-  ISequenciaDelineamento, 'id_delineamento' | 'status' | 'created_by'
->;
+import { SequenciaDelineamentoRepository } from '../repository/sequencia-delineamento.repository';
+import { countDelimitation } from '../shared/utils/counts';
+import handleError from '../shared/utils/handleError';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class SequenciaDelineamentoController {
-  private required = 'Required';
-
   private SequenciaDelineamentoRepository = new SequenciaDelineamentoRepository();
 
-  async getOneFoco(id: number) {
+  async getOne(id: number) {
     try {
       if (!id) throw new Error('Dados inválidos');
 
@@ -36,104 +15,115 @@ export class SequenciaDelineamentoController {
       if (!response) throw new Error('Item não encontrado');
 
       return { status: 200, response };
-    } catch (e) {
-      return { status: 400, message: 'Item não encontrado' };
-    }
-  }
-
-  async list(id_delineamento: number) {
-    try {
-      const result = await this.SequenciaDelineamentoRepository.list(id_delineamento);
-
-      const data = result.map((item) => ({
-        id: item.id,
-        id_delineamento: item.id_delineamento,
-        delineamento: item.delineamento.name,
-        repeticao: item.repeticao,
-        sorteio: item.sorteio,
-        nt: item.nt,
-        bloco: item.bloco,
-        status: item.status,
-      }));
-
-      const total = data.length;
-
-      return { status: 200, response: data, total };
-    } catch {
-      return { status: 400, response: [], total: 0 };
+    } catch (error: any) {
+      handleError('Sequencia Delineamento controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Sequencia Delineamento erro');
     }
   }
 
   async create(data: object | any) {
     try {
-      if (data !== null && data !== undefined) {
-        const response = await this.SequenciaDelineamentoRepository.create(data);
-        if (response) {
-          return { status: 200, message: 'itens inseridos' };
-        }
-        return { status: 400, message: 'erro' };
+      const response = await this.SequenciaDelineamentoRepository.create(data);
+      const { response: Delimitation } = await this.getAll(
+        { id_delineamento: data.id_delineamento },
+      );
+      await countDelimitation(Delimitation);
+      if (response) {
+        return { status: 200, message: 'Sequencia de delineamento cadastrada' };
       }
-    } catch (err) {
-      console.log(err);
+      return { status: 400, message: 'Sequencia de delineamento não cadastrada' };
+    } catch (error: any) {
+      handleError('Sequencia Delineamento controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Sequencia Delineamento erro');
     }
   }
 
-  async update(data: IUpdateSequenciaDelineamento) {
+  async update(data: any) {
     try {
-      const sequenciaDelineamento = await this.SequenciaDelineamentoRepository.findById(data.id);
+      const sequenciaDelineamento = await this.getOne(data.id);
 
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
 
-      sequenciaDelineamento.repeticao = data.repeticao;
-      sequenciaDelineamento.sorteio = data.sorteio;
-      sequenciaDelineamento.nt = data.nt;
-      sequenciaDelineamento.bloco = data.bloco;
-
-      await this.SequenciaDelineamentoRepository.update(sequenciaDelineamento.id, sequenciaDelineamento);
+      await this.SequenciaDelineamentoRepository.update(
+        data.id,
+        data,
+      );
 
       return { status: 200, message: 'Sequência de delineamento atualizada!' };
-    } catch (err) {
-      return { status: 404, message: 'Erro ao atualizar!' };
+    } catch (error: any) {
+      handleError('Sequencia Delineamento controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Sequencia Delineamento erro');
     }
   }
 
-  async listAll(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
-    let take;
-    let skip;
+    parameters.AND = [];
     let orderBy: object | any;
-    let select: any = [];
-
     try {
+      if (options.filterRepetitionFrom || options.filterRepetitionTo) {
+        if (options.filterRepetitionFrom && options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
+        } else if (options.filterRepetitionFrom) {
+          parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)} }`);
+        } else if (options.filterRepetitionTo) {
+          parameters.repeticao = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
+        }
+      }
+
+      if (options.filterOrderFrom || options.filterOrderTo) {
+        if (options.filterOrderFrom && options.filterOrderTo) {
+          parameters.sorteio = JSON.parse(`{"gte": ${Number(options.filterOrderFrom)}, "lte": ${Number(options.filterOrderTo)} }`);
+        } else if (options.filterOrderFrom) {
+          parameters.sorteio = JSON.parse(`{"gte": ${Number(options.filterOrderFrom)} }`);
+        } else if (options.filterOrderTo) {
+          parameters.sorteio = JSON.parse(`{"lte": ${Number(options.filterOrderTo)} }`);
+        }
+      }
+
+      if (options.filterNtFrom || options.filterNtTo) {
+        if (options.filterNtFrom && options.filterNtTo) {
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
+        } else if (options.filterNtFrom) {
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
+        } else if (options.filterNtTo) {
+          parameters.nt = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
+        }
+      }
+
+      if (options.filterBlockFrom || options.filterBlockTo) {
+        if (options.filterBlockFrom && options.filterBlockTo) {
+          parameters.bloco = JSON.parse(`{"gte": ${Number(options.filterBlockFrom)}, "lte": ${Number(options.filterBlockTo)} }`);
+        } else if (options.filterBlockFrom) {
+          parameters.bloco = JSON.parse(`{"gte": ${Number(options.filterBlockFrom)} }`);
+        } else if (options.filterBlockTo) {
+          parameters.bloco = JSON.parse(`{"lte": ${Number(options.filterBlockTo)} }`);
+        }
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
+      // Ta com erro de push aqui
+
       if (options.filterSearch) {
-        options.filterSearch = `{"contains":"${options.filterSearch}"}`;
-        parameters.volume = JSON.parse(options.filterSearch);
+        parameters.AND.push(JSON.parse(`{ "delineamento": {"name": "${options.filterSearch}" } }`));
       }
 
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
-          select[objSelect[item]] = true;
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          repeticao: true,
-          delineamento: { select: { name: true } },
-          sorteio: true,
-          nt: true,
-          bloco: true,
-          status: true,
-        };
-      }
+      const select = {
+        id: true,
+        id_delineamento: true,
+        delineamento: { select: { name: true } },
+        repeticao: true,
+        sorteio: true,
+        nt: true,
+        bloco: true,
+        status: true,
+      };
 
       if (options.repeticao) {
-        parameters.repeticao = options.repeticao;
+        parameters.repeticao = Number(options.repeticao);
       }
       if (options.id_delineamento) {
         parameters.id_delineamento = Number(options.id_delineamento);
@@ -146,6 +136,10 @@ export class SequenciaDelineamentoController {
         parameters.nt = options.nt;
       }
 
+      if (options.ntCount) {
+        parameters.nt = JSON.parse(`{"lte" : ${Number(options.ntCount)}}`);
+      }
+
       if (options.bloco) {
         parameters.bloco = options.bloco;
       }
@@ -154,24 +148,13 @@ export class SequenciaDelineamentoController {
         parameters.status = options.status;
       }
 
-      if (options.take) {
-        if (typeof (options.take) === 'string') {
-          take = Number(options.take);
-        } else {
-          take = options.take;
-        }
-      }
+      const take = (options.take) ? Number(options.take) : undefined;
 
-      if (options.skip) {
-        if (typeof (options.skip) === 'string') {
-          skip = Number(options.skip);
-        } else {
-          skip = options.skip;
-        }
-      }
+      const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
       const response: object | any = await this.SequenciaDelineamentoRepository.findAll(
@@ -186,9 +169,9 @@ export class SequenciaDelineamentoController {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
-    } catch (err) {
-      console.log(err);
-      return { status: 400, response: [], total: 0 };
+    } catch (error: any) {
+      handleError('Sequencia Delineamento controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Sequencia Delineamento erro');
     }
   }
 }

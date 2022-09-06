@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
@@ -25,7 +25,6 @@ import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { removeCookies, setCookies } from 'cookies-next';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -33,15 +32,18 @@ import {
   Content,
   Input,
   Select,
-} from 'src/components';
+} from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { safraService, userPreferencesService } from '../../../../services';
+import { fetchWrapper } from '../../../../helpers';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
   filterSafra: string | any;
-  filterYear: string | number;
+  filterYear: string | any;
+  filterYearFrom: string | number;
+  filterYearTo: string | number;
   filterStartDate: string | any;
   filterEndDate: string | any;
   orderBy: object | any;
@@ -82,7 +84,7 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -103,13 +105,15 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safraName' },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     {
@@ -133,20 +137,18 @@ export default function Listagem({
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
   ];
-
-  const filterStatus = filterBeforeEdit.split('');
-
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-
-  const columns = columnsOrder(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterSafra: '',
       filterYear: '',
+      filterYearTo: '',
+      filterYearFrom: '',
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',
@@ -155,15 +157,17 @@ export default function Listagem({
     onSubmit: async ({
       filterStatus,
       filterSafra,
-      filterYear,
+      filterYearTo,
+      filterYearFrom,
       filterStartDate,
       filterEndDate,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
-      setFiltersParams(parametersFilter);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+
+      setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
+
       await safraService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -216,11 +220,60 @@ export default function Listagem({
     });
   }
 
+  // async function handleOrder(
+  //   column: string,
+  //   order: string | any,
+  // ): Promise<void> {
+  //   let typeOrder: any;
+  //   let parametersFilter: any;
+  //   if (order === 1) {
+  //     typeOrder = 'asc';
+  //   } else if (order === 2) {
+  //     typeOrder = 'desc';
+  //   } else {
+  //     typeOrder = '';
+  //   }
+  //   setOrderBy(column);
+  //   setOrderType(typeOrder);
+  //   if (filter && typeof filter !== 'undefined') {
+  //     if (typeOrder !== '') {
+  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+  //     } else {
+  //       parametersFilter = filter;
+  //     }
+  //   } else if (typeOrder !== '') {
+  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+  //   } else {
+  //     parametersFilter = filter;
+  //   }
+
+  //   await safraService
+  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
+  //     .then((response) => {
+  //       if (response.status === 200) {
+  //         setSafras(response.response);
+  //       }
+  //     });
+
+  //   if (orderList === 2) {
+  //     setOrder(0);
+  //     setArrowOrder(<AiOutlineArrowDown />);
+  //   } else {
+  //     setOrder(orderList + 1);
+  //     if (orderList === 1) {
+  //       setArrowOrder(<AiOutlineArrowUp />);
+  //     } else {
+  //       setArrowOrder('');
+  //     }
+  //   }
+  // }
+
   function headerTableFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
           <button
+            type="button"
             className="font-medium text-gray-900"
             onClick={() => handleOrder(title, orderList)}
           >
@@ -229,7 +282,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -243,6 +296,7 @@ export default function Listagem({
         <div className="h-9 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
@@ -252,14 +306,13 @@ export default function Listagem({
         </div>
       ) : (
         <div className="h-9 flex">
-
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
-
             </button>
           </div>
         </div>
@@ -275,25 +328,30 @@ export default function Listagem({
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: ISafra) => (
-        <div className="h-7 flex">
+        <div className="h-8 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor="bg-blue-600"
-              textColor="white"
+              title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}`);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+
+                router.push(`/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`);
               }}
+              bgColor="bg-blue-600"
+              textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
+          {rowData.status ? (
             <div className="h-7">
               <Button
+                title="Ativo"
                 icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => await handleStatusSafra(rowData.id, {
+                onClick={async () => handleStatusSafra(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -304,8 +362,9 @@ export default function Listagem({
           ) : (
             <div className="h-7">
               <Button
+                title="Inativo"
                 icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => await handleStatusSafra(rowData.id, {
+                onClick={async () => handleStatusSafra(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
@@ -324,11 +383,11 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'safraName') {
-        tableFields.push(headerTableFactory('Nome', 'safraName'));
+        tableFields.push(headerTableFactory('Safra', 'safraName'));
       }
       if (columnCampos[index] === 'year') {
         tableFields.push(headerTableFactory('Ano', 'year'));
@@ -336,7 +395,7 @@ export default function Listagem({
       if (columnCampos[index] === 'plantingStartTime') {
         tableFields.push(
           headerTableFactory(
-            'Período ideal de início de plantio',
+            'Período ideal início de plantio',
             'plantingStartTime',
           ),
         );
@@ -344,7 +403,7 @@ export default function Listagem({
       if (columnCampos[index] === 'plantingEndTime') {
         tableFields.push(
           headerTableFactory(
-            'Período ideal do fim do plantio',
+            'Período ideal fim do plantio',
             'plantingEndTime',
           ),
         );
@@ -356,38 +415,21 @@ export default function Listagem({
     return tableFields;
   }
 
+  const columns = columnsOrder(camposGerenciados);
+
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== undefined) {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
     await safraService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setSafras(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
 
@@ -460,18 +502,16 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
-    }
-
     await safraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = safras.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativos' as any;
           } else {
             row.status = 'Ativos' as any;
           }
+          delete row.id;
+          delete row.tableData;
 
           return row;
         });
@@ -481,9 +521,11 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(workBook, workSheet, 'safras');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+
+        XLSX.write(workBook, {
           bookType: 'xlsx', // xlsx
           type: 'buffer',
+
         });
         // Binary
         XLSX.write(workBook, {
@@ -496,36 +538,47 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
+
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    //   console.log("inside....")
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 5000); // Remove State
       }
     });
+  }
+
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+  }
+
+  // Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
     handlePagination();
     handleTotalPages();
+    // removestate(); //Remove State
   }, [currentPage]);
 
   return (
@@ -567,19 +620,21 @@ export default function Listagem({
                       name="filterStatus"
                       id="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
-                      selected="1"
+                      selected="2"
                     />
                   </div>
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Safra
                     </label>
+
                     <Input
                       placeholder="Nome da Safra"
                       id="filterSafra"
                       name="filterSafra"
+                      defaultValue={checkValue('filterSafra')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -587,12 +642,21 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
-                    <Input
-                      placeholder="Ano"
-                      id="filterYear"
-                      name="filterYear"
-                      onChange={formik.handleChange}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterYearFrom"
+                        name="filterYearFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterYearTo"
+                        name="filterYearTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   {/* <div className="h-10 w-1/2 ml-4">
@@ -613,7 +677,10 @@ export default function Listagem({
                           py-2 px-3
                           text-gray-900
                           leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                          focus:text-gray-700
+                           focus:bg-white
+                            focus:border-blue-600
+                            focus:outline-none
                         "
                     />
                   </div> */}
@@ -636,16 +703,16 @@ export default function Listagem({
                           py-2 px-3
                           text-gray-900
                           leading-tight
-                          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                          focus:text-gray-700
+                           focus:bg-white
+                            focus:border-blue-600 focus:outline-none
                         "
                     />
                   </div> */}
-
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -653,6 +720,7 @@ export default function Listagem({
                     />
                   </div>
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -663,6 +731,7 @@ export default function Listagem({
               columns={columns}
               data={safras}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
@@ -746,7 +815,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -791,7 +860,7 @@ export default function Listagem({
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
+                      disabled={currentPage <= 1}
                     />
                     <Button
                       onClick={() => setCurrentPage(currentPage - 1)}
@@ -814,20 +883,20 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
+                      bgColor="bg-blue-600 test"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -837,7 +906,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
@@ -856,12 +925,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+
+  // const filterApplication = req.cookies.filterBeforeEdit
+  //   ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+  //   : `filterStatus=1&id_culture=${cultureId}`;
+
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+    ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
-
   removeCookies('pageBeforeEdit', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
@@ -872,10 +945,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allSafras,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allSafras, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {

@@ -108,7 +108,7 @@ export default function Atualizar({
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -146,7 +146,7 @@ export default function Atualizar({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
     { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
@@ -221,7 +221,7 @@ export default function Atualizar({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -304,9 +304,9 @@ export default function Atualizar({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[index] === 'safra') {
         tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
       }
@@ -386,6 +386,7 @@ export default function Atualizar({
             const newRow = row;
             delete newRow.npe;
             newRow.group = Number(row.group);
+            delete newRow.id;
             return newRow;
           });
 
@@ -487,7 +488,7 @@ export default function Atualizar({
 
           <div
             className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
@@ -538,6 +539,7 @@ export default function Atualizar({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -561,10 +563,9 @@ export default function Atualizar({
 
                       <Button
                         title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
-                        value="Cadastrar grupo"
+                        value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
                         bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
-
                         disabled={grupos.length}
                         onClick={() => {
                           router.push(`grupo/cadastro?id_foco=${idFoco}`);
@@ -716,7 +717,7 @@ export default function Atualizar({
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   query,
-}) => {
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

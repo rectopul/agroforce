@@ -3,10 +3,10 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext,
@@ -22,9 +22,8 @@ import {
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   tecnologiaService,
@@ -69,14 +68,14 @@ interface Idata {
 }
 
 export default function Listagem({
-  allItems,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: Idata) {
+      allItems,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
@@ -105,12 +104,12 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome',
@@ -119,13 +118,13 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Rótulo ',
+      title: 'Descrição ',
       value: 'desc',
       defaultChecked: () => camposGerenciados.includes('desc'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Código Tecnologia ',
+      title: 'Cod. tec.',
       value: 'cod_tec',
       defaultChecked: () => camposGerenciados.includes('cod_tec'),
     },
@@ -224,7 +223,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -266,9 +265,9 @@ export default function Listagem({
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -276,7 +275,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Descrição', 'desc'));
       }
       if (columnCampos[item] === 'cod_tec') {
-        tableFields.push(headerTableFactory('Código tecnologia', 'cod_tec'));
+        tableFields.push(headerTableFactory('Cod. tec.', 'cod_tec'));
       }
     });
     return tableFields;
@@ -344,7 +343,34 @@ export default function Listagem({
       .getAll(filterApplication)
       .then(({ status, response }) => {
         if (status === 200) {
-          const workSheet = XLSX.utils.json_to_sheet(response);
+          const newData = response.map((row: any) => {
+            delete row.id;
+            delete row.dt_import;
+            const dataExp = new Date();
+            let hours: string;
+            let minutes: string;
+            let seconds: string;
+            if (String(dataExp.getHours()).length === 1) {
+              hours = `0${String(dataExp.getHours())}`;
+            } else {
+              hours = String(dataExp.getHours());
+            }
+            if (String(dataExp.getMinutes()).length === 1) {
+              minutes = `0${String(dataExp.getMinutes())}`;
+            } else {
+              minutes = String(dataExp.getMinutes());
+            }
+            if (String(dataExp.getSeconds()).length === 1) {
+              seconds = `0${String(dataExp.getSeconds())}`;
+            } else {
+              seconds = String(dataExp.getSeconds());
+            }
+            row.DT = `${dataExp.toLocaleDateString(
+              'pt-BR',
+            )} ${hours}:${minutes}:${seconds}`;
+            return row;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, workSheet, 'Tecnologias');
 
@@ -457,11 +483,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Código
+                      Cod. tec.
                     </label>
                     <Input
                       type="text"
-                      placeholder="Código"
+                      placeholder="Cod. tecnologia"
                       max="40"
                       id="filterCode"
                       name="filterCode"
@@ -495,7 +521,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -515,6 +541,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div className="h-12" />
                     {/* <div className="h-12">
                       <Button
                         title="Importar planilha"
@@ -674,28 +701,24 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}`;
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
     : `&id_culture=${idCulture}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;

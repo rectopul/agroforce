@@ -497,14 +497,14 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
           </div>
 
           <div className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
             mt-10
           "
           >
-            <div className="w-30">
+            <div className="w-40">
               <Button
                 type="button"
                 value="Voltar"
@@ -531,7 +531,7 @@ export default function NovoLocal({ local, layoultEdit }: IData) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlLayoult = `${publicRuntimeConfig.apiUrl}/layoult-quadra`;
   const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;

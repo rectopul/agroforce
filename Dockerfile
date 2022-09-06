@@ -4,13 +4,17 @@ FROM node:16-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json ./
-RUN yarn install --frozen-lockfile
-
+#RUN yarn install --frozen-lockfile
+RUN npm i  --frozen-lockfile --legacy-peer-deps
 # Rebuild the source code only when needed
 FROM node:16-alpine AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
+RUN npm install next  --frozen-lockfile --legacy-peer-deps
+RUN npx prisma generate
+RUN npx update
+RUN npm run build
 RUN yarn build
 RUN yarn cache clean
 

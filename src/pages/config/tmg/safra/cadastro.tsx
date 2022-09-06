@@ -64,7 +64,7 @@ export default function Safra() {
 
       validateInputs(inputs);
       if (!values.safraName || !values.year) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       let plantingStartTime;
@@ -191,7 +191,7 @@ export default function Safra() {
           </div>
 
           <div
-            className="h-10 w-full
+            className="h-7 w-full
             flex
             gap-3
             justify-center

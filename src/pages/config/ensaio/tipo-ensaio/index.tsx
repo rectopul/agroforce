@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 import { removeCookies, setCookies } from 'cookies-next';
@@ -5,6 +6,7 @@ import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -27,9 +29,6 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { typeAssayService, userPreferencesService } from '../../../../services';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -38,6 +37,8 @@ import {
   Input,
   Select,
 } from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { typeAssayService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 interface ITypeAssayProps {
@@ -52,6 +53,8 @@ interface IFilter {
   filterStatus: string;
   filterName: string;
   filterProtocolName: string;
+  filterSeedsTo: string,
+  filterSeedsFrom: string,
   orderBy: string;
   typeOrder: string;
 }
@@ -109,12 +112,12 @@ export default function TipoEnsaio({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome',
@@ -154,13 +157,17 @@ export default function TipoEnsaio({
       filterStatus: '',
       filterName: '',
       filterProtocolName: '',
+      filterSeedsTo: '',
+      filterSeedsFrom: '',
       orderBy: '',
       typeOrder: '',
     },
-    onSubmit: async ({ filterStatus, filterName, filterProtocolName }) => {
+    onSubmit: async ({
+      filterStatus, filterName, filterProtocolName, filterSeedsTo, filterSeedsFrom,
+    }) => {
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&id_culture=${idCulture}&id_safra=${idSafra}`;
+      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${idSafra}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await typeAssayService
@@ -180,7 +187,7 @@ export default function TipoEnsaio({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   async function handleOrder(
     column: string,
@@ -268,7 +275,7 @@ export default function TipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -337,6 +344,7 @@ export default function TipoEnsaio({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, !rowData.status)}
               bgColor="bg-green-600"
@@ -348,6 +356,7 @@ export default function TipoEnsaio({
         <div className="h-7 flex">
           <div className="h-7">
             <Button
+              title={`Atualizar ${rowData.name}`}
               icon={<BiEdit size={14} />}
               onClick={() => {}}
               bgColor="bg-blue-600"
@@ -358,6 +367,7 @@ export default function TipoEnsaio({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={() => handleStatus(rowData.id, !rowData.status)}
               bgColor="bg-red-800"
@@ -373,9 +383,9 @@ export default function TipoEnsaio({
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[item] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
@@ -465,6 +475,7 @@ export default function TipoEnsaio({
             const newRow = row;
             newRow.envelope = row.envelope.seeds;
             newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
+            delete newRow.id;
             return newRow;
           });
 
@@ -500,9 +511,9 @@ export default function TipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -515,6 +526,38 @@ export default function TipoEnsaio({
           setTypeAssay(response);
         }
       });
+  }
+
+  function filterFieldFactorySeeds(name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="flex gap-2">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterSeedsFrom"
+              name="filterSeedsFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterSeedsTo"
+              name="filterSeedsTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -560,7 +603,7 @@ export default function TipoEnsaio({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -594,6 +637,8 @@ export default function TipoEnsaio({
                     />
                   </div>
 
+                  {filterFieldFactorySeeds('Faixa de envelope')}
+
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -620,7 +665,7 @@ export default function TipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -744,7 +789,6 @@ export default function TipoEnsaio({
                     {...props}
                   >
                     <Button
-
                       onClick={() => setCurrentPage(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -778,7 +822,6 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-
                       onClick={() => setCurrentPage(pages)}
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -816,15 +859,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 

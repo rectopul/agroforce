@@ -1,6 +1,7 @@
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
+import { countTreatmentsNumber } from '../../shared/utils/counts';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -16,6 +17,25 @@ export class GenotypeTreatmentController {
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[1]}" } } }`));
       }
+      if (options.filterBgmFrom || options.filterBgmTo) {
+        if (options.filterBgmFrom && options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} }}}`));
+        } else if (options.filterBgmFrom) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} }}}`));
+        } else if (options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
+        }
+      }
+      if (options.filterNtFrom || options.filterNtTo) {
+        if (options.filterNtFrom && options.filterNtTo) {
+          parameters.treatments_number = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
+        } else if (options.filterNtFrom) {
+          parameters.treatments_number = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
+        } else if (options.filterNtTo) {
+          parameters.treatments_number = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
+        }
+      }
+
       if (options.filterNca) {
         parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
       }
@@ -49,10 +69,9 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
-
       const select = {
         id: true,
-        id_safra: true,
+        safra: { select: { safraName: true } },
         genotipo: {
           select: {
             name_genotipo: true,
@@ -61,10 +80,13 @@ export class GenotypeTreatmentController {
             tecnologia: {
               select: {
                 cod_tec: true,
+                name: true,
               },
             },
           },
         },
+        treatments_number: true,
+        status: true,
         lote: {
           select: {
             ncc: true,
@@ -76,14 +98,12 @@ export class GenotypeTreatmentController {
           select: {
             foco: { select: { name: true } },
             type_assay: { select: { name: true } },
-            tecnologia: { select: { name: true } },
+            tecnologia: { select: { name: true, cod_tec: true } },
             gli: true,
             bgm: true,
             status: true,
           },
         },
-        treatments_number: true,
-        status: true,
         comments: true,
       };
       if (options.id_safra) {
@@ -122,7 +142,6 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -157,7 +176,7 @@ export class GenotypeTreatmentController {
   async create(data: any) {
     try {
       await this.genotypeTreatmentRepository.create(data);
-
+      await countTreatmentsNumber(data.id_assay_list);
       return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'Create', error.message);

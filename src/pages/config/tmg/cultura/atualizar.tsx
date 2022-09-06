@@ -40,7 +40,7 @@ export default function Cultura(culture: IUpdateCulture) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name || !values.desc) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -137,7 +137,7 @@ export default function Cultura(culture: IUpdateCulture) {
 
           <div
             className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
@@ -157,7 +157,7 @@ export default function Cultura(culture: IUpdateCulture) {
             <div className="w-40">
               <Button
                 type="submit"
-                value="Cadastrar"
+                value="Atualizar"
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
@@ -171,7 +171,7 @@ export default function Cultura(culture: IUpdateCulture) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
   const { token } = context.req.cookies;

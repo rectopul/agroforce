@@ -1,4 +1,4 @@
-import { prisma } from '../pages/api/db/db';
+import { prisma } from "../pages/api/db/db";
 
 export class EnvelopeRepository {
   async create(data: any) {
@@ -34,7 +34,6 @@ export class EnvelopeRepository {
         seeds: true,
       },
     });
-
     return envelope;
   }
 
@@ -62,7 +61,13 @@ export class EnvelopeRepository {
     return envelope;
   }
 
-  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+  async findAll(
+    where: any,
+    select: any,
+    take: any,
+    skip: any,
+    orderBy: string | any
+  ) {
     let order: object | any;
 
     if (orderBy) {

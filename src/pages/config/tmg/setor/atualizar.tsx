@@ -37,7 +37,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -99,7 +99,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
           </div>
 
           <div
-            className="h-10 w-full
+            className="h-7 w-full
             flex
             gap-3
             justify-center
@@ -132,7 +132,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlList = `${publicRuntimeConfig.apiUrl}/department`;
   const { token } = context.req.cookies;

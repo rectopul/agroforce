@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -28,6 +28,7 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
@@ -47,6 +48,8 @@ interface IFilter {
   filterSearch: string | any;
   orderBy: object | any;
   typeOrder: object | any;
+  filterGroupFrom: string | number;
+  filterGroupTo: string | number;
 }
 
 export interface IFocos {
@@ -54,7 +57,7 @@ export interface IFocos {
   name: string;
   group?: [];
   tableData?: [];
-  status?: number;
+  status?: any;
 }
 
 interface IGenerateProps {
@@ -67,6 +70,8 @@ interface IData {
   allFocos: IFocos[];
   totalItems: number;
   itensPerPage: number;
+  idCulture: number;
+  idSafra: number;
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
@@ -76,10 +81,11 @@ export default function Listagem({
   allFocos,
   totalItems,
   itensPerPage,
+  idCulture,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -105,7 +111,7 @@ export default function Listagem({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Nome', value: 'name' },
     { name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
@@ -130,12 +136,14 @@ export default function Listagem({
       filterSearch: '',
       orderBy: '',
       typeOrder: '',
+      filterGroupTo: '',
+      filterGroupFrom: '',
     },
-    onSubmit: async ({ filterStatus, filterSearch }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${
-        userLogado.userCulture.cultura_selecionada
+    onSubmit: async ({
+      filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
+    }) => {
+      const parametersFilter = `filterStatus=${filterStatus || 1
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${userLogado.userCulture.cultura_selecionada
       }`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -150,29 +158,33 @@ export default function Listagem({
     },
   });
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
-  async function handleStatus(idFoco: number, data: IFocos): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
+  async function handleStatus(idFoco: number, data: any): Promise<void> {
+    const parametersFilter = `filterStatus=${1}&id_culture=${idCulture}&filterSearch=${data.name}`;
+    if (data.status === 0) {
       data.status = 1;
+    } else {
+      data.status = 0;
     }
-    const index = focos.findIndex((foco) => foco.id === idFoco);
+    await focoService.getAll(parametersFilter).then(async ({ status }) => {
+      if (status === 200 && data.status === 1) {
+        Swal.fire('Já existe um registro ativo com esse nome na tabela foco. \n Favor inativar o registro antes de executar a ação.');
+        return;
+      }
+      await focoService.update({ id: idFoco, status: data.status });
+      const index = focos.findIndex((foco) => foco.id === idFoco);
 
-    if (index === -1) {
-      return;
-    }
+      if (index === -1) {
+        return;
+      }
 
-    setFocos((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
+      setFocos((oldFocos) => {
+        const copy = [...oldFocos];
+        copy[index].status = data.status;
+        return copy;
+      });
     });
-
-    const { id, name, status } = focos[index];
-
-    await focoService.update({ id, name, status });
   }
 
   async function handleOrder(
@@ -236,7 +248,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -284,8 +296,9 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IFocos) => (
+      render: (rowData: any) => (rowData.status ? (
         <div className="h-7 flex">
+          <div className="h-7" />
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -293,40 +306,64 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
+                router.push(
+                  `/config/ensaio/foco/atualizar?id=${rowData.id}`,
+                );
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div>
+            <Button
+              icon={<FaRegThumbsUp size={14} />}
+              title="Ativo"
+              onClick={async () => handleStatus(rowData.id, {
+                status: rowData.status,
+                ...rowData,
+              })}
+              bgColor="bg-green-600"
+              textColor="white"
+            />
+          </div>
         </div>
-      ),
+      ) : (
+        <div className="h-7 flex">
+          <div
+            className="h-7"
+          />
+          <div className="h-7">
+
+            <Button
+              icon={<BiEdit size={14} />}
+              title={`Atualizar ${rowData.name}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                router.push(
+                  `/config/ensaio/foco/atualizar?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<FaRegThumbsDown size={14} />}
+              title="Inativo"
+              onClick={async () => handleStatus(rowData.id, {
+                status: rowData.status,
+                ...rowData,
+              })}
+              bgColor="bg-red-800"
+              textColor="white"
+            />
+          </div>
+        </div>
+      )),
     };
   }
 
@@ -335,14 +372,14 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'name') {
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
       if (columnOrder[index] === 'group') {
-        tableFields.push(headerTableFactory('Grupo', 'group.group'));
+        tableFields.push(headerTableFactory('Grupo', 'group[0].group'));
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -464,11 +501,44 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await focoService.getAll(parametersFilter).then(({ status, response }) => {
       if (status === 200) {
         setFocos(response);
       }
     });
+  }
+
+  function filterFieldFactoryGroup(name: any) {
+    return (
+      <div className="h-6 w-1/2 ml-4">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <div className="flex gap-2">
+          <div>
+            <Input
+              type="text"
+              placeholder="De"
+              max="40"
+              id="filterGroupFrom"
+              name="filterGroupFrom"
+              onChange={formik.handleChange}
+            />
+          </div>
+          <div>
+            <Input
+              type="text"
+              placeholder="Até"
+              max="40"
+              id="filterGroupTo"
+              name="filterGroupTo"
+              onChange={formik.handleChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -515,7 +585,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -534,10 +604,11 @@ export default function Listagem({
                     />
                   </div>
 
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-5">
+                  {filterFieldFactoryGroup('Faixa de grupos')}
+
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -545,6 +616,7 @@ export default function Listagem({
                     />
                   </div>
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -559,6 +631,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -584,7 +657,7 @@ export default function Listagem({
                         value="Cadastrar Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="foco/cadastro"
                         icon={<FaSearchPlus size={20} />}
                       />
@@ -728,7 +801,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = await (
@@ -745,9 +818,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
@@ -755,6 +825,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -774,6 +847,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       allFocos,
       totalItems,
       itensPerPage,
+      idCulture,
+      idSafra,
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,

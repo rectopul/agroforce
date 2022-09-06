@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -57,6 +57,8 @@ interface IUnityCultureProps {
 interface IFilter {
   filterNameUnityCulture: string | any;
   filterYear: string | any;
+  filterYearFrom: string | number;
+  filterYearTo: string | number;
   filterNameLocalCulture: string | any;
   filterLabel: string | any;
   filterMloc: string | any;
@@ -75,6 +77,7 @@ interface IGenerateProps {
 interface IData {
   allCultureUnity: IUnityCultureProps[];
   totalItems: number;
+  idSafra: number;
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;
@@ -84,12 +87,13 @@ interface IData {
 
 export default function Listagem({
   allCultureUnity,
+  totalItems,
+  idSafra,
   itensPerPage,
   filterApplication,
-  totalItems,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -115,12 +119,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome un. cultura',
@@ -189,6 +193,8 @@ export default function Listagem({
     initialValues: {
       filterNameUnityCulture: '',
       filterYear: '',
+      filterYearTo: '',
+      filterYearFrom: '',
       filterNameLocalCulture: '',
       filterLabel: '',
       filterMloc: '',
@@ -202,6 +208,8 @@ export default function Listagem({
     onSubmit: async ({
       filterNameUnityCulture,
       filterYear,
+      filterYearTo,
+      filterYearFrom,
       filterNameLocalCulture,
       filterLabel,
       filterMloc,
@@ -210,11 +218,11 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
+      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await unidadeCulturaService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&id_safra=${idSafra}`)
         .then((response) => {
           setFilter(parametersFilter);
           setTotalItems(response.total);
@@ -286,7 +294,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -328,9 +336,9 @@ export default function Listagem({
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'name_unity_culture') {
         tableFields.push(
           headerTableFactory('Nome un. cultura', 'name_unity_culture'),
@@ -432,6 +440,14 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+            newRow.nome_lugar_cultura = newRow.local?.name_local_culture;
+            newRow.rotulo = newRow.local?.label;
+            newRow.mloc = newRow.local?.mloc;
+            newRow.fazenda = newRow.local?.adress;
+            newRow.pais = newRow.local?.label_country;
+            newRow.regiao = newRow.local?.label_region;
+            newRow.localidade = newRow.local?.name_locality;
+
             newRow.DT = new Date();
             delete newRow.id;
             delete newRow.id_unity_culture;
@@ -472,9 +488,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
     }
 
     if (filter) {
@@ -547,7 +563,25 @@ export default function Listagem({
                     'Nome Un. de Cult.',
                   )}
 
-                  {filterFieldFactory('filterYear', 'Ano')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Ano
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="De"
+                        id="filterYearFrom"
+                        name="filterYearFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        placeholder="Até"
+                        id="filterYearTo"
+                        name="filterYearTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory(
                     'filterNameLocalCulture',
@@ -557,15 +591,16 @@ export default function Listagem({
                   {filterFieldFactory('filterLabel', 'Rótulo')}
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
+
                 </div>
 
                 <div
                   className="w-full h-full
-                flex
-                justify-center
-                pt-2
-                pb-2
-                "
+                  flex
+                  justify-center
+                  pt-2
+                  pb-0
+                  "
                 >
                   {filterFieldFactory('filterAdress', 'Nome da Fazenda')}
 
@@ -606,6 +641,7 @@ export default function Listagem({
                 rowStyle: (rowData: IUnityCultureProps) => ({
                   backgroundColor:
                     selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
+                  height: 35,
                 }),
               }}
               components={{
@@ -623,6 +659,8 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+
+                    <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -764,7 +802,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (
@@ -772,6 +810,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
+  const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -787,7 +826,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
-  const param = `skip=0&take=${itensPerPage}`;
+  const param = `skip=0&take=${itensPerPage}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -806,6 +845,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     props: {
       allCultureUnity,
       totalItems,
+      idSafra,
       itensPerPage,
       filterApplication,
       pageBeforeEdit,

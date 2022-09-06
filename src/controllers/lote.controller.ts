@@ -1,9 +1,13 @@
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
+import { GenotipoController } from './genotype/genotipo.controller';
+import { countLotesNumber } from '../shared/utils/counts';
 
 export class LoteController {
   loteRepository = new LoteRepository();
+
+  genotipoController = new GenotipoController();
 
   async getOne(id: number) {
     try {
@@ -22,6 +26,8 @@ export class LoteController {
   async create(data: any) {
     try {
       const response = await this.loteRepository.create(data);
+      const genotype = await this.genotipoController.getOne(data.id_genotipo);
+      await countLotesNumber(genotype);
       if (response) {
         return { status: 200, response, message: 'Lote cadastrado' };
       }
@@ -37,6 +43,9 @@ export class LoteController {
       const lote = await this.loteRepository.findById(data.id);
 
       if (!lote) return { status: 404, message: 'Lote não existente' };
+
+      const genotype = await this.genotipoController.getOne(data.id_genotipo);
+      await countLotesNumber(genotype);
 
       const response = await this.loteRepository.update(data.id, data);
       if (response) {
@@ -54,6 +63,52 @@ export class LoteController {
     let orderBy: object | any = '';
     parameters.AND = [];
     try {
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
+      }
+      if (options.filterSeedFrom || options.filterSeedTo) {
+        if (options.filterSeedFrom && options.filterSeedTo) {
+          parameters.quant_sementes = JSON.parse(`{"gte": ${Number(options.filterSeedFrom)}, "lte": ${Number(options.filterSeedTo)} }`);
+        } else if (options.filterSeedFrom) {
+          parameters.quant_sementes = JSON.parse(`{"gte": ${Number(options.filterSeedFrom)} }`);
+        } else if (options.filterSeedTo) {
+          parameters.quant_sementes = JSON.parse(`{"lte": ${Number(options.filterSeedTo)} }`);
+        }
+      }
+      if (options.filterWeightFrom || options.filterWeightTo) {
+        if (options.filterWeightFrom && options.filterWeightTo) {
+          parameters.peso = JSON.parse(`{"gte": "${Number(options.filterWeightFrom)}", "lte": "${Number(options.filterWeightTo)}" }`);
+        } else if (options.filterWeightFrom) {
+          parameters.peso = JSON.parse(`{"gte": "${Number(options.filterWeightFrom)}" }`);
+        } else if (options.filterWeightTo) {
+          parameters.peso = JSON.parse(`{"lte": "${Number(options.filterWeightTo)}" }`);
+        }
+      }
+      if (options.filterGmrFrom || options.filterGmrTo) {
+        if (options.filterGmrFrom && options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": "${Number(options.filterGmrFrom)}", "lte": "${Number(options.filterGmrTo)}" }}}`));
+        } else if (options.filterGmrFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": "${Number(options.filterGmrFrom)}" }}}`));
+        } else if (options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"lte": "${Number(options.filterGmrTo)}" }}}`));
+        }
+      }
+      if (options.filterBgmFrom || options.filterBgmTo) {
+        if (options.filterBgmFrom && options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": "${Number(options.filterBgmFrom)}", "lte": "${Number(options.filterBgmTo)}" }}}`));
+        } else if (options.filterBgmFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": "${Number(options.filterBgmFrom)}" }}}`));
+        } else if (options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"lte": "${Number(options.filterBgmTo)}" }}}`));
+        }
+      }
+
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
@@ -95,16 +150,17 @@ export class LoteController {
       const select = {
         id: true,
         id_genotipo: true,
-        cod_lote: true,
         id_s2: true,
         id_dados: true,
         year: true,
+        cod_lote: true,
         ncc: true,
         fase: true,
         peso: true,
         quant_sementes: true,
         genotipo: {
           select: {
+            id: true,
             name_genotipo: true,
             name_main: true,
             gmr: true,
@@ -112,7 +168,7 @@ export class LoteController {
             tecnologia: {
               select:
               {
-                desc: true,
+                name: true,
                 cod_tec: true,
               },
             },

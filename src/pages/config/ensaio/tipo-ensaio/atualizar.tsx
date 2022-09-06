@@ -4,32 +4,27 @@
 /* eslint-disable no-return-assign */
 import { setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactNode, useEffect, useState } from 'react';
 import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
 import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { FaSortAmountUpAlt } from 'react-icons/fa';
 import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import {
+  MdFirstPage, MdLastPage,
+} from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import MaterialTable from 'material-table';
-import { FaSortAmountUpAlt } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   envelopeService,
   userPreferencesService,
@@ -38,11 +33,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import {
-  AccordionFilter,
-  Button,
-  CheckBox,
-  Content,
-  Input,
+  AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 
 interface ITypeAssayProps {
@@ -105,7 +96,7 @@ export default function AtualizarTipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
       title: 'Quant. de sementes por envelope',
@@ -143,7 +134,7 @@ export default function AtualizarTipoEnsaio({
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       await typeAssayService.update({
@@ -225,7 +216,7 @@ export default function AtualizarTipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -291,9 +282,9 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === 'seeds') {
         tableFields.push(
           headerTableFactory('Quant. de sementes por envelope', 'seeds'),
@@ -372,9 +363,10 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.type_assay = row.type_assay?.name;
+            row.tipo_ensaio = row.type_assay?.name;
             row.safra = row.safra?.safraName;
-
+            delete row.id;
+            delete row.type_assay;
             return row;
           });
 
@@ -410,14 +402,15 @@ export default function AtualizarTipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await envelopeService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setSeeds(response.response);
@@ -482,40 +475,40 @@ export default function AtualizarTipoEnsaio({
                 value={formik.values.protocol_name}
               />
             </div>
-          </div>
-
-          <div
-            className="
-            h-10 w-full
+            <div
+              className="
+            h-7 w-full
             flex
             gap-3
-            justify-center
-            mt-10
+            justify-end
+            mt-6
           "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => {
-                  router.back();
-                }}
-              />
-            </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<RiOrganizationChart size={18} />}
-                onClick={() => {}}
-              />
+            >
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => {
+                    router.back();
+                  }}
+                />
+              </div>
+              <div className="w-40">
+                <Button
+                  type="submit"
+                  value="Atualizar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<RiOrganizationChart size={18} />}
+                  onClick={() => {}}
+                />
+              </div>
             </div>
           </div>
+
         </form>
         <main
           className="w-full
@@ -537,6 +530,7 @@ export default function AtualizarTipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -560,8 +554,9 @@ export default function AtualizarTipoEnsaio({
                       <Button
                         title="Cadastrar Quant. de sementes por envelope"
                         value="Cadastrar Quant. de sementes por envelope"
-                        bgColor="bg-blue-600"
+                        bgColor={seeds.length ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
+                        disabled={seeds.length}
                         onClick={() => {
                           router.push(
                             `envelope/cadastro?id_type_assay=${idTypeAssay}`,
@@ -710,7 +705,7 @@ export default function AtualizarTipoEnsaio({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (
@@ -732,7 +727,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const idTypeAssay = Number(context.query.id);
 
-  const filterApplication = `1&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
+  const filterApplication = `id_safra=${idSafra}&id_type_assay=${idTypeAssay}`;
 
   const param = `skip=0&take=${itensPerPage}`;
   const baseUrlEnvelope = `${publicRuntimeConfig.apiUrl}/envelope`;
@@ -740,7 +735,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   urlParameters.search = new URLSearchParams(param).toString();
 
   const { response: allEnvelopes, total: totalItens } = await fetch(
-    `${baseUrlEnvelope}?id_type_assay=${idTypeAssay}`,
+    `${baseUrlEnvelope}?&id_safra=${idSafra}&id_type_assay=${idTypeAssay}`,
     requestOptions,
   ).then((response) => response.json());
 

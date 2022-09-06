@@ -1,10 +1,10 @@
+import React, { useState } from 'react';
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
 import { importService } from 'src/services/';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -14,21 +14,34 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 
+import ComponentLoading from '../../../../components/Loading';
+
 export default function Importar() {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+
+  // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) => (tab.titleTab === 'DELINEAMENTO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   function readExcel(value: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
-        table: 'DELIMITATION', spreadSheet: rows, moduleId: 7, id_culture: userLogado.userCulture.cultura_selecionada, created_by: userLogado.id,
+        table: 'DELIMITATION',
+        spreadSheet: rows,
+        moduleId: 7,
+        idCulture: userLogado.userCulture.cultura_selecionada,
+        created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -40,6 +53,8 @@ export default function Importar() {
         }
       });
     });
+
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
@@ -53,12 +68,14 @@ export default function Importar() {
   });
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação Delineamento</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
@@ -82,7 +99,7 @@ export default function Importar() {
             </div>
           </div>
           <div className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
@@ -116,7 +133,7 @@ export default function Importar() {
   );
 }
 
-// export const getServerSideProps:GetServerSideProps = async ({req}) => {
+// export const getServerSideProps:GetServerSideProps = async ({req}: any) => {
 //     const { publicRuntimeConfig } = getConfig();
 //     const  token  =  req.cookies.token;
 //     const  cultureId  =  req.cookies.cultureId;

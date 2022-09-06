@@ -24,17 +24,31 @@ export class SafraController {
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
+        if (options.filterStatus != '2') {
+          parameters.status = Number(options.filterStatus);
+        }
       }
 
       if (options.filterSafra) {
-        parameters.safraName = JSON.parse(`{"contains":"${options.filterSafra}"}`);
+        parameters.safraName = JSON.parse(
+          `{"contains":"${options.filterSafra}"}`,
+        );
       }
-
+      
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
+      
 
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
+      }
       const select = {
         id: true,
         safraName: true,
@@ -73,11 +87,13 @@ export class SafraController {
         parameters.main_safra = options.main_safra;
       }
 
-      const take = (options.take) ? Number(options.take) : undefined;
+      const take = options.take ? Number(options.take) : undefined;
 
-      const skip = (options.skip) ? Number(options.skip) : undefined;
+      const skip = options.skip ? Number(options.skip) : undefined;
 
-      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
+      const orderBy = options.orderBy
+        ? `{"${options.orderBy}":"${options.typeOrder}"}`
+        : undefined;
 
       const response: any = await this.safraRepository.findAll(
         parameters,
@@ -114,10 +130,13 @@ export class SafraController {
 
   async create(data: CreateSafra) {
     try {
-      const safraAlreadyExists = await this.safraRepository.findBySafraName(
-        { safraName: data.safraName, id_culture: data.id_culture },
-      );
-      if (safraAlreadyExists) return { status: 400, message: 'Safra já cadastrada' };
+      const safraAlreadyExists = await this.safraRepository.findBySafraName({
+        safraName: data.safraName,
+        id_culture: data.id_culture,
+      });
+      if (safraAlreadyExists) {
+        return { status: 400, message: 'Safra já cadastrada' };
+      }
 
       await this.safraRepository.create(data);
 
@@ -130,18 +149,23 @@ export class SafraController {
 
   async update(data: UpdateSafra) {
     try {
-      console.log(data);
       if (data.status === 0 || data.status === 1) {
         const safraAlreadyExists = await this.getOne(data.id);
-        if (safraAlreadyExists.status !== 200) return { status: 400, message: 'Safra não encontrado' };
+        if (safraAlreadyExists.status !== 200) {
+          return { status: 400, message: 'Safra não encontrado' };
+        }
         const response = await this.safraRepository.update(data.id, data);
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };
         }
         return { status: 200, response };
       }
-      const safraAlreadyExists = await this.safraRepository.findBySafraName(data);
-      if (safraAlreadyExists) return { status: 400, message: 'Safra já registrado' };
+      const safraAlreadyExists = await this.safraRepository.findBySafraName(
+        data,
+      );
+      if (safraAlreadyExists) {
+        return { status: 400, message: 'Safra já registrado' };
+      }
       const response = await this.safraRepository.update(data.id, data);
       if (!response) {
         return { status: 400, response: [], message: 'Safra não atualizado' };

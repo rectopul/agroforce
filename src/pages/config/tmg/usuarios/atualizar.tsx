@@ -166,7 +166,6 @@ export default function AtualizarUsuario({
       cultures: [],
     },
     onSubmit: async (values) => {
-      console.log(values);
       validateInputs(values);
       if (
         !values.name
@@ -176,7 +175,7 @@ export default function AtualizarUsuario({
         || !values.password
         || !values.confirmPassword
       ) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
       if (values.password !== values.confirmPassword) {
@@ -496,11 +495,11 @@ export default function AtualizarUsuario({
           </div>
           <div
             className="
-            h-10 w-full
+            h-7 w-full
             flex
             gap-3
             justify-center
-            mt-2
+            mt-5
           "
           >
             <div className="w-40">
@@ -530,7 +529,7 @@ export default function AtualizarUsuario({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   // Fetch data from external API
   const response = await prisma.user.findFirst({
     where: {

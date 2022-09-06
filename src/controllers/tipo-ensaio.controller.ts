@@ -1,12 +1,15 @@
 /* eslint-disable camelcase */
 import handleError from '../shared/utils/handleError';
 import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    let orderBy: object | any;
+    parameters.AND = [];
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -18,6 +21,21 @@ export class TypeAssayController {
 
       if (options.filterProtocolName) {
         parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
+      }
+
+      if (options.id_safra) {
+        parameters.AND.push(JSON.parse(`{ "envelope": { "some": {"id_safra": ${Number(options.id_safra)} } } }`));
+      }
+
+      if (options.filterSeedsFrom || options.filterSeedsTo) {
+        if (options.filterSeedsFrom && options.filterSeedsTo) {
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
+        } else if (options.filterSeedsFrom) {
+          parameters.AND.push(JSON.parse(`{ "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)} } } } }`));
+        } else if (options.filterSeedsTo) {
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "lte": ${Number(options.filterSeedsTo)} } } } }`));
+        }
       }
 
       const select = {
@@ -40,7 +58,10 @@ export class TypeAssayController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
 
       const response = await this.typeAssayRepository.findAll(
         parameters,

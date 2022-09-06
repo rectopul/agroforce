@@ -5,10 +5,10 @@ import readXlsxFile from 'read-excel-file';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import { FiUserPlus } from 'react-icons/fi';
-import React from 'react';
+import React, { useState } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { importService } from '../../../../services';
@@ -16,14 +16,19 @@ import {
   Button, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
-export default function Importar({ safra }: any) {
+export default function Importar(
+  { safra }: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
   const router = useRouter();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS' ? (tab.statusTab = true) : (tab.statusTab = false)));
+
+  const [loading, setLoading] = useState(false);
 
   const safras: object | any = [];
   safra.forEach((value: string | object | any) => {
@@ -34,6 +39,8 @@ export default function Importar({ safra }: any) {
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
     readXlsxFile(value[0]).then((rows) => {
+      setLoading(true);
+
       importService.validate({
         table: 'BLOCK',
         spreadSheet: rows,
@@ -42,6 +49,8 @@ export default function Importar({ safra }: any) {
         idCulture: userLogado.userCulture.cultura_selecionada,
         created_by: userLogado.id,
       }).then((response) => {
+        setLoading(false);
+
         if (response.message !== '') {
           Swal.fire({
             html: response.message,
@@ -53,6 +62,8 @@ export default function Importar({ safra }: any) {
         }
       });
     });
+
+    (document.getElementById('inputFile') as any).value = null;
   }
 
   const formik = useFormik<any>({
@@ -67,12 +78,14 @@ export default function Importar({ safra }: any) {
   });
   return (
     <>
+      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+
       <Head>
         <title>Importação Genótipo</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
-          className="w-full bg-white shadow-md rounded p-8 overflow-y-scroll"
+          className="w-full bg-white shadow-md rounded p-8"
           onSubmit={formik.handleSubmit}
         >
           <div className="w-full
@@ -96,7 +109,7 @@ export default function Importar({ safra }: any) {
             </div>
           </div>
           <div className="
-              h-10 w-full
+              h-7 w-full
               flex
               gap-3
               justify-center
@@ -130,7 +143,7 @@ export default function Importar({ safra }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const { cultureId } = req.cookies;

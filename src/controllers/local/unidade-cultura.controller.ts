@@ -19,6 +19,16 @@ export class UnidadeCulturaController {
         parameters.year = Number(options.filterYear);
       }
 
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
+      }
+
       if (options.filterNameLocalCulture) {
         parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
       }
@@ -49,10 +59,11 @@ export class UnidadeCulturaController {
 
       const select = {
         id: true,
+        id_safra: true,
         id_unity_culture: true,
         id_local: true,
-        year: true,
         name_unity_culture: true,
+        year: true,
         local: true,
       };
 
@@ -66,6 +77,10 @@ export class UnidadeCulturaController {
 
       if (options.id_local) {
         parameters.id_local = Number(options.id_local);
+      }
+
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

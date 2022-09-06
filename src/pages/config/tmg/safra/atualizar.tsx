@@ -62,7 +62,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.safraName || !values.year) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -191,7 +191,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           </div>
 
           <div
-            className="h-10 w-full
+            className="h-7 w-full
             flex
             gap-3
             justify-center
@@ -227,7 +227,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
   const baseUrlList = `${publicRuntimeConfig.apiUrl}/safra`;
   const { token } = context.req.cookies;

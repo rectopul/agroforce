@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -19,16 +19,17 @@ import {
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
+import * as XLSX from 'xlsx';
+
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { FiUserPlus } from 'react-icons/fi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { userPreferencesService, userService } from 'src/services';
-import { handleFormatTel } from 'src/shared/utils/tel';
-import * as XLSX from 'xlsx';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from 'cookies-next';
+import { userPreferencesService, userService } from '../../../../services';
+import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
   AccordionFilter,
   Button,
@@ -38,6 +39,8 @@ import {
   Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import {fetchWrapper} from "src/helpers";
 
 interface IUsers {
   id: number;
@@ -77,13 +80,13 @@ export default function Listagem({
   totalItems,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
-    && tab.data.map((i) => i.labelDropDown === 'Usuários')
+      && tab.data.map((i) => i.labelDropDown === 'Usuários')
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
@@ -106,12 +109,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Avatar',
@@ -162,11 +165,16 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+
+      // const parametersFilter = `filterStatus=${filterStatus || 1
+      //   }&filterName=${filterName}&filterLogin=${filterLogin}`;
+
+      // Call filter with there parameter   
+      const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus, filterName, filterLogin );
+
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
+      
       await userService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -184,7 +192,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -199,8 +207,29 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
+  }
+
+  async function handleStatus(id: number, status: any): Promise<void> {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+
+    await userService.update({ id, status });
+    const index = users.findIndex((user) => user.id === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    setUsers((oldUser) => {
+      const copy = [...oldUser];
+      copy[index].status = status;
+      return copy;
+    });
   }
 
   function idHeaderFactory() {
@@ -211,14 +240,13 @@ export default function Listagem({
       sorting: false,
       render: () => (colorStar === '#eba417' ? (
         <div className="h-9 flex">
-
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('')}
             >
               <AiTwotoneStar size={20} color="#eba417" />
-
             </button>
           </div>
         </div>
@@ -226,11 +254,11 @@ export default function Listagem({
         <div className="h-9 flex">
           <div>
             <button
+              type="button"
               className="w-full h-full flex items-center justify-center border-0"
               onClick={() => setColorStar('#eba417')}
             >
               <AiTwotoneStar size={20} />
-
             </button>
           </div>
         </div>
@@ -245,9 +273,8 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: IUsers) => (rowData.status ? (
+      render: (rowData: IUsers) => (
         <div className="h-7 flex">
-          <div className="h-7" />
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -255,58 +282,44 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                router.push(
-                  `/config/tmg/usuarios/atualizar?id=${rowData.id}`,
-                );
+                  localStorage.setItem("filterValueEdit", filtersParams);
+                  localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                router.push(                    `/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
           <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<FaRegThumbsUp size={14} />}
-              title="Ativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
-              bgColor="bg-green-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div
-            className="h-7"
-          />
-          <div className="h-7">
+          {rowData.status ? (
+            <div className="h-7">
+              <Button
+                title="Ativo"
+                icon={<FaRegThumbsUp size={14} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
 
-            <Button
-              icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.name}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                router.push(
-                  `/config/tmg/usuarios/atualizar?id=${rowData.id}`,
-                );
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<FaRegThumbsDown size={14} />}
-              title="Inativo"
-              onClick={() => handleStatus(rowData.id, !rowData.status)}
-              bgColor="bg-red-800"
-              textColor="white"
-            />
-          </div>
+                })}
+                bgColor="bg-green-600"
+                textColor="white"
+              />
+            </div>
+          ) : (
+            <div className="h-7">
+              <Button
+                title="Inativo"
+                icon={<FaRegThumbsDown size={14} />}
+                onClick={async () => handleStatus(rowData.id, {
+                  status: rowData.status,
+
+                })}
+                bgColor="bg-red-800"
+                textColor="white"
+              />
+            </div>
+          )}
         </div>
-      )),
+      ),
     };
   }
 
@@ -315,9 +328,9 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
 
       if (columnCampos[item] === 'avatar') {
         tableFields.push({
@@ -354,7 +367,7 @@ export default function Listagem({
         tableFields.push({
           title: 'Telefone',
           field: 'tel',
-          sorting: false,
+          sorting: true,
           render: (rowData: IUsers) => handleFormatTel(rowData.tel),
         });
       }
@@ -369,33 +382,16 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+   
+    //Manage orders of colunms 
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
+
     await userService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
           setUsers(response.response);
+          setFiltersParams(parametersFilter);
         }
       });
     if (orderList === 2) {
@@ -454,27 +450,6 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  async function handleStatus(id: number, status: any): Promise<void> {
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
-
-    await userService.update({ id, status });
-    const index = users.findIndex((user) => user.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setUsers((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
-    });
-  }
-
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result) return;
@@ -508,6 +483,7 @@ export default function Listagem({
         dataExcel.forEach((line: any) => {
           delete line.avatar;
           delete line.id;
+          delete line.email;
 
           if (line.status === 0) {
             line.status = 'Inativo';
@@ -539,29 +515,39 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
+    } 
+    // else if (currentPage >= pages) {
+    //   setCurrentPage(pages - 1);
+    // }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = Number(currentPage) * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+   
+    //manage using comman function
+    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);  
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setUsers(response.response);
+        setTotalItems(response.total); //Set new total records
+        setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 7000); //Remove State   
       }
     });
   }
+
+    //remove states
+  function removestate(){
+      localStorage.removeItem("filterValueEdit");  
+      localStorage.removeItem("pageBeforeEdit");    
+  }
+
+  //Checkingdefualt values
+   function checkValue(value : any){
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
+  }
+
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -574,6 +560,7 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -623,13 +610,14 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
                   </div>
+
                   {filterFieldFactory('filterName', 'Nome')}
-                  {filterFieldFactory('filterLogin', 'login')}
+                  {filterFieldFactory('filterLogin', 'Login')}
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -653,11 +641,12 @@ export default function Listagem({
               columns={columns}
               data={users}
               options={{
+                sorting: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -814,7 +803,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -831,7 +820,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

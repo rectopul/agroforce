@@ -6,16 +6,17 @@
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
+import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { CulturaController } from '../cultura.controller';
 import { DividersController } from '../dividers.controller';
 // eslint-disable-next-line import/no-cycle
 import { ImportController } from '../import.controller';
-import { LayoutQuadraController } from '../layout-quadra.controller';
+import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 import { LocalController } from '../local/local.controller';
 import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';
 import { QuadraController } from './quadra.controller';
+import { validateInteger } from '../../shared/utils/numberValidate';
 
 export class ImportBlockController {
   static async validate(
@@ -98,10 +99,10 @@ export class ImportBlockController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response }: IReturnObject = await localController.getAll(
+                const { status, response }: IReturnObject = await localController.getAll(
                   { name_local_culture: spreadSheet[row][column] },
                 );
-                if (response[0]?.length === 0) {
+                if (status !== 200) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
                       (Number(column) + 1),
@@ -145,22 +146,35 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (larg_q !== '') {
-                if (cod_quadra === cod_quadra_anterior) {
-                  if (spreadSheet[row][column] !== larg_q && row !== '1') {
-                    responseIfError[Number(column)]
-                      += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'a largQ precisa ser igual na planilha inteira',
-                      );
-                    larg_q = spreadSheet[row][column];
+              } else {
+                if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                  responseIfError[Number(column)]
+                        += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'precisa ser um numero inteiro e positivo',
+                    );
+                }
+                if (larg_q !== '') {
+                  if (cod_quadra === cod_quadra_anterior) {
+                    if (spreadSheet[row][column] !== larg_q && row !== '1') {
+                      responseIfError[Number(column)]
+                        += responseGenericFactory(
+                          (Number(column) + 1),
+                          row,
+                          spreadSheet[0][column],
+                          'a largQ precisa ser igual na planilha inteira',
+                        );
+                      larg_q = spreadSheet[row][column];
+                    } else {
+                      larg_q = spreadSheet[row][column];
+                    }
                   } else {
                     larg_q = spreadSheet[row][column];
                   }
-                } else {
-                  larg_q = spreadSheet[row][column];
                 }
               }
             }
@@ -169,21 +183,34 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (cod_quadra === cod_quadra_anterior) {
-                if (spreadSheet[row][column] !== comp_p && row !== '1') {
+              } else {
+                if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
+                        += responseGenericFactory(
                       (Number(column) + 1),
                       row,
                       spreadSheet[0][column],
-                      'o compP precisa ser igual na planilha inteira',
+                      'precisa ser um numero inteiro e positivo',
                     );
-                  comp_p = spreadSheet[row][column];
+                }
+                if (cod_quadra === cod_quadra_anterior) {
+                  if (spreadSheet[row][column] !== comp_p && row !== '1') {
+                    responseIfError[Number(column)]
+                        += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'o compP precisa ser igual na planilha inteira',
+                      );
+                    comp_p = spreadSheet[row][column];
+                  } else {
+                    comp_p = spreadSheet[row][column];
+                  }
                 } else {
                   comp_p = spreadSheet[row][column];
                 }
-              } else {
-                comp_p = spreadSheet[row][column];
               }
             }
 
@@ -191,6 +218,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -198,6 +232,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -246,13 +287,15 @@ export class ImportBlockController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else if (cod_quadra === cod_quadra_anterior) {
                 if (divisor_anterior === 0) {
-                  if (spreadSheet[row][column] <= 0) {
+                  if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
                     responseIfError[Number(column)]
-                      += responseGenericFactory(
+                        += responseGenericFactory(
                         (Number(column) + 1),
                         row,
                         spreadSheet[0][column],
-                        'o divisor precisa começar com 1 e ser positivo',
+                        'precisa ser um numero inteiro e positivo',
                       );
                   } else {
                     divisor_anterior = spreadSheet[row][column];
@@ -294,18 +337,17 @@ export class ImportBlockController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'Semente') {
+            if (configModule.response[0]?.fields[column] === 'SemMetro') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] <= 0) {
-                responseIfError[Number(column)]
-                      += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'a semmetro precisar ser maior que 0',
-                  );
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
               }
             }
 
@@ -313,7 +355,15 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (cod_quadra === cod_quadra_anterior) {
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
+              }
+              if (cod_quadra === cod_quadra_anterior) {
                 if (t4_i === 0) {
                   if (spreadSheet[row][column] !== 1) {
                     responseIfError[Number(column)]
@@ -355,7 +405,15 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (cod_quadra === cod_quadra_anterior) {
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
+              }
+              if (cod_quadra === cod_quadra_anterior) {
                 if (t4_i === 0) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
@@ -404,7 +462,15 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] !== 1) {
+              } else if (!validateInteger(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[0][column],
+                  'precisa ser um numero inteiro e positivo',
+                );
+              }
+              if (spreadSheet[row][column] !== 1) {
                 responseIfError[Number(column)]
                       += responseGenericFactory(
                     (Number(column) + 1),
@@ -422,6 +488,26 @@ export class ImportBlockController {
               } else if (df === 0) {
                 df = spreadSheet[row][column];
               } else {
+                if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0
+                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                  responseIfError[Number(column)]
+                        += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'precisa ser um numero inteiro e positivo',
+                    );
+                }
+                if (Number(spreadSheet[row][column]) <= Number(spreadSheet[row][13])) {
+                  responseIfError[Number(column)]
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'deve ser menor que o DI',
+                    );
+                }
                 df = spreadSheet[row][column];
                 if (cod_quadra === cod_quadra_anterior) {
                   if (df !== spreadSheet[row][column]) {

@@ -1,7 +1,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import router from 'next/router';
@@ -66,6 +66,12 @@ interface IFilter {
   filterEsquema: string | any;
   filterTiros: string | any;
   filterDisparos: string | any;
+  filterShotsFrom: string | any;
+  filterShotsTo: string | any;
+  filterPopFrom: string | any;
+  filterPopTo: string | any;
+  filterParcelFrom: string | any;
+  filterParcelTo: string | any;
   filterPlantadeira: string | any;
   filterParcelas: string | any;
   orderBy: object | any;
@@ -95,7 +101,7 @@ export default function Listagem({
   local,
   pageBeforeEdit,
   filterBeforeEdit,
-}: Idata) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -124,12 +130,12 @@ export default function Listagem({
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Esquema ',
@@ -179,6 +185,12 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
+      filterShotsFrom: '',
+      filterShotsTo: '',
+      filterPopFrom: '',
+      filterPopTo: '',
+      filterParcelFrom: '',
+      filterParcelTo: '',
       filterStatus: '',
       filterCodigo: '',
       filterEsquema: '',
@@ -196,9 +208,14 @@ export default function Listagem({
       filterTiros,
       filterPlantadeira,
       filterParcelas,
+      filterShotsTo,
+      filterShotsFrom,
+      filterPopTo,
+      filterPopFrom,
+      filterParcelTo,
+      filterParcelFrom,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
+      const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -218,7 +235,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -233,7 +250,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -284,6 +301,7 @@ export default function Listagem({
 						"
           >
             <Button
+              title={`Atualizar ${rowData.esquema}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -299,6 +317,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, { ...rowData })}
               bgColor="bg-green-600"
@@ -314,6 +333,7 @@ export default function Listagem({
 						"
           >
             <Button
+              title={`Atualizar ${rowData.esquema}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
               textColor="white"
@@ -329,6 +349,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={() => handleStatus(rowData.id, { ...rowData })}
               bgColor="bg-red-800"
@@ -344,9 +365,9 @@ export default function Listagem({
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnCampos[item] === 'esquema') {
         tableFields.push(headerTableFactory('Esquema', 'esquema'));
       }
@@ -473,8 +494,7 @@ export default function Listagem({
     idLayoutQuadra: number,
     data: any,
   ): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${
-      userLogado.userCulture.cultura_selecionada
+    const parametersFilter = `filterStatus=${1}&id_culture=${userLogado.userCulture.cultura_selecionada
     }&esquema=${data.esquema}&status=${1}`;
     if (data.status == 0) {
       await layoutQuadraService.getAll(parametersFilter).then((response) => {
@@ -550,18 +570,17 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-
     await layoutQuadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = quadras.map((row) => {
+        const newData = response.response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;
           } else {
             row.status = 'Ativo' as any;
           }
+          delete row.id;
+          delete row.id_culture;
+          delete row.tableData;
 
           return row;
         });
@@ -664,7 +683,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
                   <div className="h-6 w-1/2 ml-4">
@@ -674,7 +693,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -684,22 +703,77 @@ export default function Listagem({
 
                   {filterFieldFactory('filterPlantadeira', 'Plantadeiras')}
 
-                  {filterFieldFactory('filterTiros', 'Tiros')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Tiros
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterPopFrom"
+                        name="filterPopFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterPopTo"
+                        name="filterPopTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
-                  {filterFieldFactory('filterDisparos', 'Disparos')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Disparos
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterShotsFrom"
+                        name="filterShotsFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterShotsTo"
+                        name="filterShotsTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
-                  {filterFieldFactory('filterParcelas', 'Numero Parcelas')}
-                </div>
-
-                <div style={{ width: 40 }} />
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Parcelas
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterParcelFrom"
+                        name="filterParcelFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterParcelTo"
+                        name="filterParcelTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
               </form>
             </div>
@@ -716,7 +790,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -736,17 +810,17 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
+                    {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
+                        onClick={() => { }}
                         href="layout-quadra/importar-planilha"
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div>
+                    </div> */}
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -826,10 +900,11 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => {}}
+                          onClick={() => { }}
                           href="layout-quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -898,7 +973,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

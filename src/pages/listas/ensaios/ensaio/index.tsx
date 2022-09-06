@@ -4,7 +4,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -40,7 +40,7 @@ export default function TipoEnsaio({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-}: IAssayListGrid) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -52,7 +52,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,countNT,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
@@ -62,9 +62,9 @@ export default function TipoEnsaio({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
     },
@@ -81,7 +81,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'countNT', defaultChecked: () => camposGerenciados.includes('countNT'),
+      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'treatmentsNumber', defaultChecked: () => camposGerenciados.includes('treatmentsNumber'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
@@ -101,24 +101,32 @@ export default function TipoEnsaio({
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
+      filterTratFrom: '',
+      filterTratTo: '',
       filterFoco: '',
+      filterProtocol: '',
       filterTypeAssay: '',
       filterGli: '',
       filterTechnology: '',
+      filterCod: '',
       filterTreatmentNumber: '',
       filterStatusAssay: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
+      filterCod,
+      filterTratFrom,
+      filterTratTo,
       filterFoco,
+      filterProtocol,
       filterTypeAssay,
       filterGli,
       filterTechnology,
       filterTreatmentNumber,
       filterStatusAssay,
     }) => {
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterProtocol=${filterProtocol}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
@@ -183,7 +191,7 @@ export default function TipoEnsaio({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -266,6 +274,7 @@ export default function TipoEnsaio({
             <div style={{ width: 5 }} />
             <div>
               <Button
+                title={`Deletar ${rowData.gli}`}
                 icon={<BsTrashFill size={14} />}
                 onClick={() => deleteItem(rowData.id)}
                 bgColor="bg-red-600"
@@ -306,13 +315,40 @@ export default function TipoEnsaio({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'id') {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[item] === 'protocol_name') {
         tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
       }
@@ -326,10 +362,12 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Nome da tecnologia', 'tecnologia.name'));
+        tableFields.push(
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
+        );
       }
-      if (columnOrder[item] === 'countNT') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'countNT'));
+      if (columnOrder[item] === 'treatmentsNumber') {
+        tableFields.push(headerTableFactory('Nº de trat.', 'treatmentsNumber'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(headerTableFactory('Status do ensaio', 'status'));
@@ -394,27 +432,20 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    let newFilter;
-    if (!filterApplication.includes('paramSelect')) {
-      newFilter = `${filterApplication}&paramSelect=${camposGerenciados}`;
-    }
-
-    await assayListService.getAll(newFilter).then(({ status, response }) => {
+    await assayListService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
-          if (newItem.foco) {
-            newItem.foco = newItem.foco.name;
-          }
-          if (newItem.type_assay) {
-            newItem.type_assay = newItem.type_assay.name;
-          }
-          if (newItem.tecnologia) {
-            newItem.tecnologia = newItem.tecnologia.name;
-          }
-          if (newItem.genotype_treatment) {
-            newItem.genotype_treatment = newItem.genotype_treatment[0]?.treatments_number;
-          }
+
+          newItem.foco = newItem.foco?.name;
+          newItem.type_assay = newItem.type_assay?.name;
+          newItem.tecnologia = newItem.tecnologia?.name;
+
+          delete newItem.id;
+          delete newItem.id_safra;
+          delete newItem.experiment;
+          delete newItem.genotype_treatment;
+
           return newItem;
         });
         const workSheet = XLSX.utils.json_to_sheet(response);
@@ -449,9 +480,9 @@ export default function TipoEnsaio({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -515,11 +546,43 @@ export default function TipoEnsaio({
                   pb-0
                 "
                 >
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Protocolo
+                    </label>
+                    <Input
+                      placeholder="Protocolo"
+                      id="filterProtocol"
+                      name="filterProtocol"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterTechnology', 'Tecnologia')}
-                  {filterFieldFactory('filterTreatmentNumber', 'Nº de trat.')}
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nº de trat.
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTratFrom"
+                        name="filterTratFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTratTo"
+                        name="filterTratTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                   {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
 
                   <div style={{ width: 40 }} />
@@ -549,7 +612,7 @@ export default function TipoEnsaio({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb' },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -580,6 +643,8 @@ export default function TipoEnsaio({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -728,15 +793,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = filterBeforeEdit
+  const filterApplication = req.cookies.filterBeforeEdit
     ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 

@@ -2,7 +2,7 @@
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import router from 'next/router';
@@ -84,7 +84,7 @@ export default function Listagem({
   totalItems,
   pageBeforeEdit,
   filterBeforeEdit,
-}: Idata) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -109,12 +109,12 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Favorito ',
-      value: 'id',
-      defaultChecked: () => camposGerenciados.includes('id'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Nome do L. de Cult.',
@@ -135,7 +135,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome Fazenda',
+      title: 'Nome da fazenda',
       value: 'adress',
       defaultChecked: () => camposGerenciados.includes('adress'),
     },
@@ -198,8 +198,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
+      const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}`;
 
       setFiltersParams(parametersFilter);
@@ -221,7 +220,7 @@ export default function Listagem({
     { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatus = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -236,7 +235,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: false,
+      sorting: true,
     };
   }
 
@@ -292,7 +291,7 @@ export default function Listagem({
           >
             <Button
               icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.adress}`}
+              title={`Atualizar ${rowData.name_local_culture}`}
               onClick={() => {
                 setCookies('filterBeforeEdit', filtersParams);
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -305,6 +304,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Ativo"
               icon={<FaRegThumbsUp size={14} />}
               onClick={async () => handleStatus(rowData.id, rowData.status)}
               bgColor="bg-green-600"
@@ -321,7 +321,7 @@ export default function Listagem({
           >
             <Button
               icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.adress}`}
+              title={`Atualizar ${rowData.name_local_culture}`}
               onClick={() => {
                 setCookies('filterBeforeEdit', filtersParams);
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -334,6 +334,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
+              title="Inativo"
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => await handleStatus(rowData.id, rowData.status)}
               bgColor="bg-red-800"
@@ -349,9 +350,9 @@ export default function Listagem({
     const objectCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
     Object.keys(objectCampos).forEach((item) => {
-      if (objectCampos[item] === 'id') {
-        arrOb.push(idHeaderFactory());
-      }
+      // if (objectCampos[item] === 'id') {
+      //   arrOb.push(idHeaderFactory());
+      // }
       if (objectCampos[item] === 'name_local_culture') {
         arrOb.push(
           headerTableFactory('Nome do L. de cult.', 'name_local_culture'),
@@ -513,15 +514,13 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
-      // filterApplication += `&paramSelect=${camposGerenciados}`;
-    }
-    console.log(filterApplication);
-
     await localService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = row.status === 0 ? 'Inativo' : 'Ativo';
+          delete row.dt_import;
+          delete row.id;
+          delete row.cultureUnity;
           const dataExp = new Date();
           let hours: string;
           let minutes: string;
@@ -562,7 +561,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Locais.xlsx');
+        XLSX.writeFile(workBook, 'Lugar de Cultura.xlsx');
       }
     });
   };
@@ -648,7 +647,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatus[13]}
+                      defaultValue={filterStatusBeforeEdit[13]}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -664,7 +663,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMloc', 'MLOC')}
 
-                  {filterFieldFactory('filterAdress', 'Nome Fazenda')}
+                  {filterFieldFactory('filterAdress', 'Nome da fazenda')}
 
                   {filterFieldFactory('filterLabelCountry', 'País')}
 
@@ -672,18 +671,17 @@ export default function Listagem({
 
                   {filterFieldFactory('filterNameLocality', 'Localidade')}
 
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ width: 40 }} />
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
               </form>
             </div>
           </AccordionFilter>
@@ -701,10 +699,12 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
-                rowStyle: (rowData: ILocalProps) => ({
-                  backgroundColor:
-                    selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
-                }),
+                // rowStyle: (rowData: ILocalProps) => ({
+                //   backgroundColor:
+                //     selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
+                //   height: 35,
+                // }),
+                rowStyle: { background: '#f9fafb', height: 35 },
               }}
               components={{
                 Toolbar: () => (
@@ -732,6 +732,7 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+                    <div className="h-12" />
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -883,7 +884,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

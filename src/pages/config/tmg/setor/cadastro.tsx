@@ -35,7 +35,7 @@ export default function Safra() {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios');
+        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
 
@@ -107,7 +107,7 @@ export default function Safra() {
 
           <div
             className="
-            h-10
+            h-7
             w-full
             flex
             gap-3

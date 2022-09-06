@@ -22,7 +22,7 @@ export class UserController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
+        if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterName) {
@@ -43,10 +43,10 @@ export class UserController {
         select = {
           id: true,
           name: true,
+          tel: true,
+          login: true,
           cpf: true,
           email: true,
-          login: true,
-          tel: true,
           avatar: true,
           status: true,
         };

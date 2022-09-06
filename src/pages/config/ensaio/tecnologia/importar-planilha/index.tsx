@@ -122,7 +122,7 @@ export default function Importar({ idCulture }: Idata) {
   );
 }
 
-// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+// export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
 //   const { publicRuntimeConfig } = getConfig();
 //   const token = req.cookies.token;
 //   const idCulture = req.cookies.cultureId;

@@ -15,17 +15,19 @@ export class AssayListRepository {
       select: {
         id: true,
         id_safra: true,
+        protocol_name: true,
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
-        tecnologia: { select: { name: true } },
-        experiment: true,
+        tecnologia: { select: { name: true, cod_tec: true } },
+        genotype_treatment: true,
         gli: true,
-        period: true,
-        protocol_name: true,
         bgm: true,
-        project: true,
+        treatmentsNumber: true,
         status: true,
+        project: true,
         comments: true,
+        experiment: true,
+        period: true,
       },
     });
 
@@ -40,10 +42,11 @@ export class AssayListRepository {
     return result;
   }
 
-  async findByName({ gli }: any) {
+  async findByName({ gli, id_safra }: any) {
     const result = await prisma.assay_list.findFirst({
       where: {
         gli,
+        id_safra,
       },
     });
 
