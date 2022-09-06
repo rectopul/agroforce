@@ -86,15 +86,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allGenotipos,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idCulture,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -241,9 +241,8 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, "genotipo");
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'genotipo');
 
     await genotipoService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
@@ -529,7 +528,7 @@ export default function Listagem({
       .then(({ response, status }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.desc}`;
+            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
             delete row.id;
             delete row.id_tecnologia;
@@ -598,21 +597,20 @@ export default function Listagem({
 
   // paginação certa
   async function handlePagination(): Promise<void> {
-
-    //manage using comman function
+    // manage using comman function
     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setGenotipo(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 5000); //Remove State    
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 5000); // Remove State
       }
     });
   }
 
-  function filterFieldFactory(title: any, name: any,) {
+  function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -645,7 +643,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
-              defaultValue={checkValue("filterGmrRangeFrom")}
+              defaultValue={checkValue('filterGmrRangeFrom')}
               onChange={formik.handleChange}
             />
           </div>
@@ -656,7 +654,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
-              defaultValue={checkValue("filterGmrRangeTo")}
+              defaultValue={checkValue('filterGmrRangeTo')}
               onChange={formik.handleChange}
             />
           </div>
@@ -700,12 +698,12 @@ export default function Listagem({
   }
   // remove states
   function removestate() {
-    localStorage.removeItem("filterValueEdit");
-    localStorage.removeItem("pageBeforeEdit");
-    setTimeout(() => { }, 5000)
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+    setTimeout(() => { }, 5000);
   }
 
-  //Checkingdefualt values
+  // Checkingdefualt values
   function checkValue(value: any) {
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;

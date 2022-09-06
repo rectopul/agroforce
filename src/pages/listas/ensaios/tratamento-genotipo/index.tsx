@@ -78,7 +78,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
-  const [message, setMessage] = useState<boolean>(false);
+  const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -193,6 +193,10 @@ export default function Listagem({
       filterNca: '',
       orderBy: '',
       typeOrder: '',
+      filterBgmTo: '',
+      filterBgmFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -204,6 +208,10 @@ export default function Listagem({
       filterStatusAssay,
       filterGenotypeName,
       filterNca,
+      filterBgmTo,
+      filterBgmFrom,
+      filterNtTo,
+      filterNtFrom,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
@@ -216,7 +224,7 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `skip=0&take=${take}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}`;
+      const parametersFilter = `skip=0&take=${take}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
@@ -290,6 +298,33 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -304,7 +339,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory('Nome da tecnologia', 'assay_list.tecnologia.name'),
+          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
         );
       }
       if (columnOrder[item] === 'gli') {
@@ -402,7 +437,7 @@ export default function Listagem({
             const newItem: any = {};
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
             newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
@@ -442,7 +477,7 @@ export default function Listagem({
             newItem.safra = item.safra.safraName;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
+            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
             newItem.gli = item.assay_list.gli;
             newItem.bgm = item.assay_list.bgm;
             newItem.nt = item.treatments_number;
@@ -528,7 +563,7 @@ export default function Listagem({
         moduleId: 27,
         idSafra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
-      }).then(({ message }) => {
+      }).then(({ message }: any) => {
         Swal.fire({
           html: message,
           width: '800',
@@ -744,7 +779,26 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  {filterFieldFactory('filterBgm', 'BGM')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      BGM
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterBgmFrom"
+                        name="filterBgmFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterBgmTo"
+                        name="filterBgmTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <div
                   className="w-full h-full
@@ -754,7 +808,26 @@ export default function Listagem({
                   pb-3
                   "
                 >
-                  {filterFieldFactory('filterTreatmentsNumber', 'NT')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                   {filterFieldFactory('filterStatus', 'Status T')}
 
                   <div className="h-10 w-1/2 ml-4">
@@ -826,7 +899,6 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
-                  {filterFieldFactory('filterNca', 'NCA')}
 
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -883,7 +955,7 @@ export default function Listagem({
               }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: message ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                  emptyDataSourceMessage: tableMessage ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
               onChangeRowsPerPage={(e: any) => { }}
@@ -1096,7 +1168,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
