@@ -20,10 +20,11 @@ import { useRouter } from 'next/router';
 
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiArrowUpDownLine, RiSettingsFill } from 'react-icons/ri';
+import { RiArrowUpDownLine } from 'react-icons/ri';
 
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
+import Modal from 'react-modal';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../../components';
@@ -90,6 +91,7 @@ export default function Listagem({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const checkedTreatments = JSON.parse(localStorage.getItem('checkedTreatments') as string);
   const treatmentsOptionSelected = JSON.parse(localStorage.getItem('treatmentsOptionSelected') as string);
+  let replaceName;
 
   const preferences = userLogado.preferences.lote || {
     id: 0, table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
@@ -98,6 +100,7 @@ export default function Listagem({
   const router = useRouter();
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [orderList, setOrder] = useState<number>(1);
@@ -121,10 +124,11 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isReplaceGenotypeId, setIsReplaceGenotypeId] = useState<any>(null);
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterYear: '',
@@ -229,6 +233,16 @@ export default function Listagem({
     };
   }
 
+  async function openModal(id: number, genotipoName: string, nccName: number) {
+    if (checkedTreatments[0].genotipo) {
+      setNameReplace(genotipoName);
+    } else {
+      setNameReplace(nccName);
+    }
+    setIsReplaceGenotypeId(id);
+    setIsOpenModal(true);
+  }
+
   async function replaceTreatmentButton(id: number) {
     const { message } = await replaceTreatmentService.replace({ id, checkedTreatments });
     Swal.fire({
@@ -253,7 +267,7 @@ export default function Listagem({
           <Button
             title="Substituir genótipo/nca"
             type="button"
-            onClick={() => { replaceTreatmentButton(rowData.id); }}
+            onClick={() => { openModal(rowData.id, rowData.genotipo.name_genotipo, rowData.ncc); }}
             rounder="rounded-full"
             bgColor="bg-green-600"
             textColor="white"
@@ -344,7 +358,6 @@ export default function Listagem({
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
-
     setStatusAccordion(false);
     setCamposGerenciados(campos);
   }
@@ -357,7 +370,6 @@ export default function Listagem({
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
-
     setGeneratesProps(items);
   }
 
@@ -420,6 +432,61 @@ export default function Listagem({
   return (
     <>
       <Head><title>Listagem de Lotes</title></Head>
+
+      <Modal
+        isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+        className="flex
+        flex-col
+        w-full h-36
+        h-64
+        max-w-xl
+        bg-gray-50
+        rounded-tl-2xl
+        rounded-tr-2xl
+        rounded-br-2xl
+        rounded-bl-2xl
+        pt-2
+        pb-4
+        px-8
+        relative
+        shadow-lg
+        shadow-gray-900/50"
+      >
+        <div className="flex flex-col">
+          <div className="flex">
+            <h1>
+              Você tem certeza que deseja substituir os
+              {' '}
+              {checkedTreatments.length}
+              {' '}
+              selecionados por
+              {' '}
+              {nameReplace}
+            </h1>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+          </div>
+          <div className="flex justify-center">
+            <button type="button" onClick={() => replaceTreatmentButton(isReplaceGenotypeId)}>
+              <h1>SIM</h1>
+            </button>
+            <div style={{ width: 150 }} />
+            <button type="button" onClick={() => setIsOpenModal(false)}>
+              <h1>NÃO</h1>
+            </button>
+          </div>
+
+        </div>
+      </Modal>
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main className="h-full w-full

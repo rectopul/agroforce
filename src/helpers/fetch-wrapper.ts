@@ -76,14 +76,11 @@ async function deleted(url: any, body: any) {
   return handleResponse(response);
 }
 
-
-// For global pagination 
+// For global pagination
 async function handlePaginationGlobal(currentPages: any, take: any, filter: any) {
-
-  if (localStorage.getItem("filterValueEdit")) {
-    filter = localStorage.getItem("filterValueEdit");
-  }
-  else {
+  if (localStorage.getItem('filterValueEdit')) {
+    filter = localStorage.getItem('filterValueEdit');
+  } else {
     filter = filter;
   }
 
@@ -137,7 +134,7 @@ async function handleFilterParameter(...theArgs: any) {
 
   switch (key) {
    
-    case "safra":
+    case 'safra':
       parametersFilter = await safra(theArgs);
       break;
 
@@ -145,24 +142,20 @@ async function handleFilterParameter(...theArgs: any) {
       parametersFilter = await genotipo(theArgs);  
       break;
 
-    case "lote":
+    case 'lote':
       parametersFilter = await lote(theArgs);
       break;
 
-    case "setor":
+    case 'setor':
       parametersFilter = await setor(theArgs);
       break;
 
-    case "usuarios":
+    case 'usuarios':
       parametersFilter = await usuarios(theArgs);
       break;
 
-    case "cultura":
+    case 'cultura':
       parametersFilter = await cultura(theArgs);
-      break;
-
-    case "experimento":
-      parametersFilter = await experimento(theArgs);
       break;
 
     default:
@@ -173,7 +166,6 @@ async function handleFilterParameter(...theArgs: any) {
 }
 
 function safra(theArgs: any) {
-
   const [key1, filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate, cultureId] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
 
@@ -181,7 +173,6 @@ function safra(theArgs: any) {
 }
 
 function genotipo(theArgs: any) {
-
   const [key2, filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom] = theArgs;
 
   // const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
@@ -191,19 +182,15 @@ function genotipo(theArgs: any) {
   return parametersFilter;
 }
 
-
 function lote(theArgs: any) {
-
-  const [key3, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1,] = theArgs;
+  const [key3, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1] = theArgs;
 
   const parametersFilter = `&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}`;
 
   return parametersFilter;
 }
 
-
 function setor(theArgs: any) {
-
   const [key4, filterStatus2, filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus2 || 1}&filterSearch=${filterSearch}`;
 
@@ -211,36 +198,22 @@ function setor(theArgs: any) {
 }
 
 function usuarios(theArgs: any) {
-
   const [key, filterStatus, filterName, filterLogin] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus || 1
-    }&filterName=${filterName}&filterLogin=${filterLogin}`;
+  }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
   return parametersFilter;
 }
 
 function cultura(theArgs: any) {
-
   const [key, filterStatus, filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
 
-
-// experimento in list
-function experimento(theArgs: any) {
-
-  const [key, filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod,filterDelineamento,filterRepetition,filterStatus,idSafra] = theArgs;
-
-  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
-
-  return parametersFilter;
-}
-
-//Handle orders global  
+// Handle orders global
 function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
-
   let typeOrder: any;
   let parametersFilter: any;
   if (order === 1) {
@@ -263,29 +236,26 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
     parametersFilter = filter;
   }
 
-  if (from == "safra" || from == "setor") {
+  if (from == 'safra' || from == 'setor') {
     // Remove extra values here
-    parametersFilter = removeExtraValues(parametersFilter, from, "&orderBy");
+    parametersFilter = removeExtraValues(parametersFilter, from, '&orderBy');
     return parametersFilter;
   }
-  else if (from == "genotipo") {
+  if (from == 'genotipo') {
     // Remove extra values here
-    parametersFilter = removeExtraValues(parametersFilter, from, "&id_culture");
-    return parametersFilter;
-  }
-  else {
+    parametersFilter = removeExtraValues(parametersFilter, from, '&id_culture');
     return parametersFilter;
   }
 
+  return parametersFilter;
 }
 
 function removeExtraValues(parametersFilter: any, from: any, remove: any) {
-
   const myArray = parametersFilter.split(remove);
 
   if (myArray.length > 2) {
-    parametersFilter = "";
-    parametersFilter = myArray[0] + remove + myArray[2]
+    parametersFilter = '';
+    parametersFilter = myArray[0] + remove + myArray[2];
   }
 
   return parametersFilter;
@@ -293,12 +263,11 @@ function removeExtraValues(parametersFilter: any, from: any, remove: any) {
 
 // Get Values from Url
 function getValueParams(ParameterString: any) {
-
   let c;
-  if (localStorage.getItem("filterValueEdit")) {
-    let convert = localStorage.getItem("filterValueEdit");
-    let url_string = `http://www.example.com/t.html?${convert}`;
-    let url = new URL(url_string);
+  if (localStorage.getItem('filterValueEdit')) {
+    const convert = localStorage.getItem('filterValueEdit');
+    const url_string = `http://www.example.com/t.html?${convert}`;
+    const url = new URL(url_string);
     c = url.searchParams.get(ParameterString)?.toString();
   }
 

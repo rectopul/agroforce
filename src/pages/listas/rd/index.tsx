@@ -24,6 +24,9 @@ import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { useFormik } from 'formik';
 import {
+  Box, Tab, Tabs, Typography,
+} from '@mui/material';
+import {
   AccordionFilter, CheckBox, Button, Content, Input,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
@@ -44,16 +47,12 @@ interface IGenerateProps {
   value: string | number | readonly string[] | undefined;
 }
 
-interface IData {
-  allLogs: LogData[];
-  totalItems: number;
-  itensPerPage: number;
-  filterApplication: object | any;
-  id_genotipo: number;
-  uploadInProcess: number;
-  idSafra: number
-  idCulture: number
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
+
 export default function Import({
   allLogs, totalItems, itensPerPage, filterApplication, uploadInProcess, idSafra, idCulture,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -460,6 +459,41 @@ export default function Import({
     );
   }
 
+  function TabPanel(props: TabPanelProps) {
+    const {
+      children, value, index, ...other
+    } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+        )}
+      </div>
+    );
+  }
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    };
+  }
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -480,65 +514,162 @@ export default function Import({
             </div>
             <hr />
 
-            <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
-              <div className="h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  bgColor={bgColor}
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(0, '')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Cadastros RD</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-0" name="inputFile-0" />
-              </div>
-            </div>
+            <Box sx={{ width: '100%' }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                  <Tab label="Pesquisa" {...a11yProps(0)} />
+                  <Tab label="Equipe de dados" {...a11yProps(1)} />
+                </Tabs>
+              </Box>
 
-            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-              <div className=" h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  bgColor={bgColor}
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(26, 'ASSAY_LIST')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Importar Lista de Ensaio</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-26" name="inputFile-26" />
-              </div>
-            </div>
+              <TabPanel value={value} index={0}>
 
-            <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-              <div className=" h-20 w-20 flex items-center mr-1">
-                <Button
-                  textColor="white"
-                  title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
-                  bgColor={bgColor}
-                  rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                  onClick={() => readExcel(22, 'EXPERIMENT')}
-                  icon={<IoIosCloudUpload size={40} />}
-                  disabled={disabledButton}
-                  type="button"
-                />
-              </div>
-              <div className="col-span-2" style={{ marginLeft: '-15%' }}>
-                <span className="font-bold">Importar Lista de Experimento</span>
-                <p>ultimo update 28/06/22</p>
-                <Input type="file" required id="inputFile-22" name="inputFile-22" />
-              </div>
-            </div>
+                <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
+                  <div className="h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(0, '')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Cadastros RD</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-0" name="inputFile-0" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(26, 'ASSAY_LIST')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Lista de Ensaio</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-26" name="inputFile-26" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, 'EXPERIMENT')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Lista de Experimento</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-22" name="inputFile-22" />
+                  </div>
+                </div>
+
+              </TabPanel>
+
+              <TabPanel value={value} index={1}>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(7, 'DELIMITATION')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Delineamento</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-7" name="inputFile-7" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(14, 'NPE')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar NPE</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-14" name="inputFile-14" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(17, 'BLOCK')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Quadra</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-17" name="inputFile-17" />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      bgColor={bgColor}
+                      title={disabledButton ? 'Outra planilha já esta sendo importada' : 'Upload'}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: '-15%' }}>
+                    <span className="font-bold">Importar Layout de quadra</span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input type="file" required id="inputFile-5" name="inputFile-5" />
+                  </div>
+                </div>
+
+              </TabPanel>
+            </Box>
 
           </div>
 
