@@ -14,6 +14,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN npm install next  --frozen-lockfile --legacy-peer-deps
 RUN npx prisma generate
 RUN npx update
+ENV DATABASE_URL "mysql://root:root@localhost:3306/agro_force" 
 RUN npm run build
 RUN yarn build
 RUN yarn cache clean
@@ -23,6 +24,7 @@ FROM node:16-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
+
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
