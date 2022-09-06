@@ -44,6 +44,8 @@ interface IFilter {
   filterPeriod: string
   filterDelineamento: string
   filterRepetition: string
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -159,6 +161,8 @@ export default function Listagem({
       filterPeriod: '',
       filterDelineamento: '',
       filterRepetition: '',
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -173,6 +177,8 @@ export default function Listagem({
       filterPeriod,
       filterDelineamento,
       filterRepetition,
+      filterRepetitionTo,
+      filterRepetitionFrom,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
@@ -184,7 +190,7 @@ export default function Listagem({
         }
       }
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}`;
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
       await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -668,7 +674,26 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
-                  {filterFieldFactory('filterRepetition', 'Repetição')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <div className="w-full" style={{ marginLeft: -80 }} />
 

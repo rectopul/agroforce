@@ -37,4 +37,8 @@ export interface ITreatmentFilter {
   filterNca: string
   orderBy: string
   typeOrder: string
+  filterBgmTo: string | any
+  filterBgmFrom: string | any
+  filterNtTo: string | any
+  filterNtFrom: string | any
 }
