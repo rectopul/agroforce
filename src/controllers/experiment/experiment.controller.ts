@@ -100,7 +100,7 @@ export class ExperimentController {
               bgm: true,
               protocol_name: true,
               status: true,
-              genotype_treatment: true,
+              genotype_treatment: { include: { genotipo: true } },
               tecnologia: {
                 select: {
                   name: true,

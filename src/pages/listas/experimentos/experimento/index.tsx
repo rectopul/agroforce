@@ -130,6 +130,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [colorStar, setColorStar] = useState<string>('');
+  const [order,setOrderParams]=useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -213,10 +214,13 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'experimento');
 
+    setOrderParams(parametersFilter);
+    
     await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         setFiltersParams(parametersFilter);
+        
       }
     });
 
@@ -232,6 +236,7 @@ export default function Listagem({
       }
     }
   }
+
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -320,6 +325,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                // localStorage.setItem('orderSorting', order);
                 router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -470,19 +478,49 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await experimentService.getAll(filterApplication).then(({ status, response, message }: any) => {
+    await experimentService.getAll(filtersParams).then(({ status, response, message }: any) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
-          newItem.gli = item.assay_list?.gli;
-          newItem.protocol_name = item.assay_list?.protocol_name;
-          newItem.foco = item.assay_list?.foco.name;
-          newItem.type_assay = item.assay_list?.type_assay.name;
-          newItem.tecnologia = item.assay_list?.tecnologia.name;
-          newItem.local = newItem.local?.name_local_culture;
-          newItem.repeticao = item.delineamento?.repeticao;
-          newItem.delineamento = item.delineamento?.name;
+          newItem.Safra = item.assay_list?.safra?.safraName;
+          newItem.Foco = item.assay_list?.foco.name;
+          newItem.TipoDeEnsaio = item.assay_list?.type_assay.name;
+          newItem.Tecnologia = item.assay_list?.tecnologia.name;
+          newItem.Gli = item.assay_list?.gli;
+          newItem.NomeDoExperimento = item?.experimentName;
+          newItem.Bgm = item.assay_list?.bgm;
+          newItem.StatusEnsaio = item.assay_list?.status;
+          newItem.Plantio = newItem.local?.name_local_culture;
+          newItem.Delineamento = item.delineamento?.name;
+          newItem.Repetição = item.delineamento?.repeticao;
+          newItem.Densidade = item?.density;
+          newItem.NumeroDeRepetições = item.repetitionsNumber;
+          newItem.Época = item?.period;
+          newItem.OrdemSorteio = item?.orderDraw;
+          newItem.Nlp = item?.nlp;
+          newItem.Clp = item?.clp;
+          newItem.Eel = item?.eel;
+          newItem.Observações = item?.comments;
+          newItem.Protocolo = item.assay_list?.protocol_name;
+          newItem.CountNT = newItem.countNT;
+          newItem.NpeQT = newItem.npeQT;
 
+          delete newItem.countNT;
+          delete newItem.npeQT;
+          delete newItem.local;
+          delete newItem.delineamento;
+          delete newItem.eel;
+          delete newItem.clp;
+          delete newItem.nlp;
+          delete newItem.orderDraw;
+          delete newItem.comments;
+          delete newItem.period;
+          delete newItem.repetitionsNumber;
+          delete newItem.density;
+          delete newItem.status;
+          delete newItem.experimentName;
+          delete newItem.type_assay;
+          delete newItem.idSafra;
           delete newItem.id;
           delete newItem.assay_list;
           return newItem;
@@ -523,15 +561,34 @@ export default function Listagem({
     await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
+        // setFiltersParams(parametersFilter);
         // setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); // Set new current page
+        // setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 9000); // Remove State
+        
       }
     });
   }
 
+
+
+    // remove states
+    function removestate() {
+      localStorage.removeItem('filterValueEdit');
+      localStorage.removeItem('pageBeforeEdit');     
+    }
+  
+    // Checkingdefualt values
+    function checkValue(value: any) {
+      const parameter = fetchWrapper.getValueParams(value);
+      return parameter;
+    }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
+    // localStorage.removeItem('orderSorting');
+  
   }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
@@ -546,6 +603,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
