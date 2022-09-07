@@ -83,7 +83,7 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
   } else {
     filter = filter;
   }
-
+  console.log(filter);
   if (localStorage.getItem('pageBeforeEdit') != null) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
   } else {
@@ -133,13 +133,12 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-   
     case 'safra':
       parametersFilter = await safra(theArgs);
       break;
 
     case 'genotipo':
-      parametersFilter = await genotipo(theArgs);  
+      parametersFilter = await genotipo(theArgs);
       break;
 
     case 'lote':

@@ -61,9 +61,9 @@ export class AssayListController {
         id: true,
         id_safra: true,
         protocol_name: true,
-        foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
+        safra: { select: { safraName: true } },
         genotype_treatment: true,
         treatmentsNumber: true,
         gli: true,
@@ -73,6 +73,7 @@ export class AssayListController {
         comments: true,
         experiment: true,
         period: true,
+        foco: { select: { name: true } },
       };
 
       if (options.id_safra) {

@@ -23,6 +23,7 @@ import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
+import foco from 'src/pages/api/foco';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../../services';
@@ -437,10 +438,31 @@ export default function TipoEnsaio({
         response.map((item: any) => {
           const newItem = item;
 
-          newItem.foco = newItem.foco?.name;
-          newItem.type_assay = newItem.type_assay?.name;
-          newItem.tecnologia = newItem.tecnologia?.name;
+          newItem.Safra = newItem.safra?.safraName;
+          newItem.Protocolo = newItem?.protocol_name;
+          newItem.Foco = newItem.foco?.name;
+          newItem.TipoDeEnsaio = newItem.type_assay?.name;
+          newItem.Tecnologia = newItem.tecnologia?.name;
+          newItem.Gli = newItem?.gli;
+          newItem.Bgm = newItem?.bgm;
+          newItem.Status = newItem?.status;
+          newItem.Projeto = newItem?.project;
+          newItem.Observações = newItem?.comments;
+          newItem.NúmeroDeTratamentos = newItem?.countNT;
 
+          delete newItem.safra;
+          delete newItem.treatmentsNumber;
+          delete newItem.project;
+          delete newItem.status;
+          delete newItem.bgm;
+          delete newItem.gli;
+          delete newItem.tecnologia;
+          delete newItem.foco;
+          delete newItem.protocol_name;
+          delete newItem.countNT;
+          delete newItem.period;
+          delete newItem.comments;
+          delete newItem.type_assay;
           delete newItem.id;
           delete newItem.id_safra;
           delete newItem.experiment;
@@ -463,7 +485,7 @@ export default function TipoEnsaio({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
+        XLSX.writeFile(workBook, 'Ensaio.xlsx');
       }
     });
   };
