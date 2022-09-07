@@ -104,7 +104,7 @@ export default function Listagem({
       pageBeforeEdit,
       filterBeforeEdit,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs;
+  const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
