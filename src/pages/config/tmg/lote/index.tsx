@@ -26,13 +26,13 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
-import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterYearFrom: string | number;
@@ -110,7 +110,7 @@ export default function Listagem({
   const [orderList, setOrder] = useState<number>(1);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [filtersParams, setFiltersParams] = useState<any>(""); //Set filter Parameter 
+  const [filtersParams, setFiltersParams] = useState<any>(''); // Set filter Parameter
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -197,11 +197,10 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
     }) => {
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrTo, filterGmrFrom, filterBgmTo, filterBgmFrom);
 
-        // Call filter with there parameter   
-        const parametersFilter = await fetchWrapper.handleFilterParameter("lote",filterYear,filterCodLote,filterNcc,filterFase,filterPeso,filterSeeds,filterGenotipo,filterMainName,filterGmr,filterBgm,filterTecnologiaCod,filterTecnologiaDesc,);
-
-        setFiltersParams(parametersFilter); // Set filter pararameters       
+      setFiltersParams(parametersFilter); // Set filter pararameters
 
       await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
@@ -213,9 +212,8 @@ export default function Listagem({
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
- 
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"lote");
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
 
     await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
@@ -371,14 +369,40 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          newItem.name_genotipo = item.genotipo.name_genotipo;
-          newItem.name_main = item.genotipo.name_main;
-          newItem.gmr = item.genotipo.gmr;
-          newItem.bgm = item.genotipo.bgm;
-          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
+          const dataExp = new Date();
+          let hours: string;
+          let minutes: string;
+          let seconds: string;
+          if (String(dataExp.getHours()).length === 1) {
+            hours = `0${String(dataExp.getHours())}`;
+          } else {
+            hours = String(dataExp.getHours());
+          }
+          if (String(dataExp.getMinutes()).length === 1) {
+            minutes = `0${String(dataExp.getMinutes())}`;
+          } else {
+            minutes = String(dataExp.getMinutes());
+          }
+          if (String(dataExp.getSeconds()).length === 1) {
+            seconds = `0${String(dataExp.getSeconds())}`;
+          } else {
+            seconds = String(dataExp.getSeconds());
+          }
+          newItem.DT = `${dataExp.toLocaleDateString(
+            'pt-BR',
+          )} ${hours}:${minutes}:${seconds}`;
+
+          newItem.name_genotipo = item?.genotipo.name_genotipo;
+          newItem.name_main = item?.genotipo.name_main;
+          newItem.gmr = item?.genotipo.gmr;
+          newItem.bgm = item?.genotipo.bgm;
+          newItem.tecnologia = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+          newItem.data = newItem.DT;
+
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;
+
           return newItem;
         });
 
@@ -471,15 +495,14 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-   
-     //manage using comman function
-     const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
     await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
       }
     });
   }
@@ -832,7 +855,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

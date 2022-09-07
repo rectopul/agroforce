@@ -84,7 +84,6 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
   } else {
     filter = filter;
   }
-
   if(localStorage.getItem('orderSorting')){
     filter = localStorage.getItem('orderSorting');
     console.log("orderSorting ",filter)
@@ -140,13 +139,12 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-   
     case 'safra':
       parametersFilter = await safra(theArgs);
       break;
 
     case 'genotipo':
-      parametersFilter = await genotipo(theArgs);  
+      parametersFilter = await genotipo(theArgs);
       break;
 
     case 'lote':
