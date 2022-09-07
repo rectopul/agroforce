@@ -163,7 +163,7 @@ export default function Listagem({
       filterEndDate,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus || 1, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
@@ -502,7 +502,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await safraService.getAll(filterApplication).then((response) => {
+    await safraService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
@@ -883,7 +883,7 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600 test"
+                      bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}

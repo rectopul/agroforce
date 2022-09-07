@@ -133,7 +133,7 @@ export default function Listagem({
     onSubmit: async ({ filterStatus, filterSearch }) => {
    
       // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("setor",filterStatus, filterSearch );
+      const parametersFilter = await fetchWrapper.handleFilterParameter("setor",filterStatus || 1, filterSearch );
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies("filterBeforeEdit", filtersParams);
@@ -393,7 +393,7 @@ export default function Listagem({
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await departmentService.getAll(filterApplication).then((response) => {
+    await departmentService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
