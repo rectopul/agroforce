@@ -27,12 +27,13 @@ import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { userPreferencesService } from '../../../../services';
+import { npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
+import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
 
 interface IFilter {
   filterFoco: string
@@ -95,14 +96,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperiments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -524,7 +525,7 @@ export default function Listagem({
     { title: 'Epoca', field: 'epoca' },
     { title: 'NPE Inicial', field: 'npei' },
     { title: 'NPE Final', field: 'npef' },
-    { title: 'NPE Quantity', field: 'consumedQT' },
+    { title: 'NPE Quantity', field: 'npeQT' },
   ];
 
   const handleNPERowSelection = (rowData: any) => {
@@ -548,7 +549,7 @@ export default function Listagem({
           let i = NPESelectedRow.npei;
           response.map((item: any) => {
             item.npei = i;
-            item.npef = i + item.npeQT;
+            item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
           selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
@@ -558,17 +559,60 @@ export default function Listagem({
     }
   }
 
+  async function createExperimentGenotipe({ data, total_consumed }: any) {
+    let lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
+    let experimentObj: any[] = [];
+    experimentos.map((item: any) => {
+      let data: any = {};
+      data.id = Number(item.id);
+      data.status = "SORTEADO";
+      experimentObj.push(data);
+    })
+    if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE) {
+      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+        if (status === 200) {
+          experimentObj.map(async (x: any) => {
+            await experimentService.update(x).then(({ status, response }: any) => {
+              // console.log('status updated');
+            })
+          })
+
+          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed }).then(({ status, resposne }: any) => {
+            if (status === 200) {
+              router.push('/operacao/ambiente');
+            }
+          })
+        }
+      })
+    }
+  }
+
   function validateConsumedData() {
-    let totalConsumed = 0;
-    let lastNPE = 0;
-    const nextNPE = NPESelectedRow?.nextNPE;
-    experimentos.map((item) => {
-      totalConsumed += item.npeQT;
-      lastNPE = item?.npef;
+
+    let experiment_genotipo: any[] = [];
+    let npei = Number(NPESelectedRow?.npei);
+    let total_consumed = 0;
+
+    experimentos.map((item: any) => {
+      total_consumed += item.npeQT;
+      item.assay_list.genotype_treatment.map((gt: any) => {
+        let data: any = {};
+        data.idSafra = gt.id_safra;
+        data.idFoco = item.assay_list.foco.id;
+        data.idTypeAssay = item.assay_list.type_assay.id;
+        data.idTecnologia = item.assay_list.tecnologia.id;
+        data.gli = item.assay_list.gli;
+        data.experimentName = item.experimentName;
+        data.rep = item.delineamento.repeticao;
+        data.nt = gt.treatments_number;
+        data.npe = npei;
+        data.name_genotipo = gt.genotipo.name_genotipo;
+        data.nca = '';
+        experiment_genotipo.push(data);
+        npei++;
+      });
     });
-    let test = `To be Consumed - ${NPESelectedRow?.consumedQT}\nTotal Consumned - ${totalConsumed}\n`;
-    test += `Last NPE - ${lastNPE}\n Next NPE - ${nextNPE}`;
-    alert(test);
+    createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
   }
 
   useEffect(() => {

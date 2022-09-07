@@ -130,6 +130,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [colorStar, setColorStar] = useState<string>('');
+  const [order,setOrderParams]=useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -213,10 +214,13 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'experimento');
 
+    setOrderParams(parametersFilter);
+    
     await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         setFiltersParams(parametersFilter);
+        
       }
     });
 
@@ -232,6 +236,7 @@ export default function Listagem({
       }
     }
   }
+
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -320,6 +325,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                // localStorage.setItem('orderSorting', order);
                 router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -470,7 +478,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await experimentService.getAll(filterApplication).then(({ status, response, message }: any) => {
+    await experimentService.getAll(filtersParams).then(({ status, response, message }: any) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
@@ -553,15 +561,34 @@ export default function Listagem({
     await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
+        // setFiltersParams(parametersFilter);
         // setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); // Set new current page
+        // setCurrentPage(currentPages); //Set new current page
+        setTimeout(removestate, 9000); // Remove State
+        
       }
     });
   }
 
+
+
+    // remove states
+    function removestate() {
+      localStorage.removeItem('filterValueEdit');
+      localStorage.removeItem('pageBeforeEdit');     
+    }
+  
+    // Checkingdefualt values
+    function checkValue(value: any) {
+      const parameter = fetchWrapper.getValueParams(value);
+      return parameter;
+    }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
+    // localStorage.removeItem('orderSorting');
+  
   }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
@@ -576,6 +603,7 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>

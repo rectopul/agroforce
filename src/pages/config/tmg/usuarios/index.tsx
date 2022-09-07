@@ -170,7 +170,7 @@ export default function Listagem({
       //   }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
       // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus, filterName, filterLogin );
+      const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus || 1, filterName, filterLogin );
 
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
@@ -467,7 +467,7 @@ export default function Listagem({
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await userService.getAll(filterApplication).then((response) => {
+    await userService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         /* const newData = users.map((row: { avatar: any; status: any }) => {
           delete row.avatar;

@@ -157,7 +157,7 @@ export default function Listagem({
     onSubmit: async ({ filterStatus, filterSearch }) => {
 
       // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("cultura",filterStatus || 2 , filterSearch);
+      const parametersFilter = await fetchWrapper.handleFilterParameter("cultura",filterStatus || 1 , filterSearch);
 
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
@@ -427,7 +427,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await cultureService
-      .getAll(filterApplication)
+      .getAll(filtersParams)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
