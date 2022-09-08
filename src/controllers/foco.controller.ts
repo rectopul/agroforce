@@ -23,11 +23,11 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" :{"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupFrom) {
-          parameters.group = JSON.parse(`{ "some" :{"group": {"gte": ${Number(options.filterGroupFrom)} } } }`);
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" :{"group": {"lte": ${Number(options.filterGroupTo)} } } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
 
@@ -56,6 +56,7 @@ export class FocoController {
         skip,
         orderBy,
       );
+
       if (response.total > 0) {
         response.map((item: any) => {
           item.group.map((group: any) => {

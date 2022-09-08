@@ -70,8 +70,8 @@ interface IData {
   allFocos: IFocos[];
   totalItems: number;
   itensPerPage: number;
-  idCulture: number;
-  idSafra: number;
+  cultureId: number;
+  safraId: number;
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
@@ -81,7 +81,8 @@ export default function Listagem({
   allFocos,
   totalItems,
   itensPerPage,
-  idCulture,
+  cultureId,
+  safraId,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
@@ -143,8 +144,7 @@ export default function Listagem({
       filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${userLogado.userCulture.cultura_selecionada
-      }`;
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await focoService
@@ -161,7 +161,7 @@ export default function Listagem({
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   async function handleStatus(idFoco: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${idCulture}&filterSearch=${data.name}`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&filterSearch=${data.name}`;
     if (data.status === 0) {
       data.status = 1;
     } else {
@@ -379,7 +379,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
       if (columnOrder[index] === 'group') {
-        tableFields.push(headerTableFactory('Grupo', 'group[0].group'));
+        tableFields.push(headerTableFactory('Grupo', 'group.group'));
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -391,7 +391,7 @@ export default function Listagem({
   const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("type='checkbox'");
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -809,8 +809,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   )?.response[0]?.itens_per_page;
 
   const { token } = req.cookies;
-  const idSafra = req.cookies.safraId;
-  const idCulture = req.cookies.cultureId;
+  const { safraId } = req.cookies;
+  const { cultureId } = req.cookies;
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -821,10 +822,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idSafra}`
-    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}&id_safra=${safraId}`
+    : `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -847,8 +848,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       allFocos,
       totalItems,
       itensPerPage,
-      idCulture,
-      idSafra,
+      cultureId,
+      safraId,
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,

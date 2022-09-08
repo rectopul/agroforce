@@ -28,3 +28,4 @@ export * from './assay-list.service';
 export * from './genotypeTratment/genotype-treatment.service';
 export * from './genotypeTratment/replace-treatment.service';
 export * from './log-import.service';
+export * from './experiment-group.service';

@@ -83,6 +83,9 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
   } else {
     filter = filter;
   }
+  if (localStorage.getItem('orderSorting')) {
+    filter = localStorage.getItem('orderSorting');
+  }
 
   if (localStorage.getItem('pageBeforeEdit') != null) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
@@ -133,13 +136,12 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-   
     case 'safra':
       parametersFilter = await safra(theArgs);
       break;
 
     case 'genotipo':
-      parametersFilter = await genotipo(theArgs);  
+      parametersFilter = await genotipo(theArgs);
       break;
 
     case 'lote':
@@ -156,6 +158,10 @@ async function handleFilterParameter(...theArgs: any) {
 
     case 'cultura':
       parametersFilter = await cultura(theArgs);
+      break;
+
+    case 'experimento':
+      parametersFilter = await experimento(theArgs);
       break;
 
     default:
@@ -208,6 +214,15 @@ function usuarios(theArgs: any) {
 function cultura(theArgs: any) {
   const [key, filterStatus, filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
+
+  return parametersFilter;
+}
+
+// experimento in list
+function experimento(theArgs: any) {
+  const [key, filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod, filterDelineamento, filterRepetition, filterStatus, idSafra] = theArgs;
+
+  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
 
   return parametersFilter;
 }

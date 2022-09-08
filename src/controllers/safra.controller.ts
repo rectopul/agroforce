@@ -34,11 +34,10 @@ export class SafraController {
           `{"contains":"${options.filterSafra}"}`,
         );
       }
-      
+
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
-      
 
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {

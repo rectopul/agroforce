@@ -524,7 +524,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await genotipoService
-      .getAll(filterApplication)
+      .getAll(filtersParams)
       .then(({ response, status }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
