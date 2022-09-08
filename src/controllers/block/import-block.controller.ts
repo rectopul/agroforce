@@ -126,6 +126,8 @@ export class ImportBlockController {
                     cod_quadra: spreadSheet[row][column],
                     local: spreadSheet[row][2],
                     filterStatus: 1,
+                    id_safra: idSafra,
+                    id_culture: idCulture,
                   },
                 );
                 if (status === 200) {
@@ -592,7 +594,7 @@ export class ImportBlockController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Semente') {
+                if (configModule.response[0]?.fields[column] === 'SemMetro') {
                   if (spreadSheet[row][column] !== '') {
                     aux.sem_metros = spreadSheet[row][column];
                   }

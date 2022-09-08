@@ -7,7 +7,7 @@ export class DividersController {
 
   disparoRepository = new DisparoRepository();
 
-  async listAll(options: any) {
+  async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -76,6 +76,8 @@ export class DividersController {
 
   async create(data: any) {
     try {
+      console.log('data');
+      console.log(data);
       await this.disparoRepository.create(data);
       return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {

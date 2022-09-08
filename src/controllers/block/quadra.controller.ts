@@ -65,6 +65,10 @@ export class QuadraController {
         parameters.id_culture = Number(options.id_culture);
       }
 
+      if (options.id_safra) {
+        parameters.id_safra = Number(options.id_safra);
+      }
+
       if (options.cod_quadra) {
         parameters.cod_quadra = options.cod_quadra;
       }
