@@ -553,7 +553,7 @@ export default function Listagem({
     // manage using comman function
     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    await safraService.getAll(parametersFilter).then((response) => {
+    await safraService.getAll(`${parametersFilter}&id_culture=${cultureId}`).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
         setTotalItems(response.total); // Set new total records
