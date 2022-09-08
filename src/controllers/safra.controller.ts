@@ -23,8 +23,6 @@ export class SafraController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus != '2') {
           parameters.status = Number(options.filterStatus);

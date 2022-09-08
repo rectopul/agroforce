@@ -9,8 +9,6 @@ export class FocoController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -25,11 +23,11 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} }, "id_safra": ${Number(options.id_safra)} } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupFrom) {
-          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } }, "id_safra": ${Number(options.id_safra)} }`);
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } }, "id_safra": ${Number(options.id_safra)} }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
 
@@ -59,9 +57,6 @@ export class FocoController {
         orderBy,
       );
 
-      // console.log('response');
-      // console.log(response);
-
       if (response.total > 0) {
         response.map((item: any) => {
           item.group.map((group: any) => {
@@ -76,9 +71,6 @@ export class FocoController {
           });
         });
       }
-
-      // console.log('response');
-      // console.log(response[0]);
 
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };

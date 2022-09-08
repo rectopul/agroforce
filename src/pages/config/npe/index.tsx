@@ -516,7 +516,6 @@ export default function Listagem({
             row.type_assay = row.type_assay?.name;
             row.tecnologia = row.tecnologia?.name;
             row.local = row.local?.name_local_culture;
-            console.log(row);
             delete row.localId;
             delete row.safraId;
             delete row.npef;
