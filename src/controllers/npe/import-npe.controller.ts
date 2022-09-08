@@ -45,11 +45,21 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][6]}`;
-
+          const { status }: IReturnObject = await npeController.getAll({
+            filterSafra: spreadSheet[row][0],
+            filterFoco: spreadSheet[row][1],
+            filterEnsaio: spreadSheet[row][2],
+            filterCodTec: spreadSheet[row][3],
+            filterLocal: spreadSheet[row][4],
+            filterEpoca: spreadSheet[row][6],
+          });
+          if (status === 200) {
+            return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE já cadastrada no sistema` };
+          }
           if (npeTemp.includes(npeName)) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             npeTemp[row] = npeName;
-            return { status: 200, message: `Erro na linha ${Number(row) + 1}. NPE's duplicados na tabela` };
+            return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE's duplicados na tabela` };
           }
           npeTemp[row] = npeName;
           for (const column in spreadSheet[row]) {
@@ -163,14 +173,17 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'Foco') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) === 'string') {
-                  const foco: any = await focoController.getAll(
+                  const {
+                    status: focoStatus,
+                    response,
+                  }: IReturnObject = await focoController.getAll(
                     {
                       name: spreadSheet[row][column],
                       id_culture: idCulture,
                       filterStatus: 1,
                     },
                   );
-                  if (foco.total === 0) {
+                  if (focoStatus !== 200) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
@@ -178,12 +191,12 @@ export class ImportNpeController {
                       'o foco não existe no sistema',
                     );
                   } else {
-                    this.aux.focoId = foco.response[0]?.id;
-                    const { status }: IReturnObject = await groupController.getAll({
+                    this.aux.focoId = response[0]?.id;
+                    const { status: focoGroup }: IReturnObject = await groupController.getAll({
                       id_safra: idSafra,
-                      id_foco: this.aux.id_foco,
+                      id_foco: this.aux.focoId,
                     });
-                    if (status !== 200) {
+                    if (focoGroup !== 200) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,
                         row,
@@ -257,7 +270,7 @@ export class ImportNpeController {
                     Column: (Number(column) + 1),
                     Line: (Number(row) + 1),
                     safra: idSafra,
-                    foco: this.aux.id_foco,
+                    foco: this.aux.focoId,
                     npei: spreadSheet[row][column],
                   });
                   if (resp.erro === 1) {
@@ -359,7 +372,7 @@ export class ImportNpeController {
 
                 if (spreadSheet[row].length === (Number(column) + 1)) {
                   const { response: groupResponse }: any = await groupController.getAll(
-                    { id_safra: idSafra, id_foco: this.aux.id_foco },
+                    { id_safra: idSafra, id_foco: this.aux.focoId },
                   );
                   this.aux.groupId = Number(groupResponse[0]?.id);
                   await npeController.create(this.aux);

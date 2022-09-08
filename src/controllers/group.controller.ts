@@ -54,6 +54,7 @@ export class GroupController {
     try {
       const select = {
         id: true,
+        id_foco: true,
         foco: { select: { name: true, id: true } },
         safra: { select: { safraName: true } },
         npe: true,

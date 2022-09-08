@@ -38,6 +38,10 @@ export class NpeController {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
       }
 
+      if (options.filterCodTec) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+      }
+
       if (options.filterEpoca) {
         parameters.epoca = JSON.parse(`{ "contains": "${options.filterEpoca}" }`);
       }
@@ -177,6 +181,12 @@ export class NpeController {
         const group: any = await this.groupController.getAll(
           { id_safra: data.safra, id_foco: data.foco },
         );
+        console.log('data');
+        console.log(data);
+
+        console.log('group');
+        console.log(group);
+
         if (group.response.length > 0) {
           const safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
