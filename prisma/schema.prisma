@@ -82,6 +82,7 @@ model safra {
   quadra              quadra[]
   cultureUnity        cultureUnity[]
   experiment_genotipe experiment_genotipe[]
+  ExperimentGroup     ExperimentGroup[]
 }
 
 model uf {
@@ -448,27 +449,30 @@ model sequencia_delineamento {
 }
 
 model experiment {
-  id                Int          @id @default(autoincrement())
-  status            String       @default("IMPORTADO")
+  id                Int       @id @default(autoincrement())
+  status            String    @default("IMPORTADO")
   created_by        Int
-  created_at        DateTime?    @default(now())
-  clp               Decimal      @db.Decimal(5, 2)
-  comments          String       @db.LongText
+  created_at        DateTime? @default(now())
+  clp               Decimal   @db.Decimal(5, 2)
+  comments          String    @db.LongText
   density           Int
-  eel               Decimal      @db.Decimal(5, 2)
+  eel               Decimal   @db.Decimal(5, 2)
   experimentName    String
   idAssayList       Int
   idDelineamento    Int
+  experimentGroupId Int
   idLocal           Int
   idSafra           Int
   nlp               Int
   orderDraw         Int
   period            Int
   repetitionsNumber Int
-  assay_list        assay_list   @relation(fields: [idAssayList], references: [id])
-  delineamento      delineamento @relation(fields: [idDelineamento], references: [id])
-  local             local        @relation(fields: [idLocal], references: [id])
-  safra             safra        @relation(fields: [idSafra], references: [id])
+
+  assay_list      assay_list      @relation(fields: [idAssayList], references: [id])
+  delineamento    delineamento    @relation(fields: [idDelineamento], references: [id])
+  local           local           @relation(fields: [idLocal], references: [id])
+  safra           safra           @relation(fields: [idSafra], references: [id])
+  ExperimentGroup ExperimentGroup @relation(fields: [experimentGroupId], references: [id])
 }
 
 model log_import {
@@ -559,4 +563,20 @@ model experiment_genotipe {
   type_assay type_assay @relation(fields: [idTypeAssay], references: [id])
   tecnologia tecnologia @relation(fields: [idTecnologia], references: [id])
   foco       foco       @relation(fields: [idFoco], references: [id])
+}
+
+model ExperimentGroup {
+  id               Int      @id @default(autoincrement())
+  safraId          Int
+  name             String
+  experimentAmount Int
+  tagsToPrint      Int
+  tagsPrinted      Int
+  totalTags        Int
+  status           String
+  createdBy        Int
+  createdAt        DateTime @default(now())
+
+  safra      safra        @relation(fields: [safraId], references: [id])
+  experiment experiment[]
 }

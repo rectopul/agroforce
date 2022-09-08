@@ -23,18 +23,13 @@ export class TypeAssayController {
         parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
       }
 
-      if (options.id_safra) {
-        parameters.AND.push(JSON.parse(`{ "envelope": { "some": {"id_safra": ${Number(options.id_safra)} } } }`));
-      }
-
       if (options.filterSeedsFrom || options.filterSeedsTo) {
         if (options.filterSeedsFrom && options.filterSeedsTo) {
-          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
-          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} } } } }`));
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} }, "id_safra": ${Number(options.id_safra)} }  } }`));
         } else if (options.filterSeedsFrom) {
-          parameters.AND.push(JSON.parse(`{ "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)} } } } }`));
+          parameters.AND.push(JSON.parse(`{ "envelope": { "some" : {"seeds": { "gte": ${Number(options.filterSeedsFrom)} }, "id_safra": ${Number(options.id_safra)} } } }`));
         } else if (options.filterSeedsTo) {
-          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "lte": ${Number(options.filterSeedsTo)} } } } }`));
+          parameters.AND.push(JSON.parse(` { "envelope": { "some" : {"seeds": { "lte": ${Number(options.filterSeedsTo)} }, "id_safra": ${Number(options.id_safra)} } } }`));
         }
       }
 

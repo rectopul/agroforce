@@ -202,6 +202,15 @@ const tabsOperation = [
       { labelDropDown: 'Ambiente', hrefDropDown: '/operacao/ambiente', iconDropDown: <AiOutlineFileSearch /> },
     ],
   },
+  {
+    titleTab: 'ETIQUETAGEM',
+    valueTab: <BsCheckLg />,
+    statusTab: false,
+    hrefTab: '/operacao/etiquetagem',
+    data: [
+      { labelDropDown: 'Etiquetagem', hrefDropDown: '/operacao/etiquetagem', iconDropDown: <AiOutlineFileSearch /> },
+    ],
+  },
 ];
 
 // eslint-disable-next-line import/no-anonymous-default-export
