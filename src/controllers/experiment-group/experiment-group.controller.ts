@@ -1,6 +1,6 @@
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
-import { ExperimentGroupRepository } from '../../repository/experimentGroup.repository';
+import { ExperimentGroupRepository } from '../../repository/experiment-group.repository';
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
@@ -29,9 +29,12 @@ export class ExperimentGroupController {
         parameters.totalTags = Number(options.filterTotalTags);
       }
 
+      if (options.safraId) {
+        parameters.safraId = Number(options.safraId);
+      }
+
       const select = {
         id: true,
-        experimentId: true,
         name: true,
         experimentAmount: true,
         tagsToPrint: true,

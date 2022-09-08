@@ -52,79 +52,138 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
       preferences.usuario = await PreferencesControllers.getAll({
         userId: user.id, module_id: 1,
-      }); preferences.usuario = preferences.usuario.response[0];
+      });
+      preferences.usuario = preferences.usuario.response[0];
+
       preferences.culture = await PreferencesControllers.getAll({
         userId: user.id, module_id: 2,
-      }); preferences.culture = preferences.culture.response[0];
+      });
+      preferences.culture = preferences.culture.response[0];
+
       preferences.safra = await PreferencesControllers.getAll({
         userId: user.id, module_id: 3,
-      }); preferences.safra = preferences.safra.response[0];
+      });
+      preferences.safra = preferences.safra.response[0];
+
       preferences.local = await PreferencesControllers.getAll({
         userId: user.id, module_id: 4,
-      }); preferences.local = preferences.local.response[0];
+      });
+      preferences.local = preferences.local.response[0];
+
       preferences.layout_quadra = await PreferencesControllers.getAll({
         userId: user.id, module_id: 5,
-      }); preferences.layout_quadra = preferences.layout_quadra.response[0];
+      });
+      preferences.layout_quadra = preferences.layout_quadra.response[0];
+
       preferences.foco = await PreferencesControllers.getAll({
         userId: user.id, module_id: 6,
-      }); preferences.foco = preferences.foco.response[0];
+      });
+      preferences.foco = preferences.foco.response[0];
+
       preferences.delineamento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 7,
-      }); preferences.delineamento = preferences.delineamento.response[0];
+      });
+      preferences.delineamento = preferences.delineamento.response[0];
+
       preferences.tecnologia = await PreferencesControllers.getAll({
         userId: user.id, module_id: 8,
-      }); preferences.tecnologia = preferences.tecnologia.response[0];
+      });
+      preferences.tecnologia = preferences.tecnologia.response[0];
+
       preferences.tipo_ensaio = await PreferencesControllers.getAll({
         userId: user.id, module_id: 9,
-      }); preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
+      });
+      preferences.tipo_ensaio = preferences.tipo_ensaio.response[0];
+
       preferences.genotipo = await PreferencesControllers.getAll({
         userId: user.id, module_id: 10,
-      }); preferences.genotipo = preferences.genotipo.response[0];
+      });
+      preferences.genotipo = preferences.genotipo.response[0];
+
       preferences.department = await PreferencesControllers.getAll({
         userId: user.id, module_id: 11,
-      }); preferences.department = preferences.department.response[0];
+      });
+      preferences.department = preferences.department.response[0];
+
       preferences.lote = await PreferencesControllers.getAll({
         userId: user.id, module_id: 12,
-      }); preferences.lote = preferences.lote.response[0];
+      });
+      preferences.lote = preferences.lote.response[0];
+
       preferences.lote_portfolio = await PreferencesControllers.getAll({
         userId: user.id, module_id: 13,
-      }); preferences.lote_portfolio = preferences.lote_portfolio.response[0];
+      });
+      preferences.lote_portfolio = preferences.lote_portfolio.response[0];
+
       preferences.npe = await PreferencesControllers.getAll({
         userId: user.id, module_id: 14,
-      }); preferences.npe = preferences.npe.response[0];
+      });
+      preferences.npe = preferences.npe.response[0];
+
       preferences.sequencia_delineamento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 16,
-      }); preferences.sequencia_delineamento = preferences.sequencia_delineamento.response[0];
+      });
+      preferences.sequencia_delineamento = preferences.sequencia_delineamento.response[0];
+
       preferences.quadras = await PreferencesControllers.getAll({
         userId: user.id, module_id: 17,
-      }); preferences.quadras = preferences.quadras.response[0];
+      });
+      preferences.quadras = preferences.quadras.response[0];
+
       preferences.dividers = await PreferencesControllers.getAll({
         userId: user.id, module_id: 18,
-      }); preferences.dividers = preferences.dividers.response[0];
+      });
+      preferences.dividers = preferences.dividers.response[0];
+
       preferences.layout_children = await PreferencesControllers.getAll({
         userId: user.id, module_id: 19,
-      }); preferences.layout_children = preferences.layout_children.response[0];
+      });
+      preferences.layout_children = preferences.layout_children.response[0];
+
       preferences.group = await PreferencesControllers.getAll({
         userId: user.id, module_id: 20,
-      }); preferences.group = preferences.group.response[0];
+      });
+      preferences.group = preferences.group.response[0];
+
       preferences.unidadeCultura = await PreferencesControllers.getAll({
         userId: user.id, module_id: 21,
-      }); preferences.unidadeCultura = preferences.unidadeCultura.response[0];
+      });
+      preferences.unidadeCultura = preferences.unidadeCultura.response[0];
+
       preferences.experimento = await PreferencesControllers.getAll({
         userId: user.id, module_id: 22,
-      }); preferences.experimento = preferences.experimento.response[0];
+      });
+      preferences.experimento = preferences.experimento.response[0];
+
       preferences.envelope = await PreferencesControllers.getAll({
         userId: user.id, module_id: 24,
-      }); preferences.envelope = preferences.envelope.response[0];
+      });
+      preferences.envelope = preferences.envelope.response[0];
+
       preferences.rd = await PreferencesControllers.getAll({
         userId: user.id, module_id: 25,
-      }); preferences.rd = preferences.rd.response[0];
+      });
+      preferences.rd = preferences.rd.response[0];
+
       preferences.assayList = await PreferencesControllers.getAll({
         userId: user.id, module_id: 26,
-      }); preferences.assayList = preferences.assayList.response[0];
+      });
+      preferences.assayList = preferences.assayList.response[0];
+
       preferences.genotypeTreatment = await PreferencesControllers.getAll({
         userId: user.id, module_id: 27,
-      }); preferences.genotypeTreatment = preferences.genotypeTreatment.response[0];
+      });
+      preferences.genotypeTreatment = preferences.genotypeTreatment.response[0];
+
+      preferences.ambiente = await PreferencesControllers.getAll({
+        userId: user.id, module_id: 28,
+      });
+      preferences.ambiente = preferences.ambiente.response[0];
+
+      preferences.etiquetagem = await PreferencesControllers.getAll({
+        userId: user.id, module_id: 29,
+      });
+      preferences.etiquetagem = preferences.etiquetagem.response[0];
     }
 
     if (!user) throw new Error('Login ou senha é invalida!');
