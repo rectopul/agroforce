@@ -14,7 +14,6 @@ export class ExperimentGroupRepository {
       where: { id },
       select: {
         id: true,
-        experimentId: true,
         name: true,
         experimentAmount: true,
         tagsToPrint: true,
