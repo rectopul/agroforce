@@ -1,35 +1,33 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { removeCookies, setCookies } from 'cookies-next';
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { removeCookies, setCookies } from "cookies-next";
 import {
   AccordionFilter,
   Button,
@@ -37,10 +35,10 @@ import {
   Content,
   Input,
   Select,
-} from '../../../components';
-import { quadraService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import ITabs from '../../../shared/utils/dropdown';
+} from "../../../components";
+import { quadraService, userPreferencesService } from "../../../services";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
+import ITabs from "../../../shared/utils/dropdown";
 
 interface IFilter {
   filterStatus: object | any;
@@ -95,55 +93,57 @@ export default function Listagem({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS'
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "QUADRAS"
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.quadras || {
     id: 0,
-    table_preferences: 'id,local_preparo,cod_quadra,linha_p,esquema,status',
+    table_preferences: "id,local_preparo,cod_quadra,linha_p,esquema,status",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const router = useRouter();
   const [quadra, setQuadra] = useState<IQuadra[]>(() => quadras);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Local preparo',
-      value: 'local_preparo',
+      name: "CamposGerenciados[]",
+      title: "Local preparo",
+      value: "local_preparo",
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Código quadra',
-      value: 'cod_quadra',
+      name: "CamposGerenciados[]",
+      title: "Código quadra",
+      value: "cod_quadra",
     },
-    { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
-    { name: 'CamposGerenciados[]', title: 'Esquema', value: 'esquema' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: "CamposGerenciados[]", title: "Linha P", value: "linha_p" },
+    { name: "CamposGerenciados[]", title: "Esquema", value: "esquema" },
+    { name: "CamposGerenciados[]", title: "Status", value: "status" },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
   const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split("");
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -151,22 +151,27 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
-      filterSchema: '',
-      filterPTo: '',
-      filterPFrom: '',
-      filterPreparation: '',
-      orderBy: '',
-      typeOrder: '',
+      filterStatus: "",
+      filterSearch: "",
+      filterSchema: "",
+      filterPTo: "",
+      filterPFrom: "",
+      filterPreparation: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
-      filterStatus, filterSearch, filterSchema, filterPTo, filterPFrom,
+      filterStatus,
+      filterSearch,
+      filterSchema,
+      filterPTo,
+      filterPFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
       }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
       await quadraService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -179,7 +184,8 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${
+      data.cod_quadra
     }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
@@ -189,7 +195,7 @@ export default function Listagem({
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {
-        Swal.fire('Foco já ativado');
+        Swal.fire("Foco já ativado");
         return;
       }
       await quadraService.update({
@@ -199,7 +205,7 @@ export default function Listagem({
     });
 
     const index = quadra.findIndex(
-      (quadraIndex) => quadraIndex.id === idQuadra,
+      (quadraIndex) => quadraIndex.id === idQuadra
     );
 
     if (index === -1) {
@@ -215,26 +221,26 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any,
+    order: string | any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -256,7 +262,7 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
   }
@@ -282,44 +288,45 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
-      field: 'status',
+      title: "Status",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: IQuadra) => (
         <div className="h-7 flex">
           <div className="h-7">
@@ -329,8 +336,8 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.cod_quadra}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
                 router.push(`/config/quadra/atualizar?id=${rowData.id}`);
               }}
             />
@@ -340,10 +347,12 @@ export default function Listagem({
             <div className="h-7">
               <Button
                 icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
+                onClick={async () =>
+                  handleStatus(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 title="Ativo"
                 bgColor="bg-green-600"
                 textColor="white"
@@ -353,10 +362,12 @@ export default function Listagem({
             <div className="h-7">
               <Button
                 icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
+                onClick={async () =>
+                  handleStatus(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })
+                }
                 title="Inativo"
                 bgColor="bg-red-800"
                 textColor="white"
@@ -369,37 +380,37 @@ export default function Listagem({
   }
 
   function columnsOrder(columnsCampos: any): any {
-    const columnCampos: any = columnsCampos.split(',');
+    const columnCampos: any = columnsCampos.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'cod_quadra') {
-        tableFields.push(headerTableFactory('Código quadra', 'cod_quadra'));
+      if (columnCampos[index] === "cod_quadra") {
+        tableFields.push(headerTableFactory("Código quadra", "cod_quadra"));
       }
-      if (columnCampos[index] === 'comp_p') {
-        tableFields.push(headerTableFactory('Comp P', 'comp_p'));
+      if (columnCampos[index] === "comp_p") {
+        tableFields.push(headerTableFactory("Comp P", "comp_p"));
       }
-      if (columnCampos[index] === 'linha_p') {
-        tableFields.push(headerTableFactory('Linha P', 'linha_p'));
+      if (columnCampos[index] === "linha_p") {
+        tableFields.push(headerTableFactory("Linha P", "linha_p"));
       }
-      if (columnCampos[index] === 'esquema') {
-        tableFields.push(headerTableFactory('Esquema', 'esquema'));
+      if (columnCampos[index] === "esquema") {
+        tableFields.push(headerTableFactory("Esquema", "esquema"));
       }
-      if (columnCampos[index] === 'divisor') {
-        tableFields.push(headerTableFactory('Divisor', 'divisor'));
+      if (columnCampos[index] === "divisor") {
+        tableFields.push(headerTableFactory("Divisor", "divisor"));
       }
-      if (columnCampos[index] === 'local_plantio') {
-        tableFields.push(headerTableFactory('Local plantio', 'local_plantio'));
+      if (columnCampos[index] === "local_plantio") {
+        tableFields.push(headerTableFactory("Local plantio", "local_plantio"));
       }
-      if (columnCampos[index] === 'local_preparo') {
+      if (columnCampos[index] === "local_preparo") {
         tableFields.push(
-          headerTableFactory('Local preparo', 'local.name_local_culture'),
+          headerTableFactory("Local preparo", "local.name_local_culture")
         );
       }
-      if (columnCampos[index] === 'status') {
+      if (columnCampos[index] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -410,7 +421,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -433,7 +444,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.quadras = {
         id: preferences.id,
@@ -444,7 +455,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -464,42 +475,44 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await quadraService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
-          row.local = row.local?.name_local_culture;
-          delete row.id;
-          delete row.safra;
-          delete row.tableData;
-          delete row.local_plantio;
-          return row;
-        });
+    await quadraService
+      .getAll(filterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            if (row.status === 0) {
+              row.status = "Inativo" as any;
+            } else {
+              row.status = "Ativo" as any;
+            }
+            row.local = row.local?.name_local_culture;
+            delete row.id;
+            delete row.safra;
+            delete row.tableData;
+            delete row.local_plantio;
+            return row;
+          });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Quadras.xlsx');
-      } else {
-        Swal.fire(response);
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "buffer",
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "binary",
+          });
+          // Download
+          XLSX.writeFile(workBook, "Quadras.xlsx");
+        } else {
+          Swal.fire(response);
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -640,7 +653,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -648,14 +661,13 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
 
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={quadra}
               options={{
@@ -663,7 +675,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -695,10 +707,10 @@ export default function Listagem({
                       />
                     </div> */}
 
+                    <div />
+
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -742,7 +754,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                String(generate.value),
+                                                String(generate.value)
                                               )}
                                             />
                                           </li>
@@ -775,66 +787,67 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { }}
+                          onClick={() => {}}
                           href="quadra/importar-planilha/config-planilha"
                         />
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -844,11 +857,15 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 15;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 15;
 
   const { token } = req.cookies;
   const cultureId: number = Number(req.cookies.cultureId);
@@ -857,14 +874,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : "filterStatus=1";
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
@@ -874,14 +891,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   urlParameters.search = new URLSearchParams(param).toString();
 
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const response = await fetch(
     `${baseUrl}?id_culture=${cultureId}`,
-    requestOptions,
+    requestOptions
   );
   const { response: quadras, total: totalItems } = await response.json();
 
