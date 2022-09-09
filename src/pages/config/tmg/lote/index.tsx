@@ -154,8 +154,8 @@ export default function Listagem({
       filterSeedFrom: '',
       filterWeightTo: '',
       filterWeightFrom: '',
-      filterGmrTo: '',
       filterGmrFrom: '',
+      filterGmrTo: '',
       filterBgmTo: '',
       filterBgmFrom: '',
       filterYear: '',
@@ -180,8 +180,8 @@ export default function Listagem({
       filterSeedFrom,
       filterWeightTo,
       filterWeightFrom,
-      filterGmrTo,
       filterGmrFrom,
+      filterGmrTo,
       filterBgmTo,
       filterBgmFrom,
       filterYear,
@@ -198,8 +198,7 @@ export default function Listagem({
       filterTecnologiaDesc,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrTo, filterGmrFrom, filterBgmTo, filterBgmFrom);
-
+      const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
       setFiltersParams(parametersFilter); // Set filter pararameters
 
       await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -364,7 +363,6 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-
     await loteService.getAll(filtersParams).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
