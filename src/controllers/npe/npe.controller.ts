@@ -181,11 +181,6 @@ export class NpeController {
         const group: any = await this.groupController.getAll(
           { id_safra: data.safra, id_foco: data.foco },
         );
-        console.log('data');
-        console.log(data);
-
-        console.log('group');
-        console.log(group);
 
         if (group.response.length > 0) {
           const safra: any = await prisma.$queryRaw`SELECT npei

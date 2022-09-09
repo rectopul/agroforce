@@ -216,7 +216,7 @@ export default function Listagem({
       filterParcelFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
+      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await layoutQuadraService
