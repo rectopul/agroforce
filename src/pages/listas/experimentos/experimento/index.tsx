@@ -613,7 +613,7 @@ export default function Listagem({
     );
 
     await experimentService
-      .getAll(parametersFilter)
+      .getAll(`${parametersFilter}&idSafra=${idSafra}`)
       .then(({ status, response }: any) => {
         if (status === 200) {
           setExperimento(response);
