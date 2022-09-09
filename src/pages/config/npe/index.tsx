@@ -511,11 +511,30 @@ export default function Listagem({
             } else {
               row.status = 'Ativo';
             }
-            row.safra = row.safra?.safraName;
-            row.foco = row.foco?.name;
-            row.type_assay = row.type_assay?.name;
-            row.tecnologia = row.tecnologia?.name;
-            row.local = row.local?.name_local_culture;
+
+            row.Local = row.local?.name_local_culture;
+            row.Safra = row.safra?.safraName;
+            row.Foco = row.foco?.name;
+            row.Época = row?.epoca;
+            row.Tecnologia = row.tecnologia?.name;
+            row.Tipo_Ensaio = row.type_assay?.name;
+            row.Grupo = row.group.group;
+            row.NPEI = row.npei;
+            row.Status = row.status;
+            row.Quant_NPE = row?.npeQT;
+            row.Prox_NPE = row?.nextNPE;
+
+            delete row.local;
+            delete row.safra;
+            delete row.foco;
+            delete row.epoca;
+            delete row.tecnologia;
+            delete row.type_assay;
+            delete row.group;
+            delete row.npei;
+            delete row.status;
+            delete row.nextNPE;
+            delete row.npeQT;
             delete row.localId;
             delete row.safraId;
             delete row.npef;
