@@ -52,6 +52,7 @@ export class ImportNpeController {
             filterCodTec: spreadSheet[row][3],
             filterLocal: spreadSheet[row][4],
             filterEpoca: spreadSheet[row][6],
+            status: 1,
           });
           if (status === 200) {
             return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE já cadastrada no sistema` };
