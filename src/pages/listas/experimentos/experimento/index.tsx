@@ -90,19 +90,18 @@ interface IData {
 }
 
 export default function Listagem({
-      allExperiments,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   // const tabsDropDowns = TabsDropDowns('listas');
   const tabsDropDowns = TabsDropDowns();
-
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS'
     ? (tab.statusTab = true)
@@ -265,13 +264,12 @@ export default function Listagem({
 
     setOrderParams(parametersFilter);
 
-    let value = await fetchWrapper.skip(currentPage, parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await experimentService.getAll(value).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         setFiltersParams(parametersFilter);
-
       }
     });
 
@@ -623,22 +621,8 @@ export default function Listagem({
         // setTotalItems(response.total); //Set new total records
         // setCurrentPage(currentPages); //Set new current page
         setTimeout(removestate, 10000); // Remove State
-
       }
     });
-  }
-
-    await experimentService
-      .getAll(`${parametersFilter}&idSafra=${idSafra}`)
-      .then(({ status, response }: any) => {
-        if (status === 200) {
-          setExperimento(response);
-          // setFiltersParams(parametersFilter);
-          // setTotalItems(response.total); //Set new total records
-          // setCurrentPage(currentPages); //Set new current page
-          setTimeout(removestate, 9000); // Remove State
-        }
-      });
   }
 
   // remove states
@@ -654,13 +638,10 @@ export default function Listagem({
   }
 
   useEffect(() => {
-
     handlePagination();
     handleTotalPages();
     // localStorage.removeItem('orderSorting');
   }, [currentPage]);
-
-
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -966,7 +947,7 @@ export default function Listagem({
                     />
                     <Button
                       onClick={() => {
-                        setCurrentPage(currentPage - 1)
+                        setCurrentPage(currentPage - 1);
                       }}
                       bgColor="bg-blue-600"
                       textColor="white"
