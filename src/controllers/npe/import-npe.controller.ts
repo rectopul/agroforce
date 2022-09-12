@@ -46,13 +46,14 @@ export class ImportNpeController {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][6]}`;
           const { status }: IReturnObject = await npeController.getAll({
-            filterSafra: spreadSheet[row][0],
+            safraId: idSafra,
             filterFoco: spreadSheet[row][1],
             filterEnsaio: spreadSheet[row][2],
             filterCodTec: spreadSheet[row][3],
             filterLocal: spreadSheet[row][4],
             filterEpoca: spreadSheet[row][6],
-            status: 1,
+            filterStatus: 1,
+            idCulture,
           });
           if (status === 200) {
             return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE já cadastrada no sistema` };
