@@ -472,7 +472,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de genótipos do ensaio</title>
+        <title>Listagem de grupos de experimento</title>
       </Head>
 
       <Modal
@@ -544,7 +544,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar grupos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -716,7 +716,7 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
-                          title="Exportar planilha de tratamentos"
+                          title="Exportar planilha de grupos"
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"

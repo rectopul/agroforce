@@ -161,9 +161,14 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterSearch, filterSchema, filterPTo, filterPFrom,
+      filterStatus,
+      filterSearch,
+      filterSchema,
+      filterPTo,
+      filterPFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
       }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -179,7 +184,8 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${
+      data.cod_quadra
     }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
@@ -473,6 +479,8 @@ export default function Listagem({
             row.status = 'Ativo' as any;
           }
           row.local = row.local?.name_local_culture;
+
+          delete row.q;
           delete row.id;
           delete row.safra;
           delete row.tableData;
@@ -640,7 +648,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -648,7 +656,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -694,6 +701,8 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -775,7 +784,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { }}
+                          onClick={() => {}}
                           href="quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -834,7 +843,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -844,7 +853,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

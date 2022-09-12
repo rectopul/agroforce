@@ -479,15 +479,26 @@ export default function Listagem({
 
         const dataExcel: any = response.response;
         dataExcel.forEach((line: any) => {
-          delete line.avatar;
-          delete line.id;
-          delete line.email;
+          line.Nome = line.name;
+          line.Tel = line.tel;
+          line.Login = line.login;
+          line.Cpf = line.cpf;
 
           if (line.status === 0) {
             line.status = 'Inativo';
           } else {
             line.status = 'Ativo';
           }
+          line.Status = line.status;
+
+          delete line.avatar;
+          delete line.id;
+          delete line.email;
+          delete line.name;
+          delete line.tel;
+          delete line.login;
+          delete line.cpf;
+          delete line.status;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(dataExcel);

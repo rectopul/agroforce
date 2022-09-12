@@ -78,6 +78,20 @@ export class ExperimentRepository {
     return result;
   }
 
+  async relationGroup({ idList, experimentGroupId }: any): Promise<any> {
+    const result = await prisma.experiment.updateMany({
+      where: {
+        id: {
+          in: idList,
+        },
+      },
+      data: {
+        experimentGroupId,
+      },
+    });
+    return result;
+  }
+
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 

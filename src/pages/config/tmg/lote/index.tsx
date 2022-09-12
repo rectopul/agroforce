@@ -390,13 +390,30 @@ export default function Listagem({
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
-          newItem.name_genotipo = item?.genotipo.name_genotipo;
-          newItem.name_main = item?.genotipo.name_main;
-          newItem.gmr = item?.genotipo.gmr;
-          newItem.bgm = item?.genotipo.bgm;
-          newItem.tecnologia = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.data = newItem.DT;
+          newItem.ID_S2 = item?.id_s2;
+          newItem.ID_Dados = item?.id_dados;
+          newItem.Ano = item?.year;
+          newItem.Cod_Lote = item?.cod_lote;
+          newItem.Ncc = item?.ncc;
+          newItem.Fase = item?.fase;
+          newItem.Peso = item?.peso;
+          newItem.Quant_Sementes = item?.quant_sementes;
+          newItem.Nome_Genotipo = item?.genotipo.name_genotipo;
+          newItem.Nome_Principal = item?.genotipo.name_main;
+          newItem.Gmr = item?.genotipo.gmr;
+          newItem.Bgm = item?.genotipo.bgm;
+          newItem.Tecnologia = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+          newItem.Data = newItem.DT;
 
+          delete newItem.quant_sementes;
+          delete newItem.peso;
+          delete newItem.fase;
+          delete newItem.ncc;
+          delete newItem.cod_lote;
+          delete newItem.year;
+          delete newItem.id_s2;
+          delete newItem.id_dados;
+          delete newItem.DT;
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;

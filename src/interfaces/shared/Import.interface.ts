@@ -2,7 +2,7 @@ export interface IReturnObject {
   status: number
   response?: Array<any> | any
   message?: string | unknown
-  total?: number
+  total?: number | any
 }
 
 export interface ImportValidate {

@@ -30,6 +30,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -37,11 +38,10 @@ import {
   Content,
   Input,
   Select,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
-import { cultureService, userPreferencesService } from "../../../../services";
-import ITabs from "../../../../shared/utils/dropdown";
-import {fetchWrapper} from "src/helpers";
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { cultureService, userPreferencesService } from '../../../../services';
+import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
@@ -155,12 +155,11 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("cultura",filterStatus || 1 , filterSearch);
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('cultura', filterStatus || 1, filterSearch);
 
       setFiltersParams(parametersFilter);
-      setCookies("filterBeforeEdit", filtersParams);
+      setCookies('filterBeforeEdit', filtersParams);
 
       await cultureService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -211,15 +210,14 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
-   
     await cultureService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then((response) => {
         if (response.status === 200) {
-          setCultures(response.response);        
+          setCultures(response.response);
           setFiltersParams(parametersFilter);
         }
       });
@@ -303,10 +301,10 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filtersParams);
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -436,6 +434,13 @@ export default function Listagem({
             } else {
               row.status = 'Ativo' as any;
             }
+            row.Nome = row.name;
+            row.Desc = row.desc;
+            row.Status = row.status;
+
+            delete row.desc;
+            delete row.status;
+            delete row.name;
             delete row.id;
             return row;
           });
@@ -463,41 +468,38 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } 
-    
+    }
+
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
     // }
   }
 
   async function handlePagination(): Promise<void> {
-
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await cultureService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setCultures(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 3000); //Remove State
-     
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 3000); // Remove State
       }
     });
   }
 
-
-  //remove states
-  function removestate(){
-    localStorage.removeItem("filterValueEdit");  
-    localStorage.removeItem("pageBeforeEdit"); 
-    setTimeout(()=>{}, 5000)   
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+    setTimeout(() => {}, 5000);
   }
 
-  //Checkingdefualt values
-  function checkValue(value : any){
-  const parameter = fetchWrapper.getValueParams(value);
-  return parameter;
+  // Checkingdefualt values
+  function checkValue(value : any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
   }
 
   useEffect(() => {
@@ -557,7 +559,7 @@ export default function Listagem({
                       type="text"
                       placeholder="cultura"
                       max="40"
-                      defaultValue={checkValue("filterSearch")}
+                      defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -709,49 +711,49 @@ export default function Listagem({
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />

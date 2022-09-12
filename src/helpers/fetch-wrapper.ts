@@ -196,14 +196,18 @@ function lote(theArgs: any) {
 }
 
 function setor(theArgs: any) {
-  const [key4, filterStatus2, filterSearch] = theArgs;
+  const [key4,
+    filterStatus2,
+    filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus2 || 1}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
 
 function usuarios(theArgs: any) {
-  const [key, filterStatus, filterName, filterLogin] = theArgs;
+  const [key,
+    filterStatus,
+    filterName, filterLogin] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus || 1
   }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
