@@ -311,8 +311,10 @@ export default function Listagem({
     //Manage orders of colunms 
     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"setor");
 
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
     await departmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setItems(response.response);

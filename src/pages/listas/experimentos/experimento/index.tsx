@@ -91,7 +91,9 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('listas');
+  // const tabsDropDowns = TabsDropDowns('listas');
+  const tabsDropDowns = TabsDropDowns();
+
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'EXPERIMENTOS'
@@ -216,7 +218,9 @@ export default function Listagem({
 
     setOrderParams(parametersFilter);
     
-    await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
+    await experimentService.getAll(value).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         setFiltersParams(parametersFilter);
@@ -256,47 +260,47 @@ export default function Listagem({
     };
   }
 
-  function idHeaderFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-7 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={20} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-7 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={20} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
-    };
-  }
+  // function idHeaderFactory() {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         {arrowOrder}
+  //       </div>
+  //     ),
+  //     field: 'id',
+  //     width: 0,
+  //     sorting: false,
+  //     render: () => (
+  //       colorStar === '#eba417'
+  //         ? (
+  //           <div className="h-7 flex">
+  //             <div>
+  //               <button
+  //                 type="button"
+  //                 className="w-full h-full flex items-center justify-center border-0"
+  //                 onClick={() => setColorStar('')}
+  //               >
+  //                 <AiTwotoneStar size={20} color="#eba417" />
+  //               </button>
+  //             </div>
+  //           </div>
+  //         )
+  //         : (
+  //           <div className="h-7 flex">
+  //             <div>
+  //               <button
+  //                 type="button"
+  //                 className="w-full h-full flex items-center justify-center border-0"
+  //                 onClick={() => setColorStar('#eba417')}
+  //               >
+  //                 <AiTwotoneStar size={20} />
+  //               </button>
+  //             </div>
+  //           </div>
+  //         )
+  //     ),
+  //   };
+  // }
 
   async function deleteItem(id: number) {
     const { status, message } = await await experimentService.deleted(id);
@@ -564,12 +568,11 @@ export default function Listagem({
         // setFiltersParams(parametersFilter);
         // setTotalItems(response.total); //Set new total records
         // setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 9000); // Remove State
+        setTimeout(removestate, 10000); // Remove State
         
       }
     });
   }
-
 
 
     // remove states
@@ -585,11 +588,14 @@ export default function Listagem({
     }
 
   useEffect(() => {
+
     handlePagination();
     handleTotalPages();
     // localStorage.removeItem('orderSorting');
   
   }, [currentPage]);
+
+  
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -883,7 +889,8 @@ export default function Listagem({
                       disabled={currentPage < 1}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => {setCurrentPage(currentPage - 1)
+                      }}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiLeftArrow size={15} />}

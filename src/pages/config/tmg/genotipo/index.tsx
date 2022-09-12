@@ -244,8 +244,10 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'genotipo');
 
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
     await genotipoService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setGenotipo(response.response);
