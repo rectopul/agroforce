@@ -448,27 +448,28 @@ model sequencia_delineamento {
 }
 
 model experiment {
-  id                Int          @id @default(autoincrement())
-  status            String       @default("IMPORTADO")
-  created_by        Int
-  created_at        DateTime?    @default(now())
-  clp               Decimal      @db.Decimal(5, 2)
-  comments          String       @db.LongText
-  density           Int
-  eel               Decimal      @db.Decimal(5, 2)
-  experimentName    String
-  idAssayList       Int
-  idDelineamento    Int
-  idLocal           Int
-  idSafra           Int
-  nlp               Int
-  orderDraw         Int
-  period            Int
-  repetitionsNumber Int
-  assay_list        assay_list   @relation(fields: [idAssayList], references: [id])
-  delineamento      delineamento @relation(fields: [idDelineamento], references: [id])
-  local             local        @relation(fields: [idLocal], references: [id])
-  safra             safra        @relation(fields: [idSafra], references: [id])
+  id                  Int                   @id @default(autoincrement())
+  status              String                @default("IMPORTADO")
+  created_by          Int
+  created_at          DateTime?             @default(now())
+  clp                 Decimal               @db.Decimal(5, 2)
+  comments            String                @db.LongText
+  density             Int
+  eel                 Decimal               @db.Decimal(5, 2)
+  experimentName      String
+  idAssayList         Int
+  idDelineamento      Int
+  idLocal             Int
+  idSafra             Int
+  nlp                 Int
+  orderDraw           Int
+  period              Int
+  repetitionsNumber   Int
+  assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
+  delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])
+  local               local                 @relation(fields: [idLocal], references: [id])
+  safra               safra                 @relation(fields: [idSafra], references: [id])
+  experiment_genotipe experiment_genotipe[]
 }
 
 model log_import {
@@ -541,22 +542,23 @@ model history_genotype_treatment {
 }
 
 model experiment_genotipe {
-  id             Int       @id @default(autoincrement())
-  created_at     DateTime? @default(now())
-  idSafra        Int
-  idFoco         Int
-  idTypeAssay    Int
-  idTecnologia   Int
-  gli            String
-  experimentName String
-  rep            Int
-  nt             Int
-  npe            Int
-  name_genotipo  String
-  nca            String
+  id            Int       @id @default(autoincrement())
+  created_at    DateTime? @default(now())
+  idSafra       Int
+  idFoco        Int
+  idTypeAssay   Int
+  idTecnologia  Int
+  idExperiment  Int
+  gli           String
+  rep           Int
+  nt            Int
+  npe           Int
+  name_genotipo String
+  nca           String
 
   safra      safra      @relation(fields: [idSafra], references: [id])
   type_assay type_assay @relation(fields: [idTypeAssay], references: [id])
   tecnologia tecnologia @relation(fields: [idTecnologia], references: [id])
   foco       foco       @relation(fields: [idFoco], references: [id])
+  experiment experiment @relation(fields: [idExperiment], references: [id])
 }

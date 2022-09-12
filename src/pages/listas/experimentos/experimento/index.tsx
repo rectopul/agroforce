@@ -81,14 +81,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperiments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   // const tabsDropDowns = TabsDropDowns('listas');
@@ -132,7 +132,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [colorStar, setColorStar] = useState<string>('');
-  const [order,setOrderParams]=useState<string>('');
+  const [order, setOrderParams] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -217,14 +217,14 @@ export default function Listagem({
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'experimento');
 
     setOrderParams(parametersFilter);
-    
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
+    let value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await experimentService.getAll(value).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         setFiltersParams(parametersFilter);
-        
+
       }
     });
 
@@ -569,33 +569,33 @@ export default function Listagem({
         // setTotalItems(response.total); //Set new total records
         // setCurrentPage(currentPages); //Set new current page
         setTimeout(removestate, 10000); // Remove State
-        
+
       }
     });
   }
 
 
-    // remove states
-    function removestate() {
-      localStorage.removeItem('filterValueEdit');
-      localStorage.removeItem('pageBeforeEdit');     
-    }
-  
-    // Checkingdefualt values
-    function checkValue(value: any) {
-      const parameter = fetchWrapper.getValueParams(value);
-      return parameter;
-    }
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+  }
+
+  // Checkingdefualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
+  }
 
   useEffect(() => {
 
     handlePagination();
     handleTotalPages();
     // localStorage.removeItem('orderSorting');
-  
+
   }, [currentPage]);
 
-  
+
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -889,7 +889,8 @@ export default function Listagem({
                       disabled={currentPage < 1}
                     />
                     <Button
-                      onClick={() => {setCurrentPage(currentPage - 1)
+                      onClick={() => {
+                        setCurrentPage(currentPage - 1)
                       }}
                       bgColor="bg-blue-600"
                       textColor="white"
