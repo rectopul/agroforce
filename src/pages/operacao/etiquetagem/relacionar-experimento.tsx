@@ -492,7 +492,7 @@ export default function Listagem({
     );
   }
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit() {
     const experimetsSelected = rowsSelected.map((item: IExperiments) => item.id);
     console.log('experimentGroupId');
     console.log(experimentGroupId);

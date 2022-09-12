@@ -731,7 +731,6 @@ export default function Import({
                       type="button"
                     />
                   </div>
-
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
                     <span className="font-bold">Importar Layout de quadra</span>
                     <p>ultimo update 28/06/22</p>

@@ -1,4 +1,3 @@
-import { IExperiments } from '../interfaces/listas/experimento/experimento.interface';
 import { prisma } from '../pages/api/db/db';
 
 export class ExperimentRepository {
@@ -79,7 +78,7 @@ export class ExperimentRepository {
     return result;
   }
 
-  async relationGroup({ idList, experimentGroupId }: any): Promise<IExperiments> {
+  async relationGroup({ idList, experimentGroupId }: any): Promise<any> {
     const result = await prisma.experiment.updateMany({
       where: {
         id: {
