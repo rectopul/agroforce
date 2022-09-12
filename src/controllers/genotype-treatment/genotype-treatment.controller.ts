@@ -36,6 +36,9 @@ export class GenotypeTreatmentController {
         }
       }
 
+      if (options.filterStatusT) {
+        parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
+      }
       if (options.filterNca) {
         parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
       }
@@ -56,6 +59,9 @@ export class GenotypeTreatmentController {
       }
       if (options.filterTechnology) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTechnology}" } } } }`));
+      }
+      if (options.filterCodTec) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
       }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));

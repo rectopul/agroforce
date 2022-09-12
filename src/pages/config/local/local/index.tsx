@@ -518,9 +518,7 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = row.status === 0 ? 'Inativo' : 'Ativo';
-          delete row.dt_import;
-          delete row.id;
-          delete row.cultureUnity;
+
           const dataExp = new Date();
           let hours: string;
           let minutes: string;
@@ -543,6 +541,30 @@ export default function Listagem({
           row.DT = `${dataExp.toLocaleDateString(
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
+
+          row.Nome_Lugar_Cultura = row.name_local_culture;
+          row.Rótulo = row.label;
+          row.Mloc = row.mloc;
+          row.Nome_Da_Fazenda = row.adress;
+          row.País = row.label_country;
+          row.Região_Rótulo = row.label_region;
+          row.Região = row.name_locality;
+          row.Status = row.status;
+          row.Data = row.DT;
+
+          delete row.name_local_culture;
+          delete row.label;
+          delete row.mloc;
+          delete row.adress;
+          delete row.label_country;
+          delete row.label_region;
+          delete row.name_locality;
+          delete row.status;
+          delete row.dt_import;
+          delete row.DT;
+          delete row.id;
+          delete row.cultureUnity;
+
           return row;
         });
 
