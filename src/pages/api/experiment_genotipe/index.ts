@@ -6,8 +6,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const experimentGenotipeController = new ExperimentGenotipeController();
     switch (req.method) {
         case 'GET': {
-            //   const result = await experimentGenotipeController.getAll(req.query);
-            //   res.status(200).json(result);
+            const result = await experimentGenotipeController.getAll(req.query);
+            res.status(200).json(result);
             break;
         }
         case 'POST': {

@@ -214,7 +214,9 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
 
-    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
+    await loteService.getAll(value).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
         setFiltersParams(parametersFilter);

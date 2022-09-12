@@ -170,8 +170,8 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.status) {
-        parameters.status = JSON.parse(`{ "contains":"${options.status}" }`);
+      if (options.Status) {
+        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.Status}" } } `));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
