@@ -510,6 +510,17 @@ export default function Listagem({
           } else {
             row.status = 'Ativos' as any;
           }
+          row.Nome = row.safraName;
+          row.Ano = row.year;
+          row.Início_Plantio = row.plantingStartTime;
+          row.Fim_Plantio = row.plantingEndTime;
+          row.Status = row.status;
+
+          delete row.safraName;
+          delete row.year;
+          delete row.plantingStartTime;
+          delete row.plantingEndTime;
+          delete row.status;
           delete row.id;
           delete row.tableData;
 
