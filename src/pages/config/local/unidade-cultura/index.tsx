@@ -440,15 +440,43 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
-            newRow.nome_lugar_cultura = newRow.local?.name_local_culture;
-            newRow.rotulo = newRow.local?.label;
-            newRow.mloc = newRow.local?.mloc;
-            newRow.fazenda = newRow.local?.adress;
-            newRow.pais = newRow.local?.label_country;
-            newRow.regiao = newRow.local?.label_region;
-            newRow.localidade = newRow.local?.name_locality;
+            const dataExp = new Date();
+            let hours: string;
+            let minutes: string;
+            let seconds: string;
+            if (String(dataExp.getHours()).length === 1) {
+              hours = `0${String(dataExp.getHours())}`;
+            } else {
+              hours = String(dataExp.getHours());
+            }
+            if (String(dataExp.getMinutes()).length === 1) {
+              minutes = `0${String(dataExp.getMinutes())}`;
+            } else {
+              minutes = String(dataExp.getMinutes());
+            }
+            if (String(dataExp.getSeconds()).length === 1) {
+              seconds = `0${String(dataExp.getSeconds())}`;
+            } else {
+              seconds = String(dataExp.getSeconds());
+            }
+            newRow.DT = `${dataExp.toLocaleDateString(
+              'pt-BR',
+            )} ${hours}:${minutes}:${seconds}`;
+            newRow.Nome_Unidade_Cultura = newRow?.name_unity_culture;
+            newRow.Ano = newRow?.year;
+            newRow.Nome_Lugar_Cultura = newRow.local?.name_local_culture;
+            newRow.Rotulo = newRow.local?.label;
+            newRow.Mloc = newRow.local?.mloc;
+            newRow.Fazenda = newRow.local?.adress;
+            newRow.País = newRow.local?.label_country;
+            newRow.Região = newRow.local?.label_region;
+            newRow.Localidade = newRow.local?.name_locality;
+            newRow.Data = newRow.DT;
 
-            newRow.DT = new Date();
+            delete newRow.year;
+            delete newRow.name_unity_culture;
+            delete newRow.DT;
+            delete newRow.id_safra;
             delete newRow.id;
             delete newRow.id_unity_culture;
             delete newRow.id_local;

@@ -473,8 +473,19 @@ export default function TipoEnsaio({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+            console.log(newRow);
             newRow.envelope = row.envelope.seeds;
             newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
+
+            newRow.Nome = newRow.name;
+            newRow.Nome_Protocolo = newRow.protocol_name;
+            newRow.Quant_Sementes = newRow.envelope;
+            newRow.Status = newRow.status;
+
+            delete newRow.name;
+            delete newRow.protocol_name;
+            delete newRow.envelope;
+            delete newRow.status;
             delete newRow.id;
             return newRow;
           });

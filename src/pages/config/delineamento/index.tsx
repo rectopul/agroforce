@@ -536,6 +536,16 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+
+          row.Nome = row?.name;
+          row.Repetição = row?.repeticao;
+          row.Trat_Repetição = row?.trat_repeticao;
+          row.Status = row?.status;
+
+          delete row.name;
+          delete row.repeticao;
+          delete row.trat_repeticao;
+          delete row.status;
           delete row.id;
           delete row.tableData;
 

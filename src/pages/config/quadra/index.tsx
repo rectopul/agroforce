@@ -475,6 +475,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+<<<<<<< Updated upstream
     await quadraService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -492,6 +493,25 @@ export default function Listagem({
             delete row.local_plantio;
             return row;
           });
+=======
+    await quadraService.getAll(filterApplication).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          if (row.status === 0) {
+            row.status = 'Inativo' as any;
+          } else {
+            row.status = 'Ativo' as any;
+          }
+          row.local = row.local?.name_local_culture;
+
+          delete row.q;
+          delete row.id;
+          delete row.safra;
+          delete row.tableData;
+          delete row.local_plantio;
+          return row;
+        });
+>>>>>>> Stashed changes
 
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
