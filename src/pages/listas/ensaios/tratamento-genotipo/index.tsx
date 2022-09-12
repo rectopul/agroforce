@@ -63,6 +63,8 @@ export default function Listagem({
 
   const tableRef = useRef<any>(null);
 
+  console.log('allassay', assaySelect?.length);
+
   const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
@@ -1141,6 +1143,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -1186,7 +1189,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   ).then((response) => response.json());
 
   const { response: allAssay } = await fetch(
-    urlParametersAssay.toString(),
+    `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
     requestOptions,
   ).then((response) => response.json());
 

@@ -189,24 +189,8 @@ function genotipo(theArgs: any) {
 }
 
 function lote(theArgs: any) {
-
-  const [
-    key3,
-    filterYear1,
-    filterCodLote,
-    filterNcc,
-    filterFase,
-    filterPeso,
-    filterSeeds,
-    filterGenotipo1,
-    filterMainName1,
-    filterGmr1,
-    filterBgm,
-    filterTecnologiaCod1,
-    filterTecnologiaDesc1,
-  ] = theArgs;
-
-  const parametersFilter = `&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}`;
+  const [key3, filterGmrFrom, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1, filterGmrTo] = theArgs;
+  const parametersFilter = `&filterGmrFrom=${filterGmrFrom}&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}&filterGmrTo=${filterGmrTo}`;
 
   return parametersFilter;
 }

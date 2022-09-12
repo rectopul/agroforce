@@ -43,6 +43,7 @@ export class GenotipoController {
           parameters.numberLotes = JSON.parse(`{"lte": ${Number(options.filterLotsTo)} }`);
         }
       }
+
       if (options.filterTecnologiaCod) {
         parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
       }

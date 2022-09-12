@@ -216,7 +216,7 @@ export default function Listagem({
       filterParcelFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}`;
+      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await layoutQuadraService
@@ -494,7 +494,8 @@ export default function Listagem({
     idLayoutQuadra: number,
     data: any,
   ): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${userLogado.userCulture.cultura_selecionada
+    const parametersFilter = `filterStatus=${1}&id_culture=${
+      userLogado.userCulture.cultura_selecionada
     }&esquema=${data.esquema}&status=${1}`;
     if (data.status == 0) {
       await layoutQuadraService.getAll(parametersFilter).then((response) => {
@@ -767,7 +768,7 @@ export default function Listagem({
                   </div>
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -821,6 +822,9 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
+
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -904,7 +908,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { }}
+                          onClick={() => {}}
                           href="layout-quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -973,7 +977,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
