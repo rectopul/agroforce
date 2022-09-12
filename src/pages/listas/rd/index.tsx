@@ -724,23 +724,14 @@ export default function Import({
                           : 'Upload'
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-<<<<<<< Updated upstream
-                      onClick={() => readExcel(5, "BLOCK_LAYOUT")}
-=======
-                      onClick={() => readExcel(17, 'BLOCK')}
->>>>>>> Stashed changes
+                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-<<<<<<< Updated upstream
-                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                    <span className="font-bold">Importar Layout de quadra</span>
-=======
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar Quadra</span>
->>>>>>> Stashed changes
+                    <span className="font-bold">Importar Layout de quadra</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"
@@ -762,23 +753,14 @@ export default function Import({
                           : 'Upload'
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-<<<<<<< Updated upstream
-                      onClick={() => readExcel(17, "BLOCK")}
-=======
-                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
->>>>>>> Stashed changes
+                      onClick={() => readExcel(17, 'BLOCK')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-<<<<<<< Updated upstream
-                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                    <span className="font-bold">Importar Quadra</span>
-=======
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar Layout de quadra</span>
->>>>>>> Stashed changes
+                    <span className="font-bold">Importar Quadra</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"
