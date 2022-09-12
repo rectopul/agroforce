@@ -189,7 +189,22 @@ function genotipo(theArgs: any) {
 }
 
 function lote(theArgs: any) {
-  const [key3, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1] = theArgs;
+
+  const [
+    key3,
+    filterYear1,
+    filterCodLote,
+    filterNcc,
+    filterFase,
+    filterPeso,
+    filterSeeds,
+    filterGenotipo1,
+    filterMainName1,
+    filterGmr1,
+    filterBgm,
+    filterTecnologiaCod1,
+    filterTecnologiaDesc1,
+  ] = theArgs;
 
   const parametersFilter = `&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}`;
 
@@ -197,14 +212,18 @@ function lote(theArgs: any) {
 }
 
 function setor(theArgs: any) {
-  const [key4, filterStatus2, filterSearch] = theArgs;
+  const [key4,
+    filterStatus2,
+    filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus2 || 1}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
 
 function usuarios(theArgs: any) {
-  const [key, filterStatus, filterName, filterLogin] = theArgs;
+  const [key,
+    filterStatus,
+    filterName, filterLogin] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus || 1
   }&filterName=${filterName}&filterLogin=${filterLogin}`;
 

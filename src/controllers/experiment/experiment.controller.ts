@@ -60,6 +60,9 @@ export class ExperimentController {
       if (options.filterDelineamento) {
         parameters.delineamento = JSON.parse(`{ "name": {"contains": "${options.filterDelineamento}" } }`);
       }
+      if (options.experimentGroupId) {
+        parameters.experimentGroupId = Number(options.experimentGroupId);
+      }
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
         select.assay_list = {};
@@ -86,6 +89,7 @@ export class ExperimentController {
           idSafra: true,
           density: true,
           repetitionsNumber: true,
+          experimentGroupId: true,
           period: true,
           nlp: true,
           clp: true,
@@ -166,6 +170,9 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
+      if (options.status) {
+        parameters.status = JSON.parse(`{ "contains":"${options.status}" }`);
+      }
 
       const take = (options.take) ? Number(options.take) : undefined;
 
@@ -183,7 +190,6 @@ export class ExperimentController {
         skip,
         orderBy,
       );
-
       response.map((item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils
@@ -234,6 +240,10 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
+      if (data.idList) {
+        await this.experimentRepository.relationGroup(data);
+        return { status: 200, message: 'Experimento atualizado' };
+      }
       const experimento: any = await this.experimentRepository.findOne(data.id);
 
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
