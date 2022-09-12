@@ -19,14 +19,17 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsTrashFill } from 'react-icons/bs';
-import { RiFileExcel2Line } from 'react-icons/ri';
+import { BsDownload } from 'react-icons/bs';
+import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
-import { IoMdArrowBack } from 'react-icons/io';
+import readXlsxFile from 'read-excel-file';
 import {
+  ITreatment,
+  ITreatmentFilter,
   ITreatmentGrid,
 } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
@@ -41,19 +44,40 @@ import {
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
-  userPreferencesService,
-  experimentGroupService,
   experimentService,
+  importService,
+  userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
+import { IReturnObject } from '../../../interfaces/shared/Import.interface';
+import { fetchWrapper } from '../../../helpers';
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
+interface IFilter {
+  filterFoco: string
+  filterProtocol: string
+  filterTypeAssay: string
+  filterGli: string
+  filterExperimentName: string
+  filterTecnologia: string
+  filterCod: string
+  filterPeriod: string
+  filterDelineamento: string
+  filterRepetition: string
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
+}
+
 export default function Listagem({
-  experimentGroup,
-  experimentGroupId,
+  allExperiments,
+  totalItems,
   itensPerPage,
+  experimentGroupId,
   filterApplication,
-  safraId,
+  idSafra,
+  pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
@@ -61,7 +85,7 @@ export default function Listagem({
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
       'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
@@ -70,7 +94,8 @@ export default function Listagem({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const [experiments, setExperiments] = useState<IExperiments[] | any>([]);
+  const [experiments, setExperiments] = useState<ITreatment[] | any>([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
@@ -91,15 +116,84 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
+    },
+  ]);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  // const take: number = itensPerPage;
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const [rowsSelected, setRowsSelected] = useState([]);
+  const router = useRouter();
+
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterProtocol: '',
+      filterGli: '',
+      filterExperimentName: '',
+      filterTecnologia: '',
+      filterCod: '',
+      filterPeriod: '',
+      filterDelineamento: '',
+      filterRepetition: '',
+      filterRepetitionTo: '',
+      filterRepetitionFrom: '',
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async ({
+      filterFoco,
+      filterTypeAssay,
+      filterProtocol,
+      filterGli,
+      filterExperimentName,
+      filterTecnologia,
+      filterCod,
+      filterPeriod,
+      filterDelineamento,
+      filterRepetition,
+    }) => {
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']",
+      );
+      let selecionados = '';
+      for (let i = 0; i < allCheckBox.length; i += 1) {
+        if (allCheckBox[i].checked) {
+          selecionados += `${allCheckBox[i].value},`;
+        }
+      }
+      const filterStatus = selecionados.substr(0, selecionados.length - 1);
+
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('experimento', filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod, filterDelineamento, filterRepetition, filterStatus, idSafra);
+
+      setFiltersParams(parametersFilter);
+      setFilter(parametersFilter);
+      setCookies('filterBeforeEdit', filter);
+
+      await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
+        setExperiments(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0);
+      });
+    },
+  });
 
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
@@ -127,7 +221,7 @@ export default function Listagem({
 
     await experimentService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }: any) => {
+      .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
           setExperiments(response);
         }
@@ -185,38 +279,10 @@ export default function Listagem({
     };
   }
 
-  function actionTableFactory() {
-    return {
-      title: (
-        <div className="flex items-center">
-          Ação
-        </div>
-      ),
-      field: 'action',
-      sorting: false,
-      width: 0,
-      render: (rowData: any) => (
-        <div className="flex gap-2">
-          <div className="h-10 w-10">
-            <Button
-              title={`Excluir ${rowData.name}`}
-              type="button"
-              onClick={() => deleteItem(rowData.id)}
-              rounder="rounded-full"
-              bgColor="bg-red-600"
-              textColor="white"
-              icon={<BsTrashFill size={20} />}
-            />
-          </div>
-        </div>
-      ),
-    };
-  }
-
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
-    Object.keys(columnOrder).forEach((_, index) => {
+    Object.keys(columnOrder).forEach((index: any) => {
       if (columnOrder[index] === 'protocolName') {
         tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
       }
@@ -249,9 +315,6 @@ export default function Listagem({
       if (columnOrder[index] === 'status') {
         tableFields.push(headerTableFactory('Status EXP.', 'status'));
       }
-      if (columnOrder[index] === 'action') {
-        tableFields.push(actionTableFactory());
-      }
     });
     return tableFields;
   }
@@ -273,10 +336,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 22,
         })
-        .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+        .then((response: any) => {
+          userLogado.preferences.experimento = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -285,7 +348,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.experimento = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -316,7 +379,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await experimentService
       .getAll(filter)
-      .then(({ status, response }: any) => {
+      .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem = item;
@@ -365,7 +428,7 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -378,7 +441,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Experimentos.xlsx');
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
   };
@@ -395,9 +458,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&status=${'SORTEADO'}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&status=${'SORTEADO'}`;
     }
 
     if (filter) {
@@ -405,48 +468,38 @@ export default function Listagem({
     }
     await experimentService
       .getAll(parametersFilter)
-      .then(({ status, response, total: newTotal }: any) => {
+      .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
-          console.log('response');
-          console.log(response);
           setExperiments(response);
-          setTotalItems(newTotal);
         }
       });
   }
 
-  function updateFieldFactory(title: string, name: string) {
+  function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="w-2/4 h-7">
+      <div className="h-7 w-1/2 ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
-          style={{ background: '#e5e7eb' }}
-          disabled
-          required
+          type="text"
+          placeholder={name}
           id={title}
           name={title}
-          value={experimentGroup[title]}
+          onChange={formik.handleChange}
         />
       </div>
     );
   }
 
-  async function deleteItem(id: number) {
-    const { status, message } = await experimentGroupService.deleted(id);
-    if (status === 200) {
-      router.reload();
-    } else {
-      Swal.fire({
-        html: message,
-        width: '800',
-      });
-    }
-  }
-
   async function handleSubmit(event: any) {
-
+    const experimetsSelected = rowsSelected.map((item: IExperiments) => item.id);
+    console.log('experimentGroupId');
+    console.log(experimentGroupId);
+    const { status, response }: IReturnObject = await experimentService.update({
+      idList: experimetsSelected,
+      experimentGroupId: Number(experimentGroupId),
+    });
   }
 
   useEffect(() => {
@@ -457,7 +510,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de experimentos</title>
+        <title>Listagem de genótipos do ensaio</title>
       </Head>
 
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
@@ -468,73 +521,112 @@ export default function Listagem({
           gap-4
         "
         >
-          <form
-            className="w-full bg-white shadow-md rounded p-4"
-            onSubmit={() => {}}
-          >
-            <div className="w-full flex justify-between items-start gap-5 mt-1">
-
-              {updateFieldFactory('name', 'Nome do grupo de exp.')}
-              {updateFieldFactory('experimentAmount', 'Qtde. exp.')}
-              {updateFieldFactory('tagsToPrint', 'Total etiq. a imp.')}
-              {updateFieldFactory('tagsPrinted', 'Total etiq. imp.')}
-              {updateFieldFactory('totalTags', 'Total etiq')}
-              {updateFieldFactory('status', 'Status')}
-
-              <div className="h-7 w-full flex gap-3 justify-end mt-6">
-                <div className="w-40">
-                  <Button
-                    type="button"
-                    value="Voltar"
-                    bgColor="bg-red-600"
-                    textColor="white"
-                    icon={<IoMdArrowBack size={18} />}
-                    onClick={() => router.back()}
-                  />
-                </div>
-              </div>
-            </div>
-          </form>
           <AccordionFilter title="Filtrar tratamentos genótipos">
             <div className="w-full flex gap-2">
-              <div
+              <form
                 className="flex flex-col
-                  w-full
-                  items-center
-                  px-1
-                  bg-white
-                "
+                                    w-full
+                                    items-center
+                                    px-4
+                                    bg-white
+                                    "
+                onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-8
-                "
+                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-8
+                                        "
                 >
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterProtocol', 'Protocolo')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
 
-                  <div className="h-7 w-1/2 ml-4">
+                </div>
+
+                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-2
+                                        "
+                >
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterPeriod', 'Epoca')}
+
+                  <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
+                      Status do Experimento
                     </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
+                    <AccordionFilter>
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="characters">
+                          {(provided) => (
+                            <ul
+                              className="w-1/2 h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusFilter.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
+                                    >
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </AccordionFilter>
+                  </div>
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
-                  <div style={{ width: 40 }} />
+                  <div className="w-full" style={{ marginLeft: -80 }} />
+
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
-                      value="Filtrar"
                       type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiFilterAlt size={20} />}
@@ -542,7 +634,7 @@ export default function Listagem({
                   </div>
                 </div>
 
-              </div>
+              </form>
             </div>
           </AccordionFilter>
 
@@ -587,25 +679,12 @@ export default function Listagem({
                   >
                     <div className="h-12 w-32 ml-0">
                       <Button
-                        title="Adicionar Exp. ao grupo"
-                        value="Adicionar Exp. ao grupo"
+                        title="Salvar grupo de experimento"
+                        value="Salvar grupo de experimento"
                         textColor="white"
-                        onClick={() => {
-                          router.push(`/operacao/etiquetagem/relacionar-experimento?experimentGroupId=${experimentGroupId}`);
-                        }}
+                        onClick={() => { handleSubmit(); }}
                         bgColor="bg-blue-600"
-                      />
-                    </div>
-
-                    <div className="h-12 w-32 ml-0">
-                      <Button
-                        title="Excluir grupo"
-                        type="button"
-                        onClick={() => deleteItem(experimentGroupId)}
-                        rounder="rounded-full"
-                        bgColor="bg-red-600"
-                        textColor="white"
-                        icon={<BsTrashFill size={20} />}
+                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
@@ -766,22 +845,22 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEdit
     : '';
   const { token } = req.cookies;
-  const { cultureId } = req.cookies;
-  const { safraId } = req.cookies;
-  const experimentGroupId = query.id;
+  const idCulture = req.cookies.cultureId;
+  const idSafra = req.cookies.safraId;
+  const { experimentGroupId } = query;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlExperiments = `${publicRuntimeConfig.apiUrl}/experiment`;
+  const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
+  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&status=${'SORTEADO'}`;
 
-  const urlParametersExperiments: any = new URL(baseUrlExperiments);
-  urlParametersExperiments.search = new URLSearchParams(param).toString();
+  const urlParametersExperiment: any = new URL(baseUrlExperimento);
+  urlParametersExperiment.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -789,26 +868,18 @@ export const getServerSideProps: GetServerSideProps = async ({
   } as RequestInit | undefined;
 
   const { response: allExperiments, total: totalItems } = await fetch(
-    urlParametersExperiments.toString(),
-    requestOptions,
-  ).then((response) => response.json());
-
-  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment-group`;
-  const experimentGroup = await fetch(
-    `${baseUrlShow}/${experimentGroupId}`,
+    urlParametersExperiment.toString(),
     requestOptions,
   ).then((response) => response.json());
 
   return {
     props: {
       allExperiments,
-      experimentGroupId,
-      experimentGroup,
       totalItems,
+      experimentGroupId,
       itensPerPage,
       filterApplication,
-      cultureId,
-      safraId,
+      idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
     },

@@ -460,7 +460,7 @@ model experiment {
   experimentName    String
   idAssayList       Int
   idDelineamento    Int
-  experimentGroupId Int
+  experimentGroupId Int?
   idLocal           Int
   idSafra           Int
   nlp               Int
@@ -468,11 +468,11 @@ model experiment {
   period            Int
   repetitionsNumber Int
 
-  assay_list      assay_list      @relation(fields: [idAssayList], references: [id])
-  delineamento    delineamento    @relation(fields: [idDelineamento], references: [id])
-  local           local           @relation(fields: [idLocal], references: [id])
-  safra           safra           @relation(fields: [idSafra], references: [id])
-  ExperimentGroup ExperimentGroup @relation(fields: [experimentGroupId], references: [id])
+  assay_list      assay_list       @relation(fields: [idAssayList], references: [id])
+  delineamento    delineamento     @relation(fields: [idDelineamento], references: [id])
+  local           local            @relation(fields: [idLocal], references: [id])
+  safra           safra            @relation(fields: [idSafra], references: [id])
+  ExperimentGroup ExperimentGroup? @relation(fields: [experimentGroupId], references: [id])
 }
 
 model log_import {

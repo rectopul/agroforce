@@ -421,9 +421,6 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
-      // if (columnCampos[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnCampos[index] === 'protocolName') {
         tableFields.push(
           headerTableFactory('Protocolo', 'assay_list.protocol_name'),
