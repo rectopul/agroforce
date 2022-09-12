@@ -530,16 +530,6 @@ export default function Listagem({
       .then(({ response, status }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
-
-            delete row.id;
-            delete row.id_tecnologia;
-            delete row.tableData;
-            delete row.lote;
-            delete row.dt_import;
-
-            // row.DT = new Date();
-
             const dataExp = new Date();
             let hours: string;
             let minutes: string;
@@ -562,6 +552,59 @@ export default function Listagem({
             row.DT = `${dataExp.toLocaleDateString(
               'pt-BR',
             )} ${hours}:${minutes}:${seconds}`;
+
+            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
+
+            row.Id_S1 = row.id_s1;
+            row.Id_Dados = row.id_dados;
+            row.Nome_Genótipo = row.name_genotipo;
+            row.Nome_Público = row.name_public;
+            row.Nome_Experimental = row.name_experiment;
+            row.Nome_Alternativo = row.name_alter;
+            row.Elite_Nome = row.elit_name;
+            row.Tecnologia = row.tecnologia;
+            row.N_De_Lotes = row.numberLotes;
+            row.Tipo = row.type;
+            row.Gmr = row.gmr;
+            row.Bgm = row.bgm;
+            row.Cruza = row.cruza;
+            row.Progenitor_F_Direto = row.progenitor_f_direto;
+            row.Progenitor_M_Direto = row.progenitor_m_direto;
+            row.Progenitor_F_Origem = row.progenitor_f_origem;
+            row.Progenitor_M_Origem = row.progenitor_m_origem;
+            row.Progenitores_Origem = row.progenitores_origem;
+            row.Parentesco_Completo = row.parentesco_completo;
+            row.Data = row.DT;
+
+            delete row.id_s1;
+            delete row.name_main;
+            delete row.id_dados;
+            delete row.name_genotipo;
+            delete row.name_public;
+            delete row.name_experiment;
+            delete row.name_alter;
+            delete row.elit_name;
+            delete row.tecnologia;
+            delete row.numberLotes;
+            delete row.type;
+            delete row.gmr;
+            delete row.bgm;
+            delete row.cruza;
+            delete row.progenitor_f_direto;
+            delete row.progenitor_m_direto;
+            delete row.progenitor_f_origem;
+            delete row.progenitor_m_origem;
+            delete row.progenitores_origem;
+            delete row.parentesco_completo;
+            delete row.DT;
+            delete row.id;
+            delete row.id_tecnologia;
+            delete row.tableData;
+            delete row.lote;
+            delete row.dt_import;
+
+            // row.DT = new Date();
+
             return row;
           });
 

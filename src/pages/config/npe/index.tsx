@@ -560,7 +560,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'NPE.xlsx');
       } else {
-        Swal.fire('Erro ao exportar');
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
   };

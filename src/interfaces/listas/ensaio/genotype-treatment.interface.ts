@@ -41,4 +41,6 @@ export interface ITreatmentFilter {
   filterBgmFrom: string | any
   filterNtTo: string | any
   filterNtFrom: string | any
+  filterStatusT: string | any
+  filterCodTec: string | any
 }
