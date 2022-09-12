@@ -213,8 +213,12 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
+    // Manage orders of colunms
+    let parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
+
     await cultureService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setCultures(response.response);

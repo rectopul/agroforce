@@ -20,7 +20,7 @@ export function ToolTip({
     [`& .${tooltipClasses.tooltip}`]: {
       backgroundColor: '#FFF',
       color: 'rgba(0, 0, 0, 0.87)',
-      maxWidth: 220,
+      maxWidth: '300px',
       fontSize: theme.typography.pxToRem(12),
       border: '1px solid #00a5b4',
     },
@@ -31,7 +31,7 @@ export function ToolTip({
       title={<>{contentMenu}</>}
     >
       {/* <Button style={{ padding: 0 }}>{ children }</Button> */}
-      <div style={{ padding: 0 }}>{ children }</div>
+      <div style={{ padding: 0 }}>{children}</div>
     </HtmlTooltip>
   );
 }

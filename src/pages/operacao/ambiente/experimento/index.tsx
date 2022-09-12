@@ -538,7 +538,7 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
@@ -600,7 +600,7 @@ export default function Listagem({
         data.idTypeAssay = item.assay_list.type_assay.id;
         data.idTecnologia = item.assay_list.tecnologia.id;
         data.gli = item.assay_list.gli;
-        data.experimentName = item.experimentName;
+        data.idExperiment = item.id;
         data.rep = item.delineamento.repeticao;
         data.nt = gt.treatments_number;
         data.npe = npei;
@@ -711,7 +711,7 @@ export default function Listagem({
                         <strong className="text-blue-600">
                           Total registrado:
                           {' '}
-                          {itemsTotal}
+                          {experimentos.length}
                         </strong>
 
                         <div className="h-full flex items-center gap-2">

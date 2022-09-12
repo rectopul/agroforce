@@ -116,6 +116,7 @@ export function TabsDropDowns(typeAside: any = 'config') {
         hrefTab: '/listas/experimentos/experimento',
         data: [
           { labelDropDown: 'Experimento', hrefDropDown: '/listas/experimentos/experimento', iconDropDown: <AiOutlineFileSearch /> },
+          { labelDropDown: 'Parcelas do experimento', hrefDropDown: '/listas/experimentos/parcelas-experimento', iconDropDown: <MdDateRange /> },
         ],
       },
 

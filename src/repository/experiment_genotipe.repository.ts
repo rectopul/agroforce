@@ -14,4 +14,23 @@ export class ExperimentGenotipeRepository {
         });
         return result;
     }
+
+    async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+        if (orderBy) {
+            orderBy = JSON.parse(orderBy);
+        }
+
+        const count = await prisma.experiment_genotipe.count({ where });
+
+        const result: object | any = await prisma.experiment_genotipe.findMany({
+            select,
+            skip,
+            take,
+            where,
+            orderBy,
+        });
+
+        result.total = count;
+        return result;
+    }
 }
