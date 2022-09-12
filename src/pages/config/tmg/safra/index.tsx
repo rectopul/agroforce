@@ -424,8 +424,10 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    // `${parametersFilter}&skip=0&take=${take}`
     await safraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setSafras(response.response);

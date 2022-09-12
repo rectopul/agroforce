@@ -166,9 +166,6 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
 
-      // const parametersFilter = `filterStatus=${filterStatus || 1
-      //   }&filterName=${filterName}&filterLogin=${filterLogin}`;
-
       // Call filter with there parameter   
       const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus || 1, filterName, filterLogin );
 
@@ -386,8 +383,10 @@ export default function Listagem({
     //Manage orders of colunms 
     let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
 
+    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+
     await userService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setUsers(response.response);

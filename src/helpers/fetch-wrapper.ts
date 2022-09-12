@@ -81,16 +81,17 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
  
   if (localStorage.getItem('filterValueEdit')) {
     filter = localStorage.getItem('filterValueEdit');
-  } else {
+  } 
+  else {
     filter = filter;
   }
-  if(localStorage.getItem('orderSorting')){
-    filter = localStorage.getItem('orderSorting');
-    console.log("orderSorting ",filter)
 
-  }
+  // if(localStorage.getItem('orderSorting')){
+  //   filter = localStorage.getItem('orderSorting');
+  //   console.log("orderSorting ",filter)
+  // }
 
-  if (localStorage.getItem('pageBeforeEdit') != null) {
+  if (localStorage.getItem('pageBeforeEdit')) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
   } else {
     currentPages = currentPages;
@@ -106,6 +107,16 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
   return { parametersFilter, currentPages };
 }
 
+// function skip(currentPages : any, parametersFilter: any){
+//   const skip = currentPages * Number(take);
+//   let parametersFilter = `skip=${skip}&take=${take}`;
+
+//   if (filter) {
+//     parametersFilter = `${parametersFilter}&${filter}`;
+//   }
+
+//   return { parametersFilter, currentPages };
+// }
 // async function RemoveExtraCultureId(parametersFilter){
 
 //   const myArray = await parametersFilter.split("&id_culture");
@@ -259,12 +270,27 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
   if (from == 'safra' || from == 'setor') {
     // Remove extra values here
     parametersFilter = removeExtraValues(parametersFilter, from, '&orderBy');
-    return parametersFilter;
+    // parametersFilter;
   }
   if (from == 'genotipo') {
     // Remove extra values here
     parametersFilter = removeExtraValues(parametersFilter, from, '&id_culture');
-    return parametersFilter;
+    // return parametersFilter;
+  }
+
+  // return skip(currentPages , parametersFilter);
+  
+  return parametersFilter;
+}
+
+
+function skip(currentPages : any, filter: any){
+  const take = 10;
+  const skip = currentPages * Number(take);
+  let parametersFilter = `skip=${skip}&take=${take}`;
+
+  if (filter) {
+    parametersFilter = `${parametersFilter}&${filter}`;
   }
 
   return parametersFilter;
@@ -306,4 +332,5 @@ export const fetchWrapper = {
   handleFilterParameter,
   handleOrderGlobal,
   getValueParams,
+  skip
 };
