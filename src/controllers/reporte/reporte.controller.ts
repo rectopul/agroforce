@@ -4,20 +4,19 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import { prisma } from '../../pages/api/db/db';
 
 export class ReporteController {
-
   async getAll(options: object | any) {
     try {
-      console.log('get all')
+      console.log('get all');
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
     }
   }
 
   async getOne(id: number) {
     try {
-      console.log('get one for id')
+      console.log('get one for id');
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -32,7 +31,8 @@ export class ReporteController {
   async update(data: any) {
     try {
       console.log('update');
-      } catch (error: any) {
-        console.log(error);
+    } catch (error: any) {
+      console.log(error);
     }
+  }
 }

@@ -123,7 +123,7 @@ export class ExperimentGroupController {
   async delete(id: number) {
     try {
       const { status, response } = await this.getOne(Number(id));
-      response.experiment.forEach(async (item: IExperiments) => {
+      response.experiment.forEach(async (item: any) => {
         await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
       });
 

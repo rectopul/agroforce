@@ -73,190 +73,189 @@ export default function Listagem({
     id: 0,
     table_preferences:
             'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
-    };
+  };
 
-    const [camposGerenciados, setCamposGerenciados] = useState<any>(
-        preferences.table_preferences,
-    );
-    const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
-    const [tableMessage, setMessage] = useState<boolean>(false);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const [orderList, setOrder] = useState<number>(1);
-    const [afterFilter, setAfterFilter] = useState<boolean>(false);
-    const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-    const [filter, setFilter] = useState<any>(filterApplication);
-    const [itemsTotal, setTotalItems] = useState<number>(0);
-    const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-        // {
-        //   name: 'CamposGerenciados[]',
-        //   title: 'CheckBox ',
-        //   value: 'id',
-        //   defaultChecked: () => camposGerenciados.includes('id'),
-        // },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Foco',
-            value: 'foco',
-            defaultChecked: () => camposGerenciados.includes('foco'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Ensaio',
-            value: 'type_assay',
-            defaultChecked: () => camposGerenciados.includes('type_assay'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Nome da tecnologia',
-            value: 'tecnologia',
-            defaultChecked: () => camposGerenciados.includes('tecnologia'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'GLI',
-            value: 'gli',
-            defaultChecked: () => camposGerenciados.includes('gli'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Experimento',
-            value: 'experiment',
-            defaultChecked: () => camposGerenciados.includes('experiment'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Lugar de plantio',
-            value: 'experiment',
-            defaultChecked: () => camposGerenciados.includes('experiment'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'REP.',
-            value: 'rep',
-            defaultChecked: () => camposGerenciados.includes('rep'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Status T',
-            value: 'experiment',
-            defaultChecked: () => camposGerenciados.includes('experiment'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'NT',
-            value: 'nt',
-            defaultChecked: () => camposGerenciados.includes('nt'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'NPE',
-            value: 'npe',
-            defaultChecked: () => camposGerenciados.includes('npe'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'Nome do genótipo',
-            value: 'name_genotipo',
-            defaultChecked: () => camposGerenciados.includes('name_genotipo'),
-        },
-        {
-            name: 'CamposGerenciados[]',
-            title: 'NCA',
-            value: 'nca',
-            defaultChecked: () => camposGerenciados.includes('nca'),
-        },
-    ]);
-    const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
-        {
-            name: 'StatusCheckbox',
-            title: 'IMPORTADO ',
-            value: 'importado',
-            defaultChecked: () => camposGerenciados.includes('importado'),
-        },
-        {
-            name: 'StatusCheckbox',
-            title: 'SORTEADO',
-            value: 'sorteado',
-            defaultChecked: () => camposGerenciados.includes('sorteado'),
-        },
-    ]);
-    const [orderBy, setOrderBy] = useState<string>('');
-    const [orderType, setOrderType] = useState<string>('');
-    const router = useRouter();
-    const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-    // const take: number = itensPerPage;
-    const [take, setTake] = useState<number>(itensPerPage);
-    const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-    const pages = Math.ceil(total / take);
-    const [nccIsValid, setNccIsValid] = useState<boolean>(false);
-    const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
-    const [rowsSelected, setRowsSelected] = useState([]);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
+  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
+  const [tableMessage, setMessage] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(1);
+  const [afterFilter, setAfterFilter] = useState<boolean>(false);
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+  const [filter, setFilter] = useState<any>(filterApplication);
+  const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'CheckBox ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Foco',
+      value: 'foco',
+      defaultChecked: () => camposGerenciados.includes('foco'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Ensaio',
+      value: 'type_assay',
+      defaultChecked: () => camposGerenciados.includes('type_assay'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Nome da tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'GLI',
+      value: 'gli',
+      defaultChecked: () => camposGerenciados.includes('gli'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Experimento',
+      value: 'experiment',
+      defaultChecked: () => camposGerenciados.includes('experiment'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Lugar de plantio',
+      value: 'experiment',
+      defaultChecked: () => camposGerenciados.includes('experiment'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'REP.',
+      value: 'rep',
+      defaultChecked: () => camposGerenciados.includes('rep'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Status T',
+      value: 'experiment',
+      defaultChecked: () => camposGerenciados.includes('experiment'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NT',
+      value: 'nt',
+      defaultChecked: () => camposGerenciados.includes('nt'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NPE',
+      value: 'npe',
+      defaultChecked: () => camposGerenciados.includes('npe'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Nome do genótipo',
+      value: 'name_genotipo',
+      defaultChecked: () => camposGerenciados.includes('name_genotipo'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NCA',
+      value: 'nca',
+      defaultChecked: () => camposGerenciados.includes('nca'),
+    },
+  ]);
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
+    },
+  ]);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
+  const router = useRouter();
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  // const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
+  const pages = Math.ceil(total / take);
+  const [nccIsValid, setNccIsValid] = useState<boolean>(false);
+  const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
+  const [rowsSelected, setRowsSelected] = useState([]);
 
-    const formik = useFormik<ITreatmentFilter>({
-        initialValues: {
-            filterFoco: '',
-            filterTypeAssay: '',
-            filterTechnology: '',
-            filterGli: '',
-            filterBgm: '',
-            filterTreatmentsNumber: '',
-            filterStatus: '',
-            filterStatusAssay: '',
-            filterGenotypeName: '',
-            filterNca: '',
-            orderBy: '',
-            typeOrder: '',
-            filterBgmTo: '',
-            filterBgmFrom: '',
-            filterNtTo: '',
-            filterNtFrom: '',
-            filterStatusT: '',
-            filterCodTec: '',
-        },
-        onSubmit: async ({
-            filterFoco,
-            filterTypeAssay,
-            filterTechnology,
-            filterGli,
-            filterBgm,
-            filterTreatmentsNumber,
-            filterStatusAssay,
-            filterGenotypeName,
-            filterNca,
-            filterBgmTo,
-            filterBgmFrom,
-            filterNtTo,
-            filterNtFrom,
-        }) => {
-            // const allCheckBox: any = document.querySelectorAll(
-            //     "input[name='StatusCheckbox']",
-            // );
-            // let selecionados = '';
-            // for (let i = 0; i < allCheckBox.length; i += 1) {
-            //     if (allCheckBox[i].checked) {
-            //         selecionados += `${allCheckBox[i].value},`;
-            //     }
-            // }
+  const formik = useFormik<ITreatmentFilter>({
+    initialValues: {
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterTechnology: '',
+      filterGli: '',
+      filterBgm: '',
+      filterTreatmentsNumber: '',
+      filterStatus: '',
+      filterStatusAssay: '',
+      filterGenotypeName: '',
+      filterNca: '',
+      orderBy: '',
+      typeOrder: '',
+      filterBgmTo: '',
+      filterBgmFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
+      filterStatusT: '',
+      filterCodTec: '',
+    },
+    onSubmit: async ({
+      filterFoco,
+      filterTypeAssay,
+      filterTechnology,
+      filterGli,
+      filterBgm,
+      filterTreatmentsNumber,
+      filterStatusAssay,
+      filterGenotypeName,
+      filterNca,
+      filterBgmTo,
+      filterBgmFrom,
+      filterNtTo,
+      filterNtFrom,
+    }) => {
+      // const allCheckBox: any = document.querySelectorAll(
+      //     "input[name='StatusCheckbox']",
+      // );
+      // let selecionados = '';
+      // for (let i = 0; i < allCheckBox.length; i += 1) {
+      //     if (allCheckBox[i].checked) {
+      //         selecionados += `${allCheckBox[i].value},`;
+      //     }
+      // }
 
-            // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-            // const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
-            // setFiltersParams(parametersFilter);
-            // setCookies('filterBeforeEdit', filtersParams);
-            // await genotypeTreatmentService
-            //     .getAll(`${parametersFilter}`)
-            //     .then(({ response, total: allTotal }) => {
-            //         setFilter(parametersFilter);
-            //         setTreatments(response);
-            //         setTotalItems(allTotal);
-            //         setAfterFilter(true);
-            //         setCurrentPage(0);
-            //         setMessage(true);
-            //         tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
-            //     });
+      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      // const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await genotypeTreatmentService
+      //     .getAll(`${parametersFilter}`)
+      //     .then(({ response, total: allTotal }) => {
+      //         setFilter(parametersFilter);
+      //         setTreatments(response);
+      //         setTotalItems(allTotal);
+      //         setAfterFilter(true);
+      //         setCurrentPage(0);
+      //         setMessage(true);
+      //         tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
+      //     });
 
-        },
-    });
-  }
+    },
+  });
 
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
@@ -1066,13 +1065,13 @@ export default function Listagem({
                                             {...providers.dragHandleProps}
                                           >
                                             <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                    generate.value,
-                                                  )}
-                                              />
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value,
+                                              )}
+                                            />
                                           </li>
                                         )}
                                       </Draggable>

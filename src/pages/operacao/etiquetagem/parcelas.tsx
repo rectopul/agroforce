@@ -574,17 +574,17 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
-    const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
-    const { status }: IReturnObject = await experimentGenotipeService.update({
-      idList: experimentsSelected,
-      experimentGroupId: Number(experimentGroupId),
-      status: 'IMP. N INICI.',
-    });
-    if (status !== 200) {
-      Swal.fire('Erro ao associar experimentos');
-    } else {
-      router.back();
-    }
+    // const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
+    // const { status }: IReturnObject = await experimentGenotipeService.update({
+    //   idList: experimentsSelected,
+    //   experimentGroupId: Number(experimentGroupId),
+    //   status: 'IMP. N INICI.',
+    // });
+    // if (status !== 200) {
+    //   Swal.fire('Erro ao associar experimentos');
+    // } else {
+    //   router.back();
+    // }
   }
 
   useEffect(() => {
