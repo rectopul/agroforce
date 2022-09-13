@@ -100,8 +100,7 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
-  // const tabsDropDowns = TabsDropDowns('listas');
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS'
     ? (tab.statusTab = true)
@@ -614,7 +613,9 @@ export default function Listagem({
     // manage using comman function
     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+    console.log({ parametersFilter });
+
+    await experimentService.getAll(`${parametersFilter}&idSafra=${idSafra}`).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         // setFiltersParams(parametersFilter);
@@ -1029,7 +1030,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExperiments, total: totalItems } = await fetch(
+  const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
     `${baseUrl}?idSafra=${idSafra}`,
     requestOptions,
   ).then((response) => response.json());
