@@ -473,7 +473,6 @@ export default function TipoEnsaio({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
-            console.log(newRow);
             newRow.envelope = row.envelope.seeds;
             newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
 

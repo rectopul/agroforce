@@ -116,9 +116,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const router = useRouter();
-  const [experimentos, setExperimento] = useState<IExperimento[]>(
-    () => allExperiments,
-  );
+  const [experimentos, setExperimento] = useState<IExperimento[]>(() => (allExperiments));
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
@@ -1029,11 +1027,11 @@ export const getServerSideProps: GetServerSideProps = async ({
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
+  const {
+    response: allExperiments,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
-  const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
-    `${baseUrl}?idSafra=${idSafra}`,
-    requestOptions,
-  ).then((response) => response.json());
   return {
     props: {
       allExperiments,

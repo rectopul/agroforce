@@ -3,6 +3,8 @@ import { ExperimentRepository } from '../../repository/experiment.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
+import { IReturnObject } from '../../interfaces/shared/Import.interface';
+import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -12,7 +14,6 @@ export class ExperimentController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
-    let select: any = [];
     parameters.AND = [];
     try {
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
@@ -63,89 +64,67 @@ export class ExperimentController {
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
-      if (options.paramSelect) {
-        const objSelect = options.paramSelect.split(',');
-        select.assay_list = {};
-        select.assay_list.select = {};
-        Object.keys(objSelect).forEach((item) => {
-          if (objSelect[item] === 'protocolName') {
-            select.assay_list.select.protocol_name = true;
-          } else if (objSelect[item] === 'type_assay') {
-            select.assay_list.select.type_assay = true;
-          } else if (objSelect[item] === 'gli') {
-            select.assay_list.select.gli = true;
-          } else if (objSelect[item] === 'tecnologia') {
-            select.assay_list.select.tecnologia = true;
-          } else if (objSelect[item] === 'foco') {
-            select.assay_list.select.foco = true;
-          } else if (objSelect[item] !== 'action') {
-            select[objSelect[item]] = true;
-          }
-        });
-        select = { ...select };
-      } else {
-        select = {
-          id: true,
-          idSafra: true,
-          density: true,
-          repetitionsNumber: true,
-          experimentGroupId: true,
-          period: true,
-          nlp: true,
-          clp: true,
-          eel: true,
-          experimentName: true,
-          comments: true,
-          orderDraw: true,
-          status: true,
-          assay_list: {
-            select: {
-              gli: true,
-              bgm: true,
-              protocol_name: true,
-              status: true,
-              genotype_treatment: { include: { genotipo: true } },
-              tecnologia: {
-                select: {
-                  name: true,
-                  id: true,
-                  cod_tec: true,
-                },
+      const select = {
+        id: true,
+        idSafra: true,
+        density: true,
+        repetitionsNumber: true,
+        experimentGroupId: true,
+        period: true,
+        nlp: true,
+        clp: true,
+        eel: true,
+        experimentName: true,
+        comments: true,
+        orderDraw: true,
+        status: true,
+        assay_list: {
+          select: {
+            gli: true,
+            bgm: true,
+            protocol_name: true,
+            status: true,
+            genotype_treatment: { include: { genotipo: true } },
+            tecnologia: {
+              select: {
+                name: true,
+                id: true,
+                cod_tec: true,
               },
-              foco: {
-                select: {
-                  name: true,
-                  id: true,
-                },
+            },
+            foco: {
+              select: {
+                name: true,
+                id: true,
               },
-              type_assay: {
-                select: {
-                  name: true,
-                  id: true,
-                },
+            },
+            type_assay: {
+              select: {
+                name: true,
+                id: true,
               },
-              safra: {
-                select: {
-                  safraName: true,
-                },
+            },
+            safra: {
+              select: {
+                safraName: true,
               },
             },
           },
-          local: {
-            select: {
-              name_local_culture: true,
-              cultureUnity: true,
-            },
+        },
+        local: {
+          select: {
+            name_local_culture: true,
+            cultureUnity: true,
           },
-          delineamento: {
-            select: {
-              name: true,
-              repeticao: true,
-              id: true,
-            },
+        },
+        delineamento: {
+          select: {
+            name: true,
+            repeticao: true,
+            id: true,
           },
-        };
-      }
+        },
+      };
 
       if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
@@ -170,8 +149,8 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.Status) {
-        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.Status}" } } `));
+      if (options.status) {
+        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.status}" } } `));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -190,6 +169,7 @@ export class ExperimentController {
         skip,
         orderBy,
       );
+
       response.map((item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils
@@ -197,7 +177,6 @@ export class ExperimentController {
         newItem.npeQT = item.countNT * item.repetitionsNumber;
         return newItem;
       });
-
       if (!response && response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
@@ -242,13 +221,17 @@ export class ExperimentController {
     try {
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
+        await this.countExperimentGroupChildren(data.experimentGroupId);
         return { status: 200, message: 'Experimento atualizado' };
       }
       const experimento: any = await this.experimentRepository.findOne(data.id);
-
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
 
       const response = await this.experimentRepository.update(experimento.id, data);
+      await this.countExperimentGroupChildren(experimento.experimentGroupId);
+      if (!response.experimentGroupId) {
+        await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+      }
       if (response) {
         return { status: 200, message: 'Experimento atualizado' };
       }
@@ -284,5 +267,14 @@ export class ExperimentController {
       handleError('Experimento controller', 'Delete', error.message);
       throw new Error('[Controller] - Delete Experimento erro');
     }
+  }
+
+  async countExperimentGroupChildren(id: number) {
+    const experimentGroupController = new ExperimentGroupController();
+    const { response }: IReturnObject = await experimentGroupController.getOne(id);
+    if (!response) return;
+    const experimentAmount = response.experiment?.length;
+    const status = experimentAmount === 0 ? null : 'IMP. N INICI.';
+    await experimentGroupController.update({ id: response.id, experimentAmount, status });
   }
 }

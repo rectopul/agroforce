@@ -571,11 +571,11 @@ model ExperimentGroup {
   id               Int      @id @default(autoincrement())
   safraId          Int
   name             String
-  experimentAmount Int
-  tagsToPrint      Int
-  tagsPrinted      Int
-  totalTags        Int
-  status           String
+  experimentAmount Int      @default(0)
+  tagsToPrint      Int?
+  tagsPrinted      Int?
+  totalTags        Int?
+  status           String?
   createdBy        Int
   createdAt        DateTime @default(now())
 

@@ -4,7 +4,6 @@ import { ExperimentGroupController } from '../../../controllers/experiment-group
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const experimentGroupController = new ExperimentGroupController();
-
   switch (req.method) {
     case 'GET': {
       const resultGet = await experimentGroupController.getAll(req.query);

@@ -27,13 +27,12 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
 import {
   ITreatment,
   ITreatmentFilter,
   ITreatmentGrid,
-} from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
-import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
+} from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
 import {
   AccordionFilter,
@@ -41,44 +40,67 @@ import {
   CheckBox,
   Content,
   Input,
+  ModalConfirmation,
   Select,
-} from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+} from '../../../components';
+import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
-  genotypeTreatmentService,
+  experimentGenotipeService,
   importService,
   userPreferencesService,
-} from '../../../../services';
-import * as ITabs from '../../../../shared/utils/dropdown';
+} from '../../../services';
+import * as ITabs from '../../../shared/utils/dropdown';
+import { IReturnObject } from '../../../interfaces/shared/Import.interface';
+import { fetchWrapper } from '../../../helpers';
+import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
+
+interface IFilter {
+  filterFoco: string
+  filterTypeAssay: string
+  filterNameTec: string
+  filterCodTec: string
+  filterGli: string
+  filterExperimentName: string
+  filterLocal: string
+  filterRepetitionFrom: string | any;
+  filterRepetitionTo: string | any;
+  filterStatus: string
+  filterNtFrom: string
+  filterNtTo: string
+  filterNpeFrom: string
+  filterNpeTo: string
+  filterGenotypeName: string
+  filterNca: string
+  orderBy: object | any;
+  typeOrder: object | any;
+}
 
 export default function Listagem({
-  assaySelect,
-  genotypeSelect,
+  allExperiments,
+  totalItems,
   itensPerPage,
+  experimentGroupId,
   filterApplication,
   idSafra,
+  pageBeforeEdit,
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs.default;
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const { tabsOperation } = ITabs.default;
 
-  const tableRef = useRef<any>(null);
-
-  const tabsDropDowns = TabsDropDowns('listas');
-
-  tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-            'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+      'id,foco,type_assay,tecnologia,gli,experimentName,local,repetitionsNumber,status,NT,npe,genotypeName,nca,action',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
+  const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
@@ -87,12 +109,6 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // {
-    //   name: 'CamposGerenciados[]',
-    //   title: 'CheckBox ',
-    //   value: 'id',
-    //   defaultChecked: () => camposGerenciados.includes('id'),
-    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Foco',
@@ -126,8 +142,8 @@ export default function Listagem({
     {
       name: 'CamposGerenciados[]',
       title: 'Lugar de plantio',
-      value: 'experiment',
-      defaultChecked: () => camposGerenciados.includes('experiment'),
+      value: 'local',
+      defaultChecked: () => camposGerenciados.includes('local'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -137,9 +153,9 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status T',
-      value: 'experiment',
-      defaultChecked: () => camposGerenciados.includes('experiment'),
+      title: 'Status',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -180,90 +196,113 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
+  const [statusImp, setStatusImp] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'EM ETIQUETAGEM ',
+      value: 'etiquetagem',
+      defaultChecked: () => camposGerenciados.includes('etiquetagem'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQUETAGEM FINALIZADA',
+      value: 'finalizada',
+      defaultChecked: () => camposGerenciados.includes('finalizada'),
+    },
+  ]);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  // const take: number = itensPerPage;
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [nccIsValid, setNccIsValid] = useState<boolean>(false);
-  const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
-  const formik = useFormik<any>({
+  const router = useRouter();
+
+  const formik = useFormik<IFilter>({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
-      filterTechnology: '',
+      filterNameTec: '',
+      filterCodTec: '',
       filterGli: '',
-      filterBgm: '',
-      filterTreatmentsNumber: '',
+      filterExperimentName: '',
+      filterLocal: '',
+      filterRepetitionFrom: '',
+      filterRepetitionTo: '',
       filterStatus: '',
-      filterStatusAssay: '',
+      filterNtFrom: '',
+      filterNtTo: '',
+      filterNpeFrom: '',
+      filterNpeTo: '',
       filterGenotypeName: '',
       filterNca: '',
       orderBy: '',
       typeOrder: '',
-      filterBgmTo: '',
-      filterBgmFrom: '',
-      filterNtTo: '',
-      filterNtFrom: '',
     },
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterTechnology,
+      filterNameTec,
+      filterCodTec,
       filterGli,
-      filterBgm,
-      filterTreatmentsNumber,
-      filterStatusAssay,
+      filterExperimentName,
+      filterLocal,
+      filterRepetitionFrom,
+      filterRepetitionTo,
+      filterStatus,
+      filterNtFrom,
+      filterNtTo,
+      filterNpeFrom,
+      filterNpeTo,
       filterGenotypeName,
       filterNca,
-      filterBgmTo,
-      filterBgmFrom,
-      filterNtTo,
-      filterNtFrom,
     }) => {
-      // const allCheckBox: any = document.querySelectorAll(
-      //     "input[name='StatusCheckbox']",
-      // );
-      // let selecionados = '';
-      // for (let i = 0; i < allCheckBox.length; i += 1) {
-      //     if (allCheckBox[i].checked) {
-      //         selecionados += `${allCheckBox[i].value},`;
-      //     }
-      // }
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']",
+      );
+      let selecionados = '';
+      for (let i = 0; i < allCheckBox.length; i += 1) {
+        if (allCheckBox[i].checked) {
+          selecionados += `${allCheckBox[i].value},`;
+        }
+      }
+      const filterStatusT = selecionados.substr(0, selecionados.length - 1);
 
-      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      // const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await genotypeTreatmentService
-      //     .getAll(`${parametersFilter}`)
-      //     .then(({ response, total: allTotal }) => {
-      //         setFilter(parametersFilter);
-      //         setTreatments(response);
-      //         setTotalItems(allTotal);
-      //         setAfterFilter(true);
-      //         setCurrentPage(0);
-      //         setMessage(true);
-      //         tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
-      //     });
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter(
+        'parcelas',
+        filterFoco,
+        filterTypeAssay,
+        filterNameTec,
+        filterCodTec,
+        filterGli,
+        filterExperimentName,
+        filterLocal,
+        filterRepetitionFrom,
+        filterRepetitionTo,
+        filterStatus,
+        filterNtFrom,
+        filterNtTo,
+        filterNpeFrom,
+        filterNpeTo,
+        filterGenotypeName,
+        filterNca,
+        idSafra,
+      );
 
+      setFiltersParams(parametersFilter);
+      setFilter(parametersFilter);
+      setCookies('filterBeforeEdit', filter);
+
+      await experimentGenotipeService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+        setFilter(parametersFilter);
+        setParcelas(response.response);
+        setTotalItems(response.total);
+        setCurrentPage(0);
+      });
     },
   });
-
-  useEffect(() => {
-    getTreatments();
-  }, []);
-
-  async function getTreatments() {
-    await experimentGenotipeService.getAll('&nan=nan').then(({ response, total: allTotal }) => {
-      setTreatments(response);
-      setTotalItems(allTotal);
-    });
-  }
 
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
@@ -289,11 +328,11 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await genotypeTreatmentService
+    await experimentGenotipeService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
+      .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
-          setTreatments(response);
+          setParcelas(response);
         }
       });
 
@@ -352,53 +391,53 @@ export default function Listagem({
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
-    Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'foco') {
+    Object.keys(columnOrder).forEach((index: any) => {
+      if (columnOrder[index] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
-      if (columnOrder[item] === 'type_assay') {
+      if (columnOrder[index] === 'type_assay') {
         tableFields.push(
           headerTableFactory('Ensaio', 'type_assay.name'),
         );
       }
-      if (columnOrder[item] === 'tecnologia') {
+      if (columnOrder[index] === 'tecnologia') {
         tableFields.push(
           tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
         );
       }
-      if (columnOrder[item] === 'gli') {
+      if (columnOrder[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
-      if (columnOrder[item] === 'experiment') {
+      if (columnOrder[index] === 'experiment') {
         tableFields.push(headerTableFactory('Experimento', 'experiment.experimentName'));
       }
-      if (columnOrder[item] === 'experiment') {
+      if (columnOrder[index] === 'local') {
         tableFields.push(headerTableFactory('Lugar de plantio', 'experiment.local.name_local_culture'));
       }
-      if (columnOrder[item] === 'rep') {
+      if (columnOrder[index] === 'rep') {
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
-      if (columnOrder[item] === 'experiment') {
+      if (columnOrder[index] === 'status') {
         tableFields.push(
           headerTableFactory('Status EXP.', 'experiment.status'),
         );
       }
-      if (columnOrder[item] === 'nt') {
+      if (columnOrder[index] === 'nt') {
         tableFields.push(
           headerTableFactory('NT.', 'nt'),
         );
       }
-      if (columnOrder[item] === 'npe') {
+      if (columnOrder[index] === 'npe') {
         tableFields.push(
           headerTableFactory('NPE.', 'npe'),
         );
       }
-      if (columnOrder[item] === 'name_genotipo') {
+      if (columnOrder[index] === 'name_genotipo') {
         tableFields.push(
           headerTableFactory('Nome do genótipo', 'name_genotipo'),
         );
       }
-      if (columnOrder[item] === 'nca') {
+      if (columnOrder[index] === 'nca') {
         tableFields.push(headerTableFactory('NCA', 'nca'));
       }
     });
@@ -422,10 +461,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 30,
         })
-        .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+        .then((response: any) => {
+          userLogado.preferences.parcelas = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -434,7 +473,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.parcelas = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -463,28 +502,14 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
+    await experimentGenotipeService
       .getAll(filter)
-      .then(({ status, response }) => {
+      .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.Safra = item.safra.safraName;
-            newItem.Foco = item.assay_list.foco.name;
-            newItem.Ensaio = item.assay_list.type_assay.name;
-            newItem.Tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.Gli = item.assay_list.gli;
-            newItem.Bgm = item.assay_list.bgm;
-            newItem.Nt = item.treatments_number;
-            newItem.StatusT = item.status;
-            newItem.StatusEnsaio = item.assay_list.status;
-            newItem.Genotipo = item.genotipo.name_genotipo;
-            newItem.Nca = item?.lote?.ncc;
-            return newItem;
-          });
+          const newData = response.map((item: any) => item);
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
 
           // Buffer
           XLSX.write(workBook, {
@@ -497,49 +522,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
-        }
-      });
-  };
-
-  const replacementExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
-            newItem.nt = item.treatments_number;
-            newItem.status_t = item.status;
-            newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
-            newItem.novo_genotipo = '';
-            newItem.novo_status = '';
-            newItem.novo_nca = '';
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
-
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
+          XLSX.writeFile(workBook, 'Parcelas.xlsx');
         }
       });
   };
@@ -556,25 +539,21 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&experimentGroupId=${experimentGroupId}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&experimentGroupId=${experimentGroupId}`;
     }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    // await genotypeTreatmentService
-    //     .getAll(parametersFilter)
-    //     .then(({ status, response }) => {
-    //         if (status === 200) {
-    //             setTreatments(response);
-    //         }
-    //     });
-    await experimentGenotipeService.getAll(parametersFilter).then(({ response, total: allTotal }) => {
-      setTreatments(response);
-      setTotalItems(allTotal);
-    });
+    await experimentGenotipeService
+      .getAll(parametersFilter)
+      .then(({ status, response }: IReturnObject) => {
+        if (status === 200) {
+          setParcelas(response);
+        }
+      });
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -594,65 +573,17 @@ export default function Listagem({
     );
   }
 
-  function readExcel(value: any) {
-    readXlsxFile(value[0]).then((rows) => {
-      importService.validate({
-        table: 'REPLACEMENT_GENOTYPE ',
-        spreadSheet: rows,
-        moduleId: 27,
-        idSafra: userLogado.safras.safra_selecionada,
-        created_by: userLogado.id,
-      }).then(({ message }: any) => {
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-      });
+  async function handleSubmit() {
+    const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
+    const { status }: IReturnObject = await experimentGenotipeService.update({
+      idList: experimentsSelected,
+      experimentGroupId: Number(experimentGroupId),
+      status: 'IMP. N INICI.',
     });
-  }
-
-  async function handleSubmit(event: any) {
-    const genotypeButton = document.querySelector("input[id='genotipo']:checked");
-    const ncaButton = document.querySelector("input[id='nca']:checked");
-    const inputFile: any = document.getElementById('import');
-    event.preventDefault();
-    if (genotypeButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id }
-      ));
-      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
-      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
-
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
-    } else if (ncaButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
-      ));
-      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
-      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
-
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
-    } else if (inputFile?.files.length !== 0) {
-      readExcel(inputFile.files);
+    if (status !== 200) {
+      Swal.fire('Erro ao associar experimentos');
     } else {
-      Swal.fire('Selecione alguma opção ou import');
-    }
-  }
-
-  async function setRadioStatus() {
-    const selectedGenotype: any = {};
-    rowsSelected.forEach((item: any) => {
-      selectedGenotype[item.genotipo.name_genotipo] = true;
-    });
-    const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
-    if (checkedLength.length > 1) {
-      setNccIsValid(true);
-    }
-    if (rowsSelected.length <= 0) {
-      setNccIsValid(true);
-      setGenotypeIsValid(true);
+      router.back();
     }
   }
 
@@ -664,118 +595,10 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de genótipos do ensaio</title>
+        <title>Listagem de parcelas</title>
       </Head>
 
-      <Modal
-        isOpen={isOpenModal}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
-        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
-        className="flex
-          flex-col
-          w-full
-          h-64
-          max-w-xl
-          bg-gray-50
-          rounded-tl-2xl
-          rounded-tr-2xl
-          rounded-br-2xl
-          rounded-bl-2xl
-          pt-2
-          pb-4
-          px-8
-          relative
-          shadow-lg
-          shadow-gray-900/50"
-      >
-        <form className="flex flex-col">
-          <button
-            type="button"
-            className="flex absolute top-4 right-3 justify-end"
-            onClick={() => {
-              setIsOpenModal(!isOpenModal);
-              setNccIsValid(false);
-              setGenotypeIsValid(false);
-            }}
-          >
-            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
-          </button>
-
-          <div className="flex px-4  justify-between">
-            <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Ação</h2>
-              <div>
-                <div className="border-l-8 border-l-blue-600 mt-4">
-                  <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900">
-                    Substituir
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
-                  <label htmlFor="genotipo" className="font-normal text-base">
-                    Nome do genótipo
-                  </label>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input type="radio" name="substituir" id="nca" disabled={nccIsValid} />
-                <label htmlFor="nca" className="font-normal text-base">
-                  NCA
-                </label>
-              </div>
-            </header>
-            <div>
-              <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
-                <h2>
-                  Total selecionados:
-                  {' '}
-                  {rowsSelected?.length}
-                </h2>
-              </div>
-
-              <div className="border-l-8 border-l-blue-600">
-                <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-6">
-                  Importa Arquivo:
-                </h2>
-              </div>
-
-              <h2>Excel</h2>
-              <Input
-                id="import"
-                type="file"
-                className="
-              shadow
-              appearance-none
-              bg-white bg-no-repeat
-              border border-solid border-gray-300
-              rounded
-              w-full
-              py-1 px-1
-              text-gray-900
-              leading-tight
-              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-        "
-              />
-            </div>
-          </div>
-          <div className="flex justify-end py-0">
-            <div className="h-10 w-40">
-              <button
-                type="submit"
-                value="Cadastrar"
-                className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
-                onClick={(e) => handleSubmit(e)}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </form>
-      </Modal>
-
-      <Content contentHeader={tabsDropDowns} moduloActive="listas">
+      <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
           className="h-full w-full
           flex flex-col
@@ -783,113 +606,50 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar parcelas experimento">
+          <AccordionFilter title="Filtrar tratamentos genótipos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
-                  w-full
-                  items-center
-                  px-1
-                  bg-white
-                "
+                                    w-full
+                                    items-center
+                                    px-4
+                                    bg-white
+                                    "
                 onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-8
-                "
+                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-8
+                                        "
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GLI
-                    </label>
-                    <Select
-                      values={assaySelect}
-                      id="filterGli"
-                      name="filterGli"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
 
-                  {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterBgmFrom"
-                        name="filterBgmFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterBgmTo"
-                        name="filterBgmTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
                 </div>
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pt-2
-                  pb-3
-                  "
-                >
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NT
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterNtFrom"
-                        name="filterNtFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNtTo"
-                        name="filterNtTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-                  {filterFieldFactory('filterStatus', 'Status T')}
 
-                  <div className="h-10 w-1/2 ml-4">
+                <div className="w-full h-full
+                                        flex
+                                        justify-center
+                                        pb-2
+                                        "
+                >
+                  {filterFieldFactory('filterLocal', 'Lugar de plantio')}
+
+                  <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Ensaio
+                      Status do Experimento
                     </label>
-                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
                           {(provided) => (
                             <ul
-                              className="w-full h-full characters"
+                              className="w-1/2 h-full characters"
                               {...provided.droppableProps}
                               ref={provided.innerRef}
                             >
@@ -922,45 +682,119 @@ export default function Listagem({
                       </DragDropContext>
                     </AccordionFilter>
                   </div>
-                  {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
-
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome do genótipo
+                      Repetição
                     </label>
-                    <Select
-                      values={[{ id: '', name: 'Selecione' }, ...genotypeSelect]}
-                      id="filterGenotypeName"
-                      name="filterGenotypeName"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
-                  {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
-
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
+                      Status da Parcela
                     </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
+                    <AccordionFilter>
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="characters">
+                          {(provided) => (
+                            <ul
+                              className="w-1/2 h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusImp.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
+                                    >
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </AccordionFilter>
                   </div>
 
-                  <div style={{ width: 40 }} />
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFrom"
+                        name="filterNpeFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeTo"
+                        name="filterNpeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  {filterFieldFactory('filterGenotypeName', 'Nome do genotipo')}
+                  {filterFieldFactory('filterNca', 'NCA')}
+                  <div className="w-full" style={{ marginLeft: -80 }} />
+
                   <div className="h-7 w-32 mt-6">
                     <Button
+                      type="submit"
                       onClick={() => { }}
                       value="Filtrar"
-                      type="submit"
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiFilterAlt size={20} />}
@@ -975,13 +809,11 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={treatments}
+              data={parcelas}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) => (isOpenModal && { disabled: rowData }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -989,15 +821,9 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                // pageSize: itensPerPage,
                 pageSize: Number(take),
               }}
-              localization={{
-                body: {
-                  emptyDataSourceMessage: tableMessage ? 'Nenhum Trat. Genótipo encontrado!' : '',
-                },
-              }}
-              onChangeRowsPerPage={(e: any) => { }}
+              onChangeRowsPerPage={() => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1016,21 +842,37 @@ export default function Listagem({
                   >
                     <div className="h-12 w-32 ml-0">
                       <Button
-                        title="acao"
-                        value="AÇÃO"
+                        title="Ação"
+                        value="Ação"
                         textColor="white"
-                        onClick={() => {
-                          setRadioStatus();
-                          setIsOpenModal(!isOpenModal);
-                        }}
+                        onClick={() => { }}
                         bgColor="bg-blue-600"
+                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
+                      Qte. exp:
                       {' '}
-                      {itemsTotal}
+                      {parcelas.length}
+                    </strong>
+
+                    <strong className="text-blue-600">
+                      Total etiq. a imp.:
+                      {' '}
+                      {parcelas.length}
+                    </strong>
+
+                    <strong className="text-blue-600">
+                      Total etiq. imp.:
+                      {' '}
+                      {parcelas.length}
+                    </strong>
+
+                    <strong className="text-blue-600">
+                      Total etiq.:
+                      {' '}
+                      {parcelas.length}
                     </strong>
 
                     <div
@@ -1073,13 +915,13 @@ export default function Listagem({
                                             {...providers.dragHandleProps}
                                           >
                                             <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                    generate.value,
-                                                  )}
-                                              />
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value,
+                                              )}
+                                            />
                                           </li>
                                         )}
                                       </Draggable>
@@ -1091,17 +933,6 @@ export default function Listagem({
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
-                          title="Exportar planilha para substituição"
-                          icon={<BsDownload size={20} />}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {
-                            replacementExcel();
-                          }}
-                        />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
@@ -1169,7 +1000,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                                ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -1181,6 +1012,7 @@ export default function Listagem({
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
+  query,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
@@ -1196,65 +1028,38 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
+  const { id: experimentGroupId } = query;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
-  const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
+  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment_genotipe`;
 
   const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
 
-  const urlParametersAssay: any = new URL(baseUrlAssay);
-  const urlParametersTreatment: any = new URL(baseUrlTreatment);
-  urlParametersTreatment.search = new URLSearchParams(param).toString();
+  const urlParametersParcelas: any = new URL(baseUrlParcelas);
+  urlParametersParcelas.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExpTreatments, total: totalItems } = await fetch(
-    urlParametersTreatment.toString(),
+  const { response: allParcelas, total: totalItems } = await fetch(
+    urlParametersParcelas.toString(),
     requestOptions,
   ).then((response) => response.json());
-
-  const { response: allAssay } = await fetch(
-    urlParametersAssay.toString(),
-    requestOptions,
-  ).then((response) => response.json());
-
-  const assaySelect = allAssay.map((item: any) => {
-    const newItem: any = {};
-    newItem.id = item.gli;
-    newItem.name = item.gli;
-    return newItem;
-  });
-
-  const teste: any = {};
-  teste.id = '';
-  teste.name = 'Selecione';
-  assaySelect.unshift(teste);
-
-  const genotypeSelect = allExpTreatments?.map((item: any) => {
-    const newItem: any = {};
-    newItem.id = item.genotipo.name_genotipo;
-    newItem.name = item.genotipo.name_genotipo;
-    return newItem;
-  });
 
   return {
     props: {
-      allExpTreatments,
-      assaySelect,
-      genotypeSelect,
+      allParcelas,
       totalItems,
+      experimentGroupId,
       itensPerPage,
       filterApplication,
-      idCulture,
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
