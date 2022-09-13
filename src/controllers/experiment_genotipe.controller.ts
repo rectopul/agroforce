@@ -24,6 +24,9 @@ export class ExperimentGenotipeController {
         nca: true,
       };
 
+      if (options.idExperiment) {
+        parameters.idExperiment = Number(options.idExperiment);
+      }
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
