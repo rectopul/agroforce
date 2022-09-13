@@ -1,5 +1,6 @@
 import { HiOutlineClipboardList, HiOutlineMail } from 'react-icons/hi';
 import { RiUserSettingsFill } from 'react-icons/ri';
+import { FaBars } from 'react-icons/fa';
 import { IoFingerPrintSharp } from 'react-icons/io5';
 import { BiSearchAlt } from 'react-icons/bi';
 import { GiThreeLeaves } from 'react-icons/gi';
@@ -38,6 +39,12 @@ export function Aside({ moduloActive }: any) {
           icon={<RiUserSettingsFill size={32} />}
           href="/operacao/ambiente"
           active={moduloActive === 'operacao'}
+        />
+        <ButtonAside
+          title="Relatórios"
+          icon={<FaBars size={32} />}
+          href="/reporte"
+          active={moduloActive === 'relatorios'}
         />
         {/*
 
