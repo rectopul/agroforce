@@ -188,6 +188,7 @@ export default function Listagem({
       filterBgm: '',
       filterTreatmentsNumber: '',
       filterStatus: '',
+      filterCodTec: '',
       filterStatusAssay: '',
       filterGenotypeName: '',
       filterNca: '',
@@ -197,6 +198,7 @@ export default function Listagem({
       filterBgmFrom: '',
       filterNtTo: '',
       filterNtFrom: '',
+      filterStatusT: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -212,6 +214,8 @@ export default function Listagem({
       filterBgmFrom,
       filterNtTo,
       filterNtFrom,
+      filterStatusT,
+      filterCodTec,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
@@ -224,7 +228,7 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
@@ -765,6 +769,22 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cód. Tecnologia
+                    </label>
+                    <div className="flex">
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Cód. Tecnologia"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                   {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -829,7 +849,22 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  {filterFieldFactory('filterStatus', 'Status T')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status T
+                    </label>
+                    <div className="flex">
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Status T"
+                        id="filterStatusT"
+                        name="filterStatusT"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  {/* {filterFieldFactory('filterStatus', 'Status T')} */}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

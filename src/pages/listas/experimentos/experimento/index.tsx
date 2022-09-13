@@ -100,8 +100,7 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
-  // const tabsDropDowns = TabsDropDowns('listas');
-  const tabsDropDowns = TabsDropDowns();
+  const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS'
     ? (tab.statusTab = true)
@@ -612,7 +611,9 @@ export default function Listagem({
     // manage using comman function
     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+    console.log({ parametersFilter });
+
+    await experimentService.getAll(`${parametersFilter}&idSafra=${idSafra}`).then(({ status, response }: any) => {
       if (status === 200) {
         setExperimento(response);
         // setFiltersParams(parametersFilter);
@@ -767,7 +768,7 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -788,8 +789,8 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
+                  {/* <div className="w-full" style={{ marginLeft: -80 }} /> */}
+                  <div style={{ width: 80 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"

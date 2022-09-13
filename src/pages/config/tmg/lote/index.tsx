@@ -136,7 +136,7 @@ export default function Listagem({
     },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
   ]);
   const [filter, setFilter] = useState<any>();
   const [colorStar, setColorStar] = useState<string>('');
@@ -214,7 +214,7 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
 
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await loteService.getAll(value).then((response) => {
       if (response.status === 200) {
@@ -358,7 +358,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Nome Tec.', 'genotipo.tecnologia'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia'));
       }
     });
     return tableFields;
@@ -677,7 +677,10 @@ export default function Listagem({
                         />
                       </div>
                     </div>
-                    <div style={{ marginLeft: 10 }}>
+                  </div>
+
+                  <div className="h-6 w-full ml-4 flex">
+                    <div>
                       <label className="block text-gray-900 text-sm font-bold mb-1">
                         BGM
                       </label>
@@ -701,10 +704,10 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome tecnologia')}
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
+                  {/* <div className="w-full" style={{ marginLeft: -40 }} /> */}
+                  <div style={{ marginLeft: 20 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
