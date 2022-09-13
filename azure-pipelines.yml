@@ -12,8 +12,7 @@ variables:
 
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'service-connection-crtmghml001'
-  imageRepository: 'testetesteteste'
-  repository: 'crtmghml001'
+  imageRepository: 'crtmghml001'
 
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
