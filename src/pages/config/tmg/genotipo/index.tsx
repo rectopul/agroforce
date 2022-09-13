@@ -244,7 +244,7 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'genotipo');
 
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await genotipoService
       .getAll(value)
@@ -680,7 +680,7 @@ export default function Listagem({
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
               type="text"
@@ -711,11 +711,11 @@ export default function Listagem({
 
   function filterLotRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
               type="text"
@@ -810,17 +810,18 @@ export default function Listagem({
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
                   {filterLotRange('filterLots', 'Nº Lotes')}
-                </div>
 
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 50 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => { }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
               </form>

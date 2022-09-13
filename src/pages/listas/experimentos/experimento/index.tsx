@@ -770,7 +770,7 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -791,8 +791,8 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
+                  {/* <div className="w-full" style={{ marginLeft: -80 }} /> */}
+                  <div style={{ width: 80 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
