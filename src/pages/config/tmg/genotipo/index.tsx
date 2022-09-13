@@ -131,7 +131,11 @@ export default function Listagem({
       title: 'Nome principal',
       value: 'name_main',
     },
-    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Tecnologia',
+      value: 'tecnologia',
+    },
     { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
@@ -221,7 +225,21 @@ export default function Listagem({
       filterLotsFrom,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('genotipo', filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom, filterLotsTo, filterLotsFrom);
+      const parametersFilter = await fetchWrapper.handleFilterParameter(
+        'genotipo',
+        filterGenotipo,
+        filterMainName,
+        filterCruza,
+        filterTecnologiaCod,
+        filterTecnologiaDesc,
+        filterGmr,
+        idCulture,
+        idSafra,
+        filterGmrRangeTo,
+        filterGmrRangeFrom,
+        filterLotsTo,
+        filterLotsFrom,
+      );
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
 
@@ -242,18 +260,21 @@ export default function Listagem({
     order: string | any,
   ): Promise<void> {
     // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'genotipo');
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(
+      column,
+      order,
+      filter,
+      'genotipo',
+    );
 
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
-    await genotipoService
-      .getAll(value)
-      .then((response) => {
-        if (response.status === 200) {
-          setGenotipo(response.response);
-          setFiltersParams(parametersFilter);
-        }
-      });
+    await genotipoService.getAll(value).then((response) => {
+      if (response.status === 200) {
+        setGenotipo(response.response);
+        setFiltersParams(parametersFilter);
+      }
+    });
 
     if (orderList === 2) {
       setOrder(0);
@@ -400,9 +421,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Nome principal', 'name_main'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Nome Tec.', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
@@ -525,111 +544,109 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotipoService
-      .getAll(filtersParams)
-      .then(({ response, status }) => {
-        if (status === 200) {
-          const newData = response.map((row: any) => {
-            const dataExp = new Date();
-            let hours: string;
-            let minutes: string;
-            let seconds: string;
-            if (String(dataExp.getHours()).length === 1) {
-              hours = `0${String(dataExp.getHours())}`;
-            } else {
-              hours = String(dataExp.getHours());
-            }
-            if (String(dataExp.getMinutes()).length === 1) {
-              minutes = `0${String(dataExp.getMinutes())}`;
-            } else {
-              minutes = String(dataExp.getMinutes());
-            }
-            if (String(dataExp.getSeconds()).length === 1) {
-              seconds = `0${String(dataExp.getSeconds())}`;
-            } else {
-              seconds = String(dataExp.getSeconds());
-            }
-            row.DT = `${dataExp.toLocaleDateString(
-              'pt-BR',
-            )} ${hours}:${minutes}:${seconds}`;
+    await genotipoService.getAll(filtersParams).then(({ response, status }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          const dataExp = new Date();
+          let hours: string;
+          let minutes: string;
+          let seconds: string;
+          if (String(dataExp.getHours()).length === 1) {
+            hours = `0${String(dataExp.getHours())}`;
+          } else {
+            hours = String(dataExp.getHours());
+          }
+          if (String(dataExp.getMinutes()).length === 1) {
+            minutes = `0${String(dataExp.getMinutes())}`;
+          } else {
+            minutes = String(dataExp.getMinutes());
+          }
+          if (String(dataExp.getSeconds()).length === 1) {
+            seconds = `0${String(dataExp.getSeconds())}`;
+          } else {
+            seconds = String(dataExp.getSeconds());
+          }
+          row.DT = `${dataExp.toLocaleDateString(
+            'pt-BR',
+          )} ${hours}:${minutes}:${seconds}`;
 
-            row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
+          row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
-            row.Id_S1 = row.id_s1;
-            row.Id_Dados = row.id_dados;
-            row.Nome_Genótipo = row.name_genotipo;
-            row.Nome_Público = row.name_public;
-            row.Nome_Experimental = row.name_experiment;
-            row.Nome_Alternativo = row.name_alter;
-            row.Elite_Nome = row.elit_name;
-            row.Tecnologia = row.tecnologia;
-            row.N_De_Lotes = row.numberLotes;
-            row.Tipo = row.type;
-            row.Gmr = row.gmr;
-            row.Bgm = row.bgm;
-            row.Cruza = row.cruza;
-            row.Progenitor_F_Direto = row.progenitor_f_direto;
-            row.Progenitor_M_Direto = row.progenitor_m_direto;
-            row.Progenitor_F_Origem = row.progenitor_f_origem;
-            row.Progenitor_M_Origem = row.progenitor_m_origem;
-            row.Progenitores_Origem = row.progenitores_origem;
-            row.Parentesco_Completo = row.parentesco_completo;
-            row.Data = row.DT;
+          row.Id_S1 = row.id_s1;
+          row.Id_Dados = row.id_dados;
+          row.Nome_Genótipo = row.name_genotipo;
+          row.Nome_Público = row.name_public;
+          row.Nome_Experimental = row.name_experiment;
+          row.Nome_Alternativo = row.name_alter;
+          row.Elite_Nome = row.elit_name;
+          row.Tecnologia = row.tecnologia;
+          row.N_De_Lotes = row.numberLotes;
+          row.Tipo = row.type;
+          row.Gmr = row.gmr;
+          row.Bgm = row.bgm;
+          row.Cruza = row.cruza;
+          row.Progenitor_F_Direto = row.progenitor_f_direto;
+          row.Progenitor_M_Direto = row.progenitor_m_direto;
+          row.Progenitor_F_Origem = row.progenitor_f_origem;
+          row.Progenitor_M_Origem = row.progenitor_m_origem;
+          row.Progenitores_Origem = row.progenitores_origem;
+          row.Parentesco_Completo = row.parentesco_completo;
+          row.Data = row.DT;
 
-            delete row.id_s1;
-            delete row.name_main;
-            delete row.id_dados;
-            delete row.name_genotipo;
-            delete row.name_public;
-            delete row.name_experiment;
-            delete row.name_alter;
-            delete row.elit_name;
-            delete row.tecnologia;
-            delete row.numberLotes;
-            delete row.type;
-            delete row.gmr;
-            delete row.bgm;
-            delete row.cruza;
-            delete row.progenitor_f_direto;
-            delete row.progenitor_m_direto;
-            delete row.progenitor_f_origem;
-            delete row.progenitor_m_origem;
-            delete row.progenitores_origem;
-            delete row.parentesco_completo;
-            delete row.DT;
-            delete row.id;
-            delete row.id_tecnologia;
-            delete row.tableData;
-            delete row.lote;
-            delete row.dt_import;
+          delete row.id_s1;
+          delete row.name_main;
+          delete row.id_dados;
+          delete row.name_genotipo;
+          delete row.name_public;
+          delete row.name_experiment;
+          delete row.name_alter;
+          delete row.elit_name;
+          delete row.tecnologia;
+          delete row.numberLotes;
+          delete row.type;
+          delete row.gmr;
+          delete row.bgm;
+          delete row.cruza;
+          delete row.progenitor_f_direto;
+          delete row.progenitor_m_direto;
+          delete row.progenitor_f_origem;
+          delete row.progenitor_m_origem;
+          delete row.progenitores_origem;
+          delete row.parentesco_completo;
+          delete row.DT;
+          delete row.id;
+          delete row.id_tecnologia;
+          delete row.tableData;
+          delete row.lote;
+          delete row.dt_import;
 
-            // row.DT = new Date();
+          // row.DT = new Date();
 
-            return row;
-          });
+          return row;
+        });
 
-          const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(newData);
 
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
 
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Genótipos.xlsx');
-        } else {
-          // eslint-disable-next-line no-undef
-          Swal.fire(response);
-        }
-      });
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Genótipos.xlsx');
+      } else {
+        // eslint-disable-next-line no-undef
+        Swal.fire(response);
+      }
+    });
   };
 
   function handleTotalPages(): void {
@@ -643,7 +660,11 @@ export default function Listagem({
   // paginação certa
   async function handlePagination(): Promise<void> {
     // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(
+      currentPage,
+      take,
+      filtersParams,
+    );
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
@@ -680,7 +701,7 @@ export default function Listagem({
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
               type="text"
@@ -705,17 +726,16 @@ export default function Listagem({
           </div>
         </div>
       </div>
-
     );
   }
 
   function filterLotRange(title: any, name: any) {
     return (
-      <div className="h-6 w-1/2 ml-4">
+      <div className="h-6 w-full ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
               type="text"
@@ -738,7 +758,6 @@ export default function Listagem({
           </div>
         </div>
       </div>
-
     );
   }
   // remove states
@@ -795,7 +814,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome tecnologia')}
                 </div>
 
                 <div
@@ -810,19 +829,19 @@ export default function Listagem({
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
                   {filterLotRange('filterLots', 'Nº Lotes')}
-                </div>
 
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    type="submit"
-                    onClick={() => { }}
-                    value="Filtrar"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 50 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      type="submit"
+                      onClick={() => {}}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -1008,7 +1027,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1018,7 +1037,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

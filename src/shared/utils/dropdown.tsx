@@ -23,72 +23,132 @@ interface IContentProps {
 }
 
 export function TabsDropDowns(typeAside: any = 'config') {
-  const tabsConfig: IContentProps[] = typeAside === 'config' ? [
-    {
-      titleTab: 'TMG',
-      valueTab: <BsCheckLg />,
-      statusTab: true,
-      hrefTab: '/config/tmg/usuarios',
-      data: [
-        { labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine /> },
-        { labelDropDown: 'Usuários', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser /> },
-        { labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding /> },
-        { labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange /> },
-        { labelDropDown: 'Genótipo', hrefDropDown: '/config/tmg/genotipo', iconDropDown: <RiPlantLine /> },
-        { labelDropDown: 'Lotes', hrefDropDown: '/config/tmg/lote', iconDropDown: <RiPlantLine /> },
-      ],
-    },
-    {
-      titleTab: 'ENSAIO',
-      valueTab: <BsCheckLg />,
-      statusTab: false,
-      hrefTab: '/config/ensaio/tipo-ensaio',
-      data: [
-        { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange /> },
-        { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch /> },
-        { labelDropDown: 'Tecnologia', hrefDropDown: '/config/ensaio/tecnologia', iconDropDown: <BiUser /> },
-      ],
-    },
-    {
-      titleTab: 'NPE',
-      valueTab: <BsCheckLg />,
-      statusTab: false,
-      hrefTab: '/config/npe',
-      data: [
-        { labelDropDown: 'NPE', hrefDropDown: '/config/npe', iconDropDown: <FiMapPin /> },
-      ],
-    },
-    {
-      titleTab: 'DELINEAMENTO',
-      valueTab: <BsCheckLg />,
-      statusTab: false,
-      hrefTab: '/config/delineamento',
-      data: [
-        { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch /> },
-      ],
-    },
-    {
-      titleTab: 'LOCAL',
-      valueTab: <BsCheckLg />,
-      statusTab: false,
-      hrefTab: '/config/local/local',
-      data: [
-        { labelDropDown: 'Lugar cultura', hrefDropDown: '/config/local/local', iconDropDown: <FiMapPin /> },
-        { labelDropDown: 'Un. cultura', hrefDropDown: '/config/local/unidade-cultura', iconDropDown: <FiMapPin /> },
-      ],
-    },
-    {
-      titleTab: 'QUADRAS',
-      valueTab: <BsCheckLg />,
-      statusTab: false,
-      hrefTab: '/config/quadra',
-      data: [
-        { labelDropDown: 'Layout', hrefDropDown: '/config/quadra/layout-quadra', iconDropDown: <FiMapPin /> },
-        { labelDropDown: 'Quadra', hrefDropDown: '/config/quadra', iconDropDown: <FiMapPin /> },
-      ],
-    },
-
-  ]
+  const tabsConfig: IContentProps[] = typeAside === 'config'
+    ? [
+      {
+        titleTab: 'TMG',
+        valueTab: <BsCheckLg />,
+        statusTab: true,
+        hrefTab: '/config/tmg/usuarios',
+        data: [
+          {
+            labelDropDown: 'Cultura',
+            hrefDropDown: '/config/tmg/cultura',
+            iconDropDown: <RiSeedlingLine />,
+          },
+          {
+            labelDropDown: 'Usuários',
+            hrefDropDown: '/config/tmg/usuarios',
+            iconDropDown: <BiUser />,
+          },
+          {
+            labelDropDown: 'Setor',
+            hrefDropDown: '/config/tmg/setor',
+            iconDropDown: <HiOutlineOfficeBuilding />,
+          },
+          {
+            labelDropDown: 'Safra',
+            hrefDropDown: '/config/tmg/safra',
+            iconDropDown: <MdDateRange />,
+          },
+          {
+            labelDropDown: 'Genótipo',
+            hrefDropDown: '/config/tmg/genotipo',
+            iconDropDown: <RiPlantLine />,
+          },
+          {
+            labelDropDown: 'Lotes',
+            hrefDropDown: '/config/tmg/lote',
+            iconDropDown: <RiPlantLine />,
+          },
+        ],
+      },
+      {
+        titleTab: 'ENSAIO',
+        valueTab: <BsCheckLg />,
+        statusTab: false,
+        hrefTab: '/config/ensaio/tipo-ensaio',
+        data: [
+          {
+            labelDropDown: 'Tipo de ensaio',
+            hrefDropDown: '/config/ensaio/tipo-ensaio',
+            iconDropDown: <MdDateRange />,
+          },
+          {
+            labelDropDown: 'Foco',
+            hrefDropDown: '/config/ensaio/foco',
+            iconDropDown: <AiOutlineFileSearch />,
+          },
+          {
+            labelDropDown: 'Tecnologia',
+            hrefDropDown: '/config/ensaio/tecnologia',
+            iconDropDown: <BiUser />,
+          },
+        ],
+      },
+      {
+        titleTab: 'NPE',
+        valueTab: <BsCheckLg />,
+        statusTab: false,
+        hrefTab: '/config/npe',
+        data: [
+          {
+            labelDropDown: 'NPE',
+            hrefDropDown: '/config/npe',
+            iconDropDown: <FiMapPin />,
+          },
+        ],
+      },
+      {
+        titleTab: 'DELINEAMENTO',
+        valueTab: <BsCheckLg />,
+        statusTab: false,
+        hrefTab: '/config/delineamento',
+        data: [
+          {
+            labelDropDown: 'Delineamento',
+            hrefDropDown: '/config/delineamento',
+            iconDropDown: <AiOutlineFileSearch />,
+          },
+        ],
+      },
+      {
+        titleTab: 'LOCAL',
+        valueTab: <BsCheckLg />,
+        statusTab: false,
+        hrefTab: '/config/local/local',
+        data: [
+          {
+            labelDropDown: 'Lugar cultura',
+            hrefDropDown: '/config/local/local',
+            iconDropDown: <FiMapPin />,
+          },
+          {
+            labelDropDown: 'Un. cultura',
+            hrefDropDown: '/config/local/unidade-cultura',
+            iconDropDown: <FiMapPin />,
+          },
+        ],
+      },
+      {
+        titleTab: 'QUADRAS',
+        valueTab: <BsCheckLg />,
+        statusTab: false,
+        hrefTab: '/config/quadra',
+        data: [
+          {
+            labelDropDown: 'Layout',
+            hrefDropDown: '/config/quadra/layout-quadra',
+            iconDropDown: <FiMapPin />,
+          },
+          {
+            labelDropDown: 'Quadra',
+            hrefDropDown: '/config/quadra',
+            iconDropDown: <FiMapPin />,
+          },
+        ],
+      },
+    ]
     : [
       {
         titleTab: 'RD',
@@ -96,7 +156,11 @@ export function TabsDropDowns(typeAside: any = 'config') {
         statusTab: false,
         hrefTab: '/listas/rd',
         data: [
-          { labelDropDown: 'RD', hrefDropDown: '/listas/rd', iconDropDown: <AiOutlineFileSearch /> },
+          {
+            labelDropDown: 'RD',
+            hrefDropDown: '/listas/rd',
+            iconDropDown: <AiOutlineFileSearch />,
+          },
         ],
       },
       {
@@ -105,8 +169,16 @@ export function TabsDropDowns(typeAside: any = 'config') {
         statusTab: false,
         hrefTab: '/listas/ensaios/ensaio',
         data: [
-          { labelDropDown: 'Ensaio', hrefDropDown: '/listas/ensaios/ensaio', iconDropDown: <MdDateRange /> },
-          { labelDropDown: 'Trat. Genótipo', hrefDropDown: '/listas/ensaios/tratamento-genotipo', iconDropDown: <MdDateRange /> },
+          {
+            labelDropDown: 'Ensaio',
+            hrefDropDown: '/listas/ensaios/ensaio',
+            iconDropDown: <MdDateRange />,
+          },
+          {
+            labelDropDown: 'Trat. Genótipo',
+            hrefDropDown: '/listas/ensaios/tratamento-genotipo',
+            iconDropDown: <MdDateRange />,
+          },
         ],
       },
       {
@@ -115,11 +187,18 @@ export function TabsDropDowns(typeAside: any = 'config') {
         statusTab: false,
         hrefTab: '/listas/experimentos/experimento',
         data: [
-          { labelDropDown: 'Experimento', hrefDropDown: '/listas/experimentos/experimento', iconDropDown: <AiOutlineFileSearch /> },
-          { labelDropDown: 'Parcelas do experimento', hrefDropDown: '/listas/experimentos/parcelas-experimento', iconDropDown: <MdDateRange /> },
+          {
+            labelDropDown: 'Experimento',
+            hrefDropDown: '/listas/experimentos/experimento',
+            iconDropDown: <AiOutlineFileSearch />,
+          },
+          {
+            labelDropDown: 'Parcelas do experimento',
+            hrefDropDown: '/listas/experimentos/parcelas-experimento',
+            iconDropDown: <MdDateRange />,
+          },
         ],
       },
-
     ];
 
   return tabsConfig;
@@ -127,58 +206,126 @@ export function TabsDropDowns(typeAside: any = 'config') {
 
 const tabsConfig = [
   {
-    title: 'TESTE', value: <BsCheckLg />, status: true, href: '/config/tmg/usuarios',
+    title: 'TESTE',
+    value: <BsCheckLg />,
+    status: true,
+    href: '/config/tmg/usuarios',
   },
   {
-    title: 'ENSAIO', value: <BsCheckLg />, status: false, href: '/config/ensaio/foco',
+    title: 'ENSAIO',
+    value: <BsCheckLg />,
+    status: false,
+    href: '/config/ensaio/foco',
   },
   {
-    title: 'LOCAL', value: <BsCheckLg />, status: false, href: '/config/local',
+    title: 'LOCAL',
+    value: <BsCheckLg />,
+    status: false,
+    href: '/config/local',
   },
   {
-    title: 'DELINEAMENTO', value: <BsCheckLg />, status: false, href: '/config/delineamento',
+    title: 'DELINEAMENTO',
+    value: <BsCheckLg />,
+    status: false,
+    href: '/config/delineamento',
   },
   {
-    title: 'NPE', value: <BsCheckLg />, status: false, href: '/config/npe',
+    title: 'NPE',
+    value: <BsCheckLg />,
+    status: false,
+    href: '/config/npe',
   },
   {
-    title: 'QUADRAS', value: <BsCheckLg />, status: false, href: '/config/tmg/quadra',
+    title: 'QUADRAS',
+    value: <BsCheckLg />,
+    status: false,
+    href: '/config/tmg/quadra',
   },
 ];
 
 const tabsListas = [
   {
-    title: 'RD', value: <BsCheckLg />, status: true, href: '/listas/rd',
+    title: 'RD',
+    value: <BsCheckLg />,
+    status: true,
+    href: '/listas/rd',
   },
   {
-    title: 'Experimentos', value: <BsCheckLg />, status: true, href: '/listas/experimentos/experimento',
+    title: 'Experimentos',
+    value: <BsCheckLg />,
+    status: true,
+    href: '/listas/experimentos/experimento',
   },
 ];
 
 const tmgDropDown = [
-  { labelDropDown: 'Cultura', hrefDropDown: '/config/tmg/cultura', iconDropDown: <RiSeedlingLine /> },
-  { labelDropDown: 'Usuário', hrefDropDown: '/config/tmg/usuarios', iconDropDown: <BiUser /> },
-  { labelDropDown: 'Safra', hrefDropDown: '/config/tmg/safra', iconDropDown: <MdDateRange /> },
-  { labelDropDown: 'Portfólio', hrefDropDown: '/config/tmg/portfolio', iconDropDown: <RiPlantLine /> },
-  { labelDropDown: 'Setor', hrefDropDown: '/config/tmg/setor', iconDropDown: <HiOutlineOfficeBuilding /> },
+  {
+    labelDropDown: 'Cultura',
+    hrefDropDown: '/config/tmg/cultura',
+    iconDropDown: <RiSeedlingLine />,
+  },
+  {
+    labelDropDown: 'Usuário',
+    hrefDropDown: '/config/tmg/usuarios',
+    iconDropDown: <BiUser />,
+  },
+  {
+    labelDropDown: 'Safra',
+    hrefDropDown: '/config/tmg/safra',
+    iconDropDown: <MdDateRange />,
+  },
+  {
+    labelDropDown: 'Portfólio',
+    hrefDropDown: '/config/tmg/portfolio',
+    iconDropDown: <RiPlantLine />,
+  },
+  {
+    labelDropDown: 'Setor',
+    hrefDropDown: '/config/tmg/setor',
+    iconDropDown: <HiOutlineOfficeBuilding />,
+  },
 ];
 
 const ensaiosDropDown = [
-  { labelDropDown: 'Tipo de ensaio', hrefDropDown: '/config/ensaio/tipo-ensaio', iconDropDown: <MdDateRange /> },
-  { labelDropDown: 'Foco', hrefDropDown: '/config/ensaio/foco', iconDropDown: <AiOutlineFileSearch /> },
-  { labelDropDown: 'OGM', hrefDropDown: '/config/ensaio/ogm', iconDropDown: <BiUser /> },
+  {
+    labelDropDown: 'Tipo de ensaio',
+    hrefDropDown: '/config/ensaio/tipo-ensaio',
+    iconDropDown: <MdDateRange />,
+  },
+  {
+    labelDropDown: 'Foco',
+    hrefDropDown: '/config/ensaio/foco',
+    iconDropDown: <AiOutlineFileSearch />,
+  },
+  {
+    labelDropDown: 'OGM',
+    hrefDropDown: '/config/ensaio/ogm',
+    iconDropDown: <BiUser />,
+  },
 ];
 
 const localsDropDown = [
-  { labelDropDown: 'Local', hrefDropDown: '/config/local', iconDropDown: <AiOutlineFileSearch /> },
+  {
+    labelDropDown: 'Local',
+    hrefDropDown: '/config/local',
+    iconDropDown: <AiOutlineFileSearch />,
+  },
 ];
 
 const layoutQuadrasDropDown = [
-  { labelDropDown: 'Layout quadra', hrefDropDown: '/config/layout-quadra', iconDropDown: <AiOutlineFileSearch /> },
+  {
+    labelDropDown: 'Layout quadra',
+    hrefDropDown: '/config/layout-quadra',
+    iconDropDown: <AiOutlineFileSearch />,
+  },
 ];
 
 const delineamentosDropDown = [
-  { labelDropDown: 'Delineamento', hrefDropDown: '/config/delineamento', iconDropDown: <AiOutlineFileSearch /> },
+  {
+    labelDropDown: 'Delineamento',
+    hrefDropDown: '/config/delineamento',
+    iconDropDown: <AiOutlineFileSearch />,
+  },
 ];
 
 const npeDropDown = [
@@ -200,7 +347,11 @@ const tabsOperation = [
     statusTab: false,
     hrefTab: '/operacao/ambiente',
     data: [
-      { labelDropDown: 'Ambiente', hrefDropDown: '/operacao/ambiente', iconDropDown: <AiOutlineFileSearch /> },
+      {
+        labelDropDown: 'Ambiente',
+        hrefDropDown: '/operacao/ambiente',
+        iconDropDown: <AiOutlineFileSearch />,
+      },
     ],
   },
   {
@@ -209,7 +360,27 @@ const tabsOperation = [
     statusTab: false,
     hrefTab: '/operacao/etiquetagem',
     data: [
-      { labelDropDown: 'Etiquetagem', hrefDropDown: '/operacao/etiquetagem', iconDropDown: <AiOutlineFileSearch /> },
+      {
+        labelDropDown: 'Etiquetagem',
+        hrefDropDown: '/operacao/etiquetagem',
+        iconDropDown: <AiOutlineFileSearch />,
+      },
+    ],
+  },
+];
+
+const tabsReport = [
+  {
+    titleTab: 'RELATORIOS',
+    valueTab: <BsCheckLg />,
+    statusTab: false,
+    hrefTab: '/relatorios',
+    data: [
+      {
+        labelDropDown: 'Relatórios',
+        hrefDropDown: '/relatorios',
+        iconDropDown: <AiOutlineFileSearch />,
+      },
     ],
   },
 ];
@@ -220,6 +391,7 @@ export default {
   tabsConfig,
   tabsListas,
   tabsOperation,
+  tabsReport,
   tmgDropDown,
   ensaiosDropDown,
   localsDropDown,

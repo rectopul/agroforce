@@ -99,7 +99,6 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [rowsSelected, setRowsSelected] = useState([]);
 
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
@@ -407,8 +406,6 @@ export default function Listagem({
       .getAll(parametersFilter)
       .then(({ status, response, total: newTotal }: any) => {
         if (status === 200) {
-          console.log('response');
-          console.log(response);
           setExperiments(response);
           setTotalItems(newTotal);
         }
@@ -434,7 +431,7 @@ export default function Listagem({
   }
 
   async function deleteItem(id: number) {
-    const { status, message } = await experimentGroupService.deleted(id);
+    const { status, message } = await experimentService.update({ id, experimentGroupId: null });
     if (status === 200) {
       router.reload();
     } else {
@@ -443,10 +440,6 @@ export default function Listagem({
         width: '800',
       });
     }
-  }
-
-  async function handleSubmit(event: any) {
-
   }
 
   useEffect(() => {
@@ -553,7 +546,6 @@ export default function Listagem({
               columns={columns}
               data={experiments}
               options={{
-                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -569,7 +561,6 @@ export default function Listagem({
                 },
               }}
               onChangeRowsPerPage={() => { }}
-              onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
                   <div

@@ -96,14 +96,14 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperiments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -120,6 +120,7 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [SortearDisable, setSortearDisable] = useState<boolean>(false);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -617,6 +618,15 @@ export default function Listagem({
     getExperiments();
   }, [NPESelectedRow]);
 
+  useEffect(() => {
+    let count = 0;
+    experimentos.map((item: any) => {
+      item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
+    })
+    console.log('count : ', count);
+    count > 0 ? setSortearDisable(true) : setSortearDisable(false);
+  }, [experimentos]);
+
   return (
     <>
       <Head><title>Listagem de experimentos</title></Head>
@@ -673,7 +683,11 @@ export default function Listagem({
                     headerStyle: {
                       zIndex: 20,
                     },
-                    rowStyle: { background: '#f9fafb', height: 35 },
+                    rowStyle: (rowData) => ({
+                      backgroundColor:
+                        rowData.npei <= NPESelectedRow?.nextNPE && rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                      height: 40,
+                    }),
                     search: false,
                     filtering: false,
                     pageSize: itensPerPage,
@@ -771,8 +785,9 @@ export default function Listagem({
                             <Button
                               title="Sortear"
                               value="Sortear"
-                              bgColor="bg-blue-600"
+                              bgColor={SortearDisable ? "bg-gray-400" : "bg-blue-600"}
                               textColor="white"
+                              disabled={SortearDisable}
                               onClick={validateConsumedData}
                             />
                           </div>

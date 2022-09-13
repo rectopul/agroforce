@@ -22,10 +22,6 @@ export class NpeController {
         parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterLocal}" } }`);
       }
 
-      if (options.filterSafra) {
-        parameters.safra = JSON.parse(`{ "safraName": { "contains": "${options.filterSafra}" } }`);
-      }
-
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -123,7 +119,6 @@ export class NpeController {
           npeQT: true,
         };
       }
-
       const response = await this.npeRepository.findAll(
         parameters,
         select,

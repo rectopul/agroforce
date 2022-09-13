@@ -63,8 +63,6 @@ export default function Listagem({
 
   const tableRef = useRef<any>(null);
 
-  console.log('allassay', assaySelect?.length);
-
   const tabsDropDowns = TabsDropDowns('listas');
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
