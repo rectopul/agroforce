@@ -210,6 +210,8 @@ export default function Listagem({
             filterBgmFrom: '',
             filterNtTo: '',
             filterNtFrom: '',
+            filterStatusT: '',
+            filterCodTec: '',
         },
         onSubmit: async ({
             filterFoco,
