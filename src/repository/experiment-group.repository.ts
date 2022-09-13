@@ -35,10 +35,11 @@ export class ExperimentGroupRepository {
     return result;
   }
 
-  async findByName(name: string) {
+  async findByName({ name, safraId }: any) {
     const result = await prisma.experimentGroup.findFirst({
       where: {
         name,
+        safraId,
       },
     });
 

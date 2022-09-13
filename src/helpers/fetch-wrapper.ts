@@ -176,6 +176,10 @@ async function handleFilterParameter(...theArgs: any) {
       parametersFilter = await experimento(theArgs);
       break;
 
+    case 'parcelas':
+      parametersFilter = await parcelas(theArgs);
+      break;
+
     default:
       parametersFilter = '';
   }
@@ -242,8 +246,40 @@ function experimento(theArgs: any) {
   return parametersFilter;
 }
 
+function parcelas(theArgs: any) {
+  const [
+    key,
+    filterFoco,
+    filterTypeAssay,
+    filterNameTec,
+    filterCodTec,
+    filterGli,
+    filterExperimentName,
+    filterLocal,
+    filterRepetitionFrom,
+    filterRepetitionTo,
+    filterStatus,
+    filterNtFrom,
+    filterNtTo,
+    filterNpeFrom,
+    filterNpeTo,
+    filterGenotypeName,
+    filterNca,
+    idSafra,
+  ] = theArgs;
+
+  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterCodTec=${filterCodTec}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterLocal=${filterLocal}&filterRepetitionFrom=${filterRepetitionFrom}&filterRepetitionTo=${filterRepetitionTo}&filterNtFrom=${filterNtFrom}&filterNtTo=${filterNtTo}&filterNpeFrom=${filterNpeFrom}&filterNpeTo=${filterNpeTo}&idSafra=${idSafra}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&filterStatus=${filterStatus}`;
+
+  return parametersFilter;
+}
+
 // Handle orders global
-function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
+function handleOrderGlobal(
+  column: any,
+  order: any,
+  filter: any,
+  from: any,
+) {
   let typeOrder: any;
   let parametersFilter: any;
   if (order === 1) {

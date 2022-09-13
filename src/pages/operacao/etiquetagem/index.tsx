@@ -51,6 +51,7 @@ export default function Listagem({
   allExperimentGroup,
   totalItems,
   itensPerPage,
+  safraId,
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
@@ -273,7 +274,13 @@ export default function Listagem({
             <Button
               title=""
               type="button"
-              onClick={() => { }}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                router.push(`/operacao/etiquetagem/parcelas?id=${rowData.id}`);
+              }}
               rounder="rounded-full"
               bgColor="bg-blue-600"
               textColor="white"
@@ -456,11 +463,25 @@ export default function Listagem({
   async function handleSubmit(event: any) {
     event.preventDefault();
     const inputValue: any = (document.getElementById('inputName') as HTMLInputElement)?.value;
-    const { status }: IReturnObject = await experimentGroupService.getAll({
-      filterName: inputValue,
+    const { response }: IReturnObject = await experimentGroupService.getAll({
+      filterExperimentGroup: inputValue,
+      safraId,
     });
-    if (status === 200) {
+    if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
+    } else {
+      const { status: createStatus, message }: IReturnObject = await experimentGroupService.create({
+        name: inputValue,
+        safraId: Number(safraId),
+        createdBy: userLogado.id,
+      });
+      console.log('response');
+      console.log(response);
+      if (createStatus !== 200) {
+        Swal.fire('Erro ao cadastrar grupo');
+      } else {
+        router.reload();
+      }
     }
   }
 
@@ -834,6 +855,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     props: {
       allExperimentGroup,
       totalItems,
+      safraId,
       itensPerPage,
       filterApplication,
       pageBeforeEdit,

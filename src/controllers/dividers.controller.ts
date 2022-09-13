@@ -76,8 +76,6 @@ export class DividersController {
 
   async create(data: any) {
     try {
-      console.log('data');
-      console.log(data);
       await this.disparoRepository.create(data);
       return { status: 200, message: 'Disparo cadastrado' };
     } catch (error: any) {
