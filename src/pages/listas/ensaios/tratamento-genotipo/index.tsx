@@ -480,15 +480,15 @@ export default function Listagem({
           const newData = response.map((item: any) => {
             const newItem: any = {};
             newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
+            newItem.foco = item.assay_list?.foco.name;
+            newItem.ensaio = item.assay_list?.type_assay.name;
+            newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
+            newItem.gli = item.assay_list?.gli;
+            newItem.bgm = item.assay_list?.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
+            newItem.nca = item.lote?.ncc;
             newItem.novo_genotipo = '';
             newItem.novo_status = '';
             newItem.novo_nca = '';
@@ -577,6 +577,7 @@ export default function Listagem({
     });
   }
 
+  // Here
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector("input[id='genotipo']:checked");
     const ncaButton = document.querySelector("input[id='nca']:checked");
@@ -590,7 +591,7 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
         { id: item.id, genotipo: item.genotipo.name_genotipo }
@@ -599,7 +600,7 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
