@@ -616,16 +616,16 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
+        { id: item.id, genotipo: item.name_genotipo }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
