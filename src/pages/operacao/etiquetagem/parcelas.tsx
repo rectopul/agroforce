@@ -19,7 +19,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload } from 'react-icons/bs';
+import { BsDownload, BsTrashFill } from 'react-icons/bs';
 import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -27,6 +27,7 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
+import { HiArrowNarrowRight } from 'react-icons/hi';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -398,23 +399,37 @@ export default function Listagem({
       field: 'action',
       sorting: false,
       width: 0,
-      render: (rowData: any) => 
-      rowData.status === 'IMPRESSO'
-      (
-        <div className="flex gap-2">
-          <div className="h-10 w-10">
+      render: (rowData: any) => ((rowData.status === 'IMPRESSO') ? (
+        <div className="h-7 flex">
+          <div className="h-7" />
+          <div style={{ width: 5 }} />
+          <div>
             <Button
-              title={`Excluir ${rowData.name}`}
-              type="button"
-              onClick={() => deleteItem(rowData.id)}
-              rounder="rounded-full"
-              bgColor="bg-red-600"
+              icon={<HiArrowNarrowRight size={14} />}
+              title={`Dar baixa na parcela ${rowData.id}`}
+              onClick={() => {}}
+              bgColor="bg-green-600"
               textColor="white"
-              icon={<BsTrashFill size={20} />}
             />
           </div>
         </div>
-      ),
+      ) : (
+        <div className="h-7 flex">
+          <div
+            className="h-7"
+          />
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<BsTrashFill size={14} />}
+              title="Inativo"
+              onClick={() => {}}
+              bgColor="bg-red-800"
+              textColor="white"
+            />
+          </div>
+        </div>
+      )),
     };
   }
 
