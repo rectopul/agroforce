@@ -192,6 +192,8 @@ export default function Listagem({
       checkedTreatments.forEach((item: any) => {
         tempParams.push(item.genotipo);
       });
+
+      console.log("calling me...");
       const parametersFilter = `filterStatus=${1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
       await replaceTreatmentService
         .getAll(
@@ -272,6 +274,9 @@ export default function Listagem({
     };
   }
 
+
+  const value = router.query.value;
+  
   async function openModal(id: number, genotipoName: string, nccName: number) {
     if (treatmentsOptionSelected === "genotipo") {
       setNameReplace(genotipoName);
@@ -283,15 +288,19 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-    const { message } = await replaceTreatmentService.replace({
-      id,
-      checkedTreatments,
-    });
+
+    const { message } = await replaceTreatmentService.replace({ id, checkedTreatments, value });
     Swal.fire({
       html: message,
       width: "800",
     });
-    router.back();
+
+    if(value == 'ensaios'){
+      router.back();
+    }
+    else if(value == 'experiment'){
+      router.push('/listas/experimentos/parcelas-experimento');
+    }  
   }
 
   function replaceFactory(name: string, title: string) {

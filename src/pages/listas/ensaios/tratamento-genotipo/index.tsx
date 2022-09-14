@@ -579,6 +579,7 @@ export default function Listagem({
     });
   }
 
+  //Here
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector("input[id='genotipo']:checked");
     const ncaButton = document.querySelector("input[id='nca']:checked");
@@ -592,7 +593,7 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
         { id: item.id, genotipo: item.genotipo.name_genotipo }
@@ -601,7 +602,7 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
