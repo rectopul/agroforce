@@ -480,15 +480,15 @@ export default function Listagem({
           const newData = response.map((item: any) => {
             const newItem: any = {};
             newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
+            newItem.foco = item.assay_list?.foco.name;
+            newItem.ensaio = item.assay_list?.type_assay.name;
+            newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
+            newItem.gli = item.assay_list?.gli;
+            newItem.bgm = item.assay_list?.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
+            newItem.nca = item.lote?.ncc;
             newItem.novo_genotipo = '';
             newItem.novo_status = '';
             newItem.novo_nca = '';
@@ -577,7 +577,7 @@ export default function Listagem({
     });
   }
 
-  //Here
+  // Here
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector("input[id='genotipo']:checked");
     const ncaButton = document.querySelector("input[id='nca']:checked");

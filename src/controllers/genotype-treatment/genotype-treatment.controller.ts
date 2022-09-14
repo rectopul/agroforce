@@ -11,6 +11,8 @@ export class GenotypeTreatmentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
@@ -19,11 +21,11 @@ export class GenotypeTreatmentController {
       }
       if (options.filterBgmFrom || options.filterBgmTo) {
         if (options.filterBgmFrom && options.filterBgmTo) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} } } }`));
         } else if (options.filterBgmFrom) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} } } }`));
         } else if (options.filterBgmTo) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} } } }`));
         }
       }
       if (options.filterNtFrom || options.filterNtTo) {
