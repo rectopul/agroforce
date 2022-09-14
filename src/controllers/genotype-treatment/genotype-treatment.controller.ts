@@ -11,8 +11,6 @@ export class GenotypeTreatmentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');

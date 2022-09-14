@@ -388,6 +388,36 @@ export default function Listagem({
     };
   }
 
+  function actionTableFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          Ação
+        </div>
+      ),
+      field: 'action',
+      sorting: false,
+      width: 0,
+      render: (rowData: any) => 
+      rowData.status === 'IMPRESSO'
+      (
+        <div className="flex gap-2">
+          <div className="h-10 w-10">
+            <Button
+              title={`Excluir ${rowData.name}`}
+              type="button"
+              onClick={() => deleteItem(rowData.id)}
+              rounder="rounded-full"
+              bgColor="bg-red-600"
+              textColor="white"
+              icon={<BsTrashFill size={20} />}
+            />
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -439,6 +469,9 @@ export default function Listagem({
       }
       if (columnOrder[index] === 'nca') {
         tableFields.push(headerTableFactory('NCA', 'nca'));
+      }
+      if (columnOrder[index] === 'action') {
+        tableFields.push(actionTableFactory());
       }
     });
     return tableFields;
