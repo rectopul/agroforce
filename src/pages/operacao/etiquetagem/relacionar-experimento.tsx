@@ -40,6 +40,7 @@ import {
   CheckBox,
   Content,
   Input,
+  ModalConfirmation,
   Select,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
@@ -493,13 +494,17 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
-    const experimetsSelected = rowsSelected.map((item: IExperiments) => item.id);
-    console.log('experimentGroupId');
-    console.log(experimentGroupId);
-    const { status, response }: IReturnObject = await experimentService.update({
-      idList: experimetsSelected,
+    const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
+    const { status }: IReturnObject = await experimentService.update({
+      idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
+      status: 'IMP. N INICI.',
     });
+    if (status !== 200) {
+      Swal.fire('Erro ao associar experimentos');
+    } else {
+      router.back();
+    }
   }
 
   useEffect(() => {
@@ -512,6 +517,13 @@ export default function Listagem({
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
+
+      <ModalConfirmation
+        isOpen={isOpenModal}
+        text={`Você tem certeza de que quer associar ${rowsSelected?.length} experimentos a esse grupo?`}
+        onPress={handleSubmit}
+        onCancel={() => setIsOpenModal(false)}
+      />
 
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
@@ -682,7 +694,7 @@ export default function Listagem({
                         title="Salvar grupo de experimento"
                         value="Salvar grupo de experimento"
                         textColor="white"
-                        onClick={() => { handleSubmit(); }}
+                        onClick={() => { setIsOpenModal(true); }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
                       />

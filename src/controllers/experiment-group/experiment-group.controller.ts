@@ -1,9 +1,13 @@
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { ExperimentGroupRepository } from '../../repository/experiment-group.repository';
+import { IExperiments } from '../../interfaces/listas/experimento/experimento.interface';
+import { ExperimentController } from '../experiment/experiment.controller';
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
+
+  experimentController = new ExperimentController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -86,7 +90,9 @@ export class ExperimentGroupController {
 
   async create(data: any) {
     try {
-      const assayListAlreadyExist = await this.experimentGroupRepository.findByName(data.name);
+      const assayListAlreadyExist = await this.experimentGroupRepository.findByName(
+        { name: data.name, safraId: data.safraId },
+      );
 
       if (assayListAlreadyExist) return { status: 400, message: 'Grupo de experimento já cadastrados' };
 
@@ -116,9 +122,12 @@ export class ExperimentGroupController {
 
   async delete(id: number) {
     try {
-      const { status: statusAssay } = await this.getOne(Number(id));
+      const { status, response } = await this.getOne(Number(id));
+      response.experiment.forEach(async (item: any) => {
+        await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
+      });
 
-      if (statusAssay !== 200) return { status: 400, message: 'Grupo de experimento não encontrada' };
+      if (status !== 200) return { status: 400, message: 'Grupo de experimento não encontrada' };
 
       await this.experimentGroupRepository.delete(Number(id));
       return { status: 200, message: 'Grupo de experimento excluída' };
