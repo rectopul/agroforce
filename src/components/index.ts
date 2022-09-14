@@ -15,4 +15,5 @@ export { Radio } from './Radio';
 export { Select } from './Select';
 export { Select2 } from './Select/index2';
 export { ToolTip } from './ToolTip';
+export { ModalComponent } from './ModalComponent';
 export { ModalConfirmation } from './ModalConfirmation';
