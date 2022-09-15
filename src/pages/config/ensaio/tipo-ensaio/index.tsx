@@ -545,7 +545,7 @@ export default function TipoEnsaio({
           {name}
         </label>
         <div className="flex gap-2">
-          <div>
+          <div className="w-full">
             <Input
               type="text"
               placeholder="De"
@@ -555,7 +555,7 @@ export default function TipoEnsaio({
               onChange={formik.handleChange}
             />
           </div>
-          <div>
+          <div className="w-full">
             <Input
               type="text"
               placeholder="Até"

@@ -33,6 +33,7 @@ import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
+import LoadingComponent from '../../../../components/Loading';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -96,14 +97,12 @@ interface IData {
 }
 
 export default function Listagem({
-      allExperiments,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -114,10 +113,12 @@ export default function Listagem({
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperiments);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+
+  const [experimentos, setExperimento] = useState<IExperimento[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit || 0));
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
+  const [itemsTotal, setTotalItems] = useState<number | any>(0);
+
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [SortearDisable, setSortearDisable] = useState<boolean>(false);
@@ -139,6 +140,8 @@ export default function Listagem({
 
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -481,17 +484,21 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+    console.log({ currentPage });
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-      if (status === 200) {
-        setExperimento(response);
+    if (currentPage > 0) {
+      const skip = currentPage * Number(take);
+      let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+
+      if (filter) {
+        parametersFilter = `${parametersFilter}&${filter}`;
       }
-    });
+      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+        if (status === 200) {
+          setExperimento(response);
+        }
+      });
+    }
   }
 
   useEffect(() => {
@@ -539,6 +546,8 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
+      setLoading(true);
+
       let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
@@ -557,6 +566,8 @@ export default function Listagem({
           setExperimento(response);
         }
       });
+
+      setLoading(false);
     }
   }
 
@@ -577,7 +588,7 @@ export default function Listagem({
             });
           });
 
-          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed }).then(({ status, resposne }: any) => {
+          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1 }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
             }
@@ -592,7 +603,7 @@ export default function Listagem({
     let npei = Number(NPESelectedRow?.npei);
     let total_consumed = 0;
 
-    experimentos.map((item: any) => {
+    experimentos?.map((item: any) => {
       total_consumed += item.npeQT;
       item.assay_list.genotype_treatment.map((gt: any) => {
         const data: any = {};
@@ -605,7 +616,7 @@ export default function Listagem({
         data.rep = item.delineamento.repeticao;
         data.nt = gt.treatments_number;
         data.npe = npei;
-        data.name_genotipo = gt.genotipo.name_genotipo;
+        data.idGenotipo = gt.id_genotipo;
         data.nca = '';
         experiment_genotipo.push(data);
         npei++;
@@ -620,9 +631,9 @@ export default function Listagem({
 
   useEffect(() => {
     let count = 0;
-    experimentos.map((item: any) => {
+    experimentos?.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
-    })
+    });
     console.log('count : ', count);
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
@@ -630,6 +641,8 @@ export default function Listagem({
   return (
     <>
       <Head><title>Listagem de experimentos</title></Head>
+
+      {loading && <LoadingComponent />}
 
       <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
         <main className="h-full w-full
@@ -685,7 +698,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        rowData.npei <= NPESelectedRow?.nextNPE && rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,
@@ -725,7 +738,7 @@ export default function Listagem({
                         <strong className="text-blue-600">
                           Total registrado:
                           {' '}
-                          {experimentos.length}
+                          {experimentos?.length}
                         </strong>
 
                         <div className="h-full flex items-center gap-2">
@@ -785,7 +798,7 @@ export default function Listagem({
                             <Button
                               title="Sortear"
                               value="Sortear"
-                              bgColor={SortearDisable ? "bg-gray-400" : "bg-blue-600"}
+                              bgColor={SortearDisable ? 'bg-gray-400' : 'bg-blue-600'}
                               textColor="white"
                               disabled={SortearDisable}
                               onClick={validateConsumedData}
@@ -862,7 +875,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
-  const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
@@ -871,25 +883,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
-
-  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
-
-  const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(param).toString();
-  const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` },
-  } as RequestInit | undefined;
-
-  const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
-
   return {
     props: {
-      allExperiments,
-      totalItems,
       itensPerPage,
       filterApplication,
       idSafra,

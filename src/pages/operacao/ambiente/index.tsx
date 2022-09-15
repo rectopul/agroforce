@@ -78,11 +78,11 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -116,7 +116,7 @@ export default function Listagem({
     // },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
+      title: 'Lugar de cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -146,7 +146,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
+      title: 'Época',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
     },
@@ -192,8 +192,8 @@ export default function Listagem({
       filterNPE,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
-      }`;
+        }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada
+        }`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -237,7 +237,7 @@ export default function Listagem({
     Object.keys(columnCampos).forEach((item) => {
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Local', 'local.name_local_culture'),
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -253,7 +253,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
       }
       if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Epoca', 'epoca'));
+        tableFields.push(headerTableFactory('Época', 'epoca'));
       }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
@@ -359,8 +359,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
+      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+      }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -465,7 +465,7 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter = `skip=${skip}&take=${take}`;
-
+    console.log(parametersFilter);
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
@@ -528,7 +528,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar npe's">
+          <AccordionFilter title="Filtrar ambientes">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -559,7 +559,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -569,7 +569,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
-                  {filterFieldFactory('filterEpoca', 'Epoca')}
+                  {filterFieldFactory('filterEpoca', 'Época')}
 
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
 

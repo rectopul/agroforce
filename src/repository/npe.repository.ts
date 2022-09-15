@@ -6,6 +6,23 @@ export class NpeRepository {
       where: {
         id,
       },
+      select: {
+        id: true,
+        safraId: true,
+        localId: true,
+        prox_npe: true,
+        local: { select: { name_local_culture: true } },
+        safra: { select: { safraName: true } },
+        foco: { select: { name: true, id: true } },
+        epoca: true,
+        tecnologia: { select: { name: true, id: true, cod_tec: true } },
+        type_assay: { select: { name: true, id: true } },
+        group: true,
+        npei: true,
+        npef: true,
+        status: true,
+        npeQT: true,
+      },
     });
     return result;
   }

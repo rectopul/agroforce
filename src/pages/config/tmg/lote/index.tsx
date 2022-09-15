@@ -702,9 +702,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tecnologia')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome tecnologia')}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tecnologia')}
 
                   {/* <div className="w-full" style={{ marginLeft: -40 }} /> */}
                   <div style={{ marginLeft: 20 }} />

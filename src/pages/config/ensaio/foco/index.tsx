@@ -524,7 +524,7 @@ export default function Listagem({
           {name}
         </label>
         <div className="flex gap-2">
-          <div>
+          <div className="w-full">
             <Input
               type="text"
               placeholder="De"
@@ -534,7 +534,7 @@ export default function Listagem({
               onChange={formik.handleChange}
             />
           </div>
-          <div>
+          <div className="w-full">
             <Input
               type="text"
               placeholder="Até"

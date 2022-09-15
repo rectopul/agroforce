@@ -3,11 +3,13 @@ import handleError from '../../shared/utils/handleError';
 import { NpeRepository } from '../../repository/npe.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
+import { ExperimentController } from '../experiment/experiment.controller';
 
 export class NpeController {
   npeRepository = new NpeRepository();
 
   groupController = new GroupController();
+  experimentController = new ExperimentController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -70,6 +72,10 @@ export class NpeController {
         parameters.localId = Number(options.localId);
       }
 
+      if (options.npei) {
+        parameters.npei = Number(options.npei);
+      }
+
       if (options.filterNpeFrom || options.filterNpeTo) {
         if (options.filterNpeFrom && options.filterNpeTo) {
           parameters.npei = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(options.filterNpeTo)} }`);
@@ -106,6 +112,7 @@ export class NpeController {
           id: true,
           safraId: true,
           localId: true,
+          prox_npe: true,
           local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true, id: true } },
@@ -116,6 +123,7 @@ export class NpeController {
           npei: true,
           npef: true,
           status: true,
+          edited: true,
           npeQT: true,
         };
       }
@@ -127,9 +135,10 @@ export class NpeController {
         orderBy,
       );
 
-      response.map((value: any, index: any, elements: any) => {
+      response.map(async (value: any, index: any, elements: any) => {
         const newItem = value;
         const next = elements[index + 1];
+
         if (next) {
           if (!newItem.npeQT) {
             newItem.npeQT = next.npei - newItem.npei;
