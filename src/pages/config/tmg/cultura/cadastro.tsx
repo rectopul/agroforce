@@ -27,7 +27,6 @@ export default function Cadastro() {
   const router = useRouter();
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-
   const formik = useFormik<ICreateCulture>({
     initialValues: {
       name: '',
