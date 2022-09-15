@@ -37,6 +37,7 @@ import {
   Content,
   Input,
   Select,
+  ModalComponent,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -496,7 +497,28 @@ export default function Listagem({
         <title>Listagem de grupos de experimento</title>
       </Head>
 
-      <Modal
+      <ModalComponent
+        isOpen={isOpenModal}
+        onPress={(e: any) => handleSubmit(e)}
+        onCancel={() => setIsOpenModal(false)}
+      >
+        <form className="flex flex-col">
+          <div className="flex flex-col px-4  justify-between">
+            <header className="flex flex-col mt-2">
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">Cadastrar grupo</h2>
+            </header>
+            <h2 style={{ marginTop: 25, marginBottom: 5 }}>Nome do grupo</h2>
+            <Input
+              type="text"
+              placeholder="Nome do grupo"
+              id="inputName"
+              name="inputName"
+            />
+          </div>
+        </form>
+      </ModalComponent>
+
+      {/* <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEsc={false}
@@ -530,19 +552,20 @@ export default function Listagem({
             <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
           </button>
 
-          <div className="flex px-4  justify-between">
+          <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
               <h2 className="mb-2 text-blue-600 text-xl font-medium">Cadastrar grupo</h2>
             </header>
+            <div style={{ height: 25 }} />
+            <h2 style={{ marginBottom: 5 }}>Nome do grupo</h2>
             <Input
               type="text"
               placeholder="Nome do grupo"
               id="inputName"
               name="inputName"
             />
-
           </div>
-          <div className="flex justify-end py-0">
+          <div className="flex justify-end py-11">
             <div className="h-10 w-40">
               <button
                 type="submit"
@@ -555,7 +578,7 @@ export default function Listagem({
             </div>
           </div>
         </form>
-      </Modal>
+      </Modal> */}
 
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
@@ -587,37 +610,45 @@ export default function Listagem({
                   {filterFieldFactory('filterQuantityExperiment', 'Qtde. exp.')}
                   {filterFieldFactory('filterTagsToPrint', 'Total etiq. a imprimir')}
                   {filterFieldFactory('filterTagsPrinted', 'Total etiq. impressas')}
+                </div>
+
+                <div
+                  className="w-full h-full
+                  flex
+                  justify-center
+                  pb-0
+                  "
+                >
                   {filterFieldFactory('filterTotalTags', 'Total etiquetas')}
                   {filterFieldFactory('filterStatus', 'Status')}
 
-                </div>
+                  <div className="h-7 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Itens por página
+                    </label>
+                    <Select
+                      values={[
+                        { id: 10, name: 10 },
+                        { id: 50, name: 50 },
+                        { id: 100, name: 100 },
+                        { id: 200, name: 200 },
+                      ]}
+                      selected={take}
+                      onChange={(e: any) => setTake(e.target.value)}
+                    />
+                  </div>
 
-                <div className="h-7 w-1/2 ml-4">
-                  <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Itens por página
-                  </label>
-                  <Select
-                    values={[
-                      { id: 10, name: 10 },
-                      { id: 50, name: 50 },
-                      { id: 100, name: 100 },
-                      { id: 200, name: 200 },
-                    ]}
-                    selected={take}
-                    onChange={(e: any) => setTake(e.target.value)}
-                  />
-                </div>
-
-                <div style={{ width: 40 }} />
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    onClick={() => {}}
-                    value="Filtrar"
-                    type="submit"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => {}}
+                      value="Filtrar"
+                      type="submit"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
 
               </form>
@@ -658,7 +689,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-32 ml-0">
+                    <div className="h-12 w-44 ml-0">
                       <Button
                         title="Criar novo grupo"
                         value="Criar novo grupo"
@@ -810,6 +841,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -846,7 +878,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExperimentGroup, total: totalItems } = await fetch(
+  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(
     urlExperimentGroup.toString(),
     requestOptions,
   ).then((response) => response.json());

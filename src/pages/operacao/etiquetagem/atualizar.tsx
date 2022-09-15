@@ -414,7 +414,7 @@ export default function Listagem({
 
   function updateFieldFactory(title: string, name: string) {
     return (
-      <div className="w-2/4 h-7">
+      <div className="w-full h7">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -425,6 +425,24 @@ export default function Listagem({
           id={title}
           name={title}
           value={experimentGroup[title]}
+        />
+      </div>
+    );
+  }
+
+  function nameGroupFieldFactory(title: string, name: string) {
+    return (
+      <div className="h7" style={{ minWidth: 230 }}>
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <Input
+          style={{ background: '#e5e7eb' }}
+          disabled
+          required
+          id={title}
+          name={title}
+          value="123456789123456789123456789123"
         />
       </div>
     );
@@ -467,7 +485,7 @@ export default function Listagem({
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
 
-              {updateFieldFactory('name', 'Nome do grupo de exp.')}
+              {nameGroupFieldFactory('name', 'Nome do grupo de exp.')}
               {updateFieldFactory('experimentAmount', 'Qtde. exp.')}
               {updateFieldFactory('tagsToPrint', 'Total etiq. a imp.')}
               {updateFieldFactory('tagsPrinted', 'Total etiq. imp.')}
@@ -488,56 +506,6 @@ export default function Listagem({
               </div>
             </div>
           </form>
-          <AccordionFilter title="Filtrar tratamentos genótipos">
-            <div className="w-full flex gap-2">
-              <div
-                className="flex flex-col
-                  w-full
-                  items-center
-                  px-1
-                  bg-white
-                "
-              >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-8
-                "
-                >
-
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
-                    </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      type="submit"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </AccordionFilter>
 
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
@@ -555,11 +523,11 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              localization={{
-                body: {
-                  emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
-                },
-              }}
+              // localization={{
+              //   body: {
+              //     emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+              //   },
+              // }}
               onChangeRowsPerPage={() => { }}
               components={{
                 Toolbar: () => (
@@ -576,7 +544,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-32 ml-0">
+                    <div className="h-12 w-52 ml-0">
                       <Button
                         title="Adicionar Exp. ao grupo"
                         value="Adicionar Exp. ao grupo"
@@ -588,7 +556,7 @@ export default function Listagem({
                       />
                     </div>
 
-                    <div className="h-12 w-32 ml-0">
+                    <div className="h-12 w-12 ml-0">
                       <Button
                         title="Excluir grupo"
                         type="button"
@@ -740,6 +708,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -779,7 +748,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExperiments, total: totalItems } = await fetch(
+  const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
     urlParametersExperiments.toString(),
     requestOptions,
   ).then((response) => response.json());

@@ -104,7 +104,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.lote || {
     id: 0,
     table_preferences:
-      'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
+      'year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -157,6 +157,7 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterYear: '',
@@ -187,7 +188,7 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      checkedTreatments.forEach((item: any) => {
+      checkedTreatments?.forEach((item: any) => {
         tempParams.push(item.genotipo);
       });
 
@@ -447,7 +448,7 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     const tempParams: any = [];
-    checkedTreatments.forEach((item: any) => {
+    checkedTreatments?.forEach((item: any) => {
       if (item.genotipo) {
         tempParams.push(item.genotipo);
       }
