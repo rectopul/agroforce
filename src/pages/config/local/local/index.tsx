@@ -640,11 +640,11 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem dos Locais</title>
+        <title>Listagem de Lugares de Cultura</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar locais">
+          <AccordionFilter title="Filtrar lugares de cultura">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col

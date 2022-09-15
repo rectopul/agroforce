@@ -528,7 +528,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar npe's">
+          <AccordionFilter title="Filtrar ambientes">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
