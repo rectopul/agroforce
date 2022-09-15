@@ -143,7 +143,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
+      title: 'Lugar de cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -329,7 +329,7 @@ export default function Listagem({
       // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Local', 'local.name_local_culture'),
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -653,7 +653,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 

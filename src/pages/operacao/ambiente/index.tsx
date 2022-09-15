@@ -116,7 +116,7 @@ export default function Listagem({
     // },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
+      title: 'Lugar de cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -146,7 +146,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
+      title: 'Época',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
     },
@@ -237,7 +237,7 @@ export default function Listagem({
     Object.keys(columnCampos).forEach((item) => {
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Local', 'local.name_local_culture'),
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -253,7 +253,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
       }
       if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Epoca', 'epoca'));
+        tableFields.push(headerTableFactory('Época', 'epoca'));
       }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
@@ -559,7 +559,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -569,7 +569,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
-                  {filterFieldFactory('filterEpoca', 'Epoca')}
+                  {filterFieldFactory('filterEpoca', 'Época')}
 
                   {filterFieldFactory('filterNPE', 'NPE Inicial')}
 
