@@ -66,7 +66,10 @@ export class ImportGenotypeTreatmentController {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
           }
-
+          if (spreadSheet[row][3] < 10) {
+            // eslint-disable-next-line no-param-reassign
+            spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
+          }
           if (treatments.response[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;

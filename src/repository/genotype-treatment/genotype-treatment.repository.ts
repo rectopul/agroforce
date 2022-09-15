@@ -39,7 +39,7 @@ export class GenotypeTreatmentRepository {
     return result;
   }
 
-  async replaceGenotype(idList: any, idGenotype: number) {
+  async replaceGenotype(idList: any,idLote:any, idGenotype: number) {
     const result = await prisma.genotype_treatment.updateMany({
       where: {
         id: {
@@ -48,6 +48,7 @@ export class GenotypeTreatmentRepository {
       },
       data: {
         id_genotipo: idGenotype,
+        id_lote:idLote // for store both values
       },
     });
     return result;

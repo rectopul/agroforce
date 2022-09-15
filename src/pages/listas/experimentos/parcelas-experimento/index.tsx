@@ -52,13 +52,13 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function Listagem({
-  assaySelect,
-  genotypeSelect,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      assaySelect,
+      genotypeSelect,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -72,7 +72,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-            'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -616,16 +616,16 @@ export default function Listagem({
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
+        { id: item.id, genotipo: item.name_genotipo }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
@@ -635,8 +635,9 @@ export default function Listagem({
 
   async function setRadioStatus() {
     const selectedGenotype: any = {};
+
     rowsSelected.forEach((item: any) => {
-      selectedGenotype[item.genotipo.name_genotipo] = true;
+      selectedGenotype[item.name_genotipo] = true;
     });
     const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
     if (checkedLength.length > 1) {
@@ -1008,14 +1009,15 @@ export default function Listagem({
                   >
                     <div className="h-12 w-32 ml-0">
                       <Button
-                        title="acao"
-                        value="AÇÃO"
+                        title="Substituir"
+                        value="Substituir"
                         textColor="white"
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
                         }}
                         bgColor="bg-blue-600"
+                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
@@ -1161,7 +1163,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                                ) as any,
+                ) as any,
               }}
             />
           </div>

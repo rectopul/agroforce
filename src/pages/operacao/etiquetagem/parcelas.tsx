@@ -19,7 +19,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload } from 'react-icons/bs';
+import { BsDownload, BsTrashFill } from 'react-icons/bs';
 import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -27,6 +27,7 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
+import { HiArrowNarrowRight } from 'react-icons/hi';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -388,6 +389,50 @@ export default function Listagem({
     };
   }
 
+  function actionTableFactory() {
+    return {
+      title: (
+        <div className="flex items-center">
+          Ação
+        </div>
+      ),
+      field: 'action',
+      sorting: false,
+      width: 0,
+      render: (rowData: any) => ((rowData.status === 'IMPRESSO') ? (
+        <div className="h-7 flex">
+          <div className="h-7" />
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<HiArrowNarrowRight size={14} />}
+              title={`Dar baixa na parcela ${rowData.id}`}
+              onClick={() => {}}
+              bgColor="bg-green-600"
+              textColor="white"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="h-7 flex">
+          <div
+            className="h-7"
+          />
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<BsTrashFill size={14} />}
+              title="Inativo"
+              onClick={() => {}}
+              bgColor="bg-red-800"
+              textColor="white"
+            />
+          </div>
+        </div>
+      )),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -439,6 +484,9 @@ export default function Listagem({
       }
       if (columnOrder[index] === 'nca') {
         tableFields.push(headerTableFactory('NCA', 'nca'));
+      }
+      if (columnOrder[index] === 'action') {
+        tableFields.push(actionTableFactory());
       }
     });
     return tableFields;
