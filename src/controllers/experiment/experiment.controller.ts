@@ -229,7 +229,10 @@ export class ExperimentController {
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
       const response = await this.experimentRepository.update(experimento.id, data);
-      await this.countExperimentGroupChildren(experimento.experimentGroupId);
+      console.log('response:', response);
+      if (experimento.experimentGroupId) {
+        await this.countExperimentGroupChildren(experimento.experimentGroupId);
+      }
       if (!response.experimentGroupId) {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }

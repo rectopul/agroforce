@@ -90,6 +90,10 @@ export class ExperimentGenotipeController {
         }
       }
 
+      if (options.noe) {
+        parameters.npe = Number(options.npe);
+      }
+
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -104,14 +108,14 @@ export class ExperimentGenotipeController {
             status: true,
             local: {
               select:
-               { name_local_culture: true },
+                { name_local_culture: true },
             },
           },
         },
         rep: true,
         nt: true,
         npe: true,
-        name_genotipo: true,
+        genotipo: true,
         nca: true,
       };
 
