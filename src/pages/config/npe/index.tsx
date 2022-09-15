@@ -16,7 +16,7 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -26,7 +26,7 @@ import * as XLSX from 'xlsx';
 import { removeCookies } from 'cookies-next';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../services';
+import { experimentService, npeService, userPreferencesService } from '../../../services';
 import {
   AccordionFilter,
   Button,
@@ -50,6 +50,7 @@ interface INpeProps {
   prox_npe: number;
   status?: number;
   created_by: number;
+  edited?: number;
 }
 
 interface IFilter {
@@ -80,11 +81,11 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -167,6 +168,12 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
+      title: 'Prox NPE ',
+      value: 'prox_npe',
+      defaultChecked: () => camposGerenciados.includes('prox_npe'),
+    },
+    {
+      name: 'CamposGerenciados[]',
       title: 'Status',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
@@ -207,7 +214,7 @@ export default function Listagem({
       filterNpeFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
+        }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -279,24 +286,36 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
+      title: 'Ação',
       field: 'status',
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: INpeProps) => (rowData.status ? (
         <div className="h-7 flex">
-          <div className="h-7" />
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              bgColor={rowData.edited == 1 ? "bg-blue-900" : "bg-blue-600"}
+              textColor="white"
+              title={`Editar`}
+              onClick={() => {
+                router.push(`/config/npe/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+          <div style={{ width: 5 }} />
           <div>
             <Button
-              title="Ativo"
+              title={rowData.status == 3 ? "" : "Ativo"}
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, {
                 status: rowData.status,
                 ...rowData,
               })}
-              bgColor="bg-green-600"
+              bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
               textColor="white"
+              disabled={rowData.status == 3 ? true : false}
             />
           </div>
         </div>
@@ -305,14 +324,15 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
-              title="Inativo"
+              title={rowData.status == 3 ? "" : "Inativo"}
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => handleStatus(rowData.id, {
                 status: rowData.status,
                 ...rowData,
               })}
-              bgColor="bg-red-800"
+              bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
               textColor="white"
+              disabled={rowData.status == 3 ? true : false}
             />
           </div>
         </div>
@@ -349,6 +369,9 @@ export default function Listagem({
       }
       if (columnCampos[item] === 'group') {
         tableFields.push(headerTableFactory('Grupo', 'group.group'));
+      }
+      if (columnCampos[item] === 'prox_npe') {
+        tableFields.push(headerTableFactory('Prox NPE', 'prox_npe'));
       }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
@@ -455,8 +478,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
+      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+      }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -930,6 +953,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     total: totalItems,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
+  console.log(allNpe);
   return {
     props: {
       allNpe,

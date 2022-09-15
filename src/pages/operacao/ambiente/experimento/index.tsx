@@ -577,7 +577,7 @@ export default function Listagem({
             });
           });
 
-          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed }).then(({ status, resposne }: any) => {
+          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1 }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
             }
@@ -605,7 +605,7 @@ export default function Listagem({
         data.rep = item.delineamento.repeticao;
         data.nt = gt.treatments_number;
         data.npe = npei;
-        data.name_genotipo = gt.genotipo.name_genotipo;
+        data.idGenotipo = gt.id_genotipo;
         data.nca = '';
         experiment_genotipo.push(data);
         npei++;
@@ -685,7 +685,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        rowData.npei <= NPESelectedRow?.nextNPE && rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,

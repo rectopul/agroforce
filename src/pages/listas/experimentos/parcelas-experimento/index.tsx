@@ -156,8 +156,8 @@ export default function Listagem({
     {
       name: 'CamposGerenciados[]',
       title: 'Nome do genótipo',
-      value: 'name_genotipo',
-      defaultChecked: () => camposGerenciados.includes('name_genotipo'),
+      value: 'genotipo',
+      defaultChecked: () => camposGerenciados.includes('genotipo'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -385,9 +385,9 @@ export default function Listagem({
           headerTableFactory('NPE.', 'npe'),
         );
       }
-      if (columnOrder[item] === 'name_genotipo') {
+      if (columnOrder[item] === 'genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
         );
       }
       if (columnOrder[item] === 'nca') {
