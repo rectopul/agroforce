@@ -393,19 +393,19 @@ export default function Listagem({
           )} ${hours}:${minutes}:${seconds}`;
 
           newItem.ID_S2 = item?.id_s2;
-          newItem.ID_Dados = item?.id_dados;
-          newItem.Ano = item?.year;
-          newItem.Cod_Lote = item?.cod_lote;
-          newItem.Ncc = item?.ncc;
-          newItem.Fase = item?.fase;
-          newItem.Peso = item?.peso;
-          newItem.Quant_Sementes = item?.quant_sementes;
-          newItem.Nome_Genotipo = item?.genotipo.name_genotipo;
-          newItem.Nome_Principal = item?.genotipo.name_main;
-          newItem.Gmr = item?.genotipo.gmr;
-          newItem.Bgm = item?.genotipo.bgm;
-          newItem.Tecnologia = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.Data = newItem.DT;
+          newItem.ID_DADOS = item?.id_dados;
+          newItem.ANO = item?.year;
+          newItem.COD_LOTE = item?.cod_lote;
+          newItem.NCC = item?.ncc;
+          newItem.FASE = item?.fase;
+          newItem.PESO = item?.peso;
+          newItem.QUANT_SEMENTES = item?.quant_sementes;
+          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
+          newItem.GMR = item?.genotipo.gmr;
+          newItem.BGM = item?.genotipo.bgm;
+          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+          newItem.DATA = newItem.DT;
 
           delete newItem.quant_sementes;
           delete newItem.peso;

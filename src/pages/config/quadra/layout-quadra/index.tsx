@@ -579,6 +579,20 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+
+          row.ESQUEMA = row.esquema;
+          row.PLANTADEIRAS = row.plantadeira;
+          row.TIROS = row.tiros;
+          row.DISPAROS = row.disparos;
+          row.PARCELAS = row.parcelas;
+          row.STATUS = row.status;
+
+          delete row.esquema;
+          delete row.plantadeira;
+          delete row.tiros;
+          delete row.disparos;
+          delete row.parcelas;
+          delete row.status;
           delete row.id;
           delete row.id_culture;
           delete row.tableData;

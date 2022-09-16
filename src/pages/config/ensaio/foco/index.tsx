@@ -454,17 +454,17 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          row.Nome = row?.name;
-          row.Grupo = row?.group.group;
-          row.Status = row?.status;
+          console.log(row);
+          row.NOME = row?.name;
+          row.GRUPO = row?.group.group;
+          row.STATUS = row?.status;
 
           delete row.name;
-          delete row.group.group;
+          delete row.group;
           delete row.status;
           delete row.id_culture;
           delete row.tableData;
           delete row.id;
-          row.group = row.group?.group ? Number(row.group.group) : '';
 
           return row;
         });

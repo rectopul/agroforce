@@ -308,7 +308,7 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'setor');
 
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await departmentService
       .getAll(value)
@@ -400,8 +400,8 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          row.Nome = row.name;
-          row.Status = row.status;
+          row.NOME = row.name;
+          row.STATUS = row.status;
 
           delete row.name;
           delete row.status;

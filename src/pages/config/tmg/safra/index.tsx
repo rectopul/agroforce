@@ -424,7 +424,7 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
-    let value = await fetchWrapper.skip(currentPage,parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
     // `${parametersFilter}&skip=0&take=${take}`
     await safraService
       .getAll(value)
@@ -512,11 +512,11 @@ export default function Listagem({
           } else {
             row.status = 'Ativos' as any;
           }
-          row.Nome = row.safraName;
-          row.Ano = row.year;
-          row.Início_Plantio = row.plantingStartTime;
-          row.Fim_Plantio = row.plantingEndTime;
-          row.Status = row.status;
+          row.SAFRA = row.safraName;
+          row.ANO = row.year;
+          row.INÍCIO_PLANTIO = row.plantingStartTime;
+          row.FIM_PLANTIO = row.plantingEndTime;
+          row.STATUS = row.status;
 
           delete row.safraName;
           delete row.year;

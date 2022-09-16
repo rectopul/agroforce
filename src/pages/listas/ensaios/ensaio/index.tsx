@@ -438,17 +438,17 @@ export default function TipoEnsaio({
         response.map((item: any) => {
           const newItem = item;
 
-          newItem.Safra = newItem.safra?.safraName;
-          newItem.Protocolo = newItem?.protocol_name;
-          newItem.Foco = newItem.foco?.name;
-          newItem.TipoDeEnsaio = newItem.type_assay?.name;
-          newItem.Tecnologia = newItem.tecnologia?.name;
-          newItem.Gli = newItem?.gli;
-          newItem.Bgm = newItem?.bgm;
-          newItem.Status = newItem?.status;
-          newItem.Projeto = newItem?.project;
-          newItem.Observações = newItem?.comments;
-          newItem.NúmeroDeTratamentos = newItem?.countNT;
+          newItem.SAFRA = newItem.safra?.safraName;
+          newItem.PROTOCOLO = newItem?.protocol_name;
+          newItem.FOCO = newItem.foco?.name;
+          newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
+          newItem.TECNOLOGIA = newItem.tecnologia?.name;
+          newItem.GLI = newItem?.gli;
+          newItem.BGM = newItem?.bgm;
+          newItem.STATUS = newItem?.status;
+          newItem.PROJETO = newItem?.project;
+          newItem.OBSERVAÇÕES = newItem?.comments;
+          newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
 
           delete newItem.safra;
           delete newItem.treatmentsNumber;

@@ -78,11 +78,11 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -192,8 +192,8 @@ export default function Listagem({
       filterNPE,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada
-        }`;
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada
+      }`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -360,8 +360,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-      }&epoca=${String(data.epoca)}`;
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -414,24 +414,41 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map(
           (row: { avatar: any; status: any }) => {
-            delete row.avatar;
             if (row.status === 0) {
               row.status = 'Inativo';
             } else {
               row.status = 'Ativo';
             }
+            console.log(row);
+            row.LOCAL = row.local.name_local_culture;
+            row.SAFRA = row.safra.safraName;
+            row.FOCO = row.foco.name;
+            row.TIPO_ENSAIO = row.type_assay.name;
+            row.TECNOLOGIA = row.tecnologia.name;
+            row.ÉPOCA = row.epoca;
+            row.NPEI = row.npei;
+            row.NPEF = row.npef;
+            row.NPEQT = row.npeQT;
+            row.NEXT_NPE = row.nextNPE;
+            row.STATUS = row.status;
+
+            delete row.local;
+            delete row.safra;
+            delete row.foco;
+            delete row.type_assay;
+            delete row.tecnologia;
+            delete row.epoca;
+            delete row.npei;
+            delete row.npef;
+            delete row.npeQT;
+            delete row.nextNPE;
+            delete row.status;
+            delete row.avatar;
+            delete row.id;
 
             return row;
           },
         );
-
-        newData.map((item: any) => {
-          item.foco = item.foco?.name;
-          item.local = item.local?.name_local_culture;
-          item.safra = item.safra?.safraName;
-          item.tecnologia = item.tecnologia?.name;
-          item.type_assay = item.type_assay?.name;
-        });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
