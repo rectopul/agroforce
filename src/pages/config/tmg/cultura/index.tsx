@@ -55,6 +55,7 @@ export interface ICulture {
   name: string;
   desc: string;
   status?: number;
+  created_by?: number;
 }
 
 interface IGenerateProps {
@@ -203,6 +204,7 @@ export default function Listagem({
       name,
       desc,
       status,
+      created_by: Number(userLogado.id),
     });
   }
 
