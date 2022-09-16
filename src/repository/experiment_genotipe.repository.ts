@@ -64,7 +64,7 @@ export class ExperimentGenotipeRepository {
         },
       },
       data: {
-        name_genotipo: idGenotype,
+        // name_genotipo: idGenotype,
       },
     });
     return result;

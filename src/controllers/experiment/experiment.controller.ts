@@ -256,8 +256,6 @@ export class ExperimentController {
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
       const response = await this.experimentRepository.update(experimento.id, data);
-<<<<<<< Updated upstream
-      console.log('response:', response);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
       }
@@ -265,15 +263,9 @@ export class ExperimentController {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }
       if (response) {
-        console.log('UPDATEW EXP');
-        console.log(data);
-=======
-
-      if (response) {
         await this.reporteRepository.create({
           madeBy: response.created_by, madeIn: newData, module: 'Experimento', operation: 'Inativação', name: response.experimentName, ip: JSON.stringify(ip), idOperation: response.id,
         });
->>>>>>> Stashed changes
         return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };

@@ -56,7 +56,7 @@ export class EnvelopeController {
         return { status: 400, message: 'Envelope já cadastrado nessa safra' };
       }
 
-      const semente = await this.envelopeRepository.create(data);
+      const semente: any = await this.envelopeRepository.create(data);
       await this.reporteRepository.create({
         madeBy: semente.created_by, madeIn: newData, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
       });
@@ -97,7 +97,7 @@ export class EnvelopeController {
 
       if (!envelope) return { status: 400, message: 'envelope não existente' };
 
-      const semente = await this.envelopeRepository.update(data.id, data);
+      const semente: any = await this.envelopeRepository.update(data.id, data);
       await this.reporteRepository.create({
         madeBy: semente.created_by, madeIn: newData, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
       });
