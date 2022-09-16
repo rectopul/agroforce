@@ -15,7 +15,6 @@
   color: #121214;
 }
 
-
 .e-grid .e-gridpager .e-prevpagedisabled,
 .e-grid .e-gridpager .e-prevpage,
 .e-grid .e-gridpager .e-nextpage,
@@ -98,4 +97,95 @@
     height: 93vh;
     width: 100vw;
   }
+}
+
+/* STYLES DE IMPRESSAO DE ESTIQUETAS */
+@media print {
+  /* sequencia de classes até a etiqueta para não sumir com ela, tomar cuidado */
+  body *:not(#__next, .todasEtiquetas, .todasEtiquetas *),
+  .notPrint {
+    display: none;
+    visibility: hidden;
+  }
+  .imprimir {
+    page-break-after: always;
+    background-color: white;
+  }
+  .imprimir .etiqueta {
+    background-color: white;
+  }
+}
+
+.imprimir {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imprimir .etiqueta {
+  background-color: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-weight: bold;
+  border-radius: 2mm;
+  font-family: "Arial Black";
+}
+
+.etiquetaModelo1 {
+  display: flex;
+  flex-direction: column;
+  color: black;
+  font-weight: bold;
+  border-radius: 2mm;
+  font-size: 14px;
+  width: 53mm;
+  height: 13mm;
+  padding: 0 3mm;
+  font-family: "Arial Black";
+}
+
+.etiquetaModelo2 {
+  display: flex;
+  flex-direction: column;
+  color: black;
+  font-weight: bold;
+  border-radius: 2mm;
+  font-size: 14px;
+  width: 53mm;
+  padding: 1mm 3mm;
+  margin: 2mm;
+  border: 1px #000 solid;
+  font-family: "Arial Black";
+}
+
+.etiquetaModelo3 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-weight: bold;
+  border-radius: 2mm;
+  font-size: 14px;
+  width: 106mm;
+  padding: 1mm 3mm;
+  margin: 2mm;
+  font-family: "Arial Black";
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex1 {
+  flex: 1;
 }
