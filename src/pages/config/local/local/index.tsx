@@ -542,15 +542,15 @@ export default function Listagem({
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
-          row.Nome_Lugar_Cultura = row.name_local_culture;
-          row.Rótulo = row.label;
-          row.Mloc = row.mloc;
-          row.Nome_Da_Fazenda = row.adress;
-          row.País = row.label_country;
-          row.Região_Rótulo = row.label_region;
-          row.Região = row.name_locality;
-          row.Status = row.status;
-          row.Data = row.DT;
+          row.NOME_LUGAR_CULTURA = row.name_local_culture;
+          row.RÓTULO = row.label;
+          row.MLOC = row.mloc;
+          row.NOME_DA_FAZENDA = row.adress;
+          row.PAÍS = row.label_country;
+          row.REGIÃO_RÓTULO = row.label_region;
+          row.REGIÃO = row.name_locality;
+          row.STATUS = row.status;
+          row.DATA = row.DT;
 
           delete row.name_local_culture;
           delete row.label;

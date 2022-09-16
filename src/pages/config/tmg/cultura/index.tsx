@@ -438,9 +438,9 @@ export default function Listagem({
             } else {
               row.status = 'Ativo' as any;
             }
-            row.Nome = row.name;
-            row.Desc = row.desc;
-            row.Status = row.status;
+            row.COD_REDUZIDO = row.name;
+            row.NOME = row.desc;
+            row.STATUS = row.status;
 
             delete row.desc;
             delete row.status;

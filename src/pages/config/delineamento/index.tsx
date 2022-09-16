@@ -537,10 +537,10 @@ export default function Listagem({
             row.status = 'Ativo' as any;
           }
 
-          row.Nome = row?.name;
-          row.Repetição = row?.repeticao;
-          row.Trat_Repetição = row?.trat_repeticao;
-          row.Status = row?.status;
+          row.NOME = row?.name;
+          row.REPETIÇÃO = row?.repeticao;
+          row.TRAT_REPETIÇÃO = row?.trat_repeticao;
+          row.STATUS = row?.status;
 
           delete row.name;
           delete row.repeticao;
