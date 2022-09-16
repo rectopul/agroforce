@@ -147,34 +147,12 @@ export class LayoutQuadraController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       if (data) {
         const layout = await this.layoutQuadraRepository.update(data.id, data);
         if (layout.status === 0) {
           await this.reporteRepository.create({
-            madeBy: layout.created_by, madeIn: newData, module: 'Quadra-Layout', operation: 'Inativação', name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
+            madeBy: layout.created_by, module: 'Quadra-Layout', operation: 'Inativação', name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
           });
         }
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };

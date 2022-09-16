@@ -591,7 +591,7 @@ model ExperimentGroup {
 model reportes {
   id         Int      @id @default(autoincrement())
   madeBy      Int?
-  madeIn       String?
+  madeIn     DateTime @default(now())
   module     String?
   operation     String?
   idOperation      Int?   

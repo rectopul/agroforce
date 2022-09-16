@@ -117,28 +117,6 @@ export class DepartamentController {
   async postDepartament(data: CreateDepartmentDTO) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
@@ -149,7 +127,7 @@ export class DepartamentController {
       const setor = await this.departamentRepository.create(data);
 
       await this.reporteRepository.create({
-        madeBy: data.created_by, madeIn: newData, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
+        madeBy: data.created_by, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
       });
       return { status: 200, message: 'Setor cadastrado' };
     } catch (err) {
@@ -160,28 +138,6 @@ export class DepartamentController {
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const departament = await this.departamentRepository.findOne(data.id);
 
@@ -199,12 +155,12 @@ export class DepartamentController {
       await this.departamentRepository.update(data.id, departament);
       if (departament.status === 1) {
         await this.reporteRepository.create({
-          madeBy: departament.created_by, madeIn: newData, module: 'Setor', operation: 'Edição', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
+          madeBy: departament.created_by, module: 'Setor', operation: 'Edição', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
         });
       }
       if (departament.status === 0) {
         await this.reporteRepository.create({
-          madeBy: departament.created_by, madeIn: newData, module: 'Setor', operation: 'Inativação', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
+          madeBy: departament.created_by, module: 'Setor', operation: 'Inativação', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
         });
       }
       return { status: 200, message: 'Setor atualizado' };
