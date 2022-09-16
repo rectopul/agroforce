@@ -20,7 +20,7 @@ spec:
         imagePullPolicy: Always      
         image: crtmghml001.azurecr.io/agroforce-company/agroforce_tmg:latest
         env:
-          - name: dburl
+          - name: DATABASE_URL
             valueFrom:
               secretKeyRef:
                 name: dburl
