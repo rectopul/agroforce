@@ -1,4 +1,5 @@
 import { SafraRepository } from '../repository/safra.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 
 interface Safra {
@@ -19,6 +20,8 @@ export class SafraController {
   public readonly required = 'Campo obrigatório';
 
   safraRepository = new SafraRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -129,6 +132,30 @@ export class SafraController {
 
   async create(data: CreateSafra) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const safraAlreadyExists = await this.safraRepository.findBySafraName({
         safraName: data.safraName,
         id_culture: data.id_culture,
@@ -137,7 +164,11 @@ export class SafraController {
         return { status: 400, message: 'Safra já cadastrada' };
       }
 
-      await this.safraRepository.create(data);
+      const safra = await this.safraRepository.create(data);
+
+      await this.reporteRepository.create({
+        madeBy: data.created_by, madeIn: newData, module: 'Safra', operation: 'Cadastro', name: data.safraName, ip: JSON.stringify(ip), idOperation: safra.id,
+      });
 
       return { status: 200, message: 'Safra cadastrada' };
     } catch (error: any) {
@@ -148,15 +179,51 @@ export class SafraController {
 
   async update(data: UpdateSafra) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       if (data.status === 0 || data.status === 1) {
         const safraAlreadyExists = await this.getOne(data.id);
         if (safraAlreadyExists.status !== 200) {
           return { status: 400, message: 'Safra não encontrado' };
         }
         const response = await this.safraRepository.update(data.id, data);
+        if (response.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: response.created_by, madeIn: newData, module: 'Safra', operation: 'Inativação', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
+          });
+        }
+        if (response.status === 1) {
+          await this.reporteRepository.create({
+            madeBy: response.created_by, madeIn: newData, module: 'Safra', operation: 'Edição', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
+          });
+        }
+        console.log(response);
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };
         }
+
         return { status: 200, response };
       }
       const safraAlreadyExists = await this.safraRepository.findBySafraName(
@@ -169,6 +236,7 @@ export class SafraController {
       if (!response) {
         return { status: 400, response: [], message: 'Safra não atualizado' };
       }
+
       return { status: 200, response };
     } catch (error: any) {
       handleError('Safra controller', 'Update', error.message);

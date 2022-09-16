@@ -111,7 +111,8 @@ export default function Listagem({
   );
   const router = useRouter();
 
-  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  // const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [lotes, setLotes] = useState([]);
   const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -188,12 +189,15 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      checkedTreatments?.forEach((item: any) => {
-        tempParams.push(item.genotipo);
-      });
+      if (treatmentsOptionSelected == 'nca') {
+        checkedTreatments.forEach((item: any) => {
+          if (item.idGenotipo) {
+            tempParams.push(item.idGenotipo);
+          }
+        });
+      }
+      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
 
-      console.log("calling me...");
-      const parametersFilter = `filterStatus=${1}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
       await replaceTreatmentService
         .getAll(
           `${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${tempParams}`,
@@ -234,13 +238,15 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await loteService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setLotes(response.response);
-        }
-      });
+    await seperate(parametersFilter);
+
+    // await loteService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setLotes(response.response);
+    //     }
+    //   });
 
     if (orderList === 2) {
       setOrder(0);
@@ -273,9 +279,8 @@ export default function Listagem({
     };
   }
 
+  const { value } = router.query;
 
-  const value = router.query.value;
-  
   async function openModal(id: number, genotipoName: string, nccName: number) {
     if (treatmentsOptionSelected === 'genotipo') {
       setNameReplace(genotipoName);
@@ -287,19 +292,17 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-
     const { message } = await replaceTreatmentService.replace({ id, checkedTreatments, value });
     Swal.fire({
       html: message,
       width: '800',
     });
 
-    if(value == 'ensaios'){
+    if (value == 'ensaios') {
       router.back();
-    }
-    else if(value == 'experiment'){
+    } else if (value == 'experiment') {
       router.push('/listas/experimentos/parcelas-experimento');
-    }  
+    }
   }
 
   function replaceFactory(name: string, title: string) {
@@ -447,26 +450,37 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter;
+
+    await seperate(parametersFilter);
+  }
+
+  async function seperate(parametersFilter: any) {
     const tempParams: any = [];
-    checkedTreatments?.forEach((item: any) => {
-      if (item.genotipo) {
-        tempParams.push(item.genotipo);
-      }
-    });
+
+    if (treatmentsOptionSelected == 'nca') {
+      checkedTreatments.forEach((item: any) => {
+        if (item.idGenotipo) {
+          tempParams.push(item.idGenotipo);
+        }
+      });
+    }
+
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=0&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}`;
+      parametersFilter = `skip=0&take=${take}&id_safra=${idSafra}&checkedTreatments=${tempParams}`;
     }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await replaceTreatmentService
       .getAll(parametersFilter)
-      .then(({ status, response }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setLotes(response);
+          setTotalItems(total);
         }
       });
   }
@@ -556,7 +570,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -719,7 +733,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

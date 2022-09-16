@@ -41,7 +41,7 @@ export class ExperimentGenotipeRepository {
     return result;
   }
 
-  async replaceLote(idList: any, idLote: any, geneticName: any) {
+  async replaceLote(idList: any, ncc :any, idLote: any, genetic_id: any) {
     const result = await prisma.experiment_genotipe.updateMany({
       where: {
         id: {
@@ -49,8 +49,9 @@ export class ExperimentGenotipeRepository {
         },
       },
       data: {
-        nca: idLote,
-        // name_genotipo: geneticName,
+        nca: ncc,
+        idGenotipo: genetic_id,
+        idLote,
       },
     });
     return result;
@@ -64,7 +65,7 @@ export class ExperimentGenotipeRepository {
         },
       },
       data: {
-        name_genotipo: idGenotype,
+        // name_genotipo: idGenotype,
       },
     });
     return result;

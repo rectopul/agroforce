@@ -56,7 +56,7 @@ export default function Listagem({
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-// eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line no-use-before-define
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
@@ -66,7 +66,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.etiquetagem || {
     id: 0,
     table_preferences:
-    'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
+      'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
   };
 
   const tableRef = useRef<any>(null);
@@ -638,18 +638,18 @@ export default function Listagem({
                       onChange={(e: any) => setTake(e.target.value)}
                     />
                   </div>
+                </div>
 
-                  <div style={{ width: 40 }} />
-                  <div className="h-7 w-32 mt-6">
-                    <Button
-                      onClick={() => {}}
-                      value="Filtrar"
-                      type="submit"
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiFilterAlt size={20} />}
-                    />
-                  </div>
+                <div style={{ width: 40 }} />
+                <div className="h-7 w-32 mt-6">
+                  <Button
+                    onClick={() => { }}
+                    value="Filtrar"
+                    type="submit"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<BiFilterAlt size={20} />}
+                  />
                 </div>
 
               </form>

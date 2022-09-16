@@ -163,7 +163,7 @@ export default function Listagem({
       filterEndDate,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus || 1, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus || 1,cultureId, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);

@@ -90,7 +90,7 @@ export class ExperimentGenotipeController {
         }
       }
 
-      if (options.noe) {
+      if (options.npe) {
         parameters.npe = Number(options.npe);
       }
 
@@ -112,11 +112,13 @@ export class ExperimentGenotipeController {
             },
           },
         },
+        idGenotipo: true,
         rep: true,
         nt: true,
         npe: true,
         genotipo: true,
         nca: true,
+        idLote: true,
       };
 
       if (options.experimentGroupId) {

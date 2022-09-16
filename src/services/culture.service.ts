@@ -6,6 +6,7 @@ interface CultureUpdate {
     name: string;
     desc: string;
     status?: number;
+    created_by?: number;
 }
 
 const { publicRuntimeConfig } = getConfig();

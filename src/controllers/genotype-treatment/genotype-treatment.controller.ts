@@ -77,6 +77,8 @@ export class GenotypeTreatmentController {
       }
       const select = {
         id: true,
+        id_lote: true,
+        id_genotipo: true,
         safra: { select: { safraName: true } },
         genotipo: {
           select: {

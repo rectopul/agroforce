@@ -168,8 +168,6 @@ export default function AtualizarLocal({
 
   async function getTreatments() {
     await experimentGenotipeService.getAll(`&idExperiment=${idExperiment}`).then(({ response, total: allTotal }) => {
-      console.log(response)
-      console.log(allTotal)
       setTreatments(response);
     })
   }
@@ -238,7 +236,6 @@ export default function AtualizarLocal({
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
-
     Object.keys(columnCampos).forEach((item, index) => {
       if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
@@ -274,7 +271,7 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('NPE', 'npe'));
       }
       if (columnCampos[index] === 'sequence') {
-        tableFields.push(headerTableFactory('Seq.', 'sequence'));
+        tableFields.push(headerTableFactory('Sequence', 'seq'));
       }
       if (columnCampos[index] === 'block') {
         tableFields.push(headerTableFactory('Bloco', 'block'));

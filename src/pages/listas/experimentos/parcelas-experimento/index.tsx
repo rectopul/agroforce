@@ -587,6 +587,7 @@ export default function Listagem({
   }
 
   function readExcel(value: any) {
+
     readXlsxFile(value[0]).then((rows) => {
       importService.validate({
         table: 'REPLACEMENT_GENOTYPE ',
@@ -610,7 +611,10 @@ export default function Listagem({
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id }
+        { id: item.id,
+          idGenotipo:item.idGenotipo,
+          idLote:item.idLote,
+        }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
@@ -619,7 +623,8 @@ export default function Listagem({
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.name_genotipo }
+        { id: item.id, genotipo: item.name_genotipo,idGenotipo:item.idGenotipo,
+          idLote:item.idLote, }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);

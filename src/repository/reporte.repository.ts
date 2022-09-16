@@ -5,12 +5,30 @@ export class ReporteRepository {
     console.log('findOne');
   }
 
-  async findAll() {
-    console.log('findAll');
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+    let order: object | any;
+
+    if (orderBy) {
+      order = JSON.parse(orderBy);
+    }
+
+    const count = await prisma.culture.count({ where });
+
+    const result: object | any = await prisma.culture.findMany({
+      select,
+      skip,
+      take,
+      where,
+      orderBy: order,
+    });
+
+    result.total = count;
+    return result;
   }
 
-  async create() {
-    console.log('create');
+  async create(data: any) {
+    const reporte = await prisma.reportes.create({ data });
+    return reporte;
   }
 
   async update() {

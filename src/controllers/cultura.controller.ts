@@ -2,6 +2,7 @@ import {
   number, object, SchemaOf, string,
 } from 'yup';
 import { CulturaRepository } from '../repository/culture.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 
 interface CultureDTO {
   id: number;
@@ -11,14 +12,16 @@ interface CultureDTO {
   status: number;
 }
 
-type CreateCultureDTO = Omit<CultureDTO, 'id' | 'status'>;
-type UpdateCultureDTO = Omit<CultureDTO, 'created_by'>;
+type CreateCultureDTO = Omit<CultureDTO, ''>;
+type UpdateCultureDTO = Omit<CultureDTO, ''>;
 type FindOne = Omit<CultureDTO, 'name' | 'created_by' | 'status'>;
 
 export class CulturaController {
   public readonly required = 'Campo obrigatório';
 
   culturaRepository = new CulturaRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAllCulture(options: any) {
     const parameters: object | any = {};
@@ -126,22 +129,75 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
+      // data
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
       if (cultureAlreadyExists) {
         return { status: 400, message: 'Cultura ja cadastrado' };
       }
+      const culture = await this.culturaRepository.create(data);
 
-      await this.culturaRepository.create(data);
-
+      await this.reporteRepository.create({
+        madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Cadastro', name: data.desc, ip: JSON.stringify(ip), idOperation: culture.id,
+      });
       return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
+      console.log(err);
       return { status: 404, message: 'Cultura não cadastrada' };
     }
   }
 
   async updateCulture(data: UpdateCultureDTO) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      // data
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const culture = await this.culturaRepository.findOne(data.id);
 
       if (!culture) return { status: 400, message: 'Cultura não existente' };
@@ -157,6 +213,18 @@ export class CulturaController {
       culture.status = data.status;
 
       await this.culturaRepository.update(data.id, culture);
+
+      if (data.status === 1) {
+        await this.reporteRepository.create({
+          madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Edição', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+        });
+      }
+      if (data.status === 0) {
+        await this.reporteRepository.create({
+          madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Inativação', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+        });
+        console.log(data);
+      }
 
       return { status: 200, message: 'Cultura atualizada' };
     } catch (err) {
