@@ -291,7 +291,7 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: INpeProps) => (rowData.status ? (
+      render: (rowData: INpeProps) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button
@@ -305,38 +305,39 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          <div>
-            <Button
-              title={rowData.status == 3 ? "" : "Ativo"}
-              icon={<FaRegThumbsUp size={14} />}
-              onClick={() => handleStatus(rowData.id, {
-                status: rowData.status,
-                ...rowData,
-              })}
-              bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
-              textColor="white"
-              disabled={rowData.status == 3 ? true : false}
-            />
-          </div>
+          {((rowData.status == 1) || (rowData.status == 3)) ? (
+            <div>
+              <Button
+                title={rowData.status == 3 ? "" : "Ativo"}
+                icon={<FaRegThumbsUp size={14} />}
+                onClick={() => handleStatus(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
+                bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
+                textColor="white"
+                disabled={rowData.status == 3 ? true : false}
+              />
+            </div>
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7" />
+              <div>
+                <Button
+                  title="Inativo"
+                  icon={<FaRegThumbsDown size={14} />}
+                  onClick={async () => handleStatus(rowData.id, {
+                    status: rowData.status,
+                    ...rowData,
+                  })}
+                  bgColor="bg-red-800"
+                  textColor="white"
+                />
+              </div>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="h-7 flex">
-          <div className="h-7" />
-          <div>
-            <Button
-              title={rowData.status == 3 ? "" : "Inativo"}
-              icon={<FaRegThumbsDown size={14} />}
-              onClick={async () => handleStatus(rowData.id, {
-                status: rowData.status,
-                ...rowData,
-              })}
-              bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
-              textColor="white"
-              disabled={rowData.status == 3 ? true : false}
-            />
-          </div>
-        </div>
-      )),
+      ),
     };
   }
 
