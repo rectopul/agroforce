@@ -440,17 +440,17 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.Safra = item.safra.safraName;
-            newItem.Foco = item.assay_list.foco.name;
-            newItem.Ensaio = item.assay_list.type_assay.name;
-            newItem.Tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.Gli = item.assay_list.gli;
-            newItem.Bgm = item.assay_list.bgm;
-            newItem.Nt = item.treatments_number;
-            newItem.StatusT = item.status;
-            newItem.StatusEnsaio = item.assay_list.status;
-            newItem.Genotipo = item.genotipo.name_genotipo;
-            newItem.Nca = item?.lote?.ncc;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.assay_list.foco.name;
+            newItem.ENSAIO = item.assay_list.type_assay.name;
+            newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
+            newItem.GLI = item.assay_list.gli;
+            newItem.BGM = item.assay_list.bgm;
+            newItem.NT = item.treatments_number;
+            newItem.STATUS_T = item.status;
+            newItem.STATUS_ENSAIO = item.assay_list.status;
+            newItem.GENOTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item?.lote?.ncc;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -537,9 +537,12 @@ export default function Listagem({
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
-      .then(({ status, response }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setTreatments(response);
+          setTotalItems(total);
+          setAfterFilter(true);
+          setCurrentPage(0);
         }
       });
   }
@@ -578,7 +581,6 @@ export default function Listagem({
     });
   }
 
-  // Here
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector("input[id='genotipo']:checked");
     const ncaButton = document.querySelector("input[id='nca']:checked");
@@ -586,8 +588,13 @@ export default function Listagem({
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
+
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
@@ -595,7 +602,11 @@ export default function Listagem({
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);

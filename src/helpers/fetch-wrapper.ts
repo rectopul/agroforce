@@ -188,7 +188,7 @@ async function handleFilterParameter(...theArgs: any) {
 }
 
 function safra(theArgs: any) {
-  const [key1, filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate, cultureId] = theArgs;
+  const [key1, filterStatus,cultureId, filterSafra, filterYear, filterStartDate, filterEndDate] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
 
   return parametersFilter;

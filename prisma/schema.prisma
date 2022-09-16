@@ -587,3 +587,14 @@ model ExperimentGroup {
   safra      safra        @relation(fields: [safraId], references: [id])
   experiment experiment[]
 }
+
+model reportes {
+  id         Int      @id @default(autoincrement())
+  madeBy      Int?
+  madeIn       String?
+  module     String?
+  operation     String?
+  idOperation      Int?   
+  name     String? 
+  ip     String?     
+}

@@ -367,10 +367,10 @@ export default function Listagem({
               'pt-BR',
             )} ${hours}:${minutes}:${seconds}`;
 
-            row.Nome = row.name;
-            row.Desc = row.desc;
-            row.Cod_Tec = row.cod_tec;
-            row.Data = row.DT;
+            row.NOME = row.name;
+            row.DESC = row.desc;
+            row.COD_TEC = row.cod_tec;
+            row.DATA = row.DT;
 
             delete row.id;
             delete row.dt_import;

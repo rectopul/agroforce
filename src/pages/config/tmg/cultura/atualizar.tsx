@@ -18,6 +18,7 @@ export interface IUpdateCulture {
   name: string;
   desc: string;
   status: number;
+  created_by: number;
 }
 
 export default function Cultura(culture: IUpdateCulture) {
@@ -28,6 +29,8 @@ export default function Cultura(culture: IUpdateCulture) {
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+
   const [checkInput, setCheckInput] = useState('text-black');
 
   const formik = useFormik<IUpdateCulture>({
@@ -36,6 +39,7 @@ export default function Cultura(culture: IUpdateCulture) {
       name: culture.name,
       desc: culture.desc,
       status: culture.status,
+      created_by: 0,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -43,13 +47,13 @@ export default function Cultura(culture: IUpdateCulture) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         return;
       }
-
       await cultureService
         .updateCulture({
           id: culture.id,
           name: capitalize(formik.values.name),
           desc: capitalize(formik.values.desc),
           status: formik.values.status,
+          created_by: Number(userLogado.id),
         })
         .then((response) => {
           if (response.status === 200) {

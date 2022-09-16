@@ -478,9 +478,29 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          row.local = row.local?.name_local_culture;
 
+          row.COD_QUADRA = row.cod_quadra;
+          row.LOCAL = row.local?.name_local_culture;
+          row.ESQUEMA = row.esquema;
+          row.LARG_Q = row.larg_q;
+          row.COMP_P = row.comp_p;
+          row.LINHA_P = row.linha_p;
+          row.COMP_C = row.comp_c;
+          row.TIRO_FIXO = row.tiro_fixo;
+          row.DISPARO_FIXO = row.disparo_fixo;
+          row.STATUS = row.status;
+
+          delete row.cod_quadra;
+          delete row.local;
+          delete row.esquema;
+          delete row.larg_q;
+          delete row.comp_p;
+          delete row.linha_p;
           delete row.q;
+          delete row.comp_c;
+          delete row.tiro_fixo;
+          delete row.disparo_fixo;
+          delete row.status;
           delete row.id;
           delete row.safra;
           delete row.tableData;

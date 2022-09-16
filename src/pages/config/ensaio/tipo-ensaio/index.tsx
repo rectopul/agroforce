@@ -478,10 +478,10 @@ export default function TipoEnsaio({
             newRow.envelope = row.envelope.seeds;
             newRow.status = row.status === 0 ? "Inativo" : "Ativo";
 
-            newRow.Nome = newRow.name;
-            newRow.Nome_Protocolo = newRow.protocol_name;
-            newRow.Quant_Sementes = newRow.envelope;
-            newRow.Status = newRow.status;
+            newRow.NOME = newRow.name;
+            newRow.NOME_PROTOCOLO = newRow.protocol_name;
+            newRow.QUANT_SEMENTES = newRow.envelope;
+            newRow.STATUS = newRow.status;
 
             delete newRow.name;
             delete newRow.protocol_name;
