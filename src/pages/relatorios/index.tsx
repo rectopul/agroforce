@@ -96,77 +96,33 @@ export default function Listagem({
     // },
     {
       name: 'CamposGerenciados[]',
-      title: 'Foco',
+      title: 'Feito Por',
       value: 'foco',
       defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Ensaio',
+      title: 'Feito Em',
       value: 'type_assay',
       defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome da tecnologia',
+      title: 'Subsistema',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'GLI',
-      value: 'gli',
-      defaultChecked: () => camposGerenciados.includes('gli'),
+      title: 'Módulo',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM',
-      value: 'bgm',
-      defaultChecked: () => camposGerenciados.includes('bgm'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'NT',
-      value: 'treatments_number',
-      defaultChecked: () => camposGerenciados.includes('treatments_number'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Status T',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Status do Ensaio',
-      value: 'statusAssay',
-      defaultChecked: () => camposGerenciados.includes('statusAssay'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do genótipo',
-      value: 'genotipoName',
-      defaultChecked: () => camposGerenciados.includes('genotipoName'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'NCA',
-      value: 'nca',
-      defaultChecked: () => camposGerenciados.includes('nca'),
-    },
-  ]);
-  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
-      value: 'importado',
-      defaultChecked: () => camposGerenciados.includes('importado'),
-    },
-    {
-      name: 'StatusCheckbox',
-      title: 'SORTEADO',
-      value: 'sorteado',
-      defaultChecked: () => camposGerenciados.includes('sorteado'),
+      title: 'Operação',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
   ]);
   const [orderBy, setOrderBy] = useState<string>('');
@@ -337,40 +293,21 @@ export default function Listagem({
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+        tableFields.push(headerTableFactory('Feito Por', 'assay_list.foco.name'));
       }
       if (columnOrder[item] === 'type_assay') {
         tableFields.push(
-          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+          headerTableFactory('Feito Em', 'assay_list.type_assay.name'),
         );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(tecnologiaHeaderFactory('Subsistema', 'tecnologia'));
       }
       if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(headerTableFactory('Módulo', 'assay_list.gli'));
       }
-      if (columnOrder[item] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
-      }
-      if (columnOrder[item] === 'treatments_number') {
-        tableFields.push(headerTableFactory('NT', 'treatments_number'));
-      }
-      if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status T', 'status'));
-      }
-      if (columnOrder[item] === 'statusAssay') {
-        tableFields.push(
-          headerTableFactory('Status do ensaio', 'assay_list.status'),
-        );
-      }
-      if (columnOrder[item] === 'genotipoName') {
-        tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
-        );
-      }
-      if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('Operação', 'assay_list.gli'));
       }
     });
     return tableFields;
@@ -773,7 +710,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar relatórios">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -791,59 +728,11 @@ export default function Listagem({
                   pb-8
                 "
                 >
-                  {filterFieldFactory('filterFoco', 'Foco')}
-                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterFoco', 'Feito Por')}
+                  {filterFieldFactory('filterTypeAssay', 'Feito Em')}
+                  {filterFieldFactory('filterTypeAssay', 'Módulo')}
+                  {filterFieldFactory('filterTechnology', 'Operação')}
 
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecnologia
-                    </label>
-                    <div className="flex">
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Cód. Tecnologia"
-                        id="filterCodTec"
-                        name="filterCodTec"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GLI
-                    </label>
-                    <Select
-                      values={assaySelect}
-                      id="filterGli"
-                      name="filterGli"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
-
-                  {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterBgmFrom"
-                        name="filterBgmFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterBgmTo"
-                        name="filterBgmTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
                 </div>
                 <div
                   className="w-full h-full
@@ -853,131 +742,6 @@ export default function Listagem({
                   pb-3
                   "
                 >
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NT
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterNtFrom"
-                        name="filterNtFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNtTo"
-                        name="filterNtTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status T
-                    </label>
-                    <div className="flex">
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Status T"
-                        id="filterStatusT"
-                        name="filterStatusT"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  {/* {filterFieldFactory('filterStatus', 'Status T')} */}
-
-                  <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Ensaio
-                    </label>
-                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-full h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div>
-                  {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
-
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome do genótipo
-                    </label>
-                    <Select
-                      values={[
-                        { id: '', name: 'Selecione' },
-                        ...genotypeSelect,
-                      ]}
-                      id="filterGenotypeName"
-                      name="filterGenotypeName"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
-
-                  {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
-
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
-                    </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
-                  </div>
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
@@ -1039,19 +803,6 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-32 ml-0">
-                      <Button
-                        title="Substituir"
-                        value="Substituir"
-                        textColor="white"
-                        onClick={() => {
-                          setRadioStatus();
-                          setIsOpenModal(!isOpenModal);
-                        }}
-                        bgColor="bg-blue-600"
-                        icon={<RiArrowUpDownLine size={20} />}
-                      />
-                    </div>
 
                     <strong className="text-blue-600">
                       Total registrado:
