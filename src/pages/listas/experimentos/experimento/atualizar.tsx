@@ -105,7 +105,7 @@ export default function AtualizarLocal({
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Rep. Exp', value: 'repetitionExperience' },
-    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'name_genotipo' },
+    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
@@ -243,14 +243,14 @@ export default function AtualizarLocal({
       if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
       }
-      if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome do genotipo', 'name_genotipo'));
+      if (columnCampos[index] === 'genotipo') {
+        tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo'));
       }
       if (columnCampos[index] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR', 'gmr'));
+        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
       }
       if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'bgm'));
+        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'fase'));

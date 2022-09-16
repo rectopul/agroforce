@@ -23,6 +23,7 @@ export class ExperimentRepository {
         eel: true,
         comments: true,
         orderDraw: true,
+        experiment_genotipe: true,
         assay_list: {
           select: {
             status: true,

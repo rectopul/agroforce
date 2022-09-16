@@ -28,6 +28,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
 import { HiArrowNarrowRight } from 'react-icons/hi';
+import { AiOutlinePrinter } from 'react-icons/ai';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -47,6 +48,7 @@ import {
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   experimentGenotipeService,
+  experimentGroupService,
   importService,
   userPreferencesService,
 } from '../../../services';
@@ -79,6 +81,7 @@ interface IFilter {
 export default function Listagem({
   allExperiments,
   totalItems,
+  experimentGroup,
   itensPerPage,
   experimentGroupId,
   filterApplication,
@@ -217,8 +220,17 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [rowsSelected, setRowsSelected] = useState([]);
-  const router = useRouter();
+  const [validateNcaOne, setValidateNcaOne] = useState<string>('bg-gray-300');
+  const [validateNcaTwo, setValidateNcaTwo] = useState<string>('bg-gray-300');
+  const [totalMatch, setTotalMatch] = useState<number>(0);
+  const [genotypeNameOne, setGenotypeNameOne] = useState<string>('');
+  const [genotypeNameTwo, setGenotypeNameTwo] = useState<string>('');
+  const [ncaOne, setNcaOne] = useState<string>('');
+  const [ncaTwo, setNcaTwo] = useState<string>('');
+  const [groupNameOne, setGroupNameOne] = useState<string>('');
+  const [groupNameTwo, setGroupNameTwo] = useState<string>('');
+  const [doubleVerify, setDoubleVerify] = useState<boolean>(false);
+  const [parcelasToPrint, setParcelasToPrint] = useState<any>([]);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -408,27 +420,13 @@ export default function Listagem({
               icon={<HiArrowNarrowRight size={14} />}
               title={`Dar baixa na parcela ${rowData.id}`}
               onClick={() => {}}
-              bgColor="bg-green-600"
+              bgColor="bg-red-600"
               textColor="white"
             />
           </div>
         </div>
       ) : (
-        <div className="h-7 flex">
-          <div
-            className="h-7"
-          />
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<BsTrashFill size={14} />}
-              title="Inativo"
-              onClick={() => {}}
-              bgColor="bg-red-800"
-              textColor="white"
-            />
-          </div>
-        </div>
+        <div />
       )),
     };
   }
@@ -464,7 +462,7 @@ export default function Listagem({
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(
-          headerTableFactory('Status EXP.', 'experiment.status'),
+          headerTableFactory('Status', 'status'),
         );
       }
       if (columnOrder[index] === 'nt') {
@@ -621,18 +619,89 @@ export default function Listagem({
     );
   }
 
+  async function cleanState() {
+    setDoubleVerify(false);
+    setNcaOne('');
+    setGenotypeNameOne('');
+    setNcaTwo('');
+    setGenotypeNameTwo('');
+    setGroupNameOne('');
+    setGroupNameTwo('');
+    setTotalMatch(0);
+    setValidateNcaOne('bg-gray-300');
+    setValidateNcaTwo('bg-gray-300');
+    setParcelasToPrint([]);
+    setIsOpenModal(!isOpenModal);
+  }
+
   async function handleSubmit() {
-    // const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
-    // const { status }: IReturnObject = await experimentGenotipeService.update({
-    //   idList: experimentsSelected,
-    //   experimentGroupId: Number(experimentGroupId),
-    //   status: 'IMP. N INICI.',
-    // });
-    // if (status !== 200) {
-    //   Swal.fire('Erro ao associar experimentos');
-    // } else {
-    //   router.back();
-    // }
+    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    let countNca = 0;
+    parcelas.map((item: any) => {
+      if (item.nca === inputCode) {
+        setParcelasToPrint((current: any) => [...current, item.id]);
+        countNca += 1;
+        setGenotypeNameOne(item.name_genotipo);
+        setNcaOne(item.nca);
+      }
+    });
+    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    let colorVerify = '';
+    if (countNca > 0) {
+      colorVerify = 'bg-green-600';
+      setGroupNameOne(response[0]?.name);
+      setValidateNcaOne('bg-green-600');
+    } else {
+      colorVerify = 'bg-red-600';
+      setValidateNcaOne('bg-red-600');
+    }
+    setTotalMatch(countNca);
+    if (colorVerify === 'bg-green-600') {
+      (document.getElementById('inputCode') as HTMLInputElement).value = '';
+      setDoubleVerify(true);
+    } else {
+      setDoubleVerify(false);
+    }
+  }
+
+  async function verifyAgain() {
+    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    let countNca = 0;
+    let secondNca = '';
+    parcelas.map((item: any) => {
+      if (item.nca === inputCode) {
+        setGenotypeNameTwo(item.name_genotipo);
+        secondNca = item.nca;
+        setNcaTwo(item.nca);
+        countNca += 1;
+      }
+    });
+    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    let colorVerify = '';
+    if (countNca > 0 && secondNca === ncaOne) {
+      colorVerify = 'bg-green-600';
+      setGroupNameTwo(response[0]?.name);
+      setValidateNcaTwo('bg-green-600');
+    } else {
+      colorVerify = 'bg-red-600';
+      setValidateNcaTwo('bg-red-600');
+    }
+    setTotalMatch(countNca);
+    if (colorVerify === 'bg-green-600') {
+      await experimentGenotipeService.update({ idList: parcelasToPrint, status: 'IMPRESSO' });
+      cleanState();
+    }
+  }
+
+  async function validateInput() {
+    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    if (inputCode.length === 12) {
+      if (doubleVerify) {
+        verifyAgain();
+      } else {
+        handleSubmit();
+      }
+    }
   }
 
   useEffect(() => {
@@ -646,6 +715,83 @@ export default function Listagem({
         <title>Listagem de parcelas</title>
       </Head>
 
+      <Modal
+        isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+        className="flex
+          flex-col
+          w-full
+          h-64
+          max-w-xl
+          bg-gray-50
+          rounded-tl-2xl
+          rounded-tr-2xl
+          rounded-br-2xl
+          rounded-bl-2xl
+          pt-2
+          pb-4
+          px-8
+          relative
+          shadow-lg
+          shadow-gray-900/50"
+      >
+        <form className="flex flex-col">
+          <button
+            type="button"
+            className="flex absolute top-4 right-3 justify-end"
+            onClick={cleanState}
+          >
+            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
+          </button>
+
+          <div className="flex px-4  justify-between">
+            <header className="flex flex-col mt-2">
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">Imprimir etiqueta</h2>
+            </header>
+            <Input
+              type="text"
+              placeholder="Código de barras (NCA)"
+              disabled={(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+              id="inputCode"
+              name="inputCode"
+              maxLength={12}
+              onChange={validateInput}
+            />
+          </div>
+
+          <h1>{`Total nca encontrado no grupo: ${totalMatch}`}</h1>
+          <div className="flex justify-between">
+            <div>
+              <div className={`${validateNcaOne} h-10 w-10 box-border`} />
+              <h1>{ncaOne}</h1>
+              <h1>{genotypeNameOne}</h1>
+              <h1>{groupNameOne}</h1>
+            </div>
+            <div>
+              <div className={`${validateNcaTwo} h-10 w-10 box-border`} />
+              <h1>{ncaTwo}</h1>
+              <h1>{genotypeNameTwo}</h1>
+              <h1>{groupNameTwo}</h1>
+            </div>
+          </div>
+          <div className="flex justify-end py-0">
+            <div className="h-10 w-40">
+              <Button
+                title="Cancelar"
+                value="Cancelar"
+                textColor="white"
+                disabled={!(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+                onClick={cleanState}
+                bgColor="bg-red-600"
+              />
+            </div>
+          </div>
+        </form>
+      </Modal>
+
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
           className="h-full w-full
@@ -654,7 +800,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar parcelas">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -861,7 +1007,6 @@ export default function Listagem({
               columns={columns}
               data={parcelas}
               options={{
-                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -872,7 +1017,6 @@ export default function Listagem({
                 pageSize: Number(take),
               }}
               onChangeRowsPerPage={() => { }}
-              onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
                   <div
@@ -893,34 +1037,33 @@ export default function Listagem({
                         title="Ação"
                         value="Ação"
                         textColor="white"
-                        onClick={() => { }}
+                        onClick={() => setIsOpenModal(true)}
                         bgColor="bg-blue-600"
-                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
                       Qte. exp:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.experimentAmount}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. a imp.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.tagsToPrint}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. imp.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.tagsPrinted}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.totalTags}
                     </strong>
 
                     <div
@@ -1101,11 +1244,18 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
+  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment-group`;
+  const experimentGroup = await fetch(
+    `${baseUrlShow}/${experimentGroupId}`,
+    requestOptions,
+  ).then((response) => response.json());
+
   return {
     props: {
       allParcelas,
       totalItems,
       experimentGroupId,
+      experimentGroup,
       itensPerPage,
       filterApplication,
       idSafra,

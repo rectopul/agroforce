@@ -471,17 +471,18 @@ export default function Listagem({
     if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
     } else {
-      const { status: createStatus, message }: IReturnObject = await experimentGroupService.create({
+      const {
+        status: createStatus,
+        response: newGroup,
+      }: IReturnObject = await experimentGroupService.create({
         name: inputValue,
         safraId: Number(safraId),
         createdBy: userLogado.id,
       });
-      console.log('response');
-      console.log(response);
       if (createStatus !== 200) {
         Swal.fire('Erro ao cadastrar grupo');
       } else {
-        router.reload();
+        router.push(`/operacao/etiquetagem/atualizar?id=${newGroup.id}`);
       }
     }
   }

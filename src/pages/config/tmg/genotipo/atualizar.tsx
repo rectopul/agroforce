@@ -3,7 +3,7 @@
 /* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -99,13 +99,13 @@ interface IData {
 }
 
 export default function Atualizargenotipo({
-  allLote,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idGenotipo,
-  genotipo,
-}: IData) {
+      allLote,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idGenotipo,
+      genotipo,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();

@@ -12,7 +12,12 @@ function getAll(parameters: any) {
   return fetchWrapper.get(baseUrl, parameters);
 }
 
+function update(data: any) {
+  return fetchWrapper.put(baseUrl, data);
+}
+
 export const experimentGenotipeService = {
   create,
+  update,
   getAll,
 };
