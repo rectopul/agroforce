@@ -537,9 +537,12 @@ export default function Listagem({
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
-      .then(({ status, response }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setTreatments(response);
+          setTotalItems(total);
+          setAfterFilter(true);
+          setCurrentPage(0);
         }
       });
   }
@@ -578,7 +581,6 @@ export default function Listagem({
     });
   }
 
-  // Here
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector("input[id='genotipo']:checked");
     const ncaButton = document.querySelector("input[id='nca']:checked");
@@ -586,8 +588,13 @@ export default function Listagem({
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
+
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
@@ -595,7 +602,11 @@ export default function Listagem({
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);

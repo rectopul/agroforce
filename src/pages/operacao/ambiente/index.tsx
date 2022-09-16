@@ -209,6 +209,7 @@ export default function Listagem({
     { id: 2, name: 'Todos' },
     { id: 1, name: 'Ativos' },
     { id: 0, name: 'Inativos' },
+    { id: 3, name: 'Sorteado' },
   ];
 
   const filterStatus = filterApplication.split('');
@@ -465,7 +466,6 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter = `skip=${skip}&take=${take}`;
-    console.log(parametersFilter);
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
