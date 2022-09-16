@@ -121,6 +121,7 @@ export class ReplaceTreatmentController {
     return response;
   }
   async experiment( idList:any, ncc :any, geneticName :any,lote_id: any, geneticName_id :any){
+    
    const response = await this.experimentGenotipeRepository.replaceLote(
       idList,
       ncc,
