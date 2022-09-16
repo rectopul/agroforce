@@ -413,7 +413,7 @@ export default function Listagem({
     await npeService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map(
-          (row: { avatar: any; status: any }) => {
+          (row: any) => {
             if (row.status === 0) {
               row.status = 'Inativo';
             } else {
