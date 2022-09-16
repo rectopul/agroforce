@@ -11,10 +11,11 @@ export function DropDown({ label, href, icon }: IDropDownProps) {
   return (
     <ul
       className="
-      h-7 w-40
+      h-7
       px-2
       bg-white mb-0.5
     "
+      style={{ maxWidth: '300px' }}
     >
       <li>
         <Link href={href}>

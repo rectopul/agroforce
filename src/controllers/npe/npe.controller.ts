@@ -1,13 +1,18 @@
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { NpeRepository } from '../../repository/npe.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
+import { ExperimentController } from '../experiment/experiment.controller';
 
 export class NpeController {
   npeRepository = new NpeRepository();
 
   groupController = new GroupController();
+  experimentController = new ExperimentController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -22,10 +27,6 @@ export class NpeController {
         parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterLocal}" } }`);
       }
 
-      if (options.filterSafra) {
-        parameters.safra = JSON.parse(`{ "safraName": { "contains": "${options.filterSafra}" } }`);
-      }
-
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -36,6 +37,10 @@ export class NpeController {
 
       if (options.filterTecnologia) {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
+      }
+
+      if (options.filterCodTec) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
       }
 
       if (options.filterEpoca) {
@@ -68,6 +73,10 @@ export class NpeController {
 
       if (options.localId) {
         parameters.localId = Number(options.localId);
+      }
+
+      if (options.npei) {
+        parameters.npei = Number(options.npei);
       }
 
       if (options.filterNpeFrom || options.filterNpeTo) {
@@ -106,6 +115,7 @@ export class NpeController {
           id: true,
           safraId: true,
           localId: true,
+          prox_npe: true,
           local: { select: { name_local_culture: true } },
           safra: { select: { safraName: true } },
           foco: { select: { name: true, id: true } },
@@ -116,10 +126,10 @@ export class NpeController {
           npei: true,
           npef: true,
           status: true,
+          edited: true,
           npeQT: true,
         };
       }
-
       const response = await this.npeRepository.findAll(
         parameters,
         select,
@@ -128,9 +138,10 @@ export class NpeController {
         orderBy,
       );
 
-      response.map((value: any, index: any, elements: any) => {
+      response.map(async (value: any, index: any, elements: any) => {
         const newItem = value;
         const next = elements[index + 1];
+
         if (next) {
           if (!newItem.npeQT) {
             newItem.npeQT = next.npei - newItem.npei;
@@ -177,6 +188,7 @@ export class NpeController {
         const group: any = await this.groupController.getAll(
           { id_safra: data.safra, id_foco: data.foco },
         );
+
         if (group.response.length > 0) {
           const safra: any = await prisma.$queryRaw`SELECT npei
                                                   FROM npe n
@@ -215,9 +227,38 @@ export class NpeController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
+      if (data) {
         const npe = await this.npeRepository.update(data.id, data);
         if (!npe) return { status: 400, message: 'Npe não encontrado' };
+        if (npe.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: npe.created_by, madeIn: newData, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+          });
+        }
         return { status: 200, message: 'Npe atualizada' };
       }
       const npeExist = await this.getOne(data.id);

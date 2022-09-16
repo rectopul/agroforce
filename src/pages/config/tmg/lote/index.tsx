@@ -26,13 +26,13 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { fetchWrapper } from 'src/helpers';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
-import {fetchWrapper} from "src/helpers";
 
 interface IFilter {
   filterYearFrom: string | number;
@@ -110,7 +110,7 @@ export default function Listagem({
   const [orderList, setOrder] = useState<number>(1);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [filtersParams, setFiltersParams] = useState<any>(""); //Set filter Parameter 
+  const [filtersParams, setFiltersParams] = useState<any>(''); // Set filter Parameter
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -136,7 +136,7 @@ export default function Listagem({
     },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-    { name: 'CamposGerenciados[]', title: 'Nome Tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
   ]);
   const [filter, setFilter] = useState<any>();
   const [colorStar, setColorStar] = useState<string>('');
@@ -154,8 +154,8 @@ export default function Listagem({
       filterSeedFrom: '',
       filterWeightTo: '',
       filterWeightFrom: '',
-      filterGmrTo: '',
       filterGmrFrom: '',
+      filterGmrTo: '',
       filterBgmTo: '',
       filterBgmFrom: '',
       filterYear: '',
@@ -180,8 +180,8 @@ export default function Listagem({
       filterSeedFrom,
       filterWeightTo,
       filterWeightFrom,
-      filterGmrTo,
       filterGmrFrom,
+      filterGmrTo,
       filterBgmTo,
       filterBgmFrom,
       filterYear,
@@ -197,11 +197,9 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
     }) => {
-
-        // Call filter with there parameter   
-        const parametersFilter = await fetchWrapper.handleFilterParameter("lote",filterYear,filterCodLote,filterNcc,filterFase,filterPeso,filterSeeds,filterGenotipo,filterMainName,filterGmr,filterBgm,filterTecnologiaCod,filterTecnologiaDesc,);
-
-        setFiltersParams(parametersFilter); // Set filter pararameters       
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
+      setFiltersParams(parametersFilter); // Set filter pararameters
 
       await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
@@ -213,11 +211,12 @@ export default function Listagem({
   });
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
- 
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"lote");
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
 
-    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
+
+    await loteService.getAll(value).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
         setFiltersParams(parametersFilter);
@@ -359,25 +358,68 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Nome Tec.', 'genotipo.tecnologia'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia'));
       }
     });
     return tableFields;
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await loteService.getAll(`${filter}&id_safra=${idSafra}`).then(({ status, response }) => {
+    await loteService.getAll(filtersParams).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          newItem.name_genotipo = item.genotipo.name_genotipo;
-          newItem.name_main = item.genotipo.name_main;
-          newItem.gmr = item.genotipo.gmr;
-          newItem.bgm = item.genotipo.bgm;
-          newItem.tecnologia = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
+          const dataExp = new Date();
+          let hours: string;
+          let minutes: string;
+          let seconds: string;
+          if (String(dataExp.getHours()).length === 1) {
+            hours = `0${String(dataExp.getHours())}`;
+          } else {
+            hours = String(dataExp.getHours());
+          }
+          if (String(dataExp.getMinutes()).length === 1) {
+            minutes = `0${String(dataExp.getMinutes())}`;
+          } else {
+            minutes = String(dataExp.getMinutes());
+          }
+          if (String(dataExp.getSeconds()).length === 1) {
+            seconds = `0${String(dataExp.getSeconds())}`;
+          } else {
+            seconds = String(dataExp.getSeconds());
+          }
+          newItem.DT = `${dataExp.toLocaleDateString(
+            'pt-BR',
+          )} ${hours}:${minutes}:${seconds}`;
+
+          newItem.ID_S2 = item?.id_s2;
+          newItem.ID_DADOS = item?.id_dados;
+          newItem.ANO = item?.year;
+          newItem.COD_LOTE = item?.cod_lote;
+          newItem.NCC = item?.ncc;
+          newItem.FASE = item?.fase;
+          newItem.PESO = item?.peso;
+          newItem.QUANT_SEMENTES = item?.quant_sementes;
+          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
+          newItem.GMR = item?.genotipo.gmr;
+          newItem.BGM = item?.genotipo.bgm;
+          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+          newItem.DATA = newItem.DT;
+
+          delete newItem.quant_sementes;
+          delete newItem.peso;
+          delete newItem.fase;
+          delete newItem.ncc;
+          delete newItem.cod_lote;
+          delete newItem.year;
+          delete newItem.id_s2;
+          delete newItem.id_dados;
+          delete newItem.DT;
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;
+
           return newItem;
         });
 
@@ -470,15 +512,14 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-   
-     //manage using comman function
-     const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filter);
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
 
     await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setLotes(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
       }
     });
   }
@@ -636,7 +677,10 @@ export default function Listagem({
                         />
                       </div>
                     </div>
-                    <div style={{ marginLeft: 10 }}>
+                  </div>
+
+                  <div className="h-6 w-full ml-4 flex">
+                    <div>
                       <label className="block text-gray-900 text-sm font-bold mb-1">
                         BGM
                       </label>
@@ -658,12 +702,12 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tecnologia')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec.')}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tecnologia')}
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
+                  {/* <div className="w-full" style={{ marginLeft: -40 }} /> */}
+                  <div style={{ marginLeft: 20 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
@@ -831,7 +875,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

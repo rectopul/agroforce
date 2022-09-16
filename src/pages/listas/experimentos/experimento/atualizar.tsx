@@ -3,7 +3,7 @@
 /* eslint-disable react/no-array-index-key */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -28,6 +28,8 @@ import {
   Input, InputMoney,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
+import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
 
 export interface IData {
   // allItens: any;
@@ -39,11 +41,11 @@ export interface IData {
   // pageBeforeEdit: string | any
 }
 
-// interface IGenerateProps {
-//   name: string | undefined;
-//   title: string | number | readonly string[] | undefined;
-//   value: string | number | readonly string[] | undefined;
-// }
+interface IGenerateProps {
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
+}
 
 interface IUpdateExperimento {
   id: number
@@ -66,14 +68,14 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-  experimento,
-  // allItens,
-  // totalItems,
-  // itensPerPage,
-  // filterApplication,
-  // idExperiment,
-  // pageBeforeEdit,
-}: IData) {
+      experimento,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idExperiment,
+      pageBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -86,51 +88,41 @@ export default function AtualizarLocal({
 
   const router = useRouter();
 
-  // const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  // const preferences = userLogado.preferences.materiais || {
-  //   id: 0, table_preferences: 'repetitionExperience,
-  // genotipo_name,
-  // gmr,
-  // bgm,
-  // fase,
-  // tecnologia,
-  // treatments_number,
-  // status,
-  // nca,
-  // npe,
-  // sequence,
-  // block,
-  // statusParcial',
-  // };
-  // const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.materiais || {
+    id: 0, table_preferences: 'repetitionExperience,genotipo_name,gmr,bgm,fase,tecnologia,treatments_number,status,nca,npe,sequence,block,statusParcial',
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  // const [materiais, setMateriais] = useState<any>(() => allItens);
-  // const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
-  // const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  // const [orderList, setOrder] = useState<number>(1);
-  // const [setArrowOrder] = useState<any>('');
-  // const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  // const [filter, setFilter] = useState<any>(filterApplication);
+  const [materiais, setMateriais] = useState<any>(() => allItens);
+  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
+  const [orderList, setOrder] = useState<number>(1);
+  const [setArrowOrder] = useState<any>('');
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [filter, setFilter] = useState<any>(filterApplication);
   // const [colorStar, setColorStar] = useState<string>('');
-  // const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-  //   { name: 'CamposGerenciados[]', title: 'Rep. Exp', value: 'repetitionExperience' },
-  //   { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo_name' },
-  //   { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-  //   { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
-  //   { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-  //   { name: 'CamposGerenciados[]', title: 'Cód. tec.', value: 'tecnologia' },
-  //   { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'treatments_number' },
-  //   { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
-  //   { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-  //   { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
-  //   { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sequence' },
-  //   { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
-  //   { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'statusParcial' },
-  // ]);
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    { name: 'CamposGerenciados[]', title: 'Rep. Exp', value: 'repetitionExperience' },
+    { name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo' },
+    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Cód. tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
+    { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'rep' },
+    { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
+    { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
+    { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sequence' },
+    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
+    { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'experiment' },
+  ]);
 
-  // const take: number = itensPerPage;
-  // const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
-  // const pages = Math.ceil(total / take);
+  const take: number = itensPerPage;
+  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const pages = Math.ceil(total / take);
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
@@ -170,234 +162,249 @@ export default function AtualizarLocal({
     },
   });
 
-  // async function handleOrder(column: string, order: string | any): Promise<void> {
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
+  useEffect(() => {
+    getTreatments();
+  }, [])
 
-  //   if (filter && typeof (filter) !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
+  async function getTreatments() {
+    await experimentGenotipeService.getAll(`&idExperiment=${idExperiment}`).then(({ response, total: allTotal }) => {
+      setTreatments(response);
+    })
+  }
 
-  //   await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then(({ status, response }: any) => {
-  //     if (status === 200) {
-  //       setMateriais(response);
-  //     }
-  //   });
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
 
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-  // }
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: false,
-  //   };
-  // }
+    // await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }: any) => {
+    //   if (status === 200) {
+    //     setMateriais(response);
+    //   }
+    // });
 
-  // function columnsOrder(columnsCampos: string) {
-  //   const columnCampos: string[] = columnsCampos.split(',');
-  //   const tableFields: any = [];
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
+  }
 
-  //   Object.keys(columnCampos).forEach((item, index) => {
-  //     if (columnCampos[index] === 'repetitionExperience') {
-  //       tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
-  //     }
-  //     if (columnCampos[index] === 'genotipo_name') {
-  //       tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo_name'));
-  //     }
-  //     if (columnCampos[index] === 'gmr') {
-  //       tableFields.push(headerTableFactory('GMR', 'gmr'));
-  //     }
-  //     if (columnCampos[index] === 'bgm') {
-  //       tableFields.push(headerTableFactory('BGM', 'bgm'));
-  //     }
-  //     if (columnCampos[index] === 'fase') {
-  //       tableFields.push(headerTableFactory('Fase', 'fase'));
-  //     }
-  //     if (columnCampos[index] === 'tecnologia') {
-  //       tableFields.push(headerTableFactory('Cód. tec.', 'tecnologia'));
-  //     }
-  //     if (columnCampos[index] === 'treatments_number') {
-  //       tableFields.push(headerTableFactory('Rep. trat.', 'treatments_number'));
-  //     }
-  //     if (columnCampos[index] === 'nca') {
-  //       tableFields.push(headerTableFactory('NCA', 'nca'));
-  //     }
-  //     if (columnCampos[index] === 'npe') {
-  //       tableFields.push(headerTableFactory('NPE', 'npe'));
-  //     }
-  //     if (columnCampos[index] === 'sequence') {
-  //       tableFields.push(headerTableFactory('Seq.', 'sequence'));
-  //     }
-  //     if (columnCampos[index] === 'block') {
-  //       tableFields.push(headerTableFactory('Bloco', 'block'));
-  //     }
-  //     if (columnCampos[index] === 'statusParcial') {
-  //       tableFields.push(headerTableFactory('Status parc.', 'statusParcial'));
-  //     }
-  //   });
-  //   return tableFields;
-  // }
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+    };
+  }
 
-  // const columns = columnsOrder(camposGerenciados);
+  function columnsOrder(columnsCampos: string) {
+    const columnCampos: string[] = columnsCampos.split(',');
+    const tableFields: any = [];
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === 'repetitionExperience') {
+        tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
+      }
+      if (columnCampos[index] === 'genotipo') {
+        tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo'));
+      }
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
+      }
+      if (columnCampos[index] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+      }
+      if (columnCampos[index] === 'fase') {
+        tableFields.push(headerTableFactory('Fase', 'fase'));
+      }
+      if (columnCampos[index] === 'tecnologia') {
+        tableFields.push(headerTableFactory('Cód. tec.', 'tecnologia.cod_tec'));
+      }
+      if (columnCampos[index] === 'nt') {
+        tableFields.push(headerTableFactory('NT', 'nt'));
+      }
+      if (columnCampos[index] === 'treatments_number') {
+        tableFields.push(headerTableFactory('Rep. trat.', 'rep'));
+      }
+      if (columnCampos[index] === 'status') {
+        tableFields.push(headerTableFactory('T', 'status'));
+      }
+      if (columnCampos[index] === 'nca') {
+        tableFields.push(headerTableFactory('NCA', 'nca'));
+      }
+      if (columnCampos[index] === 'npe') {
+        tableFields.push(headerTableFactory('NPE', 'npe'));
+      }
+      if (columnCampos[index] === 'sequence') {
+        tableFields.push(headerTableFactory('Sequence', 'seq'));
+      }
+      if (columnCampos[index] === 'block') {
+        tableFields.push(headerTableFactory('Bloco', 'block'));
+      }
+      if (columnCampos[index] === 'experiment') {
+        tableFields.push(headerTableFactory('Status parc.', 'experiment.status'));
+      }
+    });
+    return tableFields;
+  }
 
-  // async function getValuesColumns(): Promise<void> {
-  //   const els: any = document.querySelectorAll("input[type='checkbox'");
-  //   let selecionados = '';
-  //   for (let i = 0; i < els.length; i += 1) {
-  //     if (els[i].checked) {
-  //       selecionados += `${els[i].value},`;
-  //     }
-  //   }
-  //   const totalString = selecionados.length;
-  //   const campos = selecionados.substr(0, totalString - 1);
-  //   if (preferences.id === 0) {
-  //     await userPreferencesService.create({
-  //       table_preferences: campos,
-  //       userId: userLogado.id,
-  //       module_id: 23,
-  //     }).then((response) => {
-  //       userLogado.preferences.materiais = {
-  //         id: response.response.id,
-  //         userId: preferences.userId,
-  //         table_preferences: campos,
-  //       };
-  //       preferences.id = response.response.id;
-  //     });
-  //     localStorage.setItem('user', JSON.stringify(userLogado));
-  //   } else {
-  //     userLogado.preferences.materiais = {
-  //       id: preferences.id,
-  //       userId: preferences.userId,
-  //       table_preferences: campos,
-  //     };
-  //     await userPreferencesService.update({
-  //       table_preferences: campos,
-  //       id: preferences.id,
-  //     });
-  //     localStorage.setItem('user', JSON.stringify(userLogado));
-  //   }
+  const columns = columnsOrder(camposGerenciados);
 
-  //   setStatusAccordion(false);
-  //   setCamposGerenciados(campos);
-  // }
+  async function getValuesColumns(): Promise<void> {
+    const els: any = document.querySelectorAll("input[type='checkbox'");
+    let selecionados = '';
+    for (let i = 0; i < els.length; i += 1) {
+      if (els[i].checked) {
+        selecionados += `${els[i].value},`;
+      }
+    }
+    const totalString = selecionados.length;
+    const campos = selecionados.substr(0, totalString - 1);
+    if (preferences.id === 0) {
+      await userPreferencesService.create({
+        table_preferences: campos,
+        userId: userLogado.id,
+        module_id: 23,
+      }).then((response) => {
+        userLogado.preferences.materiais = {
+          id: response.response.id,
+          userId: preferences.userId,
+          table_preferences: campos,
+        };
+        preferences.id = response.response.id;
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
+      userLogado.preferences.materiais = {
+        id: preferences.id,
+        userId: preferences.userId,
+        table_preferences: campos,
+      };
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
 
-  // function handleOnDragEnd(result: DropResult): void {
-  //   setStatusAccordion(true);
-  //   if (!result) return;
+    setStatusAccordion(false);
+    setCamposGerenciados(campos);
+  }
 
-  //   const items = Array.from(generatesProps);
-  //   const [reorderedItem] = items.splice(result.source.index, 1);
-  //   const index: number = Number(result.destination?.index);
-  //   items.splice(index, 0, reorderedItem);
-  //   setGeneratesProps(items);
-  // }
+  function handleOnDragEnd(result: DropResult): void {
+    setStatusAccordion(true);
+    if (!result) return;
 
-  // const downloadExcel = async (): Promise<void> => {
-  //   if (!filterApplication.includes('paramSelect')) {
-  //     filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
-  //   }
-  //   await materiaisService.getAll(filterApplication).then((response) => {
-  //     if (response.status === 200) {
-  //       const newData = response.response.map((row: { status: any }) => {
-  //         if (row.status === 0) {
-  //           row.status = 'Inativo';
-  //         } else {
-  //           row.status = 'Ativo';
-  //         }
+    const items = Array.from(generatesProps);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    const index: number = Number(result.destination?.index);
+    items.splice(index, 0, reorderedItem);
+    setGeneratesProps(items);
+  }
 
-  //         return row;
-  //       });
+  const downloadExcel = async (): Promise<void> => {
+    if (!filterApplication.includes('paramSelect')) {
+      filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
+    }
+    // await materiaisService.getAll(filterApplication).then((response) => {
+    //   if (response.status === 200) {
+    //     const newData = response.response.map((row: { status: any }) => {
+    //       if (row.status === 0) {
+    //         row.status = 'Inativo';
+    //       } else {
+    //         row.status = 'Ativo';
+    //       }
 
-  //       newData.map((item: any) => {
-  //         item.foco = item.foco?.name;
-  //         item.safra = item.safra?.safraName;
-  //         return item;
-  //       });
+    //       return row;
+    //     });
 
-  //       const workSheet = XLSX.utils.json_to_sheet(newData);
-  //       const workBook = XLSX.utils.book_new();
-  //       XLSX.utils.book_append_sheet(workBook, workSheet, 'materiais');
+    //     newData.map((item: any) => {
+    //       item.foco = item.foco?.name;
+    //       item.safra = item.safra?.safraName;
+    //       return item;
+    //     });
 
-  //       // Buffer
-  //       XLSX.write(workBook, {
-  //         bookType: 'xlsx', // xlsx
-  //         type: 'buffer',
-  //       });
-  //       // Binary
-  //       XLSX.write(workBook, {
-  //         bookType: 'xlsx', // xlsx
-  //         type: 'binary',
-  //       });
-  //       // Download
-  //       XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
-  //     }
-  //   });
-  // };
+    //     const workSheet = XLSX.utils.json_to_sheet(newData);
+    //     const workBook = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(workBook, workSheet, 'materiais');
 
-  // function handleTotalPages(): void {
-  //   if (currentPage < 0) {
-  //     setCurrentPage(0);
-  //   } else if (currentPage >= pages) {
-  //     setCurrentPage(pages - 1);
-  //   }
-  // }
+    //     // Buffer
+    //     XLSX.write(workBook, {
+    //       bookType: 'xlsx', // xlsx
+    //       type: 'buffer',
+    //     });
+    //     // Binary
+    //     XLSX.write(workBook, {
+    //       bookType: 'xlsx', // xlsx
+    //       type: 'binary',
+    //     });
+    //     // Download
+    //     XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
+    //   }
+    // });
+  };
 
-  // async function handlePagination(): Promise<void> {
-  //   const skip = currentPage * Number(take);
-  //   let parametersFilter = `skip=${skip}&take=${take}`;
+  function handleTotalPages(): void {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
+    }
+  }
 
-  //   if (filter) {
-  //     parametersFilter = `${parametersFilter}&${filter}`;
-  //   }
-  //   await materiaisService.getAll(parametersFilter).then((response) => {
-  //     if (response.status === 200) {
-  //       setMateriais(response.response);
-  //     }
-  //   });
-  // }
+  async function handlePagination(): Promise<void> {
+    const skip = currentPage * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
+    if (filter) {
+      parametersFilter = `${parametersFilter}&${filter}`;
+    }
+    // await materiaisService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setMateriais(response.response);
+    //   }
+    // });
+  }
+
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
   function fieldsFactory(name: string, title: string, values: any) {
     return (
@@ -620,11 +627,11 @@ export default function AtualizarLocal({
         "
         >
 
-          {/* <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+          {<div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={materiais}
+              data={treatments}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -652,7 +659,7 @@ export default function AtualizarLocal({
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
-                      {itemsTotal}
+                      {treatments.length}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -664,8 +671,8 @@ export default function AtualizarLocal({
                                 {
                                   (provided) => (
                                     <ul className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                     ref={provided.innerRef}>
+                                      {...provided.droppableProps}
+                                      ref={provided.innerRef}>
                                       <div className="h-8 mb-3">
                                         <Button
                                           value="Atualizar"
@@ -712,10 +719,10 @@ export default function AtualizarLocal({
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button title="Exportar planilha de materiais"
-                        icon={<RiFileExcel2Line size={20} />}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => { downloadExcel(); }} />
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -775,7 +782,7 @@ export default function AtualizarLocal({
                 ) as any,
               }}
             />
-          </div> */}
+          </div>}
         </main>
       </Content>
     </>

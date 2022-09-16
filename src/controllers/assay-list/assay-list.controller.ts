@@ -1,6 +1,7 @@
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListRepository } from '../../repository/assay-list.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 
@@ -8,6 +9,8 @@ export class AssayListController {
   assayListRepository = new AssayListRepository();
 
   genotypeTreatmentController = new GenotypeTreatmentController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -61,9 +64,9 @@ export class AssayListController {
         id: true,
         id_safra: true,
         protocol_name: true,
-        foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
+        safra: { select: { safraName: true } },
         genotype_treatment: true,
         treatmentsNumber: true,
         gli: true,
@@ -73,6 +76,7 @@ export class AssayListController {
         comments: true,
         experiment: true,
         period: true,
+        foco: { select: { name: true } },
       };
 
       if (options.id_safra) {
@@ -137,7 +141,6 @@ export class AssayListController {
       if (assayListAlreadyExist) return { status: 400, message: 'Lista de ensaio já cadastrados' };
 
       const response = await this.assayListRepository.create(data);
-
       return { status: 200, response, message: 'Lista de ensaio cadastrada' };
     } catch (error: any) {
       handleError('Lista de ensaio controller', 'Create', error.message);
@@ -147,11 +150,38 @@ export class AssayListController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const assayList: any = await this.assayListRepository.findById(data.id);
 
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
 
       const response = await this.assayListRepository.update(Number(data.id), data);
+      await this.reporteRepository.create({
+        madeBy: response.created_by, madeIn: newData, module: 'Ensaio', operation: 'Edição', name: response.protocol_name, ip: JSON.stringify(ip), idOperation: response.id,
+      });
 
       return { status: 200, response, message: 'Lista de ensaio atualizado' };
     } catch (error: any) {
@@ -163,7 +193,6 @@ export class AssayListController {
   async delete(id: number) {
     try {
       const { status: statusAssay, response } = await this.getOne(Number(id));
-
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 

@@ -188,6 +188,7 @@ export default function Listagem({
       filterBgm: '',
       filterTreatmentsNumber: '',
       filterStatus: '',
+      filterCodTec: '',
       filterStatusAssay: '',
       filterGenotypeName: '',
       filterNca: '',
@@ -197,6 +198,7 @@ export default function Listagem({
       filterBgmFrom: '',
       filterNtTo: '',
       filterNtFrom: '',
+      filterStatusT: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -212,6 +214,8 @@ export default function Listagem({
       filterBgmFrom,
       filterNtTo,
       filterNtFrom,
+      filterStatusT,
+      filterCodTec,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
@@ -224,7 +228,7 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
@@ -280,7 +284,7 @@ export default function Listagem({
     }
   }
 
-  function headerTableFactory(name: string, title: string) {
+  function headerTableFactory(name: string, title: string, style: boolean = false) {
     return {
       title: (
         <div className="flex items-center">
@@ -295,6 +299,7 @@ export default function Listagem({
       ),
       field: title,
       sorting: true,
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -361,11 +366,11 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
       }
     });
     return tableFields;
@@ -435,16 +440,17 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
-            newItem.nt = item.treatments_number;
-            newItem.status_t = item.status;
-            newItem.status_ensaio = item.assay_list.status;
-            newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.assay_list.foco.name;
+            newItem.ENSAIO = item.assay_list.type_assay.name;
+            newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
+            newItem.GLI = item.assay_list.gli;
+            newItem.BGM = item.assay_list.bgm;
+            newItem.NT = item.treatments_number;
+            newItem.STATUS_T = item.status;
+            newItem.STATUS_ENSAIO = item.assay_list.status;
+            newItem.GENOTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item?.lote?.ncc;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -475,15 +481,15 @@ export default function Listagem({
           const newData = response.map((item: any) => {
             const newItem: any = {};
             newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
+            newItem.foco = item.assay_list?.foco.name;
+            newItem.ensaio = item.assay_list?.type_assay.name;
+            newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
+            newItem.gli = item.assay_list?.gli;
+            newItem.bgm = item.assay_list?.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
+            newItem.nca = item.lote?.ncc;
             newItem.novo_genotipo = '';
             newItem.novo_status = '';
             newItem.novo_nca = '';
@@ -531,9 +537,12 @@ export default function Listagem({
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
-      .then(({ status, response }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setTreatments(response);
+          setTotalItems(total);
+          setAfterFilter(true);
+          setCurrentPage(0);
         }
       });
   }
@@ -579,22 +588,31 @@ export default function Listagem({
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
+
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.genotipo.name_genotipo }
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
+        }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
+      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
@@ -764,6 +782,22 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cód. Tecnologia
+                    </label>
+                    <div className="flex">
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Cód. Tecnologia"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                   {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -828,7 +862,22 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  {filterFieldFactory('filterStatus', 'Status T')}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status T
+                    </label>
+                    <div className="flex">
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Status T"
+                        id="filterStatusT"
+                        name="filterStatusT"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  {/* {filterFieldFactory('filterStatus', 'Status T')} */}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1140,6 +1189,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -1185,7 +1235,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   ).then((response) => response.json());
 
   const { response: allAssay } = await fetch(
-    urlParametersAssay.toString(),
+    `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
     requestOptions,
   ).then((response) => response.json());
 

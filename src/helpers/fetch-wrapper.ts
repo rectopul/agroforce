@@ -84,7 +84,12 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
     filter = filter;
   }
 
-  if (localStorage.getItem('pageBeforeEdit') != null) {
+  // if(localStorage.getItem('orderSorting')){
+  //   filter = localStorage.getItem('orderSorting');
+  //   console.log("orderSorting ",filter)
+  // }
+
+  if (localStorage.getItem('pageBeforeEdit')) {
     currentPages = Number(localStorage.getItem('pageBeforeEdit'));
   } else {
     currentPages = currentPages;
@@ -100,6 +105,16 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
   return { parametersFilter, currentPages };
 }
 
+// function skip(currentPages : any, parametersFilter: any){
+//   const skip = currentPages * Number(take);
+//   let parametersFilter = `skip=${skip}&take=${take}`;
+
+//   if (filter) {
+//     parametersFilter = `${parametersFilter}&${filter}`;
+//   }
+
+//   return { parametersFilter, currentPages };
+// }
 // async function RemoveExtraCultureId(parametersFilter){
 
 //   const myArray = await parametersFilter.split("&id_culture");
@@ -133,13 +148,12 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-   
     case 'safra':
       parametersFilter = await safra(theArgs);
       break;
 
     case 'genotipo':
-      parametersFilter = await genotipo(theArgs);  
+      parametersFilter = await genotipo(theArgs);
       break;
 
     case 'lote':
@@ -158,6 +172,14 @@ async function handleFilterParameter(...theArgs: any) {
       parametersFilter = await cultura(theArgs);
       break;
 
+    case 'experimento':
+      parametersFilter = await experimento(theArgs);
+      break;
+
+    case 'parcelas':
+      parametersFilter = await parcelas(theArgs);
+      break;
+
     default:
       parametersFilter = '';
   }
@@ -166,7 +188,7 @@ async function handleFilterParameter(...theArgs: any) {
 }
 
 function safra(theArgs: any) {
-  const [key1, filterStatus, filterSafra, filterYear, filterStartDate, filterEndDate, cultureId] = theArgs;
+  const [key1, filterStatus,cultureId, filterSafra, filterYear, filterStartDate, filterEndDate] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
 
   return parametersFilter;
@@ -183,22 +205,25 @@ function genotipo(theArgs: any) {
 }
 
 function lote(theArgs: any) {
-  const [key3, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1] = theArgs;
-
-  const parametersFilter = `&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}`;
+  const [key3, filterGmrFrom, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1, filterGmrTo] = theArgs;
+  const parametersFilter = `&filterGmrFrom=${filterGmrFrom}&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}&filterGmrTo=${filterGmrTo}`;
 
   return parametersFilter;
 }
 
 function setor(theArgs: any) {
-  const [key4, filterStatus2, filterSearch] = theArgs;
+  const [key4,
+    filterStatus2,
+    filterSearch] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus2 || 1}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
 
 function usuarios(theArgs: any) {
-  const [key, filterStatus, filterName, filterLogin] = theArgs;
+  const [key,
+    filterStatus,
+    filterName, filterLogin] = theArgs;
   const parametersFilter = `filterStatus=${filterStatus || 1
   }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
@@ -212,8 +237,49 @@ function cultura(theArgs: any) {
   return parametersFilter;
 }
 
+// experimento in list
+function experimento(theArgs: any) {
+  const [key, filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod, filterDelineamento, filterRepetition, filterStatus, idSafra] = theArgs;
+
+  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
+
+  return parametersFilter;
+}
+
+function parcelas(theArgs: any) {
+  const [
+    key,
+    filterFoco,
+    filterTypeAssay,
+    filterNameTec,
+    filterCodTec,
+    filterGli,
+    filterExperimentName,
+    filterLocal,
+    filterRepetitionFrom,
+    filterRepetitionTo,
+    filterStatus,
+    filterNtFrom,
+    filterNtTo,
+    filterNpeFrom,
+    filterNpeTo,
+    filterGenotypeName,
+    filterNca,
+    idSafra,
+  ] = theArgs;
+
+  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterCodTec=${filterCodTec}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterLocal=${filterLocal}&filterRepetitionFrom=${filterRepetitionFrom}&filterRepetitionTo=${filterRepetitionTo}&filterNtFrom=${filterNtFrom}&filterNtTo=${filterNtTo}&filterNpeFrom=${filterNpeFrom}&filterNpeTo=${filterNpeTo}&idSafra=${idSafra}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&filterStatus=${filterStatus}`;
+
+  return parametersFilter;
+}
+
 // Handle orders global
-function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
+function handleOrderGlobal(
+  column: any,
+  order: any,
+  filter: any,
+  from: any,
+) {
   let typeOrder: any;
   let parametersFilter: any;
   if (order === 1) {
@@ -239,12 +305,26 @@ function handleOrderGlobal(column: any, order: any, filter: any, from: any) {
   if (from == 'safra' || from == 'setor') {
     // Remove extra values here
     parametersFilter = removeExtraValues(parametersFilter, from, '&orderBy');
-    return parametersFilter;
+    // parametersFilter;
   }
   if (from == 'genotipo') {
     // Remove extra values here
     parametersFilter = removeExtraValues(parametersFilter, from, '&id_culture');
-    return parametersFilter;
+    // return parametersFilter;
+  }
+
+  // return skip(currentPages , parametersFilter);
+
+  return parametersFilter;
+}
+
+function skip(currentPages : any, filter: any) {
+  const take = 10;
+  const skip = currentPages * Number(take);
+  let parametersFilter = `skip=${skip}&take=${take}`;
+
+  if (filter) {
+    parametersFilter = `${parametersFilter}&${filter}`;
   }
 
   return parametersFilter;
@@ -286,4 +366,5 @@ export const fetchWrapper = {
   handleFilterParameter,
   handleOrderGlobal,
   getValueParams,
+  skip,
 };

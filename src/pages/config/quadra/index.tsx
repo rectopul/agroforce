@@ -161,9 +161,14 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({
-      filterStatus, filterSearch, filterSchema, filterPTo, filterPFrom,
+      filterStatus,
+      filterSearch,
+      filterSchema,
+      filterPTo,
+      filterPFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
       }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
@@ -179,7 +184,8 @@ export default function Listagem({
   });
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${data.cod_quadra
+    const parametersFilter = `filterStatus=${1}&cod_quadra=${
+      data.cod_quadra
     }&local_preparo=${data.local.name_local_culture}`;
     if (data.status === 0) {
       data.status = 1;
@@ -472,7 +478,29 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          row.local = row.local?.name_local_culture;
+
+          row.COD_QUADRA = row.cod_quadra;
+          row.LOCAL = row.local?.name_local_culture;
+          row.ESQUEMA = row.esquema;
+          row.LARG_Q = row.larg_q;
+          row.COMP_P = row.comp_p;
+          row.LINHA_P = row.linha_p;
+          row.COMP_C = row.comp_c;
+          row.TIRO_FIXO = row.tiro_fixo;
+          row.DISPARO_FIXO = row.disparo_fixo;
+          row.STATUS = row.status;
+
+          delete row.cod_quadra;
+          delete row.local;
+          delete row.esquema;
+          delete row.larg_q;
+          delete row.comp_p;
+          delete row.linha_p;
+          delete row.q;
+          delete row.comp_c;
+          delete row.tiro_fixo;
+          delete row.disparo_fixo;
+          delete row.status;
           delete row.id;
           delete row.safra;
           delete row.tableData;
@@ -640,7 +668,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -648,7 +676,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -694,6 +721,8 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
+
+                    <div />
 
                     <strong className="text-blue-600">
                       Total registrado:
@@ -775,7 +804,7 @@ export default function Listagem({
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { }}
+                          onClick={() => {}}
                           href="quadra/importar-planilha/config-planilha"
                         />
                       </div>
@@ -834,7 +863,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -844,7 +873,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()

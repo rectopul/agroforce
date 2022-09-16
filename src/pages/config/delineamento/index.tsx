@@ -188,7 +188,7 @@ export default function Listagem({
       filterTratRepetitionFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}`;
+      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await delineamentoService
@@ -536,6 +536,16 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+
+          row.NOME = row?.name;
+          row.REPETIÇÃO = row?.repeticao;
+          row.TRAT_REPETIÇÃO = row?.trat_repeticao;
+          row.STATUS = row?.status;
+
+          delete row.name;
+          delete row.repeticao;
+          delete row.trat_repeticao;
+          delete row.status;
           delete row.id;
           delete row.tableData;
 
@@ -757,6 +767,7 @@ export default function Listagem({
                       />
                     </div> */}
 
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

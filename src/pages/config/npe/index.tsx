@@ -16,7 +16,9 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -26,7 +28,7 @@ import * as XLSX from 'xlsx';
 import { removeCookies } from 'cookies-next';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../services';
+import { experimentService, npeService, userPreferencesService } from '../../../services';
 import {
   AccordionFilter,
   Button,
@@ -50,6 +52,7 @@ interface INpeProps {
   prox_npe: number;
   status?: number;
   created_by: number;
+  edited?: number;
 }
 
 interface IFilter {
@@ -143,7 +146,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
+      title: 'Lugar de cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -164,6 +167,12 @@ export default function Listagem({
       title: 'Grupo ',
       value: 'group',
       defaultChecked: () => camposGerenciados.includes('group'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Prox NPE ',
+      value: 'prox_npe',
+      defaultChecked: () => camposGerenciados.includes('prox_npe'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -279,24 +288,36 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
+      title: 'Ação',
       field: 'status',
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: INpeProps) => (rowData.status ? (
         <div className="h-7 flex">
-          <div className="h-7" />
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              bgColor={rowData.edited == 1 ? 'bg-blue-900' : 'bg-blue-600'}
+              textColor="white"
+              title="Editar"
+              onClick={() => {
+                router.push(`/config/npe/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+          <div style={{ width: 5 }} />
           <div>
             <Button
-              title="Ativo"
+              title={rowData.status == 3 ? '' : 'Ativo'}
               icon={<FaRegThumbsUp size={14} />}
               onClick={() => handleStatus(rowData.id, {
                 status: rowData.status,
                 ...rowData,
               })}
-              bgColor="bg-green-600"
+              bgColor={rowData.status == 3 ? 'bg-gray-400' : 'bg-green-600'}
               textColor="white"
+              disabled={rowData.status == 3}
             />
           </div>
         </div>
@@ -305,14 +326,15 @@ export default function Listagem({
           <div className="h-7" />
           <div>
             <Button
-              title="Inativo"
+              title={rowData.status == 3 ? '' : 'Inativo'}
               icon={<FaRegThumbsDown size={14} />}
               onClick={async () => handleStatus(rowData.id, {
                 status: rowData.status,
                 ...rowData,
               })}
-              bgColor="bg-red-800"
+              bgColor={rowData.status == 3 ? 'bg-gray-400' : 'bg-green-600'}
               textColor="white"
+              disabled={rowData.status == 3}
             />
           </div>
         </div>
@@ -329,7 +351,7 @@ export default function Listagem({
       // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Local', 'local.name_local_culture'),
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -349,6 +371,9 @@ export default function Listagem({
       }
       if (columnCampos[item] === 'group') {
         tableFields.push(headerTableFactory('Grupo', 'group.group'));
+      }
+      if (columnCampos[item] === 'prox_npe') {
+        tableFields.push(headerTableFactory('Prox NPE', 'prox_npe'));
       }
       if (columnCampos[item] === 'npei') {
         tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
@@ -511,12 +536,32 @@ export default function Listagem({
             } else {
               row.status = 'Ativo';
             }
-            row.safra = row.safra?.safraName;
-            row.foco = row.foco?.name;
-            row.type_assay = row.type_assay?.name;
-            row.tecnologia = row.tecnologia?.name;
-            row.local = row.local?.name_local_culture;
 
+            row.LOCAL = row.local?.name_local_culture;
+            row.SAFRA = row.safra?.safraName;
+            row.FOCO = row.foco?.name;
+            row.ÉPOCA = row?.epoca;
+            row.TECNOLOGIA = row.tecnologia?.name;
+            row.TIPO_ENSAIO = row.type_assay?.name;
+            row.GRUPO = row.group.group;
+            row.NPEI = row.npei;
+            row.STATUS = row.status;
+            row.QUANT_NPE = row?.npeQT;
+            row.PROX_NPE = row?.nextNPE;
+
+            delete row.local;
+            delete row.safra;
+            delete row.foco;
+            delete row.epoca;
+            delete row.tecnologia;
+            delete row.type_assay;
+            delete row.group;
+            delete row.npei;
+            delete row.status;
+            delete row.nextNPE;
+            delete row.npeQT;
+            delete row.localId;
+            delete row.safraId;
             delete row.npef;
             delete row.id;
             return row;
@@ -540,7 +585,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'NPE.xlsx');
       } else {
-        Swal.fire('Erro ao exportar');
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
   };
@@ -633,7 +678,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -725,6 +770,7 @@ export default function Listagem({
                       />
                     </div> */}
 
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

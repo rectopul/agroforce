@@ -4,6 +4,7 @@ import handleError from '../shared/utils/handleError';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
 import { UserPermissionController } from './user-permission.controller';
+import { ReporteRepository } from '../repository/reporte.repository';
 
 export class UserController {
   userRepository = new UserRepository();
@@ -13,6 +14,8 @@ export class UserController {
   userCultureController = new UserCultureController();
 
   userPermissionsController = new UserPermissionController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -42,13 +45,13 @@ export class UserController {
       } else {
         select = {
           id: true,
+          login: true,
           name: true,
           tel: true,
-          login: true,
+          status: true,
           cpf: true,
           email: true,
           avatar: true,
-          status: true,
         };
       }
 
@@ -135,6 +138,31 @@ export class UserController {
 
   async create(data: object | any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      // data
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const parameters: any = {};
       if (data !== null && data !== undefined) {
         data.password = functionsUtils.Crypto(data.password, 'cipher');
@@ -201,6 +229,10 @@ export class UserController {
               { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
             );
           }
+          console.log(response);
+          await this.reporteRepository.create({
+            madeBy: data.created_by, madeIn: newData, module: 'Usuários', operation: 'Cadastro', name: data.name, idOperation: response.id, ip: JSON.stringify(ip),
+          });
           return { status: 200, message: 'users inseridos' };
         }
         return { status: 400, message: 'houve um erro, tente novamente' };
@@ -273,6 +305,31 @@ export class UserController {
 
   async update(data: object | any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      // data
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       if (data !== null && data !== undefined) {
         const parameters: object | any = {};
 
@@ -336,6 +393,17 @@ export class UserController {
                   created_by: Number(data.created_by),
                 });
               });
+            });
+          }
+
+          if (data.status === 1) {
+            await this.reporteRepository.create({
+              madeBy: data.created_by, madeIn: newData, module: 'Usuários', operation: 'Edição', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
+            });
+          }
+          if (data.status === 0) {
+            await this.reporteRepository.create({
+              madeBy: data.created_by, madeIn: newData, module: 'Usuários', operation: 'Inativação', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
             });
           }
           return { status: 200, message: { message: 'Usuário atualizada' } };

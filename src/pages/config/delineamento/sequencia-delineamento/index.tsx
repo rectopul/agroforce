@@ -433,9 +433,22 @@ export default function Listagem({
             } else {
               row.status = 'Ativo' as any;
             }
-            row.delineamento = row.delineamento?.name;
+            console.log(row);
+            row.NOME = row.delineamento?.name;
+            row.REPETICAO = row.repeticao;
+            row.SORTEIO = row.sorteio;
+            row.NT = row.nt;
+            row.BLOCO = row.bloco;
+            row.STATUS = row.status;
+
+            delete row.nt;
+            delete row.bloco;
+            delete row.status;
+            delete row.sorteio;
+            delete row.repeticao;
             delete row.id;
             delete row.id_delineamento;
+            delete row.delineamento;
 
             return row;
           });

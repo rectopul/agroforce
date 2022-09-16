@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
@@ -24,11 +25,18 @@ export class ImportLocalController {
     const logImportController = new LogImportController();
     const unidadeCulturaController = new UnidadeCulturaController();
 
-    const responseIfError: any = [];
+    const localTemp: Array<string> = [];
+    const responseIfError: Array<string> = [];
     try {
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
+        if (localTemp.includes(spreadSheet[row][2])) {
+          await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+          localTemp[row] = spreadSheet[row][2];
+          return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
+        }
+        localTemp[row] = spreadSheet[row][2];
         for (const column in spreadSheet[row]) {
           if (row === '0') {
             if (!(spreadSheet[row][column].toUpperCase())
@@ -91,13 +99,15 @@ export class ImportLocalController {
               }: IReturnObject = await unidadeCulturaController.getAll({
                 name_unity_culture: spreadSheet[row][column],
               });
-              if (unityExist[0]?.id_local !== response[0]?.id) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
-                );
+              if (unityExist.length > 0) {
+                if (unityExist[0]?.id_local !== response[0]?.id) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
+                  );
+                }
               }
             }
           } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {

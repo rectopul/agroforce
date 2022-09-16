@@ -68,14 +68,14 @@ interface Idata {
 }
 
 export default function Listagem({
-      allItems,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idCulture,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allItems,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
@@ -344,8 +344,6 @@ export default function Listagem({
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            delete row.id;
-            delete row.dt_import;
             const dataExp = new Date();
             let hours: string;
             let minutes: string;
@@ -368,6 +366,19 @@ export default function Listagem({
             row.DT = `${dataExp.toLocaleDateString(
               'pt-BR',
             )} ${hours}:${minutes}:${seconds}`;
+
+            row.NOME = row.name;
+            row.DESC = row.desc;
+            row.COD_TEC = row.cod_tec;
+            row.DATA = row.DT;
+
+            delete row.id;
+            delete row.dt_import;
+            delete row.name;
+            delete row.desc;
+            delete row.cod_tec;
+            delete row.DT;
+
             return row;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);

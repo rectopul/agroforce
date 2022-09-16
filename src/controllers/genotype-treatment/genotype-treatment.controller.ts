@@ -19,11 +19,11 @@ export class GenotypeTreatmentController {
       }
       if (options.filterBgmFrom || options.filterBgmTo) {
         if (options.filterBgmFrom && options.filterBgmTo) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} } } }`));
         } else if (options.filterBgmFrom) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} } } }`));
         } else if (options.filterBgmTo) {
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"lte": ${Number(options.filterBgmTo)} } } }`));
         }
       }
       if (options.filterNtFrom || options.filterNtTo) {
@@ -36,6 +36,9 @@ export class GenotypeTreatmentController {
         }
       }
 
+      if (options.filterStatusT) {
+        parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
+      }
       if (options.filterNca) {
         parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
       }
@@ -57,6 +60,9 @@ export class GenotypeTreatmentController {
       if (options.filterTechnology) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTechnology}" } } } }`));
       }
+      if (options.filterCodTec) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
+      }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
       }
@@ -71,6 +77,8 @@ export class GenotypeTreatmentController {
       }
       const select = {
         id: true,
+        id_lote: true,
+        id_genotipo: true,
         safra: { select: { safraName: true } },
         genotipo: {
           select: {

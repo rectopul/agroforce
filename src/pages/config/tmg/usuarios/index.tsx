@@ -28,6 +28,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from 'cookies-next';
+import { fetchWrapper } from 'src/helpers';
 import { userPreferencesService, userService } from '../../../../services';
 import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
@@ -40,7 +41,6 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import {fetchWrapper} from "src/helpers";
 
 interface IUsers {
   id: number;
@@ -165,16 +165,12 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
-
-      // const parametersFilter = `filterStatus=${filterStatus || 1
-      //   }&filterName=${filterName}&filterLogin=${filterLogin}`;
-
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("usuarios",filterStatus, filterName, filterLogin );
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('usuarios', filterStatus || 1, filterName, filterLogin);
 
       setFiltersParams(parametersFilter);
-      setCookies("filterBeforeEdit", filtersParams);
-      
+      setCookies('filterBeforeEdit', filtersParams);
+
       await userService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -282,9 +278,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filtersParams);
-                  localStorage.setItem("filterValueEdit", filtersParams);
-                  localStorage.setItem("pageBeforeEdit", currentPage?.toString());
-                router.push(                    `/config/tmg/usuarios/atualizar?id=${rowData.id}`);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -382,12 +378,13 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-   
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"safra");
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
+
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await userService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setUsers(response.response);
@@ -467,7 +464,7 @@ export default function Listagem({
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await userService.getAll(filterApplication).then((response) => {
+    await userService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         /* const newData = users.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
@@ -481,15 +478,26 @@ export default function Listagem({
 
         const dataExcel: any = response.response;
         dataExcel.forEach((line: any) => {
-          delete line.avatar;
-          delete line.id;
-          delete line.email;
-
           if (line.status === 0) {
             line.status = 'Inativo';
           } else {
             line.status = 'Ativo';
           }
+
+          line.LOGIN = line.login;
+          line.NOME = line.name;
+          line.TEL = line.tel;
+          line.STATUS = line.status;
+          line.CPF = line.cpf;
+
+          delete line.avatar;
+          delete line.id;
+          delete line.email;
+          delete line.name;
+          delete line.tel;
+          delete line.login;
+          delete line.cpf;
+          delete line.status;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(dataExcel);
@@ -515,39 +523,37 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } 
+    }
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
     // }
   }
 
   async function handlePagination(): Promise<void> {
-   
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);  
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
     await userService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setUsers(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 7000); //Remove State   
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 7000); // Remove State
       }
     });
   }
 
-    //remove states
-  function removestate(){
-      localStorage.removeItem("filterValueEdit");  
-      localStorage.removeItem("pageBeforeEdit");    
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
   }
 
-  //Checkingdefualt values
-   function checkValue(value : any){
+  // Checkingdefualt values
+  function checkValue(value : any) {
     const parameter = fetchWrapper.getValueParams(value);
     return parameter;
   }
-
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -803,7 +809,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

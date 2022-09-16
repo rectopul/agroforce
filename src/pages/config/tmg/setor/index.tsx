@@ -32,13 +32,12 @@ import {
   Content,
   Input,
   Select,
-} from "src/components";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { departmentService, userPreferencesService } from "src/services";
-import * as XLSX from "xlsx";
-import ITabs from "../../../../shared/utils/dropdown";
-import {fetchWrapper} from "src/helpers";
-
+} from 'src/components';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { departmentService, userPreferencesService } from 'src/services';
+import * as XLSX from 'xlsx';
+import { fetchWrapper } from 'src/helpers';
+import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterStatus: object | any;
@@ -131,13 +130,12 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-   
-      // Call filter with there parameter   
-      const parametersFilter = await fetchWrapper.handleFilterParameter("setor",filterStatus, filterSearch );
+      // Call filter with there parameter
+      const parametersFilter = await fetchWrapper.handleFilterParameter('setor', filterStatus || 1, filterSearch);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
-      setCookies("filterBeforeEdit", filtersParams);
-      
+      setCookies('filterBeforeEdit', filtersParams);
+
       await departmentService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -244,10 +242,10 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filtersParams);
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filtersParams);
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
               }}
             />
@@ -307,12 +305,13 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
- 
-    //Manage orders of colunms 
-    let parametersFilter = await fetchWrapper.handleOrderGlobal(column,order,filter,"setor");
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'setor');
+
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
     await departmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setItems(response.response);
@@ -393,7 +392,7 @@ export default function Listagem({
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await departmentService.getAll(filterApplication).then((response) => {
+    await departmentService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
@@ -401,7 +400,11 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+          row.NOME = row.name;
+          row.STATUS = row.status;
 
+          delete row.name;
+          delete row.status;
           delete row.id;
           delete row.tableData;
 
@@ -438,31 +441,30 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
+    // manage using comman function
+    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    //manage using comman function
-    const {parametersFilter, currentPages} = await fetchWrapper.handlePaginationGlobal(currentPage,take,filtersParams);
-   
     await departmentService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
         setItems(response.response);
-        setTotalItems(response.total); //Set new total records
-        setCurrentPage(currentPages); //Set new current page
-        setTimeout(removestate, 5000); //Remove State     
+        setTotalItems(response.total); // Set new total records
+        setCurrentPage(currentPages); // Set new current page
+        setTimeout(removestate, 5000); // Remove State
       }
     });
   }
 
-  //remove states
- function removestate(){
-    localStorage.removeItem("filterValueEdit");  
-    localStorage.removeItem("pageBeforeEdit");    
- }
+  // remove states
+  function removestate() {
+    localStorage.removeItem('filterValueEdit');
+    localStorage.removeItem('pageBeforeEdit');
+  }
 
-//Checkingdefualt values
- function checkValue(value : any){
-  const parameter = fetchWrapper.getValueParams(value);
-  return parameter;
-}
+  // Checkingdefualt values
+  function checkValue(value : any) {
+    const parameter = fetchWrapper.getValueParams(value);
+    return parameter;
+  }
 
   useEffect(() => {
     handlePagination();
@@ -520,7 +522,7 @@ export default function Listagem({
                       type="text"
                       placeholder="setor"
                       max="40"
-                      defaultValue={checkValue("filterSearch")}
+                      defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -708,7 +710,7 @@ export default function Listagem({
                     />
                     <Button
 
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

@@ -23,6 +23,7 @@ import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
+import foco from 'src/pages/api/foco';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../../services';
@@ -78,7 +79,7 @@ export default function TipoEnsaio({
       name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nome da tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'treatmentsNumber', defaultChecked: () => camposGerenciados.includes('treatmentsNumber'),
@@ -437,10 +438,31 @@ export default function TipoEnsaio({
         response.map((item: any) => {
           const newItem = item;
 
-          newItem.foco = newItem.foco?.name;
-          newItem.type_assay = newItem.type_assay?.name;
-          newItem.tecnologia = newItem.tecnologia?.name;
+          newItem.SAFRA = newItem.safra?.safraName;
+          newItem.PROTOCOLO = newItem?.protocol_name;
+          newItem.FOCO = newItem.foco?.name;
+          newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
+          newItem.TECNOLOGIA = newItem.tecnologia?.name;
+          newItem.GLI = newItem?.gli;
+          newItem.BGM = newItem?.bgm;
+          newItem.STATUS = newItem?.status;
+          newItem.PROJETO = newItem?.project;
+          newItem.OBSERVAÇÕES = newItem?.comments;
+          newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
 
+          delete newItem.safra;
+          delete newItem.treatmentsNumber;
+          delete newItem.project;
+          delete newItem.status;
+          delete newItem.bgm;
+          delete newItem.gli;
+          delete newItem.tecnologia;
+          delete newItem.foco;
+          delete newItem.protocol_name;
+          delete newItem.countNT;
+          delete newItem.period;
+          delete newItem.comments;
+          delete newItem.type_assay;
           delete newItem.id;
           delete newItem.id_safra;
           delete newItem.experiment;
@@ -463,7 +485,7 @@ export default function TipoEnsaio({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
+        XLSX.writeFile(workBook, 'Ensaio.xlsx');
       }
     });
   };
@@ -561,8 +583,8 @@ export default function TipoEnsaio({
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterTechnology', 'Tecnologia')}
                   {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nº de trat.

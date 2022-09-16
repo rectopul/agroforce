@@ -26,12 +26,14 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { userPreferencesService } from '../../../../services';
+import { npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
+import LoadingComponent from '../../../../components/Loading';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -95,8 +97,6 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
   itensPerPage,
   filterApplication,
   idSafra,
@@ -113,12 +113,15 @@ export default function Listagem({
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-  const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperiments);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+
+  const [experimentos, setExperimento] = useState<IExperimento[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit || 0));
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
+  const [itemsTotal, setTotalItems] = useState<number | any>(0);
+
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [SortearDisable, setSortearDisable] = useState<boolean>(false);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -137,6 +140,8 @@ export default function Listagem({
 
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
@@ -479,17 +484,21 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+    console.log({ currentPage });
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-      if (status === 200) {
-        setExperimento(response);
+    if (currentPage > 0) {
+      const skip = currentPage * Number(take);
+      let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+
+      if (filter) {
+        parametersFilter = `${parametersFilter}&${filter}`;
       }
-    });
+      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+        if (status === 200) {
+          setExperimento(response);
+        }
+      });
+    }
   }
 
   useEffect(() => {
@@ -524,7 +533,7 @@ export default function Listagem({
     { title: 'Epoca', field: 'epoca' },
     { title: 'NPE Inicial', field: 'npei' },
     { title: 'NPE Final', field: 'npef' },
-    { title: 'NPE Quantity', field: 'consumedQT' },
+    { title: 'NPE Quantity', field: 'npeQT' },
   ];
 
   const handleNPERowSelection = (rowData: any) => {
@@ -537,7 +546,9 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}`;
+      setLoading(true);
+
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
@@ -548,38 +559,94 @@ export default function Listagem({
           let i = NPESelectedRow.npei;
           response.map((item: any) => {
             item.npei = i;
-            item.npef = i + item.npeQT;
+            item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
           selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
           setExperimento(response);
         }
       });
+
+      setLoading(false);
+    }
+  }
+
+  async function createExperimentGenotipe({ data, total_consumed }: any) {
+    const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
+    const experimentObj: any[] = [];
+    experimentos.map((item: any) => {
+      const data: any = {};
+      data.id = Number(item.id);
+      data.status = 'SORTEADO';
+      experimentObj.push(data);
+    });
+    if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE) {
+      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+        if (status === 200) {
+          experimentObj.map(async (x: any) => {
+            await experimentService.update(x).then(({ status, response }: any) => {
+            });
+          });
+
+          await npeService.update({
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+          }).then(({ status, resposne }: any) => {
+            if (status === 200) {
+              router.push('/operacao/ambiente');
+            }
+          });
+        }
+      });
     }
   }
 
   function validateConsumedData() {
-    let totalConsumed = 0;
-    let lastNPE = 0;
-    const nextNPE = NPESelectedRow?.nextNPE;
-    experimentos.map((item) => {
-      totalConsumed += item.npeQT;
-      lastNPE = item?.npef;
+    const experiment_genotipo: any[] = [];
+    let npei = Number(NPESelectedRow?.npei);
+    let total_consumed = 0;
+
+    experimentos?.map((item: any) => {
+      total_consumed += item.npeQT;
+      item.assay_list.genotype_treatment.map((gt: any) => {
+        const data: any = {};
+        data.idSafra = gt.id_safra;
+        data.idFoco = item.assay_list.foco.id;
+        data.idTypeAssay = item.assay_list.type_assay.id;
+        data.idTecnologia = item.assay_list.tecnologia.id;
+        data.gli = item.assay_list.gli;
+        data.idExperiment = item.id;
+        data.rep = item.delineamento.repeticao;
+        data.nt = gt.treatments_number;
+        data.npe = npei;
+        // data.name_genotipo = gt.genotipo.name_genotipo;
+        data.idGenotipo = gt.genotipo.id; // Added new field
+        data.nca = '';
+        experiment_genotipo.push(data);
+        npei++;
+      });
     });
-    let test = `To be Consumed - ${NPESelectedRow?.consumedQT}\nTotal Consumned - ${totalConsumed}\n`;
-    test += `Last NPE - ${lastNPE}\n Next NPE - ${nextNPE}`;
-    alert(test);
+    createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
   }
 
   useEffect(() => {
     getExperiments();
   }, [NPESelectedRow]);
 
+  useEffect(() => {
+    let count = 0;
+    experimentos?.map((item: any) => {
+      item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
+    });
+    count > 0 ? setSortearDisable(true) : setSortearDisable(false);
+  }, [experimentos]);
+
   return (
     <>
       <Head><title>Listagem de experimentos</title></Head>
 
-      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
+      {loading && <LoadingComponent />}
+
+      <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
         <main className="h-full w-full
                         flex flex-col
                         items-start
@@ -631,7 +698,11 @@ export default function Listagem({
                     headerStyle: {
                       zIndex: 20,
                     },
-                    rowStyle: { background: '#f9fafb', height: 35 },
+                    rowStyle: (rowData) => ({
+                      backgroundColor:
+                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                      height: 40,
+                    }),
                     search: false,
                     filtering: false,
                     pageSize: itensPerPage,
@@ -669,7 +740,7 @@ export default function Listagem({
                         <strong className="text-blue-600">
                           Total registrado:
                           {' '}
-                          {itemsTotal}
+                          {experimentos?.length}
                         </strong>
 
                         <div className="h-full flex items-center gap-2">
@@ -729,8 +800,9 @@ export default function Listagem({
                             <Button
                               title="Sortear"
                               value="Sortear"
-                              bgColor="bg-blue-600"
+                              bgColor={SortearDisable ? 'bg-gray-400' : 'bg-blue-600'}
                               textColor="white"
+                              disabled={SortearDisable}
                               onClick={validateConsumedData}
                             />
                           </div>
@@ -805,7 +877,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   // eslint-disable-next-line max-len
   const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
 
-  const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
@@ -814,25 +885,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
-
-  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
-
-  const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(param).toString();
-  const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Authorization: `Bearer ${token}` },
-  } as RequestInit | undefined;
-
-  const { response: allExperiments, total: totalItems } = await fetch(`${baseUrl}?idSafra=${idSafra}`, requestOptions).then((response) => response.json());
-
   return {
     props: {
-      allExperiments,
-      totalItems,
       itensPerPage,
       filterApplication,
       idSafra,

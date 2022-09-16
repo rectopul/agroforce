@@ -147,7 +147,9 @@ export default function NovoUsuario({
         || !values.password
         || !values.confirmPassword
       ) {
-        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        Swal.fire(
+          'Preencha todos os campos obrigatórios destacados em vermelho.',
+        );
         return;
       }
       if (values.password !== values.confirmPassword) {
@@ -324,7 +326,7 @@ export default function NovoUsuario({
                 *Setor
               </label>
               <Select
-                values={departments}
+                values={[{ id: null, name: 'Selecione...' }, ...departments]}
                 id="departmentId"
                 name="departmentId"
                 onChange={formik.handleChange}

@@ -1,0 +1,208 @@
+import handleError from '../../shared/utils/handleError';
+import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { ExperimentGroupRepository } from '../../repository/experiment-group.repository';
+import { IExperiments } from '../../interfaces/listas/experimento/experimento.interface';
+import { ExperimentController } from '../experiment/experiment.controller';
+
+export class ExperimentGroupController {
+  experimentGroupRepository = new ExperimentGroupRepository();
+
+  experimentController = new ExperimentController();
+
+  async getAll(options: any) {
+    const parameters: object | any = {};
+    let orderBy: object | any;
+    try {
+      if (options.filterExperimentGroup) {
+        parameters.name = JSON.parse(`{"contains":"${options.filterExperimentGroup}"}`);
+      }
+
+      if (options.filterQuantityExperiment) {
+        parameters.experimentAmount = Number(options.filterQuantityExperiment);
+      }
+
+      if (options.filterTagsToPrint) {
+        parameters.tagsToPrint = Number(options.filterTagsToPrint);
+      }
+
+      if (options.filterTagsPrinted) {
+        parameters.tagsPrinted = Number(options.filterTagsPrinted);
+      }
+
+      if (options.filterTotalTags) {
+        parameters.totalTags = Number(options.filterTotalTags);
+      }
+
+      if (options.safraId) {
+        parameters.safraId = Number(options.safraId);
+      }
+
+      if (options.id) {
+        parameters.id = Number(options.id);
+      }
+
+      const select = {
+        id: true,
+        name: true,
+        experimentAmount: true,
+        tagsToPrint: true,
+        tagsPrinted: true,
+        totalTags: true,
+        status: true,
+        experiment: true,
+      };
+
+      const take = (options.take) ? Number(options.take) : undefined;
+
+      const skip = (options.skip) ? Number(options.skip) : undefined;
+
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+
+      const response: object | any = await this.experimentGroupRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
+
+      if (!response || response.total <= 0) {
+        return { status: 400, response: [], total: 0 };
+      }
+      return { status: 200, response, total: response.total };
+    } catch (error: any) {
+      handleError('Grupo de experimento controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Grupo de experimento erro');
+    }
+  }
+
+  async getOne(id: number) {
+    try {
+      const response = await this.experimentGroupRepository.findById(id);
+
+      if (!response) throw new Error('Grupo de experimento não encontrada');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Grupo de experimento controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Grupo de experimento erro');
+    }
+  }
+
+  async create(data: any) {
+    try {
+      const assayListAlreadyExist = await this.experimentGroupRepository.findByName(
+        { name: data.name, safraId: data.safraId },
+      );
+
+      if (assayListAlreadyExist) return { status: 400, message: 'Grupo de experimento já cadastrados' };
+
+      const response = await this.experimentGroupRepository.create(data);
+
+      return { status: 200, response, message: 'Grupo de experimento cadastrada' };
+    } catch (error: any) {
+      handleError('Grupo de experimento controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Grupo de experimento erro');
+    }
+  }
+
+  async update(data: any) {
+    try {
+      console.log('data');
+      console.log(data);
+      const assayList: any = await this.experimentGroupRepository.findById(data.id);
+
+      if (!assayList) return { status: 404, message: 'Grupo de experimento não existente' };
+
+      const response = await this.experimentGroupRepository.update(Number(data.id), data);
+
+      return { status: 200, response, message: 'Grupo de experimento atualizado' };
+    } catch (error: any) {
+      handleError('Grupo de experimento controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Grupo de experimento erro');
+    }
+  }
+
+  async delete(id: number) {
+    try {
+      const { status, response } = await this.getOne(Number(id));
+      response.experiment.forEach(async (item: any) => {
+        await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
+      });
+
+      if (status !== 200) return { status: 400, message: 'Grupo de experimento não encontrada' };
+
+      await this.experimentGroupRepository.delete(Number(id));
+      return { status: 200, message: 'Grupo de experimento excluída' };
+    } catch (error: any) {
+      handleError('Grupo de experimento controller', 'Delete', error.message);
+      throw new Error('[Controller] - Delete Grupo de experimento erro');
+    }
+  }
+
+  async countEtiqueta(id: number, idExperiment: any) {
+    const { response } = await this.getOne(id);
+    let totalTags = 0;
+    let tagsToPrint = 0;
+    let tagsPrinted = 0;
+    response.experiment.map((item: any) => {
+      item.experiment_genotipe.map((parcelas: any) => {
+        totalTags += 1;
+        if (parcelas.status === 'EM ETIQUETAGEM') {
+          tagsToPrint += 1;
+        } else if (parcelas.status === 'IMPRESSO') {
+          tagsPrinted += 1;
+        }
+      });
+    });
+    await this.update({
+      id,
+      totalTags,
+      tagsToPrint,
+      tagsPrinted,
+    });
+    if (typeof idExperiment === 'number') {
+      await this.experimentController.handleExperimentStatus(idExperiment);
+    } else {
+      idExperiment?.map(async (experimentId: number) => {
+        await this.experimentController.handleExperimentStatus(experimentId);
+      });
+    }
+    await this.handleGroupStatus(id);
+  }
+
+  async handleGroupStatus(id: number) {
+    const { response } : any = await this.getOne(id);
+    const allExperiments = response?.experiment?.length;
+    let toPrint = 0;
+    let printed = 0;
+    let status = '';
+    response?.experiment?.map((experiment: any) => {
+      if (experiment.status === 'ETIQ. FINALIZADA') {
+        printed += 1;
+      } else if (experiment.status === 'ETIQ. EM ANDAMENTO') {
+        toPrint += 1;
+      }
+    });
+
+    console.log('toPrint');
+    console.log(toPrint);
+
+    if (toPrint >= 1) {
+      status = 'ETIQ. EM ANDAMENTO';
+    } else if (printed === allExperiments) {
+      status = 'ETIQ. FINALIZADA';
+    }
+
+    console.log('status');
+    console.log(status);
+
+    console.log('printed');
+    console.log(printed);
+
+    await this.update({ id, status });
+  }
+}

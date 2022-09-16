@@ -518,9 +518,7 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           row.status = row.status === 0 ? 'Inativo' : 'Ativo';
-          delete row.dt_import;
-          delete row.id;
-          delete row.cultureUnity;
+
           const dataExp = new Date();
           let hours: string;
           let minutes: string;
@@ -543,6 +541,30 @@ export default function Listagem({
           row.DT = `${dataExp.toLocaleDateString(
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
+
+          row.NOME_LUGAR_CULTURA = row.name_local_culture;
+          row.RÓTULO = row.label;
+          row.MLOC = row.mloc;
+          row.NOME_DA_FAZENDA = row.adress;
+          row.PAÍS = row.label_country;
+          row.REGIÃO_RÓTULO = row.label_region;
+          row.REGIÃO = row.name_locality;
+          row.STATUS = row.status;
+          row.DATA = row.DT;
+
+          delete row.name_local_culture;
+          delete row.label;
+          delete row.mloc;
+          delete row.adress;
+          delete row.label_country;
+          delete row.label_region;
+          delete row.name_locality;
+          delete row.status;
+          delete row.dt_import;
+          delete row.DT;
+          delete row.id;
+          delete row.cultureUnity;
+
           return row;
         });
 
@@ -618,11 +640,11 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem dos Locais</title>
+        <title>Listagem de Lugares de Cultura</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar locais">
+          <AccordionFilter title="Filtrar lugares de cultura">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col

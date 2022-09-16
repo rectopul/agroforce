@@ -1,10 +1,13 @@
 import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 
 export class FocoController {
   public readonly required = 'Campo obrigatório';
 
   focoRepository = new FocoRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -23,11 +26,11 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" :{"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupFrom) {
-          parameters.group = JSON.parse(`{ "some" :{"group": {"gte": ${Number(options.filterGroupFrom)} } } }`);
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" :{"group": {"lte": ${Number(options.filterGroupTo)} } } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
 
@@ -56,6 +59,7 @@ export class FocoController {
         skip,
         orderBy,
       );
+
       if (response.total > 0) {
         response.map((item: any) => {
           item.group.map((group: any) => {
@@ -99,6 +103,30 @@ export class FocoController {
 
   async create(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture, status: 1 },
       );
@@ -106,6 +134,10 @@ export class FocoController {
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 
       const response = await this.focoRepository.create(data);
+      await this.reporteRepository.create({
+        madeBy: response.created_by, madeIn: newData, module: 'Foco', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+      });
+
       if (response) {
         return { status: 200, response, message: { message: 'Foco criado' } };
       }
@@ -118,9 +150,44 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const dataExp = new Date();
+      let hours: string;
+      let minutes: string;
+      let seconds: string;
+      if (String(dataExp.getHours()).length === 1) {
+        hours = `0${String(dataExp.getHours())}`;
+      } else {
+        hours = String(dataExp.getHours());
+      }
+      if (String(dataExp.getMinutes()).length === 1) {
+        minutes = `0${String(dataExp.getMinutes())}`;
+      } else {
+        minutes = String(dataExp.getMinutes());
+      }
+      if (String(dataExp.getSeconds()).length === 1) {
+        seconds = `0${String(dataExp.getSeconds())}`;
+      } else {
+        seconds = String(dataExp.getSeconds());
+      }
+      const newData = `${dataExp.toLocaleDateString(
+        'pt-BR',
+      )} ${hours}:${minutes}:${seconds}`;
+
+      if (data) {
         const foco = await this.focoRepository.update(data.id, data);
         if (!foco) return { status: 400, message: 'Foco não encontrado' };
+        if (foco.status === 1) {
+          await this.reporteRepository.create({
+            madeBy: foco.created_by, madeIn: newData, module: 'Foco', operation: 'Edição', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          });
+        }
+        if (foco.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: foco.created_by, madeIn: newData, module: 'Foco', operation: 'Inativação', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          });
+        }
+
         return { status: 200, message: 'Foco atualizada' };
       }
       const focoAlreadyExists = await this.focoRepository.findByName(

@@ -16,12 +16,14 @@ export class ExperimentRepository {
         period: true,
         repetitionsNumber: true,
         experimentName: true,
+        experimentGroupId: true,
         status: true,
         nlp: true,
         clp: true,
         eel: true,
         comments: true,
         orderDraw: true,
+        experiment_genotipe: true,
         assay_list: {
           select: {
             status: true,
@@ -74,6 +76,21 @@ export class ExperimentRepository {
     const result = await prisma.experiment.update({
       where: { id },
       data,
+    });
+    return result;
+  }
+
+  async relationGroup({ idList, experimentGroupId, status }: any): Promise<any> {
+    const result = await prisma.experiment.updateMany({
+      where: {
+        id: {
+          in: idList,
+        },
+      },
+      data: {
+        experimentGroupId,
+        status,
+      },
     });
     return result;
   }

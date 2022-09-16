@@ -163,7 +163,7 @@ export default function Listagem({
       filterEndDate,
     }) => {
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate, cultureId);
+      const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus || 1,cultureId, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate);
 
       setFiltersParams(parametersFilter); // Set filter pararameters
       setCookies('filterBeforeEdit', filtersParams);
@@ -424,8 +424,10 @@ export default function Listagem({
     // Manage orders of colunms
     const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
 
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // `${parametersFilter}&skip=0&take=${take}`
     await safraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(value)
       .then((response) => {
         if (response.status === 200) {
           setSafras(response.response);
@@ -502,7 +504,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await safraService.getAll(filterApplication).then((response) => {
+    await safraService.getAll(filtersParams).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
@@ -510,6 +512,17 @@ export default function Listagem({
           } else {
             row.status = 'Ativos' as any;
           }
+          row.SAFRA = row.safraName;
+          row.ANO = row.year;
+          row.INÍCIO_PLANTIO = row.plantingStartTime;
+          row.FIM_PLANTIO = row.plantingEndTime;
+          row.STATUS = row.status;
+
+          delete row.safraName;
+          delete row.year;
+          delete row.plantingStartTime;
+          delete row.plantingEndTime;
+          delete row.status;
           delete row.id;
           delete row.tableData;
 
@@ -553,7 +566,7 @@ export default function Listagem({
     // manage using comman function
     const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    await safraService.getAll(parametersFilter).then((response) => {
+    await safraService.getAll(`${parametersFilter}&id_culture=${cultureId}`).then((response) => {
       if (response.status === 200) {
         setSafras(response.response);
         setTotalItems(response.total); // Set new total records
@@ -883,7 +896,7 @@ export default function Listagem({
                       ))}
                     <Button
                       onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600 test"
+                      bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
