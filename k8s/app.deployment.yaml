@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmgapp
+  labels:
+    app: tmgapp  
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tmgapp
+  template:
+    metadata:
+      name: tmgapp    
+      labels:
+        app: tmgapp
+    spec:
+      containers:
+      - name: tmgapp
+        imagePullPolicy: Always      
+        image: crtmghml001.azurecr.io/gom/hml
+        envFrom:
+          - configMapRef:
+              name: tmg-app-env
+          
+        resources:
+          limits:
+            memory: 1024Mi
+            cpu: 512m
+          requests:
+            cpu: 256m
+            memory: 250Mi           
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  selector:
+    app: tmgapp
+  ports:
+  - port: 3000
+    name: php
+    protocol: TCP
+    targetPort: 3000
+  type: ClusterIP
