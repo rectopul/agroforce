@@ -10,6 +10,7 @@ export class NpeController {
   npeRepository = new NpeRepository();
 
   groupController = new GroupController();
+
   experimentController = new ExperimentController();
 
   reporteRepository = new ReporteRepository();
@@ -86,6 +87,16 @@ export class NpeController {
           parameters.npei = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)} }`);
         } else if (options.filterNpeTo) {
           parameters.npei = JSON.parse(`{"lte": ${Number(options.filterNpeTo)} }`);
+        }
+      }
+
+      if (options.filterNpeFinalFrom || options.filterNpeFinalTo) {
+        if (options.filterNpeFinalFrom && options.filterNpeFinalTo) {
+          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)}, "lte": ${Number(options.filterNpeFinalTo)} }`);
+        } else if (options.filterNpeFinalFrom) {
+          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)} }`);
+        } else if (options.filterNpeFinalTo) {
+          parameters.npef = JSON.parse(`{"lte": ${Number(options.filterNpeFinalTo)} }`);
         }
       }
 
