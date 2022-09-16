@@ -416,10 +416,10 @@ export default function Import({
           response.map((item: any) => {
             const newItem = item;
 
-            newItem.Usuário = item.user.name;
-            newItem.Tabela = item.table;
-            newItem.Status = item.state;
-            newItem.Importado_Em = item.created_at;
+            newItem.USUÁRIO = item.user.name;
+            newItem.TABELA = item.table;
+            newItem.STATUS = item.state;
+            newItem.IMPORTADO_EM = item.created_at;
 
             delete newItem.user;
             delete newItem.table;

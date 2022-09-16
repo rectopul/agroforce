@@ -45,13 +45,13 @@ export class UserController {
       } else {
         select = {
           id: true,
+          login: true,
           name: true,
           tel: true,
-          login: true,
+          status: true,
           cpf: true,
           email: true,
           avatar: true,
-          status: true,
         };
       }
 
