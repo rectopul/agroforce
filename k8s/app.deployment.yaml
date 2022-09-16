@@ -18,7 +18,7 @@ spec:
       containers:
       - name: tmgapp
         imagePullPolicy: Always      
-        image: crtmghml001.azurecr.io/gom/hml
+        image: crtmghml001.azurecr.io/agroforce-company/agroforce_tmg
         envFrom:
           - configMapRef:
               name: tmg-app-env
