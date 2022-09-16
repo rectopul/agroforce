@@ -40,7 +40,7 @@ export class ReplaceTreatmentController {
           response = await this.genotypeTreatment(idList, lote_id, geneticName_id); //third argument for chnage genetic value also
         }
         else if(value == 'experiment'){          
-          response = await this.experiment(idList, ncc, geneticName) //third argument for chnage genetic value also
+          response = await this.experiment(idList, ncc, geneticName,lote_id,geneticName_id) //third argument for chnage genetic value also
         }
 
         if (response) {
@@ -54,8 +54,8 @@ export class ReplaceTreatmentController {
       if(value == 'ensaios'){
        response = await this.genotypeTreatment(idList, lote_id, geneticName_id); //third argument for chnage genetic value also
       }
-      else if(value == 'experiment'){     
-        response = await this.experiment(idList, ncc, geneticName);
+      else if(value == 'experiment'){ 
+        response = await this.experiment(idList, ncc, geneticName,lote_id,geneticName_id);
       }
       if (response) {
         return { status: 200, response, message: 'Genótipo Substituído com sucesso' };
@@ -120,11 +120,13 @@ export class ReplaceTreatmentController {
 
     return response;
   }
-  async experiment( idList:any, ncc :any, geneticName :any){
+  async experiment( idList:any, ncc :any, geneticName :any,lote_id: any, geneticName_id :any){
    const response = await this.experimentGenotipeRepository.replaceLote(
       idList,
       ncc,
       geneticName,
+      lote_id,
+      geneticName_id
     );
 
     return response;
@@ -183,6 +185,7 @@ export class ReplaceTreatmentController {
         quant_sementes: true,
         genotipo: {
           select: {
+            id:true,
             name_genotipo: true,
             name_main: true,
             gmr: true,
@@ -197,8 +200,9 @@ export class ReplaceTreatmentController {
       }
 
       if (options.checkedTreatments) {
-        const checkedParams = options.checkedTreatments.split(',');
-        parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
+        // const checkedParams = options.checkedTreatments.split(',');
+        // parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
+        parameters.id_genotipo = Number(options.checkedTreatments);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

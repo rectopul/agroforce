@@ -605,7 +605,8 @@ export default function Listagem({
         data.rep = item.delineamento.repeticao;
         data.nt = gt.treatments_number;
         data.npe = npei;
-        data.idGenotipo = gt.id_genotipo;
+        data.name_genotipo = gt.genotipo.name_genotipo;
+        data.idGenotipo = gt.genotipo.id; // Added new field
         data.nca = '';
         experiment_genotipo.push(data);
         npei++;

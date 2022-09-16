@@ -77,6 +77,8 @@ export class ImportGenotypeTreatmentController {
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
           }
 
+          console.log("working here.......................");
+
           for (const column in spreadSheet[row]) {
             if (column === '0') { // SAFRA
               if (spreadSheet[row][column] === null) {
