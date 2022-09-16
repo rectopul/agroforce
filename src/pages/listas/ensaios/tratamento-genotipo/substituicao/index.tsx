@@ -81,12 +81,12 @@ interface IData {
 }
 
 export default function Listagem({
-  allLote,
-  totalItems,
-  idSafra,
-  itensPerPage,
-  filterApplication,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLote,
+      totalItems,
+      idSafra,
+      itensPerPage,
+      filterApplication,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -188,7 +188,7 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      if(treatmentsOptionSelected == "nca"){
+      if (treatmentsOptionSelected == "nca") {
         checkedTreatments.forEach((item: any) => {
           if (item.idGenotipo) {
             tempParams.push(item.idGenotipo);
@@ -196,7 +196,7 @@ export default function Listagem({
         });
       }
       const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
-      
+
       await replaceTreatmentService
         .getAll(
           `${parametersFilter}&skip=0&take=${itensPerPage}&checkedTreatments=${tempParams}`,
@@ -280,7 +280,7 @@ export default function Listagem({
 
 
   const value = router.query.value;
-  
+
   async function openModal(id: number, genotipoName: string, nccName: number) {
     if (treatmentsOptionSelected === 'genotipo') {
       setNameReplace(genotipoName);
@@ -299,12 +299,12 @@ export default function Listagem({
       width: '800',
     });
 
-    if(value == 'ensaios'){
+    if (value == 'ensaios') {
       router.back();
     }
-    else if(value == 'experiment'){
+    else if (value == 'experiment') {
       router.push('/listas/experimentos/parcelas-experimento');
-    }  
+    }
   }
 
   function replaceFactory(name: string, title: string) {
@@ -457,11 +457,11 @@ export default function Listagem({
   }
 
 
-  async function seperate(parametersFilter :any){
+  async function seperate(parametersFilter: any) {
 
     const tempParams: any = [];
-   
-    if(treatmentsOptionSelected == "nca"){
+
+    if (treatmentsOptionSelected == "nca") {
       checkedTreatments.forEach((item: any) => {
         if (item.idGenotipo) {
           tempParams.push(item.idGenotipo);
@@ -481,7 +481,7 @@ export default function Listagem({
 
     await replaceTreatmentService
       .getAll(parametersFilter)
-      .then(({ status,response, total }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setLotes(response);
           setTotalItems(total);
@@ -576,7 +576,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -739,7 +739,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

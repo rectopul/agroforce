@@ -84,7 +84,7 @@ export class ExperimentGenotipeController {
         }
       }
 
-      if (options.noe) {
+      if (options.npe) {
         parameters.npe = Number(options.npe);
       }
 

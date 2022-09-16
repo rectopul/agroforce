@@ -228,7 +228,6 @@ export class ExperimentController {
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
 
       const response = await this.experimentRepository.update(experimento.id, data);
-      console.log('response:', response);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
       }

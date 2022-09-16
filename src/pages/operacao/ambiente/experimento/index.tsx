@@ -624,7 +624,6 @@ export default function Listagem({
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
     })
-    console.log('count : ', count);
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
 

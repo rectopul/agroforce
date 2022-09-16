@@ -48,15 +48,15 @@ import { IExperimentGroupFilter, IExperimentsGroup } from '../../../interfaces/l
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 
 export default function Listagem({
-  allExperimentGroup,
-  totalItems,
-  itensPerPage,
-  safraId,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-// eslint-disable-next-line no-use-before-define
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperimentGroup,
+      totalItems,
+      itensPerPage,
+      safraId,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      // eslint-disable-next-line no-use-before-define
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
@@ -65,7 +65,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.etiquetagem || {
     id: 0,
     table_preferences:
-    'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
+      'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
   };
 
   const tableRef = useRef<any>(null);
@@ -153,11 +153,11 @@ export default function Listagem({
       filterStatus,
     }) => {
       const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup
-      }&filterQuantityExperiment=${filterQuantityExperiment
-      }&filterTagsToPrint=${filterTagsToPrint
-      }&filterTagsPrinted=${filterTagsPrinted
-      }&filterTotalTags=${filterTotalTags
-      }&filterStatus=${filterStatus}`;
+        }&filterQuantityExperiment=${filterQuantityExperiment
+        }&filterTagsToPrint=${filterTagsToPrint
+        }&filterTagsPrinted=${filterTagsPrinted
+        }&filterTotalTags=${filterTotalTags
+        }&filterStatus=${filterStatus}`;
       setFiltersParams(parametersFilter);
       setCookies('filterBeforeEdit', filtersParams);
       await experimentGroupService
@@ -475,8 +475,6 @@ export default function Listagem({
         safraId: Number(safraId),
         createdBy: userLogado.id,
       });
-      console.log('response');
-      console.log(response);
       if (createStatus !== 200) {
         Swal.fire('Erro ao cadastrar grupo');
       } else {
@@ -611,7 +609,7 @@ export default function Listagem({
                 <div style={{ width: 40 }} />
                 <div className="h-7 w-32 mt-6">
                   <Button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     value="Filtrar"
                     type="submit"
                     bgColor="bg-blue-600"
