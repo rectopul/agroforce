@@ -25,28 +25,6 @@ export class EnvelopeController {
   async create(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const envelopeAlreadyExists = await this.envelopeRepository.findByData(
         data,
@@ -58,7 +36,7 @@ export class EnvelopeController {
 
       const semente: any = await this.envelopeRepository.create(data);
       await this.reporteRepository.create({
-        madeBy: semente.created_by, madeIn: newData, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
       });
       return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
@@ -70,28 +48,6 @@ export class EnvelopeController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const envelope: any = await this.envelopeRepository.findById(data.id);
 
@@ -99,7 +55,7 @@ export class EnvelopeController {
 
       const semente: any = await this.envelopeRepository.update(data.id, data);
       await this.reporteRepository.create({
-        madeBy: semente.created_by, madeIn: newData, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
       });
 
       return { status: 200, message: 'envelope atualizado' };

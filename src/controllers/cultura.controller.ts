@@ -129,30 +129,7 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
-      // data
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
 
@@ -162,7 +139,7 @@ export class CulturaController {
       const culture = await this.culturaRepository.create(data);
 
       await this.reporteRepository.create({
-        madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Cadastro', name: data.desc, ip: JSON.stringify(ip), idOperation: culture.id,
+        madeBy: data.created_by, module: 'Cultura', operation: 'Cadastro', name: data.desc, ip: JSON.stringify(ip), idOperation: culture.id,
       });
       return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
@@ -174,29 +151,6 @@ export class CulturaController {
   async updateCulture(data: UpdateCultureDTO) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      // data
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const culture = await this.culturaRepository.findOne(data.id);
 
@@ -216,12 +170,12 @@ export class CulturaController {
 
       if (data.status === 1) {
         await this.reporteRepository.create({
-          madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Edição', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+          madeBy: data.created_by, module: 'Cultura', operation: 'Edição', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
         });
       }
       if (data.status === 0) {
         await this.reporteRepository.create({
-          madeBy: data.created_by, madeIn: newData, module: 'Cultura', operation: 'Inativação', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+          madeBy: data.created_by, module: 'Cultura', operation: 'Inativação', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
         });
         console.log(data);
       }

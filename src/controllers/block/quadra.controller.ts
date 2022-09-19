@@ -132,35 +132,13 @@ export class QuadraController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       if (data) {
         const quadra = await this.quadraRepository.update(data.id, data);
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
         if (quadra.status === 0) {
           await this.reporteRepository.create({
-            madeBy: quadra.created_by, madeIn: newData, module: 'Quadras-Quadra', operation: 'Inativação', name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
+            madeBy: quadra.created_by, module: 'Quadras-Quadra', operation: 'Inativação', name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
           });
         }
         return { status: 200, message: 'Quadra atualizada' };

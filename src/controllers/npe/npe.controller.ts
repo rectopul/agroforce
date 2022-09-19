@@ -239,35 +239,13 @@ export class NpeController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       if (data) {
         const npe = await this.npeRepository.update(data.id, data);
         if (!npe) return { status: 400, message: 'Npe não encontrado' };
         if (npe.status === 0) {
           await this.reporteRepository.create({
-            madeBy: npe.created_by, madeIn: newData, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+            madeBy: npe.created_by, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
           });
         }
         return { status: 200, message: 'Npe atualizada' };
