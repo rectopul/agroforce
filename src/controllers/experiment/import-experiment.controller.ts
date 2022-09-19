@@ -7,7 +7,6 @@ import {
   responseDiffFactory,
   responseNullFactory,
   responseGenericFactory,
-  responsePositiveNumericFactory,
   responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
@@ -17,7 +16,7 @@ import { DelineamentoController } from '../delimitation/delineamento.controller'
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
-import { validateDecimal, validateDouble, validateInteger } from '../../shared/utils/numberValidate';
+import { validateInteger } from '../../shared/utils/numberValidate';
 
 export class ImportExperimentController {
   static async validate(
@@ -262,15 +261,12 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
-              if (!validateDouble(spreadSheet[row][column])
-                  || !validateDecimal(spreadSheet[row][column])
-                  || Number(spreadSheet[row][column]) < 0
-                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+              if ((typeof spreadSheet[row][column]) !== 'number' || spreadSheet[row][column] < 0) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
                   row,
                   spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                  'precisa ser um numero inteiro e positivo e casas decimais precisam ser com virgula',
                 );
               }
             }
@@ -280,14 +276,12 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
 
-              if (!validateDouble(spreadSheet[row][column])
-                  || Number(spreadSheet[row][column]) < 0
-                  || Number.isNaN(Number(spreadSheet[row][column]))) {
+              if ((typeof spreadSheet[row][column]) !== 'number' || spreadSheet[row][column] < 0) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
                   row,
                   spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo e com 2 casas decimais',
+                  'precisa ser um numero inteiro e positivo e casas decimais precisam ser com virgula',
                 );
               }
             }

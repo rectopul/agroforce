@@ -142,7 +142,6 @@ export class TypeAssayController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-
       if (data) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
@@ -168,10 +167,6 @@ export class TypeAssayController {
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
       }
-      console.log(response);
-
-      console.log('debaixo');
-      console.log(response);
       return { status: 200, response };
     } catch (error: any) {
       handleError('Tipo de ensaio controller', 'Update', error.message);
