@@ -110,6 +110,7 @@ model user {
   users_cultures    users_cultures[]
   users_permissions users_permissions[]
   users_preferences users_preferences[]
+  PrintHistory      PrintHistory[]
 }
 
 model users_cultures {
@@ -564,12 +565,13 @@ model experiment_genotipe {
   nca          String
   status       String    @default("SORTEADO")
 
-  safra      safra      @relation(fields: [idSafra], references: [id])
-  type_assay type_assay @relation(fields: [idTypeAssay], references: [id])
-  tecnologia tecnologia @relation(fields: [idTecnologia], references: [id])
-  foco       foco       @relation(fields: [idFoco], references: [id])
-  experiment experiment @relation(fields: [idExperiment], references: [id])
-  genotipo   genotipo   @relation(fields: [idGenotipo], references: [id])
+  safra        safra          @relation(fields: [idSafra], references: [id])
+  type_assay   type_assay     @relation(fields: [idTypeAssay], references: [id])
+  tecnologia   tecnologia     @relation(fields: [idTecnologia], references: [id])
+  foco         foco           @relation(fields: [idFoco], references: [id])
+  experiment   experiment     @relation(fields: [idExperiment], references: [id])
+  genotipo     genotipo       @relation(fields: [idGenotipo], references: [id])
+  PrintHistory PrintHistory[]
 }
 
 model ExperimentGroup {
@@ -588,10 +590,22 @@ model ExperimentGroup {
   experiment experiment[]
 }
 
+model PrintHistory {
+  id                   Int      @id @default(autoincrement())
+  experimentGenotypeId Int
+  status               String
+  userId               Int
+  changes              Int?
+  changedAt            DateTime @default(now())
+
+  user                user                @relation(fields: [userId], references: [id])
+  experiment_genotipe experiment_genotipe @relation(fields: [experimentGenotypeId], references: [id])
+}
+
 model reportes {
-  id         Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   madeBy      Int?
-  madeIn       String?
+  madeIn     DateTime @default(now())
   module     String?
   operation     String?
   idOperation      Int?   

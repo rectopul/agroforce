@@ -24,7 +24,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   const random = (max = 30, min = 10) => Math.floor(Math.random() * max) + min;
 
   if (tagType === 1) {
-    const listTags = data.map((item: any) => (
+    const listTags = data.map(() => (
       <div className="etiquetaModelo1">
         <div className="flexRow" style={{ fontSize: 16 }}>
           <div className="flex1">{random(999999, 100000)}</div>
@@ -54,7 +54,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   }
 
   if (tagType === 2) {
-    const listTags = data.map((item: any) => (
+    const listTags = data.map(() => (
       <div className="etiquetaModelo2">
         <div className="flexRow" style={{ fontSize: 16 }}>
           <div className="flexColumn" style={{ flex: 1 }}>
@@ -104,7 +104,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   }
 
   if (tagType === 3) {
-    const listTags = data.map((item: any) => (
+    const listTags = data.map(() => (
       <div className="etiquetaModelo3">
         <div className="flexColumn" style={{ fontSize: 16 }}>
           <div style={{ textAlign: 'center', fontSize: 34 }}>MTG</div>

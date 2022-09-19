@@ -133,28 +133,6 @@ export class SafraController {
   async create(data: CreateSafra) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const safraAlreadyExists = await this.safraRepository.findBySafraName({
         safraName: data.safraName,
@@ -167,7 +145,7 @@ export class SafraController {
       const safra = await this.safraRepository.create(data);
 
       await this.reporteRepository.create({
-        madeBy: data.created_by, madeIn: newData, module: 'Safra', operation: 'Cadastro', name: data.safraName, ip: JSON.stringify(ip), idOperation: safra.id,
+        madeBy: data.created_by, module: 'Safra', operation: 'Cadastro', name: data.safraName, ip: JSON.stringify(ip), idOperation: safra.id,
       });
 
       return { status: 200, message: 'Safra cadastrada' };
@@ -180,28 +158,6 @@ export class SafraController {
   async update(data: UpdateSafra) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       if (data.status === 0 || data.status === 1) {
         const safraAlreadyExists = await this.getOne(data.id);
@@ -211,15 +167,14 @@ export class SafraController {
         const response = await this.safraRepository.update(data.id, data);
         if (response.status === 0) {
           await this.reporteRepository.create({
-            madeBy: response.created_by, madeIn: newData, module: 'Safra', operation: 'Inativação', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
+            madeBy: response.created_by, module: 'Safra', operation: 'Inativação', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
           });
         }
         if (response.status === 1) {
           await this.reporteRepository.create({
-            madeBy: response.created_by, madeIn: newData, module: 'Safra', operation: 'Edição', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
+            madeBy: response.created_by, module: 'Safra', operation: 'Edição', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
           });
         }
-        console.log(response);
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };
         }

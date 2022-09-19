@@ -120,35 +120,13 @@ export class TypeAssayController {
   async create(data: object | any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe' };
       const response = await this.typeAssayRepository.create(data);
 
       await this.reporteRepository.create({
-        madeBy: response.created_by, madeIn: newData, module: 'Tipo de Ensaio', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+        madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
       });
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não cadastrado' };
@@ -164,29 +142,6 @@ export class TypeAssayController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
-      // console.log(data);
       if (data) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
@@ -196,12 +151,12 @@ export class TypeAssayController {
         }
         if (response.status === 1) {
           await this.reporteRepository.create({
-            madeBy: response.created_by, madeIn: newData, module: 'Tipo de Ensaio', operation: 'Edição', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Edição', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
           });
         }
         if (response.status === 0) {
           await this.reporteRepository.create({
-            madeBy: response.created_by, madeIn: newData, module: 'Tipo de Ensaio', operation: 'Inativação', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Inativação', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
           });
         }
         return { status: 200, response };
@@ -212,10 +167,6 @@ export class TypeAssayController {
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
       }
-      console.log(response);
-
-      console.log('debaixo');
-      console.log(response);
       return { status: 200, response };
     } catch (error: any) {
       handleError('Tipo de ensaio controller', 'Update', error.message);

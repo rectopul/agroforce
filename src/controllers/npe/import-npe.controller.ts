@@ -67,8 +67,6 @@ export class ImportNpeController {
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
-            this.aux.npef = 0;
-            this.aux.prox_npe = 0;
             if (configModule.response[0]?.fields[column] === 'Local') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) === 'string') {
@@ -280,10 +278,12 @@ export class ImportNpeController {
                   }
                   if (responseIfError.length === 0) {
                     this.aux.npei = spreadSheet[row][column];
+                    this.aux.npef = spreadSheet[row][column];
+                    this.aux.prox_npe = spreadSheet[row][column];
                   }
                 } else {
                   responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                    += responsePositiveNumericFactory(
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
@@ -302,7 +302,7 @@ export class ImportNpeController {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) !== 'number' || spreadSheet[row][column] <= 0) {
                   responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
+                    += responsePositiveNumericFactory(
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
@@ -326,8 +326,6 @@ export class ImportNpeController {
               for (const column in spreadSheet[row]) {
                 this.aux.status = 1;
                 this.aux.created_by = createdBy;
-                this.aux.npef = 0;
-                this.aux.prox_npe = 0;
                 if (configModule.response[0]?.fields[column] === 'Local') {
                   const local: any = await localController.getAll(
                     { name_local_culture: spreadSheet[row][column] },
@@ -370,6 +368,8 @@ export class ImportNpeController {
 
                 if (configModule.response[0]?.fields[column] === 'NPEI') {
                   this.aux.npei = spreadSheet[row][column];
+                  this.aux.npef = spreadSheet[row][column];
+                  this.aux.prox_npe = spreadSheet[row][column];
                 }
 
                 if (spreadSheet[row].length === (Number(column) + 1)) {

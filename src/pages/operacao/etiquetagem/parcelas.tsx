@@ -237,6 +237,10 @@ export default function Listagem({
   const [groupNameTwo, setGroupNameTwo] = useState<string>('');
   const [doubleVerify, setDoubleVerify] = useState<boolean>(false);
   const [parcelasToPrint, setParcelasToPrint] = useState<any>([]);
+  const [dismiss, setDismiss] = useState<boolean>();
+  const [writeOffId, setWriteOffId] = useState<number>();
+  const [writeOffNca, setWriteOffNca] = useState<number>();
+  const [rowsSelected, setRowsSelected] = useState([]);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -422,7 +426,12 @@ export default function Listagem({
             <Button
               icon={<HiArrowNarrowRight size={14} />}
               title={`Dar baixa na parcela ${rowData.id}`}
-              onClick={() => {}}
+              onClick={() => {
+                setDismiss(true);
+                setIsOpenModal(true);
+                setWriteOffNca(rowData.nca);
+                setWriteOffId(rowData.id);
+              }}
               bgColor="bg-red-600"
               textColor="white"
             />
@@ -628,6 +637,9 @@ export default function Listagem({
     setGroupNameOne('');
     setGroupNameTwo('');
     setTotalMatch(0);
+    setDismiss(false);
+    setWriteOffNca(0);
+    setWriteOffId(0);
     setValidateNcaOne('bg-gray-300');
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
@@ -696,11 +708,41 @@ export default function Listagem({
     }
     setTotalMatch(countNca);
     if (colorVerify === 'bg-green-600') {
-      await experimentGenotipeService.update({
-        idList: parcelasToPrint,
-        status: 'IMPRESSO',
-      });
+      await experimentGenotipeService.update({ idList: parcelasToPrint, status: 'IMPRESSO', userId: userLogado.id });
       cleanState();
+    }
+  }
+
+  async function writeOff() {
+    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    if (!doubleVerify) {
+      let colorVerify = '';
+      if (inputCode === writeOffNca) {
+        colorVerify = 'bg-green-600';
+        setValidateNcaOne('bg-green-600');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaOne('bg-red-600');
+      }
+      if (colorVerify === 'bg-green-600') {
+        (document.getElementById('inputCode') as HTMLInputElement).value = '';
+        setDoubleVerify(true);
+      } else {
+        setDoubleVerify(false);
+      }
+    } else {
+      let colorVerify = '';
+      if (inputCode === writeOffNca) {
+        colorVerify = 'bg-green-600';
+        setValidateNcaTwo('bg-green-600');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaTwo('bg-red-600');
+      }
+      if (colorVerify === 'bg-green-600') {
+        await experimentGenotipeService.update({ idList: [writeOffId], status: 'EM ETIQUETAGEM', userId: userLogado.id });
+        cleanState();
+      }
     }
   }
 
@@ -709,12 +751,20 @@ export default function Listagem({
       document.getElementById('inputCode') as HTMLInputElement
     )?.value;
     if (inputCode.length === 12) {
-      if (doubleVerify) {
+      if (dismiss) {
+        writeOff();
+      } else if (doubleVerify) {
         verifyAgain();
       } else {
         handleSubmit();
       }
     }
+  }
+
+  async function reprint() {
+    const idList = rowsSelected.map((item: any) => item.id);
+    console.log(`Imprimir ${idList}`);
+    await experimentGenotipeService.update({ idList, status: 'IMPRESSO', userId: userLogado.id });
   }
 
   useEffect(() => {
@@ -1047,6 +1097,7 @@ export default function Listagem({
               columns={columns}
               data={parcelas}
               options={{
+                selection: true,
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1056,7 +1107,8 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
+              onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
                   <div
@@ -1077,7 +1129,9 @@ export default function Listagem({
                         title="Ação"
                         value="Ação"
                         textColor="white"
-                        onClick={() => setIsOpenModal(true)}
+                        onClick={() => ((rowsSelected?.length > 0)
+                          ? reprint()
+                          : setIsOpenModal(true))}
                         bgColor="bg-blue-600"
                       />
                     </div>
