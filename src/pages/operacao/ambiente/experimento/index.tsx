@@ -9,7 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
@@ -115,10 +115,12 @@ export default function Listagem({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
   const [experimentos, setExperimento] = useState<IExperimento[]>(() => allExperiments);
+  const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(1);
+  const [lastExperimentNPE, setLastExperimentNPE] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [SortearDisable, setSortearDisable] = useState<boolean>(false);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -144,7 +146,7 @@ export default function Listagem({
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
+  let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -481,20 +483,31 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+    if (NPESelectedRow) {
+      const skip = currentPage * Number(take);
+      let parametersFilter = `skip=${skip}&take=${take}&idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-      if (status === 200) {
-        setExperimento(response);
+      if (filter) {
+        parametersFilter = `${parametersFilter}&${filter}`;
       }
-    });
+      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+        if (status === 200) {
+          let i = lastExperimentNPE;
+          console.log('i', i);
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+          });
+          setLastExperimentNPE(i);
+          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
+          setExperimentoNew(response);
+        }
+      });
+    }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
@@ -539,6 +552,7 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
+      const skip = currentPage * Number(take);
       let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
@@ -547,14 +561,29 @@ export default function Listagem({
 
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          let i = NPESelectedRow.npei;
+          let i = NPESelectedRow.npei_i;
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
           selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
+          console.log('SelectedNPE: ', selectedNPE);
           setExperimento(response);
+        }
+      });
+      parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
+      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+        if (status === 200) {
+          let i = NPESelectedRow.npei_i;
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+          });
+          setLastExperimentNPE(i);
+          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
+          setExperimentoNew(response);
         }
       });
     }
@@ -622,7 +651,7 @@ export default function Listagem({
   useEffect(() => {
     let count = 0;
     experimentos.map((item: any) => {
-      item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
+      (item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE) || NPESelectedRow?.nextNPE == 'N/A' ? count++ : '';
     })
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
@@ -677,7 +706,7 @@ export default function Listagem({
                 <MaterialTable
                   style={{ background: '#f9fafb' }}
                   columns={columns}
-                  data={experimentos}
+                  data={experimentosNew}
                   options={{
                     showTitle: false,
                     headerStyle: {
@@ -685,7 +714,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                        (rowData.npef >= NPESelectedRow?.nextNPE) && SortearDisable ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,
