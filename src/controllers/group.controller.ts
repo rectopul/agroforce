@@ -25,35 +25,13 @@ export class GroupController {
   async create(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const groupAlreadyExists = await this.groupRepository.findByData(data);
       if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
       const grupo = await this.groupRepository.create(data);
       await this.reporteRepository.create({
-        madeBy: grupo.created_by, madeIn: newData, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
       });
 
       return { status: 200, message: 'grupo cadastrado' };
@@ -66,28 +44,6 @@ export class GroupController {
   async update(data: any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      const newData = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
 
       const group: any = await this.groupRepository.findById(data.id);
 
@@ -95,7 +51,7 @@ export class GroupController {
 
       const grupo = await this.groupRepository.update(data.id, data);
       await this.reporteRepository.create({
-        madeBy: grupo.created_by, madeIn: newData, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
       });
       return { status: 200, message: 'grupo atualizado' };
     } catch (error: any) {

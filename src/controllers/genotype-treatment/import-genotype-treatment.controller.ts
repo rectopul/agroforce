@@ -66,9 +66,9 @@ export class ImportGenotypeTreatmentController {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
           }
-          if (spreadSheet[row][3] < 10) {
+          if ((typeof (spreadSheet[row][3])) === 'number' && spreadSheet[row][3].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
-            spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
+            spreadSheet[row][3] = `0${spreadSheet[row][3].toString()}`;
           }
           if (treatments.response[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
             responseIfError[0]
@@ -79,8 +79,6 @@ export class ImportGenotypeTreatmentController {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
           }
-
-          console.log("working here.......................");
 
           for (const column in spreadSheet[row]) {
             if (column === '0') { // SAFRA

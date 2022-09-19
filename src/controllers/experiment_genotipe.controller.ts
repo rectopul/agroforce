@@ -3,6 +3,7 @@ import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
 import { ExperimentController } from './experiment/experiment.controller';
+import { PrintHistoryController } from './print-history/print-history.controller';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -10,6 +11,8 @@ export class ExperimentGenotipeController {
   private experimentController = new ExperimentController();
 
   private experimentGroupController = new ExperimentGroupController();
+
+  private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -182,7 +185,7 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async update({ idList, status }: any) {
+  async update({ idList, status, userId }: any) {
     try {
       await this.ExperimentGenotipeRepository.printed(idList, status);
       const { response: parcelas } = await this.getOne(idList[0]);
@@ -191,6 +194,7 @@ export class ExperimentGenotipeController {
         response.experimentGroupId,
         parcelas?.idExperiment,
       );
+      await this.printedHistoryController.create({idList, userId});
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');

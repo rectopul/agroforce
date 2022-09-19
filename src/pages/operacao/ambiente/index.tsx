@@ -61,6 +61,10 @@ interface IFilter {
   filterTecnologia: string | any;
   filterEpoca: string | any;
   filterNPE: string | any;
+  filterNpeTo: string | any;
+  filterNpeFrom: string | any;
+  filterNpeFinalTo: string | any;
+  filterNpeFinalFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -180,6 +184,10 @@ export default function Listagem({
       filterNPE: '',
       orderBy: '',
       typeOrder: '',
+      filterNpeTo: '',
+      filterNpeFrom: '',
+      filterNpeFinalTo: '',
+      filterNpeFinalFrom: '',
     },
     onSubmit: async ({
       filterStatus,
@@ -190,10 +198,13 @@ export default function Listagem({
       filterTecnologia,
       filterEpoca,
       filterNPE,
+      filterNpeTo,
+      filterNpeFrom,
+      filterNpeFinalTo,
+      filterNpeFinalFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada
-      }`;
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -588,7 +599,47 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEpoca', 'Época')}
 
-                  {filterFieldFactory('filterNPE', 'NPE Inicial')}
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE Inicial
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFrom"
+                        name="filterNpeFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeTo"
+                        name="filterNpeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE Final
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFinalFrom"
+                        name="filterNpeFinalFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeFinalTo"
+                        name="filterNpeFinalTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
