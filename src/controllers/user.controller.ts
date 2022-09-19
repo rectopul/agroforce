@@ -206,7 +206,6 @@ export class UserController {
               { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
             );
           }
-          console.log(response);
           await this.reporteRepository.create({
             madeBy: data.created_by, module: 'Usuários', operation: 'Cadastro', name: data.name, idOperation: response.id, ip: JSON.stringify(ip),
           });

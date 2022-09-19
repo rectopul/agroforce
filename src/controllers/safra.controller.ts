@@ -175,7 +175,6 @@ export class SafraController {
             madeBy: response.created_by, module: 'Safra', operation: 'Edição', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
           });
         }
-
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };
         }

@@ -111,8 +111,6 @@ export class ExperimentGroupController {
 
   async update(data: any) {
     try {
-      console.log('data');
-      console.log(data);
       const assayList: any = await this.experimentGroupRepository.findById(data.id);
 
       if (!assayList) return { status: 404, message: 'Grupo de experimento não existente' };
@@ -188,21 +186,11 @@ export class ExperimentGroupController {
       }
     });
 
-    console.log('toPrint');
-    console.log(toPrint);
-
     if (toPrint >= 1) {
       status = 'ETIQ. EM ANDAMENTO';
     } else if (printed === allExperiments) {
       status = 'ETIQ. FINALIZADA';
     }
-
-    console.log('status');
-    console.log(status);
-
-    console.log('printed');
-    console.log(printed);
-
     await this.update({ id, status });
   }
 }
