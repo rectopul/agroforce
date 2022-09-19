@@ -1,9 +1,10 @@
+/* eslint-disable react/require-default-props */
 interface EtiquetaProps {
-  folhaWidth: number;
-  folhaHeight: number;
-  folhaQtdEtiqueta: number;
-  etiquetaWidth: number;
-  etiquetaHeight: number;
+  folhaWidth?: number;
+  folhaHeight?: number;
+  folhaQtdEtiqueta?: number;
+  etiquetaWidth?: number;
+  etiquetaHeight?: number;
   etiquetas: Array<any>;
 }
 
@@ -18,16 +19,18 @@ function Etiqueta({
   const getEtiquetas = (folhai: number) => {
     const etiquetasFolha = [];
 
-    for (let i = 0; i < folhaQtdEtiqueta; i++) {
-      etiquetasFolha.push(<div
-        className="etiqueta"
-        style={{
-          width: `${etiquetaWidth}mm`,
-          height: `${etiquetaHeight}mm`,
-        }}
-      >
-        {etiquetas[folhai + i]}
-                          </div>);
+    for (let i = 0; i < folhaQtdEtiqueta; i += 1) {
+      etiquetasFolha.push(
+        <div
+          className="etiqueta"
+          style={{
+            width: `${etiquetaWidth}mm`,
+            height: `${etiquetaHeight}mm`,
+          }}
+        >
+          {etiquetas[folhai + i]}
+        </div>,
+      );
     }
 
     return etiquetasFolha;
@@ -43,15 +46,17 @@ function Etiqueta({
         folhas.push(<div className="notPrint" style={{ height: 15 }} />);
       }
 
-      folhas.push(<div
-        className="imprimir"
-        style={{
-          width: `${folhaWidth}mm`,
-          height: `${folhaHeight}mm`,
-        }}
-      >
-        {getEtiquetas(i)}
-                  </div>);
+      folhas.push(
+        <div
+          className="imprimir"
+          style={{
+            width: `${folhaWidth}mm`,
+            height: `${folhaHeight}mm`,
+          }}
+        >
+          {getEtiquetas(i)}
+        </div>,
+      );
     });
 
     return folhas;
