@@ -565,6 +565,7 @@ model experiment_genotipe {
   npe          Int
   nca          String
   status       String    @default("SORTEADO")
+  status_t     String    @default("L")
 
   safra        safra          @relation(fields: [idSafra], references: [id])
   type_assay   type_assay     @relation(fields: [idTypeAssay], references: [id])
