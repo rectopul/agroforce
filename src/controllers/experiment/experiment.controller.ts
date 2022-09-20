@@ -128,10 +128,15 @@ export class ExperimentController {
             id: true,
           },
         },
+        experiment_genotipe: true,
       };
 
       if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
+      }
+
+      if (options.id) {
+        parameters.id = Number(options.id);
       }
 
       if (options.id_assay_list) {
@@ -155,7 +160,6 @@ export class ExperimentController {
       }
       if (options.Status) {
         parameters.status = options.Status;
-
       }
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
@@ -185,7 +189,7 @@ export class ExperimentController {
         newItem.npeQT = item.countNT * item.repetitionsNumber;
         return newItem;
       });
-      if (!response && response.total <= 0) {
+      if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
         };
@@ -203,7 +207,7 @@ export class ExperimentController {
 
       const response = await this.experimentRepository.findOne(id);
 
-      if (!response) throw new Error('Item não encontrado');
+      if (!response) return { status: 400, response };
 
       return { status: 200, response };
     } catch (error: any) {
@@ -224,7 +228,6 @@ export class ExperimentController {
       throw new Error('[Controller] - GetOne Experimento erro');
     }
   }
-
 
   async create(data: any) {
     try {

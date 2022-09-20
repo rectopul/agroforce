@@ -85,12 +85,6 @@ model safra {
   ExperimentGroup     ExperimentGroup[]
 }
 
-model uf {
-  id    Int     @id
-  nome  String? @db.Char(255)
-  sigla String? @db.Char(2)
-}
-
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
@@ -189,18 +183,19 @@ model cultureUnity {
 }
 
 model layout_quadra {
-  id          Int               @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   esquema     String
   plantadeira String
   tiros       Int?
   disparos    Int?
   parcelas    Int?
-  status      Int               @default(1)
+  status      Int      @default(1)
   created_by  Int
-  created_at  DateTime          @default(now())
+  created_at  DateTime @default(now())
   id_culture  Int
-  culture     culture           @relation(fields: [id_culture], references: [id])
-  children    layout_children[]
+
+  culture  culture           @relation(fields: [id_culture], references: [id])
+  children layout_children[]
 }
 
 model layout_children {
@@ -223,27 +218,29 @@ model layout_children {
 }
 
 model quadra {
-  id            Int        @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   cod_quadra    String
   id_culture    Int
   local_plantio String?
   larg_q        Int
   comp_p        Int
   linha_p       Int
-  comp_c        Decimal    @db.Decimal(2, 1)
+  comp_c        Decimal  @db.Decimal(2, 1)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?
   q             String?
-  status        Int        @default(1)
+  status        Int      @default(1)
   created_by    Int
-  created_at    DateTime   @default(now())
+  created_at    DateTime @default(now())
   id_safra      Int
   id_local      Int
-  culture       culture    @relation(fields: [id_culture], references: [id])
-  local         local      @relation(fields: [id_local], references: [id])
-  safra         safra      @relation(fields: [id_safra], references: [id])
-  dividers      dividers[]
+  allocation    String?
+
+  culture  culture    @relation(fields: [id_culture], references: [id])
+  local    local      @relation(fields: [id_local], references: [id])
+  safra    safra      @relation(fields: [id_safra], references: [id])
+  dividers dividers[]
 }
 
 model dividers {
@@ -605,12 +602,12 @@ model PrintHistory {
 }
 
 model reportes {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   madeBy      Int?
-  madeIn     DateTime @default(now())
-  module     String?
-  operation     String?
-  idOperation      Int?   
-  name     String? 
-  ip     String?     
+  madeIn      DateTime @default(now())
+  module      String?
+  operation   String?
+  idOperation Int?
+  name        String?
+  ip          String?
 }
