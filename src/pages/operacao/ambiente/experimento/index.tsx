@@ -145,8 +145,8 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
+  const [selectedNPE, setSelectedNPE] = useState<any[]>(JSON.parse(localStorage.getItem('selectedNPE') as string))
+  // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -500,7 +500,7 @@ export default function Listagem({
             i = item.npef + 1;
           });
           setLastExperimentNPE(i);
-          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
+
           setExperimentoNew(response);
         }
       });
@@ -558,18 +558,19 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+      let temp = [...selectedNPE]
 
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          let i = NPESelectedRow.npei_i;
+          let i = 0;
+          response.length > 0 ? i = NPESelectedRow.npei_i : i = NPESelectedRow.npef;
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
-          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
-          console.log('SelectedNPE: ', selectedNPE);
           setExperimento(response);
+          temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
         }
       });
       parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
@@ -582,7 +583,6 @@ export default function Listagem({
             i = item.npef + 1;
           });
           setLastExperimentNPE(i);
-          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
           setExperimentoNew(response);
         }
       });
@@ -618,7 +618,7 @@ export default function Listagem({
 
   function validateConsumedData() {
     const experiment_genotipo: any[] = [];
-    let npei = Number(NPESelectedRow?.npei);
+    let npei = Number(NPESelectedRow?.npei_i);
     let total_consumed = 0;
 
     experimentos.map((item: any) => {
@@ -684,7 +684,7 @@ export default function Listagem({
                 },
                 rowStyle: (rowData) => ({
                   backgroundColor:
-                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? (SortearDisable ? '#FF5349' : '#d3d3d3') : '#f9fafb',
                   height: 40,
                 }),
                 search: false,
