@@ -416,6 +416,7 @@ model npe {
   id           Int       @id @default(autoincrement())
   npei         Int
   npef         Int?
+  npei_i       Int?      @default(0)
   prox_npe     Int?
   npeQT        Int?
   created_by   Int
@@ -564,6 +565,7 @@ model experiment_genotipe {
   npe          Int
   nca          String
   status       String    @default("SORTEADO")
+  status_t     String    @default("L")
 
   safra        safra          @relation(fields: [idSafra], references: [id])
   type_assay   type_assay     @relation(fields: [idTypeAssay], references: [id])

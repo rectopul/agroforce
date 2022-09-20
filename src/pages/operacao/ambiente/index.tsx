@@ -914,7 +914,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=4&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
