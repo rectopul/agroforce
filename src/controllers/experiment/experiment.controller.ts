@@ -128,6 +128,7 @@ export class ExperimentController {
             id: true,
           },
         },
+        experiment_genotipe: true,
       };
 
       if (options.idSafra) {
@@ -159,7 +160,6 @@ export class ExperimentController {
       }
       if (options.Status) {
         parameters.status = options.Status;
-
       }
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
@@ -189,7 +189,7 @@ export class ExperimentController {
         newItem.npeQT = item.countNT * item.repetitionsNumber;
         return newItem;
       });
-      if (!response && response.total <= 0) {
+      if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
         };
@@ -228,7 +228,6 @@ export class ExperimentController {
       throw new Error('[Controller] - GetOne Experimento erro');
     }
   }
-
 
   async create(data: any) {
     try {

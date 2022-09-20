@@ -15,38 +15,49 @@ import { ExperimentController } from '../experiment/experiment.controller';
 import { LogImportController } from '../log-import.controller';
 import { QuadraController } from '../block/quadra.controller';
 import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 
 export class ImportAllocationController {
   static async validate(
     idLog: number,
     {
-      spreadSheet, idSafra, created_by: createdBy,
+      spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
+    const quadraController = new QuadraController();
     const logImportController = new LogImportController();
     const experimentController = new ExperimentController();
+    const layoutQuadraController = new LayoutQuadraController();
     const experimentGenotipeController = new ExperimentGenotipeController();
-    const quadraController = new QuadraController();
 
     const responseIfError: Array<string> = [];
 
+    for (const count in spreadSheet) {
+      spreadSheet[count].push(Number(count));
+    }
     // eslint-disable-next-line no-param-reassign
-    spreadSheet = this.orderByBlock(spreadSheet);
+    spreadSheet = await this.orderByBlock(spreadSheet);
+
     try {
+      const allParcelas: any = {};
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
-            if (spreadSheet[0][column].includes('ID_EXPERIMENTO')) {
+            if (column === '0') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
               } else {
@@ -58,7 +69,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'o id do experimento não encontrado nessa safra',
                     );
@@ -66,17 +77,21 @@ export class ImportAllocationController {
               }
             }
 
-            if (spreadSheet[0][column].includes('SAFRA')) {
+            if (column === '1') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else {
                 const { response }: IReturnObject = await safraController.getOne(Number(idSafra));
                 if (response.safraName !== spreadSheet[row][column]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'safra e diferente da safra selecionada',
                     );
@@ -84,10 +99,14 @@ export class ImportAllocationController {
               }
             }
 
-            if (spreadSheet[0][column].includes('EXPE')) {
+            if (column === '2') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else {
                 const { status }: IReturnObject = await experimentController.getAll({
                   filterExperimentName: spreadSheet[row][column],
@@ -97,7 +116,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'o nome do experimento não cadastrado nessa safra',
                     );
@@ -105,31 +124,60 @@ export class ImportAllocationController {
               }
             }
 
-            if (spreadSheet[0][column].includes('NPEI')) {
+            if (column === '3') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
               } else {
-                // valida npei
+                const { response }: IReturnObject = await experimentController.getAll({
+                  id: spreadSheet[row][0],
+                  idSafra,
+                });
+                const allNpe = response[0]?.experiment_genotipe.map((item: any) => item.npe);
+                let npeRange = Number(spreadSheet[row][column]);
+                let validateNpeRange = true;
+                while (npeRange < Number(spreadSheet[row][4])) {
+                  if (!(allNpe?.includes(spreadSheet[row][column]))) {
+                    validateNpeRange = false;
+                  }
+                  npeRange += 1;
+                }
+                if (!validateNpeRange) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
+                      (Number(column) + 1),
+                      spreadSheet[row][9],
+                      spreadSheet[0][column],
+                      'as parcelas desse experimento não estão dentro do intervalo de NPE',
+                    );
+                }
               }
             }
 
-            if (spreadSheet[0][column].includes('NPEF')) {
+            if (column === '4') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
               } else {
@@ -137,36 +185,98 @@ export class ImportAllocationController {
               }
             }
 
-            if (spreadSheet[0][column].includes('NTPARC')) {
+            if (column === '5') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
               } else {
+                if (spreadSheet[Number(row) - 1][7] !== spreadSheet[row][7]
+                      || row === '1') {
+                  allParcelas[spreadSheet[row][7]] = 0;
+                }
                 // eslint-disable-next-line max-len
-                const npeDiff = spreadSheet[row][Number(column) - 1] - spreadSheet[row][Number(column) - 2];
+                const npeDiff = Number(spreadSheet[row][Number(column) - 1]) === Number(spreadSheet[row][Number(column) - 2])
+                  ? 1
+                  : (spreadSheet[row][Number(column) - 1]
+                  - spreadSheet[row][Number(column) - 2]) + 1;
                 if (npeDiff !== spreadSheet[row][column]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'o numero de parcelas estão fora do alcance de NPE',
                     );
+                } else if ((spreadSheet.length - 1) !== Number(row)) {
+                  if (spreadSheet[Number(row) + 1][7] !== spreadSheet[row][7]
+                  || Number(row) === (Number(spreadSheet?.length) - 1)) {
+                    allParcelas[spreadSheet[row][7]] += Number(spreadSheet[row][column]);
+                    const { response }: IReturnObject = await quadraController.getAll({
+                      cod_quadra: spreadSheet[Number(row) - 1][7],
+                      id_safra: idSafra,
+                    });
+                    const {
+                      response: esquema,
+                    }: IReturnObject = await layoutQuadraController.getAll({
+                      filterEsquema: response[0]?.esquema,
+                      id_culture: idCulture,
+                    });
+                    if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
+                      responseIfError[Number(column)]
+                      += responseGenericFactory(
+                          (Number(column) + 1),
+                          spreadSheet[row][9],
+                          spreadSheet[0][column],
+                          'o numero de parcelas e diferente das parcelas do layout',
+                        );
+                    }
+                  } else {
+                    allParcelas[spreadSheet[row][7]] += Number(spreadSheet[row][column]);
+                  }
+                } else {
+                  allParcelas[spreadSheet[Number(row) - 1][7]] += Number(spreadSheet[row][column]);
+                  const { response }: IReturnObject = await quadraController.getAll({
+                    cod_quadra: spreadSheet[Number(row) - 1][7],
+                    id_safra: idSafra,
+                  });
+                  const {
+                    response: esquema,
+                  }: IReturnObject = await layoutQuadraController.getAll({
+                    filterEsquema: response[0]?.esquema,
+                    id_culture: idCulture,
+                  });
+                  if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
+                    responseIfError[Number(column)]
+                      += responseGenericFactory(
+                        (Number(column) + 1),
+                        spreadSheet[row][9],
+                        spreadSheet[0][column],
+                        'o numero de parcelas e diferente das parcelas do layout',
+                      );
+                  }
                 }
               }
             }
 
-            if (spreadSheet[0][column].includes('LOCPREP')) {
+            if (column === '6') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else {
                 const { status, response }: IReturnObject = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
@@ -175,7 +285,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'o local de preparo não cadastrado no sistema',
                     );
@@ -191,7 +301,7 @@ export class ImportAllocationController {
                     responseIfError[Number(column)]
                     += responseGenericFactory(
                         (Number(column) + 1),
-                        row,
+                        spreadSheet[row][9],
                         spreadSheet[0][column],
                         'não tem unidade de cultura cadastrada no local informado',
                       );
@@ -200,36 +310,52 @@ export class ImportAllocationController {
               }
             }
 
-            if (spreadSheet[0][column].includes('QM')) {
+            if (column === '7') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else {
-                const { status }: IReturnObject = await quadraController.getAll({
+                const { status, response }: IReturnObject = await quadraController.getAll({
                   cod_quadra: spreadSheet[row][column],
                   id_safra: idSafra,
                 });
                 if (status !== 200) {
                   responseIfError[Number(column)]
-                    += responseGenericFactory(
+                      += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'quadra não cadastrada nessa safra',
+                    );
+                } else if (response[0]?.local?.name_local_culture !== spreadSheet[row][6]) {
+                  responseIfError[Number(column)]
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      spreadSheet[row][9],
+                      spreadSheet[0][column],
+                      'local de preparo não e o mesmo relacionado a quadra',
                     );
                 }
               }
             }
 
-            if (spreadSheet[0][column].includes('SEQ')) {
+            if (column === '8') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][9],
+                    spreadSheet[0][column],
+                  );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
               } else if (spreadSheet[row][7] === spreadSheet[Number(row) - 1][7]) {
@@ -238,7 +364,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      spreadSheet[row][9],
                       spreadSheet[0][column],
                       'a seq deve ser sequencial',
                     );
@@ -247,7 +373,7 @@ export class ImportAllocationController {
                 responseIfError[Number(column)]
                     += responseGenericFactory(
                     (Number(column) + 1),
-                    row,
+                    spreadSheet[row][9],
                     spreadSheet[0][column],
                     'a seq precisa começar em 1 por quadra',
                   );
