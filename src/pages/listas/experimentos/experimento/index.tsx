@@ -90,14 +90,14 @@ interface IData {
 }
 
 export default function Listagem({
-      allExperiments,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -575,7 +575,6 @@ export default function Listagem({
             delete newItem.experimentName;
             delete newItem.type_assay;
             delete newItem.idSafra;
-            delete newItem.id;
             delete newItem.assay_list;
             return newItem;
           });

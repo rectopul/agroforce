@@ -134,6 +134,10 @@ export class ExperimentController {
         parameters.idSafra = Number(options.idSafra);
       }
 
+      if (options.id) {
+        parameters.id = Number(options.id);
+      }
+
       if (options.id_assay_list) {
         parameters.idAssayList = Number(options.id_assay_list);
       }
@@ -199,7 +203,7 @@ export class ExperimentController {
 
       const response = await this.experimentRepository.findOne(id);
 
-      if (!response) throw new Error('Item não encontrado');
+      if (!response) return { status: 400, response };
 
       return { status: 200, response };
     } catch (error: any) {

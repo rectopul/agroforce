@@ -58,6 +58,7 @@ export class ImportNpeController {
           if (status === 200) {
             return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE já cadastrada no sistema` };
           }
+
           if (npeTemp.includes(npeName)) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             npeTemp[row] = npeName;
