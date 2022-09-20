@@ -62,10 +62,13 @@ interface IFilter {
   filterFoco: string | any;
   filterEnsaio: string | any;
   filterTecnologia: string | any;
+  filterCodTecnologia: string | any;
   filterEpoca: string | any;
   filterNPE: string | any;
   filterNpeFrom: string | any;
   filterNpeTo: string | any;
+  filterNpeFinalFrom: string | any;
+  filterNpeFinalTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -164,12 +167,6 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Grupo ',
-      value: 'group',
-      defaultChecked: () => camposGerenciados.includes('group'),
-    },
-    {
-      name: 'CamposGerenciados[]',
       title: 'Prox NPE ',
       value: 'prox_npe',
       defaultChecked: () => camposGerenciados.includes('prox_npe'),
@@ -196,10 +193,13 @@ export default function Listagem({
       filterFoco: '',
       filterEnsaio: '',
       filterTecnologia: '',
+      filterCodTecnologia: '',
       filterEpoca: '',
       filterNPE: '',
       filterNpeTo: '',
       filterNpeFrom: '',
+      filterNpeFinalTo: '',
+      filterNpeFinalFrom: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -210,13 +210,16 @@ export default function Listagem({
       filterFoco,
       filterEnsaio,
       filterTecnologia,
+      filterCodTecnologia,
       filterEpoca,
       filterNPE,
       filterNpeTo,
       filterNpeFrom,
+      filterNpeFinalTo,
+      filterNpeFinalFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterCodTecnologia=${filterCodTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -716,7 +719,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterTecnologia', 'Nome tec.')}
+                  {filterFieldFactory('filterCodTecnologia', 'Cód. Tec.')}
+
+                  {filterFieldFactory('filterTecnologia', 'Nome Tec.')}
 
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
@@ -736,6 +741,27 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Prox NPE
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFinalFrom"
+                        name="filterNpeFinalFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeFinalTo"
+                        name="filterNpeFinalTo"
                         onChange={formik.handleChange}
                       />
                     </div>

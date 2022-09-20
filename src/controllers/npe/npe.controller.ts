@@ -21,15 +21,7 @@ export class NpeController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') {
-          if (options.filterStatus == '1') {
-            parameters.status = JSON.parse(`{ "in" : [1, 3]}`);
-          } else if (options.filterStatus == '4') {
-            parameters.status = 1;
-          } else {
-            parameters.status = Number(options.filterStatus);
-          }
-        }
+        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
 
       if (options.filterLocal) {
@@ -48,8 +40,8 @@ export class NpeController {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
       }
 
-      if (options.filterCodTec) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+      if (options.filterCodTecnologia) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTecnologia}" } }`);
       }
 
       if (options.filterEpoca) {
@@ -108,6 +100,16 @@ export class NpeController {
         }
       }
 
+      if (options.filterGrpFrom || options.filterGrpTo) {
+        if (options.filterGrpFrom && options.filterGrpTo) {
+          parameters.foco = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+        } else if (options.filterGrpFrom) {
+          parameters.foco = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+        } else if (options.filterGrpTo) {
+          parameters.foco = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+        }
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -144,7 +146,6 @@ export class NpeController {
           group: true,
           npei: true,
           npef: true,
-          npei_i: true,
           status: true,
           edited: true,
           npeQT: true,
@@ -164,7 +165,7 @@ export class NpeController {
 
         if (next) {
           if (!newItem.npeQT) {
-            newItem.npeQT = next.npei - newItem.prox_npe;
+            newItem.npeQT = next.npei - newItem.npei;
           }
           newItem.nextNPE = next.npei;
         } else {
