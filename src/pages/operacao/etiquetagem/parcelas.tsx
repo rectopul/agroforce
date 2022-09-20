@@ -20,7 +20,11 @@ import {
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload, BsTrashFill } from 'react-icons/bs';
-import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import {
+  RiArrowUpDownLine,
+  RiCloseCircleFill,
+  RiFileExcel2Line,
+} from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
@@ -58,22 +62,22 @@ import { fetchWrapper } from '../../../helpers';
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
 interface IFilter {
-  filterFoco: string
-  filterTypeAssay: string
-  filterNameTec: string
-  filterCodTec: string
-  filterGli: string
-  filterExperimentName: string
-  filterLocal: string
+  filterFoco: string;
+  filterTypeAssay: string;
+  filterNameTec: string;
+  filterCodTec: string;
+  filterGli: string;
+  filterExperimentName: string;
+  filterLocal: string;
   filterRepetitionFrom: string | any;
   filterRepetitionTo: string | any;
-  filterStatus: string
-  filterNtFrom: string
-  filterNtTo: string
-  filterNpeFrom: string
-  filterNpeTo: string
-  filterGenotypeName: string
-  filterNca: string
+  filterStatus: string;
+  filterNtFrom: string;
+  filterNtTo: string;
+  filterNpeFrom: string;
+  filterNpeTo: string;
+  filterGenotypeName: string;
+  filterNca: string;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -90,6 +94,8 @@ export default function Listagem({
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
+
+  const router = useRouter();
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
@@ -312,12 +318,14 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
 
-      await experimentGenotipeService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setParcelas(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await experimentGenotipeService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setParcelas(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
@@ -380,7 +388,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -407,15 +414,11 @@ export default function Listagem({
 
   function actionTableFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          Ação
-        </div>
-      ),
+      title: <div className="flex items-center">Ação</div>,
       field: 'action',
       sorting: false,
       width: 0,
-      render: (rowData: any) => ((rowData.status === 'IMPRESSO') ? (
+      render: (rowData: any) => (rowData.status === 'IMPRESSO' ? (
         <div className="h-7 flex">
           <div className="h-7" />
           <div style={{ width: 5 }} />
@@ -448,41 +451,38 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
       if (columnOrder[index] === 'type_assay') {
-        tableFields.push(
-          headerTableFactory('Ensaio', 'type_assay.name'),
-        );
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnOrder[index] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnOrder[index] === 'experiment') {
-        tableFields.push(headerTableFactory('Experimento', 'experiment.experimentName'));
+        tableFields.push(
+          headerTableFactory('Experimento', 'experiment.experimentName'),
+        );
       }
       if (columnOrder[index] === 'local') {
-        tableFields.push(headerTableFactory('Lugar de plantio', 'experiment.local.name_local_culture'));
+        tableFields.push(
+          headerTableFactory(
+            'Lugar de plantio',
+            'experiment.local.name_local_culture',
+          ),
+        );
       }
       if (columnOrder[index] === 'rep') {
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(
-          headerTableFactory('Status', 'status'),
-        );
+        tableFields.push(headerTableFactory('Status', 'status'));
       }
       if (columnOrder[index] === 'nt') {
-        tableFields.push(
-          headerTableFactory('NT.', 'nt'),
-        );
+        tableFields.push(headerTableFactory('NT.', 'nt'));
       }
       if (columnOrder[index] === 'npe') {
-        tableFields.push(
-          headerTableFactory('NPE.', 'npe'),
-        );
+        tableFields.push(headerTableFactory('NPE.', 'npe'));
       }
       if (columnOrder[index] === 'name_genotipo') {
         tableFields.push(
@@ -647,7 +647,9 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
@@ -657,7 +659,9 @@ export default function Listagem({
         setNcaOne(item.nca);
       }
     });
-    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
     let colorVerify = '';
     if (countNca > 0) {
       colorVerify = 'bg-green-600';
@@ -677,7 +681,9 @@ export default function Listagem({
   }
 
   async function verifyAgain() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     let countNca = 0;
     let secondNca = '';
     parcelas.map((item: any) => {
@@ -688,7 +694,9 @@ export default function Listagem({
         countNca += 1;
       }
     });
-    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
     let colorVerify = '';
     if (countNca > 0 && secondNca === ncaOne) {
       colorVerify = 'bg-green-600';
@@ -739,7 +747,9 @@ export default function Listagem({
   }
 
   async function validateInput() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     if (inputCode.length === 12) {
       if (dismiss) {
         writeOff();
@@ -772,7 +782,9 @@ export default function Listagem({
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
+        onRequestClose={() => {
+          setIsOpenModal(!isOpenModal);
+        }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
@@ -797,17 +809,25 @@ export default function Listagem({
             className="flex absolute top-4 right-3 justify-end"
             onClick={cleanState}
           >
-            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
+            <RiCloseCircleFill
+              size={35}
+              className="fill-red-600 hover:fill-red-800"
+            />
           </button>
 
           <div className="flex px-4  justify-between">
             <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Imprimir etiqueta</h2>
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">
+                Imprimir etiqueta
+              </h2>
             </header>
             <Input
               type="text"
               placeholder="Código de barras (NCA)"
-              disabled={(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+              disabled={
+                validateNcaOne === 'bg-red-600'
+                || validateNcaTwo === 'bg-red-600'
+              }
               id="inputCode"
               name="inputCode"
               maxLength={12}
@@ -836,9 +856,23 @@ export default function Listagem({
                 title="Cancelar"
                 value="Cancelar"
                 textColor="white"
-                disabled={!(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+                disabled={
+                  !(
+                    validateNcaOne === 'bg-red-600'
+                    || validateNcaTwo === 'bg-red-600'
+                  )
+                }
                 onClick={cleanState}
                 bgColor="bg-red-600"
+              />
+            </div>
+            <div className="h-10 w-40 ml-2">
+              <Button
+                title="Imprimir"
+                value="Imprimir"
+                textColor="white"
+                onClick={() => router.push('imprimir')}
+                bgColor="bg-green-600"
               />
             </div>
           </div>
@@ -864,7 +898,8 @@ export default function Listagem({
                                     "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-8
@@ -875,11 +910,14 @@ export default function Listagem({
                   {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-
+                  {filterFieldFactory(
+                    'filterExperimentName',
+                    'Nome Experimento',
+                  )}
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-2
@@ -1040,7 +1078,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1048,7 +1086,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -1248,7 +1285,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1281,7 +1318,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment_genotipe`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1296,7 +1334,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allParcelas, total: totalItems } = await fetch(
+  const { response: allParcelas = [], total: totalItems = 0 } = await fetch(
     urlParametersParcelas.toString(),
     requestOptions,
   ).then((response) => response.json());

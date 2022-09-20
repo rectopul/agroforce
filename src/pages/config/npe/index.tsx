@@ -343,6 +343,32 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory(title: string, name: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {title}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
@@ -364,8 +390,11 @@ export default function Listagem({
       if (columnCampos[item] === 'ensaio') {
         tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
+      // if (columnCampos[item] === 'tecnologia') {
+      //   tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
+      // }
       if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
@@ -953,8 +982,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   } as RequestInit | undefined;
 
   const {
-    response: allNpe,
-    total: totalItems,
+    response: allNpe = [],
+    total: totalItems = 0,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
   return {

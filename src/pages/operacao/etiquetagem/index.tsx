@@ -444,9 +444,9 @@ export default function Listagem({
       });
   }
 
-  function filterFieldFactory(title: string, name: string) {
+  function filterFieldFactory(title: string, name: string, small: boolean = false) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className={small ? 'h-7 w-1/3 ml-2' : 'h-7 w-1/2 ml-2'}>
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -604,26 +604,17 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-8
+                  pb-0
                 "
                 >
-                  {filterFieldFactory('filterExperimentGroup', 'Nome do grupo de experimento')}
-                  {filterFieldFactory('filterQuantityExperiment', 'Qtde. exp.')}
+                  {filterFieldFactory('filterExperimentGroup', 'Nome do grupo de exp.')}
+                  {filterFieldFactory('filterQuantityExperiment', 'Qtde. exp.', true)}
                   {filterFieldFactory('filterTagsToPrint', 'Total etiq. a imprimir')}
                   {filterFieldFactory('filterTagsPrinted', 'Total etiq. impressas')}
-                </div>
+                  {filterFieldFactory('filterTotalTags', 'Total etiquetas', true)}
+                  {filterFieldFactory('filterStatus', 'Status', true)}
 
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                  "
-                >
-                  {filterFieldFactory('filterTotalTags', 'Total etiquetas')}
-                  {filterFieldFactory('filterStatus', 'Status')}
-
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-7 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Itens por página
                     </label>
@@ -638,20 +629,19 @@ export default function Listagem({
                       onChange={(e: any) => setTake(e.target.value)}
                     />
                   </div>
-                </div>
 
-                <div style={{ width: 40 }} />
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    type="submit"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => { }}
+                      value="Filtrar"
+                      type="submit"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>

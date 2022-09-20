@@ -166,6 +166,12 @@ export default function Listagem({
       value: 'npef',
       defaultChecked: () => camposGerenciados.includes('npef'),
     },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'GRP',
+      value: 'grp',
+      defaultChecked: () => camposGerenciados.includes('grp'),
+    },
   ]);
 
   const take: number = itensPerPage;
@@ -225,60 +231,6 @@ export default function Listagem({
 
   const filterStatus = filterApplication.split('');
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
-    const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'local') {
-        tableFields.push(
-          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
-        );
-      }
-      if (columnCampos[item] === 'safra') {
-        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
-      }
-      if (columnCampos[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
-      }
-      if (columnCampos[item] === 'ensaio') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
-      }
-      if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
-      }
-      if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Época', 'epoca'));
-      }
-      if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
-      }
-      if (columnCampos[item] === 'npef') {
-        tableFields.push(headerTableFactory('NPE Final', 'npef'));
-      }
-    });
-    return tableFields;
-  }
-
-  const columns = colums(camposGerenciados);
-
   async function handleOrder(
     column: string,
     order: string | any,
@@ -325,6 +277,89 @@ export default function Listagem({
       }
     }
   }
+
+  function headerTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: true,
+    };
+  }
+
+  function tecnologiaHeaderFactory(title: string, name: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {title}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
+  function colums(camposGerenciados: any): any {
+    const columnCampos: any = camposGerenciados.split(',');
+    const tableFields: any = [];
+    Object.keys(columnCampos).forEach((item) => {
+      if (columnCampos[item] === 'local') {
+        tableFields.push(
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
+        );
+      }
+      if (columnCampos[item] === 'safra') {
+        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
+      }
+      if (columnCampos[item] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+      }
+      if (columnCampos[item] === 'ensaio') {
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      }
+      if (columnCampos[item] === 'tecnologia') {
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+      }
+      if (columnCampos[item] === 'epoca') {
+        tableFields.push(headerTableFactory('Época', 'epoca'));
+      }
+      if (columnCampos[item] === 'npei') {
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+      }
+      if (columnCampos[item] === 'npef') {
+        tableFields.push(headerTableFactory('NPE Final', 'npef'));
+      }
+      if (columnCampos[item] === 'grp') {
+        tableFields.push(headerTableFactory('GRP', 'grp'));
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = colums(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -506,7 +541,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-7 w-1/2 ml-4">
+      <div className="h-7 w-1/2 ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -574,7 +609,7 @@ export default function Listagem({
                   pb-0
                 "
                 >
-                  <div className="h-6 w-1/2 ml-1">
+                  {/* <div className="h-6 w-1/3 ml-1">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
@@ -585,7 +620,7 @@ export default function Listagem({
                       values={filters.map((id) => id)}
                       selected="1"
                     />
-                  </div>
+                  </div> */}
 
                   {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
@@ -599,7 +634,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEpoca', 'Época')}
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE Inicial
                     </label>
@@ -620,7 +655,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE Final
                     </label>
@@ -640,6 +675,8 @@ export default function Listagem({
                       />
                     </div>
                   </div>
+
+                  {filterFieldFactory('grp', 'GRP')}
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
