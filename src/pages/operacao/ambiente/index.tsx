@@ -1,31 +1,31 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { Router, useRouter } from 'next/router';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { removeCookies } from 'cookies-next';
-import { npeService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+} from "react-icons/ai";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { Router, useRouter } from "next/router";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { removeCookies } from "cookies-next";
+import { npeService, userPreferencesService } from "../../../services";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   AccordionFilter,
   Button,
@@ -33,8 +33,8 @@ import {
   Content,
   Input,
   Select,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../components";
+import * as ITabs from "../../../shared/utils/dropdown";
 
 interface INpeProps {
   id: number | any;
@@ -89,24 +89,29 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
+  const tabsOperationMenu = tabsOperation.map((i) =>
+    i.titleTab === "AMBIENTE"
+      ? { ...i, statusTab: true }
+      : { ...i, statubsTab: false }
+  );
+  console.log({ tabsOperationMenu });
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.npe || {
     id: 0,
-    table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef',
+    table_preferences: "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef",
   };
-  preferences.table_preferences = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef';
+  preferences.table_preferences =
+    "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef";
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -119,58 +124,58 @@ export default function Listagem({
     //   defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Lugar de cultura',
-      value: 'local',
-      defaultChecked: () => camposGerenciados.includes('local'),
+      name: "CamposGerenciados[]",
+      title: "Lugar de cultura",
+      value: "local",
+      defaultChecked: () => camposGerenciados.includes("local"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Safra ',
-      value: 'safra',
-      defaultChecked: () => camposGerenciados.includes('safra'),
+      name: "CamposGerenciados[]",
+      title: "Safra ",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Foco ',
-      value: 'foco',
-      defaultChecked: () => camposGerenciados.includes('foco'),
+      name: "CamposGerenciados[]",
+      title: "Foco ",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ensaio ',
-      value: 'ensaio',
-      defaultChecked: () => camposGerenciados.includes('ensaio'),
+      name: "CamposGerenciados[]",
+      title: "Ensaio ",
+      value: "ensaio",
+      defaultChecked: () => camposGerenciados.includes("ensaio"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Época',
-      value: 'epoca',
-      defaultChecked: () => camposGerenciados.includes('epoca'),
+      name: "CamposGerenciados[]",
+      title: "Época",
+      value: "epoca",
+      defaultChecked: () => camposGerenciados.includes("epoca"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Inicial ',
-      value: 'npei',
-      defaultChecked: () => camposGerenciados.includes('npei'),
+      name: "CamposGerenciados[]",
+      title: "NPE Inicial ",
+      value: "npei",
+      defaultChecked: () => camposGerenciados.includes("npei"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Final',
-      value: 'npef',
-      defaultChecked: () => camposGerenciados.includes('npef'),
+      name: "CamposGerenciados[]",
+      title: "NPE Final",
+      value: "npef",
+      defaultChecked: () => camposGerenciados.includes("npef"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'GRP',
-      value: 'grp',
-      defaultChecked: () => camposGerenciados.includes('grp'),
+      name: "CamposGerenciados[]",
+      title: "GRP",
+      value: "grp",
+      defaultChecked: () => camposGerenciados.includes("grp"),
     },
   ]);
 
@@ -180,20 +185,20 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterLocal: '',
-      filterSafra: '',
-      filterFoco: '',
-      filterEnsaio: '',
-      filterTecnologia: '',
-      filterEpoca: '',
-      filterNPE: '',
-      orderBy: '',
-      typeOrder: '',
-      filterNpeTo: '',
-      filterNpeFrom: '',
-      filterNpeFinalTo: '',
-      filterNpeFinalFrom: '',
+      filterStatus: "",
+      filterLocal: "",
+      filterSafra: "",
+      filterFoco: "",
+      filterEnsaio: "",
+      filterTecnologia: "",
+      filterEpoca: "",
+      filterNPE: "",
+      orderBy: "",
+      typeOrder: "",
+      filterNpeTo: "",
+      filterNpeFrom: "",
+      filterNpeFinalTo: "",
+      filterNpeFinalFrom: "",
     },
     onSubmit: async ({
       filterStatus,
@@ -209,8 +214,11 @@ export default function Listagem({
       filterNpeFinalTo,
       filterNpeFinalFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${userLogado.safras.safra_selecionada}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${
+        userLogado.safras.safra_selecionada
+      }`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -223,35 +231,35 @@ export default function Listagem({
   });
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-    { id: 3, name: 'Sorteado' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
+    { id: 3, name: "Sorteado" },
   ];
 
-  const filterStatus = filterApplication.split('');
+  const filterStatus = filterApplication.split("");
 
   async function handleOrder(
     column: string,
-    order: string | any,
+    order: string | any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
 
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -273,7 +281,7 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
   }
@@ -309,7 +317,7 @@ export default function Listagem({
           </button>
         </div>
       ),
-      field: 'tecnologia',
+      field: "tecnologia",
       width: 0,
       sorting: true,
       render: (rowData: any) => (
@@ -323,37 +331,37 @@ export default function Listagem({
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === 'local') {
+      if (columnCampos[item] === "local") {
         tableFields.push(
-          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
+          headerTableFactory("Lugar de cultura", "local.name_local_culture")
         );
       }
-      if (columnCampos[item] === 'safra') {
-        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
+      if (columnCampos[item] === "safra") {
+        tableFields.push(headerTableFactory("Safra", "safra.safraName"));
       }
-      if (columnCampos[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+      if (columnCampos[item] === "foco") {
+        tableFields.push(headerTableFactory("Foco", "foco.name"));
       }
-      if (columnCampos[item] === 'ensaio') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      if (columnCampos[item] === "ensaio") {
+        tableFields.push(headerTableFactory("Ensaio", "type_assay.name"));
       }
-      if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+      if (columnCampos[item] === "tecnologia") {
+        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
       }
-      if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Época', 'epoca'));
+      if (columnCampos[item] === "epoca") {
+        tableFields.push(headerTableFactory("Época", "epoca"));
       }
-      if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+      if (columnCampos[item] === "npei") {
+        tableFields.push(headerTableFactory("NPE Inicial", "npei"));
       }
-      if (columnCampos[item] === 'npef') {
-        tableFields.push(headerTableFactory('NPE Final', 'npef'));
+      if (columnCampos[item] === "npef") {
+        tableFields.push(headerTableFactory("NPE Final", "npef"));
       }
-      if (columnCampos[item] === 'grp') {
-        tableFields.push(headerTableFactory('GRP', 'grp'));
+      if (columnCampos[item] === "grp") {
+        tableFields.push(headerTableFactory("GRP", "grp"));
       }
     });
     return tableFields;
@@ -363,7 +371,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -386,7 +394,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.layout_quadra = {
         id: preferences.id,
@@ -397,7 +405,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -405,16 +413,18 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    const parametersFilter = `filterStatus=${1}&id_safra=${
+      data.id_safra
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
+      data.id_type_assay
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
           Swal.fire(
-            'NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações',
+            "NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações"
           );
-          router.push('');
+          router.push("");
         }
       });
     } else {
@@ -452,68 +462,66 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes('paramSelect')) {
+    if (!filterApplication.includes("paramSelect")) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
     await npeService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map(
-          (row: any) => {
-            if (row.status === 0) {
-              row.status = 'Inativo';
-            } else {
-              row.status = 'Ativo';
-            }
-            console.log(row);
-            row.LOCAL = row.local.name_local_culture;
-            row.SAFRA = row.safra.safraName;
-            row.FOCO = row.foco.name;
-            row.TIPO_ENSAIO = row.type_assay.name;
-            row.TECNOLOGIA = row.tecnologia.name;
-            row.ÉPOCA = row.epoca;
-            row.NPEI = row.npei;
-            row.NPEF = row.npef;
-            row.NPEQT = row.npeQT;
-            row.NEXT_NPE = row.nextNPE;
-            row.STATUS = row.status;
+        const newData = response.response.map((row: any) => {
+          if (row.status === 0) {
+            row.status = "Inativo";
+          } else {
+            row.status = "Ativo";
+          }
+          console.log(row);
+          row.LOCAL = row.local.name_local_culture;
+          row.SAFRA = row.safra.safraName;
+          row.FOCO = row.foco.name;
+          row.TIPO_ENSAIO = row.type_assay.name;
+          row.TECNOLOGIA = row.tecnologia.name;
+          row.ÉPOCA = row.epoca;
+          row.NPEI = row.npei;
+          row.NPEF = row.npef;
+          row.NPEQT = row.npeQT;
+          row.NEXT_NPE = row.nextNPE;
+          row.STATUS = row.status;
 
-            delete row.local;
-            delete row.safra;
-            delete row.foco;
-            delete row.type_assay;
-            delete row.tecnologia;
-            delete row.epoca;
-            delete row.npei;
-            delete row.npef;
-            delete row.npeQT;
-            delete row.nextNPE;
-            delete row.status;
-            delete row.avatar;
-            delete row.id;
+          delete row.local;
+          delete row.safra;
+          delete row.foco;
+          delete row.type_assay;
+          delete row.tecnologia;
+          delete row.epoca;
+          delete row.npei;
+          delete row.npef;
+          delete row.npeQT;
+          delete row.nextNPE;
+          delete row.status;
+          delete row.avatar;
+          delete row.id;
 
-            return row;
-          },
-        );
+          return row;
+        });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
-        Swal.fire('Erro ao exportar');
+        Swal.fire("Erro ao exportar");
       }
     });
   };
@@ -558,8 +566,10 @@ export default function Listagem({
   }
 
   function handleSelectionRow(data: any) {
-    const selectedRow = data?.map((e: any) => (
-      { ...e, tableData: { id: e.tableData.id, checked: false } }));
+    const selectedRow = data?.map((e: any) => ({
+      ...e,
+      tableData: { id: e.tableData.id, checked: false },
+    }));
     setSelectedNPE(selectedRow);
   }
 
@@ -622,17 +632,17 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
+                  {filterFieldFactory("filterLocal", "Lugar de cultura")}
 
-                  {filterFieldFactory('filterSafra', 'Safra')}
+                  {filterFieldFactory("filterSafra", "Safra")}
 
-                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory("filterFoco", "Foco")}
 
-                  {filterFieldFactory('filterEnsaio', 'Ensaio')}
+                  {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory("filterTecnologia", "Tecnologia")}
 
-                  {filterFieldFactory('filterEpoca', 'Época')}
+                  {filterFieldFactory("filterEpoca", "Época")}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -676,11 +686,11 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('grp', 'GRP')}
+                  {filterFieldFactory("grp", "GRP")}
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -688,7 +698,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -696,7 +705,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={npe}
               onRowClick={(evt, selectedRow: any) => {
@@ -707,7 +716,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -735,23 +744,28 @@ export default function Listagem({
                       <Button
                         title="Gerar sorteio"
                         value="Gerar sorteio"
-                        bgColor={selectedNPE?.length <= 0 ? 'bg-gray-400' : 'bg-blue-600'}
+                        bgColor={
+                          selectedNPE?.length <= 0
+                            ? "bg-gray-400"
+                            : "bg-blue-600"
+                        }
                         textColor="white"
                         disabled={selectedNPE.length <= 0}
                         onClick={() => {
                           selectedNPE.sort((a, b) => a.npei - b.npei);
-                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
+                          localStorage.setItem(
+                            "selectedNPE",
+                            JSON.stringify(selectedNPE)
+                          );
                           router.push({
-                            pathname: '/operacao/ambiente/experimento',
+                            pathname: "/operacao/ambiente/experimento",
                           });
                         }}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -798,7 +812,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -835,59 +849,60 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 10)}
-                      bgColor="bg-blue-600 testing"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600 testing"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -897,7 +912,10 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
@@ -906,8 +924,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
@@ -918,15 +936,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allNpe = [],
-    total: totalItems = 0,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
+  const { response: allNpe = [], total: totalItems = 0 } = await fetch(
+    urlParameters.toString(),
+    requestOptions
+  ).then((response) => response.json());
 
   return {
     props: {

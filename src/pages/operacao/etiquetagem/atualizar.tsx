@@ -85,7 +85,7 @@ export default function Listagem({
     { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
     {
       name: "CamposGerenciados[]",
-      title: "Nome do experimento",
+      title: "Nome experimento",
       value: "experimentName",
     },
     { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
