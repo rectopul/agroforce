@@ -141,6 +141,8 @@ export default function Listagem({
 
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+  const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
+  const [npeUsedTo, setNpeUsedTo] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -571,7 +573,9 @@ export default function Listagem({
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
+            i == NPESelectedRow.nextNPE ? setNpeUsedFrom(i) : '';
           });
+          npeUsedFrom != 0 ? setNpeUsedTo(i) : setNpeUsedTo(0);
           setExperimento(response);
           setTotalItems(total)
           temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
@@ -625,31 +629,52 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
-    const experiment_genotipo: any[] = [];
-    let npei = Number(NPESelectedRow?.npei_i);
-    let total_consumed = 0;
+    if (!SortearDisable) {
+      const experiment_genotipo: any[] = [];
+      let npei = Number(NPESelectedRow?.npei_i);
+      let total_consumed = 0;
 
-    experimentos?.map((item: any) => {
-      total_consumed += item.npeQT;
-      item.assay_list.genotype_treatment.map((gt: any) => {
-        const data: any = {};
-        data.idSafra = gt.id_safra;
-        data.idFoco = item.assay_list.foco.id;
-        data.idTypeAssay = item.assay_list.type_assay.id;
-        data.idTecnologia = item.assay_list.tecnologia.id;
-        data.gli = item.assay_list.gli;
-        data.idExperiment = item.id;
-        data.rep = item.delineamento.repeticao;
-        data.nt = gt.treatments_number;
-        data.npe = npei;
-        // data.name_genotipo = gt.genotipo.name_genotipo;
-        data.idGenotipo = gt.genotipo.id; // Added new field
-        data.nca = '';
-        experiment_genotipo.push(data);
-        npei++;
+      experimentos?.map((item: any) => {
+        total_consumed += item.npeQT;
+        item.assay_list.genotype_treatment.map((gt: any) => {
+          const data: any = {};
+          data.idSafra = gt.id_safra;
+          data.idFoco = item.assay_list.foco.id;
+          data.idTypeAssay = item.assay_list.type_assay.id;
+          data.idTecnologia = item.assay_list.tecnologia.id;
+          data.gli = item.assay_list.gli;
+          data.idExperiment = item.id;
+          data.rep = item.delineamento.repeticao;
+          data.nt = gt.treatments_number;
+          data.npe = npei;
+          // data.name_genotipo = gt.genotipo.name_genotipo;
+          data.idGenotipo = gt.genotipo.id; // Added new field
+          data.nca = '';
+          experiment_genotipo.push(data);
+          npei++;
+        });
       });
-    });
-    createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+    } else {
+      const temp = selectedNPE[selectedNPE.indexOf(NPESelectedRow) + 1];
+      Swal.fire({
+        title: 'NPE Já usado !!!',
+        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + npeUsedTo + "</b><br><br>" +
+          "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " +
+          temp.foco.name + "</b><br><b> Ensaio : " +
+          temp.type_assay.name + "</b><br><b> Local : " +
+          temp.local.name_local_culture + "</b><br><b> Tecnologia : " +
+          temp.tecnologia.name + "</b></p></div>",
+        icon: 'warning',
+        confirmButtonText: 'Acesse o NPE e atualize',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push({
+            pathname: '/config/npe',
+          });
+        }
+      });
+    }
   }
 
   useEffect(() => {
@@ -826,7 +851,6 @@ export default function Listagem({
                               value="Sortear"
                               bgColor={SortearDisable ? 'bg-gray-400' : 'bg-blue-600'}
                               textColor="white"
-                              disabled={SortearDisable}
                               onClick={validateConsumedData}
                             />
                           </div>
