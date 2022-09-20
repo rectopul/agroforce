@@ -1,10 +1,13 @@
 /* eslint-disable camelcase */
 import handleError from '../shared/utils/handleError';
 import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -116,12 +119,19 @@ export class TypeAssayController {
 
   async create(data: object | any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe' };
       const response = await this.typeAssayRepository.create(data);
+
+      await this.reporteRepository.create({
+        madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+      });
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não cadastrado' };
       }
+
       return { status: 200, response };
     } catch (error: any) {
       handleError('Tipo de ensaio controller', 'Create', error.message);
@@ -131,12 +141,23 @@ export class TypeAssayController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      if (data) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
         const response = await this.typeAssayRepository.update(data.id, data);
         if (!response) {
           return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
+        }
+        if (response.status === 1) {
+          await this.reporteRepository.create({
+            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Edição', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+          });
+        }
+        if (response.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Inativação', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+          });
         }
         return { status: 200, response };
       }

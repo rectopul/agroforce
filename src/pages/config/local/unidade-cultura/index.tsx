@@ -462,16 +462,16 @@ export default function Listagem({
             newRow.DT = `${dataExp.toLocaleDateString(
               'pt-BR',
             )} ${hours}:${minutes}:${seconds}`;
-            newRow.Nome_Unidade_Cultura = newRow?.name_unity_culture;
-            newRow.Ano = newRow?.year;
-            newRow.Nome_Lugar_Cultura = newRow.local?.name_local_culture;
-            newRow.Rotulo = newRow.local?.label;
-            newRow.Mloc = newRow.local?.mloc;
-            newRow.Fazenda = newRow.local?.adress;
-            newRow.País = newRow.local?.label_country;
-            newRow.Região = newRow.local?.label_region;
-            newRow.Localidade = newRow.local?.name_locality;
-            newRow.Data = newRow.DT;
+            newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
+            newRow.ANO = newRow?.year;
+            newRow.NOME_LUGAR_CULTURA = newRow.local?.name_local_culture;
+            newRow.RÓTULO = newRow.local?.label;
+            newRow.MLOC = newRow.local?.mloc;
+            newRow.FAZENDA = newRow.local?.adress;
+            newRow.PAÍS = newRow.local?.label_country;
+            newRow.REGIÃO = newRow.local?.label_region;
+            newRow.LOCALIDADE = newRow.local?.name_locality;
+            newRow.DATA = newRow.DT;
 
             delete newRow.year;
             delete newRow.name_unity_culture;

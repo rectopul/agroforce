@@ -1,10 +1,13 @@
 import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 
 export class FocoController {
   public readonly required = 'Campo obrigatório';
 
   focoRepository = new FocoRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -100,6 +103,8 @@ export class FocoController {
 
   async create(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture, status: 1 },
       );
@@ -107,6 +112,10 @@ export class FocoController {
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
 
       const response = await this.focoRepository.create(data);
+      await this.reporteRepository.create({
+        madeBy: response.created_by, module: 'Foco', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+      });
+
       if (response) {
         return { status: 200, response, message: { message: 'Foco criado' } };
       }
@@ -119,9 +128,22 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
+      if (data) {
         const foco = await this.focoRepository.update(data.id, data);
         if (!foco) return { status: 400, message: 'Foco não encontrado' };
+        if (foco.status === 1) {
+          await this.reporteRepository.create({
+            madeBy: foco.created_by, module: 'Foco', operation: 'Edição', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          });
+        }
+        if (foco.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: foco.created_by, module: 'Foco', operation: 'Inativação', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          });
+        }
+
         return { status: 200, message: 'Foco atualizada' };
       }
       const focoAlreadyExists = await this.focoRepository.findByName(

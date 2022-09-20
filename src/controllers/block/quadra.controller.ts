@@ -1,9 +1,12 @@
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { QuadraRepository } from '../../repository/quadra.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 
 export class QuadraController {
   quadraRepository = new QuadraRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -128,9 +131,16 @@ export class QuadraController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
+      if (data) {
         const quadra = await this.quadraRepository.update(data.id, data);
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
+        if (quadra.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: quadra.created_by, module: 'Quadras-Quadra', operation: 'Inativação', name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
+          });
+        }
         return { status: 200, message: 'Quadra atualizada' };
       }
       const quadra = await this.quadraRepository.findOne(data.id);

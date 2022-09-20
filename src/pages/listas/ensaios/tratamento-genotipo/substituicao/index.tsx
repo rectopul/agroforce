@@ -81,12 +81,12 @@ interface IData {
 }
 
 export default function Listagem({
-      allLote,
-      totalItems,
-      idSafra,
-      itensPerPage,
-      filterApplication,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  idSafra,
+  itensPerPage,
+  filterApplication,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -104,7 +104,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.lote || {
     id: 0,
     table_preferences:
-      'id,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
+      'year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -158,6 +158,7 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
   const formik = useFormik<IFilter>({
     initialValues: {
       filterYear: '',
@@ -188,7 +189,7 @@ export default function Listagem({
       filterTecnologia,
     }) => {
       const tempParams: any = [];
-      if (treatmentsOptionSelected == "nca") {
+      if (treatmentsOptionSelected == 'nca') {
         checkedTreatments.forEach((item: any) => {
           if (item.idGenotipo) {
             tempParams.push(item.idGenotipo);
@@ -278,8 +279,7 @@ export default function Listagem({
     };
   }
 
-
-  const value = router.query.value;
+  const { value } = router.query;
 
   async function openModal(id: number, genotipoName: string, nccName: number) {
     if (treatmentsOptionSelected === 'genotipo') {
@@ -292,7 +292,6 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-
     const { message } = await replaceTreatmentService.replace({ id, checkedTreatments, value });
     Swal.fire({
       html: message,
@@ -301,8 +300,7 @@ export default function Listagem({
 
     if (value == 'ensaios') {
       router.back();
-    }
-    else if (value == 'experiment') {
+    } else if (value == 'experiment') {
       router.push('/listas/experimentos/parcelas-experimento');
     }
   }
@@ -456,12 +454,10 @@ export default function Listagem({
     await seperate(parametersFilter);
   }
 
-
   async function seperate(parametersFilter: any) {
-
     const tempParams: any = [];
 
-    if (treatmentsOptionSelected == "nca") {
+    if (treatmentsOptionSelected == 'nca') {
       checkedTreatments.forEach((item: any) => {
         if (item.idGenotipo) {
           tempParams.push(item.idGenotipo);
@@ -487,9 +483,7 @@ export default function Listagem({
           setTotalItems(total);
         }
       });
-
   }
-
 
   function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (

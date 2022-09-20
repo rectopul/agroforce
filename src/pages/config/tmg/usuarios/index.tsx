@@ -478,17 +478,17 @@ export default function Listagem({
 
         const dataExcel: any = response.response;
         dataExcel.forEach((line: any) => {
-          line.Nome = line.name;
-          line.Tel = line.tel;
-          line.Login = line.login;
-          line.Cpf = line.cpf;
-
           if (line.status === 0) {
             line.status = 'Inativo';
           } else {
             line.status = 'Ativo';
           }
-          line.Status = line.status;
+
+          line.LOGIN = line.login;
+          line.NOME = line.name;
+          line.TEL = line.tel;
+          line.STATUS = line.status;
+          line.CPF = line.cpf;
 
           delete line.avatar;
           delete line.id;

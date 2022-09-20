@@ -16,7 +16,9 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -81,11 +83,11 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -144,7 +146,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Local ',
+      title: 'Lugar de cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -214,7 +216,7 @@ export default function Listagem({
       filterNpeFrom,
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
       await npeService
         .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
         .then((response) => {
@@ -296,9 +298,9 @@ export default function Listagem({
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor={rowData.edited == 1 ? "bg-blue-900" : "bg-blue-600"}
+              bgColor={rowData.edited == 1 ? 'bg-blue-900' : 'bg-blue-600'}
               textColor="white"
-              title={`Editar`}
+              title="Editar"
               onClick={() => {
                 router.push(`/config/npe/atualizar?id=${rowData.id}`);
               }}
@@ -308,15 +310,15 @@ export default function Listagem({
           {((rowData.status == 1) || (rowData.status == 3)) ? (
             <div>
               <Button
-                title={rowData.status == 3 ? "" : "Ativo"}
+                title={rowData.status == 3 ? '' : 'Ativo'}
                 icon={<FaRegThumbsUp size={14} />}
                 onClick={() => handleStatus(rowData.id, {
                   status: rowData.status,
                   ...rowData,
                 })}
-                bgColor={rowData.status == 3 ? "bg-gray-400" : "bg-green-600"}
+                bgColor={rowData.status == 3 ? 'bg-gray-400' : 'bg-green-600'}
                 textColor="white"
-                disabled={rowData.status == 3 ? true : false}
+                disabled={rowData.status == 3}
               />
             </div>
           ) : (
@@ -350,7 +352,7 @@ export default function Listagem({
       // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Local', 'local.name_local_culture'),
+          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -479,8 +481,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
-      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-      }&epoca=${String(data.epoca)}`;
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -536,17 +538,17 @@ export default function Listagem({
               row.status = 'Ativo';
             }
 
-            row.Local = row.local?.name_local_culture;
-            row.Safra = row.safra?.safraName;
-            row.Foco = row.foco?.name;
-            row.Época = row?.epoca;
-            row.Tecnologia = row.tecnologia?.name;
-            row.Tipo_Ensaio = row.type_assay?.name;
-            row.Grupo = row.group.group;
+            row.LOCAL = row.local?.name_local_culture;
+            row.SAFRA = row.safra?.safraName;
+            row.FOCO = row.foco?.name;
+            row.ÉPOCA = row?.epoca;
+            row.TECNOLOGIA = row.tecnologia?.name;
+            row.TIPO_ENSAIO = row.type_assay?.name;
+            row.GRUPO = row.group.group;
             row.NPEI = row.npei;
-            row.Status = row.status;
-            row.Quant_NPE = row?.npeQT;
-            row.Prox_NPE = row?.nextNPE;
+            row.STATUS = row.status;
+            row.QUANT_NPE = row?.npeQT;
+            row.PROX_NPE = row?.nextNPE;
 
             delete row.local;
             delete row.safra;
@@ -677,7 +679,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Local')}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -769,6 +771,7 @@ export default function Listagem({
                       />
                     </div> */}
 
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

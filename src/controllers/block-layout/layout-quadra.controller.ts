@@ -1,4 +1,5 @@
 import { LayoutQuadraRepository } from '../../repository/layout-quadra.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 import { LayoutChildrenController } from '../layout-children.controller';
 
@@ -6,6 +7,8 @@ export class LayoutQuadraController {
   layoutQuadraRepository = new LayoutQuadraRepository();
 
   layoutChildrenController = new LayoutChildrenController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -143,9 +146,15 @@ export class LayoutQuadraController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
-        const layout = await this.layoutQuadraRepository.update(data.id, data);
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
 
+      if (data) {
+        const layout = await this.layoutQuadraRepository.update(data.id, data);
+        if (layout.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: layout.created_by, module: 'Quadra-Layout', operation: 'Inativação', name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
+          });
+        }
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
         return { status: 200, message: 'Layout de quadra atualizada' };
       }

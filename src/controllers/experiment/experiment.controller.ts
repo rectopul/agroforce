@@ -1,15 +1,19 @@
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
+import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
 
   assayListController = new AssayListController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -220,14 +224,16 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
-        await this.countExperimentGroupChildren(data.experimentGroupId);
+        const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+        await this.setParcelasStatus(idList);
         return { status: 200, message: 'Experimento atualizado' };
       }
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
-
       const response = await this.experimentRepository.update(experimento.id, data);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
@@ -236,6 +242,9 @@ export class ExperimentController {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }
       if (response) {
+        await this.reporteRepository.create({
+          madeBy: response.created_by, module: 'Experimento', operation: 'Inativação', name: response.experimentName, ip: JSON.stringify(ip), idOperation: response.id,
+        });
         return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
@@ -275,9 +284,41 @@ export class ExperimentController {
   async countExperimentGroupChildren(id: number) {
     const experimentGroupController = new ExperimentGroupController();
     const { response }: IReturnObject = await experimentGroupController.getOne(id);
-    if (!response) return;
+    if (!response) throw new Error('GRUPO DE EXPERIMENTO NÃO ENCONTRADO');
+    const idList = response.experiment?.map((item: any) => item.id);
     const experimentAmount = response.experiment?.length;
-    const status = experimentAmount === 0 ? null : 'IMP. N INICI.';
+    let { status } = response;
+    if (!response.status) {
+      status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
+    }
     await experimentGroupController.update({ id: response.id, experimentAmount, status });
+    return idList;
+  }
+
+  async setParcelasStatus(idList: Array<number>) {
+    const experimentGenotipeController = new ExperimentGenotipeController();
+    await experimentGenotipeController.setStatus({ idList, status: 'EM ETIQUETAGEM' });
+  }
+
+  async handleExperimentStatus(id: number) {
+    const { response } : any = await this.getOne(id);
+    const allParcelas = response?.experiment_genotipe?.length;
+    let toPrint = 0;
+    let printed = 0;
+    let status = '';
+    response.experiment_genotipe?.map((parcelas: any) => {
+      if (parcelas.status === 'IMPRESSO') {
+        printed += 1;
+      } else if (parcelas.status === 'EM ETIQUETAGEM') {
+        toPrint += 1;
+      }
+    });
+    if (toPrint > 1) {
+      status = 'ETIQ. EM ANDAMENTO';
+    } else if (printed === allParcelas) {
+      status = 'ETIQ. FINALIZADA';
+    }
+
+    await this.update({ id, status });
   }
 }

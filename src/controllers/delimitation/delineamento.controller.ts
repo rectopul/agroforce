@@ -1,8 +1,11 @@
 import { DelineamentoRepository } from '../../repository/delineamento.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 
 export class DelineamentoController {
   Repository = new DelineamentoRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -117,9 +120,16 @@ export class DelineamentoController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
+      if (data) {
         const delineamento = await this.Repository.update(data.id, data);
         if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
+        if (delineamento.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: delineamento.created_by, module: 'Delineamento', operation: 'Inativação', name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
+          });
+        }
         return { status: 200, message: 'Delineamento atualizada' };
       }
       const response = await this.Repository.update(data.id, data);

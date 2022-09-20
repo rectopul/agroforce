@@ -1,10 +1,13 @@
 import { GroupRepository } from '../repository/group.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 
 export class GroupController {
   public readonly required = 'Campo obrigatório';
 
   groupRepository = new GroupRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getOne({ id }: any) {
     try {
@@ -21,11 +24,15 @@ export class GroupController {
 
   async create(data: any) {
     try {
-      const groupAlreadyExists = await this.groupRepository.findByData(data);
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
 
+      const groupAlreadyExists = await this.groupRepository.findByData(data);
       if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
-      await this.groupRepository.create(data);
+      const grupo = await this.groupRepository.create(data);
+      await this.reporteRepository.create({
+        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+      });
 
       return { status: 200, message: 'grupo cadastrado' };
     } catch (error: any) {
@@ -36,12 +43,16 @@ export class GroupController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       const group: any = await this.groupRepository.findById(data.id);
 
       if (!group) return { status: 400, message: 'grupo não existente' };
 
-      await this.groupRepository.update(data.id, data);
-
+      const grupo = await this.groupRepository.update(data.id, data);
+      await this.reporteRepository.create({
+        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+      });
       return { status: 200, message: 'grupo atualizado' };
     } catch (error: any) {
       handleError('Grupo controller', 'Update', error.message);

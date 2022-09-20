@@ -610,7 +610,9 @@ export default function Listagem({
                       </DragDropContext>
                     </AccordionFilter>
                   </div>
+
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
+
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
@@ -632,8 +634,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="w-full" style={{ marginLeft: -80 }} />
-
+                  <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
@@ -689,7 +690,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-32 ml-0">
+                    <div className="h-12 w-74 ml-0">
                       <Button
                         title="Salvar grupo de experimento"
                         value="Salvar grupo de experimento"
@@ -840,6 +841,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,

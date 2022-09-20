@@ -542,15 +542,15 @@ export default function Listagem({
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
-          row.Nome_Lugar_Cultura = row.name_local_culture;
-          row.Rótulo = row.label;
-          row.Mloc = row.mloc;
-          row.Nome_Da_Fazenda = row.adress;
-          row.País = row.label_country;
-          row.Região_Rótulo = row.label_region;
-          row.Região = row.name_locality;
-          row.Status = row.status;
-          row.Data = row.DT;
+          row.NOME_LUGAR_CULTURA = row.name_local_culture;
+          row.RÓTULO = row.label;
+          row.MLOC = row.mloc;
+          row.NOME_DA_FAZENDA = row.adress;
+          row.PAÍS = row.label_country;
+          row.REGIÃO_RÓTULO = row.label_region;
+          row.REGIÃO = row.name_locality;
+          row.STATUS = row.status;
+          row.DATA = row.DT;
 
           delete row.name_local_culture;
           delete row.label;
@@ -640,11 +640,11 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem dos Locais</title>
+        <title>Listagem de Lugares de Cultura</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar locais">
+          <AccordionFilter title="Filtrar lugares de cultura">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col

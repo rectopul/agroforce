@@ -1,6 +1,7 @@
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { NpeRepository } from '../../repository/npe.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
@@ -9,7 +10,10 @@ export class NpeController {
   npeRepository = new NpeRepository();
 
   groupController = new GroupController();
+
   experimentController = new ExperimentController();
+
+  reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -91,6 +95,16 @@ export class NpeController {
           parameters.npei = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)} }`);
         } else if (options.filterNpeTo) {
           parameters.npei = JSON.parse(`{"lte": ${Number(options.filterNpeTo)} }`);
+        }
+      }
+
+      if (options.filterNpeFinalFrom || options.filterNpeFinalTo) {
+        if (options.filterNpeFinalFrom && options.filterNpeFinalTo) {
+          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)}, "lte": ${Number(options.filterNpeFinalTo)} }`);
+        } else if (options.filterNpeFinalFrom) {
+          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)} }`);
+        } else if (options.filterNpeFinalTo) {
+          parameters.npef = JSON.parse(`{"lte": ${Number(options.filterNpeFinalTo)} }`);
         }
       }
 
@@ -233,9 +247,16 @@ export class NpeController {
 
   async update(data: any) {
     try {
-      if (data.status === 0 || data.status === 1) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
+      if (data) {
         const npe = await this.npeRepository.update(data.id, data);
         if (!npe) return { status: 400, message: 'Npe não encontrado' };
+        if (npe.status === 0) {
+          await this.reporteRepository.create({
+            madeBy: npe.created_by, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+          });
+        }
         return { status: 200, message: 'Npe atualizada' };
       }
       const npeExist = await this.getOne(data.id);

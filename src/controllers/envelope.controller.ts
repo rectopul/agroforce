@@ -1,10 +1,13 @@
 import { EnvelopeRepository } from '../repository/envelope.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 
 export class EnvelopeController {
   public readonly required = 'Campo obrigatório';
 
   envelopeRepository = new EnvelopeRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getOne({ id }: any) {
     try {
@@ -21,6 +24,8 @@ export class EnvelopeController {
 
   async create(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       const envelopeAlreadyExists = await this.envelopeRepository.findByData(
         data,
       );
@@ -29,8 +34,10 @@ export class EnvelopeController {
         return { status: 400, message: 'Envelope já cadastrado nessa safra' };
       }
 
-      await this.envelopeRepository.create(data);
-
+      const semente: any = await this.envelopeRepository.create(data);
+      await this.reporteRepository.create({
+        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+      });
       return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
       handleError('Envelope controller', 'Create', error.message);
@@ -40,11 +47,16 @@ export class EnvelopeController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+
       const envelope: any = await this.envelopeRepository.findById(data.id);
 
       if (!envelope) return { status: 400, message: 'envelope não existente' };
 
-      await this.envelopeRepository.update(data.id, data);
+      const semente: any = await this.envelopeRepository.update(data.id, data);
+      await this.reporteRepository.create({
+        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+      });
 
       return { status: 200, message: 'envelope atualizado' };
     } catch (error: any) {
@@ -84,7 +96,6 @@ export class EnvelopeController {
       const orderBy = options.orderBy
         ? `{"${options.orderBy}":"${options.typeOrder}"}`
         : undefined;
-
 
       const response: object | any = await this.envelopeRepository.findAll(
         parameters,

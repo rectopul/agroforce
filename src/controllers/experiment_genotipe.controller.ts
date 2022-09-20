@@ -1,9 +1,18 @@
 import { ExperimentGenotipeRepository } from 'src/repository/experiment_genotipe.repository';
+import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
+import { ExperimentController } from './experiment/experiment.controller';
+import { PrintHistoryController } from './print-history/print-history.controller';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
+
+  private experimentController = new ExperimentController();
+
+  private experimentGroupController = new ExperimentGroupController();
+
+  private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -95,6 +104,7 @@ export class ExperimentGenotipeController {
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
         gli: true,
+        status: true,
         experiment: {
           select: {
             experimentName: true,
@@ -116,7 +126,7 @@ export class ExperimentGenotipeController {
 
       if (options.experimentGroupId) {
         const idList = await this.generateIdList(Number(options.experimentGroupId));
-        if (idList.length > 1) {
+        if (idList?.length > 1) {
           parameters.idExperiment = {};
           parameters.idExperiment.in = idList;
         } else {
@@ -144,8 +154,8 @@ export class ExperimentGenotipeController {
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Tratamentos do genótipo controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Tratamentos do genótipo erro');
+      handleError('Parcelas controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Parcelas erro');
     }
   }
 
@@ -155,17 +165,67 @@ export class ExperimentGenotipeController {
       if (response) {
         return { status: 200, message: 'Tratamento experimental registrado' };
       }
-      return { status: 400, message: 'Tratamento do experimento não registrado' };
+      return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
-      handleError('Tratamento do experimento do controlador', 'Create', error.message);
-      throw new Error('[Controller] - Erro ao criar esboço de tratamento do experimento');
+      handleError('Parcelas do controlador', 'Create', error.message);
+      throw new Error('[Controller] - Erro ao criar esboço de Parcelas');
+    }
+  }
+
+  async getOne(id: number) {
+    try {
+      const response = await this.ExperimentGenotipeRepository.findById(id);
+
+      if (!response) throw new Error('Parcela não encontrada');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Parcela controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Grupo de experimento erro');
+    }
+  }
+
+  async update({ idList, status, userId }: any) {
+    try {
+      await this.ExperimentGenotipeRepository.printed(idList, status);
+      const { response: parcelas } = await this.getOne(idList[0]);
+      const { response }: any = await this.experimentController.getOne(parcelas?.idExperiment);
+      await this.experimentGroupController.countEtiqueta(
+        response.experimentGroupId,
+        parcelas?.idExperiment,
+      );
+      await this.printedHistoryController.create({idList, userId});
+    } catch (error: any) {
+      handleError('Parcelas controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Parcelas erro');
     }
   }
 
   async generateIdList(id: number): Promise<Array<number>> {
-    const experimentGroupController = new ExperimentGroupController();
-    const { response } = await experimentGroupController.getOne(id);
-    const idList = response.experiment.map((item: any) => Number(item.id));
-    return idList;
+    try {
+      const experimentGroupController = new ExperimentGroupController();
+      const { response }: any = await experimentGroupController.getOne(id);
+      const idList = response.experiment?.map((item: any) => Number(item.id));
+      return idList;
+    } catch (error: any) {
+      handleError('Parcelas controller', 'generateIdList', error.message);
+      throw new Error('[Controller] - generateIdList Parcelas erro');
+    }
+  }
+
+  async setStatus({ idList: idExperiment, status }: any) {
+    try {
+      await this.ExperimentGenotipeRepository.updateStatus(idExperiment, status);
+      idExperiment.map(async (id: number) => {
+        const { response }: any = await this.experimentController.getOne(id);
+        await this.experimentGroupController.countEtiqueta(
+          response.experimentGroupId,
+          idExperiment,
+        );
+      });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'setStatus', error.message);
+      throw new Error('[Controller] - setStatus Parcelas erro');
+    }
   }
 }

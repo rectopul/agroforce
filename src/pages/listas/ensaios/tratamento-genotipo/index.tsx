@@ -284,7 +284,7 @@ export default function Listagem({
     }
   }
 
-  function headerTableFactory(name: string, title: string) {
+  function headerTableFactory(name: string, title: string, style: boolean = false) {
     return {
       title: (
         <div className="flex items-center">
@@ -299,6 +299,7 @@ export default function Listagem({
       ),
       field: title,
       sorting: true,
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -365,11 +366,11 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
       }
     });
     return tableFields;
@@ -439,17 +440,17 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.Safra = item.safra.safraName;
-            newItem.Foco = item.assay_list.foco.name;
-            newItem.Ensaio = item.assay_list.type_assay.name;
-            newItem.Tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.Gli = item.assay_list.gli;
-            newItem.Bgm = item.assay_list.bgm;
-            newItem.Nt = item.treatments_number;
-            newItem.StatusT = item.status;
-            newItem.StatusEnsaio = item.assay_list.status;
-            newItem.Genotipo = item.genotipo.name_genotipo;
-            newItem.Nca = item?.lote?.ncc;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.assay_list.foco.name;
+            newItem.ENSAIO = item.assay_list.type_assay.name;
+            newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
+            newItem.GLI = item.assay_list.gli;
+            newItem.BGM = item.assay_list.bgm;
+            newItem.NT = item.treatments_number;
+            newItem.STATUS_T = item.status;
+            newItem.STATUS_ENSAIO = item.assay_list.status;
+            newItem.GENOTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item?.lote?.ncc;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -480,15 +481,15 @@ export default function Listagem({
           const newData = response.map((item: any) => {
             const newItem: any = {};
             newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
+            newItem.foco = item.assay_list?.foco.name;
+            newItem.ensaio = item.assay_list?.type_assay.name;
+            newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
+            newItem.gli = item.assay_list?.gli;
+            newItem.bgm = item.assay_list?.bgm;
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
+            newItem.nca = item.lote?.ncc;
             newItem.novo_genotipo = '';
             newItem.novo_status = '';
             newItem.novo_nca = '';
@@ -536,7 +537,7 @@ export default function Listagem({
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
-      .then(({ status, response,total }) => {
+      .then(({ status, response, total }) => {
         if (status === 200) {
           setTreatments(response);
           setTotalItems(total);
@@ -586,11 +587,11 @@ export default function Listagem({
     const inputFile: any = document.getElementById('import');
     event.preventDefault();
     if (genotypeButton) {
-      
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id,
-          idGenotipo:item.id_genotipo,
-          idLote:item.id_lote,
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
         }
       ));
 
@@ -601,9 +602,10 @@ export default function Listagem({
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id,
-          idGenotipo:item.id_genotipo,
-          idLote:item.id_lote,
+        {
+          id: item.id,
+          idGenotipo: item.id_genotipo,
+          idLote: item.id_lote,
         }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);

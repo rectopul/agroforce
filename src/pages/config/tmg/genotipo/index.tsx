@@ -572,26 +572,26 @@ export default function Listagem({
 
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
-          row.Id_S1 = row.id_s1;
-          row.Id_Dados = row.id_dados;
-          row.Nome_Genótipo = row.name_genotipo;
-          row.Nome_Público = row.name_public;
-          row.Nome_Experimental = row.name_experiment;
-          row.Nome_Alternativo = row.name_alter;
-          row.Elite_Nome = row.elit_name;
-          row.Tecnologia = row.tecnologia;
-          row.N_De_Lotes = row.numberLotes;
-          row.Tipo = row.type;
-          row.Gmr = row.gmr;
-          row.Bgm = row.bgm;
-          row.Cruza = row.cruza;
-          row.Progenitor_F_Direto = row.progenitor_f_direto;
-          row.Progenitor_M_Direto = row.progenitor_m_direto;
-          row.Progenitor_F_Origem = row.progenitor_f_origem;
-          row.Progenitor_M_Origem = row.progenitor_m_origem;
-          row.Progenitores_Origem = row.progenitores_origem;
-          row.Parentesco_Completo = row.parentesco_completo;
-          row.Data = row.DT;
+          row.ID_S1 = row.id_s1;
+          row.ID_DADOS = row.id_dados;
+          row.NOME_GENÓTIPO = row.name_genotipo;
+          row.NOME_PÚBLICO = row.name_public;
+          row.NOME_EXPERIMENTAL = row.name_experiment;
+          row.NOME_ALTERNATIVO = row.name_alter;
+          row.ELITE_NOME = row.elit_name;
+          row.TECNOLOGIA = row.tecnologia;
+          row.N_DE_LOTES = row.numberLotes;
+          row.TIPO = row.type;
+          row.GMR = row.gmr;
+          row.BGM = row.bgm;
+          row.CRUZA = row.cruza;
+          row.PROGENITOR_F_DIRETO = row.progenitor_f_direto;
+          row.PROGENITOR_M_DIRETO = row.progenitor_m_direto;
+          row.PROGENITOR_F_ORIGEM = row.progenitor_f_origem;
+          row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
+          row.PROGENITORES_ORIGEM = row.progenitores_origem;
+          row.PARENTESCO_COMPLETO = row.parentesco_completo;
+          row.DATA = row.DT;
 
           delete row.id_s1;
           delete row.name_main;
@@ -812,9 +812,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tec')}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cód. Tecnologia')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome tecnologia')}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tecnologia')}
                 </div>
 
                 <div

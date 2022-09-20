@@ -37,6 +37,10 @@ export class ExperimentGroupController {
         parameters.safraId = Number(options.safraId);
       }
 
+      if (options.id) {
+        parameters.id = Number(options.id);
+      }
+
       const select = {
         id: true,
         name: true,
@@ -135,5 +139,58 @@ export class ExperimentGroupController {
       handleError('Grupo de experimento controller', 'Delete', error.message);
       throw new Error('[Controller] - Delete Grupo de experimento erro');
     }
+  }
+
+  async countEtiqueta(id: number, idExperiment: any) {
+    const { response } = await this.getOne(id);
+    let totalTags = 0;
+    let tagsToPrint = 0;
+    let tagsPrinted = 0;
+    response.experiment.map((item: any) => {
+      item.experiment_genotipe.map((parcelas: any) => {
+        totalTags += 1;
+        if (parcelas.status === 'EM ETIQUETAGEM') {
+          tagsToPrint += 1;
+        } else if (parcelas.status === 'IMPRESSO') {
+          tagsPrinted += 1;
+        }
+      });
+    });
+    await this.update({
+      id,
+      totalTags,
+      tagsToPrint,
+      tagsPrinted,
+    });
+    if (typeof idExperiment === 'number') {
+      await this.experimentController.handleExperimentStatus(idExperiment);
+    } else {
+      idExperiment?.map(async (experimentId: number) => {
+        await this.experimentController.handleExperimentStatus(experimentId);
+      });
+    }
+    await this.handleGroupStatus(id);
+  }
+
+  async handleGroupStatus(id: number) {
+    const { response } : any = await this.getOne(id);
+    const allExperiments = response?.experiment?.length;
+    let toPrint = 0;
+    let printed = 0;
+    let status = '';
+    response?.experiment?.map((experiment: any) => {
+      if (experiment.status === 'ETIQ. FINALIZADA') {
+        printed += 1;
+      } else if (experiment.status === 'ETIQ. EM ANDAMENTO') {
+        toPrint += 1;
+      }
+    });
+
+    if (toPrint >= 1) {
+      status = 'ETIQ. EM ANDAMENTO';
+    } else if (printed === allExperiments) {
+      status = 'ETIQ. FINALIZADA';
+    }
+    await this.update({ id, status });
   }
 }

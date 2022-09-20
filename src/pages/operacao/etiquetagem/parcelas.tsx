@@ -19,14 +19,20 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload } from 'react-icons/bs';
-import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import { BsDownload, BsTrashFill } from 'react-icons/bs';
+import {
+  RiArrowUpDownLine,
+  RiCloseCircleFill,
+  RiFileExcel2Line,
+} from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
+import { HiArrowNarrowRight } from 'react-icons/hi';
+import { AiOutlinePrinter } from 'react-icons/ai';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -46,6 +52,7 @@ import {
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   experimentGenotipeService,
+  experimentGroupService,
   importService,
   userPreferencesService,
 } from '../../../services';
@@ -55,22 +62,22 @@ import { fetchWrapper } from '../../../helpers';
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
 interface IFilter {
-  filterFoco: string
-  filterTypeAssay: string
-  filterNameTec: string
-  filterCodTec: string
-  filterGli: string
-  filterExperimentName: string
-  filterLocal: string
+  filterFoco: string;
+  filterTypeAssay: string;
+  filterNameTec: string;
+  filterCodTec: string;
+  filterGli: string;
+  filterExperimentName: string;
+  filterLocal: string;
   filterRepetitionFrom: string | any;
   filterRepetitionTo: string | any;
-  filterStatus: string
-  filterNtFrom: string
-  filterNtTo: string
-  filterNpeFrom: string
-  filterNpeTo: string
-  filterGenotypeName: string
-  filterNca: string
+  filterStatus: string;
+  filterNtFrom: string;
+  filterNtTo: string;
+  filterNpeFrom: string;
+  filterNpeTo: string;
+  filterGenotypeName: string;
+  filterNca: string;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -78,6 +85,7 @@ interface IFilter {
 export default function Listagem({
   allExperiments,
   totalItems,
+  experimentGroup,
   itensPerPage,
   experimentGroupId,
   filterApplication,
@@ -86,6 +94,8 @@ export default function Listagem({
   filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
+
+  const router = useRouter();
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
@@ -216,8 +226,21 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+  const [validateNcaOne, setValidateNcaOne] = useState<string>('bg-gray-300');
+  const [validateNcaTwo, setValidateNcaTwo] = useState<string>('bg-gray-300');
+  const [totalMatch, setTotalMatch] = useState<number>(0);
+  const [genotypeNameOne, setGenotypeNameOne] = useState<string>('');
+  const [genotypeNameTwo, setGenotypeNameTwo] = useState<string>('');
+  const [ncaOne, setNcaOne] = useState<string>('');
+  const [ncaTwo, setNcaTwo] = useState<string>('');
+  const [groupNameOne, setGroupNameOne] = useState<string>('');
+  const [groupNameTwo, setGroupNameTwo] = useState<string>('');
+  const [doubleVerify, setDoubleVerify] = useState<boolean>(false);
+  const [parcelasToPrint, setParcelasToPrint] = useState<any>([]);
+  const [dismiss, setDismiss] = useState<boolean>();
+  const [writeOffId, setWriteOffId] = useState<number>();
+  const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
-  const router = useRouter();
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -295,12 +318,14 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
 
-      await experimentGenotipeService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setParcelas(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await experimentGenotipeService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setParcelas(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
@@ -363,7 +388,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -388,6 +412,37 @@ export default function Listagem({
     };
   }
 
+  function actionTableFactory() {
+    return {
+      title: <div className="flex items-center">Ação</div>,
+      field: 'action',
+      sorting: false,
+      width: 0,
+      render: (rowData: any) => (rowData.status === 'IMPRESSO' ? (
+        <div className="h-7 flex">
+          <div className="h-7" />
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<HiArrowNarrowRight size={14} />}
+              title={`Dar baixa na parcela ${rowData.id}`}
+              onClick={() => {
+                setDismiss(true);
+                setIsOpenModal(true);
+                setWriteOffNca(rowData.nca);
+                setWriteOffId(rowData.id);
+              }}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
+        </div>
+      ) : (
+        <div />
+      )),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -396,41 +451,38 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
       if (columnOrder[index] === 'type_assay') {
-        tableFields.push(
-          headerTableFactory('Ensaio', 'type_assay.name'),
-        );
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnOrder[index] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnOrder[index] === 'experiment') {
-        tableFields.push(headerTableFactory('Experimento', 'experiment.experimentName'));
+        tableFields.push(
+          headerTableFactory('Experimento', 'experiment.experimentName'),
+        );
       }
       if (columnOrder[index] === 'local') {
-        tableFields.push(headerTableFactory('Lugar de plantio', 'experiment.local.name_local_culture'));
+        tableFields.push(
+          headerTableFactory(
+            'Lugar de plantio',
+            'experiment.local.name_local_culture',
+          ),
+        );
       }
       if (columnOrder[index] === 'rep') {
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(
-          headerTableFactory('Status EXP.', 'experiment.status'),
-        );
+        tableFields.push(headerTableFactory('Status', 'status'));
       }
       if (columnOrder[index] === 'nt') {
-        tableFields.push(
-          headerTableFactory('NT.', 'nt'),
-        );
+        tableFields.push(headerTableFactory('NT.', 'nt'));
       }
       if (columnOrder[index] === 'npe') {
-        tableFields.push(
-          headerTableFactory('NPE.', 'npe'),
-        );
+        tableFields.push(headerTableFactory('NPE.', 'npe'));
       }
       if (columnOrder[index] === 'name_genotipo') {
         tableFields.push(
@@ -439,6 +491,9 @@ export default function Listagem({
       }
       if (columnOrder[index] === 'nca') {
         tableFields.push(headerTableFactory('NCA', 'nca'));
+      }
+      if (columnOrder[index] === 'action') {
+        tableFields.push(actionTableFactory());
       }
     });
     return tableFields;
@@ -573,18 +628,143 @@ export default function Listagem({
     );
   }
 
+  async function cleanState() {
+    setDoubleVerify(false);
+    setNcaOne('');
+    setGenotypeNameOne('');
+    setNcaTwo('');
+    setGenotypeNameTwo('');
+    setGroupNameOne('');
+    setGroupNameTwo('');
+    setTotalMatch(0);
+    setDismiss(false);
+    setWriteOffNca(0);
+    setWriteOffId(0);
+    setValidateNcaOne('bg-gray-300');
+    setValidateNcaTwo('bg-gray-300');
+    setParcelasToPrint([]);
+    setIsOpenModal(!isOpenModal);
+  }
+
   async function handleSubmit() {
-    // const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
-    // const { status }: IReturnObject = await experimentGenotipeService.update({
-    //   idList: experimentsSelected,
-    //   experimentGroupId: Number(experimentGroupId),
-    //   status: 'IMP. N INICI.',
-    // });
-    // if (status !== 200) {
-    //   Swal.fire('Erro ao associar experimentos');
-    // } else {
-    //   router.back();
-    // }
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
+    let countNca = 0;
+    parcelas.map((item: any) => {
+      if (item.nca === inputCode) {
+        setParcelasToPrint((current: any) => [...current, item.id]);
+        countNca += 1;
+        setGenotypeNameOne(item.name_genotipo);
+        setNcaOne(item.nca);
+      }
+    });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
+    let colorVerify = '';
+    if (countNca > 0) {
+      colorVerify = 'bg-green-600';
+      setGroupNameOne(response[0]?.name);
+      setValidateNcaOne('bg-green-600');
+    } else {
+      colorVerify = 'bg-red-600';
+      setValidateNcaOne('bg-red-600');
+    }
+    setTotalMatch(countNca);
+    if (colorVerify === 'bg-green-600') {
+      (document.getElementById('inputCode') as HTMLInputElement).value = '';
+      setDoubleVerify(true);
+    } else {
+      setDoubleVerify(false);
+    }
+  }
+
+  async function verifyAgain() {
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
+    let countNca = 0;
+    let secondNca = '';
+    parcelas.map((item: any) => {
+      if (item.nca === inputCode) {
+        setGenotypeNameTwo(item.name_genotipo);
+        secondNca = item.nca;
+        setNcaTwo(item.nca);
+        countNca += 1;
+      }
+    });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
+    let colorVerify = '';
+    if (countNca > 0 && secondNca === ncaOne) {
+      colorVerify = 'bg-green-600';
+      setGroupNameTwo(response[0]?.name);
+      setValidateNcaTwo('bg-green-600');
+    } else {
+      colorVerify = 'bg-red-600';
+      setValidateNcaTwo('bg-red-600');
+    }
+    setTotalMatch(countNca);
+    if (colorVerify === 'bg-green-600') {
+      await experimentGenotipeService.update({ idList: parcelasToPrint, status: 'IMPRESSO', userId: userLogado.id });
+      cleanState();
+    }
+  }
+
+  async function writeOff() {
+    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    if (!doubleVerify) {
+      let colorVerify = '';
+      if (inputCode === writeOffNca) {
+        colorVerify = 'bg-green-600';
+        setValidateNcaOne('bg-green-600');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaOne('bg-red-600');
+      }
+      if (colorVerify === 'bg-green-600') {
+        (document.getElementById('inputCode') as HTMLInputElement).value = '';
+        setDoubleVerify(true);
+      } else {
+        setDoubleVerify(false);
+      }
+    } else {
+      let colorVerify = '';
+      if (inputCode === writeOffNca) {
+        colorVerify = 'bg-green-600';
+        setValidateNcaTwo('bg-green-600');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaTwo('bg-red-600');
+      }
+      if (colorVerify === 'bg-green-600') {
+        await experimentGenotipeService.update({ idList: [writeOffId], status: 'EM ETIQUETAGEM', userId: userLogado.id });
+        cleanState();
+      }
+    }
+  }
+
+  async function validateInput() {
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
+    if (inputCode.length === 12) {
+      if (dismiss) {
+        writeOff();
+      } else if (doubleVerify) {
+        verifyAgain();
+      } else {
+        handleSubmit();
+      }
+    }
+  }
+
+  async function reprint() {
+    const idList = rowsSelected.map((item: any) => item.id);
+    console.log(`Imprimir ${idList}`);
+    await experimentGenotipeService.update({ idList, status: 'IMPRESSO', userId: userLogado.id });
   }
 
   useEffect(() => {
@@ -598,6 +778,107 @@ export default function Listagem({
         <title>Listagem de parcelas</title>
       </Head>
 
+      <Modal
+        isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        onRequestClose={() => {
+          setIsOpenModal(!isOpenModal);
+        }}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+        className="flex
+          flex-col
+          w-full
+          h-64
+          max-w-xl
+          bg-gray-50
+          rounded-tl-2xl
+          rounded-tr-2xl
+          rounded-br-2xl
+          rounded-bl-2xl
+          pt-2
+          pb-4
+          px-8
+          relative
+          shadow-lg
+          shadow-gray-900/50"
+      >
+        <form className="flex flex-col">
+          <button
+            type="button"
+            className="flex absolute top-4 right-3 justify-end"
+            onClick={cleanState}
+          >
+            <RiCloseCircleFill
+              size={35}
+              className="fill-red-600 hover:fill-red-800"
+            />
+          </button>
+
+          <div className="flex px-4  justify-between">
+            <header className="flex flex-col mt-2">
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">
+                Imprimir etiqueta
+              </h2>
+            </header>
+            <Input
+              type="text"
+              placeholder="Código de barras (NCA)"
+              disabled={
+                validateNcaOne === 'bg-red-600'
+                || validateNcaTwo === 'bg-red-600'
+              }
+              id="inputCode"
+              name="inputCode"
+              maxLength={12}
+              onChange={validateInput}
+            />
+          </div>
+
+          <h1>{`Total nca encontrado no grupo: ${totalMatch}`}</h1>
+          <div className="flex justify-between">
+            <div>
+              <div className={`${validateNcaOne} h-10 w-10 box-border`} />
+              <h1>{ncaOne}</h1>
+              <h1>{genotypeNameOne}</h1>
+              <h1>{groupNameOne}</h1>
+            </div>
+            <div>
+              <div className={`${validateNcaTwo} h-10 w-10 box-border`} />
+              <h1>{ncaTwo}</h1>
+              <h1>{genotypeNameTwo}</h1>
+              <h1>{groupNameTwo}</h1>
+            </div>
+          </div>
+          <div className="flex justify-end py-0">
+            <div className="h-10 w-40">
+              <Button
+                title="Cancelar"
+                value="Cancelar"
+                textColor="white"
+                disabled={
+                  !(
+                    validateNcaOne === 'bg-red-600'
+                    || validateNcaTwo === 'bg-red-600'
+                  )
+                }
+                onClick={cleanState}
+                bgColor="bg-red-600"
+              />
+            </div>
+            <div className="h-10 w-40 ml-2">
+              <Button
+                title="Imprimir"
+                value="Imprimir"
+                textColor="white"
+                onClick={() => router.push('imprimir')}
+                bgColor="bg-green-600"
+              />
+            </div>
+          </div>
+        </form>
+      </Modal>
+
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
           className="h-full w-full
@@ -606,7 +887,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar parcelas">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -617,7 +898,8 @@ export default function Listagem({
                                     "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-8
@@ -628,11 +910,14 @@ export default function Listagem({
                   {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-
+                  {filterFieldFactory(
+                    'filterExperimentName',
+                    'Nome Experimento',
+                  )}
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-2
@@ -793,7 +1078,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -801,7 +1086,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -845,34 +1129,35 @@ export default function Listagem({
                         title="Ação"
                         value="Ação"
                         textColor="white"
-                        onClick={() => { }}
+                        onClick={() => ((rowsSelected?.length > 0)
+                          ? reprint()
+                          : setIsOpenModal(true))}
                         bgColor="bg-blue-600"
-                        icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
                       Qte. exp:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.experimentAmount}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. a imp.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.tagsToPrint}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. imp.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.tagsPrinted}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq.:
                       {' '}
-                      {parcelas.length}
+                      {experimentGroup.totalTags}
                     </strong>
 
                     <div
@@ -1000,7 +1285,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1033,7 +1318,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment_genotipe`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1048,8 +1334,14 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allParcelas, total: totalItems } = await fetch(
+  const { response: allParcelas = [], total: totalItems = 0 } = await fetch(
     urlParametersParcelas.toString(),
+    requestOptions,
+  ).then((response) => response.json());
+
+  const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment-group`;
+  const experimentGroup = await fetch(
+    `${baseUrlShow}/${experimentGroupId}`,
     requestOptions,
   ).then((response) => response.json());
 
@@ -1058,6 +1350,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       allParcelas,
       totalItems,
       experimentGroupId,
+      experimentGroup,
       itensPerPage,
       filterApplication,
       idSafra,
