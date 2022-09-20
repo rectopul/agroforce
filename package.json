@@ -76,7 +76,9 @@
     "util": "^0.12.4",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.3",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "next-barcode": "1.4.0",
+    "next-qrcode": "2.2.0"
   },
   "devDependencies": {
     "@types/cookie": "^0.4.1",
