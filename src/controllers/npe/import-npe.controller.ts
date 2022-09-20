@@ -280,7 +280,6 @@ export class ImportNpeController {
                   if (responseIfError.length === 0) {
                     this.aux.npei = spreadSheet[row][column];
                     this.aux.npef = spreadSheet[row][column];
-                    this.aux.npei_i = spreadSheet[row][column];
                     this.aux.prox_npe = spreadSheet[row][column];
                   }
                 } else {
@@ -371,7 +370,6 @@ export class ImportNpeController {
                 if (configModule.response[0]?.fields[column] === 'NPEI') {
                   this.aux.npei = spreadSheet[row][column];
                   this.aux.npef = spreadSheet[row][column];
-                  this.aux.npei_i = spreadSheet[row][column];
                   this.aux.prox_npe = spreadSheet[row][column];
                 }
 
