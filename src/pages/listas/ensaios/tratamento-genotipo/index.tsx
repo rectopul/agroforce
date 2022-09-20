@@ -883,17 +883,7 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
                     </label>
-                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
+
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
