@@ -386,17 +386,17 @@ export class ImportAllocationController {
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
-              const { response: local }: IReturnObject = await localController.getAll({
+              const { response: local }: any = await localController.getAll({
                 name_local_culture: spreadSheet[row][6],
               });
-              const { response: quadra }: IReturnObject = await quadraController.getAll({
+              const { response: quadra }: any = await quadraController.getAll({
                 id_safra: idSafra, name: spreadSheet[row][7],
               });
-              const { response: experiment }: IReturnObject = await experimentController.getAll({
+              const { response: experiment }: any = await experimentController.getAll({
                 filterExperimentName: spreadSheet[row][2],
                 idSafra,
               });
-              const { response: teste }: IReturnObject = await experimentGenotipeController.update({
+              const { response: teste }: any = await experimentGenotipeController.update({
 
               });
             }
