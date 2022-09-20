@@ -659,13 +659,19 @@ export default function Listagem({
       const temp = selectedNPE[selectedNPE.indexOf(NPESelectedRow) + 1];
       Swal.fire({
         title: 'NPE Já usado !!!',
-        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + npeUsedTo + "</b><br><br>" +
+        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + selectedNPE.filter((x) => x == NPESelectedRow)[0].npef + "</b><br><br>" +
           "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " +
           temp.foco.name + "</b><br><b> Ensaio : " +
           temp.type_assay.name + "</b><br><b> Local : " +
-          temp.local.name_local_culture + "</b><br><b> Tecnologia : " +
+          temp.local.name_local_culture + "</b><br><b>Epoca : " +
+          temp.epoca + "</b><br><b>Tecnologia : " +
           temp.tecnologia.name + "</b></p></div>",
         icon: 'warning',
+        showCloseButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#d33',
+        confirmButtonColor: '#3085d6',
         confirmButtonText: 'Acesse o NPE e atualize',
       }).then((result) => {
         if (result.isConfirmed) {
