@@ -533,7 +533,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar dados de etiquetagem">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -555,7 +555,7 @@ export default function Listagem({
                   {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
 
                 </div>
 
@@ -565,7 +565,7 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
 
                   <div className="h-10 w-full ml-4">

@@ -143,7 +143,7 @@ export class ExperimentController {
       }
 
       if (options.experimentName) {
-        parameters.experimentName = options.idSafra;
+        parameters.experimentName = options.experimentName;
       }
       if (options.Foco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"id": ${Number(options.Foco)} } } }`));
@@ -157,8 +157,12 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.status) {
-        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.status}" } } `));
+      if (options.Status) {
+        parameters.status = options.Status;
+
+      }
+      if (options.gli) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -211,6 +215,20 @@ export class ExperimentController {
       throw new Error('[Controller] - GetOne Experimento erro');
     }
   }
+
+  async getFromExpName(name: any) {
+    try {
+      const response = await this.experimentRepository.findOneByName(name);
+
+      if (!response) throw new Error('Item não encontrado');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Experimento controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Experimento erro');
+    }
+  }
+
 
   async create(data: any) {
     try {
