@@ -126,7 +126,6 @@ export class ExperimentGenotipeController {
         genotipo: true,
         nca: true,
         idLote: true,
-        status:true
       };
 
 
