@@ -11,6 +11,7 @@ export class GenotypeTreatmentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+ 
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
@@ -79,9 +80,11 @@ export class GenotypeTreatmentController {
         id: true,
         id_lote: true,
         id_genotipo: true,
-        safra: { select: { safraName: true } },
+        safra: { select: { id: true,
+        safraName: true } },
         genotipo: {
           select: {
+            id:true,
             name_genotipo: true,
             gmr: true,
             bgm: true,
@@ -104,9 +107,10 @@ export class GenotypeTreatmentController {
         },
         assay_list: {
           select: {
-            foco: { select: { name: true } },
-            type_assay: { select: { name: true } },
-            tecnologia: { select: { name: true, cod_tec: true } },
+            foco: { select: { id:true, name: true } },
+            experiment: { select: { id:true,experimentName: true}},
+            type_assay: { select: { id:true,name: true } },
+            tecnologia: { select: { id:true,name: true, cod_tec: true } },
             gli: true,
             bgm: true,
             status: true,
@@ -114,6 +118,9 @@ export class GenotypeTreatmentController {
         },
         comments: true,
       };
+
+
+      
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
       }
@@ -134,6 +141,7 @@ export class GenotypeTreatmentController {
         parameters.genotipo = (JSON.parse(`{"name_genotipo": {"contains": "${options.name_genotipo}" } }`));
       }
 
+
       if (options.nca) {
         parameters.lote = (JSON.parse(`{"ncc": ${Number(options.nca)} }`));
       }
@@ -150,6 +158,8 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
+
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -157,6 +167,7 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
+
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

@@ -586,20 +586,24 @@ export default function Listagem({
     );
   }
 
-  function readExcel(value: any) {
-
+  async function readExcel(value: any) {
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({
+       importService.validate({
         table: 'REPLACEMENT_GENOTYPE ',
         spreadSheet: rows,
         moduleId: 27,
         idSafra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
-      }).then(({ message }: any) => {
+      }).then(({ status, message}: any) => {
+ 
         Swal.fire({
           html: message,
           width: '800',
         });
+        if(status != 400 && status == 200){
+          // console.log("dfhgdsf dhfd hgdf ",)
+          handlePagination();
+        }
       });
     });
   }
@@ -635,7 +639,8 @@ export default function Listagem({
 
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (inputFile?.files.length !== 0) {
-      readExcel(inputFile.files);
+      const value = await readExcel(inputFile.files);
+      console.log("calling me....",value);
     } else {
       Swal.fire('Selecione alguma opção ou import');
     }
