@@ -539,7 +539,8 @@ export default function Listagem({
     { title: 'Ensaio', field: 'type_assay.name' },
     { title: 'Tecnologia', field: 'tecnologia.name' },
     { title: 'Epoca', field: 'epoca' },
-    { title: 'NPE Inicial', field: 'npei' },
+    { title: 'NPE I', field: 'npei' },
+    { title: 'NPE Inicial', field: 'npei_i' },
     { title: 'NPE Final', field: 'npef' },
     { title: 'NPE Quantity', field: 'npeQT' },
   ];
@@ -562,7 +563,7 @@ export default function Listagem({
       }
       let temp = [...selectedNPE]
 
-      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
         if (status === 200) {
           let i = 0;
           response.length > 0 ? i = NPESelectedRow.npei_i : i = NPESelectedRow.npef;
@@ -572,6 +573,7 @@ export default function Listagem({
             i = item.npef + 1;
           });
           setExperimento(response);
+          setTotalItems(total)
           temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
         }
       });
@@ -864,7 +866,6 @@ export default function Listagem({
                               value={`${currentPage + 1}`}
                               bgColor="bg-blue-600"
                               textColor="white"
-                              disabled
                             />
                           ))
                         }
