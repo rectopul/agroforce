@@ -59,12 +59,15 @@ interface IFilter {
   filterFoco: string | any;
   filterEnsaio: string | any;
   filterTecnologia: string | any;
+  filterCodTecnologia: string | any;
   filterEpoca: string | any;
   filterNPE: string | any;
   filterNpeTo: string | any;
   filterNpeFrom: string | any;
   filterNpeFinalTo: string | any;
   filterNpeFinalFrom: string | any;
+  filterGrpTo: string | any;
+  filterGrpFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -191,6 +194,7 @@ export default function Listagem({
       filterFoco: "",
       filterEnsaio: "",
       filterTecnologia: "",
+      filterCodTecnologia: "",
       filterEpoca: "",
       filterNPE: "",
       orderBy: "",
@@ -199,6 +203,8 @@ export default function Listagem({
       filterNpeFrom: "",
       filterNpeFinalTo: "",
       filterNpeFinalFrom: "",
+      filterGrpTo: "",
+      filterGrpFrom: "",
     },
     onSubmit: async ({
       filterStatus,
@@ -207,16 +213,24 @@ export default function Listagem({
       filterFoco,
       filterEnsaio,
       filterTecnologia,
+      filterCodTecnologia,
       filterEpoca,
       filterNPE,
       filterNpeTo,
       filterNpeFrom,
       filterNpeFinalTo,
       filterNpeFinalFrom,
+      filterGrpTo,
+      filterGrpFrom,
     }) => {
+      // const parametersFilter = `filterStatus=${
+      //   filterStatus || 1
+      // }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${
+      //   userLogado.safras.safra_selecionada
+      // }`;
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterCodTecnologia=${filterCodTecnologia}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${
         userLogado.safras.safra_selecionada
       }`;
       await npeService
@@ -640,6 +654,8 @@ export default function Listagem({
 
                   {filterFieldFactory("filterEnsaio", "Ensaio")}
 
+                  {filterFieldFactory("filterCodTecnologia", "Cód. Tecnologia")}
+
                   {filterFieldFactory("filterTecnologia", "Tecnologia")}
 
                   {filterFieldFactory("filterEpoca", "Época")}
@@ -686,7 +702,26 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("grp", "GRP")}
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GRP
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterGrpFrom"
+                        name="filterGrpFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterGrpTo"
+                        name="filterGrpTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
@@ -932,7 +967,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=4&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

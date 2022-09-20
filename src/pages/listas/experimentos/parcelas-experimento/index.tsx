@@ -126,8 +126,8 @@ export default function Listagem({
     {
       name: 'CamposGerenciados[]',
       title: 'Lugar de plantio',
-      value: 'experiment',
-      defaultChecked: () => camposGerenciados.includes('experiment'),
+      value: 'culture',
+      defaultChecked: () => camposGerenciados.includes('culture'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -137,9 +137,9 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status T',
-      value: 'experiment',
-      defaultChecked: () => camposGerenciados.includes('experiment'),
+      title: 'Status',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -364,13 +364,13 @@ export default function Listagem({
       if (columnOrder[item] === 'experiment') {
         tableFields.push(headerTableFactory('Experimento', 'experiment.experimentName'));
       }
-      if (columnOrder[item] === 'experiment') {
+      if (columnOrder[item] === 'culture') {
         tableFields.push(headerTableFactory('Lugar de plantio', 'experiment.local.name_local_culture'));
       }
       if (columnOrder[item] === 'rep') {
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
-      if (columnOrder[item] === 'experiment') {
+      if (columnOrder[item] === 'status') {
         tableFields.push(
           headerTableFactory('Status EXP.', 'experiment.status'),
         );
@@ -586,20 +586,24 @@ export default function Listagem({
     );
   }
 
-  function readExcel(value: any) {
-
+  async function readExcel(value: any) {
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({
+       importService.validate({
         table: 'REPLACEMENT_GENOTYPE ',
         spreadSheet: rows,
         moduleId: 27,
         idSafra: userLogado.safras.safra_selecionada,
         created_by: userLogado.id,
-      }).then(({ message }: any) => {
+      }).then(({ status, message}: any) => {
+ 
         Swal.fire({
           html: message,
           width: '800',
         });
+        if(status != 400 && status == 200){
+          // console.log("dfhgdsf dhfd hgdf ",)
+          handlePagination();
+        }
       });
     });
   }
@@ -611,9 +615,10 @@ export default function Listagem({
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id,
-          idGenotipo:item.idGenotipo,
-          idLote:item.idLote,
+        {
+          id: item.id,
+          idGenotipo: item.idGenotipo,
+          idLote: item.idLote,
         }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
@@ -623,8 +628,10 @@ export default function Listagem({
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => (
-        { id: item.id, genotipo: item.name_genotipo,idGenotipo:item.idGenotipo,
-          idLote:item.idLote, }
+        {
+          id: item.id, genotipo: item.name_genotipo, idGenotipo: item.idGenotipo,
+          idLote: item.idLote,
+        }
       ));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
@@ -632,7 +639,8 @@ export default function Listagem({
 
       router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=experiment');
     } else if (inputFile?.files.length !== 0) {
-      readExcel(inputFile.files);
+      const value = await readExcel(inputFile.files);
+      console.log("calling me....",value);
     } else {
       Swal.fire('Selecione alguma opção ou import');
     }

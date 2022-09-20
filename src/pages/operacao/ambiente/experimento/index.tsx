@@ -9,7 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
@@ -97,12 +97,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -113,13 +113,14 @@ export default function Listagem({
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
-
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit || 0));
+  const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(0);
 
   const [orderList, setOrder] = useState<number>(1);
+  const [lastExperimentNPE, setLastExperimentNPE] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [SortearDisable, setSortearDisable] = useState<boolean>(false);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -140,14 +141,16 @@ export default function Listagem({
 
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+  const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
+  const [npeUsedTo, setNpeUsedTo] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
+  const [selectedNPE, setSelectedNPE] = useState<any[]>(JSON.parse(localStorage.getItem('selectedNPE') as string))
+  // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -484,24 +487,31 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    console.log({ currentPage });
-
-    if (currentPage > 0) {
+    if (NPESelectedRow) {
       const skip = currentPage * Number(take);
-      let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+      let parametersFilter = `skip=${skip}&take=${take}&idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          setExperimento(response);
+          let i = lastExperimentNPE;
+          console.log('i', i);
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+          });
+          setLastExperimentNPE(i);
+
+          setExperimentoNew(response);
         }
       });
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
@@ -531,7 +541,8 @@ export default function Listagem({
     { title: 'Ensaio', field: 'type_assay.name' },
     { title: 'Tecnologia', field: 'tecnologia.name' },
     { title: 'Epoca', field: 'epoca' },
-    { title: 'NPE Inicial', field: 'npei' },
+    { title: 'NPE I', field: 'npei' },
+    { title: 'NPE Inicial', field: 'npei_i' },
     { title: 'NPE Final', field: 'npef' },
     { title: 'NPE Quantity', field: 'npeQT' },
   ];
@@ -546,24 +557,41 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      setLoading(true);
-
+      const skip = currentPage * Number(take);
       let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+      let temp = [...selectedNPE]
 
+      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
+        if (status === 200) {
+          let i = 0;
+          response.length > 0 ? i = NPESelectedRow.npei_i : i = NPESelectedRow.npef;
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+            i == NPESelectedRow.nextNPE ? setNpeUsedFrom(i) : '';
+          });
+          npeUsedFrom != 0 ? setNpeUsedTo(i) : setNpeUsedTo(0);
+          setExperimento(response);
+          setTotalItems(total)
+          temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
+        }
+      });
+      parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          let i = NPESelectedRow.npei;
+          let i = NPESelectedRow.npei_i;
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
-          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
-          setExperimento(response);
+          setLastExperimentNPE(i);
+          setExperimentoNew(response);
         }
       });
 
@@ -601,31 +629,58 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
-    const experiment_genotipo: any[] = [];
-    let npei = Number(NPESelectedRow?.npei);
-    let total_consumed = 0;
+    if (!SortearDisable) {
+      const experiment_genotipo: any[] = [];
+      let npei = Number(NPESelectedRow?.npei_i);
+      let total_consumed = 0;
 
-    experimentos?.map((item: any) => {
-      total_consumed += item.npeQT;
-      item.assay_list.genotype_treatment.map((gt: any) => {
-        const data: any = {};
-        data.idSafra = gt.id_safra;
-        data.idFoco = item.assay_list.foco.id;
-        data.idTypeAssay = item.assay_list.type_assay.id;
-        data.idTecnologia = item.assay_list.tecnologia.id;
-        data.gli = item.assay_list.gli;
-        data.idExperiment = item.id;
-        data.rep = item.delineamento.repeticao;
-        data.nt = gt.treatments_number;
-        data.npe = npei;
-        // data.name_genotipo = gt.genotipo.name_genotipo;
-        data.idGenotipo = gt.genotipo.id; // Added new field
-        data.nca = '';
-        experiment_genotipo.push(data);
-        npei++;
+      experimentos?.map((item: any) => {
+        total_consumed += item.npeQT;
+        item.assay_list.genotype_treatment.map((gt: any) => {
+          const data: any = {};
+          data.idSafra = gt.id_safra;
+          data.idFoco = item.assay_list.foco.id;
+          data.idTypeAssay = item.assay_list.type_assay.id;
+          data.idTecnologia = item.assay_list.tecnologia.id;
+          data.gli = item.assay_list.gli;
+          data.idExperiment = item.id;
+          data.rep = item.delineamento.repeticao;
+          data.nt = gt.treatments_number;
+          data.npe = npei;
+          // data.name_genotipo = gt.genotipo.name_genotipo;
+          data.idGenotipo = gt.genotipo.id; // Added new field
+          data.nca = '';
+          experiment_genotipo.push(data);
+          npei++;
+        });
       });
-    });
-    createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+    } else {
+      const temp = selectedNPE[selectedNPE.indexOf(NPESelectedRow) + 1];
+      Swal.fire({
+        title: 'NPE Já usado !!!',
+        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + selectedNPE.filter((x) => x == NPESelectedRow)[0].npef + "</b><br><br>" +
+          "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " +
+          temp.foco.name + "</b><br><b> Ensaio : " +
+          temp.type_assay.name + "</b><br><b> Local : " +
+          temp.local.name_local_culture + "</b><br><b>Epoca : " +
+          temp.epoca + "</b><br><b>Tecnologia : " +
+          temp.tecnologia.name + "</b></p></div>",
+        icon: 'warning',
+        showCloseButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#d33',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Acesse o NPE e atualize',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push({
+            pathname: '/config/npe',
+          });
+        }
+      });
+    }
   }
 
   useEffect(() => {
@@ -634,9 +689,9 @@ export default function Listagem({
 
   useEffect(() => {
     let count = 0;
-    experimentos?.map((item: any) => {
-      item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
-    });
+    experimentos.map((item: any) => {
+      (item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE) || NPESelectedRow?.nextNPE == 'N/A' ? count++ : '';
+    })
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
 
@@ -670,7 +725,7 @@ export default function Listagem({
                 },
                 rowStyle: (rowData) => ({
                   backgroundColor:
-                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? (SortearDisable ? '#FF5349' : '#d3d3d3') : '#f9fafb',
                   height: 40,
                 }),
                 search: false,
@@ -692,7 +747,7 @@ export default function Listagem({
                 <MaterialTable
                   style={{ background: '#f9fafb' }}
                   columns={columns}
-                  data={experimentos}
+                  data={experimentosNew}
                   options={{
                     showTitle: false,
                     headerStyle: {
@@ -700,7 +755,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                        (rowData.npef >= NPESelectedRow?.nextNPE) && SortearDisable ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,
@@ -802,7 +857,6 @@ export default function Listagem({
                               value="Sortear"
                               bgColor={SortearDisable ? 'bg-gray-400' : 'bg-blue-600'}
                               textColor="white"
-                              disabled={SortearDisable}
                               onClick={validateConsumedData}
                             />
                           </div>
@@ -842,7 +896,6 @@ export default function Listagem({
                               value={`${currentPage + 1}`}
                               bgColor="bg-blue-600"
                               textColor="white"
-                              disabled
                             />
                           ))
                         }

@@ -18,4 +18,12 @@ export interface IExperimentGroupFilter {
   filterTagsPrinted: string,
   filterTotalTags: string,
   filterStatus: string,
+  filterQtdExpFrom: string,
+  filterQtdExpTo: string,
+  filterTotalEtiqImprimirFrom: string,
+  filterTotalEtiqImprimirTo: string,
+  filterTotalEtiqImpressasFrom: string,
+  filterTotalEtiqImpressasTo: string,
+  filterTotalEtiqFrom: string,
+  filterTotalEtiqTo: string,
 }

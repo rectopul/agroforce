@@ -161,6 +161,21 @@ export class GenotipoController {
     }
   }
 
+
+  async getOneByName(name: any) {
+    try {
+     
+      const response = await this.genotipoRepository.findOneByName(name);
+
+      if (!response) throw new Error('Item não encontrado');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Genotipo Controller', 'getOneByName', error.message);
+      throw new Error('[Controller] - getOne Genotipo erro');
+    }
+  }
+
   async create(data: any) {
     try {
       const response = await this.genotipoRepository.create(data);

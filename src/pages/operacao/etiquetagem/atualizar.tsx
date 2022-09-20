@@ -449,7 +449,7 @@ export default function Listagem({
           required
           id={title}
           name={title}
-          value="123456789123456789123456789123"
+          value={experimentGroup[title]}
         />
       </div>
     );

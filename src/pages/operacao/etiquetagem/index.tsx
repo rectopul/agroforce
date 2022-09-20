@@ -133,6 +133,26 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   ]);
   const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: "StatusCheckbox",
+      title: "ETIQ. NÃO INICIADA",
+      value: "ETIQ. NÃO INICIADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. NÃO INICIADA"),
+    },
+    {
+      name: "StatusCheckbox",
+      title: "ETIQ. EM ANDAMENTO",
+      value: "ETIQ. EM ANDAMENTO",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. EM ANDAMENTO"),
+    },
+    {
+      name: "StatusCheckbox",
+      title: "ETIQ. FINALIZADA",
+      value: "ETIQ. FINALIZADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. FINALIZADA"),
+    },
+  ]);
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -148,6 +168,20 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       filterTagsPrinted: "",
       filterTotalTags: "",
       filterStatus: "",
+      filterExperimentGroup: "",
+      filterQuantityExperiment: "",
+      filterTagsToPrint: "",
+      filterTagsPrinted: "",
+      filterTotalTags: "",
+      filterStatus: "",
+      filterQtdExpTo: "",
+      filterQtdExpFrom: "",
+      filterTotalEtiqImprimirTo: "",
+      filterTotalEtiqImprimirFrom: "",
+      filterTotalEtiqImpressasTo: "",
+      filterTotalEtiqImpressasFrom: "",
+      filterTotalEtiqTo: "",
+      filterTotalEtiqFrom: "",
     },
     onSubmit: async ({
       filterExperimentGroup,
@@ -155,9 +189,27 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       filterTagsToPrint,
       filterTagsPrinted,
       filterTotalTags,
-      filterStatus,
+      filterQtdExpTo,
+      filterQtdExpFrom,
+      filterTotalEtiqImprimirTo,
+      filterTotalEtiqImprimirFrom,
+      filterTotalEtiqImpressasTo,
+      filterTotalEtiqImpressasFrom,
+      filterTotalEtiqTo,
+      filterTotalEtiqFrom,
     }) => {
-      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}`;
+      // const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}`;
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']"
+      );
+      let selecionados = "";
+      for (let i = 0; i < allCheckBox.length; i += 1) {
+        if (allCheckBox[i].checked) {
+          selecionados += `${allCheckBox[i].value},`;
+        }
+      }
+      const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}&filterQtdExpTo=${filterQtdExpTo}&filterQtdExpFrom=${filterQtdExpFrom}&filterTotalEtiqImprimirTo=${filterTotalEtiqImprimirTo}&filterTotalEtiqImprimirFrom=${filterTotalEtiqImprimirFrom}&filterTotalEtiqImpressasTo=${filterTotalEtiqImpressasTo}&filterTotalEtiqImpressasFrom=${filterTotalEtiqImpressasFrom}&filterTotalEtiqTo=${filterTotalEtiqTo}&filterTotalEtiqFrom=${filterTotalEtiqFrom}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       await experimentGroupService
@@ -618,25 +670,153 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     "filterExperimentGroup",
                     "Nome do grupo de exp."
                   )}
-                  {filterFieldFactory(
+                  {/* {filterFieldFactory(
                     "filterQuantityExperiment",
                     "Qtde. exp.",
                     true
-                  )}
-                  {filterFieldFactory(
+                  )} */}
+                  {/* {filterFieldFactory(
                     "filterTagsToPrint",
                     "Total etiq. a imprimir"
-                  )}
-                  {filterFieldFactory(
+                  )} */}
+                  {/* {filterFieldFactory(
                     "filterTagsPrinted",
                     "Total etiq. impressas"
-                  )}
-                  {filterFieldFactory(
+                  )} */}
+                  {/* {filterFieldFactory(
                     "filterTotalTags",
                     "Total etiquetas",
                     true
-                  )}
-                  {filterFieldFactory("filterStatus", "Status", true)}
+                  )} */}
+                  {/* {filterFieldFactory("filterStatus", "Status", true)} */}
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Qtde. exp.
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterQtdExpFrom"
+                        name="filterQtdExpFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterQtdExpTo"
+                        name="filterQtdExpTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Total etiq. a imprimir
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqImprimirFrom"
+                        name="filterTotalEtiqImprimirFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqImprimirTo"
+                        name="filterTotalEtiqImprimirTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Total etiq. impressas
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqImpressasFrom"
+                        name="filterTotalEtiqImpressasFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqImpressasTo"
+                        name="filterTotalEtiqImpressasTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Total etiquetas
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqFrom"
+                        name="filterTotalEtiqFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqTo"
+                        name="filterTotalEtiqTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status
+                    </label>
+
+                    <AccordionFilter>
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="characters">
+                          {(provided) => (
+                            <ul
+                              className="w-full h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusFilter.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
+                                    >
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </AccordionFilter>
+                  </div>
 
                   <div className="h-7 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

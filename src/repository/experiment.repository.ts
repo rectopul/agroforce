@@ -72,6 +72,78 @@ export class ExperimentRepository {
     return experiment;
   }
 
+  async findOneByName(name : any){
+    
+    const result: object | any = await prisma.experiment.findMany({
+      where: { experimentName: name },
+      select: {
+        id: true,
+        idAssayList: true,
+        density: true,
+        period: true,
+        repetitionsNumber: true,
+        experimentName: true,
+        experimentGroupId: true,
+        status: true,
+        nlp: true,
+        clp: true,
+        eel: true,
+        comments: true,
+        orderDraw: true,
+        assay_list: {
+          select: {
+            id : true,
+            status: true,
+            gli: true,
+            bgm: true,
+            protocol_name: true,
+            tecnologia: {
+              select: {
+                id: true,
+                name: true,
+                cod_tec: true,
+              },
+            },
+            foco: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            type_assay: {
+              select: {
+                id : true,
+                name: true,
+              },
+            },
+            safra: {
+              select: {
+                id: true,
+                safraName: true,
+              },
+            },
+          },
+        },
+        local: {
+          select: {
+            name_local_culture: true,
+            cultureUnity: true,
+          },
+        },
+      
+        delineamento: {
+          select: {
+            name: true,
+            repeticao: true,
+            trat_repeticao: true,
+          },
+        },
+
+      },
+    });
+    return result;
+  }
+
   async update(id: number, data: any) {
     const result = await prisma.experiment.update({
       where: { id },
