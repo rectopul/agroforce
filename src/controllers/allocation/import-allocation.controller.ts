@@ -17,6 +17,7 @@ import { QuadraController } from '../block/quadra.controller';
 import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 
+
 export class ImportAllocationController {
   static async validate(
     idLog: number,
@@ -53,6 +54,7 @@ export class ImportAllocationController {
                     spreadSheet[row][9],
                     spreadSheet[0][column],
                   );
+
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
@@ -144,7 +146,7 @@ export class ImportAllocationController {
                   id: spreadSheet[row][0],
                   idSafra,
                 });
-                const allNpe = response[0]?.experiment_genotipe.map((item: any) => item.npe);
+                const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : null));
                 let npeRange = Number(spreadSheet[row][column]);
                 let validateNpeRange = true;
                 while (npeRange < Number(spreadSheet[row][4])) {

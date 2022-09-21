@@ -21,9 +21,10 @@ import {
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import Modal from 'react-modal';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
@@ -142,7 +143,9 @@ export default function Listagem({
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
   const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
-  const [npeUsedTo, setNpeUsedTo] = useState<number>(0);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+
+
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -290,7 +293,7 @@ export default function Listagem({
   }
 
   async function deleteItem(id: number) {
-    const { status, message } = await await experimentService.deleted(id);
+    const { status, message } = await experimentService.deleted(id);
     if (status === 200) {
       router.reload();
     } else {
@@ -575,7 +578,7 @@ export default function Listagem({
             i = item.npef + 1;
             i == NPESelectedRow.nextNPE ? setNpeUsedFrom(i) : '';
           });
-          npeUsedFrom != 0 ? setNpeUsedTo(i) : setNpeUsedTo(0);
+
           setExperimento(response);
           setTotalItems(total)
           temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
@@ -608,16 +611,17 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
-    if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE) {
+    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE)) {
       await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
         if (status === 200) {
           experimentObj.map(async (x: any) => {
+            console.log(x);
             await experimentService.update(x).then(({ status, response }: any) => {
             });
           });
 
           await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
           }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
@@ -668,9 +672,7 @@ export default function Listagem({
           temp.tecnologia.name + "</b></p></div>",
         icon: 'warning',
         showCloseButton: true,
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#d33',
+        closeButtonHtml: '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Acesse o NPE e atualize',
       }).then((result) => {
@@ -700,7 +702,6 @@ export default function Listagem({
       <Head><title>Listagem de experimentos</title></Head>
 
       {loading && <LoadingComponent />}
-
       <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
         <main className="h-full w-full
                         flex flex-col
