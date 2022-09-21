@@ -32,9 +32,10 @@ export class ExperimentController {
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[0]}" } } `));
-        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[1]}" } } `));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
       }
+
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
       }
@@ -68,6 +69,7 @@ export class ExperimentController {
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
+
       const select = {
         id: true,
         idSafra: true,

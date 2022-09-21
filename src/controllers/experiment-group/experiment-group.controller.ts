@@ -87,8 +87,7 @@ export class ExperimentGroupController {
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
       }
-      console.log(parameters);
-      console.log(options);
+  
       const select = {
         id: true,
         name: true,

@@ -171,6 +171,24 @@ export default function Listagem({
       value: 'sorteado',
       defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. NÃO INICIADA',
+      value: 'ETIQ. NÃO INICIADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. NÃO INICIADA'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. EM ANDAMENTO',
+      value: 'ETIQ. EM ANDAMENTO',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. EM ANDAMENTO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. FINALIZADA',
+      value: 'ETIQ. FINALIZADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
+    },
   ]);
 
   const formik = useFormik<IFilter>({
@@ -534,6 +552,7 @@ export default function Listagem({
       .then(({ status, response, message }: any) => {
         if (status === 200) {
           response.map((item: any) => {
+            console.log(response);
             const newItem = item;
             newItem.SAFRA = item.assay_list?.safra?.safraName;
             newItem.FOCO = item.assay_list?.foco.name;
