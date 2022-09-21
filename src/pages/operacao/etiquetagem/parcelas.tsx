@@ -620,7 +620,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className="h-7 w-full ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -935,6 +935,7 @@ export default function Listagem({
                     "filterExperimentName",
                     "Nome Experimento"
                   )}
+                  {filterFieldFactory("filterLocal", "Lugar de plantio")}
                 </div>
 
                 <div
@@ -944,51 +945,7 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory("filterLocal", "Lugar de plantio")}
-
-                  <div className="h-10 w-full ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
-                    </label>
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-1/2 h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -1009,7 +966,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-full ml-4">
+                  <div className="h-10 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status da Parcela
                     </label>
@@ -1052,7 +1009,7 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
                     </label>
@@ -1072,7 +1029,7 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE
                     </label>
@@ -1094,8 +1051,8 @@ export default function Listagem({
                   </div>
                   {filterFieldFactory("filterGenotypeName", "Nome do genotipo")}
                   {filterFieldFactory("filterNca", "NCA")}
-                  <div className="w-full" style={{ marginLeft: -80 }} />
 
+                  <div style={{ width: 50 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
