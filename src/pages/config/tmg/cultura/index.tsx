@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from "cookies-next";
+import { removeCookies, setCookie } from "cookies-next";
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -176,13 +176,13 @@ export default function Listagem({
   //Calling common API 
   async function callingApi(parametersFilter: any) {
 
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookie("filterBeforeEdit", parametersFilter);
+    setCookie("filterBeforeEditTypeOrder", typeOrder);
+    setCookie("filterBeforeEditOrderBy", orderBy);
 
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookie("filtersParams", parametersFilter);
 
     await cultureService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
@@ -338,12 +338,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                setCookie("pageBeforeEdit", currentPage?.toString());
+                setCookie("filterBeforeEdit", filter);
+                setCookie("filterBeforeEditTypeOrder", typeOrder);
+                setCookie("filterBeforeEditOrderBy", orderBy);
+                setCookie("filtersParams", filtersParams);
+                setCookie("lastPage", "atualizar");
                 localStorage.setItem('filterValueEdit', filtersParams);
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
