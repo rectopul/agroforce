@@ -829,6 +829,11 @@ export default function Listagem({
           shadow-gray-900/50"
       >
         <form className="flex flex-col">
+          <header className="flex flex-col mt-2">
+            <h2 className="mb-2 text-blue-600 text-xl font-medium">
+              {`Total NCA encontrado(s) no grupo: ${totalMatch}`}
+            </h2>
+          </header>
           <button
             type="button"
             className="flex absolute top-4 right-3 justify-end"
@@ -840,12 +845,7 @@ export default function Listagem({
             />
           </button>
 
-          <div className="flex px-4  justify-between">
-            <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">
-                Imprimir etiqueta
-              </h2>
-            </header>
+          <div className="w-44">
             <Input
               type="text"
               placeholder="Código de barras (NCA)"
@@ -860,22 +860,42 @@ export default function Listagem({
             />
           </div>
 
-          <h1>{`Total nca encontrado no grupo: ${totalMatch}`}</h1>
-          <div className="flex justify-between">
-            <div>
-              <div className={`${validateNcaOne} h-10 w-10 box-border`} />
-              <h1>{ncaOne}</h1>
-              <h1>{genotypeNameOne}</h1>
-              <h1>{groupNameOne}</h1>
+          <div className="flex flex-1 mt-5">
+            <div className="flex flex-1">
+              <div className="bg-blue-600 w-1 h-full mr-2" />
+              <div>
+                <div className={`${validateNcaOne} h-6 w-20 rounded-xl mb-3`} />
+                <p className="font-bold text-xs">NCA</p>
+                <p className="font-bold text-xs text-blue-600">{ncaOne}AA</p>
+                <p className="font-bold text-xs">Nome do genótipo</p>
+                <p className="font-bold text-xs text-gray-300">
+                  {genotypeNameOne}AA
+                </p>
+                <p className="font-bold text-xs">Nome do grupo de exp.</p>
+                <p className="font-bold text-xs text-gray-300">
+                  {groupNameOne}AA
+                </p>
+              </div>
             </div>
-            <div>
-              <div className={`${validateNcaTwo} h-10 w-10 box-border`} />
-              <h1>{ncaTwo}</h1>
-              <h1>{genotypeNameTwo}</h1>
-              <h1>{groupNameTwo}</h1>
+            <div className="flex flex-1">
+              <div className="bg-blue-600 w-1 h-full mr-2" />
+              <div>
+                <div className={`${validateNcaTwo} h-6 w-20 rounded-xl mb-3`} />
+                <p className="font-bold text-xs">NCA</p>
+                <p className="font-bold text-xs text-blue-600">{ncaTwo}AA</p>
+                <p className="font-bold text-xs">Nome do genótipo</p>
+                <p className="font-bold text-xs text-gray-300">
+                  {genotypeNameTwo}AA
+                </p>
+                <p className="font-bold text-xs">Nome do grupo de exp.</p>
+                <p className="font-bold text-xs text-gray-300">
+                  {groupNameTwo}AA
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex justify-end py-0">
+
+          {/* <div className="flex justify-end py-0">
             <div className="h-10 w-40">
               <Button
                 title="Cancelar"
@@ -900,7 +920,7 @@ export default function Listagem({
                 bgColor="bg-green-600"
               />
             </div>
-          </div>
+          </div> */}
         </form>
       </Modal>
 
