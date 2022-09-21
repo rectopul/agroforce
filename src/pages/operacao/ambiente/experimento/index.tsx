@@ -544,7 +544,6 @@ export default function Listagem({
     { title: 'Ensaio', field: 'type_assay.name' },
     { title: 'Tecnologia', field: 'tecnologia.name' },
     { title: 'Epoca', field: 'epoca' },
-    { title: 'NPE I', field: 'npei' },
     { title: 'NPE Inicial', field: 'npei_i' },
     { title: 'NPE Final', field: 'npef' },
     { title: 'NPE Quantity', field: 'npeQT' },
@@ -576,7 +575,7 @@ export default function Listagem({
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
-            i == NPESelectedRow.nextNPE ? setNpeUsedFrom(i) : '';
+            i == NPESelectedRow.nextNPE.npei_i ? setNpeUsedFrom(i) : '';
           });
 
           setExperimento(response);
@@ -611,17 +610,16 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
-    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE)) {
+    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
       await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
         if (status === 200) {
           experimentObj.map(async (x: any) => {
-            console.log(x);
             await experimentService.update(x).then(({ status, response }: any) => {
             });
           });
 
           await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1, npei_i: lastNpe + 1,
           }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
@@ -660,16 +658,16 @@ export default function Listagem({
       });
       createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
     } else {
-      const temp = selectedNPE[selectedNPE.indexOf(NPESelectedRow) + 1];
+      const temp = NPESelectedRow;
       Swal.fire({
         title: 'NPE Já usado !!!',
-        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + selectedNPE.filter((x) => x == NPESelectedRow)[0].npef + "</b><br><br>" +
+        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + temp.npef + "</b><br><br>" +
           "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " +
-          temp.foco.name + "</b><br><b> Ensaio : " +
-          temp.type_assay.name + "</b><br><b> Local : " +
-          temp.local.name_local_culture + "</b><br><b>Epoca : " +
-          temp.epoca + "</b><br><b>Tecnologia : " +
-          temp.tecnologia.name + "</b></p></div>",
+          temp.nextNPE.foco.name + "</b><br><b> Ensaio : " +
+          temp.nextNPE.type_assay.name + "</b><br><b> Local : " +
+          temp.nextNPE.local.name_local_culture + "</b><br><b>Epoca : " +
+          temp.nextNPE.epoca + "</b><br><b>Tecnologia : " +
+          temp.nextNPE.tecnologia.name + "</b></p></div>",
         icon: 'warning',
         showCloseButton: true,
         closeButtonHtml: '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
@@ -692,7 +690,7 @@ export default function Listagem({
   useEffect(() => {
     let count = 0;
     experimentos.map((item: any) => {
-      (item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE) || NPESelectedRow?.nextNPE == 'N/A' ? count++ : '';
+      (item.npei <= NPESelectedRow?.nextNPE.npei_i && item.npef >= NPESelectedRow?.nextNPE.npei_i) && NPESelectedRow?.nextNPE != 0 ? count++ : '';
     })
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
