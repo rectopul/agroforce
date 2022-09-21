@@ -128,6 +128,7 @@ export class ExperimentController {
             id: true,
           },
         },
+        experiment_genotipe: true,
       };
 
       if (options.idSafra) {
@@ -143,7 +144,7 @@ export class ExperimentController {
       }
 
       if (options.experimentName) {
-        parameters.experimentName = options.idSafra;
+        parameters.experimentName = options.experimentName;
       }
       if (options.Foco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"id": ${Number(options.Foco)} } } }`));
@@ -157,8 +158,11 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.status) {
-        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.status}" } } `));
+      if (options.Status) {
+        parameters.status = options.Status;
+      }
+      if (options.gli) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -185,7 +189,7 @@ export class ExperimentController {
         newItem.npeQT = item.countNT * item.repetitionsNumber;
         return newItem;
       });
-      if (!response && response.total <= 0) {
+      if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
         };
@@ -204,6 +208,19 @@ export class ExperimentController {
       const response = await this.experimentRepository.findOne(id);
 
       if (!response) return { status: 400, response };
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Experimento controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Experimento erro');
+    }
+  }
+
+  async getFromExpName(name: any) {
+    try {
+      const response = await this.experimentRepository.findOneByName(name);
+
+      if (!response) throw new Error('Item não encontrado');
 
       return { status: 200, response };
     } catch (error: any) {

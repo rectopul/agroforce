@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from 'cookies-next';
+import { removeCookies, setCookie } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -83,6 +83,8 @@ interface IData {
   idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  typeOrderServer :any| string,
+  orderByserver : any |string
 }
 
 export default function Listagem({
@@ -94,6 +96,8 @@ export default function Listagem({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
@@ -104,7 +108,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes',
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes,name_public,name_experiment,name_alter,elit_name,type,progenitor_f_direto,progenitor_m_direto,progenitor_f_origem,progenitor_m_origem,progenitores_origem,parentesco_completo,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -191,24 +195,28 @@ export default function Listagem({
 
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterGenotipo: '',
-      filterMainName: '',
-      filterTecnologiaCod: '',
-      filterTecnologiaDesc: '',
-      filterCruza: '',
-      filterGmr: '',
-      filterGmrRangeFrom: '',
-      filterGmrRangeTo: '',
-      filterLotsFrom: '',
-      filterLotsTo: '',
+      filterGenotipo: checkValue('filterGenotipo'),
+      filterMainName: checkValue('filterMainName'),
+      filterTecnologiaCod: checkValue('filterTecnologiaCod'),
+      filterTecnologiaDesc: checkValue('filterTecnologiaDesc'),
+      filterCruza: checkValue('filterCruza'),
+      filterGmr: checkValue('filterGmr'),
+      filterGmrRangeFrom: checkValue('filterGmrRangeFrom'),
+      filterGmrRangeTo: checkValue('filterGmrRangeTo'),
+      filterLotsFrom: checkValue('filterLotsFrom'),
+      filterLotsTo: checkValue('filterLotsTo'),
       orderBy: '',
       typeOrder: '',
     },
@@ -224,69 +232,109 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
-      // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter(
-        'genotipo',
-        filterGenotipo,
-        filterMainName,
-        filterCruza,
-        filterTecnologiaCod,
-        filterTecnologiaDesc,
-        filterGmr,
-        idCulture,
-        idSafra,
-        filterGmrRangeTo,
-        filterGmrRangeFrom,
-        filterLotsTo,
-        filterLotsFrom,
-      );
-      setFiltersParams(parametersFilter); // Set filter pararameters
-      setCookies('filterBeforeEdit', filtersParams);
+    //   // Call filter with there parameter
+    //   const parametersFilter = await fetchWrapper.handleFilterParameter(
+    //     'genotipo',
+    //     filterGenotipo,
+    //     filterMainName,
+    //     filterCruza,
+    //     filterTecnologiaCod,
+    //     filterTecnologiaDesc,
+    //     filterGmr,
+    //     idCulture,
+    //     idSafra,
+    //     filterGmrRangeTo,
+    //     filterGmrRangeFrom,
+    //     filterLotsTo,
+    //     filterLotsFrom,
+    //   );
+    //   setFiltersParams(parametersFilter); // Set filter pararameters
+    //   setCookies('filterBeforeEdit', filtersParams);
 
-      await genotipoService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setGenotipo(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      //   await genotipoService
+      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //     .then((response) => {
+      //       setFilter(parametersFilter);
+      //       setGenotipo(response.response);
+      //       setTotalItems(response.total);
+      //       setCurrentPage(0);
+      //     });
+      // },
+
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&id_culture=${idCulture}`;
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
+
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookie('filterBeforeEdit', parametersFilter);
+    setCookie('filterBeforeEditTypeOrder', typeOrder);
+    setCookie('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookie('filtersParams', parametersFilter);
+    console.log('---sdfdsf   ', parametersFilter);
+
+    await genotipoService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setGenotipo(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  }
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   // esta functionando ordeação
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(
-      column,
-      order,
-      filter,
-      'genotipo',
-    );
+    // // Manage orders of colunms
+    // const parametersFilter = await fetchWrapper.handleOrderGlobal(
+    //   column,
+    //   order,
+    //   filter,
+    //   'genotipo',
+    // );
 
-    const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
-    await genotipoService.getAll(value).then((response) => {
-      if (response.status === 200) {
-        setGenotipo(response.response);
-        setFiltersParams(parametersFilter);
-      }
-    });
+    // await genotipoService.getAll(value).then((response) => {
+    //   if (response.status === 200) {
+    //     setGenotipo(response.response);
+    //     setFiltersParams(parametersFilter);
+    //   }
+    // });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await fetchWrapper.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -382,12 +430,12 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-
-                localStorage.setItem('filterValueEdit', filtersParams);
-                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
-
+                setCookie('pageBeforeEdit', currentPage?.toString());
+                setCookie('filterBeforeEdit', filter);
+                setCookie('filterBeforeEditTypeOrder', typeOrder);
+                setCookie('filterBeforeEditOrderBy', orderBy);
+                setCookie('filtersParams', filtersParams);
+                setCookie('lastPage', 'atualizar');
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -544,7 +592,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotipoService.getAll(filtersParams).then(({ response, status }) => {
+    await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
           const dataExp = new Date();
@@ -649,31 +697,36 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
-
   // paginação certa
   async function handlePagination(): Promise<void> {
     // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(
-      currentPage,
-      take,
-      filtersParams,
-    );
+    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(
+    //   currentPage,
+    //   take,
+    //   filtersParams,
+    // );
 
-    await genotipoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setGenotipo(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
-        setTimeout(removestate, 5000); // Remove State
-      }
-    });
+    // await genotipoService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setGenotipo(response.response);
+    //     setTotalItems(response.total); // Set new total records
+    //     setCurrentPage(currentPages); // Set new current page
+    //     setTimeout(removestate, 5000); // Remove State
+    //   }
+    // });
+    await callingApi(filter); // handle pagination globly
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = fetchWrapper.getValuesForFilter(value, filtersParams);
+    return parameter;
   }
 
   function filterFieldFactory(title: any, name: any) {
@@ -760,17 +813,6 @@ export default function Listagem({
       </div>
     );
   }
-  // remove states
-  function removestate() {
-    localStorage.removeItem('filterValueEdit');
-    localStorage.removeItem('pageBeforeEdit');
-  }
-
-  // Checkingdefualt values
-  function checkValue(value: any) {
-    const parameter = fetchWrapper.getValueParams(value);
-    return parameter;
-  }
 
   useEffect(() => {
     handlePagination();
@@ -814,7 +856,10 @@ export default function Listagem({
 
                   {filterFieldFactory('filterTecnologiaCod', 'Cód. Tecnologia')}
 
-                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tecnologia')}
+                  {filterFieldFactory(
+                    'filterTecnologiaDesc',
+                    'Nome Tecnologia',
+                  )}
                 </div>
 
                 <div
@@ -1056,17 +1101,43 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEdit
     : '';
 
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name_genotipo';
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const urlParameters: any = new URL(baseUrl);
   // const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
 
   urlParameters.search = new URLSearchParams(param).toString();
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
+    ? `${req.cookies.filterBeforeEdit}`
     : `&id_culture=${idCulture}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const requestOptions = {
     method: 'GET',
@@ -1090,6 +1161,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

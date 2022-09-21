@@ -3,6 +3,7 @@ import {
 } from 'yup';
 import { DepartamentRepository } from '../repository/departament.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
+import handleError from '../shared/utils/handleError';
 
 interface DepartmentDTO {
   id: number;
@@ -98,7 +99,8 @@ export class DepartamentController {
       }
       return { status: 200, response, total: response.total };
     } catch (err) {
-      return { status: 400, message: err };
+      handleError('Department Controller', 'GetAll', err);
+      throw new Error('[Controller] - GetAll Department erro');
     }
   }
 

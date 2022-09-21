@@ -33,6 +33,9 @@ package-lock.json
 .env.production.local
 .env
 
+.vscode/settings.json
+
+
 # vercel
 .vercel
 

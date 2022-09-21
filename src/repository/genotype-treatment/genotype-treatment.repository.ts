@@ -68,7 +68,6 @@ export class GenotypeTreatmentRepository {
       where,
       orderBy,
     });
-
     result.total = count;
     return result;
   }

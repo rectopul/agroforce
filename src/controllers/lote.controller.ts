@@ -180,6 +180,8 @@ export class LoteController {
         parameters.genotipo = options.genotipo;
       }
 
+      
+
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
       }
