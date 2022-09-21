@@ -118,7 +118,7 @@ export class DepartamentController {
 
   async postDepartament(data: CreateDepartmentDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
@@ -139,7 +139,7 @@ export class DepartamentController {
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const departament = await this.departamentRepository.findOne(data.id);
 

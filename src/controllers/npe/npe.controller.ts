@@ -248,7 +248,7 @@ export class NpeController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data) {
         const npe = await this.npeRepository.update(data.id, data);
