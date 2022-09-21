@@ -61,9 +61,9 @@ interface IUpdateExperimento {
   density: number
   drawOrder: number
   status: string
-  eel: number
+  eel: any
   nlp: number
-  clp: number
+  clp: any
   comments: string
 }
 
