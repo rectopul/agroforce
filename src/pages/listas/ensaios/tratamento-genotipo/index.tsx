@@ -71,7 +71,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,status,statusAssay,genotipoName,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
