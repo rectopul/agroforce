@@ -567,9 +567,28 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await experimentGenotipeService
       .getAll(filter)
-      .then(({ status, response }: IReturnObject) => {
+      .then(({ status, response }) => {
         if (status === 200) {
-          const newData = response.map((item: any) => item);
+        // console.log(response);
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.REP = item.rep;
+            newItem.STATUS = item.status;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+
+            delete newItem.id;
+            return newItem;
+          });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
