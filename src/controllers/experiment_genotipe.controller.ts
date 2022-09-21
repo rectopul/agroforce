@@ -19,7 +19,6 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -40,17 +39,21 @@ export class ExperimentGenotipeController {
         parameters.AND.push(JSON.parse(`{ "tecnologia": {"cod_tec": {"contains": "${options.filterCodTec}" } } }`));
       }
 
-      // if (options.filterCodTec) {
-      //   parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": {"contains": "${options.filterCodTec}" } } }`));
-      // }
-
       if (options.filterExperimentName) {
         parameters.AND.push(JSON.parse(`{ "experiment": {"experimentName": {"contains": "${options.filterExperimentName}" } } }`));
       }
 
+      // if (options.filterStatus) {
+      //   parameters.AND.push(JSON.parse(`{ "experiment": {"status": {"contains": "${options.filterStatus}" } } }`));
+      // }
       if (options.filterStatus) {
-        parameters.AND.push(JSON.parse(`{ "experiment": {"status": {"contains": "${options.filterStatus}" } } }`));
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": {"contains": "${statusParams[0]}" } } }`));
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": {"contains": "${statusParams[1]}" } } }`));
       }
+      console.log(parameters);
+      console.log(options);
       if (options.ensaio) {
         parameters.AND.push(JSON.parse(`{ "type_assay": {"name": {"contains": "${options.ensaio}" } } }`));
       }
@@ -113,6 +116,7 @@ export class ExperimentGenotipeController {
           select: {
             experimentName: true,
             status: true,
+            delineamento: true,
             local: {
               select:
                 { name_local_culture: true },
@@ -126,8 +130,8 @@ export class ExperimentGenotipeController {
         genotipo: true,
         nca: true,
         idLote: true,
+        status_t: true,
       };
-
 
       if (options.experimentGroupId) {
         const idList = await this.generateIdList(Number(options.experimentGroupId));
@@ -143,55 +147,47 @@ export class ExperimentGenotipeController {
         parameters.idExperiment = Number(options.idExperiment);
       }
 
-
       if (options.safraName) {
         parameters.AND.push(JSON.parse(`{ "safra": {"safraName": {"contains": "${options.safraName}" } } }`));
       }
 
-
-      if(options.idSafra){
+      if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
       }
 
-      if(options.idFoco){
+      if (options.idFoco) {
         parameters.idFoco = Number(options.idFoco);
       }
 
-
-      if(options.idTypeAssay){
+      if (options.idTypeAssay) {
         parameters.idTypeAssay = Number(options.idTypeAssay);
       }
 
-      if(options.idTecnologia){
+      if (options.idTecnologia) {
         parameters.idTecnologia = Number(options.idTecnologia);
       }
 
-
-      if(options.nt){
+      if (options.nt) {
         parameters.nt = Number(options.nt);
       }
 
-
-
-      if(options.gli){
+      if (options.gli) {
         parameters.gli = options.gli;
       }
 
-
-      if(options.npe){
+      if (options.npe) {
         parameters.npe = Number(options.npe);
       }
 
-
-      if(options.idExperiment){
+      if (options.idExperiment) {
         parameters.idExperiment = Number(options.idExperiment);
       }
 
-      if(options.idGenotipo){
+      if (options.idGenotipo) {
         parameters.idGenotipo = Number(options.idGenotipo);
       }
 
-      if(options.idLote){
+      if (options.idLote) {
         parameters.idLote = Number(options.idLote);
       }
 
@@ -252,7 +248,7 @@ export class ExperimentGenotipeController {
         response.experimentGroupId,
         parcelas?.idExperiment,
       );
-      await this.printedHistoryController.create({idList, userId});
+      await this.printedHistoryController.create({ idList, userId });
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
@@ -287,21 +283,18 @@ export class ExperimentGenotipeController {
     }
   }
 
-
   async updateData(data: any) {
     try {
       const response: any = await this.ExperimentGenotipeRepository.findById(data.id);
 
-     
       if (!response) return { status: 404, response, message: 'Tratamentos do genótipo não existente' };
 
       const check = await this.ExperimentGenotipeRepository.update(data.id, data);
-      
+
       return { status: 200, message: 'experimento do genótipo atualizado' };
     } catch (error: any) {
       handleError('Tratamento do experimento do controlador', 'Create', error.message);
       throw new Error('[Controller] - Erro ao criar esboço de tratamento do experimento');
     }
   }
-
 }
