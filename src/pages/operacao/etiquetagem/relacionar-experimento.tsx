@@ -103,7 +103,7 @@ export default function Listagem({
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
@@ -467,6 +467,7 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response }: IReturnObject) => {
@@ -550,9 +551,9 @@ export default function Listagem({
                                         pb-8
                                         "
                 >
+                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
                   {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
@@ -567,8 +568,30 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
-                  <div className="h-10 w-full ml-4">
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Experimento
                     </label>
@@ -609,29 +632,6 @@ export default function Listagem({
                         </Droppable>
                       </DragDropContext>
                     </AccordionFilter>
-                  </div>
-
-                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
-
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterRepetitionFrom"
-                        name="filterRepetitionFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterRepetitionTo"
-                        name="filterRepetitionTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
                   </div>
 
                   <div style={{ width: 40 }} />
