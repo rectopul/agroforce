@@ -105,7 +105,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,experimentName,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action',
+      'id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(

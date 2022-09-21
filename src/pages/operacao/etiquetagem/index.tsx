@@ -683,7 +683,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                   )} */}
                   {/* {filterFieldFactory("filterStatus", "Status", true)} */}
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Qtde. exp.
                     </label>
@@ -704,9 +704,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Total etiq. a imprimir
+                      Etiq. a imprimir
                     </label>
                     <div className="flex">
                       <Input
@@ -725,9 +725,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Total etiq. impressas
+                      Etiq. impressas
                     </label>
                     <div className="flex">
                       <Input
@@ -746,7 +746,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Total etiquetas
                     </label>
@@ -767,7 +767,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
+                  <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>

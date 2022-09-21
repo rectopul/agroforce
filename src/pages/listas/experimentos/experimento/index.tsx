@@ -710,9 +710,9 @@ export default function Listagem({
                                         pb-8
                                         "
                 >
+                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory(
                     'filterExperimentName',
@@ -730,6 +730,28 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
+
+                  <div className="h-6 w-full ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -784,29 +806,7 @@ export default function Listagem({
                       </DragDropContext>
                     </AccordionFilter>
                   </div>
-                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
-                  <div className="h-6 w-full ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterRepetitionFrom"
-                        name="filterRepetitionFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterRepetitionTo"
-                        name="filterRepetitionTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
 
-                  {/* <div className="w-full" style={{ marginLeft: -80 }} /> */}
                   <div style={{ width: 80 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
