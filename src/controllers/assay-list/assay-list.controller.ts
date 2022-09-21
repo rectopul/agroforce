@@ -150,7 +150,7 @@ export class AssayListController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const assayList: any = await this.assayListRepository.findById(data.id);
 
@@ -158,7 +158,7 @@ export class AssayListController {
 
       const response = await this.assayListRepository.update(Number(data.id), data);
       await this.reporteRepository.create({
-        madeBy: response.created_by, module: 'Ensaio', operation: 'Edição', name: response.protocol_name, ip: JSON.stringify(ip), idOperation: response.id,
+        madeBy: response.created_by, module: 'Ensaio', operation: 'Edição', name: response.gli, ip: JSON.stringify(ip), idOperation: response.id,
       });
 
       return { status: 200, response, message: 'Lista de ensaio atualizado' };
