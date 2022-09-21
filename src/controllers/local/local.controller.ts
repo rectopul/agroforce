@@ -127,7 +127,7 @@ export class LocalController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const localCultura: any = await this.localRepository.findOne(data.id);
 

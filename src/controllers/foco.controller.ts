@@ -103,7 +103,7 @@ export class FocoController {
 
   async create(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture, status: 1 },
@@ -128,7 +128,7 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data) {
         const foco = await this.focoRepository.update(data.id, data);

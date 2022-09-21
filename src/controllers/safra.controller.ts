@@ -132,7 +132,7 @@ export class SafraController {
 
   async create(data: CreateSafra) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const safraAlreadyExists = await this.safraRepository.findBySafraName({
         safraName: data.safraName,
@@ -157,7 +157,7 @@ export class SafraController {
 
   async update(data: UpdateSafra) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data.status === 0 || data.status === 1) {
         const safraAlreadyExists = await this.getOne(data.id);
