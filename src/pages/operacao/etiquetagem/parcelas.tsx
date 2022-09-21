@@ -98,7 +98,9 @@ export default function Listagem({
   const router = useRouter();
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
-    i.titleTab === "ETIQUETAGEM" ? { ...i, statusTab: true } : i
+    i.titleTab === "ETIQUETAGEM"
+      ? { ...i, statusTab: true }
+      : { ...i, statusTab: false }
   );
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -495,7 +497,7 @@ export default function Listagem({
       }
       if (columnOrder[index] === "name_genotipo") {
         tableFields.push(
-          headerTableFactory("Nome do genótipo", "name_genotipo")
+          headerTableFactory("Nome do genótipo", "genotipo.name_genotipo")
         );
       }
       if (columnOrder[index] === "nca") {
@@ -947,7 +949,7 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  <div className="h-6 w-full ml-2">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
