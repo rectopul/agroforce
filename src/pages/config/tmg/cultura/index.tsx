@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -70,20 +70,20 @@ interface IData {
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string, //RR
-  orderByserver : any |string //RR
+  typeOrderServer: any | string, //RR
+  orderByserver: any | string //RR
 }
 
 export default function Listagem({
-  allCultures,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, //RR
-  orderByserver //RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, //RR
+      orderByserver //RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -150,9 +150,9 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); //RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
 
 
   const formik = useFormik<IFilter>({
@@ -174,23 +174,23 @@ export default function Listagem({
   });
 
   //Calling common API 
-  async function callingApi(parametersFilter : any ){
+  async function callingApi(parametersFilter: any) {
 
-    setCookie("filterBeforeEdit", parametersFilter);
-    setCookie("filterBeforeEditTypeOrder", typeOrder);
-    setCookie("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
 
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie("filtersParams", parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await cultureService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {       
+      if (response.status === 200 || response.status === 400) {
         setCultures(response.response);
-        setTotalItems(response.total); 
+        setTotalItems(response.total);
       }
     });
-  } 
+  }
 
 
   //Call that function when change type order value.
@@ -264,7 +264,7 @@ export default function Listagem({
     // }
 
     //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } = await fetchWrapper.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -338,12 +338,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookie("pageBeforeEdit", currentPage?.toString());
-                setCookie("filterBeforeEdit", filter);
-                setCookie("filterBeforeEditTypeOrder", typeOrder);
-                setCookie("filterBeforeEditOrderBy", orderBy);
-                setCookie("filtersParams", filtersParams);
-                setCookie("lastPage", "atualizar");
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 localStorage.setItem('filterValueEdit', filtersParams);
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
@@ -533,10 +533,10 @@ export default function Listagem({
     await callingApi(filter); //handle pagination globly
   }
 
- 
+
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = fetchWrapper.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
@@ -792,7 +792,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -820,26 +820,26 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=2';
 
-      //Last page
+  //Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : "No";
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies("lastPage", { req, res });
   }
 
-   //RR
+  //RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-       
+    ? req.cookies.filterBeforeEditTypeOrder
+    : "desc";
+
   //RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name";
+    ? req.cookies.filterBeforeEditOrderBy
+    : "name";
 
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEdit', { req, res });
@@ -848,7 +848,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
-  
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
   const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
