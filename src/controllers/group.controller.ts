@@ -24,7 +24,7 @@ export class GroupController {
 
   async create(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const groupAlreadyExists = await this.groupRepository.findByData(data);
       if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
@@ -43,7 +43,7 @@ export class GroupController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const group: any = await this.groupRepository.findById(data.id);
 

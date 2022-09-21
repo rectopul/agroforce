@@ -131,7 +131,7 @@ export class QuadraController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data) {
         const quadra = await this.quadraRepository.update(data.id, data);
