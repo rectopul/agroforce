@@ -3,6 +3,8 @@ import {
 } from 'yup';
 import { CulturaRepository } from '../repository/culture.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
+import handleError from '../shared/utils/handleError';
+
 
 interface CultureDTO {
   id: number;
@@ -95,7 +97,9 @@ export class CulturaController {
       }
       return { status: 200, response, total: response.total };
     } catch (err) {
-      return { status: 400, message: err };
+      handleError('Culture Controller', 'GetAll', err);
+      throw new Error('[Controller] - GetAll Culture erro');
+      // return { status: 400, message: err };
     }
   }
 
