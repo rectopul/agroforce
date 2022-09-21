@@ -97,17 +97,16 @@ export default function Listagem({
       ? { ...i, statusTab: true }
       : { ...i, statubsTab: false }
   );
-  console.log({ tabsOperationMenu });
 
   const router = useRouter();
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.npe || {
     id: 0,
-    table_preferences: "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef",
+    table_preferences:
+      "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,grp",
   };
-  preferences.table_preferences =
-    "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef";
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
   );
@@ -181,6 +180,8 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("grp"),
     },
   ]);
+
+  console.log({ npe });
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -375,7 +376,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory("NPE Final", "npef"));
       }
       if (columnCampos[item] === "grp") {
-        tableFields.push(headerTableFactory("GRP", "grp"));
+        tableFields.push(headerTableFactory("GRP", "group.group"));
       }
     });
     return tableFields;
@@ -551,6 +552,8 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter = `skip=${skip}&take=${take}`;
+    console.log({ filter });
+
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
@@ -967,7 +970,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=4&safraId=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
