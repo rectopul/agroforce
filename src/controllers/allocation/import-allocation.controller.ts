@@ -144,7 +144,7 @@ export class ImportAllocationController {
                   id: spreadSheet[row][0],
                   idSafra,
                 });
-                const allNpe = response[0]?.experiment_genotipe.map((item: any) => item.npe);
+                const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : null));
                 let npeRange = Number(spreadSheet[row][column]);
                 let validateNpeRange = true;
                 while (npeRange < Number(spreadSheet[row][4])) {
