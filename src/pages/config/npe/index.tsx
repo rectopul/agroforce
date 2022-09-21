@@ -103,7 +103,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,safra,foco,ensaio,tecnologia,local,npei,epoca,status',
+      'id,safra,foco,ensaio,tecnologia,local,npei,epoca,prox_npe,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -149,21 +149,21 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Lugar de cultura',
+      title: 'Lugar cultura',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Inicial ',
-      value: 'npei',
-      defaultChecked: () => camposGerenciados.includes('npei'),
     },
     {
       name: 'CamposGerenciados[]',
       title: 'Epoca ',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NPE Inicial ',
+      value: 'npei',
+      defaultChecked: () => camposGerenciados.includes('npei'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -381,7 +381,7 @@ export default function Listagem({
       // }
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
+          headerTableFactory('Lugar cultura', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -402,14 +402,14 @@ export default function Listagem({
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
       }
+      if (columnCampos[item] === 'npei') {
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+      }
       if (columnCampos[item] === 'group') {
         tableFields.push(headerTableFactory('Grupo', 'group.group'));
       }
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(headerTableFactory('Prox NPE', 'prox_npe'));
-      }
-      if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
       }
       if (columnCampos[item] === 'status') {
         tableFields.push(statusHeaderFactory());
@@ -711,7 +711,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
+                  {filterFieldFactory('filterLocal', 'Lugar cultura')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -725,7 +725,7 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEpoca', 'Epoca')}
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE Inicial
                     </label>
@@ -746,7 +746,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-6 w-1/3 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Prox NPE
                     </label>

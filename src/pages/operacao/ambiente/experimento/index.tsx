@@ -9,7 +9,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useEffect, useLayoutEffect, useRef, useState,
+} from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
@@ -98,19 +100,19 @@ interface IData {
 }
 
 export default function Listagem({
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0, table_preferences: 'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber',
+    id: 0, table_preferences: 'id,protocolName,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
@@ -145,14 +147,12 @@ export default function Listagem({
   const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
-
-
   const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-  const [selectedNPE, setSelectedNPE] = useState<any[]>(JSON.parse(localStorage.getItem('selectedNPE') as string))
+  const [selectedNPE, setSelectedNPE] = useState<any[]>(JSON.parse(localStorage.getItem('selectedNPE') as string));
   // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
@@ -566,7 +566,7 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      let temp = [...selectedNPE]
+      const temp = [...selectedNPE];
 
       await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
         if (status === 200) {
@@ -580,7 +580,7 @@ export default function Listagem({
           });
 
           setExperimento(response);
-          setTotalItems(total)
+          setTotalItems(total);
           temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
         }
       });
@@ -621,7 +621,7 @@ export default function Listagem({
           });
 
           await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
           }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
@@ -663,13 +663,13 @@ export default function Listagem({
       const temp = selectedNPE[selectedNPE.indexOf(NPESelectedRow) + 1];
       Swal.fire({
         title: 'NPE Já usado !!!',
-        html: "Existem NPE usados ​​entre <b>" + npeUsedFrom + "</b> e <b>" + selectedNPE.filter((x) => x == NPESelectedRow)[0].npef + "</b><br><br>" +
-          "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " +
-          temp.foco.name + "</b><br><b> Ensaio : " +
-          temp.type_assay.name + "</b><br><b> Local : " +
-          temp.local.name_local_culture + "</b><br><b>Epoca : " +
-          temp.epoca + "</b><br><b>Tecnologia : " +
-          temp.tecnologia.name + "</b></p></div>",
+        html: `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${selectedNPE.filter((x) => x == NPESelectedRow)[0].npef}</b><br><br>`
+          + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${
+            temp.foco.name}</b><br><b> Ensaio : ${
+            temp.type_assay.name}</b><br><b> Local : ${
+            temp.local.name_local_culture}</b><br><b>Epoca : ${
+            temp.epoca}</b><br><b>Tecnologia : ${
+            temp.tecnologia.name}</b></p></div>`,
         icon: 'warning',
         showCloseButton: true,
         closeButtonHtml: '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
@@ -693,7 +693,7 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       (item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE) || NPESelectedRow?.nextNPE == 'N/A' ? count++ : '';
-    })
+    });
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
 
