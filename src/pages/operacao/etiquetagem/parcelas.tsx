@@ -1080,6 +1080,9 @@ export default function Listagem({
               data={parcelas}
               options={{
                 selection: true,
+                selectionProps: (rowData: any) => ({
+                  disabled: rowData.status !== "IMPRESSO",
+                }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
