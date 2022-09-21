@@ -114,10 +114,17 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("type_assay"),
     },
     {
+<<<<<<< Updated upstream
       name: "CamposGerenciados[]",
       title: "Nome da tecnologia",
       value: "tecnologia",
       defaultChecked: () => camposGerenciados.includes("tecnologia"),
+=======
+      name: 'CamposGerenciados[]',
+      title: 'Tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+>>>>>>> Stashed changes
     },
     {
       name: "CamposGerenciados[]",
@@ -144,10 +151,17 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
     {
+<<<<<<< Updated upstream
       name: "CamposGerenciados[]",
       title: "Status",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
+=======
+      name: 'CamposGerenciados[]',
+      title: 'Status EXP.',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
+>>>>>>> Stashed changes
     },
     {
       name: "CamposGerenciados[]",
@@ -186,6 +200,24 @@ export default function Listagem({
       title: "SORTEADO",
       value: "sorteado",
       defaultChecked: () => camposGerenciados.includes("sorteado"),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. NÃO INICIADA',
+      value: 'ETIQ. NÃO INICIADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. NÃO INICIADA'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. EM ANDAMENTO',
+      value: 'ETIQ. EM ANDAMENTO',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. EM ANDAMENTO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. FINALIZADA',
+      value: 'ETIQ. FINALIZADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
     },
   ]);
   const [orderBy, setOrderBy] = useState<string>("");
@@ -459,28 +491,38 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
+    await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.Safra = item.safra.safraName;
-            newItem.Foco = item.assay_list.foco.name;
-            newItem.Ensaio = item.assay_list.type_assay.name;
-            newItem.Tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.Gli = item.assay_list.gli;
-            newItem.Bgm = item.assay_list.bgm;
-            newItem.Nt = item.treatments_number;
-            newItem.StatusT = item.status;
-            newItem.StatusEnsaio = item.assay_list.status;
-            newItem.Genotipo = item.genotipo.name_genotipo;
-            newItem.Nca = item?.lote?.ncc;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.DELINEAMENTO = item.experiment.delineamento.name;
+            newItem.REP = item.rep;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.STATUS_T = item.status_t;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+            newItem.STATUS_EXP = item.experiment.status;
+
+            delete newItem.id;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
+<<<<<<< Updated upstream
           XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+=======
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
+>>>>>>> Stashed changes
 
           // Buffer
           XLSX.write(workBook, {
@@ -493,18 +535,23 @@ export default function Listagem({
             type: "binary",
           });
           // Download
+<<<<<<< Updated upstream
           XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
+=======
+          XLSX.writeFile(workBook, 'Parcelas.xlsx');
+>>>>>>> Stashed changes
         }
       });
   };
 
   const replacementExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
+    await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
+<<<<<<< Updated upstream
             newItem.safra = item.safra.safraName;
             newItem.foco = item.assay_list.foco.name;
             newItem.ensaio = item.assay_list.type_assay.name;
@@ -518,6 +565,27 @@ export default function Listagem({
             newItem.novo_genotipo = "";
             newItem.novo_status = "";
             newItem.novo_nca = "";
+=======
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.DELINEAMENTO = item.experiment.delineamento.name;
+            newItem.REP = item.rep;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.STATUS_T = item.status_t;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+            newItem.NOVO_GENOTIPO = '';
+            newItem.NOVO_STATUS = '';
+            newItem.NOVO_NCA = '';
+
+            delete newItem.id;
+>>>>>>> Stashed changes
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -594,6 +662,7 @@ export default function Listagem({
 
   async function readExcel(value: any) {
     readXlsxFile(value[0]).then((rows) => {
+<<<<<<< Updated upstream
       importService
         .validate({
           table: "REPLACEMENT_GENOTYPE ",
@@ -612,6 +681,23 @@ export default function Listagem({
             handlePagination();
           }
         });
+=======
+      importService.validate({
+        table: 'REPLACEMENT_GENOTYPE ',
+        spreadSheet: rows,
+        moduleId: 27,
+        idSafra: userLogado.safras.safra_selecionada,
+        created_by: userLogado.id,
+      }).then(({ status, message }: any) => {
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+        if (status != 400 && status == 200) {
+          handlePagination();
+        }
+      });
+>>>>>>> Stashed changes
     });
   }
 
@@ -639,12 +725,23 @@ export default function Listagem({
         "/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
       );
     } else if (ncaButton) {
+<<<<<<< Updated upstream
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
         id: item.id,
         genotipo: item.name_genotipo,
         idGenotipo: item.idGenotipo,
         idLote: item.idLote,
       }));
+=======
+      const checkedTreatments: any = rowsSelected.map((item: any) => (
+        {
+          id: item.id,
+          genotipo: item.name_genotipo,
+          idGenotipo: item.idGenotipo,
+          idLote: item.idLote,
+        }
+      ));
+>>>>>>> Stashed changes
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem("checkedTreatments", checkedTreatmentsLocal);
       localStorage.setItem("treatmentsOptionSelected", JSON.stringify("nca"));
@@ -654,7 +751,11 @@ export default function Listagem({
       );
     } else if (inputFile?.files.length !== 0) {
       const value = await readExcel(inputFile.files);
+<<<<<<< Updated upstream
       console.log("calling me....", value);
+=======
+      console.log('calling me....', value);
+>>>>>>> Stashed changes
     } else {
       Swal.fire("Selecione alguma opção ou import");
     }
@@ -849,26 +950,7 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterBgmFrom"
-                        name="filterBgmFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterBgmTo"
-                        name="filterBgmTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+
                 </div>
                 <div
                   className="w-full h-full
@@ -902,7 +984,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Ensaio
+                      Status do Experimento
                     </label>
                     {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
                       {statusFilter.map((generate, index) => (

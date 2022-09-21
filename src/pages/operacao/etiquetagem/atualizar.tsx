@@ -79,10 +79,16 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+<<<<<<< Updated upstream
     { name: "CamposGerenciados[]", title: "Protocolo", value: "protocolName" },
     { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
     { name: "CamposGerenciados[]", title: "Ensaio", value: "type_assay" },
     { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
+=======
+    { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
+    { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
+    { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
+>>>>>>> Stashed changes
     {
       name: "CamposGerenciados[]",
       title: "Nome experimento",
@@ -326,29 +332,21 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          newItem.Safra = item.assay_list?.safra?.safraName;
-          newItem.Foco = item.assay_list?.foco.name;
-          newItem.TipoDeEnsaio = item.assay_list?.type_assay.name;
-          newItem.Tecnologia = item.assay_list?.tecnologia.name;
-          newItem.Gli = item.assay_list?.gli;
-          newItem.NomeDoExperimento = item?.experimentName;
-          newItem.Bgm = item.assay_list?.bgm;
-          newItem.StatusEnsaio = item.assay_list?.status;
-          newItem.Plantio = newItem.local?.name_local_culture;
-          newItem.Delineamento = item.delineamento?.name;
-          newItem.Repetição = item.delineamento?.repeticao;
-          newItem.Densidade = item?.density;
-          newItem.NumeroDeRepetições = item.repetitionsNumber;
-          newItem.Época = item?.period;
-          newItem.OrdemSorteio = item?.orderDraw;
-          newItem.Nlp = item?.nlp;
-          newItem.Clp = item?.clp;
-          newItem.Eel = item?.eel;
-          newItem.Observações = item?.comments;
-          newItem.Protocolo = item.assay_list?.protocol_name;
-          newItem.CountNT = newItem.countNT;
-          newItem.NpeQT = newItem.npeQT;
+          console.log(item);
+          newItem.SAFRA = item.assay_list?.safra?.safraName;
+          newItem.PROTOCOLO = item.assay_list?.protocol_name;
+          newItem.FOCO = item.assay_list?.foco.name;
+          newItem.ENSAIO = item.assay_list?.type_assay.name;
+          newItem.GLI = item.assay_list?.gli;
+          newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
+          newItem.TECNOLOGIA = item.assay_list?.tecnologia.name;
+          newItem.ÉPOCA = item?.period;
+          newItem.DELINEAMENTO = item.delineamento?.name;
+          newItem.REPETIÇÃO = item.delineamento?.repeticao;
+          newItem.STATUS_ENSAIO = item.assay_list?.status;
 
+          delete newItem.experimentGroupId;
+          delete newItem.experiment_genotipe;
           delete newItem.countNT;
           delete newItem.npeQT;
           delete newItem.local;

@@ -102,11 +102,11 @@ export class NpeController {
 
       if (options.filterGrpFrom || options.filterGrpTo) {
         if (options.filterGrpFrom && options.filterGrpTo) {
-          parameters.foco = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGrpFrom) {
-          parameters.foco = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGrpFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGrpTo) {
-          parameters.foco = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
 
