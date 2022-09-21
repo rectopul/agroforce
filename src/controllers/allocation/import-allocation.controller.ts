@@ -17,6 +17,7 @@ import { QuadraController } from '../block/quadra.controller';
 import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 
+
 export class ImportAllocationController {
   static async validate(
     idLog: number,
@@ -53,6 +54,7 @@ export class ImportAllocationController {
                     spreadSheet[row][9],
                     spreadSheet[0][column],
                   );
+
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
