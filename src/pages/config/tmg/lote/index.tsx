@@ -78,6 +78,7 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
+  
   idSafra: number;
   idCulture : number;
   itensPerPage: number;
