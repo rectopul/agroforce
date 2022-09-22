@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from 'react';
+import React from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -19,25 +19,13 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload, BsTrashFill } from 'react-icons/bs';
-import {
-  RiArrowUpDownLine,
-  RiCloseCircleFill,
-  RiFileExcel2Line,
-} from 'react-icons/ri';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import readXlsxFile from 'read-excel-file';
 import { HiArrowNarrowRight } from 'react-icons/hi';
-import { AiOutlinePrinter } from 'react-icons/ai';
-import {
-  ITreatment,
-  ITreatmentFilter,
-  ITreatmentGrid,
-} from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { ITreatment } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
 import {
@@ -46,20 +34,17 @@ import {
   CheckBox,
   Content,
   Input,
-  ModalConfirmation,
-  Select,
 } from '../../../components';
+import LoadingComponent from '../../../components/Loading';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   experimentGenotipeService,
   experimentGroupService,
-  importService,
   userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { fetchWrapper } from '../../../helpers';
-import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
 interface IFilter {
   filterFoco: string;
@@ -249,6 +234,8 @@ export default function Listagem({
   const [writeOffId, setWriteOffId] = useState<number>();
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -569,7 +556,7 @@ export default function Listagem({
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
-        // console.log(response);
+          // console.log(response);
           const newData = response.map((item: any) => {
             const newItem: any = {};
 
@@ -713,6 +700,7 @@ export default function Listagem({
     )?.value;
     let countNca = 0;
     let secondNca = '';
+
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
         setGenotypeNameTwo(item.name_genotipo);
@@ -721,10 +709,13 @@ export default function Listagem({
         countNca += 1;
       }
     });
+
     const { response } = await experimentGroupService.getAll({
       id: experimentGroupId,
     });
+
     let colorVerify = '';
+
     if (countNca > 0 && secondNca === ncaOne) {
       colorVerify = 'bg-green-600';
       setGroupNameTwo(response[0]?.name);
@@ -734,14 +725,26 @@ export default function Listagem({
       setValidateNcaTwo('bg-red-600');
     }
     setTotalMatch(countNca);
+
     if (colorVerify === 'bg-green-600') {
+      setIsLoading(true);
+
       await experimentGenotipeService.update({
         idList: parcelasToPrint,
         status: 'IMPRESSO',
         userId: userLogado.id,
       });
       cleanState();
+
+      const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
+      const parcels = parcelsByNCA.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x) => x.id_safra === idSafra)[0]?.seeds }));
+      if (parcels) {
+        localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
+        router.push('imprimir');
+      }
     }
+
+    setIsLoading(false);
   }
 
   async function writeOff() {
@@ -799,13 +802,23 @@ export default function Listagem({
   }
 
   async function reprint() {
+    setIsLoading(true);
+
     const idList = rowsSelected.map((item: any) => item.id);
-    console.log(`Imprimir ${idList}`);
+
     await experimentGenotipeService.update({
       idList,
       status: 'IMPRESSO',
       userId: userLogado.id,
     });
+
+    const parcels = rowsSelected.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x) => x.id_safra == idSafra)[0]?.seeds }));
+    if (parcels?.length > 0) {
+      localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
+      router.push('imprimir');
+    }
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -818,6 +831,8 @@ export default function Listagem({
       <Head>
         <title>Listagem de parcelas</title>
       </Head>
+
+      {isLoading && <LoadingComponent text="Gerando etiquetas para impressão..." />}
 
       <Modal
         isOpen={isOpenModal}
@@ -1115,6 +1130,7 @@ export default function Listagem({
               columns={columns}
               data={parcelas}
               options={{
+                showSelectAllCheckbox: false,
                 selection: true,
                 selectionProps: (rowData: any) => ({
                   disabled: rowData.status !== 'IMPRESSO',
@@ -1315,6 +1331,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,

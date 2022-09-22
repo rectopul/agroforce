@@ -24,17 +24,26 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   const random = (max = 30, min = 10) => Math.floor(Math.random() * max) + min;
 
   if (tagType === 1) {
-    const listTags = data.map(() => (
+    const listTags = data.map((item) => (
       <div className="etiquetaModelo1">
         <div className="flexRow" style={{ fontSize: 16 }}>
-          <div className="flex1">{random(999999, 100000)}</div>
-          <div className="flex1"><BarCode valor={random(99999, 10000).toString()} /></div>
+          <div className="flex1">{item?.npe}</div>
+          <div className="flex1">{item?.nca && (<BarCode valor={item?.nca} />)}</div>
         </div>
         <div className="flexRow" style={{ fontSize: 9 }}>
-          <div className="flex1">TC19(3)70.028/G002/01</div>
-          <div>{random(99999, 10000)}</div>
+          <div className="flex1">
+            {item?.genotipo?.name_genotipo}
+          </div>
+          <div>{item?.nca}</div>
         </div>
-        <div style={{ fontSize: 9 }}>MT403RL01-VCU(2)-500MTS</div>
+        <div style={{ fontSize: 7.5 }}>
+          {item?.experiment?.local?.name_local_culture}
+          -
+          {item?.gli}
+          -
+          {item?.envelope}
+          MTS
+        </div>
       </div>
     ));
 
