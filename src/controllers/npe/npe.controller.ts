@@ -158,6 +158,7 @@ export class NpeController {
         orderBy,
       );
 
+      const next_available_npe = response[response.length - 1].prox_npe;
       response.map(async (value: any, index: any, elements: any) => {
         const newItem = value;
         const next = elements[index + 1];
@@ -171,6 +172,7 @@ export class NpeController {
           newItem.npeQT = 'N/A';
           newItem.nextNPE = 0;
         }
+        newItem.nextAvailableNPE = next_available_npe;
         return newItem;
       });
 
