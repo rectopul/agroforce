@@ -40,11 +40,13 @@ export class GenotypeTreatmentController {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
       if (options.filterNca) {
-        parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
+        parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
       }
+      console.log(parameters);
+      console.log(options);
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
       }

@@ -27,10 +27,6 @@ export class ExperimentGenotipeController {
         parameters.type_assay = JSON.parse(`{ "name": { "contains": "${options.filterTypeAssay}" } }`);
       }
 
-      if (options.filterGli) {
-        parameters.assayList = JSON.parse(`{ "name": { "contains": "${options.filterGli}" } }`);
-      }
-
       if (options.filterNameTec) {
         parameters.tecnologia = JSON.parse(`{ "name": { "contains": "${options.filterNameTec}" } }`);
       }
@@ -39,18 +35,27 @@ export class ExperimentGenotipeController {
         parameters.AND.push(JSON.parse(`{ "tecnologia": {"cod_tec": {"contains": "${options.filterCodTec}" } } }`));
       }
 
+      if (options.filterTechnology) {
+        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": "${options.filterTechnology}" } }`));
+      }
+
       if (options.filterExperimentName) {
         parameters.AND.push(JSON.parse(`{ "experiment": {"experimentName": {"contains": "${options.filterExperimentName}" } } }`));
       }
 
-      // if (options.filterStatus) {
-      //   parameters.AND.push(JSON.parse(`{ "experiment": {"status": {"contains": "${options.filterStatus}" } } }`));
-      // }
+      if (options.filterPlacingPlace) {
+        parameters.AND.push(JSON.parse(`{ "experiment": { "local": {"name_local_culture": {"contains": "${options.filterPlacingPlace}" } } } }`));
+      }
+
+      if (options.filterGli) {
+        parameters.AND.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
+      }
+
       if (options.filterStatus) {
         parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(JSON.parse(`{ "experiment": {"status": {"contains": "${statusParams[0]}" } } }`));
-        parameters.OR.push(JSON.parse(`{ "experiment": {"status": {"contains": "${statusParams[1]}" } } }`));
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": "${statusParams[0]}" } } `));
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": "${statusParams[1]}" } } `));
       }
       console.log(parameters);
       console.log(options);
@@ -67,7 +72,7 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterNca) {
-        parameters.nca = JSON.parse(`{ ${Number(options.filterNca)}`);
+        parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
       }
 
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
@@ -100,9 +105,29 @@ export class ExperimentGenotipeController {
         }
       }
 
-      if (options.npe) {
-        parameters.npe = Number(options.npe);
+      if (options.filterRepFrom || options.filterRepTo) {
+        if (options.filterRepFrom && options.filterRepTo) {
+          parameters.rep = JSON.parse(`{"gte": ${Number(options.filterRepFrom)}, "lte": ${Number(options.filterRepTo)} }`);
+        } else if (options.filterRepFrom) {
+          parameters.rep = JSON.parse(`{"gte": ${Number(options.filterRepFrom)} }`);
+        } else if (options.filterRepTo) {
+          parameters.rep = JSON.parse(`{"lte": ${Number(options.filterRepTo)} }`);
+        }
       }
+
+      if (options.filterNpeFrom || options.filterNpeTo) {
+        if (options.filterNpeFrom && options.filterNpeTo) {
+          parameters.npe = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(options.filterNpeTo)} }`);
+        } else if (options.filterNpeFrom) {
+          parameters.npe = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)} }`);
+        } else if (options.filterNpeTo) {
+          parameters.npe = JSON.parse(`{"lte": ${Number(options.filterNpeTo)} }`);
+        }
+      }
+
+      // if (options.npe) {
+      //   parameters.npe = Number(options.npe);
+      // }
 
       const select = {
         id: true,

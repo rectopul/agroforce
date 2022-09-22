@@ -216,7 +216,7 @@ export default function Listagem({
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
 
-  const formik = useFormik<ITreatmentFilter>({
+  const formik = useFormik<any>({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
@@ -234,8 +234,14 @@ export default function Listagem({
       filterBgmFrom: '',
       filterNtTo: '',
       filterNtFrom: '',
+      filterNpeTo: '',
+      filterNpeFrom: '',
+      filterRepTo: '',
+      filterRepFrom: '',
       filterStatusT: '',
       filterCodTec: '',
+      filterExperimentName: '',
+      filterPlacingPlace: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -251,31 +257,38 @@ export default function Listagem({
       filterBgmFrom,
       filterNtTo,
       filterNtFrom,
+      filterNpeTo,
+      filterNpeFrom,
+      filterRepTo,
+      filterRepFrom,
+      filterCodTec,
+      filterExperimentName,
+      filterPlacingPlace,
     }) => {
-      // const allCheckBox: any = document.querySelectorAll(
-      //     "input[name='StatusCheckbox']",
-      // );
-      // let selecionados = '';
-      // for (let i = 0; i < allCheckBox.length; i += 1) {
-      //     if (allCheckBox[i].checked) {
-      //         selecionados += `${allCheckBox[i].value},`;
-      //     }
-      // }
-      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      // const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await genotypeTreatmentService
-      //     .getAll(`${parametersFilter}`)
-      //     .then(({ response, total: allTotal }) => {
-      //         setFilter(parametersFilter);
-      //         setTreatments(response);
-      //         setTotalItems(allTotal);
-      //         setAfterFilter(true);
-      //         setCurrentPage(0);
-      //         setMessage(true);
-      //         tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
-      //     });
+      const allCheckBox: any = document.querySelectorAll(
+        "input[name='StatusCheckbox']",
+      );
+      let selecionados = '';
+      for (let i = 0; i < allCheckBox.length; i += 1) {
+        if (allCheckBox[i].checked) {
+          selecionados += `${allCheckBox[i].value},`;
+        }
+      }
+      const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      const parametersFilter = `&filterFoco=${filterFoco}&filterPlacingPlace=${filterPlacingPlace}&filterExperimentName=${filterExperimentName}&filterCodTec=${filterCodTec}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}`;
+      setFiltersParams(parametersFilter);
+      setCookies('filterBeforeEdit', filtersParams);
+      await experimentGenotipeService
+        .getAll(`${parametersFilter}`)
+        .then(({ response, total: allTotal }) => {
+          setFilter(parametersFilter);
+          setTreatments(response);
+          setTotalItems(allTotal);
+          setAfterFilter(true);
+          setCurrentPage(0);
+          setMessage(true);
+          tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
+        });
     },
   });
 
@@ -318,7 +331,7 @@ export default function Listagem({
     }
   }
 
-  function headerTableFactory(name: string, title: string) {
+  function headerTableFactory(name: string, title: string, style: boolean = false) {
     return {
       title: (
         <div className="flex items-center">
@@ -333,6 +346,7 @@ export default function Listagem({
       ),
       field: title,
       sorting: true,
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -355,7 +369,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+            {`${rowData.tecnologia?.cod_tec} ${rowData.tecnologia?.name}`}
           </div>
         </div>
       ),
@@ -407,11 +421,11 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
+        tableFields.push(headerTableFactory('NCA', 'nca', true));
       }
     });
     return tableFields;
@@ -865,21 +879,10 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GLI
-                    </label>
-                    <Select
-                      values={assaySelect}
-                      id="filterGli"
-                      name="filterGli"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div>
-
-                  {/* {filterFieldFactory('filterGli', 'GLI')} */}
+                  {filterFieldFactory('filterCodTec', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome da Tecnologia')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
 
                 </div>
                 <div
@@ -890,27 +893,28 @@ export default function Listagem({
                   pb-3
                   "
                 >
+                  {filterFieldFactory('filterPlacingPlace', 'Lugar de Plantio')}
+
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NT
+                      REP
                     </label>
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        id="filterNtFrom"
-                        name="filterNtFrom"
+                        id="filterRepFrom"
+                        name="filterRepFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        id="filterNtTo"
-                        name="filterNtTo"
+                        id="filterRepTo"
+                        name="filterRepTo"
                         onChange={formik.handleChange}
                       />
                     </div>
                   </div>
-                  {filterFieldFactory('filterStatus', 'Status T')}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -965,6 +969,46 @@ export default function Listagem({
                       </DragDropContext>
                     </AccordionFilter>
                   </div>
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE.
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNpeFrom"
+                        name="filterNpeFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNpeTo"
+                        name="filterNpeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                   {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
 
                   <div className="h-7 w-1/2 ml-4">
@@ -983,6 +1027,7 @@ export default function Listagem({
                     />
                   </div>
 
+                  {filterFieldFactory('filterNca', 'NCA')}
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
 
                   <div className="h-7 w-1/2 ml-4">
@@ -1294,7 +1339,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.genotipo.name_genotipo;
     return newItem;
   });
-
+  console.log(allExpTreatments);
   return {
     props: {
       allExpTreatments,

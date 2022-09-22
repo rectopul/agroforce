@@ -165,7 +165,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Status da parcela',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -484,7 +484,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(headerTableFactory('Status', 'status'));
+        tableFields.push(headerTableFactory('Status da parcela', 'status'));
       }
       if (columnOrder[index] === 'nt') {
         tableFields.push(headerTableFactory('NT.', 'nt'));
@@ -1008,7 +1008,7 @@ export default function Listagem({
 
                   <div className="h-10 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status da Parcela
+                      Status da parcela
                     </label>
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>

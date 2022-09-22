@@ -102,19 +102,19 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq. a imp.',
+      title: 'Etiq. a imprimir',
       value: 'tagsToPrint',
       defaultChecked: () => camposGerenciados.includes('tagsToPrint'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq. imp.',
+      title: 'Etiq. impressas',
       value: 'tagsPrinted',
       defaultChecked: () => camposGerenciados.includes('tagsPrinted'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq.',
+      title: 'Total etiquetas',
       value: 'totalTags',
       defaultChecked: () => camposGerenciados.includes('totalTags'),
     },
@@ -359,14 +359,14 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       }
       if (columnOrder[item] === 'tagsToPrint') {
         tableFields.push(
-          headerTableFactory('Total etiq. a imp.', 'tagsToPrint'),
+          headerTableFactory('Etiq. a imprimir', 'tagsToPrint'),
         );
       }
       if (columnOrder[item] === 'tagsPrinted') {
-        tableFields.push(headerTableFactory('Total etiq. imp.', 'tagsPrinted'));
+        tableFields.push(headerTableFactory('Etiq. impressas', 'tagsPrinted'));
       }
       if (columnOrder[item] === 'totalTags') {
-        tableFields.push(headerTableFactory('Total etiq.', 'totalTags'));
+        tableFields.push(headerTableFactory('Total etiquetas', 'totalTags'));
       }
       if (columnOrder[item] === 'status') {
         tableFields.push(headerTableFactory('Status', 'status'));

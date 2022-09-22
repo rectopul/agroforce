@@ -1,4 +1,4 @@
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -141,7 +141,7 @@ export default function Listagem({
       // const parametersFilter = await fetchWrapper.handleFilterParameter('setor', filterStatus || 1, filterSearch);
 
       // setFiltersParams(parametersFilter); // Set filter pararameters
-      // setCookies('filterBeforeEdit', filtersParams);
+      // setCookiess('filterBeforeEdit', filtersParams);
 
       // await departmentService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -164,12 +164,12 @@ export default function Listagem({
   //Calling common API 
   async function callingApi(parametersFilter : any ){
 
-    setCookie("filterBeforeEdit", parametersFilter);
-    setCookie("filterBeforeEditTypeOrder", typeOrder);
-    setCookie("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie("filtersParams", parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await departmentService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400 ) {
@@ -281,12 +281,12 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               onClick={() => {
-                setCookie("pageBeforeEdit", currentPage?.toString());
-                setCookie("filterBeforeEdit", filter);
-                setCookie("filterBeforeEditTypeOrder", typeOrder);
-                setCookie("filterBeforeEditOrderBy", orderBy);
-                setCookie("filtersParams", filtersParams);
-                setCookie("lastPage", "atualizar");
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
               }}
             />
@@ -796,6 +796,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   : "No";
 
   if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });  
