@@ -570,12 +570,14 @@ export default function Listagem({
       await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
         if (status === 200) {
           let i = 0;
-          response.length > 0 ? i = NPESelectedRow.npei_i : i = NPESelectedRow.npef;
+          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
+          console.log('i', i);
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
-            i == NPESelectedRow.nextNPE.npei_i ? setNpeUsedFrom(i) : '';
+            console.log('i', i);
+            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
           });
 
           setExperimento(response);
@@ -586,7 +588,7 @@ export default function Listagem({
       parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          let i = NPESelectedRow.npei_i;
+          let i = NPESelectedRow.prox_npe;
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
@@ -619,7 +621,7 @@ export default function Listagem({
           });
 
           await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1, npei_i: lastNpe + 1,
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == "N/A" ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
           }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
@@ -755,7 +757,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        (rowData.npef >= NPESelectedRow?.nextNPE) && SortearDisable ? '#FF5349' : '#f9fafb',
+                        (rowData.npef >= NPESelectedRow?.nextNPE.npei_i) && SortearDisable ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,

@@ -158,23 +158,27 @@ export class NpeController {
         orderBy,
       );
 
-      const next_available_npe = response[response.length - 1].prox_npe;
-      response.map(async (value: any, index: any, elements: any) => {
-        const newItem = value;
-        const next = elements[index + 1];
 
-        if (next) {
-          if (!newItem.npeQT) {
-            newItem.npeQT = next.npei_i - newItem.prox_npe;
+      if (response.length > 0) {
+        const next_available_npe = response[response.length - 1].prox_npe;
+        response.map(async (value: any, index: any, elements: any) => {
+          const newItem = value;
+          const next = elements[index + 1];
+
+          if (next) {
+            if (!newItem.npeQT) {
+              newItem.npeQT = next.npei_i - newItem.prox_npe;
+            }
+            newItem.nextNPE = next;
+          } else {
+            newItem.npeQT = 'N/A';
+            newItem.nextNPE = 0;
           }
-          newItem.nextNPE = next;
-        } else {
-          newItem.npeQT = 'N/A';
-          newItem.nextNPE = 0;
-        }
-        newItem.nextAvailableNPE = next_available_npe;
-        return newItem;
-      });
+          newItem.nextAvailableNPE = next_available_npe;
+          return newItem;
+        });
+      }
+
 
       if (!response || response.total <= 0) {
         return {
