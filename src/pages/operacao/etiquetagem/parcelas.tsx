@@ -737,7 +737,7 @@ export default function Listagem({
       cleanState();
 
       const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
-      const parcels = parcelsByNCA.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x) => x.id_safra === idSafra)[0]?.seeds }));
+      const parcels = parcelsByNCA.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x: any) => x.id_safra === idSafra)[0]?.seeds }));
       if (parcels) {
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
         router.push('imprimir');
@@ -812,7 +812,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
 
-    const parcels = rowsSelected.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x) => x.id_safra == idSafra)[0]?.seeds }));
+    const parcels = rowsSelected.map((i: any) => ({ ...i, envelope: i?.type_assay?.envelope?.filter((x: any) => x.id_safra == idSafra)[0]?.seeds }));
     if (parcels?.length > 0) {
       localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
       router.push('imprimir');
