@@ -667,7 +667,8 @@ export default function Listagem({
           temp.nextNPE.type_assay.name + "</b><br><b> Local : " +
           temp.nextNPE.local.name_local_culture + "</b><br><b>Epoca : " +
           temp.nextNPE.epoca + "</b><br><b>Tecnologia : " +
-          temp.nextNPE.tecnologia.name + "</b></p></div>",
+          temp.nextNPE.tecnologia.name + "</b></p><br>" +
+          "O próximo NPE disponível é <strong>" + temp.nextAvailableNPE + "</strong></div>",
         icon: 'warning',
         showCloseButton: true,
         closeButtonHtml: '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
