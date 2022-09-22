@@ -877,7 +877,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {/* {filterFieldFactory('filterStatus', 'Status T')} */}
+                  {filterFieldFactory('filterNca', 'NCA')}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
