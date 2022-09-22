@@ -889,8 +889,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const lastPageServer = req.cookies.lastPage
   ? req.cookies.lastPage
   : "No";
-
   if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });  

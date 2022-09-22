@@ -78,11 +78,13 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
+  
   idSafra: number;
   idCulture : number;
   itensPerPage: number;
   typeOrderServer :any| string,
   orderByserver : any |string,
+  filterApplication : any |string,
 }
 
 
@@ -95,6 +97,7 @@ export default function Listagem({
   itensPerPage,
   typeOrderServer, 
   orderByserver,
+  filterApplication
 
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
@@ -147,7 +150,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
   ]);
-  const [filter, setFilter] = useState<any>();
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
   // const [orderBy, setOrderBy] = useState<string>('');
   // const [orderType, setOrderType] = useState<string>('');
@@ -229,7 +232,6 @@ export default function Listagem({
       await callingApi(parametersFilter); 
     },
   });
-
 
   //Calling common API 
   async function callingApi(parametersFilter : any ){
@@ -967,12 +969,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
    ? req.cookies.lastPage
    : "No";
  
-   if(lastPageServer == undefined || lastPageServer == "No"){
-     removeCookies("filterBeforeEditTypeOrder", { req, res });
-     removeCookies("filterBeforeEditOrderBy", { req, res });
-     removeCookies("lastPage", { req, res });  
-   }
- 
+  if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
+  }
    //RR
    const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
    ? req.cookies.filterBeforeEditTypeOrder
@@ -997,10 +1000,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
 
+
+  
   const filterApplication = req.cookies.filterBeforeEdit
   ? `${req.cookies.filterBeforeEdit}`
   : `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
+  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -1019,6 +1029,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       itensPerPage,
       orderByserver,
       typeOrderServer,  
+      filterApplication
     },
   };
 };
