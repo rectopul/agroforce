@@ -120,7 +120,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Status grupo exp.',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -369,7 +369,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         tableFields.push(headerTableFactory('Total etiquetas', 'totalTags'));
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status', 'status'));
+        tableFields.push(headerTableFactory('Status grupo exp.', 'status'));
       }
       if (columnOrder[item] === 'action') {
         tableFields.push(actionTableFactory());
@@ -769,7 +769,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status
+                      Status grupo exp.
                     </label>
 
                     <AccordionFilter>
