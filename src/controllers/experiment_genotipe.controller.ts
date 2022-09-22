@@ -1,9 +1,9 @@
-import { ExperimentGenotipeRepository } from "src/repository/experiment_genotipe.repository";
-import { IReturnObject } from "../interfaces/shared/Import.interface";
-import handleError from "../shared/utils/handleError";
-import { ExperimentGroupController } from "./experiment-group/experiment-group.controller";
-import { ExperimentController } from "./experiment/experiment.controller";
-import { PrintHistoryController } from "./print-history/print-history.controller";
+import { ExperimentGenotipeRepository } from 'src/repository/experiment_genotipe.repository';
+import { IReturnObject } from '../interfaces/shared/Import.interface';
+import handleError from '../shared/utils/handleError';
+import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
+import { ExperimentController } from './experiment/experiment.controller';
+import { PrintHistoryController } from './print-history/print-history.controller';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -21,101 +21,102 @@ export class ExperimentGenotipeController {
     try {
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
-          `{ "name": { "contains": "${options.filterFoco}" } }`
+          `{ "name": { "contains": "${options.filterFoco}" } }`,
         );
       }
 
       if (options.filterTypeAssay) {
         parameters.type_assay = JSON.parse(
-          `{ "name": { "contains": "${options.filterTypeAssay}" } }`
+          `{ "name": { "contains": "${options.filterTypeAssay}" } }`,
         );
       }
 
       if (options.filterGli) {
         parameters.assayList = JSON.parse(
-          `{ "name": { "contains": "${options.filterGli}" } }`
+          `{ "name": { "contains": "${options.filterGli}" } }`,
         );
       }
 
       if (options.filterNameTec) {
         parameters.tecnologia = JSON.parse(
-          `{ "name": { "contains": "${options.filterNameTec}" } }`
+          `{ "name": { "contains": "${options.filterNameTec}" } }`,
         );
       }
 
       if (options.filterCodTec) {
         parameters.AND.push(
           JSON.parse(
-            `{ "tecnologia": {"cod_tec": {"contains": "${options.filterCodTec}" } } }`
-          )
+            `{ "tecnologia": {"cod_tec": {"contains": "${options.filterCodTec}" } } }`,
+          ),
         );
+      }
+
+      if (options.filterTechnology) {
+        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": "${options.filterTechnology}" } }`));
       }
 
       if (options.filterExperimentName) {
         parameters.AND.push(
           JSON.parse(
-            `{ "experiment": {"experimentName": {"contains": "${options.filterExperimentName}" } } }`
-          )
+            `{ "experiment": {"experimentName": {"contains": "${options.filterExperimentName}" } } }`,
+          ),
         );
       }
 
-      // if (options.filterStatus) {
-      //   parameters.AND.push(JSON.parse(`{ "experiment": {"status": {"contains": "${options.filterStatus}" } } }`));
-      // }
+      if (options.filterPlacingPlace) {
+        parameters.AND.push(JSON.parse(`{ "experiment": { "local": {"name_local_culture": {"contains": "${options.filterPlacingPlace}" } } } }`));
+      }
+
+      if (options.filterGli) {
+        parameters.AND.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
+      }
+
       if (options.filterStatus) {
         parameters.OR = [];
-        const statusParams = options.filterStatus.split(",");
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[0]}" } } }`
-          )
-        );
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[1]}" } } }`
-          )
-        );
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": "${statusParams[0]}" } } `));
+        parameters.OR.push(JSON.parse(`{ "experiment": {"status": "${statusParams[1]}" } } `));
       }
       console.log(parameters);
       console.log(options);
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(
-            `{ "type_assay": {"name": {"contains": "${options.ensaio}" } } }`
-          )
+            `{ "type_assay": {"name": {"contains": "${options.ensaio}" } } }`,
+          ),
         );
       }
 
       if (options.filterLocal) {
         parameters.experiment = JSON.parse(
-          `{ "local": { "name_local_culture": { "contains": "${options.filterLocal}" } } }`
+          `{ "local": { "name_local_culture": { "contains": "${options.filterLocal}" } } }`,
         );
       }
 
       if (options.filterGenotypeName) {
         parameters.name_genotipo = JSON.parse(
-          `{ "contains": "${options.filterGenotypeName}" }`
+          `{ "contains": "${options.filterGenotypeName}" }`,
         );
       }
 
       if (options.filterNca) {
-        parameters.nca = JSON.parse(`{ ${Number(options.filterNca)}`);
+        parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
       }
 
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.rep = JSON.parse(
             `{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(
-              options.filterRepetitionTo
-            )} }`
+              options.filterRepetitionTo,
+            )} }`,
           );
         } else if (options.filterRepetitionFrom) {
           parameters.rep = JSON.parse(
-            `{"gte": ${Number(options.filterRepetitionFrom)} }`
+            `{"gte": ${Number(options.filterRepetitionFrom)} }`,
           );
         } else if (options.filterRepetitionTo) {
           parameters.rep = JSON.parse(
-            `{"lte": ${Number(options.filterRepetitionTo)} }`
+            `{"lte": ${Number(options.filterRepetitionTo)} }`,
           );
         }
       }
@@ -124,16 +125,16 @@ export class ExperimentGenotipeController {
         if (options.filterNpeFrom && options.filterNpeTo) {
           parameters.npe = JSON.parse(
             `{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(
-              options.filterNpeTo
-            )} }`
+              options.filterNpeTo,
+            )} }`,
           );
         } else if (options.filterNpeFrom) {
           parameters.npe = JSON.parse(
-            `{"gte": ${Number(options.filterNpeFrom)} }`
+            `{"gte": ${Number(options.filterNpeFrom)} }`,
           );
         } else if (options.filterNpeTo) {
           parameters.npe = JSON.parse(
-            `{"lte": ${Number(options.filterNpeTo)} }`
+            `{"lte": ${Number(options.filterNpeTo)} }`,
           );
         }
       }
@@ -142,21 +143,41 @@ export class ExperimentGenotipeController {
         if (options.filterNtFrom && options.filterNtTo) {
           parameters.nt = JSON.parse(
             `{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(
-              options.filterNtTo
-            )} }`
+              options.filterNtTo,
+            )} }`,
           );
         } else if (options.filterNtFrom) {
           parameters.nt = JSON.parse(
-            `{"gte": ${Number(options.filterNtFrom)} }`
+            `{"gte": ${Number(options.filterNtFrom)} }`,
           );
         } else if (options.filterNtTo) {
           parameters.nt = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
         }
       }
 
-      if (options.npe) {
-        parameters.npe = Number(options.npe);
+      if (options.filterRepFrom || options.filterRepTo) {
+        if (options.filterRepFrom && options.filterRepTo) {
+          parameters.rep = JSON.parse(`{"gte": ${Number(options.filterRepFrom)}, "lte": ${Number(options.filterRepTo)} }`);
+        } else if (options.filterRepFrom) {
+          parameters.rep = JSON.parse(`{"gte": ${Number(options.filterRepFrom)} }`);
+        } else if (options.filterRepTo) {
+          parameters.rep = JSON.parse(`{"lte": ${Number(options.filterRepTo)} }`);
+        }
       }
+
+      if (options.filterNpeFrom || options.filterNpeTo) {
+        if (options.filterNpeFrom && options.filterNpeTo) {
+          parameters.npe = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(options.filterNpeTo)} }`);
+        } else if (options.filterNpeFrom) {
+          parameters.npe = JSON.parse(`{"gte": ${Number(options.filterNpeFrom)} }`);
+        } else if (options.filterNpeTo) {
+          parameters.npe = JSON.parse(`{"lte": ${Number(options.filterNpeTo)} }`);
+        }
+      }
+
+      // if (options.npe) {
+      //   parameters.npe = Number(options.npe);
+      // }
 
       const select = {
         id: true,
@@ -188,7 +209,7 @@ export class ExperimentGenotipeController {
 
       if (options.experimentGroupId) {
         const idList = await this.generateIdList(
-          Number(options.experimentGroupId)
+          Number(options.experimentGroupId),
         );
         if (idList?.length > 1) {
           parameters.idExperiment = {};
@@ -205,8 +226,8 @@ export class ExperimentGenotipeController {
       if (options.safraName) {
         parameters.AND.push(
           JSON.parse(
-            `{ "safra": {"safraName": {"contains": "${options.safraName}" } } }`
-          )
+            `{ "safra": {"safraName": {"contains": "${options.safraName}" } } }`,
+          ),
         );
       }
 
@@ -254,22 +275,21 @@ export class ExperimentGenotipeController {
 
       const skip = options.skip ? Number(options.skip) : undefined;
 
-      const response: object | any =
-        await this.ExperimentGenotipeRepository.findAll(
-          parameters,
-          select,
-          take,
-          skip,
-          orderBy
-        );
+      const response: object | any = await this.ExperimentGenotipeRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy,
+      );
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError("Parcelas controller", "GetAll", error.message);
-      throw new Error("[Controller] - GetAll Parcelas erro");
+      handleError('Parcelas controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Parcelas erro');
     }
   }
 
@@ -277,12 +297,12 @@ export class ExperimentGenotipeController {
     try {
       const response = await this.ExperimentGenotipeRepository.createMany(data);
       if (response) {
-        return { status: 200, message: "Tratamento experimental registrado" };
+        return { status: 200, message: 'Tratamento experimental registrado' };
       }
-      return { status: 400, message: "Parcelas não registrado" };
+      return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
-      handleError("Parcelas do controlador", "Create", error.message);
-      throw new Error("[Controller] - Erro ao criar esboço de Parcelas");
+      handleError('Parcelas do controlador', 'Create', error.message);
+      throw new Error('[Controller] - Erro ao criar esboço de Parcelas');
     }
   }
 
@@ -290,12 +310,12 @@ export class ExperimentGenotipeController {
     try {
       const response = await this.ExperimentGenotipeRepository.findById(id);
 
-      if (!response) throw new Error("Parcela não encontrada");
+      if (!response) throw new Error('Parcela não encontrada');
 
       return { status: 200, response };
     } catch (error: any) {
-      handleError("Parcela controller", "getOne", error.message);
-      throw new Error("[Controller] - getOne Grupo de experimento erro");
+      handleError('Parcela controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Grupo de experimento erro');
     }
   }
 
@@ -304,16 +324,16 @@ export class ExperimentGenotipeController {
       await this.ExperimentGenotipeRepository.printed(idList, status);
       const { response: parcelas } = await this.getOne(idList[0]);
       const { response }: any = await this.experimentController.getOne(
-        parcelas?.idExperiment
+        parcelas?.idExperiment,
       );
       await this.experimentGroupController.countEtiqueta(
         response.experimentGroupId,
-        parcelas?.idExperiment
+        parcelas?.idExperiment,
       );
       await this.printedHistoryController.create({ idList, userId });
     } catch (error: any) {
-      handleError("Parcelas controller", "Update", error.message);
-      throw new Error("[Controller] - Update Parcelas erro");
+      handleError('Parcelas controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Parcelas erro');
     }
   }
 
@@ -324,8 +344,8 @@ export class ExperimentGenotipeController {
       const idList = response.experiment?.map((item: any) => Number(item.id));
       return idList;
     } catch (error: any) {
-      handleError("Parcelas controller", "generateIdList", error.message);
-      throw new Error("[Controller] - generateIdList Parcelas erro");
+      handleError('Parcelas controller', 'generateIdList', error.message);
+      throw new Error('[Controller] - generateIdList Parcelas erro');
     }
   }
 
@@ -333,48 +353,49 @@ export class ExperimentGenotipeController {
     try {
       await this.ExperimentGenotipeRepository.updateStatus(
         idExperiment,
-        status
+        status,
       );
       idExperiment.map(async (id: number) => {
         const { response }: any = await this.experimentController.getOne(id);
         await this.experimentGroupController.countEtiqueta(
           response.experimentGroupId,
-          idExperiment
+          idExperiment,
         );
       });
     } catch (error: any) {
-      handleError("Parcelas controller", "setStatus", error.message);
-      throw new Error("[Controller] - setStatus Parcelas erro");
+      handleError('Parcelas controller', 'setStatus', error.message);
+      throw new Error('[Controller] - setStatus Parcelas erro');
     }
   }
 
   async updateData(data: any) {
     try {
       const response: any = await this.ExperimentGenotipeRepository.findById(
-        data.id
+        data.id,
       );
 
-      if (!response)
+      if (!response) {
         return {
           status: 404,
           response,
-          message: "Tratamentos do genótipo não existente",
+          message: 'Tratamentos do genótipo não existente',
         };
+      }
 
       const check = await this.ExperimentGenotipeRepository.update(
         data.id,
-        data
+        data,
       );
 
-      return { status: 200, message: "experimento do genótipo atualizado" };
+      return { status: 200, message: 'experimento do genótipo atualizado' };
     } catch (error: any) {
       handleError(
-        "Tratamento do experimento do controlador",
-        "Create",
-        error.message
+        'Tratamento do experimento do controlador',
+        'Create',
+        error.message,
       );
       throw new Error(
-        "[Controller] - Erro ao criar esboço de tratamento do experimento"
+        '[Controller] - Erro ao criar esboço de tratamento do experimento',
       );
     }
   }

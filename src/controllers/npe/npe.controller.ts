@@ -118,7 +118,7 @@ export class NpeController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {
-        orderBy = '{"npei":"asc"}';
+        orderBy = '{"npei_i":"asc"}';
       }
 
       if (options.paramSelect) {
@@ -159,19 +159,21 @@ export class NpeController {
         orderBy,
       );
 
+      const next_available_npe = response[response.length - 1].prox_npe;
       response.map(async (value: any, index: any, elements: any) => {
         const newItem = value;
         const next = elements[index + 1];
 
         if (next) {
           if (!newItem.npeQT) {
-            newItem.npeQT = next.npei - newItem.npei;
+            newItem.npeQT = next.npei_i - newItem.prox_npe;
           }
-          newItem.nextNPE = next.npei;
+          newItem.nextNPE = next;
         } else {
           newItem.npeQT = 'N/A';
           newItem.nextNPE = 0;
         }
+        newItem.nextAvailableNPE = next_available_npe;
         return newItem;
       });
 
