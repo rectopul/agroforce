@@ -146,13 +146,13 @@ export class LayoutQuadraController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data) {
+        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
         const layout = await this.layoutQuadraRepository.update(data.id, data);
-        if (layout.status === 0) {
+        if (data.status === 0 || data.status === 1) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
           await this.reporteRepository.create({
-            madeBy: layout.created_by, module: 'Quadra-Layout', operation: 'Inativação', name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
+            madeBy: layout.created_by, module: 'Quadra-Layout', operation, name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
           });
         }
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
