@@ -16,7 +16,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -177,13 +177,13 @@ export default function Listagem({
   //Calling common API 
   async function callingApi(parametersFilter: any) {
 
-    setCookie("filterBeforeEdit", parametersFilter);
-    setCookie("filterBeforeEditTypeOrder", typeOrder);
-    setCookie("filterBeforeEditOrderBy", orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
 
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie("filtersParams", parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await cultureService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
@@ -339,12 +339,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookie("pageBeforeEdit", currentPage?.toString());
-                setCookie("filterBeforeEdit", filter);
-                setCookie("filterBeforeEditTypeOrder", typeOrder);
-                setCookie("filterBeforeEditOrderBy", orderBy);
-                setCookie("filtersParams", filtersParams);
-                setCookie("lastPage", "atualizar");
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 localStorage.setItem('filterValueEdit', filtersParams);
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
