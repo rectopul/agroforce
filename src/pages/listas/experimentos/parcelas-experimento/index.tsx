@@ -318,7 +318,7 @@ export default function Listagem({
     }
   }
 
-  function headerTableFactory(name: string, title: string) {
+  function headerTableFactory(name: string, title: string, style: boolean = false) {
     return {
       title: (
         <div className="flex items-center">
@@ -333,6 +333,7 @@ export default function Listagem({
       ),
       field: title,
       sorting: true,
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -407,11 +408,11 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
+        tableFields.push(headerTableFactory('NCA', 'nca', true));
       }
     });
     return tableFields;

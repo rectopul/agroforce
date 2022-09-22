@@ -724,20 +724,20 @@ export default function Import({
                           : 'Upload'
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(31, 'ALLOCATION')}
+                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar Alocação</span>
+                    <span className="font-bold">Importar Layout de quadra</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"
                       required
-                      id="inputFile-31"
-                      name="inputFile-31"
+                      id="inputFile-5"
+                      name="inputFile-5"
                     />
                   </div>
                 </div>
@@ -782,20 +782,20 @@ export default function Import({
                           : 'Upload'
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
+                      onClick={() => readExcel(31, 'ALLOCATION')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar layout de quadra</span>
+                    <span className="font-bold">Importar Alocação</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"
                       required
-                      id="inputFile-5"
-                      name="inputFile-5"
+                      id="inputFile-31"
+                      name="inputFile-31"
                     />
                   </div>
                 </div>
