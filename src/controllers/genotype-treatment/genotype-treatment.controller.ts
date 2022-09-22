@@ -45,8 +45,6 @@ export class GenotypeTreatmentController {
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
       }
-      console.log(parameters);
-      console.log(options);
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
       }

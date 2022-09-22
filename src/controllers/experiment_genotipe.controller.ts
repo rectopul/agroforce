@@ -86,8 +86,6 @@ export class ExperimentGenotipeController {
           ),
         );
       }
-      console.log(parameters);
-      console.log(options);
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(

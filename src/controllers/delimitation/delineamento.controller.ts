@@ -107,8 +107,6 @@ export class DelineamentoController {
 
   async create(data: object | any) {
     try {
-      console.log('CREATE DELI');
-      console.log(data);
       const response = await this.Repository.create(data);
       if (response) {
         return { status: 200, message: 'Delineamento criado', response };

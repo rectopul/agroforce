@@ -1,5 +1,5 @@
 import { SequenciaDelineamentoRepository } from '../repository/sequencia-delineamento.repository';
-import { ReporteRepository } from '../../repository/reporte.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import { countDelimitation } from '../shared/utils/counts';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
@@ -26,8 +26,6 @@ export class SequenciaDelineamentoController {
 
   async create(data: object | any) {
     try {
-      console.log('CREATE SEQ');
-      console.log(data);
       const response = await this.SequenciaDelineamentoRepository.create(data);
       const { response: Delimitation } = await this.getAll(
         { id_delineamento: data.id_delineamento },
