@@ -34,13 +34,19 @@ export interface ITreatmentFilter {
   filterStatus: string
   filterStatusAssay: string
   filterGenotypeName: string
-  filterNca: string
+  filterNca: string | any
   orderBy: string
   typeOrder: string
   filterBgmTo: string | any
   filterBgmFrom: string | any
   filterNtTo: string | any
   filterNtFrom: string | any
+  filterRepTo: string | any
+  filterRepFrom: string | any
+  filterNpeTo: string | any
+  filterNpeFrom: string | any
   filterStatusT: string | any
   filterCodTec: string | any
+  filterExperimentName: string | any
+  filterPlacingPlace: string | any
 }
