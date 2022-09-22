@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookie } from 'cookies-next';
+import { removeCookies, setCookie, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -249,7 +249,7 @@ export default function Listagem({
     //     filterLotsFrom,
     //   );
     //   setFiltersParams(parametersFilter); // Set filter pararameters
-    //   setCookies('filterBeforeEdit', filtersParams);
+    //   setCookiess('filterBeforeEdit', filtersParams);
 
       //   await genotipoService
       //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -430,12 +430,12 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
-                setCookie('pageBeforeEdit', currentPage?.toString());
-                setCookie('filterBeforeEdit', filter);
-                setCookie('filterBeforeEditTypeOrder', typeOrder);
-                setCookie('filterBeforeEditOrderBy', orderBy);
-                setCookie('filtersParams', filtersParams);
-                setCookie('lastPage', 'atualizar');
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -1107,6 +1107,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
@@ -1119,6 +1121,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
     : 'name_genotipo';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;

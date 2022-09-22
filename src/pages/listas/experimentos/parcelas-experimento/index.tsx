@@ -216,7 +216,7 @@ export default function Listagem({
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
 
-  const formik = useFormik<ITreatmentFilter>({
+  const formik = useFormik<any>({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',

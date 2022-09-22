@@ -163,7 +163,7 @@ export default function Listagem({
       name: 'CamposGerenciados[]',
       title: 'NPE Inicial ',
       value: 'npei',
-      defaultChecked: () => camposGerenciados.includes('npei'),
+      defaultChecked: () => camposGerenciados.includes('npei_i'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -366,7 +366,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Época', 'epoca'));
       }
       if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei_i'));
       }
       if (columnCampos[item] === 'npef') {
         tableFields.push(headerTableFactory('NPE Final', 'npef'));
@@ -424,10 +424,8 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${
-      data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
-      data.id_type_assay
+    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
