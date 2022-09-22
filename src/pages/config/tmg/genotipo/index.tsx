@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -249,7 +249,7 @@ export default function Listagem({
     //     filterLotsFrom,
     //   );
     //   setFiltersParams(parametersFilter); // Set filter pararameters
-    //   setCookies('filterBeforeEdit', filtersParams);
+    //   setCookiess('filterBeforeEdit', filtersParams);
 
     //   await genotipoService
     //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -274,12 +274,12 @@ export default function Listagem({
 //Calling common API 
 async function callingApi(parametersFilter : any ){
 
-  setCookie("filterBeforeEdit", parametersFilter);
-  setCookie("filterBeforeEditTypeOrder", typeOrder);
-  setCookie("filterBeforeEditOrderBy", orderBy);  
+  setCookies("filterBeforeEdit", parametersFilter);
+  setCookies("filterBeforeEditTypeOrder", typeOrder);
+  setCookies("filterBeforeEditOrderBy", orderBy);  
   parametersFilter = `${parametersFilter}&${pathExtra}`;
   setFiltersParams(parametersFilter);
-  setCookie("filtersParams", parametersFilter);
+  setCookies("filtersParams", parametersFilter);
   console.log("---sdfdsf   ",parametersFilter)
 
   await genotipoService.getAll(parametersFilter).then((response) => {
@@ -432,12 +432,12 @@ async function callingApi(parametersFilter : any ){
               textColor="white"
               title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
-                setCookie("pageBeforeEdit", currentPage?.toString());
-                setCookie("filterBeforeEdit", filter);
-                setCookie("filterBeforeEditTypeOrder", typeOrder);
-                setCookie("filterBeforeEditOrderBy", orderBy);
-                setCookie("filtersParams", filtersParams);
-                setCookie("lastPage", "atualizar");          
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");          
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />

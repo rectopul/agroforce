@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -236,12 +236,12 @@ export default function Listagem({
   //Calling common API 
   async function callingApi(parametersFilter : any ){
 
-    setCookie("filterBeforeEdit", parametersFilter);
-    setCookie("filterBeforeEditTypeOrder", typeOrder);
-    setCookie("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie("filtersParams", parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await loteService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400 ) {

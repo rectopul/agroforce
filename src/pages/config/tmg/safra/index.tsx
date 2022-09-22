@@ -24,7 +24,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { removeCookies, setCookie } from "cookies-next";
+import { removeCookies, setCookies } from "cookies-next";
 import {
   AccordionFilter,
   Button,
@@ -192,12 +192,12 @@ export default function Listagem({
 //Calling common API 
   async function callingApi(parametersFilter : any ){
 
-    setCookie("filterBeforeEdit", parametersFilter);
-    setCookie("filterBeforeEditTypeOrder", typeOrder);
-    setCookie("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie("filtersParams", parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400 ) {
@@ -367,12 +367,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
-                setCookie("pageBeforeEdit", currentPage?.toString());
-                setCookie("filterBeforeEdit", filter);
-                setCookie("filterBeforeEditTypeOrder", typeOrder);
-                setCookie("filterBeforeEditOrderBy", orderBy);
-                setCookie("filtersParams", filtersParams);
-                setCookie("lastPage", "atualizar");
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 router.push(`/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`);
               }}
               bgColor="bg-blue-600"
