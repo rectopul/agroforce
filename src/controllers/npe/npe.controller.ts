@@ -250,14 +250,14 @@ export class NpeController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data) {
+        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
         const npe = await this.npeRepository.update(data.id, data);
         if (!npe) return { status: 400, message: 'Npe não encontrado' };
-        if (npe.status === 0) {
+        if (data.status === 0 || data.status === 1) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
           await this.reporteRepository.create({
-            madeBy: npe.created_by, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+            madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
           });
         }
         return { status: 200, message: 'Npe atualizada' };
