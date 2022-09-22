@@ -23,6 +23,8 @@ export class SequenciaDelineamentoController {
 
   async create(data: object | any) {
     try {
+      console.log('CREATE SEQ');
+      console.log(data);
       const response = await this.SequenciaDelineamentoRepository.create(data);
       const { response: Delimitation } = await this.getAll(
         { id_delineamento: data.id_delineamento },
@@ -40,6 +42,8 @@ export class SequenciaDelineamentoController {
 
   async update(data: any) {
     try {
+      console.log('UPDATE SEQ');
+      console.log(data);
       const sequenciaDelineamento = await this.getOne(data.id);
 
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };

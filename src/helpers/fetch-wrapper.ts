@@ -1,11 +1,11 @@
 import getConfig from 'next/config';
 
-import { userService } from '../services';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
+} from 'react-icons/ai';
+import { userService } from '../services';
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -74,7 +74,7 @@ async function put(url: any, body: any) {
 async function deleted(url: any, body: any) {
   const requestOptions: object | any = {
     method: 'DELETE',
-    headers: authHeader(url),
+    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
     body: JSON.stringify(body),
   };
   const response = await fetch(url, requestOptions);
@@ -167,8 +167,6 @@ async function handleFilterParameter(...theArgs: any) {
 
   return parametersFilter;
 }
-
-
 
 // experimento in list
 function experimento(theArgs: any) {
@@ -287,7 +285,7 @@ function getValueParams(ParameterString: any) {
   return c;
 }
 
-//Get value from Url.
+// Get value from Url.
 function getValuesForFilter(ParameterString: any, filtersParams :any) {
   let c;
   if (filtersParams) {
@@ -297,37 +295,37 @@ function getValuesForFilter(ParameterString: any, filtersParams :any) {
     c = url.searchParams.get(ParameterString)?.toString();
   }
 
-  c = c == undefined?'' :c;
+  c = c == undefined ? '' : c;
 
   return c;
 }
 
-
-function handleOrderG(columnG:any, orderG :any, orderListG:any ){
-
+function handleOrderG(columnG:any, orderG :any, orderListG:any) {
   let typeOrderG: any;
-  let orderByG: any; //RR
+  let orderByG: any; // RR
   let arrowOrder : any;
   if (orderG == 1) {
-    typeOrderG = "asc";
-    } else if (orderG == 2) {
-    typeOrderG = "desc";
+    typeOrderG = 'asc';
+  } else if (orderG == 2) {
+    typeOrderG = 'desc';
   } else {
-    typeOrderG = "";
+    typeOrderG = '';
   }
 
   if (orderListG === 2) {
-      orderByG = 0;
-      arrowOrder = AiOutlineArrowDown; 
+    orderByG = 0;
+    arrowOrder = AiOutlineArrowDown;
   } else {
-        orderByG = orderListG + 1;  
+    orderByG = orderListG + 1;
     if (orderListG === 1) {
-      arrowOrder  = AiOutlineArrowUp;    
-    } else {     
-      arrowOrder = "";
+      arrowOrder = AiOutlineArrowUp;
+    } else {
+      arrowOrder = '';
     }
   }
-  return {typeOrderG, columnG, orderByG, arrowOrder }
+  return {
+    typeOrderG, columnG, orderByG, arrowOrder,
+  };
 }
 
 // helper functions
@@ -344,5 +342,5 @@ export const fetchWrapper = {
   getValueParams,
   skip,
   getValuesForFilter,
-  handleOrderG
+  handleOrderG,
 };
