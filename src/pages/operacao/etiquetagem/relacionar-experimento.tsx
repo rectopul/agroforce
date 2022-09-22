@@ -570,7 +570,7 @@ export default function Listagem({
                   {filterFieldFactory('filterPeriod', 'Epoca')}
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -591,9 +591,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
+                  <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
+                      Status EXP.
                     </label>
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>

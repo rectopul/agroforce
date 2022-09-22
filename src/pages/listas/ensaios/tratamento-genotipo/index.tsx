@@ -877,8 +877,6 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterNca', 'NCA')}
-
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
@@ -938,6 +936,7 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
+                  {filterFieldFactory('filterNca', 'NCA')}
 
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

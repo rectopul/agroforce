@@ -131,7 +131,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Lugar de plantio',
+      title: 'Lugar plantio',
       value: 'culture',
       defaultChecked: () => camposGerenciados.includes('culture'),
     },
@@ -161,7 +161,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do genótipo',
+      title: 'Nome genótipo',
       value: 'genotipo',
       defaultChecked: () => camposGerenciados.includes('genotipo'),
     },
@@ -400,7 +400,7 @@ export default function Listagem({
       if (columnOrder[item] === 'culture') {
         tableFields.push(
           headerTableFactory(
-            'Lugar de plantio',
+            'Lugar plantio',
             'experiment.local.name_local_culture',
           ),
         );
@@ -421,7 +421,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
+          headerTableFactory('Nome genótipo', 'genotipo.name_genotipo', true),
         );
       }
       if (columnOrder[item] === 'nca') {
@@ -882,7 +882,8 @@ export default function Listagem({
                   {filterFieldFactory('filterCodTec', 'Cód. Tecnologia')}
                   {filterFieldFactory('filterTechnology', 'Nome da Tecnologia')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
+                  {filterFieldFactory('filterExperimentName', 'Experimento')}
+                  {filterFieldFactory('filterPlacingPlace', 'Lugar plantio')}
 
                 </div>
                 <div
@@ -893,9 +894,8 @@ export default function Listagem({
                   pb-3
                   "
                 >
-                  {filterFieldFactory('filterPlacingPlace', 'Lugar de Plantio')}
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       REP
                     </label>
@@ -916,9 +916,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
+                  <div className="h-10 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
+                      Status EXP.
                     </label>
                     {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
                       {statusFilter.map((generate, index) => (
@@ -969,7 +969,8 @@ export default function Listagem({
                       </DragDropContext>
                     </AccordionFilter>
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
                     </label>
@@ -989,7 +990,7 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE.
                     </label>
@@ -1011,9 +1012,9 @@ export default function Listagem({
                   </div>
                   {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
 
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-7 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome do genótipo
+                      Nome genótipo
                     </label>
                     <Select
                       values={[
@@ -1030,7 +1031,7 @@ export default function Listagem({
                   {filterFieldFactory('filterNca', 'NCA')}
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
 
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-7 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Itens por página
                     </label>
