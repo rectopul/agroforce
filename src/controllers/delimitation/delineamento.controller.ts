@@ -107,8 +107,6 @@ export class DelineamentoController {
 
   async create(data: object | any) {
     try {
-      console.log('CREATE DELI');
-      console.log(data);
       const response = await this.Repository.create(data);
       if (response) {
         return { status: 200, message: 'Delineamento criado', response };
@@ -122,18 +120,16 @@ export class DelineamentoController {
 
   async update(data: any) {
     try {
-      console.log('UPDATE DELI');
-      console.log(data);
-      // const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data) {
         const delineamento = await this.Repository.update(data.id, data);
+        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
         if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
-        // if (delineamento.status === 0) {
-        //   await this.reporteRepository.create({
-        //     madeBy: delineamento.created_by, module: 'Delineamento', operation: 'Inativação', name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
-        //   });
-        // }
+        if (data.status === 0 || data.status === 1) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+          await this.reporteRepository.create({
+            madeBy: delineamento.created_by, module: 'Delineamento', operation, name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
+          });
+        }
         return { status: 200, message: 'Delineamento atualizada' };
       }
       const response = await this.Repository.update(data.id, data);

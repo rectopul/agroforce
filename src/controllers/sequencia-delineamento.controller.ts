@@ -1,10 +1,13 @@
 import { SequenciaDelineamentoRepository } from '../repository/sequencia-delineamento.repository';
+import { ReporteRepository } from '../repository/reporte.repository';
 import { countDelimitation } from '../shared/utils/counts';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class SequenciaDelineamentoController {
   private SequenciaDelineamentoRepository = new SequenciaDelineamentoRepository();
+
+  reporteRepository = new ReporteRepository();
 
   async getOne(id: number) {
     try {
@@ -23,8 +26,6 @@ export class SequenciaDelineamentoController {
 
   async create(data: object | any) {
     try {
-      console.log('CREATE SEQ');
-      console.log(data);
       const response = await this.SequenciaDelineamentoRepository.create(data);
       const { response: Delimitation } = await this.getAll(
         { id_delineamento: data.id_delineamento },
@@ -42,12 +43,15 @@ export class SequenciaDelineamentoController {
 
   async update(data: any) {
     try {
-      console.log('UPDATE SEQ');
-      console.log(data);
       const sequenciaDelineamento = await this.getOne(data.id);
-
+      const operation = data.status === 1 ? 'Ativação' : 'Inativação';
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
-
+      if (data.status === 0 || data.status === 1) {
+        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+        await this.reporteRepository.create({
+          madeBy: data.created_by, module: 'Seq. Delineamento', operation, name: data.name, ip: JSON.stringify(ip), idOperation: data.id,
+        });
+      }
       await this.SequenciaDelineamentoRepository.update(
         data.id,
         data,
