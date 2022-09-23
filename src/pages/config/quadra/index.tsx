@@ -41,6 +41,7 @@ import {
 import { quadraService, userPreferencesService } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
 
 interface IFilter {
   filterStatus: object | any;
@@ -80,6 +81,8 @@ interface IData {
   cultureId: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  typeOrderServer :any| string;
+  orderByserver : any |string 
 }
 
 export default function Listagem({
@@ -90,6 +93,8 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
+  typeOrderServer,
+  orderByserver 
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -135,7 +140,7 @@ export default function Listagem({
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
@@ -149,14 +154,18 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
+  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
-      filterSchema: '',
-      filterPTo: '',
-      filterPFrom: '',
-      filterPreparation: '',
+      filterStatus: filterStatusBeforeEdit[13],
+      filterSearch: checkValue('filterSearch'),
+      filterSchema: checkValue('filterSchema'),
+      filterPTo: checkValue('filterPTo'),
+      filterPFrom: checkValue('filterPFrom'),
+      filterPreparation: checkValue('filterPreparation'),
       orderBy: '',
       typeOrder: '',
     },
@@ -167,21 +176,48 @@ export default function Listagem({
       filterPTo,
       filterPFrom,
     }) => {
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}&id_culture=${cultureId}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await quadraService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setQuadra(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await quadraService
+      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //   .then((response) => {
+      //     setFilter(parametersFilter);
+      //     setQuadra(response.response);
+      //     setTotalItems(response.total);
+      //     setCurrentPage(0);
+      //   });
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter); 
+
     },
   });
+
+  //Calling common API 
+  async function callingApi(parametersFilter : any ){
+
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies("filtersParams", parametersFilter);
+
+    await quadraService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400 ) {
+        setQuadra(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  } 
+
+  //Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+  
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${
@@ -223,48 +259,56 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await quadraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setQuadra(response.response);
-        }
-      });
+    // await quadraService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setQuadra(response.response);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+      //Gobal manage orders
+      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+
+      setTypeOrder(typeOrderG);
+      setOrderBy(columnG);
+      setOrder(orderByG);
+      setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -335,8 +379,12 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.cod_quadra}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 router.push(`/config/quadra/atualizar?id=${rowData.id}`);
               }}
             />
@@ -470,7 +518,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await quadraService.getAll(filterApplication).then(({ status, response }) => {
+    await quadraService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
@@ -530,31 +578,38 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+  //manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
-    }
-    await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setQuadra(response.response);
-      }
-    });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
+    // }
+    // await quadraService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setQuadra(response.response);
+    //   }
+    // });
+    await callingApi(filter); //handle pagination globly
+  }
+
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    return parameter;
   }
 
   useEffect(() => {
@@ -601,7 +656,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={filterStatusBeforeEdit[13]}
+                      defaultValue={checkValue('filterSearch')}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -616,6 +672,7 @@ export default function Listagem({
                       max="40"
                       id="filterPreparation"
                       name="filterPreparation"
+                      defaultValue={checkValue('filterPreparation')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -629,6 +686,7 @@ export default function Listagem({
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
+                      defaultValue={checkValue('filterSearch')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -642,12 +700,15 @@ export default function Listagem({
                         id="filterPFrom"
                         name="filterPFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterPFrom')}
+
                       />
                       <Input
                         placeholder="Até"
                         id="filterPTo"
                         name="filterPTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterPTo')}
                       />
                     </div>
                   </div>
@@ -662,6 +723,7 @@ export default function Listagem({
                       id="filterSchema"
                       name="filterSchema"
                       onChange={formik.handleChange}
+                      defaultValue={checkValue('filterSchema')}
                     />
                   </div>
 
@@ -856,7 +918,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -889,19 +951,44 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : `filterStatus=2`;
+
+  //Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : "No";
+
+  if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
+  }
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+  ? req.cookies.filterBeforeEditTypeOrder
+  : "desc";
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+  ? req.cookies.filterBeforeEditOrderBy
+  : "local.name_local_culture";
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
-    : `filterStatus=1&id_culture=${cultureId}`;
+    ? `${req.cookies.filterBeforeEdit}`
+    : `filterStatus=2`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
@@ -912,7 +999,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   } as RequestInit | undefined;
 
   const response = await fetch(
-    `${baseUrl}?id_culture=${cultureId}`,
+    `${baseUrl}`,
     requestOptions,
   );
   const { response: quadras, total: totalItems } = await response.json();
@@ -926,6 +1013,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       cultureId,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver, 
+      typeOrderServer,  
     },
   };
 };

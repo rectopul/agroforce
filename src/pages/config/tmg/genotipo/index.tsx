@@ -29,7 +29,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -233,7 +233,7 @@ export default function Listagem({
       filterLotsFrom,
     }) => {
     //   // Call filter with there parameter
-    //   const parametersFilter = await fetchWrapper.handleFilterParameter(
+    //   const parametersFilter = await tableGlobalFunctions.handleFilterParameter(
     //     'genotipo',
     //     filterGenotipo,
     //     filterMainName,
@@ -302,14 +302,14 @@ async function callingApi(parametersFilter : any ){
     order: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(
     //   column,
     //   order,
     //   filter,
     //   'genotipo',
     // );
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
     // await genotipoService.getAll(value).then((response) => {
     //   if (response.status === 200) {
@@ -331,7 +331,7 @@ async function callingApi(parametersFilter : any ){
     // }
 
     //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -708,7 +708,7 @@ async function callingApi(parametersFilter : any ){
   // paginação certa
   async function handlePagination(): Promise<void> {
     // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(
     //   currentPage,
     //   take,
     //   filtersParams,
@@ -727,7 +727,7 @@ async function callingApi(parametersFilter : any ){
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
     return parameter;
   }
 

@@ -35,7 +35,7 @@ import {
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { safraService, userPreferencesService } from '../../../../services';
-import { fetchWrapper } from '../../../../helpers';
+import { tableGlobalFunctions } from '../../../../helpers';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -169,7 +169,7 @@ export default function Listagem({
       filterEndDate,
     }) => {
       // Call filter with there parameter
-      // const parametersFilter = await fetchWrapper.handleFilterParameter('safra', filterStatus || 1,cultureId, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate);
+      // const parametersFilter = await tableGlobalFunctions.handleFilterParameter('safra', filterStatus || 1,cultureId, filterSafra, filterYearTo, filterYearFrom, filterStartDate, filterEndDate);
 
       // const parametersFilter = `filterStatus=${filterStatus || 1}&filterSafra=${filterSafra}&filterYear=${filterYearTo}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
     //   await safraService
@@ -457,7 +457,7 @@ export default function Listagem({
   ): Promise<void> {
 
   //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -581,7 +581,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
     return parameter;
   }
 
