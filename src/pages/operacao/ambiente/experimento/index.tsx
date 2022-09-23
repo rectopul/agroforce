@@ -576,7 +576,7 @@ export default function Listagem({
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
-            i >= NPESelectedRow.nextNPE.prox_npe && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.prox_npe) : '';
+            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
           });
 
           setExperimento(response);
@@ -692,7 +692,7 @@ export default function Listagem({
   useEffect(() => {
     let count = 0;
     experimentos.map((item: any) => {
-      (item.npei <= NPESelectedRow?.nextNPE.prox_npe && item.npef >= NPESelectedRow?.nextNPE.prox_npe) && NPESelectedRow?.nextNPE != 0 ? count++ : '';
+      (item.npei <= NPESelectedRow?.nextNPE.npei_i && item.npef >= NPESelectedRow?.nextNPE.npei_i) && NPESelectedRow?.nextNPE != 0 ? count++ : '';
     })
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);

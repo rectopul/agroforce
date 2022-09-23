@@ -167,7 +167,7 @@ export class NpeController {
 
           if (next) {
             if (!newItem.npeQT) {
-              newItem.npeQT = next.npef - newItem.prox_npe;
+              newItem.npeQT = newItem.npef < next.npei ? next.npei - newItem.npef : next.npei_i - newItem.npef;
             }
             newItem.nextNPE = next;
           } else {
