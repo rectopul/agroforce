@@ -116,7 +116,7 @@ export class NpeController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {
-        orderBy = '{"npei_i":"asc"}';
+        orderBy = '{"prox_npe":"asc"}';
       }
 
       if (options.paramSelect) {
@@ -167,7 +167,7 @@ export class NpeController {
 
           if (next) {
             if (!newItem.npeQT) {
-              newItem.npeQT = next.npei_i - newItem.prox_npe;
+              newItem.npeQT = next.npef - newItem.prox_npe;
             }
             newItem.nextNPE = next;
           } else {

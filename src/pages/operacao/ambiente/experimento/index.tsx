@@ -576,13 +576,12 @@ export default function Listagem({
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
-            console.log('i', i);
             i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
           });
 
           setExperimento(response);
           setTotalItems(total)
-          temp.filter((x): any => x == NPESelectedRow)[0].npef = i;
+          temp.filter((x): any => x == NPESelectedRow)[0].npef = i - 1;
         }
       });
       parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;

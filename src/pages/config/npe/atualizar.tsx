@@ -132,7 +132,6 @@ export default function NovoLocal({
               await npeService.update({
                 id: values.id,
                 prox_npe: values.prox_npe,
-                npei_i: values.prox_npe,
                 npef: values.prox_npe,
                 edited: 1,
               }).then((response) => {

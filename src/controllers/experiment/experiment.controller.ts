@@ -318,7 +318,7 @@ export class ExperimentController {
   }
 
   async handleExperimentStatus(id: number) {
-    const { response } : any = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;
