@@ -161,8 +161,8 @@ export default function AtualizarQuadra({
     { name: 'CamposGerenciados[]', title: 'Nº Parcelas', value: 'parcelas' },
   ]);
   const [
-    generatesPropsExperiments,
-    setGeneratesPropsExperiments,
+    generatesPropsParcelas,
+    setGeneratesPropsParcelas,
   ] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName' },
@@ -426,7 +426,7 @@ export default function AtualizarQuadra({
     }
   }
 
-  let columns = [];
+  let columns: any = [];
 
   useEffect(() => {
     columns = generateColumns();

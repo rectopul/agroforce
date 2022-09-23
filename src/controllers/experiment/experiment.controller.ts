@@ -262,9 +262,6 @@ export class ExperimentController {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }
       if (response) {
-        await this.reporteRepository.create({
-          madeBy: response.created_by, module: 'Experimento', operation: 'Inativação', name: response.experimentName, ip: JSON.stringify(ip), idOperation: response.id,
-        });
         return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
