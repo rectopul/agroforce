@@ -163,16 +163,21 @@ export class AssayListController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { status: statusAssay, response } = await this.getOne(Number(id));
+      console.log(data);
+      const { status: statusAssay, response } = await this.getOne(Number(data.id));
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
-      const { status } = await this.genotypeTreatmentController.deleteAll(id);
-
+      const { status } = await this.genotypeTreatmentController.deleteAll(data.id);
+      const operation = data.status === 1 ? 'Ativação' : 'Inativação';
       if (status === 200) {
-        await this.assayListRepository.delete(Number(id));
+        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+        await this.reporteRepository.create({
+          madeBy: data.userId, module: 'Ensaio', operation, name: response.type_assay.name, ip: JSON.stringify(ip), idOperation: response.id,
+        });
+        await this.assayListRepository.delete(Number(data.id));
         return { status: 200, message: 'Lista de ensaio excluída' };
       }
       return { status: 400, message: 'Lista de ensaio não excluída' };

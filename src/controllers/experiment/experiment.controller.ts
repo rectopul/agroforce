@@ -246,8 +246,6 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
         const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
@@ -276,13 +274,13 @@ export class ExperimentController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { response: experimentExist } = await this.getOne(Number(id));
+      const { response: experimentExist } = await this.getOne(Number(data.id));
 
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
 
-      const response = await this.experimentRepository.delete(Number(id));
+      const response = await this.experimentRepository.delete(Number(data.id));
       const {
         response: assayList,
       } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
