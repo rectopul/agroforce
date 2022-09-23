@@ -362,7 +362,8 @@ export default function Listagem({
   // }
 
   async function deleteItem(id: number) {
-    const { status, message } = await await experimentService.deleted(id);
+    // eslint-disable-next-line max-len
+    const { status, message } = await await experimentService.deleted({ id, userId: userLogado.id });
     if (status === 200) {
       router.reload();
     } else {
