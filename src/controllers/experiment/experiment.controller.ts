@@ -327,18 +327,26 @@ export class ExperimentController {
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;
+    let allocated = 0;
     let status = '';
     response.experiment_genotipe?.map((parcelas: any) => {
       if (parcelas.status === 'IMPRESSO') {
         printed += 1;
       } else if (parcelas.status === 'EM ETIQUETAGEM') {
         toPrint += 1;
+      } else if (parcelas.status === 'ALOCADO') {
+        allocated += 1;
       }
     });
     if (toPrint > 1) {
       status = 'ETIQ. EM ANDAMENTO';
     } else if (printed === allParcelas) {
       status = 'ETIQ. FINALIZADA';
+    }
+    if (allocated === allParcelas) {
+      status = 'TOTALMENTE ALOCADO';
+    } else if (allocated > 1) {
+      status = 'PARCIALMENTE ALOCADO';
     }
 
     await this.update({ id, status });

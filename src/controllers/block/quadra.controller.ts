@@ -60,6 +60,7 @@ export class QuadraController {
           local_plantio: true,
           q: true,
           safra: { select: { safraName: true } },
+          allocation: true,
           status: true,
         };
       }
