@@ -16,6 +16,7 @@ import { LogImportController } from '../log-import.controller';
 import { QuadraController } from '../block/quadra.controller';
 import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
+import { LayoutChildrenController } from '../layout-children.controller';
 
 export class ImportAllocationController {
   static async validate(
@@ -30,6 +31,7 @@ export class ImportAllocationController {
     const logImportController = new LogImportController();
     const experimentController = new ExperimentController();
     const layoutQuadraController = new LayoutQuadraController();
+    const layoutChildrenController = new LayoutChildrenController();
     const experimentGenotipeController = new ExperimentGenotipeController();
 
     const responseIfError: Array<string> = [];
@@ -37,8 +39,11 @@ export class ImportAllocationController {
     for (const count in spreadSheet) {
       spreadSheet[count].push(Number(count));
     }
+    const header = spreadSheet.shift();
     // eslint-disable-next-line no-param-reassign
     spreadSheet = await this.orderByBlock(spreadSheet);
+
+    spreadSheet.unshift(header);
 
     try {
       const allParcelas: any = {};
@@ -144,16 +149,19 @@ export class ImportAllocationController {
                   id: spreadSheet[row][0],
                   idSafra,
                 });
-                const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : null));
+                const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : 0));
                 let npeRange = Number(spreadSheet[row][column]);
-                let validateNpeRange = true;
-                while (npeRange < Number(spreadSheet[row][4])) {
-                  if (!(allNpe?.includes(spreadSheet[row][column]))) {
-                    validateNpeRange = false;
+                const validateNpeRange = [];
+                while (npeRange <= Number(spreadSheet[row][4])) {
+                  if (allNpe?.includes(npeRange)) {
+                    validateNpeRange.push(true);
+                  } else {
+                    validateNpeRange.push(false);
                   }
                   npeRange += 1;
                 }
-                if (!validateNpeRange) {
+
+                if (validateNpeRange.includes(false)) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -256,6 +264,11 @@ export class ImportAllocationController {
                     filterEsquema: response[0]?.esquema,
                     id_culture: idCulture,
                   });
+
+                  console.log('allparce');
+                  console.log(allParcelas[spreadSheet[Number(row) - 1][7]]);
+                  console.log('esquema[0]?.parcelas');
+                  console.log(esquema[0]?.parcelas);
                   if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
@@ -386,9 +399,6 @@ export class ImportAllocationController {
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
-              const { response: local }: any = await localController.getAll({
-                name_local_culture: spreadSheet[row][6],
-              });
               const { response: quadra }: any = await quadraController.getAll({
                 id_safra: idSafra, name: spreadSheet[row][7],
               });
@@ -396,9 +406,27 @@ export class ImportAllocationController {
                 filterExperimentName: spreadSheet[row][2],
                 idSafra,
               });
-              const { response: teste }: any = await experimentGenotipeController.update({
-
+              const { response: blockLayout }: any = await layoutQuadraController.getAll({
+                esquema: quadra[0]?.esquema,
+                id_culture: idCulture,
               });
+              const { response: layoutSequence }: any = await layoutChildrenController.getAll({
+                id_layout: blockLayout[0]?.id,
+                orderBy: 'sc',
+                typeOrder: 'asc',
+              });
+              const parcelas = experiment[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.id : 0));
+              layoutSequence.forEach(async (item: any, index: number) => {
+                if (parcelas[index]) {
+                  await experimentGenotipeController.relateLayout({
+                    id: parcelas[index],
+                    blockLayoutId: item.id,
+                    status: 'ALOCADO',
+                  });
+                }
+              });
+              await quadraController.update({ id: quadra[0]?.id, allocation: 'ALOCADO' });
+              await experimentController.update({ id: experiment[0]?.id, blockId: quadra[0]?.id });
             }
           }
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });

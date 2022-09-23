@@ -322,7 +322,7 @@ export class ExperimentGenotipeController {
       return { status: 200, response };
     } catch (error: any) {
       handleError('Parcela controller', 'getOne', error.message);
-      throw new Error('[Controller] - getOne Grupo de experimento erro');
+      throw new Error('[Controller] - getOne Parcela erro');
     }
   }
 
@@ -341,6 +341,29 @@ export class ExperimentGenotipeController {
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
+    }
+  }
+
+  async relateLayout({ id, blockLayoutId, status }: any) {
+    try {
+      const parcela: any = await this.getOne(Number(id));
+
+      if (!parcela) return { status: 400, message: 'parcela não existente' };
+
+      const response: any = await this.ExperimentGenotipeRepository.update(
+        id,
+        {
+          blockLayoutId,
+          status,
+        },
+      );
+      if (response) {
+        return { status: 200, response, message: 'parcela atualizada' };
+      }
+      return { status: 400, response, message: 'parcela não atualizada' };
+    } catch (error: any) {
+      handleError('Parcelas controller', 'Relacionar layout', error.message);
+      throw new Error('[Controller] - Relacionar layout Parcelas erro');
     }
   }
 

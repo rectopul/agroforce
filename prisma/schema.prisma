@@ -194,8 +194,9 @@ model layout_quadra {
   created_at  DateTime @default(now())
   id_culture  Int
 
-  culture  culture           @relation(fields: [id_culture], references: [id])
-  children layout_children[]
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  children            layout_children[]
+  experiment_genotipe experiment_genotipe[]
 }
 
 model layout_children {
@@ -237,10 +238,11 @@ model quadra {
   id_local      Int
   allocation    String?
 
-  culture  culture    @relation(fields: [id_culture], references: [id])
-  local    local      @relation(fields: [id_local], references: [id])
-  safra    safra      @relation(fields: [id_safra], references: [id])
-  dividers dividers[]
+  culture    culture      @relation(fields: [id_culture], references: [id])
+  local      local        @relation(fields: [id_local], references: [id])
+  safra      safra        @relation(fields: [id_safra], references: [id])
+  dividers   dividers[]
+  experiment experiment[]
 }
 
 model dividers {
@@ -468,12 +470,14 @@ model experiment {
   orderDraw         Int
   period            Int
   repetitionsNumber Int
+  blockId           Int?
 
   assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
   delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])
   local               local                 @relation(fields: [idLocal], references: [id])
   safra               safra                 @relation(fields: [idSafra], references: [id])
   ExperimentGroup     ExperimentGroup?      @relation(fields: [experimentGroupId], references: [id])
+  quadra              quadra?               @relation(fields: [blockId], references: [id])
   experiment_genotipe experiment_genotipe[]
 }
 
@@ -547,30 +551,32 @@ model history_genotype_treatment {
 }
 
 model experiment_genotipe {
-  id           Int       @id @default(autoincrement())
-  created_at   DateTime? @default(now())
-  idSafra      Int
-  idFoco       Int
-  idTypeAssay  Int
-  idTecnologia Int
-  idExperiment Int
-  idGenotipo   Int
-  idLote       Int?
-  gli          String
-  rep          Int
-  nt           Int
-  npe          Int
-  nca          String
-  status       String    @default("SORTEADO")
-  status_t     String    @default("L")
+  id            Int       @id @default(autoincrement())
+  created_at    DateTime? @default(now())
+  idSafra       Int
+  idFoco        Int
+  idTypeAssay   Int
+  idTecnologia  Int
+  idExperiment  Int
+  idGenotipo    Int
+  blockLayoutId Int?
+  idLote        Int?
+  gli           String
+  rep           Int
+  nt            Int
+  npe           Int
+  nca           String
+  status        String    @default("SORTEADO")
+  status_t      String    @default("L")
 
-  safra        safra          @relation(fields: [idSafra], references: [id])
-  type_assay   type_assay     @relation(fields: [idTypeAssay], references: [id])
-  tecnologia   tecnologia     @relation(fields: [idTecnologia], references: [id])
-  foco         foco           @relation(fields: [idFoco], references: [id])
-  experiment   experiment     @relation(fields: [idExperiment], references: [id])
-  genotipo     genotipo       @relation(fields: [idGenotipo], references: [id])
-  PrintHistory PrintHistory[]
+  safra         safra          @relation(fields: [idSafra], references: [id])
+  type_assay    type_assay     @relation(fields: [idTypeAssay], references: [id])
+  tecnologia    tecnologia     @relation(fields: [idTecnologia], references: [id])
+  foco          foco           @relation(fields: [idFoco], references: [id])
+  experiment    experiment     @relation(fields: [idExperiment], references: [id])
+  genotipo      genotipo       @relation(fields: [idGenotipo], references: [id])
+  layout_quadra layout_quadra? @relation(fields: [blockLayoutId], references: [id])
+  PrintHistory  PrintHistory[]
 }
 
 model ExperimentGroup {

@@ -39,7 +39,6 @@ export class LayoutChildrenController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
       const response: object | any = await this.disparoRepository.findAll(
         parameters,
         select,

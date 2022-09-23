@@ -26,7 +26,13 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { userPreferencesService, dividersService, quadraService } from '../../../services';
+import {
+  userPreferencesService,
+  dividersService,
+  quadraService,
+  experimentService,
+  experimentGenotipeService,
+} from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   Button,
@@ -118,7 +124,17 @@ export default function AtualizarQuadra({
   const preferences = userLogado.preferences.dividers || { id: 0, table_preferences: 'id,divisor,sem_metros,t4_i,t4_f,di,df' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [dividers, setDividers] = useState<any[]>(() => allDividers);
+  const [
+    experimentsCamposGerenciados,
+    setExperimentsCamposGerenciados,
+  ] = useState<any>('seq,experimentName,npe_i,npe_f,parcelas');
+
+  const [
+    parcelasCamposGerenciados,
+    setParcelasCamposGerenciados,
+  ] = useState<any>('experimentName,genotipo,status_t,fase,nlp,sc,npe,nc,rep,plantio');
+
+  const [data, setData] = useState<any[]>(() => allDividers);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
@@ -133,6 +149,32 @@ export default function AtualizarQuadra({
     { name: 'CamposGerenciados[]', title: 'DI', value: 'di' },
     { name: 'CamposGerenciados[]', title: 'DF', value: 'df' },
   ]);
+  const [
+    generatesPropsExperiments,
+    setGeneratesPropsExperiments,
+  ] = useState<IGenerateProps[]>(() => [
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Seq', value: 'seq' },
+    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'NPEI', value: 'npe_i' },
+    { name: 'CamposGerenciados[]', title: 'NPEF.', value: 'npe_f' },
+    { name: 'CamposGerenciados[]', title: 'Nº Parcelas', value: 'parcelas' },
+  ]);
+  const [
+    generatesPropsExperiments,
+    setGeneratesPropsExperiments,
+  ] = useState<IGenerateProps[]>(() => [
+    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'Lugar de Cultura', value: 'local' },
+    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'NLP', value: 'nlp' },
+    { name: 'CamposGerenciados[]', title: 'CLP', value: 'clp' },
+    { name: 'CamposGerenciados[]', title: 'EEL', value: 'eel' },
+    { name: 'CamposGerenciados[]', title: 'Densidade', value: 'density' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
+  ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
@@ -140,23 +182,7 @@ export default function AtualizarQuadra({
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
-
-  useFormik<IFilter>({
-    initialValues: {
-      filterStatus: '',
-      filterSearch: '',
-      orderBy: '',
-      typeOrder: '',
-    },
-    onSubmit: async (values) => {
-      const parametersFilter = `&filterSearch=${values.filterSearch}&id_quadra=${idQuadra}`;
-      await dividersService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response: any[]) => {
-        setDividers(response);
-        setTotalItems(response.length);
-        setFilter(parametersFilter);
-      });
-    },
-  });
+  const [table, setTable] = useState<string>('dividers');
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     let typeOrder: any;
@@ -182,11 +208,43 @@ export default function AtualizarQuadra({
       parametersFilter = filter;
     }
 
-    await dividersService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
-      if (response.status === 200) {
-        setDividers(response.response);
+    switch (table) {
+      case 'dividers': {
+        await dividersService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
       }
-    });
+      case 'experiments': {
+        await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
+      }
+      case 'parcelas': {
+        await experimentGenotipeService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
+      }
+      case 'colheita': {
+        setData([]);
+        break;
+      }
+      default: {
+        await dividersService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+      }
+    }
 
     if (orderList === 2) {
       setOrder(0);
@@ -291,7 +349,88 @@ export default function AtualizarQuadra({
     return tableFields;
   }
 
-  const columns = columnsOrder(camposGerenciados);
+  function experimentColumnsOrder(columnCampos: string) {
+    const columnOrder: string[] = columnCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnOrder).forEach((item, index) => {
+      if (columnOrder[index] === 'experimentName') {
+        tableFields.push(headerTableFactory('Experimento Planejado', 'experimentName'));
+      }
+      if (columnOrder[index] === 'local') {
+        tableFields.push(headerTableFactory('Lugar de cultura', 'local.name_local_culture'));
+      }
+      if (columnOrder[index] === 'delineamento') {
+        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
+      }
+      if (columnOrder[index] === 'repetitionsNumber') {
+        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+      }
+      if (columnOrder[index] === 'nlp') {
+        tableFields.push(headerTableFactory('NLP', 'nlp'));
+      }
+      if (columnOrder[index] === 'clp') {
+        tableFields.push(headerTableFactory('CLP', 'clp'));
+      }
+      if (columnOrder[index] === 'eel') {
+        tableFields.push(headerTableFactory('EEL', 'eel'));
+      }
+      if (columnOrder[index] === 'density') {
+        tableFields.push(headerTableFactory('Densidade', 'density'));
+      }
+      if (columnOrder[index] === 'status') {
+        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+      }
+    });
+    return tableFields;
+  }
+
+  function parcelaColumnsOrder(columnCampos: string) {
+    const columnOrder: string[] = columnCampos.split(',');
+    const tableFields: any = [];
+
+    Object.keys(columnOrder).forEach((item, index) => {
+      if (columnOrder[index] === 'seq') {
+        tableFields.push(headerTableFactory('Seq', 'seq'));
+      }
+      if (columnOrder[index] === 'experimentName') {
+        tableFields.push(headerTableFactory('Nome do Experimento', 'experimentName'));
+      }
+      if (columnOrder[index] === 'npe_i') {
+        tableFields.push(headerTableFactory('NPEI', 'npe_i'));
+      }
+      if (columnOrder[index] === 'npe_f') {
+        tableFields.push(headerTableFactory('NPEF', 'npe_f'));
+      }
+      if (columnOrder[index] === 'parcelas') {
+        tableFields.push(headerTableFactory('Nº Parcelas', 'parcelas'));
+      }
+    });
+    return tableFields;
+  }
+
+  function generateColumns() {
+    switch (table) {
+      case 'dividers': {
+        return columnsOrder(camposGerenciados);
+      }
+      case 'experiments': {
+        return experimentColumnsOrder(experimentsCamposGerenciados);
+      }
+      case 'parcelas': {
+        return parcelaColumnsOrder(parcelasCamposGerenciados);
+      }
+      default: {
+        return columnsOrder(camposGerenciados);
+      }
+    }
+  }
+
+  let columns = [];
+
+  useEffect(() => {
+    columns = generateColumns();
+  }, [table]);
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -408,11 +547,44 @@ export default function AtualizarQuadra({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await dividersService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setDividers(response.response);
+
+    switch (table) {
+      case 'dividers': {
+        await dividersService.getAll(parametersFilter).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
       }
-    });
+      case 'experiments': {
+        await experimentService.getAll(parametersFilter).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
+      }
+      case 'parcelas': {
+        await experimentGenotipeService.getAll(parametersFilter).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+        break;
+      }
+      case 'colheita': {
+        setData([]);
+        break;
+      }
+      default: {
+        await dividersService.getAll(parametersFilter).then((response) => {
+          if (response.status === 200) {
+            setData(response.response);
+          }
+        });
+      }
+    }
   }
 
   useEffect(() => {
@@ -519,7 +691,7 @@ export default function AtualizarQuadra({
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={dividers}
+              data={data}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -545,6 +717,53 @@ export default function AtualizarQuadra({
                     border-gray-200
                   "
                   >
+                    <div className="flex
+                    items-center"
+                    >
+                      <div className="h-12">
+                        <Button
+                          title="DIVISORES"
+                          value="DIVISORES"
+                          bgColor={table === 'dividers' ? 'bg-blue-600' : 'bg-gray-600'}
+                          textColor="white"
+                          onClick={() => setTable('dividers')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
+                        />
+                      </div>
+                      <div style={{ width: 10 }} />
+                      <div className="h-12">
+                        <Button
+                          title="EXPERIMENTOS"
+                          value="EXPERIMENTOS"
+                          bgColor={table === 'experiments' ? 'bg-blue-600' : 'bg-gray-600'}
+                          textColor="white"
+                          onClick={() => setTable('experiments')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
+                        />
+                      </div>
+                      <div style={{ width: 10 }} />
+                      <div className="h-12">
+                        <Button
+                          title="PARCELAS"
+                          value="PARCELAS"
+                          bgColor={table === 'parcelas' ? 'bg-blue-600' : 'bg-gray-600'}
+                          textColor="white"
+                          onClick={() => setTable('parcelas')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
+                        />
+                      </div>
+                      <div style={{ width: 10 }} />
+                      <div className="h-12">
+                        <Button
+                          title="COLHEITA"
+                          value="COLHEITA"
+                          bgColor={table === 'colheitas' ? 'bg-blue-600' : 'bg-gray-600'}
+                          textColor="white"
+                          onClick={() => setTable('colheitas')}
+                          // icon={<FaSortAmountUpAlt size={20} />}
+                        />
+                      </div>
+                    </div>
                     <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado:
