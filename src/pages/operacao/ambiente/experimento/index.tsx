@@ -70,7 +70,6 @@ interface INpeProps {
 
 export interface IExperimento {
   id: number;
-  protocol_name: string;
   experiment_name: string;
   year: number;
   rotulo: string;
@@ -112,7 +111,7 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0, table_preferences: 'id,protocolName,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
+    id: 0, table_preferences: 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const router = useRouter();
@@ -129,7 +128,6 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
     { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
@@ -346,9 +344,6 @@ export default function Listagem({
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'protocolName') {
-        tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
-      }
       if (columnCampos[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
@@ -446,7 +441,6 @@ export default function Listagem({
           const newItem = item;
           if (item.assay_list) {
             newItem.gli = item.assay_list.gli;
-            newItem.protocol_name = item.assay_list.protocol_name;
             newItem.foco = item.assay_list.foco.name;
             newItem.type_assay = item.assay_list.type_assay.name;
             newItem.tecnologia = item.assay_list.tecnologia.name;
@@ -500,7 +494,6 @@ export default function Listagem({
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
           let i = lastExperimentNPE;
-          console.log('i', i);
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;

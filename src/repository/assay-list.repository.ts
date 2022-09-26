@@ -15,7 +15,6 @@ export class AssayListRepository {
       select: {
         id: true,
         id_safra: true,
-        protocol_name: true,
         foco: { select: { name: true } },
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
@@ -27,7 +26,6 @@ export class AssayListRepository {
         project: true,
         comments: true,
         experiment: true,
-        period: true,
       },
     });
 

@@ -53,7 +53,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
@@ -66,9 +66,6 @@ export default function TipoEnsaio({
     // {
     //   name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     // },
-    {
-      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
-    },
     {
       name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
     },
@@ -350,9 +347,6 @@ export default function TipoEnsaio({
       // if (columnOrder[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
-      }
       if (columnOrder[item] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
@@ -439,7 +433,6 @@ export default function TipoEnsaio({
           const newItem = item;
 
           newItem.SAFRA = newItem.safra?.safraName;
-          newItem.PROTOCOLO = newItem?.protocol_name;
           newItem.FOCO = newItem.foco?.name;
           newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
           newItem.TECNOLOGIA = newItem.tecnologia?.name;
@@ -458,9 +451,7 @@ export default function TipoEnsaio({
           delete newItem.gli;
           delete newItem.tecnologia;
           delete newItem.foco;
-          delete newItem.protocol_name;
           delete newItem.countNT;
-          delete newItem.period;
           delete newItem.comments;
           delete newItem.type_assay;
           delete newItem.id;

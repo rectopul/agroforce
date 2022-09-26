@@ -459,7 +459,6 @@ model experiment {
   clp               Decimal   @db.Decimal(5, 2)
   comments          String    @db.LongText
   density           Int
-  eel               Decimal   @db.Decimal(5, 2)
   experimentName    String
   idAssayList       Int
   idDelineamento    Int
@@ -501,8 +500,6 @@ model assay_list {
   id_type_assay      Int
   id_tecnologia      Int
   gli                String
-  period             Int
-  protocol_name      String
   treatmentsNumber   Int?
   bgm                Int
   project            String
@@ -616,4 +613,15 @@ model reportes {
   idOperation Int?
   name        String?
   ip          String?
+}
+
+model AllocatedExperiment {
+  id             Int      @id @default(autoincrement())
+  seq            Int
+  experimentName String
+  npei           Int
+  npef           Int
+  parcelas       Int
+  createdBy      Int
+  createdAt      DateTime @default(now())
 }

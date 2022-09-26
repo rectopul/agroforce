@@ -62,7 +62,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
+      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -77,7 +77,6 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
     { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
@@ -217,11 +216,6 @@ export default function Listagem({
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((_, index) => {
-      if (columnOrder[index] === 'protocolName') {
-        tableFields.push(
-          headerTableFactory('Protocolo', 'assay_list.protocol_name'),
-        );
-      }
       if (columnOrder[index] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
@@ -324,9 +318,7 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          console.log(item);
           newItem.SAFRA = item.assay_list?.safra?.safraName;
-          newItem.PROTOCOLO = item.assay_list?.protocol_name;
           newItem.FOCO = item.assay_list?.foco.name;
           newItem.ENSAIO = item.assay_list?.type_assay.name;
           newItem.GLI = item.assay_list?.gli;

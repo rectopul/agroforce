@@ -1340,7 +1340,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.genotipo.name_genotipo;
     return newItem;
   });
-  console.log(allExpTreatments);
   return {
     props: {
       allExpTreatments,
