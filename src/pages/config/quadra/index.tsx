@@ -102,7 +102,7 @@ export default function Listagem({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.quadras || {
     id: 0,
-    table_preferences: 'id,local_preparo,cod_quadra,linha_p,esquema,status',
+    table_preferences: 'id,local_preparo,cod_quadra,linha_p,esquema,allocation,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -131,7 +131,8 @@ export default function Listagem({
     },
     { name: 'CamposGerenciados[]', title: 'Linha P', value: 'linha_p' },
     { name: 'CamposGerenciados[]', title: 'Esquema', value: 'esquema' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Status', value: 'allocation' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -405,7 +406,12 @@ export default function Listagem({
           headerTableFactory('Local preparo', 'local.name_local_culture'),
         );
       }
-      if (columnCampos[index] === 'status') {
+      if (columnCampos[index] === 'allocation') {
+        tableFields.push(
+          headerTableFactory('Status', 'allocation'),
+        );
+      }
+      if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -488,6 +494,7 @@ export default function Listagem({
           row.COMP_C = row.comp_c;
           row.TIRO_FIXO = row.tiro_fixo;
           row.DISPARO_FIXO = row.disparo_fixo;
+          row.STATUS_ALOCADO = row.allocation;
           row.STATUS = row.status;
 
           delete row.cod_quadra;
@@ -505,6 +512,7 @@ export default function Listagem({
           delete row.safra;
           delete row.tableData;
           delete row.local_plantio;
+          delete row.allocation;
           return row;
         });
 
@@ -710,19 +718,6 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    {/* <div className="h-12">
-                      <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        onClick={() => { }}
-                        href="quadra/importar-planilha"
-                        icon={<RiFileExcel2Line size={20} />}
-                      />
-                    </div> */}
-
-                    <div />
 
                     <strong className="text-blue-600">
                       Total registrado:

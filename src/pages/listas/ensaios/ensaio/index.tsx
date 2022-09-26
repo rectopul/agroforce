@@ -239,7 +239,7 @@ export default function TipoEnsaio({
   }
 
   async function deleteItem(id: number) {
-    const { status, message } = await assayListService.deleted(id);
+    const { status, message } = await assayListService.deleted({ id, userId: userLogado.id });
     if (status === 200) {
       router.reload();
     } else {

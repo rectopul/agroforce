@@ -804,7 +804,7 @@ export default function AtualizarTipoEnsaio({
                         <Button
                           title="GENÓTIPOS"
                           value="GENÓTIPOS"
-                          bgColor={table == 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
+                          bgColor={table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
                           onClick={() => setTable('genotipo')}
                           // icon={<FaSortAmountUpAlt size={20} />}
@@ -815,7 +815,7 @@ export default function AtualizarTipoEnsaio({
                         <Button
                           title="EXPERIMENTOS"
                           value="EXPERIMENTOS"
-                          bgColor={table == 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
+                          bgColor={table === 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
                           onClick={() => setTable('experimentos')}
                           // icon={<FaSortAmountUpAlt size={20} />}

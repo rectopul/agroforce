@@ -246,8 +246,6 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
         const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
@@ -264,9 +262,6 @@ export class ExperimentController {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }
       if (response) {
-        await this.reporteRepository.create({
-          madeBy: response.created_by, module: 'Experimento', operation: 'Inativação', name: response.experimentName, ip: JSON.stringify(ip), idOperation: response.id,
-        });
         return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
@@ -276,13 +271,13 @@ export class ExperimentController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { response: experimentExist } = await this.getOne(Number(id));
+      const { response: experimentExist } = await this.getOne(Number(data.id));
 
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
 
-      const response = await this.experimentRepository.delete(Number(id));
+      const response = await this.experimentRepository.delete(Number(data.id));
       const {
         response: assayList,
       } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
@@ -327,18 +322,26 @@ export class ExperimentController {
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;
+    let allocated = 0;
     let status = '';
     response.experiment_genotipe?.map((parcelas: any) => {
       if (parcelas.status === 'IMPRESSO') {
         printed += 1;
       } else if (parcelas.status === 'EM ETIQUETAGEM') {
         toPrint += 1;
+      } else if (parcelas.status === 'ALOCADO') {
+        allocated += 1;
       }
     });
     if (toPrint > 1) {
       status = 'ETIQ. EM ANDAMENTO';
     } else if (printed === allParcelas) {
       status = 'ETIQ. FINALIZADA';
+    }
+    if (allocated === allParcelas) {
+      status = 'TOTALMENTE ALOCADO';
+    } else if (allocated > 1) {
+      status = 'PARCIALMENTE ALOCADO';
     }
 
     await this.update({ id, status });
