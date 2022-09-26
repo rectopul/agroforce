@@ -2,33 +2,31 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef, useEffect, useState } from 'react';
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
+import React, { useRef, useEffect, useState } from "react";
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { BsTrashFill } from 'react-icons/bs';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import Modal from 'react-modal';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import { AiOutlinePrinter } from 'react-icons/ai';
-import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+} from "react-beautiful-dnd";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsTrashFill } from "react-icons/bs";
+import { RiCloseCircleFill, RiFileExcel2Line } from "react-icons/ri";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import Modal from "react-modal";
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import { AiOutlinePrinter } from "react-icons/ai";
+import { IGenerateProps } from "../../../interfaces/shared/generate-props.interface";
 
 import {
   AccordionFilter,
@@ -38,18 +36,19 @@ import {
   Input,
   Select,
   ModalComponent,
-} from '../../../components';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+  FieldItemsPerPage,
+} from "../../../components";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   experimentGroupService,
   userPreferencesService,
-} from '../../../services';
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../services";
+import * as ITabs from "../../../shared/utils/dropdown";
 import {
   IExperimentGroupFilter,
   IExperimentsGroup,
-} from '../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface';
-import { IReturnObject } from '../../../interfaces/shared/Import.interface';
+} from "../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface";
+import { IReturnObject } from "../../../interfaces/shared/Import.interface";
 
 export default function Listagem({
   allExperimentGroup,
@@ -63,24 +62,26 @@ export default function Listagem({
 InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM'
-    ? { ...i, statusTab: true }
-    : { ...i, statubsTab: false }));
+  const tabsEtiquetagemMenu = tabsOperation.map((i) =>
+    i.titleTab === "ETIQUETAGEM"
+      ? { ...i, statusTab: true }
+      : { ...i, statubsTab: false }
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.etiquetagem || {
     id: 0,
     table_preferences:
-      'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
+      "id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action",
   };
 
   const tableRef = useRef<any>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [experimentGroup, setExperimentGroup] = useState<IExperimentsGroup[]>(
-    () => allExperimentGroup,
+    () => allExperimentGroup
   );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
@@ -89,68 +90,68 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do grupo de exp.',
-      value: 'name',
-      defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Nome do grupo de exp.",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Qtde. exp.',
-      value: 'experimentAmount',
-      defaultChecked: () => camposGerenciados.includes('experimentAmount'),
+      name: "CamposGerenciados[]",
+      title: "Qtde. exp.",
+      value: "experimentAmount",
+      defaultChecked: () => camposGerenciados.includes("experimentAmount"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Etiq. a imprimir',
-      value: 'tagsToPrint',
-      defaultChecked: () => camposGerenciados.includes('tagsToPrint'),
+      name: "CamposGerenciados[]",
+      title: "Etiq. a imprimir",
+      value: "tagsToPrint",
+      defaultChecked: () => camposGerenciados.includes("tagsToPrint"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Etiq. impressas',
-      value: 'tagsPrinted',
-      defaultChecked: () => camposGerenciados.includes('tagsPrinted'),
+      name: "CamposGerenciados[]",
+      title: "Etiq. impressas",
+      value: "tagsPrinted",
+      defaultChecked: () => camposGerenciados.includes("tagsPrinted"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Total etiquetas',
-      value: 'totalTags',
-      defaultChecked: () => camposGerenciados.includes('totalTags'),
+      name: "CamposGerenciados[]",
+      title: "Total etiquetas",
+      value: "totalTags",
+      defaultChecked: () => camposGerenciados.includes("totalTags"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Status grupo exp.',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status grupo exp.",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'action',
-      defaultChecked: () => camposGerenciados.includes('action'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "action",
+      defaultChecked: () => camposGerenciados.includes("action"),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. NÃO INICIADA',
-      value: 'ETIQ. NÃO INICIADA',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. NÃO INICIADA'),
+      name: "StatusCheckbox",
+      title: "ETIQ. NÃO INICIADA",
+      value: "ETIQ. NÃO INICIADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. NÃO INICIADA"),
     },
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. EM ANDAMENTO',
-      value: 'ETIQ. EM ANDAMENTO',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. EM ANDAMENTO'),
+      name: "StatusCheckbox",
+      title: "ETIQ. EM ANDAMENTO",
+      value: "ETIQ. EM ANDAMENTO",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. EM ANDAMENTO"),
     },
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. FINALIZADA',
-      value: 'ETIQ. FINALIZADA',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
+      name: "StatusCheckbox",
+      title: "ETIQ. FINALIZADA",
+      value: "ETIQ. FINALIZADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. FINALIZADA"),
     },
   ]);
   const router = useRouter();
@@ -162,20 +163,20 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const formik = useFormik<IExperimentGroupFilter>({
     initialValues: {
-      filterExperimentGroup: '',
-      filterQuantityExperiment: '',
-      filterTagsToPrint: '',
-      filterTagsPrinted: '',
-      filterTotalTags: '',
-      filterStatus: '',
-      filterQtdExpTo: '',
-      filterQtdExpFrom: '',
-      filterTotalEtiqImprimirTo: '',
-      filterTotalEtiqImprimirFrom: '',
-      filterTotalEtiqImpressasTo: '',
-      filterTotalEtiqImpressasFrom: '',
-      filterTotalEtiqTo: '',
-      filterTotalEtiqFrom: '',
+      filterExperimentGroup: "",
+      filterQuantityExperiment: "",
+      filterTagsToPrint: "",
+      filterTagsPrinted: "",
+      filterTotalTags: "",
+      filterStatus: "",
+      filterQtdExpTo: "",
+      filterQtdExpFrom: "",
+      filterTotalEtiqImprimirTo: "",
+      filterTotalEtiqImprimirFrom: "",
+      filterTotalEtiqImpressasTo: "",
+      filterTotalEtiqImpressasFrom: "",
+      filterTotalEtiqTo: "",
+      filterTotalEtiqFrom: "",
     },
     onSubmit: async ({
       filterExperimentGroup,
@@ -194,9 +195,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     }) => {
       // const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}`;
       const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']",
+        "input[name='StatusCheckbox']"
       );
-      let selecionados = '';
+      let selecionados = "";
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
           selecionados += `${allCheckBox[i].value},`;
@@ -205,7 +206,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}&filterQtdExpTo=${filterQtdExpTo}&filterQtdExpFrom=${filterQtdExpFrom}&filterTotalEtiqImprimirTo=${filterTotalEtiqImprimirTo}&filterTotalEtiqImprimirFrom=${filterTotalEtiqImprimirFrom}&filterTotalEtiqImpressasTo=${filterTotalEtiqImpressasTo}&filterTotalEtiqImpressasFrom=${filterTotalEtiqImpressasFrom}&filterTotalEtiqTo=${filterTotalEtiqTo}&filterTotalEtiqFrom=${filterTotalEtiqFrom}`;
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
       await experimentGroupService
         .getAll(`${parametersFilter}`)
         .then(({ response, total: allTotal }) => {
@@ -214,7 +215,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           setTotalItems(allTotal);
           setCurrentPage(0);
           tableRef.current.dataManager.changePageSize(
-            allTotal >= take ? take : allTotal,
+            allTotal >= take ? take : allTotal
           );
         });
     },
@@ -224,21 +225,21 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -266,7 +267,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     } else {
       Swal.fire({
         html: message,
-        width: '800',
+        width: "800",
       });
     }
   }
@@ -292,7 +293,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   function actionTableFactory() {
     return {
       title: <div className="flex items-center">Ação</div>,
-      field: 'action',
+      field: "action",
       sorting: false,
       width: 0,
       render: (rowData: any) => (
@@ -302,10 +303,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               title={`Editar ${rowData.name}`}
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                localStorage.setItem('filterValueEdit', filtersParams);
-                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
                 router.push(`/operacao/etiquetagem/atualizar?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -319,10 +320,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               title=""
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                localStorage.setItem('filterValueEdit', filtersParams);
-                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filtersParams);
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
                 router.push(`/operacao/etiquetagem/parcelas?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -348,30 +349,28 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'name') {
-        tableFields.push(headerTableFactory('Nome do grupo de exp.', 'name'));
+      if (columnOrder[item] === "name") {
+        tableFields.push(headerTableFactory("Nome do grupo de exp.", "name"));
       }
-      if (columnOrder[item] === 'experimentAmount') {
-        tableFields.push(headerTableFactory('Qtde. exp.', 'experimentAmount'));
+      if (columnOrder[item] === "experimentAmount") {
+        tableFields.push(headerTableFactory("Qtde. exp.", "experimentAmount"));
       }
-      if (columnOrder[item] === 'tagsToPrint') {
-        tableFields.push(
-          headerTableFactory('Etiq. a imprimir', 'tagsToPrint'),
-        );
+      if (columnOrder[item] === "tagsToPrint") {
+        tableFields.push(headerTableFactory("Etiq. a imprimir", "tagsToPrint"));
       }
-      if (columnOrder[item] === 'tagsPrinted') {
-        tableFields.push(headerTableFactory('Etiq. impressas', 'tagsPrinted'));
+      if (columnOrder[item] === "tagsPrinted") {
+        tableFields.push(headerTableFactory("Etiq. impressas", "tagsPrinted"));
       }
-      if (columnOrder[item] === 'totalTags') {
-        tableFields.push(headerTableFactory('Total etiquetas', 'totalTags'));
+      if (columnOrder[item] === "totalTags") {
+        tableFields.push(headerTableFactory("Total etiquetas", "totalTags"));
       }
-      if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status grupo exp.', 'status'));
+      if (columnOrder[item] === "status") {
+        tableFields.push(headerTableFactory("Status grupo exp.", "status"));
       }
-      if (columnOrder[item] === 'action') {
+      if (columnOrder[item] === "action") {
         tableFields.push(actionTableFactory());
       }
     });
@@ -382,7 +381,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -405,7 +404,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.etiquetagem = {
         id: preferences.id,
@@ -416,7 +415,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -443,21 +442,21 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         XLSX.utils.book_append_sheet(
           workBook,
           workSheet,
-          'Grupos do experimento',
+          "Grupos do experimento"
         );
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+        XLSX.writeFile(workBook, "Grupos do experimento.xlsx");
       }
     });
   };
@@ -494,10 +493,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   function filterFieldFactory(
     title: string,
     name: string,
-    small: boolean = false,
+    small: boolean = false
   ) {
     return (
-      <div className={small ? 'h-7 w-1/3 ml-2' : 'h-7 w-1/2 ml-2'}>
+      <div className={small ? "h-7 w-1/3 ml-2" : "h-7 w-1/2 ml-2"}>
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -515,22 +514,23 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   async function handleSubmit(event: any) {
     event.preventDefault();
     const inputValue: any = (
-      document.getElementById('inputName') as HTMLInputElement
+      document.getElementById("inputName") as HTMLInputElement
     )?.value;
     const { response }: IReturnObject = await experimentGroupService.getAll({
       filterExperimentGroup: inputValue,
       safraId,
     });
     if (response?.length > 0) {
-      Swal.fire('Grupo já cadastrado');
+      Swal.fire("Grupo já cadastrado");
     } else {
-      const { status: createStatus, response: newGroup }: IReturnObject = await experimentGroupService.create({
-        name: inputValue,
-        safraId: Number(safraId),
-        createdBy: userLogado.id,
-      });
+      const { status: createStatus, response: newGroup }: IReturnObject =
+        await experimentGroupService.create({
+          name: inputValue,
+          safraId: Number(safraId),
+          createdBy: userLogado.id,
+        });
       if (createStatus !== 200) {
-        Swal.fire('Erro ao cadastrar grupo');
+        Swal.fire("Erro ao cadastrar grupo");
       } else {
         router.push(`/operacao/etiquetagem/atualizar?id=${newGroup.id}`);
       }
@@ -660,8 +660,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 "
                 >
                   {filterFieldFactory(
-                    'filterExperimentGroup',
-                    'Nome do grupo de exp.',
+                    "filterExperimentGroup",
+                    "Nome do grupo de exp."
                   )}
                   {/* {filterFieldFactory(
                     "filterQuantityExperiment",
@@ -811,21 +811,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </AccordionFilter>
                   </div>
 
-                  <div className="h-7 w-1/3 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
-                    </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
-                  </div>
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
@@ -847,16 +833,17 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={experimentGroup}
               options={{
-                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
+                selectionProps: (rowData: any) =>
+                  isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -890,9 +877,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -939,7 +924,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -968,58 +953,59 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1044,31 +1030,33 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : '';
+    : "";
   const { token } = req.cookies;
   const { safraId } = req.cookies;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimentGroup = `${publicRuntimeConfig.apiUrl}/experiment-group`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&safraId=${safraId}`;
+  const filterApplication =
+    req.cookies.filterBeforeEdit || `&safraId=${safraId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const param = `&safraId=${safraId}`;
 
   const urlExperimentGroup: any = new URL(baseUrlExperimentGroup);
   urlExperimentGroup.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(urlExperimentGroup.toString(), requestOptions).then(
-    (response) => response.json(),
-  );
+  const { response: allExperimentGroup = [], total: totalItems = 0 } =
+    await fetch(urlExperimentGroup.toString(), requestOptions).then(
+      (response) => response.json()
+    );
 
   return {
     props: {
