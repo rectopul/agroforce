@@ -26,7 +26,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
@@ -212,7 +212,7 @@ export default function Listagem({
       filterTecnologiaDesc,
     }) => {
       // // Call filter with there parameter
-      // const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
+      // const parametersFilter = await tableGlobalFunctions.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
       // setFiltersParams(parametersFilter); // Set filter pararameters
 
       // await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
@@ -254,9 +254,9 @@ export default function Listagem({
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'lote');
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
     // await loteService.getAll(value).then((response) => {
     //   if (response.status === 200) {
@@ -279,7 +279,7 @@ export default function Listagem({
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
-    } = await fetchWrapper.handleOrderG(column, order, orderList);
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -566,7 +566,7 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filter);
 
     // await loteService.getAll(parametersFilter).then((response) => {
     //   if (response.status === 200) {
@@ -581,7 +581,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value, filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 

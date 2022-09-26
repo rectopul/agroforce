@@ -29,7 +29,6 @@ export class ExperimentGroupRepository {
             clp: true,
             comments: true,
             density: true,
-            eel: true,
             experimentName: true,
             idAssayList: true,
             idDelineamento: true,

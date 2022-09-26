@@ -87,7 +87,7 @@ export class ExperimentGroupController {
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
       }
-  
+
       const select = {
         id: true,
         name: true,
@@ -173,7 +173,7 @@ export class ExperimentGroupController {
 
   async delete(id: number) {
     try {
-      const { status, response } = await this.getOne(Number(id));
+      const { status, response }: any = await this.getOne(Number(id));
       response.experiment.forEach(async (item: any) => {
         await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
       });
@@ -189,7 +189,7 @@ export class ExperimentGroupController {
   }
 
   async countEtiqueta(id: number, idExperiment: any) {
-    const { response } = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;
     let tagsPrinted = 0;

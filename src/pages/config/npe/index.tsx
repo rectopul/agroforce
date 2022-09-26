@@ -25,7 +25,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { removeCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import { experimentService, npeService, userPreferencesService } from '../../../services';
@@ -38,6 +38,7 @@ import {
   Select,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
 
 interface INpeProps {
   id: number | any;
@@ -83,13 +84,23 @@ interface IData {
   filter: string | any;
   itensPerPage: number | any;
   filterApplication: object | any;
+  filterBeforeEdit: object | any;
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string // RR
+  safraId :any| number;
+  idCulture :any| number;
 }
 
 export default function Listagem({
   allNpe,
   itensPerPage,
   filterApplication,
+  filterBeforeEdit,
   totalItems,
+  typeOrderServer,
+  orderByserver,
+  safraId,
+  idCulture,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -179,27 +190,36 @@ export default function Listagem({
     },
   ]);
 
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const formik = useFormik<IFilter>({
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
+
+  const filterStatusBeforeEdit = filterApplication.split('');
+
+  const formik = useFormik<any>({
     initialValues: {
-      filterStatus: '',
-      filterLocal: '',
-      filterSafra: '',
-      filterFoco: '',
-      filterEnsaio: '',
-      filterTecnologia: '',
-      filterCodTecnologia: '',
-      filterEpoca: '',
-      filterNPE: '',
-      filterNpeTo: '',
-      filterNpeFrom: '',
-      filterNpeFinalTo: '',
-      filterNpeFinalFrom: '',
+      filterStatus: filterStatusBeforeEdit[13],
+      filterLocal: checkValue('filterLocal'),
+      filterSafra: checkValue('filterSafra'),
+      filterFoco: checkValue('filterFoco'),
+      filterEnsaio: checkValue('filterEnsaio'),
+      filterTecnologia: checkValue('filterTecnologia'),
+      filterEpoca: checkValue('filterEpoca'),
+      filterNPE: checkValue('filterNPE'),
+      filterNpeTo: checkValue('filterNpeTo'),
+      filterNpeFrom: checkValue('filterNpeFrom'),
       orderBy: '',
       typeOrder: '',
     },
@@ -218,26 +238,45 @@ export default function Listagem({
       filterNpeFinalTo,
       filterNpeFinalFrom,
     }) => {
+      // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterCodTecnologia=${filterCodTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&safraId=${userLogado.safras.safra_selecionada}`;
-      await npeService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setNPE(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
+      // &id_safra=${safraId}
+      // await npeService
+      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //   .then((response) => {
+      //     setFilter(parametersFilter);
+      //     setNPE(response.response);
+      //     setTotalItems(response.total);
+      //     setCurrentPage(0);
+      //   });
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-  const filterStatusBeforeEdit = filterApplication.split('');
+    await npeService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setNPE(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  }
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -305,6 +344,12 @@ export default function Listagem({
               textColor="white"
               title="Editar"
               onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(`/config/npe/atualizar?id=${rowData.id}`);
               }}
             />
@@ -424,48 +469,58 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await npeService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setNPE(response.response);
-        }
-      });
+    // await npeService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setNPE(response.response);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -559,8 +614,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await npeService.getAll(filterApplication).then(({ status, response }) => {
-      console.log(response);
+    await npeService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map(
           (row: any) => {
@@ -585,7 +639,7 @@ export default function Listagem({
 
             delete row.nextAvailableNPE;
             delete row.prox_npe;
-            
+
             delete row.edited;
             delete row.local;
             delete row.safra;
@@ -628,31 +682,32 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await npeService.getAll(parametersFilter).then(({ status, response }) => {
-      if (status === 200) {
-        setNPE(response);
-      }
-    });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await npeService.getAll(parametersFilter).then(({ status, response }) => {
+    //   if (status === 200) {
+    //     setNPE(response);
+    //   }
+    // });
+
+    await callingApi(filter); // handle pagination globly
   }
 
   function filterFieldFactory(title: any, name: any) {
@@ -664,6 +719,7 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
+          defaultValue={checkValue(title)}
           max="40"
           id={title}
           name={title}
@@ -671,6 +727,12 @@ export default function Listagem({
         />
       </div>
     );
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    return parameter;
   }
 
   useEffect(() => {
@@ -710,7 +772,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={filterStatusBeforeEdit[13]}
+                      defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -740,12 +803,15 @@ export default function Listagem({
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterNpeFrom')}
+
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
+                        defaultValue={checkValue('filterNpeTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -967,7 +1033,7 @@ export default function Listagem({
                     />
                     <Button
 
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -990,20 +1056,52 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const { token } = req.cookies;
   const { safraId } = req.cookies;
+  const idCulture = req.cookies.cultureId;
+  const { token } = req.cookies;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'safra.safraName';
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=2&id_culture=${idCulture}&id_safra=${safraId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&safraId=${safraId}`
-    : `filterStatus=1&safraId=${safraId}`;
+    ? `${req.cookies.filterBeforeEdit}`
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
+    // id_culture=${idCulture}&id_safra=${safraId}
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${safraId}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -1023,6 +1121,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       totalItems,
       itensPerPage,
       filterApplication,
+      filterBeforeEdit,
+      orderByserver, // RR
+      typeOrderServer, // RR
+      safraId,
+      idCulture,
     },
   };
 };

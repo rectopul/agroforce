@@ -55,7 +55,7 @@ export class ExperimentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
       }
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterTypeAssay}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
       }
       if (options.filterTecnologia) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTecnologia}" } } } }`));
@@ -313,7 +313,7 @@ export class ExperimentController {
   }
 
   async handleExperimentStatus(id: number) {
-    const { response } : any = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;

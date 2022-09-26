@@ -46,6 +46,7 @@ import {
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
+import { fetchWrapper } from 'src/helpers';
 
 export interface LogData {
   id: number;
@@ -67,14 +68,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-  allLogs,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  uploadInProcess,
-  idSafra,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLogs,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      uploadInProcess,
+      idSafra,
+      idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -165,6 +166,7 @@ export default function Import({
 
   const take: number = itensPerPage || 10;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -184,66 +186,76 @@ export default function Import({
       filterState,
     }) => {
       const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
-      await logImportService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then(({ response, total: allTotal }) => {
-          setFilter(parametersFilter);
-          setLogs(response);
-          setTotalItems(allTotal);
-          setCurrentPage(0);
-        });
+      setFilter(parametersFilter);
+      await getAllLogs(`${parametersFilter}`);
+
     },
   });
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-  ): Promise<void> {
-    let orderType: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      orderType = 'asc';
-    } else if (order === 2) {
-      orderType = 'desc';
-    } else {
-      orderType = '';
-    }
-
-    setOrderBy(column);
-    setTypeOrder(orderType);
-
-    if (filter && typeof filter !== 'undefined') {
-      if (orderType !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${orderType}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (orderType !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = filter;
-    }
-
+  async function getAllLogs(parametersFilter: any) {
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
     await logImportService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setLogs(response.response);
-        }
+      .getAll(parametersFilter)
+      .then(({ response, total: allTotal }) => {
+        setLogs(response);
+        setTotalItems(allTotal);
       });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
   }
+
+  //Call that function when change type order value.
+  useEffect(() => {
+    getAllLogs(filter);
+  }, [typeOrder]);
+
+  // async function handleOrder(
+  //   column: string,
+  //   order: string | any,
+  // ): Promise<void> {
+  //   let orderType: any;
+  //   let parametersFilter: any;
+  //   if (order === 1) {
+  //     orderType = 'asc';
+  //   } else if (order === 2) {
+  //     orderType = 'desc';
+  //   } else {
+  //     orderType = '';
+  //   }
+
+  //   setOrderBy(column);
+  //   setTypeOrder(orderType);
+
+  //   if (filter && typeof filter !== 'undefined') {
+  //     if (orderType !== '') {
+  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${orderType}`;
+  //     } else {
+  //       parametersFilter = filter;
+  //     }
+  //   } else if (orderType !== '') {
+  //     parametersFilter = `orderBy=${column}&typeOrder=${orderType}`;
+  //   } else {
+  //     parametersFilter = filter;
+  //   }
+
+  //   await logImportService
+  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
+  //     .then((response) => {
+  //       if (response.status === 200) {
+  //         setLogs(response.response);
+  //       }
+  //     });
+
+  //   if (orderList === 2) {
+  //     setOrder(0);
+  //     setArrowOrder(<AiOutlineArrowDown />);
+  //   } else {
+  //     setOrder(orderList + 1);
+  //     if (orderList === 1) {
+  //       setArrowOrder(<AiOutlineArrowUp />);
+  //     } else {
+  //       setArrowOrder('');
+  //     }
+  //   }
+  // }
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -322,6 +334,16 @@ export default function Import({
   }
 
   const columns = columnsOrder(camposGerenciados);
+
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    //Gobal manage orders
+    const { typeOrderG, columnG, orderByG, arrowOrder } = await fetchWrapper.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+  }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -410,7 +432,7 @@ export default function Import({
 
   const downloadExcel = async (): Promise<void> => {
     await logImportService
-      .getAll(filterApplication)
+      .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
           response.map((item: any) => {
@@ -458,22 +480,7 @@ export default function Import({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (typeOrder) {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
-    }
-
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await logImportService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setLogs(response.response);
-      }
-    });
+    await getAllLogs(filter);
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -858,7 +865,7 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => {}}
+                        onClick={() => { }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -1016,7 +1023,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>

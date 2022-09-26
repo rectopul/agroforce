@@ -28,7 +28,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from "cookies-next";
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import { userPreferencesService, userService } from '../../../../services';
 import { handleFormatTel } from '../../../../shared/utils/tel';
 import {
@@ -180,7 +180,7 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
       // Call filter with there parameter
-      // const parametersFilter = await fetchWrapper.handleFilterParameter('usuarios', filterStatus || 1, filterName, filterLogin);
+      // const parametersFilter = await tableGlobalFunctions.handleFilterParameter('usuarios', filterStatus || 1, filterName, filterLogin);
 
       // setFiltersParams(parametersFilter);
       // setCookiess('filterBeforeEdit', filtersParams);
@@ -418,9 +418,9 @@ export default function Listagem({
     order: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
     // await userService
     //   .getAll(value)
@@ -443,7 +443,7 @@ export default function Listagem({
     // }
 
     //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -576,7 +576,7 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
     // await userService.getAll(parametersFilter).then((response) => {
     //   if (response.status === 200) {
@@ -591,7 +591,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
     return parameter;
   }
 

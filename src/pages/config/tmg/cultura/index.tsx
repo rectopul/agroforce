@@ -30,7 +30,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -239,9 +239,9 @@ export default function Listagem({
     order: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
     // await cultureService
     //   .getAll(value)
@@ -265,7 +265,7 @@ export default function Listagem({
     // }
 
     //Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } = await fetchWrapper.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -520,7 +520,7 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
     // await cultureService.getAll(parametersFilter).then((response) => {
     //   if (response.status === 200) {
@@ -537,7 +537,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value, filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
