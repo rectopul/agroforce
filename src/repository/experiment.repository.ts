@@ -20,7 +20,6 @@ export class ExperimentRepository {
         status: true,
         nlp: true,
         clp: true,
-        eel: true,
         comments: true,
         orderDraw: true,
         experiment_genotipe: true,
@@ -29,7 +28,6 @@ export class ExperimentRepository {
             status: true,
             gli: true,
             bgm: true,
-            protocol_name: true,
             tecnologia: {
               select: {
                 name: true,
@@ -72,8 +70,7 @@ export class ExperimentRepository {
     return experiment;
   }
 
-  async findOneByName(name : any){
-    
+  async findOneByName(name : any) {
     const result: object | any = await prisma.experiment.findMany({
       where: { experimentName: name },
       select: {
@@ -87,16 +84,14 @@ export class ExperimentRepository {
         status: true,
         nlp: true,
         clp: true,
-        eel: true,
         comments: true,
         orderDraw: true,
         assay_list: {
           select: {
-            id : true,
+            id: true,
             status: true,
             gli: true,
             bgm: true,
-            protocol_name: true,
             tecnologia: {
               select: {
                 id: true,
@@ -112,7 +107,7 @@ export class ExperimentRepository {
             },
             type_assay: {
               select: {
-                id : true,
+                id: true,
                 name: true,
               },
             },
@@ -130,7 +125,7 @@ export class ExperimentRepository {
             cultureUnity: true,
           },
         },
-      
+
         delineamento: {
           select: {
             name: true,

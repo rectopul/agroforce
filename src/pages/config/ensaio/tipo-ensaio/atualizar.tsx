@@ -40,7 +40,6 @@ interface ITypeAssayProps {
   name: any;
   id: number | any;
   id_culture: number;
-  protocol_name: string;
   created_by: number;
 }
 
@@ -128,7 +127,6 @@ export default function AtualizarTipoEnsaio({
       id: typeAssay.id,
       id_culture: typeAssay.id_culture,
       name: typeAssay.name,
-      protocol_name: typeAssay.protocol_name,
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
@@ -141,7 +139,6 @@ export default function AtualizarTipoEnsaio({
         id: values.id,
         name: values.name,
         id_culture: values.id_culture,
-        protocol_name: values.protocol_name,
         created_by: Number(userLogado.id),
       }).then((response) => {
         if (response.status === 200) {
@@ -458,21 +455,6 @@ export default function AtualizarTipoEnsaio({
                 name="name"
                 onChange={formik.handleChange}
                 value={formik.values.name}
-              />
-            </div>
-            <div className="w-full h-7">
-              <label className="block text-gray-900 text-sm font-bold mb-1">
-                *Nome
-              </label>
-              <Input
-                type="text"
-                placeholder="Protocolo"
-                id="protocol_name"
-                name="protocol_name"
-                style={{ background: '#e5e7eb' }}
-                disabled
-                onChange={formik.handleChange}
-                value={formik.values.protocol_name}
               />
             </div>
             <div

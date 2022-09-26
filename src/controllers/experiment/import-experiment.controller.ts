@@ -270,22 +270,7 @@ export class ImportExperimentController {
                 );
               }
             }
-            if (column === '13') { // EEL
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              }
-
-              if ((typeof spreadSheet[row][column]) !== 'number' || spreadSheet[row][column] < 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo e casas decimais precisam ser com virgula',
-                );
-              }
-            }
-            if (column === '15') { // ORDEM SORTEIO
+            if (column === '14') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -315,7 +300,7 @@ export class ImportExperimentController {
               const { response: delineamento } = await delineamentoController.getAll({
                 id_culture: idCulture, name: spreadSheet[row][9],
               });
-              const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
+              const comments = spreadSheet[row][13]?.substr(0, 255) ? spreadSheet[row][13]?.substr(0, 255) : '';
               const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
               const { response: experiment } = await experimentController.getAll({
                 filterExperimentName: experimentName,
@@ -335,9 +320,8 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][10],
                     nlp: spreadSheet[row][11],
                     clp: spreadSheet[row][12],
-                    eel: spreadSheet[row][13],
                     comments,
-                    orderDraw: spreadSheet[row][15],
+                    orderDraw: spreadSheet[row][14],
                     created_by: createdBy,
                   },
                 );
@@ -354,9 +338,8 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][10],
                     nlp: spreadSheet[row][11],
                     clp: spreadSheet[row][12],
-                    eel: spreadSheet[row][13],
                     comments,
-                    orderDraw: spreadSheet[row][15],
+                    orderDraw: spreadSheet[row][14],
                     created_by: createdBy,
                   },
                 );

@@ -483,7 +483,6 @@ export default function Listagem({
           } else {
             row.status = 'Ativo';
           }
-          console.log(row);
           row.LOCAL = row.local.name_local_culture;
           row.SAFRA = row.safra.safraName;
           row.FOCO = row.foco.name;
@@ -546,7 +545,6 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter = `skip=${skip}&take=${take}`;
-    console.log({ filter });
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;

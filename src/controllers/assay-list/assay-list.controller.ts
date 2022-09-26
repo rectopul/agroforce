@@ -16,9 +16,6 @@ export class AssayListController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
-      if (options.filterProtocol) {
-        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocol}"}`);
-      }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -36,9 +33,6 @@ export class AssayListController {
       }
       if (options.filterGli) {
         parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
-      }
-      if (options.filterPeriod) {
-        parameters.period = JSON.parse(`{ "contains": "${options.filterPeriod}" }`);
       }
       if (options.filterBgm) {
         parameters.bgm = JSON.parse(`{ "contains": "${options.filterBgm}" }`);
@@ -63,7 +57,6 @@ export class AssayListController {
       const select = {
         id: true,
         id_safra: true,
-        protocol_name: true,
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
         safra: { select: { safraName: true } },
@@ -75,7 +68,6 @@ export class AssayListController {
         project: true,
         comments: true,
         experiment: true,
-        period: true,
         foco: { select: { name: true } },
       };
 
@@ -165,7 +157,6 @@ export class AssayListController {
 
   async delete(data: any) {
     try {
-      console.log(data);
       const { status: statusAssay, response } = await this.getOne(Number(data.id));
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };

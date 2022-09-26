@@ -42,9 +42,6 @@ export class GenotypeTreatmentController {
       if (options.filterNca) {
         parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
       }
-      if (options.filterPeriod) {
-        parameters.period = Number(options.filterPeriod);
-      }
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
       }

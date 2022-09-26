@@ -17,6 +17,7 @@ import { QuadraController } from '../block/quadra.controller';
 import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
+import { AllocatedExperimentController } from './allocated-experimento.controller';
 
 export class ImportAllocationController {
   static async validate(
@@ -33,6 +34,7 @@ export class ImportAllocationController {
     const layoutQuadraController = new LayoutQuadraController();
     const layoutChildrenController = new LayoutChildrenController();
     const experimentGenotipeController = new ExperimentGenotipeController();
+    const allocatedExperimentController = new AllocatedExperimentController();
 
     const responseIfError: Array<string> = [];
 
@@ -188,8 +190,6 @@ export class ImportAllocationController {
                     spreadSheet[row][9],
                     spreadSheet[row][column],
                   );
-              } else {
-                // valida npef
               }
             }
 
@@ -264,11 +264,6 @@ export class ImportAllocationController {
                     filterEsquema: response[0]?.esquema,
                     id_culture: idCulture,
                   });
-
-                  console.log('allparce');
-                  console.log(allParcelas[spreadSheet[Number(row) - 1][7]]);
-                  console.log('esquema[0]?.parcelas');
-                  console.log(esquema[0]?.parcelas);
                   if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
@@ -427,6 +422,14 @@ export class ImportAllocationController {
               });
               await quadraController.update({ id: quadra[0]?.id, allocation: 'ALOCADO' });
               await experimentController.update({ id: experiment[0]?.id, blockId: quadra[0]?.id });
+              await allocatedExperimentController.create({
+                seq: Number(spreadSheet[row][8]),
+                experimentName: spreadSheet[row][2],
+                npei: Number(spreadSheet[row][3]),
+                npef: Number(spreadSheet[row][4]),
+                parcelas: Number(spreadSheet[row][5]),
+                createdBy,
+              });
             }
           }
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });

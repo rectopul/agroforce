@@ -75,7 +75,6 @@ interface INpeProps {
 
 export interface IExperimento {
   id: number;
-  protocol_name: string;
   experiment_name: string;
   year: number;
   rotulo: string;
@@ -119,9 +118,7 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0,
-    table_preferences:
-      "id,protocolName,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT",
+    id: 0, table_preferences: 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
@@ -142,37 +139,17 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Protocolo", value: "protocolName" },
-    { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Nome do experimento",
-      value: "experimentName",
-    },
-    { name: "CamposGerenciados[]", title: "Nome tec.", value: "tecnologia" },
-    { name: "CamposGerenciados[]", title: "Época", value: "period" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Delineamento",
-      value: "delineamento",
-    },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Number of treatment",
-      value: "countNT",
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "NPE Inicial",
-      value: "repetitionsNumber",
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "NPE Final",
-      value: "repetitionsNumber",
-    },
-    { name: "CamposGerenciados[]", title: "QT. NPE", value: "npeQT" },
+    { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
+    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
+    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'Number of treatment', value: 'countNT' },
+    { name: 'CamposGerenciados[]', title: 'NPE Inicial', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'NPE Final', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
+
   ]);
 
   const [colorStar, setColorStar] = useState<string>("");
@@ -383,13 +360,8 @@ export default function Listagem({
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "protocolName") {
-        tableFields.push(
-          headerTableFactory("Protocolo", "assay_list.protocol_name")
-        );
-      }
-      if (columnCampos[index] === "gli") {
-        tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
+      if (columnCampos[index] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnCampos[index] === "tecnologia") {
         tableFields.push(
@@ -487,26 +459,23 @@ export default function Listagem({
     //   filterApplication +=
     // }
 
-    await experimentService
-      .getAll(excelFilters)
-      .then(({ status, response, message }: any) => {
-        if (status === 200) {
-          response.map((item: any) => {
-            const newItem = item;
-            if (item.assay_list) {
-              newItem.gli = item.assay_list.gli;
-              newItem.protocol_name = item.assay_list.protocol_name;
-              newItem.foco = item.assay_list.foco.name;
-              newItem.type_assay = item.assay_list.type_assay.name;
-              newItem.tecnologia = item.assay_list.tecnologia.name;
-            }
-            if (item.delineamento) {
-              newItem.repeticao = item.delineamento.repeticao;
-              newItem.delineamento = item.delineamento.name;
-            }
-            delete newItem.assay_list;
-            return newItem;
-          });
+    await experimentService.getAll(excelFilters).then(({ status, response, message }: any) => {
+      if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          if (item.assay_list) {
+            newItem.gli = item.assay_list.gli;
+            newItem.foco = item.assay_list.foco.name;
+            newItem.type_assay = item.assay_list.type_assay.name;
+            newItem.tecnologia = item.assay_list.tecnologia.name;
+          }
+          if (item.delineamento) {
+            newItem.repeticao = item.delineamento.repeticao;
+            newItem.delineamento = item.delineamento.name;
+          }
+          delete newItem.assay_list;
+          return newItem;
+        });
 
           const workSheet = XLSX.utils.json_to_sheet(response);
           const workBook = XLSX.utils.book_new();
@@ -546,19 +515,15 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      await experimentService
-        .getAll(parametersFilter)
-        .then(({ status, response }: any) => {
-          if (status === 200) {
-            let i = lastExperimentNPE;
-            console.log("i", i);
-            response.map((item: any) => {
-              item.npei = i;
-              item.npef = i + item.npeQT - 1;
-              i = item.npef + 1;
-            });
-            setLastExperimentNPE(i);
-
+      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
+        if (status === 200) {
+          let i = lastExperimentNPE;
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+          });
+          setLastExperimentNPE(i);
             setExperimentoNew(response);
           }
         });

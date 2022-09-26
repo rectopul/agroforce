@@ -8,8 +8,6 @@ export interface IAssayList {
   tecnologia: object | any
   experiment: object | any
   gli: string
-  period: number
-  protocol_name: string
   bgm: number
   project: string
   status: string

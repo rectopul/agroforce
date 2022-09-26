@@ -62,7 +62,6 @@ interface IFilter {
 
 export interface IExperimento {
   id: number;
-  protocol_name: string;
   experiment_name: string;
   year: number;
   rotulo: string;
@@ -110,7 +109,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
+      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -127,7 +126,6 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
     { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
@@ -445,12 +443,7 @@ export default function Listagem({
     const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
 
-    Object.keys(columnCampos).forEach((_, index) => {
-      if (columnCampos[index] === 'protocolName') {
-        tableFields.push(
-          headerTableFactory('Protocolo', 'assay_list.protocol_name'),
-        );
-      }
+    Object.keys(columnCampos).forEach((_, index) => {   
       if (columnCampos[index] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
@@ -553,7 +546,6 @@ export default function Listagem({
       .then(({ status, response, message }: any) => {
         if (status === 200) {
           response.map((item: any) => {
-            console.log(response);
             const newItem = item;
             newItem.SAFRA = item.assay_list?.safra?.safraName;
             newItem.FOCO = item.assay_list?.foco.name;
@@ -574,7 +566,6 @@ export default function Listagem({
             newItem.CLP = item?.clp;
             newItem.EEL = item?.eel;
             newItem.OBSERVAÇÕES = item?.comments;
-            newItem.PROTOCOLO = item.assay_list?.protocol_name;
             newItem.COUNT_NT = newItem.countNT;
             newItem.NPE_QT = newItem.npeQT;
 

@@ -175,7 +175,7 @@ export default function Listagem({
       await focoService.update({ id: idFoco, status: data.status });
       const index = focos.findIndex((foco) => foco.id === idFoco);
 
-      if (index === -1) {
+      if (!index || index === -1) {
         return;
       }
 
