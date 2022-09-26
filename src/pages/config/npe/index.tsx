@@ -240,7 +240,7 @@ export default function Listagem({
     }) => {
        // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
