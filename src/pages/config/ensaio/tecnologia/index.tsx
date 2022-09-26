@@ -342,6 +342,7 @@ export default function Listagem({
     await tecnologiaService
       .getAll(filterApplication)
       .then(({ status, response }) => {
+        console.log(response);
         if (status === 200) {
           const newData = response.map((row: any) => {
             const dataExp = new Date();

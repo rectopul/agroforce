@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from "cookies-next";
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -78,7 +78,7 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
-  
+
   idSafra: number;
   idCulture : number;
   itensPerPage: number;
@@ -87,17 +87,15 @@ interface IData {
   filterApplication : any |string,
 }
 
-
-
 export default function Listagem({
   allLote,
   totalItems,
   idSafra,
-  idCulture, 
+  idCulture,
   itensPerPage,
-  typeOrderServer, 
+  typeOrderServer,
   orderByserver,
-  filterApplication
+  filterApplication,
 
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
@@ -158,9 +156,9 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra =`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -223,39 +221,36 @@ export default function Listagem({
       //   setTotalItems(response.total);
       //   setCurrentPage(0);
       // });
-      
 
       const parametersFilter = `&filterGmrFrom=${filterGmrFrom}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmrTo=${filterGmrTo}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
+      await callingApi(parametersFilter);
     },
   });
 
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await loteService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setLotes(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-  
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
     // // Manage orders of colunms
@@ -281,13 +276,15 @@ export default function Listagem({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await fetchWrapper.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -450,17 +447,18 @@ export default function Listagem({
           newItem.ID_S2 = item?.id_s2;
           newItem.ID_DADOS = item?.id_dados;
           newItem.ANO = item?.year;
+          newItem.SAFRA = item?.safra.safraName;
           newItem.COD_LOTE = item?.cod_lote;
           newItem.NCC = item?.ncc;
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
+          newItem.DATA = newItem.DT;
           newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
           newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
           newItem.GMR = item?.genotipo.gmr;
           newItem.BGM = item?.genotipo.bgm;
           newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.DATA = newItem.DT;
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -578,16 +576,14 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); //handle pagination globly
-
+    await callingApi(filter); // handle pagination globly
   }
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = fetchWrapper.getValuesForFilter(value, filtersParams);
     return parameter;
   }
-  
 
   function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
@@ -964,28 +960,27 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 10;
 
-   //Last page
-   const lastPageServer = req.cookies.lastPage
-   ? req.cookies.lastPage
-   : "No";
- 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
-   //RR
-   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-   ? req.cookies.filterBeforeEditTypeOrder
-   : "desc";
-        
-   //RR
-   const orderByserver = req.cookies.filterBeforeEditOrderBy
-   ? req.cookies.filterBeforeEditOrderBy
-   : "year";
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'year';
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1000,17 +995,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
 
-
-  
   const filterApplication = req.cookies.filterBeforeEdit
-  ? `${req.cookies.filterBeforeEdit}`
-  : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-
+    ? `${req.cookies.filterBeforeEdit}`
+    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -1028,8 +1019,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       idCulture,
       itensPerPage,
       orderByserver,
-      typeOrderServer,  
-      filterApplication
+      typeOrderServer,
+      filterApplication,
     },
   };
 };

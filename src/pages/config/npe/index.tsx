@@ -560,6 +560,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await npeService.getAll(filterApplication).then(({ status, response }) => {
+      console.log(response);
       if (status === 200) {
         const newData = response.map(
           (row: any) => {
@@ -570,18 +571,22 @@ export default function Listagem({
               row.status = 'Ativo';
             }
 
-            row.LOCAL = row.local?.name_local_culture;
             row.SAFRA = row.safra?.safraName;
             row.FOCO = row.foco?.name;
-            row.ÉPOCA = row?.epoca;
-            row.TECNOLOGIA = row.tecnologia?.name;
             row.TIPO_ENSAIO = row.type_assay?.name;
-            row.GRUPO = row.group.group;
+            row.TECNOLOGIA = row.tecnologia?.name;
+            row.LOCAL = row.local?.name_local_culture;
             row.NPEI = row.npei;
+            row.ÉPOCA = row?.epoca;
+            row.GRUPO = row.group.group;
+            row.NEXT_AVAILABLE_NPE = row?.nextAvailableNPE;
+            row.PROX_NPE = row.prox_npe;
             row.STATUS = row.status;
-            row.QUANT_NPE = row?.npeQT;
-            row.PROX_NPE = row?.nextNPE;
 
+            delete row.nextAvailableNPE;
+            delete row.prox_npe;
+            
+            delete row.edited;
             delete row.local;
             delete row.safra;
             delete row.foco;

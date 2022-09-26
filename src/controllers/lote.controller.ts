@@ -157,6 +157,7 @@ export class LoteController {
         ncc: true,
         fase: true,
         peso: true,
+        safra: true,
         quant_sementes: true,
         genotipo: {
           select: {
@@ -179,8 +180,6 @@ export class LoteController {
       if (options.genotipo) {
         parameters.genotipo = options.genotipo;
       }
-
-      
 
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);

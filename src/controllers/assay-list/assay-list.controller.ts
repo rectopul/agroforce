@@ -165,7 +165,6 @@ export class AssayListController {
 
   async delete(data: any) {
     try {
-      console.log(data);
       const { status: statusAssay, response } = await this.getOne(Number(data.id));
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
