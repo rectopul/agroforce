@@ -37,6 +37,7 @@ import {
   Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 interface ITecnologiaProps {
   id: number | any;
@@ -65,6 +66,9 @@ interface Idata {
   idCulture: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  typeOrderServer :any| string; 
+  orderByserver : any |string; 
+  safraId :any |string
 }
 
 export default function Listagem({
@@ -75,6 +79,9 @@ export default function Listagem({
   idCulture,
   pageBeforeEdit,
   filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  safraId
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -131,82 +138,124 @@ export default function Listagem({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
+  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterName: '',
-      filterDescription: '',
-      filterCode: '',
+      filterName: checkValue('filterName'),
+      filterDescription: checkValue('filterName'),
+      filterCode: checkValue('filterName'),
       orderBy: '',
       typeOrder: '',
     },
 
     onSubmit: async ({ filterName, filterDescription, filterCode }) => {
-      const parametersFilter = `&filterName=${filterName}&filterDescription=${filterDescription}&filterCode=${filterCode}&id_culture=${idCulture}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await tecnologiaService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setTecnologias(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      const parametersFilter = `&filterName=${filterName}&filterDescription=${filterDescription}&filterCode=${filterCode}&id_culture=${idCulture}&id_safra=${safraId}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await tecnologiaService
+      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //   .then((response) => {
+      //     setFilter(parametersFilter);
+      //     setTecnologias(response.response);
+      //     setTotalItems(response.total);
+      //     setCurrentPage(0);
+      //   });
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter); 
+
     },
   });
+
+
+  //Calling common API 
+  async function callingApi(parametersFilter : any ){
+
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies("filtersParams", parametersFilter);
+
+    await tecnologiaService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400 ) {
+        setTecnologias(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  } 
+
+  //Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+  
 
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof (filter) !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await tecnologiaService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setTecnologias(response.response);
-        }
-      });
+    // await tecnologiaService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setTecnologias(response.response);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+     //Gobal manage orders
+     const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+
+     setTypeOrder(typeOrderG);
+     setOrderBy(columnG);
+     setOrder(orderByG);
+     setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -340,8 +389,9 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await tecnologiaService
-      .getAll(filterApplication)
+      .getAll(filter)
       .then(({ status, response }) => {
+        console.log(response);
         if (status === 200) {
           const newData = response.map((row: any) => {
             const dataExp = new Date();
@@ -401,31 +451,40 @@ export default function Listagem({
       });
   };
 
-  function handleTotalPages(): void {
+
+  //manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await tecnologiaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setTecnologias(response.response);
-      }
-    });
+  async function handlePagination(): Promise<void> {
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
+
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await tecnologiaService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setTecnologias(response.response);
+    //   }
+    // });
+
+    await callingApi(filter); //handle pagination globly
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    return parameter;
   }
 
   useEffect(() => {
@@ -473,6 +532,7 @@ export default function Listagem({
                       placeholder="Nome"
                       max="40"
                       id="filterName"
+                      defaultValue={checkValue('filterName')}
                       name="filterName"
                       onChange={formik.handleChange}
                     />
@@ -488,6 +548,7 @@ export default function Listagem({
                       max="40"
                       id="filterDescription"
                       name="filterDescription"
+                      defaultValue={checkValue('filterDescription')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -502,6 +563,7 @@ export default function Listagem({
                       max="40"
                       id="filterCode"
                       name="filterCode"
+                      defaultValue={checkValue('filterCode')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -722,14 +784,43 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
+  const { safraId } = req.cookies;
 
-  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}`;
+  //Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : "No";
+
+  if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
+  }
+
+  //RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+  ? req.cookies.filterBeforeEditTypeOrder
+  : "desc";
+       
+  //RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+  ? req.cookies.filterBeforeEditOrderBy
+  : "name";
+
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${safraId}`;
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${idCulture}`
-    : `&id_culture=${idCulture}`;
+    ? `${req.cookies.filterBeforeEdit}`
+    : `&id_culture=${idCulture}&id_safra=${safraId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+  
+    //RR
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/tecnologia`;
@@ -754,6 +845,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       idCulture,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver, //RR
+      typeOrderServer,  //RR
+      safraId
     },
   };
 };

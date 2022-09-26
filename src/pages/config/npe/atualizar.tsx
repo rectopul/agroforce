@@ -11,6 +11,7 @@ import InputMask from 'react-input-mask';
 
 import { IoMdArrowBack } from 'react-icons/io';
 import { MdDateRange } from 'react-icons/md';
+import npe from 'src/pages/api/npe';
 import {
   Content,
   Input,
@@ -19,7 +20,6 @@ import {
 } from '../../../components';
 
 import * as ITabs from '../../../shared/utils/dropdown';
-import npe from 'src/pages/api/npe';
 
 interface ILayoultProps {
   id: number | any;
@@ -71,10 +71,10 @@ interface IData {
 }
 
 export default function NovoLocal({
-      local,
-      layoultEdit,
-      npe,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  local,
+  layoultEdit,
+  npe,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -132,7 +132,7 @@ export default function NovoLocal({
               await npeService.update({
                 id: values.id,
                 prox_npe: values.prox_npe,
-                npei: values.prox_npe,
+                npei_i: values.prox_npe,
                 edited: 1,
               }).then((response) => {
                 if (response.status === 200) {
@@ -143,9 +143,9 @@ export default function NovoLocal({
                 }
               });
             }
-          })
+          });
         } else {
-          Swal.fire('Unable to update prox npe')
+          Swal.fire('Unable to update prox npe');
         }
       });
     },

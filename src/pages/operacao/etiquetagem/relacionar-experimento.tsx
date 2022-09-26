@@ -96,7 +96,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      "id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action",
+      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
   };
 
   const tableRef = useRef<any>(null);
@@ -113,25 +113,16 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Protocolo", value: "protocolName" },
-    { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
-    { name: "CamposGerenciados[]", title: "Ensaio", value: "type_assay" },
-    { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Nome do experimento",
-      value: "experimentName",
-    },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
-    { name: "CamposGerenciados[]", title: "Época", value: "period" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Delineamento",
-      value: "delineamento",
-    },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
-    { name: "CamposGerenciados[]", title: "Ações", value: "action" },
+    { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
+    { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
+    { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
+    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
+    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
@@ -318,13 +309,8 @@ export default function Listagem({
     const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((index: any) => {
-      if (columnOrder[index] === "protocolName") {
-        tableFields.push(
-          headerTableFactory("Protocolo", "assay_list.protocol_name")
-        );
-      }
-      if (columnOrder[index] === "foco") {
-        tableFields.push(headerTableFactory("Foco", "assay_list.foco.name"));
+      if (columnOrder[index] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
       if (columnOrder[index] === "type_assay") {
         tableFields.push(
@@ -443,7 +429,6 @@ export default function Listagem({
             newItem.Clp = item?.clp;
             newItem.Eel = item?.eel;
             newItem.Observações = item?.comments;
-            newItem.Protocolo = item.assay_list?.protocol_name;
             newItem.CountNT = newItem.countNT;
             newItem.NpeQT = newItem.npeQT;
 

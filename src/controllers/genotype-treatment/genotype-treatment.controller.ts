@@ -42,9 +42,6 @@ export class GenotypeTreatmentController {
       if (options.filterNca) {
         parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
       }
-      if (options.filterPeriod) {
-        parameters.period = Number(options.filterPeriod);
-      }
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
       }
@@ -155,6 +152,7 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
+        console.log("orderBy   ",options.orderBy);
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }

@@ -21,7 +21,15 @@ export class NpeController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') {
+          if (options.filterStatus == '1') {
+            parameters.status = JSON.parse('{ "in" : [1, 3]}');
+          } else if (options.filterStatus == '4') {
+            parameters.status = 1;
+          } else {
+            parameters.status = Number(options.filterStatus);
+          }
+        }
       }
 
       if (options.filterLocal) {
@@ -54,6 +62,10 @@ export class NpeController {
 
       if (options.safraId) {
         parameters.safraId = Number(options.safraId);
+      }
+
+      if (options.filterSafra) {
+        parameters.safra = JSON.parse(`{ "safraName": { "contains": "${options.filterSafra}" } }`);
       }
 
       if (options.focoId) {
@@ -118,7 +130,7 @@ export class NpeController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {
-        orderBy = '{"npei_i":"asc"}';
+        orderBy = '{"prox_npe":"asc"}';
       }
 
       if (options.paramSelect) {
@@ -159,23 +171,27 @@ export class NpeController {
         orderBy,
       );
 
-      const next_available_npe = response[response.length - 1].prox_npe;
-      response.map(async (value: any, index: any, elements: any) => {
-        const newItem = value;
-        const next = elements[index + 1];
+      // console.log("filter response ",response)
 
-        if (next) {
-          if (!newItem.npeQT) {
-            newItem.npeQT = next.npei_i - newItem.prox_npe;
+      if (response.length > 0) {
+        const next_available_npe = response[response.length - 1].prox_npe;
+        response.map(async (value: any, index: any, elements: any) => {
+          const newItem = value;
+          const next = elements[index + 1];
+
+          if (next) {
+            if (!newItem.npeQT) {
+              newItem.npeQT = newItem.npef < next.npei ? next.npei - newItem.npef : next.npei_i - newItem.npef;
+            }
+            newItem.nextNPE = next;
+          } else {
+            newItem.npeQT = 'N/A';
+            newItem.nextNPE = 0;
           }
-          newItem.nextNPE = next;
-        } else {
-          newItem.npeQT = 'N/A';
-          newItem.nextNPE = 0;
-        }
-        newItem.nextAvailableNPE = next_available_npe;
-        return newItem;
-      });
+          newItem.nextAvailableNPE = next_available_npe;
+          return newItem;
+        });
+      }
 
       if (!response || response.total <= 0) {
         return {

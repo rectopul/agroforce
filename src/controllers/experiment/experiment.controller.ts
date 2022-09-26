@@ -39,9 +39,6 @@ export class ExperimentController {
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
       }
-      if (options.filterProtocol) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"protocol_name": {"contains": "${options.filterProtocol}" } } }`));
-      }
       if (options.filterCod) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
       }
@@ -58,7 +55,7 @@ export class ExperimentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
       }
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterTypeAssay}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
       }
       if (options.filterTecnologia) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTecnologia}" } } } }`));
@@ -79,7 +76,6 @@ export class ExperimentController {
         period: true,
         nlp: true,
         clp: true,
-        eel: true,
         experimentName: true,
         comments: true,
         orderDraw: true,
@@ -88,7 +84,6 @@ export class ExperimentController {
           select: {
             gli: true,
             bgm: true,
-            protocol_name: true,
             status: true,
             genotype_treatment: { include: { genotipo: true } },
             tecnologia: {
@@ -318,7 +313,7 @@ export class ExperimentController {
   }
 
   async handleExperimentStatus(id: number) {
-    const { response } : any = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;

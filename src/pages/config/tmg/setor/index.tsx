@@ -36,7 +36,7 @@ import {
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { departmentService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
@@ -138,7 +138,7 @@ export default function Listagem({
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
       // Call filter with there parameter
-      // const parametersFilter = await fetchWrapper.handleFilterParameter('setor', filterStatus || 1, filterSearch);
+      // const parametersFilter = await tableGlobalFunctions.handleFilterParameter('setor', filterStatus || 1, filterSearch);
 
       // setFiltersParams(parametersFilter); // Set filter pararameters
       // setCookiess('filterBeforeEdit', filtersParams);
@@ -347,9 +347,9 @@ export default function Listagem({
     order: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'setor');
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'setor');
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
     // await departmentService
     //   .getAll(value)
@@ -374,7 +374,7 @@ export default function Listagem({
 
 
     //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await fetchWrapper.handleOrderG(column, order , orderList);
+    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -490,7 +490,7 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
     // await departmentService.getAll(parametersFilter).then((response) => {
     //   if (response.status === 200) {
@@ -507,7 +507,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = fetchWrapper.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
     return parameter;
   }
 
