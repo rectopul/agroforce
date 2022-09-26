@@ -11,17 +11,18 @@ export interface ITreatment {
 }
 
 export interface ITreatmentGrid {
-  allTreatments: ITreatment[];
-  assaySelect: Array<Object>;
-  genotypeSelect: Array<Object>;
-  totalItems: number;
-  idAssayList: number;
-  idSafra: number | any
-  itensPerPage: number;
-  filterApplication: object | any;
-  pageBeforeEdit: number
-  filterBeforeEdit: string
-
+  allTreatments : ITreatment[],
+  assaySelect : Array<Object>,
+  genotypeSelect :Array<Object>,
+  totalItems :number|any,
+  itensPerPage :number |any,
+  filterApplication :object |any,
+  idCulture :number |any,
+  idSafra :number |any,
+  pageBeforeEdit : object |any,
+  filterBeforeEdit :object |any,
+  orderByserver:number |any,
+  typeOrderServer : number |any,
 }
 
 export interface ITreatmentFilter {

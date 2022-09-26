@@ -20,7 +20,7 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      if (options.filterStatus) {
+      if (options.filterStatus) {     
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
             parameters.status = JSON.parse(`{ "in" : [1, 3]}`);
@@ -31,6 +31,7 @@ export class NpeController {
           }
         }
       }
+
 
       if (options.filterLocal) {
         parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterLocal}" } }`);
@@ -60,6 +61,7 @@ export class NpeController {
         parameters.npei = Number(options.filterNPE);
       }
 
+      
       if (options.safraId) {
         parameters.safraId = Number(options.safraId);
       }
@@ -162,6 +164,8 @@ export class NpeController {
         orderBy,
       );
 
+
+      // console.log("filter response ",response)
 
       if (response.length > 0) {
         const next_available_npe = response[response.length - 1].prox_npe;

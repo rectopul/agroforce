@@ -53,14 +53,23 @@ import {
   userPreferencesService,
 } from '../../services';
 import * as ITabs from '../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../helpers';
 
 export default function Listagem({
+  allTreatments,
   assaySelect,
   genotypeSelect,
+  totalItems,
   itensPerPage,
   filterApplication,
+  idCulture,
   idSafra,
+  pageBeforeEdit,
   filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
+
+
 }: ITreatmentGrid) {
   const { tabsReport } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -86,6 +95,7 @@ export default function Listagem({
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // {
@@ -125,7 +135,7 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -136,6 +146,10 @@ export default function Listagem({
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
+  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
+  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
@@ -186,62 +200,99 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await genotypeTreatmentService
-        .getAll(`${parametersFilter}`)
-        .then(({ response, total: allTotal }) => {
-          setFilter(parametersFilter);
-          setTreatments(response);
-          setTotalItems(allTotal);
-          setAfterFilter(true);
-          setCurrentPage(0);
-          setMessage(true);
-          tableRef.current.dataManager.changePageSize(
-            allTotal >= take ? take : allTotal,
-          );
-        });
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&id_culture=${idCulture}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await genotypeTreatmentService
+      //   .getAll(`${parametersFilter}`)
+      //   .then(({ response, total: allTotal }) => {
+      //     setFilter(parametersFilter);
+      //     setTreatments(response);
+      //     setTotalItems(allTotal);
+      //     setAfterFilter(true);
+      //     setCurrentPage(0);
+      //     setMessage(true);
+      //     tableRef.current.dataManager.changePageSize(
+      //       allTotal >= take ? take : allTotal,
+      //     );
+      //   });
+
+
+    setFilter(parametersFilter);
+    setCurrentPage(0);
+    await callingApi(parametersFilter); 
     },
   });
 
-  async function handleOrder(column: string, order: number): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
+
+  //Calling common API 
+  async function callingApi(parametersFilter : any ){
+
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);  
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies("filtersParams", parametersFilter);
+
+    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400 ) {
+        setTreatments(response.response);
+        setTotalItems(response.total);
       }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    });
+  } 
 
-    await genotypeTreatmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setTreatments(response);
-        }
-      });
+  //Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
+
+  async function handleOrder(column: string, order: number): Promise<void> {
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
+
+    // await genotypeTreatmentService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setTreatments(response);
+    //     }
+    //   });
+
+    // if (orderList === 2) {
+    //   setOrder(0);
+    // } else {
+    //   setOrder(orderList + 1);
+    // }
+      //Gobal manage orders
+      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+
+      setTypeOrder(typeOrderG);
+      setOrderBy(columnG);
+      setOrder(orderByG);
+      setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: string, title: string) {
@@ -452,34 +503,40 @@ export default function Listagem({
       });
   };
 
-  function handleTotalPages(): void {
+  //manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await genotypeTreatmentService
-      .getAll(parametersFilter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setTreatments(response);
-        }
-      });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await genotypeTreatmentService
+    //   .getAll(parametersFilter)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setTreatments(response);
+    //     }
+    //   });
+    await callingApi(filter); //handle pagination globly
   }
+
+    // Checking defualt values
+    function checkValue(value: any) {
+      const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+      return parameter;
+    }
 
   function filterFieldFactory(title: string, name: string) {
     return (
@@ -492,6 +549,7 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -939,7 +997,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -979,11 +1037,39 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
+
+  //Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : "No";
+
+  if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
+  }
+
+  //RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+  ? req.cookies.filterBeforeEditTypeOrder
+  : "desc";
+        
+  //RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+  ? req.cookies.filterBeforeEditOrderBy
+  : "assay_list.foco.name";
+
+  
   const filterApplication = req.cookies.filterBeforeEdit
     || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1037,6 +1123,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,  
     },
   };
 };

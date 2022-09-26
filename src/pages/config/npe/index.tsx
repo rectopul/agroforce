@@ -238,8 +238,9 @@ export default function Listagem({
       filterNpeTo,
       filterNpeFrom,
     }) => {
+       // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}`;
+      }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}`;
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -1033,7 +1034,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
   ? req.cookies.filterBeforeEdit
-  : `filterStatus=2&id_culture=${idCulture}`;
+  : `filterStatus=2&id_culture=${idCulture}&id_safra=${safraId}`;
 
 
   const { publicRuntimeConfig } = getConfig();
@@ -1041,7 +1042,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=1&id_culture=${idCulture}`;
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
     // id_culture=${idCulture}&id_safra=${safraId}
 
     removeCookies('filterBeforeEdit', { req, res });
@@ -1050,7 +1051,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });  
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

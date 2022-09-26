@@ -54,10 +54,6 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-    case 'experimento':
-      parametersFilter = await experimento(theArgs);
-      break;
-
     case 'parcelas':
       parametersFilter = await parcelas(theArgs);
       break;
@@ -70,15 +66,6 @@ async function handleFilterParameter(...theArgs: any) {
 }
 
 
-
-// experimento in list
-function experimento(theArgs: any) {
-  const [key, filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod, filterDelineamento, filterRepetition, filterStatus, idSafra] = theArgs;
-
-  const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}`;
-
-  return parametersFilter;
-}
 
 function parcelas(theArgs: any) {
   const [
