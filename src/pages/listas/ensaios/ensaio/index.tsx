@@ -32,15 +32,19 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 export default function TipoEnsaio({
   allAssay,
   itensPerPage,
   filterApplication,
   totalItems,
+  idCulture,
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
+  typeOrderServer, 
+  orderByserver 
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -93,25 +97,30 @@ export default function TipoEnsaio({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
+  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
+  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+
+  console.log("filterApplication  ",filterApplication)
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
-      filterTratFrom: '',
-      filterTratTo: '',
-      filterFoco: '',
-      filterProtocol: '',
-      filterTypeAssay: '',
-      filterGli: '',
-      filterTechnology: '',
-      filterCod: '',
-      filterTreatmentNumber: '',
-      filterStatusAssay: '',
+      filterTratFrom:  checkValue('filterTratFrom'),
+      filterTratTo: checkValue('filterTratTo'),
+      filterFoco: checkValue('filterFoco'),
+      filterProtocol: checkValue('filterProtocol'),
+      filterTypeAssay: checkValue('filterTypeAssay'),
+      filterGli: checkValue('filterGli'),
+      filterTechnology: checkValue('filterTechnology'),
+      filterCod: checkValue('filterCod'),
+      filterTreatmentNumber: checkValue('filterTreatmentNumber'),
+      filterStatusAssay: checkValue('filterStatusAssay'),
       orderBy: '',
       typeOrder: '',
     },
@@ -127,59 +136,98 @@ export default function TipoEnsaio({
       filterTreatmentNumber,
       filterStatusAssay,
     }) => {
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterProtocol=${filterProtocol}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
-        setFilter(parametersFilter);
-        setAssayList(response);
-        setTotalItems(allTotal);
-        setCurrentPage(0);
-      });
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterProtocol=${filterProtocol}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}&id_culture=${idCulture}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
+      //   setFilter(parametersFilter);
+      //   setAssayList(response);
+      //   setTotalItems(allTotal);
+      //   setCurrentPage(0);
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter); 
+      // });
     },
   });
 
+
+
+//Calling common API 
+async function callingApi(parametersFilter : any ){
+
+  setCookies("filterBeforeEdit", parametersFilter);
+  setCookies("filterBeforeEditTypeOrder", typeOrder);
+  setCookies("filterBeforeEditOrderBy", orderBy);  
+  parametersFilter = `${parametersFilter}&${pathExtra}`;
+  setFiltersParams(parametersFilter);
+  setCookies("filtersParams", parametersFilter);
+
+  await assayListService.getAll(parametersFilter).then((response) => {
+    if (response.status === 200 || response.status === 400 ) {
+      setAssayList(response.response);
+      setTotalItems(response.total);
+    }
+  });
+} 
+
+//Call that function when change type order value.
+useEffect(() => {
+  callingApi(filter);
+}, [typeOrder]);
+
+
   async function handleOrder(column: string, order: number): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof (filter) !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
-      if (status === 200) {
-        setAssayList(response);
-      }
-    });
+    // await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+    //   if (status === 200) {
+    //     setAssayList(response);
+    //   }
+    // });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+
+  //Gobal manage orders
+  const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+
+  setTypeOrder(typeOrderG);
+  setOrderBy(columnG);
+  setOrder(orderByG);
+  setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: string, title: string) {
@@ -264,8 +312,12 @@ export default function TipoEnsaio({
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
-                  setCookies('pageBeforeEdit', currentPage?.toString());
-                  setCookies('filterBeforeEdit', filtersParams);
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  setCookies("filterBeforeEdit", filter);
+                  setCookies("filterBeforeEditTypeOrder", typeOrder);
+                  setCookies("filterBeforeEditOrderBy", orderBy);
+                  setCookies("filtersParams", filtersParams);
+                  setCookies("lastPage", "atualizar");
                   router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -433,7 +485,7 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await assayListService.getAll(filterApplication).then(({ status, response }) => {
+    await assayListService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
@@ -490,33 +542,41 @@ export default function TipoEnsaio({
     });
   };
 
-  function handleTotalPages(): void {
+  //manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await assayListService.getAll(parametersFilter).then(({ status, response }) => {
-      if (status === 200) {
-        setAssayList(response);
-      }
-    });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await assayListService.getAll(parametersFilter).then(({ status, response }) => {
+    //   if (status === 200) {
+    //     setAssayList(response);
+    //   }
+    // });
+
+    await callingApi(filter); //handle pagination globly
   }
 
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    return parameter;
+  }
+  
   function filterFieldFactory(title: string, name: string) {
     return (
       <div className="h-7 w-1/2 ml-4">
@@ -527,6 +587,7 @@ export default function TipoEnsaio({
           type="text"
           placeholder={name}
           id={title}
+          defaultValue={checkValue(title)}
           name={title}
           onChange={formik.handleChange}
         />
@@ -577,6 +638,7 @@ export default function TipoEnsaio({
                       id="filterProtocol"
                       name="filterProtocol"
                       onChange={formik.handleChange}
+                      defaultValue={checkValue('filterProtocol')}
                     />
                   </div>
 
@@ -818,12 +880,39 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${filterBeforeEdit}&id_culture=${idCulture}&id_safra=${idCulture}`
-    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+   //Last page
+   const lastPageServer = req.cookies.lastPage
+   ? req.cookies.lastPage
+   : "No";
+ 
+   if(lastPageServer == undefined || lastPageServer == "No"){
+     removeCookies('filterBeforeEdit', { req, res });
+     removeCookies('pageBeforeEdit', { req, res });
+     removeCookies("filterBeforeEditTypeOrder", { req, res });
+     removeCookies("filterBeforeEditOrderBy", { req, res });
+     removeCookies("lastPage", { req, res });  
+   }
+ 
+   //RR
+   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+   ? req.cookies.filterBeforeEditTypeOrder
+   : "desc";
+        
+   //RR
+   const orderByserver = req.cookies.filterBeforeEditOrderBy
+   ? req.cookies.filterBeforeEditOrderBy
+   : "protocol_name";
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${filterBeforeEdit}`
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // removeCookies('filterBeforeEdit', { req, res });
+  // removeCookies('pageBeforeEdit', { req, res });
+
+  // //RR
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -850,6 +939,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver, 
+      typeOrderServer,  
     },
   };
 };

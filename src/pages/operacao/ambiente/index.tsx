@@ -961,6 +961,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies("lastPage", { req, res });
   }
 
+
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
     : "desc";

@@ -203,7 +203,7 @@ export default function Listagem({
 
   const [orderBy,setOrderBy]=useState<string>(orderByserver); 
   const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer);
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "Tecnologia"?"tecnologia.cod_tec":orderBy}&typeOrder=${typeOrder}`;  
 
   const formik = useFormik<IFilter>({
     initialValues: {
