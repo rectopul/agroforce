@@ -155,8 +155,8 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.Status) {
-        parameters.status = options.Status;
+      if (options.status) {
+        parameters.status = options.status;
       }
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
