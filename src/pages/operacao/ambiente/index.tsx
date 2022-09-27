@@ -82,12 +82,12 @@ interface IData {
   totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
-  filterBeforeEdit :object |any;
+  filterBeforeEdit: object | any;
   filterApplication: object | any;
-  id_safra :number |any,
-  cultureId :number | any,
-  orderByserver :string |any,
-  typeOrderServer: string |any,
+  id_safra: number | any,
+  cultureId: number | any,
+  orderByserver: string | any,
+  typeOrderServer: string | any,
 }
 
 export default function Listagem({
@@ -242,7 +242,7 @@ export default function Listagem({
       filterGrpFrom,
     }) => {
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_culture=${cultureId}&id_safra=${id_safra}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -259,7 +259,7 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter : any) {
+  async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -1052,7 +1052,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+    : `filterStatus=2&safraId=${id_safra}`;
 
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });
@@ -1060,7 +1060,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = `filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+  const filterApplication = `filterStatus=2&safraId=${id_safra}`;
 
   // Last page
   const lastPageServer = req.cookies.lastPage
@@ -1089,7 +1089,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=2&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
