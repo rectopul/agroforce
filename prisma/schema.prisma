@@ -236,7 +236,7 @@ model quadra {
   created_at    DateTime @default(now())
   id_safra      Int
   id_local      Int
-  allocation    String?
+  allocation    String?  @default("IMPORTADO")
 
   culture    culture      @relation(fields: [id_culture], references: [id])
   local      local        @relation(fields: [id_local], references: [id])
